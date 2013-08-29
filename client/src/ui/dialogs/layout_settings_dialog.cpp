@@ -2,14 +2,16 @@
 #include "ui_layout_settings_dialog.h"
 
 #include <QtCore/qmath.h>
-#include <QUrl>
-#include <QResizeEvent>
+#include <QtCore/QUrl>
+#include <QtGui/QResizeEvent>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
 #include <QtGui/QPaintEvent>
-#include <QImageReader>
+#include <QtGui/QImageReader>
+
+#include <QtWidgets/QDesktopWidget>
 
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>

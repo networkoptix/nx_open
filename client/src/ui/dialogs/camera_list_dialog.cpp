@@ -1,8 +1,8 @@
 #include "camera_list_dialog.h"
 
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
-#include <QMimeData>
+#include <QtWidgets/QMenu>
+#include <QtCore/QMimeData>
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -59,7 +59,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
     connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
     connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
 
-    ui->gridCameras->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    ui->gridCameras->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::CameraList_Help);
 }

@@ -7,7 +7,7 @@
 
 #include <stack>
 
-#include <QXmlDefaultHandler>
+#include <QtXml/QXmlDefaultHandler>
 
 #include "node.h"
 #include "resourcenameset.h"

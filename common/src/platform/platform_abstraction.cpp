@@ -1,7 +1,7 @@
 #include "platform_abstraction.h"
 
 #include <QtCore/QCoreApplication>
-#include <QProcess>
+#include <QtCore/QProcess>
 
 #include <utils/common/warnings.h>
 
@@ -15,7 +15,6 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
 
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
     m_notifier = QnPlatformNotifier::newInstance(this);
-    m_images = QnPlatformImages::newInstance(this);
     m_process = QnPlatformProcess::newInstance(NULL, this);
 
     if(s_instance) {

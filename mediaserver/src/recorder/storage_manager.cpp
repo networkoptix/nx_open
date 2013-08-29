@@ -1,7 +1,6 @@
-
 #include "storage_manager.h"
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "utils/common/util.h"
 #include <utils/fs/file.h>

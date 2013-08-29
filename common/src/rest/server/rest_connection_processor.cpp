@@ -1,17 +1,21 @@
 
-#include <QElapsedTimer>
-#include <QUrl>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QTime>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtCore/QRegExp>
+
+#ifdef Q_OS_MACX
+#include <zlib.h>
+#else
+#include <QtZlib/zlib.h>
+#endif
 
 #include "rest_connection_processor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
 #include "rest_server.h"
 #include "request_handler.h"
-#include <QTime>
-
-extern "C" {
-    quint32 crc32 (quint32 crc, char *buf, quint32 len);
-}
 
 
 static const int CONNECTION_TIMEOUT = 60 * 1000;
@@ -59,7 +63,7 @@ QByteArray compressData(const QByteArray& data)
     result.reserve(cleanData.size() + GZIP_HEADER_SIZE);
     result.append((const char*) GZIP_HEADER, GZIP_HEADER_SIZE);
     result.append(cleanData);
-    quint32 tmp = crc32(0, (char*) data.data(), data.size());
+    quint32 tmp = crc32(0, (const Bytef*) data.data(), data.size());
     result.append((const char*) &tmp, sizeof(quint32));
     tmp = (quint32)data.size();
     result.append((const char*) &tmp, sizeof(quint32));
@@ -85,10 +89,19 @@ void QnRestConnectionProcessor::run()
         {
             t.restart();
             parseRequest();
+#ifdef USE_NX_HTTP
+            isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
+#else
             isKeepAlive = d->requestHeaders.value(QLatin1String("Connection")).toLower() == QString(QLatin1String("keep-alive"));
+#endif
             if (isKeepAlive) {
+#ifdef USE_NX_HTTP
+                d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
+                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", QString::fromLatin1("timeout=%1").arg(d->socketTimeout/1000).toLatin1()) );
+#else
                 d->responseHeaders.addValue(QLatin1String("Connection"), QLatin1String("Keep-Alive"));
                 d->responseHeaders.addValue(QLatin1String("Keep-Alive"), QString(QLatin1String("timeout=%1")).arg(d->socketTimeout/1000));
+#endif
             }
 
             d->responseBody.clear();
@@ -98,7 +111,17 @@ void QnRestConnectionProcessor::run()
             QnRestRequestHandlerPtr handler = findHandler(url.path());
             if (handler) 
             {
-                QList<QPair<QString, QString> > params = url.queryItems();
+                QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems();
+#ifdef USE_NX_HTTP
+                if (d->owner->authenticate(d->request, d->response))
+                {
+                    if (d->request.requestLine.method.toUpper() == "GET") {
+                        rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
+                    }
+                    else if (d->request.requestLine.method.toUpper() == "POST") {
+                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
+                    }
+#else
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
                     if (d->requestHeaders.method().toUpper() == QLatin1String("GET")) {
@@ -107,8 +130,13 @@ void QnRestConnectionProcessor::run()
                     else if (d->requestHeaders.method().toUpper() == QLatin1String("POST")) {
                         rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
                     }
+#endif
                     else {
+#ifdef USE_NX_HTTP
+                        qWarning() << "Unknown REST method " << d->request.requestLine.method;
+#else
                         qWarning() << "Unknown REST method " << d->requestHeaders.method();
+#endif
                         contentType = "text/plain";
                         d->responseBody = "Invalid HTTP method";
                         rez = CODE_NOT_FOUND;
@@ -138,7 +166,7 @@ void QnRestConnectionProcessor::run()
                     if (str.startsWith(QLatin1String("api/")))
                     {
                         d->responseBody.append("<TR><TD>");
-                        d->responseBody.append(str.toAscii());
+                        d->responseBody.append(str.toLatin1());
                         d->responseBody.append("<TD>");
                         d->responseBody.append(itr.value()->description());
                         d->responseBody.append("</TD>");
@@ -153,7 +181,11 @@ void QnRestConnectionProcessor::run()
             }
 
             QByteArray contentEncoding;
+#ifdef USE_NX_HTTP
+            if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
+#else
             if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
+#endif
                 d->responseBody = compressData(d->responseBody);
                 contentEncoding = "gzip";
             }

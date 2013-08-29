@@ -1,7 +1,7 @@
 #include "sign_helper.h"
 
-#include <QProcess>
-#include <QTemporaryFile>
+#include <QtCore/QProcess>
+#include <QtCore/QTemporaryFile>
 
 #include "utils/common/util.h"
 #include "licensing/license.h"

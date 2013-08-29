@@ -47,24 +47,31 @@
         <sigar.version>1.6-1.5.2-SNAPSHOT</sigar.version>
         <festival.version>2.1-1.5.2-SNAPSHOT</festival.version>
         <boost.version>1.52-1.5.2-SNAPSHOT</boost.version>
+        <sigar.version>1.7-SNAPSHOT</sigar.version>
+        <qjson.version>0.8.1-SNAPSHOT</qjson.version>
+        <bespin.version>1.2-SNAPSHOT</bespin.version>
+
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <customization>default</customization>
         <!--QT libs used--> 
-        <qtlib1>core</qtlib1>
-        <qtlib2>gui</qtlib2>
-        <qtlib3>network</qtlib3>
-        <qtlib4>opengl</qtlib4>
-        <qtlib5>xml</qtlib5>
-        <qtlib6>multimedia</qtlib6>
-        <qtlib7>sql</qtlib7>
-        <qtlib8/>
-        <qtlib9/>
+        <qtlib1>Core</qtlib1>
+        <qtlib2>Gui</qtlib2>
+        <qtlib3>Network</qtlib3>
+        <qtlib4>Opengl</qtlib4>
+        <qtlib5>Xml</qtlib5>
+        <qtlib6>Multimedia</qtlib6>
+        <qtlib7>Sql</qtlib7>
+        <qtlib8>Widgets</qtlib8>
+        <qtlib9>Concurrent</qtlib9>
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>sqldrivers</qtplugin2>
-        <qtplugin3/>	
+        <qtplugin3>platforms</qtplugin3>	
+
+        <toolchain.version></toolchain.version> <!-- defined only for cross compilation -->
     </properties>
+
     <modules>
         <module>build_environment</module>
         <module>appserver</module>
@@ -74,7 +81,6 @@
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
-        <module>client</module>		
         <module>testcamera</module>
     </modules>
     <build>
@@ -180,6 +186,7 @@
                 </os>
             </activation>
             <modules>
+                <module>client</module>		
                 <module>quicksyncdecoder</module>	
                 <module>axiscamplugin</module>
                 <module>genericrtspplugin</module>
@@ -188,9 +195,12 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
+                <protobuf.version>2.5.0</protobuf.version>
+                <boost.version>1.54-SNAPSHOT</boost.version>
+
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
-                <compiler>msvc2008</compiler>
+                <compiler>msvc2012u3</compiler>
                 <arch>x86</arch>
                 <force_x86>false</force_x86>
                 <platform>windows</platform>
@@ -204,43 +214,90 @@
                     <name>linux</name>
                 </os> 
             </activation>
-            <modules>
-                <!--<module>xvbadecoder</module>-->
-                <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/appserver-deb</module>
-            </modules>
             <properties>
+                <protobuf.version>2.4.1</protobuf.version>
+                <boost.version>1.52-SNAPSHOT</boost.version>
+                <sigar.version>1.6-SNAPSHOT</sigar.version>
+
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin</python.dir>				
                 <qt.dir>${env.QTDIR}</qt.dir>				
                 <platform>linux</platform>
                 <compiler>gcc</compiler>
+                <qt.spec>linux-g++</qt.spec>
+            </properties>
+        </profile>	
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+		<activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>cross-arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <properties>
+                <protobuf.version>2.5.0</protobuf.version>
+                <boost.version>1.54-SNAPSHOT</boost.version>
+                <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version>
+                <sigar.version>1.7-SNAPSHOT</sigar.version>
+
+                <arch>${cross-arch}</arch>
+                <!-- <toolchain.version>2011.09</toolchain.version> -->
+                <toolchain.version>2009q3</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
             </properties>
         </profile>	
         <profile>
             <id>linux-x64</id>
             <activation>
                 <os>
+                    <family>unix</family>
+                    <name>linux</name>
                     <arch>amd64</arch>
                 </os> 
+                <property>
+                    <name>!cross-arch</name>
+                </property>
             </activation>
             <properties>
                 <arch>x64</arch>
             </properties>
+            <modules>
+                <!--<module>xvbadecoder</module>-->
+       	        <module>client</module>		
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+                <module>debsetup/appserver-deb</module>
+            </modules>
         </profile>
         <profile>
             <id>linux-x86</id>
             <activation>
                 <os>
+                    <family>unix</family>
+                    <name>linux</name>
                     <arch>i386</arch>
-                    <!--<arch>i586</arch>
-					<arch>i686</arch>-->
-                </os> 
+                </os>
+                <property>
+                    <name>!cross-arch</name>
+                </property>
             </activation>
             <properties>
                 <arch>x86</arch>
             </properties>
+            <modules>
+                <!--<module>xvbadecoder</module>-->
+       	        <module>client</module>		
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+                <module>debsetup/appserver-deb</module>
+            </modules>
         </profile>	
         <profile>
             <id>android</id>
@@ -260,17 +317,24 @@
                 </os> 
             </activation>
             <modules>
+       	        <module>client</module>		
                 <module>ios-client</module>
             </modules>
             <properties>
+                <sigar.version>1.6-SNAPSHOT</sigar.version>
+                <boost.version>1.52-SNAPSHOT</boost.version>
+                <protobuf.version>2.5.0</protobuf.version>
+
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
                 <qt.dir/>
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>
                 <arch>x64</arch>
+                <qt.spec>macx-g++47</qt.spec>
             </properties>
         </profile>	
     </profiles>	
+
 </project>
 

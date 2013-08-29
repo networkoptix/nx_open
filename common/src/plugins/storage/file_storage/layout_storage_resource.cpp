@@ -1,7 +1,7 @@
 #include "layout_storage_resource.h"
 
-#include <QDebug>
-#include <QDir>
+#include <QtCore/QDebug>
+#include <QtCore/QDir>
 
 #include "utils/common/util.h"
 #include <utils/fs/file.h>

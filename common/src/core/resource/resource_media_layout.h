@@ -9,7 +9,7 @@
 #include <QtCore/QSize>
 
 #include <core/datapacket/abstract_data_packet.h>
-
+#include <common/common_globals.h>
 
 class QnResourceLayout {
 public:
@@ -126,7 +126,7 @@ public:
         return result;
     }
 
-    virtual QString QnCustomResourceVideoLayout::toString() const override
+    virtual QString toString() const override
     {
         QString result(lit("width=%1;height=%2;sensors=%3"));
         QString sensors;

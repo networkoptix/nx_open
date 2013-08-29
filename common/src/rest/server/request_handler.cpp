@@ -1,6 +1,6 @@
-#include <QDebug>
-#include <QDateTime>
-#include <QStringList>
+#include <QtCore/QDebug>
+#include <QtCore/QDateTime>
+#include <QtCore/QStringList>
 #include "request_handler.h"
 #include "utils/common/util.h"
 

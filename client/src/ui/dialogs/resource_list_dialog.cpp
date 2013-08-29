@@ -1,8 +1,8 @@
 #include "resource_list_dialog.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QTableView>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QTableView>
+#include <QtWidgets/QVBoxLayout>
 
 #include <ui/models/resource_list_model.h>
 #include <ui/help/help_topic_accessor.h>

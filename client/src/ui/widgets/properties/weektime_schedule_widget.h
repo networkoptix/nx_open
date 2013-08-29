@@ -1,8 +1,8 @@
 #ifndef QN_WEEKTIME_SCHEDULE_WIDGET_H
 #define QN_WEEKTIME_SCHEDULE_WIDGET_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QDialog>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QDialog>
 
 class QnWorkbenchContext;
 

@@ -1,17 +1,17 @@
 ﻿#include "resource_browser_widget.h"
 #include "ui_resource_browser_widget.h"
 
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QItemSelectionModel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMenu>
-#include <QtGui/QTabWidget>
-#include <QtGui/QToolButton>
-#include <QtGui/QTreeView>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QBoxLayout>
+#include <QtCore/QItemSelectionModel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QTreeView>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <camera/camera_thumbnail_manager.h>
 
@@ -444,7 +444,7 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
     }
     else {
         m_tooltipWidget->setText(toolTipText);
-        m_tooltipWidget->pointTo(QPointF(qRound(geometry().right()), pos.y()));
+        m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {

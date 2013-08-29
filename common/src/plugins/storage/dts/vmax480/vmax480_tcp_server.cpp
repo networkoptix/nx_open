@@ -1,7 +1,8 @@
 #include "vmax480_tcp_server.h"
 
-#include <QElapsedTimer>
-#include <QUuid>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QUuid>
+#include <QtCore/QString>
 
 #include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
@@ -366,7 +367,7 @@ QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("12
 QString QnVMax480Server::registerProvider(VMaxStreamFetcher* provider)
 {
     QMutexLocker lock(&m_mutexProvider);
-    QString result = QUuid::createUuid();
+    QString result = QUuid::createUuid().toString();
     m_providers.insert(result, provider);
     return result;
 }

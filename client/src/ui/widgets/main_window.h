@@ -1,8 +1,8 @@
 #ifndef QN_MAIN_WINDOW_H
 #define QN_MAIN_WINDOW_H
 
-#include <QWidget>
-#include <QScopedPointer>
+#include <QtWidgets/QWidget>
+#include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -38,7 +38,7 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
@@ -67,7 +67,7 @@ protected:
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
 #ifdef Q_OS_WIN
-    virtual bool winEvent(MSG *message, long *result) override;
+    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 #endif
 
 protected slots:

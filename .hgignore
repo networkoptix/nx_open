@@ -31,6 +31,7 @@ build_environment/python/packages/llutil/llutil.egg-info
 build_environment/target
 build_environment/x86
 build_environment/x64
+build_environment/arm
 
 appserver/.idea
 appserver/env
@@ -58,9 +59,11 @@ applauncher/src/client.vcproj
 applauncher/client.mak*
 applauncher/x86
 applauncher/x64
+applauncher/arm
 
 axiscamplugin/x86
 axiscamplugin/x64
+axiscamplugin/arm
 
 client/bin
 client/build
@@ -73,6 +76,7 @@ client/src/client.vcproj
 client/client.mak*
 client/x86
 client/x64
+client/arm
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
@@ -99,6 +103,7 @@ common/src/common.pri
 common/common.mak*
 common/x86
 common/x64
+common/arm
 common/src/version.h
 
 cpp/x86
@@ -125,6 +130,7 @@ mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
 mediaserver/x86
 mediaserver/x64
+mediaserver/arm
 
 mediaproxy/bin
 mediaproxy/build
@@ -134,6 +140,7 @@ mediaproxy/src/mediaproxy.pro
 mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
+mediaproxy/arm
 
 vmaxproxy/bin
 vmaxproxy/build
@@ -143,6 +150,7 @@ vmaxproxy/src/mediaproxy.pro
 vmaxproxy/mediaproxy.mak*
 vmaxproxy/x86
 vmaxproxy/x64
+vmaxproxy/arm
 
 xvbadecoder/x86
 xvbadecoder/x64
@@ -159,6 +167,7 @@ testcamera/testcamera.mak*
 testcamera/build
 testcamera/x86
 testcamera/x64
+testcamera/arm
 
 help/target
 
@@ -168,6 +177,7 @@ traytool/src/traytool.vcproj
 traytool/traytool.mak*
 traytool/x86
 traytool/x64
+traytool/arm
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
@@ -197,6 +207,7 @@ ios-client/Podfile
 
 launcher/x86
 launcher/x64
+launcher/arm
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
@@ -204,11 +215,13 @@ android-client/android-dw/**
 
 axiscamplugin/x86
 axiscamplugin/x64
+axiscamplugin/arm
 axiscamplugin/docs/
 appserver/hostedfiles/*
 
 genericrtspplugin/x86
 genericrtspplugin/x64
+genericrtspplugin/arm
 
 
 nx_sdk/nx_sdk 

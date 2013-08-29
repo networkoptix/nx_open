@@ -1,6 +1,6 @@
 #include "client_module.h"
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 #include <utils/common/module_resources.h>
 

@@ -5,13 +5,15 @@
 #   include <sys/time.h>
 #endif
 
-#include <QDateTime>
-#include <QDesktopServices>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QHostInfo>
+#include <QtCore/QDateTime>
+#include <QtCore/QStandardPaths>
+#include <QtGui/QDesktopServices>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtNetwork/QHostInfo>
 
+#include <common/common_globals.h>
 #include "version.h"
 
 
@@ -51,11 +53,13 @@ QString fromNativePath(const QString &path)
 
 QString getMoviesDirectory()
 {
-    return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
+    const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
+    return moviesDirs.isEmpty() ? QString() : moviesDirs[0];
 }
 
 QString getBackgroundsDirectory() {
-    QString baseDir = QDesktopServices::storageLocation(QDesktopServices::PicturesLocation);
+    const QStringList& pictureFolderList = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
+    QString baseDir = pictureFolderList.isEmpty() ? QString(): pictureFolderList[0];
 #ifdef Q_OS_WIN
     QString productDir = baseDir + QDir::toNativeSeparators(QString(lit("/%1 Backgrounds")).arg(lit(QN_PRODUCT_NAME_LONG)));
 #else

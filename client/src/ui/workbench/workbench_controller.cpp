@@ -4,19 +4,19 @@
 #include <cmath> /* For std::floor. */
 #include <limits>
 
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGLWidget>
-#include <QGraphicsLinearLayout>
-#include <QAction>
-#include <QMenu>
-#include <QMessageBox>
-#include <QLabel>
-#include <QPropertyAnimation>
-#include <QFileInfo>
-#include <QSettings>
-#include <QFileDialog>
-#include <QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QLabel>
+#include <QtCore/QPropertyAnimation>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSettings>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>

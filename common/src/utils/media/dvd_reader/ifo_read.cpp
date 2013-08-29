@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <QByteArray>
-#include <QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -15,7 +15,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 #include "bswap.h"
 #include "ifo_types.h"

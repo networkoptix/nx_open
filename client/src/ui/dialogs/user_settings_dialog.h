@@ -1,10 +1,10 @@
 #ifndef QN_NEW_USER_DIALOG_H
 #define QN_NEW_USER_DIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 #include <QHash>
-#include <QScopedPointer>
-#include <QString>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
 

@@ -1,10 +1,10 @@
 #ifndef UPDATE_CHECKER_H_
 #define UPDATE_CHECKER_H_
 
-#include <QObject>
-#include <QUrl>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 
 #include "update_info.h"
 #include "appcast_parser.h"

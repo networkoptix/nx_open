@@ -6,12 +6,12 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <functional>
 #include <map>
 
-#include <QByteArray>
-#include <QMap>
-#include <QUrl>
-#include <functional>
+#include <QtCore/QByteArray>
+#include <QtCore/QMap>
+#include <QtCore/QUrl>
 
 #include "qnbytearrayref.h"
 
@@ -55,6 +55,12 @@ namespace nx_http
 
     typedef std::map<StringType, StringType, ci_less> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
+
+    /*!
+        This is convinient method for simplify transition from QHttp
+        \return Value of header \a headerName (if found), empty string otherwise
+    */
+    StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
 
     static const size_t BufferNpos = size_t(-1);
 
@@ -200,7 +206,10 @@ namespace nx_http
     public:
         StatusLine statusLine;
         HttpHeaders headers;
-        //BufferType messageBody; // not filled anywhere.
+        BufferType messageBody;
+
+        void serialize( BufferType* const dstBuffer ) const;
+        BufferType toString() const;
     };
 
     namespace MessageType

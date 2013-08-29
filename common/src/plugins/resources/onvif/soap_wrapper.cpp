@@ -14,9 +14,9 @@
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
 #include <onvif/wsseapi.h>
 
-#include <QtGlobal>
-#include <QDateTime>
-#include <QDebug>
+#include <QtCore/QtGlobal>
+#include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 
 
 namespace {

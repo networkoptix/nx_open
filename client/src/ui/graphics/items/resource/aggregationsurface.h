@@ -16,12 +16,12 @@ extern "C"
 
 #include <GL/gl.h>
 
-#include <QMutex>
-#include <QRect>
-#include <QRegion>
-#include <QScopedPointer>
+#include <QtCore/QMutex>
+#include <QtCore/QRect>
+#include <QtGui/QRegion>
+#include <QtCore/QScopedPointer>
 #include <QSharedPointer>
-#include <QSize>
+#include <QtCore/QSize>
 
 
 class QnGlRendererTexture1;

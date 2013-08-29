@@ -4,7 +4,7 @@
 ***********************************************************/
 
 #include "file.h"
-
+#include <QtCore/QFileInfo>
 
 static void splitPath( const QString& path, QString* dirPath, QString* fileName )
 {

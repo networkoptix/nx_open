@@ -2,9 +2,9 @@
 #include "ui_preferences_dialog.h"
 
 #include <QtCore/QDir>
-#include <QtGui/QToolButton>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include <translation/translation_list_model.h>
 

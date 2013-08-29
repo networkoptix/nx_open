@@ -6,7 +6,7 @@
 #ifndef AIOSERVICE_H
 #define AIOSERVICE_H
 
-#include <QMutex>
+#include <QtCore/QMutex>
 #include <QSharedPointer>
 
 #include "aioeventhandler.h"

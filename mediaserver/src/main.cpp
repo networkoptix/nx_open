@@ -1,10 +1,11 @@
+
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
-#include <QThreadPool>
+#include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QHostAddress>
@@ -96,7 +97,6 @@
 #include "core/resource_managment/camera_driver_restriction_list.h"
 #include <utils/network/multicodec_rtp_reader.h>
 
-
 #define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -117,6 +117,8 @@ void stopServer(int signal);
 
 static const int DEFAUT_RTSP_PORT = 50000;
 static const int DEFAULT_STREAMING_PORT = 50000;
+
+static const int PROXY_POOL_SIZE = 8;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -418,14 +420,14 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 }
 #endif
 
-static QtMsgHandler defaultMsgHandler = 0;
+static QtMessageHandler defaultMsgHandler = 0;
 
-static void myMsgHandler(QtMsgType type, const char *msg)
+static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
     if (defaultMsgHandler)
-        defaultMsgHandler(type, msg);
+        defaultMsgHandler(type, ctx, msg);
 
-    qnLogMsgHandler(type, msg);
+    qnLogMsgHandler(type, ctx, msg);
 }
 
 int serverMain(int argc, char *argv[])
@@ -443,23 +445,10 @@ int serverMain(int argc, char *argv[])
     QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
-    QString dataLocation = getDataDirectory();
+    const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-
-    QDir dataDirectory;
-    dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
-
-    QString logFileName = dataLocation + QLatin1String("/log/log_file");
-    qSettings.setValue("logFile", logFileName);
-
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
-    {
-        qApp->quit();
-
-        return 0;
-    }
 
     QString logLevel;
     QString rebuildArchive;
@@ -469,7 +458,22 @@ int serverMain(int argc, char *argv[])
     commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
     commandLineParser.parse(argc, argv, stderr);
 
-    QnLog::initLog(logLevel);
+    if( logLevel != QString::fromLatin1("none") )
+    {
+        const QString& logDir = qSettings.value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+        QDir().mkpath( logDir );
+        const QString& logFileName = logDir + QLatin1String("/log_file");
+        //qSettings.setValue("logFile", logFileName);
+        if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        {
+            qApp->quit();
+
+            return 0;
+        }
+
+        QnLog::initLog(logLevel);
+    }
+
     if (rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     else if (rebuildArchive == "hq")
@@ -482,7 +486,8 @@ int serverMain(int argc, char *argv[])
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-    defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
+    if( logLevel != QString::fromLatin1("none") )
+        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
@@ -531,15 +536,17 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events/");
-    appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
-    appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
-    appServerEventsUrl.addQueryItem("version", QN_ENGINE_VERSION);
-    appServerEventsUrl.addQueryItem("format", "pb");
+    QUrlQuery appServerEventsUrlQuery;
+    appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
+    appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
+    appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
+    appServerEventsUrlQuery.addQueryItem("format", "pb");
+    appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
+    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toLatin1(), EVENT_RECONNECT_TIMEOUT);
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -589,6 +596,7 @@ void QnMain::stopObjects()
         m_progressiveDownloadingServer->pleaseStop();
     if (m_rtspListener)
         m_rtspListener->pleaseStop();
+    
     if (m_universalTcpListener) {
         m_universalTcpListener->pleaseStop();
         delete m_universalTcpListener;
@@ -611,6 +619,7 @@ void QnMain::stopObjects()
         delete m_rtspListener;
         m_rtspListener = 0;
     }
+
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -786,6 +795,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     m_universalTcpListener->start();
+
 #else
     int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
     int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
@@ -897,7 +907,6 @@ void QnMain::run()
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
-
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
@@ -951,6 +960,11 @@ void QnMain::run()
     } while (appserverHost.toIPv4Address() == 0);
 
     initTcpListener();
+
+    QUrl proxyServerUrl = appServerConnection->url();
+    proxyServerUrl.setPort(connectInfo->proxyPort);
+    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
+    m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
     QHostAddress publicAddress = getPublicAddress();
 

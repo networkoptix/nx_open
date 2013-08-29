@@ -1,8 +1,8 @@
 #include "business_rule_item_delegate.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QComboBox>
 
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>

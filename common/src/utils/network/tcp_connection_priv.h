@@ -1,9 +1,19 @@
-#include <QByteArray>
+#ifndef __TCP_CONNECTION_PRIV_H__
+#define __TCP_CONNECTION_PRIV_H__
+
+#include <QtCore/QByteArray>
+
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
-#include <QHttpRequestHeader>
 #include "tcp_connection_processor.h"
+
+#ifdef USE_NX_HTTP
+#include "utils/network/http/httptypes.h"
+#else
+#include <QHttpRequestHeader>
+#endif
+
 #include "utils/common/byte_array.h"
 
 
@@ -51,8 +61,13 @@ public:
 
 public:
     TCPSocket* socket;
+#ifdef USE_NX_HTTP
+    nx_http::HttpRequest request;
+    nx_http::HttpResponse response;
+#else
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;
+#endif
 
     QByteArray protocol;
     QByteArray requestBody;
@@ -67,3 +82,5 @@ public:
     SSL* ssl;
 
 };
+
+#endif // __TCP_CONNECTION_PRIV_H__

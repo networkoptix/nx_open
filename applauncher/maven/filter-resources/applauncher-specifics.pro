@@ -1,6 +1,5 @@
 TEMPLATE = app
+QT += core gui network xml
 
-include(${environment.dir}/qt-custom/qtservice/src/qtservice.pri)
-include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
 
 QMAKE_RPATHDIR = ""

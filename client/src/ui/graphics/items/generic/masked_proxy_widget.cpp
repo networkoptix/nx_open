@@ -1,8 +1,10 @@
 
 #include "masked_proxy_widget.h"
 
-#include <QPainter>
-#include <QPaintEngine>
+#include <iostream>
+
+#include <QtGui/QPainter>
+#include <QtGui/QPaintEngine>
 #include <QStyleOptionGraphicsItem>
 
 #include <ui/common/geometry.h>
@@ -60,10 +62,12 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
         return;
 
     if(m_pixmapDirty && m_updatesEnabled) {
-        m_pixmap = QPixmap::grabWidget(this->widget(), this->widget()->rect());
-#ifndef __APPLE__
+        //std::cout<<"QnMaskedProxyWidget::paint\n";
+        //m_pixmap = QPixmap::grabWidget(this->widget(), this->widget()->rect());
+        m_pixmap = this->widget()->grab(this->widget()->rect());
+//#ifndef __APPLE__
         m_pixmapDirty = false;
-#endif
+//#endif
     }
 
     painter->drawPixmap(renderRect, m_pixmap, QRectF(renderRect.topLeft() - rect().topLeft(), renderRect.size()));
@@ -80,9 +84,11 @@ bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
             return true;*/
         }
 #ifdef __APPLE__
-        if(event->type() == QEvent::Paint)
+        if(event->type() != QEvent::Paint)
             m_pixmapDirty = true;
 #endif
+
+//        std::cout<<"QnMaskedProxyWidget::eventFilter. "<<object->objectName().toStdString()<<". event type "<<event->type()<<"\n";
     }
 
     return base_type::eventFilter(object, event);
@@ -129,6 +135,18 @@ void QnMaskedProxyWidget::setPaintGeometry(const QRectF &paintGeometry) {
 
 bool QnMaskedProxyWidget::isUpdatesEnabled() const {
     return m_updatesEnabled;
+}
+
+bool QnMaskedProxyWidget::event( QEvent* e )
+{
+//    std::cout<<"QnMaskedProxyWidget::event. event type "<<e->type()<<"\n";
+
+    //if( e->type() == QEvent::UpdateRequest )
+//    {
+        m_pixmapDirty = true;
+//    }
+
+    return QGraphicsProxyWidget::event( e );
 }
 
 void QnMaskedProxyWidget::setUpdatesEnabled(bool updatesEnabled) {

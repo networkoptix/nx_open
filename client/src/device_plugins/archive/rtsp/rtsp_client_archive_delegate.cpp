@@ -1,7 +1,7 @@
 
 #include "rtsp_client_archive_delegate.h"
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 
 extern "C"
 {
@@ -154,6 +154,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
             if (server && server->getStatus() != QnResource::Offline)
             {
                 otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
+                otherRtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toUtf8());
                 if (otherRtspSession.open(getUrl(otherCamera)).errorCode == CameraDiagnostics::ErrorCode::noError) {
                     if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
                     {
@@ -232,6 +233,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_rtspSession.setTransport(QLatin1String("TCP"));
 
     m_rtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
+    m_rtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toUtf8());
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;

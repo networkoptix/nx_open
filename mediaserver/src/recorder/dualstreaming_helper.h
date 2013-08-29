@@ -1,7 +1,7 @@
 #ifndef __DUAL_STREAMING_HELPER_H__
 #define __DUAL_STREAMING_HELPER_H__
 
-#include <QMutex>
+#include <QtCore/QMutex>
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/resource_media_layout.h"
@@ -19,7 +19,7 @@ public:
 private:
     QMutex m_mutex;
     qint64 m_lastMotionTime;
-    __m128i *m_motionMaskBinData[CL_MAX_CHANNELS];
+    simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 };
 
 typedef QSharedPointer<QnDualStreamingHelper> QnDualStreamingHelperPtr;

@@ -1,7 +1,7 @@
 #ifndef QN_GRAPHICS_VIEW_H
 #define QN_GRAPHICS_VIEW_H
 
-#include <QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 
 //#define QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 

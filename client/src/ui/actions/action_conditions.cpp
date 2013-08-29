@@ -1,6 +1,6 @@
 #include "action_conditions.h"
 
-#include <QAction>
+#include <QtWidgets/QAction>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_criterion.h>

@@ -1,5 +1,5 @@
 #include "dlink_stream_reader.h"
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"

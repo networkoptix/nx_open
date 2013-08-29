@@ -2,9 +2,9 @@
 #include "table_view.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QHeaderView>
+#include <QtWidgets/QHeaderView>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QScrollBar>
+#include <QtWidgets/QScrollBar>
 
 #include <client/client_globals.h>
 #include <utils/common/event_processors.h>

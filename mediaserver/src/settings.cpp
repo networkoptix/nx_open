@@ -1,4 +1,4 @@
-#include <QSettings>
+#include <QtCore/QSettings>
 #include "version.h"
 
 #if defined(Q_OS_LINUX)

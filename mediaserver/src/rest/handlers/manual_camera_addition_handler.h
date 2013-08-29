@@ -1,8 +1,8 @@
 #ifndef QN_MANUAL_CAMERA_ADDITION_HANDLER_H
 #define QN_MANUAL_CAMERA_ADDITION_HANDLER_H
 
-#include <QHostAddress>
-#include <QHostInfo>
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QHostInfo>
 #include "rest/server/request_handler.h"
 
 class QnManualCameraAdditionHandler: public QnRestRequestHandler

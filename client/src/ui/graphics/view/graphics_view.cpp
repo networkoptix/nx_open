@@ -1,6 +1,6 @@
 #include "graphics_view.h"
 
-#include <QtOpenGL>
+#include <QtOpenGL/QtOpenGL>
 
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
@@ -84,8 +84,10 @@ void QnGraphicsView::showEvent(QShowEvent *event) {
 }
 
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
-    if(!(m_paintFlags & PaintOnExternalSurfaces) && QPainter::redirected(viewport(), NULL) != viewport())
-        return;
+//    if(!(m_paintFlags & PaintOnExternalSurfaces) && QPainter::redirected(viewport(), NULL) != viewport())
+//        return;
+
+    //TODO: #Elric #QT5PORT
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();

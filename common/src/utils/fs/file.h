@@ -7,8 +7,8 @@
 #ifndef _FS_FILE_H_
 #define _FS_FILE_H_
 
-#include <QIODevice>
-#include <QString>
+#include <QtCore/QIODevice>
+#include <QtCore/QString>
 #include <fcntl.h>
 
 #ifdef WIN32

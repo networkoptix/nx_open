@@ -1,8 +1,8 @@
 #ifndef sequrity_cam_resource_h_1239
 #define sequrity_cam_resource_h_1239
 
-#include <QRegion>
-#include <QMutex>
+#include <QtGui/QRegion>
+#include <QtCore/QMutex>
 
 #include "media_resource.h"
 #include "motion_window.h"

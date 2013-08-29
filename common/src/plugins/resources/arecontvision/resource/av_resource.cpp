@@ -1,4 +1,9 @@
 
+#ifdef _WIN32
+#  include <winsock2.h>
+#endif
+
+
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
@@ -6,9 +11,7 @@
 
 #include <QtNetwork/QUdpSocket>
 
-#if defined(Q_OS_WIN)
-#  include <winsock2.h>
-#elif defined(QT_LINUXBASE)
+#if defined(QT_LINUXBASE)
 #  include <arpa/inet.h>
 #endif
 #include "utils/network/nettools.h"

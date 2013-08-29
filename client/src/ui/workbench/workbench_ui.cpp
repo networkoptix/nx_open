@@ -5,14 +5,14 @@
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
 
-#include <QtGui/QComboBox>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsProxyWidget>
-#include <QtGui/QGraphicsLinearLayout>
-#include <QtGui/QStyle>
-#include <QtGui/QApplication>
-#include <QtGui/QMenu>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
 
 #include <core/dataprovider/abstract_streamdataprovider.h>
 #include <core/resource/security_cam_resource.h>
@@ -259,7 +259,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Fps counter. */
     m_fpsItem = new QnProxyLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
-    m_fpsItem->setAcceptsHoverEvents(false);
+    m_fpsItem->setAcceptHoverEvents(false);
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText,  QColor(63, 159, 216));
 
@@ -509,7 +509,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_notificationsXAnimator->setTargetObject(m_notificationsItem);
     m_notificationsXAnimator->setAccessor(new PropertyAccessor("x"));
-    m_notificationsXAnimator->setSpeed(m_notificationsItem->size().width() * 2.0);
     m_notificationsXAnimator->setTimeLimit(500);
 
     m_notificationsOpacityAnimatorGroup = new AnimatorGroup(this);

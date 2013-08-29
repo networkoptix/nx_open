@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "isd_resource.h"
 #include "isd_stream_reader.h"
 #include "utils/common/sleep.h"

@@ -6,10 +6,10 @@
 #ifndef SYNC_HTTP_CLIENT_H
 #define SYNC_HTTP_CLIENT_H
 
-#include <QAuthenticator>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
+#include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QNetworkRequest>
 
 
 class SyncHttpClientDelegate;

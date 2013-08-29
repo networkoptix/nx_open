@@ -1,7 +1,7 @@
 #ifndef _LAYOUT_STORAGE_PROTOCOL_H__
 #define _LAYOUT_STORAGE_PROTOCOL_H__
 
-#include <QFile>
+#include <QtCore/QFile>
 
 extern "C"
 {

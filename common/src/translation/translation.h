@@ -2,6 +2,7 @@
 #define QN_TRANSLATION_H
 
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 

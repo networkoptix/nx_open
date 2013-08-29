@@ -1,8 +1,8 @@
 #ifndef QN_CALENDAR_WIDGET_H
 #define QN_CALENDAR_WIDGET_H
 
-#include <QtGui/QCalendarWidget>
-#include <QtGui/QTableView>
+#include <QtWidgets/QCalendarWidget>
+#include <QtWidgets/QTableView>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>

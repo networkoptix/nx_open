@@ -1,8 +1,8 @@
 #include "resource_tree_widget.h"
 #include "ui_resource_tree_widget.h"
 
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QScrollBar>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QScrollBar>
 #include <QtGui/QContextMenuEvent>
 
 #include <common/common_meta_types.h>
@@ -54,6 +54,11 @@ public:
         } else
             return base_type::setData(index, value, role);
     }
+
+    Qt::DropActions supportedDropActions() const override {
+        return sourceModel()->supportedDropActions();
+    }
+
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
@@ -158,7 +163,6 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     if (model) {
         m_resourceProxyModel = new QnResourceTreeSortProxyModel(this);
         m_resourceProxyModel->setSourceModel(model);
-        m_resourceProxyModel->setSupportedDragActions(model->supportedDragActions());
         m_resourceProxyModel->setDynamicSortFilter(true);
         m_resourceProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
         m_resourceProxyModel->setFilterKeyColumn(Qn::NameColumn);

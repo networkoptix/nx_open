@@ -1,13 +1,13 @@
 #ifndef __BUSINESS_MESSAGE_BUS_H_
 #define __BUSINESS_MESSAGE_BUS_H_
 
-#include <QMutex>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QMap>
-#include <QUrl>
-#include <QThread>
+#include <QtCore/QMutex>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
+#include <QtCore/QMap>
+#include <QtCore/QUrl>
+#include <QtCore/QThread>
 
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>

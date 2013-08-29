@@ -1,7 +1,7 @@
 #ifndef _REST_CONNECTION_PROCESSOR_H__
 #define _REST_CONNECTION_PROCESSOR_H__
 
-#include <QVariantList>
+#include <QtCore/QVariantList>
 #include "utils/network/tcp_connection_processor.h"
 #include "request_handler.h"
 

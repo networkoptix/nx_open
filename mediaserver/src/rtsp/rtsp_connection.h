@@ -1,8 +1,8 @@
 #ifndef __RTSP_CONNECTION_H_
 #define __RTSP_CONNECTION_H_
 
-#include <QHostAddress>
-#include <QMutex>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QMutex>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"

@@ -1,8 +1,8 @@
 #include "workbench_context_aware.h"
 
 #include <QtCore/QObject>
-#include <QtGui/QGraphicsItem>
-#include <QtGui/QGraphicsScene>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsScene>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_pool.h>

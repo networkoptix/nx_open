@@ -1,9 +1,9 @@
 #ifndef __RECORDING_MANAGER_H__
 #define __RECORDING_MANAGER_H__
 
-#include <QTimer>
-#include <QObject>
-#include <QMap>
+#include <QtCore/QTimer>
+#include <QtCore/QObject>
+#include <QtCore/QMap>
 #include "core/resource/resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"

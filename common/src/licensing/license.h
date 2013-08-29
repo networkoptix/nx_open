@@ -1,16 +1,16 @@
 #ifndef QN_LICENSING_LICENSE
 #define QN_LICENSING_LICENSE
 
-#include <QByteArray>
-#include <QCoreApplication>
-#include <QMetaType>
+#include <QtCore/QByteArray>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QMetaType>
 #include <QSharedPointer>
-#include <QString>
-#include <QList>
-#include <QMap>
-#include <QMutex>
-#include <QSet>
-#include <QTextStream>
+#include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QSet>
+#include <QtCore/QTextStream>
 
 class QnLicense;
 typedef QSharedPointer<QnLicense> QnLicensePtr;

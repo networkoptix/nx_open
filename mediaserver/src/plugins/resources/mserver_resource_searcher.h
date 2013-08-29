@@ -1,9 +1,9 @@
 #ifndef __MSERVER_RESOURCE_SEARCHER_H__
 #define __MSERVER_RESOURCE_SEARCHER_H__
 
-#include <QString>
-#include <QSet>
-#include <QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QSet>
+#include <QtCore/QByteArray>
 
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/common/long_runnable.h"

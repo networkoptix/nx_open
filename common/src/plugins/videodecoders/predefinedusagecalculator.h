@@ -7,8 +7,8 @@
 
 #include <memory>
 
-#include <QMutex>
-#include <QString>
+#include <QtCore/QMutex>
+#include <QtCore/QString>
 
 #include "abstractvideodecoderusagecalculator.h"
 #include "videodecoderplugintypes.h"

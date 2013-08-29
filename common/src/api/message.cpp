@@ -60,7 +60,7 @@ namespace Qn
             case Message_Type_FileUpdate:
                 return QLatin1String("FileUpdate");
             default:
-                return QString::fromAscii("Unknown %1").arg((int)val);
+                return QString::fromLatin1("Unknown %1").arg((int)val);
         }
     }
 }

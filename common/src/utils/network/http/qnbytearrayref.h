@@ -6,7 +6,7 @@
 #ifndef QNBYTEARRAYREF_H
 #define QNBYTEARRAYREF_H
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 
 
 //!Reference to substring in \a QByteArray object

@@ -2,7 +2,7 @@
 #define QN_SCOPED_PAINTER_ROLLBACK_H
 
 #include "scoped_value_rollback.h"
-#include <QPainter>
+#include <QtGui/QPainter>
 
 template<class T, class Accessor>
 class QnGenericScopedPainterRollback: public QnGenericScopedValueRollback<T, QPainter, Accessor, Accessor> {

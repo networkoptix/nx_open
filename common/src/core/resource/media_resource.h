@@ -1,8 +1,8 @@
 #ifndef QN_MEDIA_RESOURCE_H
 #define QN_MEDIA_RESOURCE_H
 
-#include <QMap>
-#include <QSize>
+#include <QtCore/QMap>
+#include <QtCore/QSize>
 #include "resource.h"
 #include "resource_media_layout.h"
 #include "utils/common/from_this_to_shared.h"

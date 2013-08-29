@@ -1,6 +1,6 @@
 #include "business_rule_processor.h"
 
-#include <QList>
+#include <QtCore/QList>
 
 #include <api/app_server_connection.h>
 
@@ -20,6 +20,9 @@
 #include <utils/common/email.h>
 #include "business_strings_helper.h"
 #include "version.h"
+
+#include <QtCore/QBuffer>
+#include <QtGui/QImage>
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -82,12 +85,12 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
                 QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
 #if 0
                 // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
 #else
                 // do proxy via CPP media proxy
                 proxyUrl.setScheme(QLatin1String("http"));
                 proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
 #endif
 
                 QString url = proxyUrl.toString();

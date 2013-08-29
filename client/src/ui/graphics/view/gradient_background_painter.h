@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QWeakPointer>
+
 
 #include <ui/workbench/workbench_context_aware.h>
 

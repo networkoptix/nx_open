@@ -1,8 +1,8 @@
 #ifndef QN_WORKBENCH_RESOURCE_H
 #define QN_WORKBENCH_RESOURCE_H
 
-#include <QString>
-#include <QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 #include <core/resource/resource_fwd.h>
 
 class QMimeData;

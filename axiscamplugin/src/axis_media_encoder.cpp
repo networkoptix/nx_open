@@ -9,7 +9,7 @@
 #include <cstring>
 #include <cstdio>
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 
 #include "axis_camera_manager.h"
 #include "axis_camera_plugin.h"

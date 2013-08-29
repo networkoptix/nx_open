@@ -1,8 +1,8 @@
 #include "media_server_resource.h"
 
 #include <QtCore/QUrl>
-#include <QCoreApplication>
-#include <QTimer>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include "utils/common/sleep.h"
@@ -89,7 +89,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(getApiUrl()), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this), &qnDeleteLater);
 
     return m_restConnection;
 }

@@ -1,8 +1,8 @@
 #ifndef __TCP_CONNECTION_PROCESSOR_H__
 #define __TCP_CONNECTION_PROCESSOR_H__
 
-#include <QMutex>
-#include <QUrl>
+#include <QtCore/QMutex>
+#include <QtCore/QUrl>
 
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"

@@ -12,8 +12,8 @@
 
 #include <memory>
 
-#include <QString>
-#include <QWidget>
+#include <QtCore/QString>
+#include <QtWidgets/QWidget>
 
 #ifdef Q_OS_WIN
 #include <WinGDI.h>

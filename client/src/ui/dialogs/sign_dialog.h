@@ -1,8 +1,8 @@
 #ifndef SIGNDIALOG_H
 #define SIGNDIALOG_H
 
-#include <QtGui/QDialog>
-#include <QVBoxLayout>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QVBoxLayout>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 

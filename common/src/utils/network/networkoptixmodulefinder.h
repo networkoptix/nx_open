@@ -9,8 +9,8 @@
 #include <set>
 #include <vector>
 
-#include <QHostAddress>
-#include <QThread>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QThread>
 
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"

@@ -34,7 +34,7 @@ QnBusinessRulesViewModel::~QnBusinessRulesViewModel() {
 }
 
 QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelIndex &parent) const {
-    return hasIndex(row, column, parent) ? createIndex(row, column, 0) : QModelIndex();
+    return hasIndex(row, column, parent) ? createIndex(row, column, (void*)0) : QModelIndex();
 }
 
 QModelIndex QnBusinessRulesViewModel::parent(const QModelIndex &child) const {
@@ -143,8 +143,9 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
 }
 
 void QnBusinessRulesViewModel::clear() {
+    beginResetModel();
     m_rules.clear();
-    reset();
+    endResetModel();
 }
 
 void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessRules) {

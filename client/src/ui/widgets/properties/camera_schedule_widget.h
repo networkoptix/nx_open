@@ -1,7 +1,7 @@
 #ifndef QN_CAMERA_SCHEDULE_WIDGET_H
 #define QN_CAMERA_SCHEDULE_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/misc/schedule_task.h>
 #include "core/resource/media_resource.h"

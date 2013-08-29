@@ -1,7 +1,7 @@
 #include "device_settings_tab.h"
 
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QGroupBox>
+#include <QtWidgets/QItemEditorFactory>
+#include <QtWidgets/QGroupBox>
 
 #include "ui/style/globals.h"
 

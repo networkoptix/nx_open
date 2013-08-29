@@ -1,7 +1,7 @@
 #ifndef droid_device_server_h_1755
 #define droid_device_server_h_1755
 
-#include <QList>
+#include <QtCore/QList>
 
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/network/nettools.h"

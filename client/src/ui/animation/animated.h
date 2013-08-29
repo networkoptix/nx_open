@@ -5,7 +5,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QScopedPointer>
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 
 #include <utils/common/forward.h>
 

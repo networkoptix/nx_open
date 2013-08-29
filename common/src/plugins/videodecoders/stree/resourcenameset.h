@@ -7,8 +7,8 @@
 
 #include <map>
 
-#include <QString>
-#include <QVariant>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 
 namespace stree

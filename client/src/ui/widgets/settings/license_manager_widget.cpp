@@ -3,13 +3,13 @@
 #include "version.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QUrl>
 #include <QtCore/QTextStream>
+#include <QtCore/QUrlQuery>
 
-#include <QtGui/QAbstractItemView>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -71,7 +71,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(qnLicensePool->hardwareId2());
-    ui->licenseWidget->setFreeLicenseAvailable(!licenseListHelper.haveLicenseKey(qnProductFeatures().freeLicenseKey.toAscii()) && (qnProductFeatures().freeLicenseCount > 0));
+    ui->licenseWidget->setFreeLicenseAvailable(!licenseListHelper.haveLicenseKey(qnProductFeatures().freeLicenseKey.toLatin1()) && (qnProductFeatures().freeLicenseCount > 0));
 
     /* Update grid. */
     m_model->setLicenses(m_licenses);
@@ -134,7 +134,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     QNetworkRequest request;
     request.setUrl(url);
 
-    QUrl params;
+    QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
 
     int n = 1;
@@ -149,7 +149,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
 
-    QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());  
+    QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
     m_replyKeyMap[reply] = licenseKey;
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));

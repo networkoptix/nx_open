@@ -4,14 +4,14 @@
 #include <QtCore/QEvent>
 #include <QtCore/QPointer>
 
-#include <QtGui/QAbstractItemView>
+#include <QtWidgets/QAbstractItemView>
 #ifndef QT_NO_ACCESSIBILITY
 #  include <QtGui/QAccessible>
 #endif
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QStyle>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QStyle>
 
 #define AUTO_REPEAT_DELAY  300
 #define AUTO_REPEAT_INTERVAL 100
@@ -264,7 +264,7 @@ QList<AbstractGraphicsButton *>AbstractGraphicsButtonPrivate::queryButtonList() 
         return group->d_func()->buttonList;
 #endif
 
-    QList<AbstractGraphicsButton*>candidates = qFindChildren<AbstractGraphicsButton *>(q_func()->parent());
+    QList<AbstractGraphicsButton*>candidates = q_func()->parent()->findChildren<AbstractGraphicsButton *>();
     if (autoExclusive) {
         for (int i = candidates.count() - 1; i >= 0; --i) {
             AbstractGraphicsButton *candidate = candidates.at(i);
@@ -334,8 +334,9 @@ void AbstractGraphicsButtonPrivate::moveFocus(int key)
     QRectF target = f->rect().translated(f->mapToScene(QPoint(0,0)));
     QPointF goal = target.center();
 
-    Q_GUI_EXPORT extern bool qt_tab_all_widgets;
-    uint focus_flag = qt_tab_all_widgets ? Qt::TabFocus : Qt::StrongFocus;
+    //Q_GUI_EXPORT extern bool qt_tab_all_widgets;
+    //uint focus_flag = qt_tab_all_widgets ? Qt::TabFocus : Qt::StrongFocus;
+    uint focus_flag = Qt::StrongFocus;
 
     for (int i = 0; i < buttonList.count(); ++i) {
         AbstractGraphicsButton *button = buttonList.at(i);
@@ -450,7 +451,7 @@ void AbstractGraphicsButtonPrivate::refresh()
         return;
     q->update();
 #ifndef QT_NO_ACCESSIBILITY
-    QAccessible::updateAccessibility(q, 0, QAccessible::StateChanged);
+    QAccessible::updateAccessibility(new QAccessibleEvent(q, QAccessible::StateChanged));
 #endif
 }
 
@@ -596,7 +597,7 @@ void AbstractGraphicsButton::setText(const QString &text)
     update();
     updateGeometry();
 #ifndef QT_NO_ACCESSIBILITY
-    QAccessible::updateAccessibility(this, 0, QAccessible::NameChanged);
+    QAccessible::updateAccessibility(new QAccessibleEvent(this, QAccessible::NameChanged));
 #endif
 }
 

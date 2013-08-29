@@ -5,8 +5,8 @@
 #ifndef APPLICATION_TASK_H
 #define APPLICATION_TASK_H
 
-#include <QString>
-#include <QStringList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include <utils/network/http/qnbytearrayref.h>
 

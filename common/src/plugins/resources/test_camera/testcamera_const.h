@@ -1,7 +1,7 @@
 #ifndef __TEST_CAMERA_CONST_H__
 #define __TEST_CAMERA_CONST_H__
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 
 
 class TestCamConst

@@ -1,9 +1,9 @@
 #ifndef __BLURAY_HELPER_H
 #define __BLURAY_HELPER_H
 
-#include <QMap>
-#include <QString>
-#include <QVector>
+#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtCore/QVector>
 
 #include "../bitStream.h"
 

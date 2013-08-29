@@ -1,7 +1,7 @@
 #ifndef __IP_CONFLICT_BUSINESS_EVENT_H__
 #define __IP_CONFLICT_BUSINESS_EVENT_H__
 
-#include <QHostAddress>
+#include <QtNetwork/QHostAddress>
 
 #include "conflict_business_event.h"
 #include "core/resource/resource_fwd.h"

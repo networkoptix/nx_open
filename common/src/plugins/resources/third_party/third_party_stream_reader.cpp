@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-#include <QTextStream>
+#include <QtCore/QTextStream>
 
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"

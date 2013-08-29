@@ -7,18 +7,23 @@
 
 #ifdef NX_GLCONTEXT_PRESENT
 
-#include <QGLContext>
+#include <QtOpenGL/QGLContext>
 
 #include <utils/common/log.h>
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 #define WGL_WGLEXT_PROTOTYPES
 #include <gl/wglext.h>
 #else
-#include <QX11Info>
+#include <QtX11Extras/QX11Info>
 #include <GL/glx.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#endif
+
+
+#ifdef Q_OS_WIN
+    #include <utils/qt5port_windows_specific.h>
 #endif
 
 
@@ -48,8 +53,8 @@ GLContext::GLContext( const QGLWidget* shareWidget )
 
 GLContext::~GLContext()
 {
-#ifdef _WIN32
-    Q_ASSERT( IsWindow(m_winID) );
+#ifdef Q_OS_WIN
+    Q_ASSERT( IsWindow(widToHwnd(m_winID)) );
 
     if( m_handle != NULL )
     {
@@ -77,15 +82,15 @@ bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
 
     //return true;
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     if( paintDevToUse != NULL )
     {
         m_dc = paintDevToUse;
     }
     else
     {
-        Q_ASSERT( IsWindow( m_winID ) );
-        m_dc = GetDC( m_winID );
+        Q_ASSERT( IsWindow( widToHwnd(m_winID) ) );
+        m_dc = GetDC( widToHwnd(m_winID) );
     }
     BOOL res = wglMakeCurrent( m_dc, m_handle );
     m_previousErrorCode = GetLastError();
@@ -105,10 +110,10 @@ bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
 
 void GLContext::doneCurrent()
 {
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     wglMakeCurrent( NULL, NULL );
     if( m_dc != NULL )
-        ReleaseDC( m_winID, m_dc );
+        ReleaseDC( widToHwnd(m_winID), m_dc );
     m_dc = NULL;
 #else
     glXMakeCurrent(
@@ -143,7 +148,7 @@ QString GLContext::getLastErrorString() const
 /*
 bool GLContext::shareWith( SYS_GL_CTX_HANDLE ctxID )
 {
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     if( !wglShareLists( ctxID, m_handle ) )
     {
         m_previousErrorCode = GetLastError();
@@ -176,7 +181,7 @@ GLContext::SYS_GL_CTX_HANDLE GLContext::getSysHandleOfQtContext( const QGLContex
         const_cast<QGLContext*>(context)->makeCurrent();
     }
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
     SYS_GL_CTX_HANDLE sysContextHandle = wglGetCurrentContext();
 #else
     SYS_GL_CTX_HANDLE sysContextHandle = glXGetCurrentContext();
@@ -184,7 +189,7 @@ GLContext::SYS_GL_CTX_HANDLE GLContext::getSysHandleOfQtContext( const QGLContex
 
     if( paintDeviceHandle )
     {
-#ifdef _WIN32
+#ifdef Q_OS_WIN
         //QPaintDevice* contextDevice = context->device();
         //if( contextDevice )
         //{
@@ -221,25 +226,25 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
 
     m_winID = m_widget->winId();
 
-#ifdef _WIN32
-    Q_ASSERT( IsWindow( m_winID ) );
+#ifdef Q_OS_WIN
+    Q_ASSERT( IsWindow( widToHwnd(m_winID) ) );
 
-    HDC dc = GetDC( m_winID );
+    HDC dc = GetDC( widToHwnd(m_winID) );
     //reading pixel format of src window
     {
-        HDC hdc = GetDC( wnd );
+        HDC hdc = GetDC( widToHwnd(wnd) );
         // get the current pixel format index  
         int iPixelFormat = GetPixelFormat(hdc); 
 
         memset( &m_pfd, 0, sizeof(m_pfd) );
         // obtain a detailed description of that pixel format  
         DescribePixelFormat( hdc, iPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &m_pfd );
-        ReleaseDC( wnd, hdc );
+        ReleaseDC( widToHwnd(wnd), hdc );
 
         if( !SetPixelFormat( dc, iPixelFormat, &m_pfd ) )
         {
             m_previousErrorCode = GetLastError();
-            ReleaseDC( m_winID, dc );
+            ReleaseDC( widToHwnd(m_winID), dc );
             return;
         }
     }
@@ -269,7 +274,7 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
         }
     }
 
-    ReleaseDC( m_winID, dc );
+    ReleaseDC( widToHwnd(m_winID), dc );
     dc = NULL;
 
     if( m_handle == NULL )

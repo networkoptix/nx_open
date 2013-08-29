@@ -7,7 +7,7 @@
 
 #include <set>
 
-#include <QMutex>
+#include <QtCore/QMutex>
 #include <QSharedMemory>
 
 #include "pluginusagerecord.h"

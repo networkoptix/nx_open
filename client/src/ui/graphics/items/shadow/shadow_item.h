@@ -1,7 +1,7 @@
 #ifndef QN_SHADOW_ITEM
 #define QN_SHADOW_ITEM
 
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 
 #include "shadow_shape_provider.h"
 

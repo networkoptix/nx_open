@@ -1,8 +1,8 @@
 #ifndef EMAIL_H
 #define EMAIL_H
 
-#include <QString>
-#include <QStringList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 #include <boost/preprocessor/stringize.hpp>
 

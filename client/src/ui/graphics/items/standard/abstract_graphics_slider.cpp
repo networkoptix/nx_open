@@ -4,10 +4,10 @@
 #ifndef QT_NO_ACCESSIBILITY
 #  include <QtGui/QAccessible>
 #endif
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QStyleOption>
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QStyleOption>
+#include <QtWidgets/QGraphicsView>
 #include <limits>
 
 namespace {
@@ -179,7 +179,8 @@ void AbstractGraphicsSlider::setValue(qint64 value) {
             Q_EMIT sliderMoved(d->position);
     }
 #ifndef QT_NO_ACCESSIBILITY
-    QAccessible::updateAccessibility(this, 0, QAccessible::ValueChanged);
+    //QAccessible::updateAccessibility(this, 0, QAccessible::ValueChange);
+    QAccessible::updateAccessibility(new QAccessibleValueChangeEvent(this, 0));
 #endif
     sliderChange(SliderValueChange);
     Q_EMIT valueChanged(d->value);

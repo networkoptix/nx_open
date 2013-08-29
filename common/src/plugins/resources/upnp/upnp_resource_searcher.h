@@ -4,7 +4,7 @@
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/network/nettools.h"
 #include "utils/network/socket.h"
-#include <QAtomicInt>
+#include <QtCore/QAtomicInt>
 
 #include "upnp_device_searcher.h"
 

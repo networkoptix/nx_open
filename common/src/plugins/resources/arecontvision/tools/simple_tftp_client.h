@@ -1,6 +1,7 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
-#include <QString>
+#include <QtCore/QString>
+
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/network/socket.h"
 

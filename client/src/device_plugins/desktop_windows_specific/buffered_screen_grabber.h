@@ -5,7 +5,7 @@
 
 #ifdef Q_OS_WIN
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include "screen_grabber.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/threadqueue.h"

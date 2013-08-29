@@ -8,7 +8,7 @@
 
 #include <vector>
 
-#include <QThread>
+#include <QtCore/QThread>
 
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"

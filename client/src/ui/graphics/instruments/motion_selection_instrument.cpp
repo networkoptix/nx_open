@@ -2,10 +2,10 @@
 
 #include <cassert>
 
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/warnings.h>
@@ -271,3 +271,12 @@ void MotionSelectionInstrument::finishDragProcess(DragInfo *info) {
 
     emit selectionProcessFinished(info->view(), target());
 }
+
+SelectionItem *MotionSelectionInstrument::selectionItem() const {
+    return m_selectionItem.data();
+}
+
+QnMediaResourceWidget *MotionSelectionInstrument::target() const {
+    return m_target.data();
+}
+

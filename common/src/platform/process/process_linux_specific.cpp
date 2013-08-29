@@ -4,8 +4,9 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <QProcess>
-#include <QWeakPointer>
+#include <QtCore/QProcess>
+#include <QtCore/QPointer>
+
 
 #include <utils/common/warnings.h>
 
@@ -102,7 +103,7 @@ private:
     bool current;
     bool valid;
     qint64 pid;
-    QWeakPointer<QProcess> process;
+    QPointer<QProcess>  process;
 };
 
 

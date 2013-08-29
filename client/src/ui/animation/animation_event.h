@@ -1,7 +1,7 @@
 #ifndef QN_ANIMATION_EVENT_H
 #define QN_ANIMATION_EVENT_H
 
-#include <QEvent>
+#include <QtCore/QEvent>
 
 class AnimationEvent: public QEvent {
 public:

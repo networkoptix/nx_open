@@ -1,7 +1,7 @@
 #ifndef __RTSP_H264_ENCODER_H__
 #define __RTSP_H264_ENCODER_H__
 
-#include <QMap>
+#include <QtCore/QMap>
 #include "rtsp_encoder.h"
 
 static const int RTSP_H264_PAYLOAD_TYPE = 96;

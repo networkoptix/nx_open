@@ -1,9 +1,9 @@
 #ifndef __BUFFERED_FILE_H__
 #define __BUFFERED_FILE_H__
 
-#include <QWaitCondition>
-#include <QString>
-#include <QQueue>
+#include <QtCore/QWaitCondition>
+#include <QtCore/QString>
+#include <QtCore/QQueue>
 #include "utils/fs/file.h"
 #include "utils/common/threadqueue.h"
 #include "utils/common/long_runnable.h"

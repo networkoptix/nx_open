@@ -1,8 +1,8 @@
 #ifndef BUSINESS_RULE_ITEM_DELEGATE_H
 #define BUSINESS_RULE_ITEM_DELEGATE_H
 
-#include <QStyledItemDelegate>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QPushButton>
 
 #include <core/resource/resource_fwd.h>
 

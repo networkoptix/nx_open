@@ -12,7 +12,7 @@
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <QTime>
+#include <QtCore/QTime>
 
 class QnScreenGrabber: public QObject
 {

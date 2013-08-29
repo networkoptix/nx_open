@@ -6,7 +6,7 @@
 #include "asynchttpclient.h"
 
 #include <QCryptographicHash>
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "../aio/aioservice.h"
 #include "../../common/log.h"

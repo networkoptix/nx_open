@@ -3,7 +3,7 @@
 
 #include <limits>
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 #include <ui/common/palette.h>
 

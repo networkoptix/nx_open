@@ -1,6 +1,6 @@
 #include "multicodec_rtp_reader.h"
 
-#include <QSettings>
+#include <QtCore/QSettings>
 
 #ifdef __GNUC__
 #include <sys/select.h>

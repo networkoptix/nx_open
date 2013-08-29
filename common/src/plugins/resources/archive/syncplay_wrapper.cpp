@@ -1,4 +1,4 @@
-#include <QWaitCondition>
+#include <QtCore/QWaitCondition>
 
 #include "syncplay_wrapper.h"
 #include "syncplay_archive_delegate.h"

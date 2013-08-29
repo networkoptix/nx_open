@@ -6,11 +6,11 @@
 #ifndef SYNC_HTTP_CLIENT_DELEGATE_H
 #define SYNC_HTTP_CLIENT_DELEGATE_H
 
-#include <QMutex>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QObject>
-#include <QWaitCondition>
+#include <QtCore/QMutex>
+#include <QtCore/QObject>
+#include <QtCore/QWaitCondition>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 
 
 //!Helper class, used by SyncHttpClient

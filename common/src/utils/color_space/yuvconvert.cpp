@@ -1,3 +1,6 @@
+
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
+
 #include <emmintrin.h>
 
 #include <cstdio>
@@ -19,7 +22,7 @@ const __m128i  sse_rv_coeff_intrs  = _mm_setr_epi32(0x33123312, 0x33123312, 0x33
 const __m128i  sse_gu_coeff_intrs  = _mm_setr_epi32(0xf37df37d, 0xf37df37d, 0xf37df37d, 0xf37df37d);
 const __m128i  sse_gv_coeff_intrs  = _mm_setr_epi32(0xe5fce5fc, 0xe5fce5fc, 0xe5fce5fc, 0xe5fce5fc);
 
-void yuv444_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
+void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,
                             const unsigned int dst_stride, const unsigned int y_stride,
@@ -88,7 +91,7 @@ void yuv444_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
     }
 }
 
-void yuv422_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
+void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,
                             const unsigned int dst_stride, const unsigned int y_stride,
@@ -162,7 +165,7 @@ void yuv422_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
     }
 }
 
-void yuv420_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
+void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned char * pu, const unsigned char * pv,
                             const unsigned int width, const unsigned int height,
                             const unsigned int dst_stride, const unsigned int y_stride,
@@ -271,7 +274,7 @@ void yuv420_argb32_sse2_intr(unsigned char * dst, const unsigned char * py,
     }
 }
 
-void bgra_to_yv12_sse2_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
+void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
     Q_ASSERT( qPower2Ceil((unsigned int)xStride, 32) == (unsigned int)xStride );
 
@@ -356,14 +359,14 @@ void bgra_to_yv12_sse2_intr(const quint8* rgba, int xStride, quint8* y, quint8* 
     }
 }
 
-void bgra_to_yva12_sse2_intr(
+void bgra_to_yva12_simd_intr(
     const quint8* rgba, int xStride,
     quint8* y, quint8* u, quint8* v, quint8* a,
     int yStride, int uvStride, int aStride,
     int width, int height,
     bool flip )
 {
-    bgra_to_yv12_sse2_intr( rgba, xStride, y, u, v, yStride, uvStride, width, height, flip );
+    bgra_to_yv12_simd_intr( rgba, xStride, y, u, v, yStride, uvStride, width, height, flip );
 
     //copying alpha plane to \a a
     //TODO: optimize with sse
@@ -414,3 +417,113 @@ void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int wid
         yptr2 += width;
     }
 }
+
+#elif __arm__ && __ARM_NEON__
+
+void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
+                            const unsigned char * pu, const unsigned char * pv,
+                            const unsigned int width, const unsigned int height,
+                            const unsigned int dst_stride, const unsigned int y_stride,
+                            const unsigned int uv_stride, quint8 alpha)
+{
+    //TODO/ARM
+}
+
+void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
+                            const unsigned char * pu, const unsigned char * pv,
+                            const unsigned int width, const unsigned int height,
+                            const unsigned int dst_stride, const unsigned int y_stride,
+                            const unsigned int uv_stride, quint8 alpha)
+{
+    //TODO/ARM
+}
+
+void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
+                            const unsigned char * pu, const unsigned char * pv,
+                            const unsigned int width, const unsigned int height,
+                            const unsigned int dst_stride, const unsigned int y_stride,
+                            const unsigned int uv_stride, quint8 alpha)
+{
+    //TODO/ARM
+}
+
+void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int width, int height, bool flip)
+{
+    //TODO/ARM
+}
+
+/*!
+    \param xStride Line length in \a rgba buffer. MUST be multiple of 32
+    \param yStride Line length in \a y
+    \param uvStride Line length in \a u and \a v buffers
+*/
+void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
+{
+    //TODO/ARM
+}
+
+//!Converts bgra to yuv420 with alpha plane, total 20 bits per pixel (Y - 8bit, A - 8bit, UV)
+/*!
+    \param xStride Line length in \a rgba buffer. MUST be multiple of 32
+    \param yStride Line length in \a y
+    \param uvStride Line length in \a u and \a v buffers
+*/
+void bgra_to_yva12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, quint8* a, int yStride, int uvStride, int aStride, int width, int height, bool flip)
+{
+    //TODO/ARM
+}
+
+#else
+void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
+                            const unsigned char * pu, const unsigned char * pv,
+                            const unsigned int width, const unsigned int height,
+                            const unsigned int dst_stride, const unsigned int y_stride,
+                            const unsigned int uv_stride, quint8 alpha)
+{
+    //TODO
+}
+
+void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
+                            const unsigned char * pu, const unsigned char * pv,
+                            const unsigned int width, const unsigned int height,
+                            const unsigned int dst_stride, const unsigned int y_stride,
+                            const unsigned int uv_stride, quint8 alpha)
+{
+    //TODO
+}
+
+void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
+                            const unsigned char * pu, const unsigned char * pv,
+                            const unsigned int width, const unsigned int height,
+                            const unsigned int dst_stride, const unsigned int y_stride,
+                            const unsigned int uv_stride, quint8 alpha)
+{
+    //TODO
+}
+
+void bgra_yuv420(quint8* rgba, quint8* yptr, quint8* uptr, quint8* vptr, int width, int height, bool flip)
+{
+    //TODO
+}
+
+/*!
+    \param xStride Line length in \a rgba buffer. MUST be multiple of 32
+    \param yStride Line length in \a y
+    \param uvStride Line length in \a u and \a v buffers
+*/
+void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
+{
+    //TODO
+}
+
+//!Converts bgra to yuv420 with alpha plane, total 20 bits per pixel (Y - 8bit, A - 8bit, UV)
+/*!
+    \param xStride Line length in \a rgba buffer. MUST be multiple of 32
+    \param yStride Line length in \a y
+    \param uvStride Line length in \a u and \a v buffers
+*/
+void bgra_to_yva12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, quint8* a, int yStride, int uvStride, int aStride, int width, int height, bool flip)
+{
+    //TODO
+}
+#endif

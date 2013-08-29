@@ -4,8 +4,34 @@
 #include <QtCore/QString>
 #include <QtCore/private/qsimd_p.h>
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>
 #include <emmintrin.h>
+
+typedef __m128i simd128i;
+typedef __m128 simd128;
+
+#elif __arm__ && __ARM_NEON__
+#include <arm_neon.h>
+
+typedef int32x4_t simd128i;
+typedef uint32x4_t simd128;
+#else
+#warning "Target CPU type is not supported - using C fallback routines"
+
+typedef struct
+{
+    int64_t one;
+    uint64_t two;
+} simd128i;
+
+typedef struct
+{
+    uint64_t one;
+    uint64_t two;
+} simd128;
+#endif
+
 
 
 #if defined(Q_CC_MSVC)
@@ -20,7 +46,7 @@
             "mov %%rsi, %%rbx    \n\t"                                          \
             :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
             :"0"(op) : "%rsi")
-#   else
+#   elif defined(__i386) || defined(__amd64)
 #       define __cpuid(res, op)                                                 \
             __asm__ volatile(                                                   \
             "movl %%ebx, %%esi   \n\t"                                          \
@@ -29,12 +55,17 @@
             "movl %%esi, %%ebx   \n\t"                                          \
             :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
             :"0"(op) : "%esi")
+#   elif __arm__
+#       define __cpuid(res, op)       //TODO/ARM
+#   else
+#       error __cpuid is not implemented for target CPU
 #   endif
 #else
 #   error __cpuid is not supported for your compiler.
 #endif
 
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #if defined(Q_CC_GNU) && !defined(Q_OS_MAC)
 
 /* We cannot include GCC intrinsic headers cause they cause compilation errors.
@@ -80,54 +111,69 @@ _mm_hadd_epi16 (__m128i __X, __m128i __Y)
 #define sse4_attribute 
 #define ssse3_attribute
 #endif
+#endif	//__i386
 
+
+//TODO: #ak give up following Q_OS_MAC check
+//TODO/ARM: sse analog
 
 static inline bool useSSE2()
 {
-#ifdef Q_OS_MAC
+#ifdef __arm__
+    return false;
+#elif defined(Q_OS_MAC)
     return true;
 #else
-    return qDetectCPUFeatures() & SSE2;
+    return qCpuHasFeature(SSE2);
 #endif
 }
 
 static inline bool useSSE3()
 {
-#ifdef Q_OS_MAC
+#ifdef __arm__
+    return false;
+#elif defined(Q_OS_MAC)
     return true;
 #else
-    return qDetectCPUFeatures() & SSE3;
+    return qCpuHasFeature(SSE3);
 #endif
 }
 
 static inline bool useSSSE3()
 {
-#ifdef Q_OS_MAC
+#ifdef __arm__
+    return false;
+#elif defined(Q_OS_MAC)
     return true;
 #else
-    return qDetectCPUFeatures() & SSSE3;
+    return qCpuHasFeature(SSSE3);
 #endif
 }
 
 static inline bool useSSE41()
 {
-#ifdef Q_OS_MAC
-    return true;
+#ifdef __arm__
+    return false;
+#elif defined(Q_OS_MAC)
+    return false;
 #else
-    return qDetectCPUFeatures() & SSE4_1;
+    return qCpuHasFeature(SSE4_1);
 #endif
 }
 
 static inline bool useSSE42()
 {
-#ifdef Q_OS_MAC
-    return true;
+#ifdef __arm__
+    return false;
+#elif defined(Q_OS_MAC)
+    return false;
 #else
-    return qDetectCPUFeatures() & SSE4_2;
+    return qCpuHasFeature(SSE4_2);
 #endif
 }
 
 // TODO: #vasilenko function too large for inlining. Move to cpp file.
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40]; 
@@ -156,9 +202,16 @@ static inline QString getCPUString()
     if(nExIds >= 0x80000004)
     {
         //printf_s("\nCPU Brand String: %s\n", CPUBrandString);
-        return QString::fromAscii( CPUBrandString ).trimmed();
+        return QString::fromLatin1( CPUBrandString ).trimmed();
     }
     return QString();
 }
+#elif __arm__
+static inline QString getCPUString()
+{
+    //TODO/ARM
+    return QString();
+}
+#endif
 
 #endif // QN_SSE_HELPER_H

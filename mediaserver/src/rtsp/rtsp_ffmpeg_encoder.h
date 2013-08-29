@@ -1,7 +1,7 @@
 #ifndef __RTSP_FFMPEG_ENCODER_H__
 #define __RTSP_FFMPEG_ENCODER_H__
 
-#include <QMap>
+#include <QtCore/QMap>
 #include "rtsp_encoder.h"
 
 class QnRtspFfmpegEncoder: public QnRtspEncoder

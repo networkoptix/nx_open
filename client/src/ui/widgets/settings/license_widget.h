@@ -1,7 +1,7 @@
 #ifndef QN_LICENSE_WIDGET_H
 #define QN_LICENSE_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class LicenseWidget;

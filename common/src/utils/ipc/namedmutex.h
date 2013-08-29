@@ -6,7 +6,7 @@
 #ifndef NAMEDMUTEX_H
 #define NAMEDMUTEX_H
 
-#include <QString>
+#include <QtCore/QString>
 
 
 class NamedMutexImpl;

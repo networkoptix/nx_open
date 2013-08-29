@@ -1,5 +1,7 @@
 #include "business_message_bus.h"
 
+#include <QtCore/QUrlQuery>
+
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 
 QnBusinessMessageBus* QnBusinessMessageBus::instance()
@@ -35,7 +37,11 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
 
     QUrl u(url);
     if (res)
-        u.addQueryItem(QLatin1String("resource"), res->getId().toString()); // execute action for 1 resource only
+    {
+        QUrlQuery urlQuery(u.query());
+        urlQuery.addQueryItem(QLatin1String("resource"), res->getId().toString()); // execute action for 1 resource only
+        u.setQuery(urlQuery);
+    }
 
     request.setUrl(u);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));

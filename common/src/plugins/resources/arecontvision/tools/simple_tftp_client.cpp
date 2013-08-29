@@ -229,7 +229,7 @@ int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
     int len = 2;
     int req_len = fn.length();
 
-    memcpy(buff+len, fn.toAscii(), req_len);    len+=req_len;
+    memcpy(buff+len, fn.toLatin1(), req_len);    len+=req_len;
     buff[len] = 0;    len++;
 
     memcpy(buff+len, "netascii", 8); len+=8;

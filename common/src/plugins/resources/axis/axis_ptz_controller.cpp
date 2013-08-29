@@ -110,18 +110,18 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
         maxAngle /= 10.0;
 
         /* We implement E-Flip, so we don't want strange tilt angles. */
-        maxTilt = qMin(maxTilt, 90.0);
-        minTilt = qMax(minTilt, -90.0);
+        maxTilt = qMin<double>(maxTilt, 90.0);
+        minTilt = qMax<double>(minTilt, -90.0);
 
         /* Axis takes care of image rotation automagically, but we still need to adjust tilt limits. */
         qreal rotation = params.value("root.Image.I0.Appearance.Rotation", 0.0);
-        if(qFuzzyCompare(rotation, 180.0)) {
+        if(qFuzzyCompare(rotation, (qreal)180.0)) {
             minTilt = -minTilt;
             maxTilt = -maxTilt;
             qSwap(minTilt, maxTilt);
         }
 
-        QnScalarSpaceMapper xMapper(minPan, maxPan, minPan, maxPan, qFuzzyCompare(maxPan - minPan, 360.0) ? Qn::PeriodicExtrapolation : Qn::ConstantExtrapolation);
+        QnScalarSpaceMapper xMapper(minPan, maxPan, minPan, maxPan, qFuzzyCompare(maxPan - minPan, (qreal)360.0) ? Qn::PeriodicExtrapolation : Qn::ConstantExtrapolation);
         QnScalarSpaceMapper yMapper(minTilt, maxTilt, minTilt, maxTilt, Qn::ConstantExtrapolation);
         QnScalarSpaceMapper zMapper(1, 9999, fovTo35mmEquiv(gradToRad(maxAngle)), fovTo35mmEquiv(gradToRad(minAngle)), Qn::ConstantExtrapolation);
         /* Note that we do not care about actual zoom limits on the camera. 

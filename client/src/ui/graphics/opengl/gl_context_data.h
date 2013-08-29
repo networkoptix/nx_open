@@ -2,9 +2,9 @@
 #define QN_GL_CONTEXT_DATA_H
 
 #include <QHash>
-#include <QMutex>
+#include <QtCore/QMutex>
 #include <QSharedPointer>
-#include <QGLContext>
+#include <QtOpenGL/QGLContext>
 
 template<class T>
 class QnGlContextDataStardardFactory {

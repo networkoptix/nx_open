@@ -1,7 +1,7 @@
 #ifndef QN_DRAG_INFO_H
 #define QN_DRAG_INFO_H
 
-#include <QPoint>
+#include <QtCore/QPoint>
 
 class QGraphicsView;
 class QGraphicsItem;

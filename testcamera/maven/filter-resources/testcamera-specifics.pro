@@ -1,2 +1,4 @@
 TEMPLATE = app
 CONFIG += console
+DEFINES += USE_NX_HTTP
+

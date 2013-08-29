@@ -1,7 +1,7 @@
 #ifndef QN_MESSAGE_BOX_H
 #define QN_MESSAGE_BOX_H
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 class QnMessageBox: public QMessageBox {
     Q_OBJECT

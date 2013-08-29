@@ -1,7 +1,7 @@
 #ifndef VIDEORECORDERSETTINGS_H
 #define VIDEORECORDERSETTINGS_H
 
-#include <QRegExp>
+#include <QtCore/QRegExp>
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
 #include <QtMultimedia/QAudioDeviceInfo>

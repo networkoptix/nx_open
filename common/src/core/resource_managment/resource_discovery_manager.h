@@ -4,7 +4,7 @@
 #include <memory> // for auto_ptr
 #include <QtCore/QThread>
 #include <QAuthenticator>
-#include <QTimer>
+#include <QtCore/QTimer>
 #include "utils/common/long_runnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"

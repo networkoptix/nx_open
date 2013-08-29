@@ -1,7 +1,7 @@
 #include "onvif_resource_settings.h"
 #include "onvif/soapImagingBindingProxy.h"
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 enum onvifXsd__WideDynamicMode;
 

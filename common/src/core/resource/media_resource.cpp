@@ -1,7 +1,7 @@
 #include "media_resource.h"
 
-#include <QImage>
-#include <QCoreApplication>
+#include <QtGui/QImage>
+#include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
 #include <utils/common/enum_name_mapper.h>

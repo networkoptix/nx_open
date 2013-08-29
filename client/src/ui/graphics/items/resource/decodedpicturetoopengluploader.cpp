@@ -7,7 +7,8 @@
 
 #include <algorithm>
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
+#include <QtGui/QOpenGLFunctions>
 
 #ifdef _WIN32
 #include <D3D9.h>
@@ -126,7 +127,7 @@ public:
         const unsigned int currentTick = GetTickCount();
         if( currentTick - m_startCalcTick > 5000 )
         {
-            NX_LOG( QString::fromAscii("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second").
+            NX_LOG( QString::fromLatin1("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second").
                 arg(currentTick - m_startCalcTick).arg(m_bytes/1000000.0).arg(m_bytes /1000.0 / (currentTick - m_startCalcTick)), cl_logDEBUG1 );
             m_startCalcTick = currentTick;
             m_bytes = 0;
@@ -150,14 +151,15 @@ static BitrateCalculator bitrateCalculator;
 // -------------------------------------------------------------------------- //
 class DecodedPictureToOpenGLUploaderPrivate
 :
-    public QnGlFunctions
+    public QOpenGLFunctions
 {
-    Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate);
+    Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate)
 
 public:
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
-        QnGlFunctions(context),
-        supportsNonPower2Textures(false)
+        QOpenGLFunctions(context->contextHandle()),
+        supportsNonPower2Textures(false),
+        functions(new QnGlFunctions(context))
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -210,6 +212,7 @@ public:
 public:
     GLint clampConstant;
     bool supportsNonPower2Textures;
+    QScopedPointer<QnGlFunctions> functions;
 private:
     struct Filler
     {
@@ -502,7 +505,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_skippingForbidden( false ),
     m_flags( 0 ),
-    m_glFence( uploader->d.data() ),
+    m_glFence( uploader->d->functions.data() ),
     m_displayedRect(0.0, 0.0, 1.0, 1.0)
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
@@ -696,7 +699,7 @@ public:
 
     virtual void run()
     {
-        DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf;
+        DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf.load();
 
         {
             QMutexLocker lk( &m_mutex );
@@ -705,7 +708,7 @@ public:
                 return; //m_pictureBuf has been changed (running has been cancelled?)
             if( pictureBuf == NULL )
             {
-                NX_LOG( QString::fromAscii("AsyncPicDataUploader. Picture upload has been cancelled..."), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Picture upload has been cancelled..."), cl_logDEBUG1 );
                 m_picDataRef.clear();
                 m_uploader->pictureDataUploadCancelled( this );
                 return; //running has been cancelled from outside
@@ -740,7 +743,7 @@ public:
                 m_lineSizes,
                 true ) )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Failed to move to opengl memory frame (pts %1) data. Skipping frame...").arg(pictureBuf->pts()), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Failed to move to opengl memory frame (pts %1) data. Skipping frame...").arg(pictureBuf->pts()), cl_logDEBUG1 );
             m_picDataRef.clear();
             m_uploader->pictureDataUploadFailed( this, pictureBuf );
             return;
@@ -781,17 +784,17 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        if( !m_pictureBuf )
+        if( !m_pictureBuf.load() )
             return false;
 
         if( prevPicPts )
-            *prevPicPts = m_pictureBuf->m_pts;
-        m_pictureBuf->m_sequence = picSequence;
-        m_pictureBuf->m_pts = decodedPicture->pkt_dts;
-        m_pictureBuf->m_width = decodedPicture->width;
-        m_pictureBuf->m_height = decodedPicture->height;
-        m_pictureBuf->m_metadata = decodedPicture->metadata;
-        m_pictureBuf->m_displayedRect = displayedRect;
+            *prevPicPts = m_pictureBuf.load()->m_pts;
+        m_pictureBuf.load()->m_sequence = picSequence;
+        m_pictureBuf.load()->m_pts = decodedPicture->pkt_dts;
+        m_pictureBuf.load()->m_width = decodedPicture->width;
+        m_pictureBuf.load()->m_height = decodedPicture->height;
+        m_pictureBuf.load()->m_metadata = decodedPicture->metadata;
+        m_pictureBuf.load()->m_displayedRect = displayedRect;
         m_picDataRef = picDataRef;
 
         return true;
@@ -818,7 +821,7 @@ private:
         ScopedAtomicLock picUsageCounterLock( &m_picDataRef->syncCtx()->usageCounter );
         if( !m_picDataRef->isValid() )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -830,13 +833,13 @@ private:
         HRESULT res = surf->GetDesc( &surfDesc );
         if( res != D3D_OK )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Failed to get dxva surface info (%1). Ignoring decoded picture...").arg(res), cl_logERROR );
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Failed to get dxva surface info (%1). Ignoring decoded picture...").arg(res), cl_logERROR );
             return false;
         }
 
         if( surfDesc.Format != (D3DFORMAT)MAKEFOURCC('N','V','1','2') )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Dxva surface format %1 while only NV12 (%2) is supported. Ignoring decoded picture...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Dxva surface format %1 while only NV12 (%2) is supported. Ignoring decoded picture...").
                 arg(surfDesc.Format).arg(MAKEFOURCC('N','V','1','2')), cl_logERROR );
             return false;
         }
@@ -855,7 +858,7 @@ private:
         res = surf->LockRect( &lockedRect, &rectToLock, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY );
         if( res != D3D_OK )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Failed to map dxva surface (%1). Ignoring decoded picture...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Failed to map dxva surface (%1). Ignoring decoded picture...").
                 arg(QString::fromWCharArray(DXGetErrorDescription(res))), cl_logERROR );
             return false;
         }
@@ -877,7 +880,7 @@ private:
 #ifndef DISABLE_FRAME_DOWNLOAD
                 surf->UnlockRect();
 #endif
-                NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) could not be uploaded due to memory allocation error. Releasing...").
+                NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) could not be uploaded due to memory allocation error. Releasing...").
                     arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
                 return false;
             }
@@ -909,7 +912,7 @@ private:
                 lockedRect.Pitch ) )
         {
             surf->UnlockRect();
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (2). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (2). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -924,7 +927,7 @@ private:
                 lockedRect.Pitch ) )
         {
             surf->UnlockRect();
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (3). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (3). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -940,7 +943,7 @@ private:
                 targetPitch / 2 ) )
         {
             surf->UnlockRect();
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (4). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (4). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -1275,7 +1278,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
     const QRectF displayedRect )
 {
-    NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
+    NX_LOG( QString::fromLatin1( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
 
     m_hardwareDecoderUsed = decodedPicture->flags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 
@@ -1305,7 +1308,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //this condition allows to use single PictureBuffer for rendering
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                NX_LOG( QString::fromLatin1( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else
@@ -1314,7 +1317,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
             {
                 emptyPictureBuf = m_emptyBuffers.front();
                 m_emptyBuffers.pop_front();
-                NX_LOG( QString::fromAscii( "Found empty buffer" ), cl_logDEBUG2 );
+                NX_LOG( QString::fromLatin1( "Found empty buffer" ), cl_logDEBUG2 );
             }
             else if( (!m_asyncUploadUsed && !m_renderedPictures.empty())
                   || (m_asyncUploadUsed && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1U : 0U))) )  //reserving one uploaded picture (preferring picture 
@@ -1324,7 +1327,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                NX_LOG( QString::fromLatin1( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else if( ((!m_asyncUploadUsed && !m_picturesWaitingRendering.empty())
@@ -1334,7 +1337,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
                 emptyPictureBuf = m_picturesWaitingRendering.front();
                 m_picturesWaitingRendering.pop_front();
-                NX_LOG( QString::fromAscii( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
+                NX_LOG( QString::fromLatin1( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
                     arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
             }
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
@@ -1347,7 +1350,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 {
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
-                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
+                    NX_LOG( QString::fromLatin1( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
                         arg((*it)->picture()->m_pts).arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts/1000).toString(QLatin1String("hh:mm:ss.zzz"))), cl_logDEBUG2 );
                     emptyPictureBuf = (*it)->picture();
                     delete (*it);
@@ -1367,7 +1370,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                         quint64 prevPicPts = 0;
                         if( m_usedAsyncUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
                         {
-                            NX_LOG( QString::fromAscii( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
+                            NX_LOG( QString::fromLatin1( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
                                 arg(prevPicPts).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
                             decodedPicture->picData.clear();
                             return;
@@ -1375,11 +1378,11 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                     }
 
                     //ignoring decoded picture so that not to stop decoder
-                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
+                    NX_LOG( QString::fromLatin1( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
                     decodedPicture->picData.clear();
                     return;
                 }
-                NX_LOG( QString::fromAscii( "Waiting for a picture gl buffer to get free" ), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1( "Waiting for a picture gl buffer to get free" ), cl_logDEBUG1 );
                 //waiting for a picture buffer to get free
                 m_cond.wait( lk.mutex() );
                 continue;
@@ -1513,7 +1516,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
             return NULL;
 #endif
         m_picturesWaitingRendering.pop_front();
-        NX_LOG( QString::fromAscii( "Taking uploaded picture (pts %1, seq %2) for first-time rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1( "Taking uploaded picture (pts %1, seq %2) for first-time rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
     }
     else if( !m_renderedPictures.empty() )
     {
@@ -1524,11 +1527,11 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
             return NULL;
 #endif
         m_renderedPictures.pop_back();
-        NX_LOG( QString::fromAscii( "Taking previously shown uploaded picture (pts %1, seq %2) for rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1( "Taking previously shown uploaded picture (pts %1, seq %2) for rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
     }
     else
     {
-        NX_LOG( QString::fromAscii( "Failed to find picture for rendering. No data from decoder?" ), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1( "Failed to find picture for rendering. No data from decoder?" ), cl_logDEBUG2 );
         return NULL;
     }
 
@@ -1682,7 +1685,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 
     QMutexLocker lk( &m_mutex );
 
-    NX_LOG( QString::fromAscii( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
+    NX_LOG( QString::fromLatin1( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
 
     //m_picturesBeingRendered holds only one picture
     std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
@@ -2070,7 +2073,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV420P:
                 if (useSSE2())
                 {
-                    yuv420_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv420_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2084,7 +2087,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV422P:
                 if (useSSE2())
                 {
-                    yuv422_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv422_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2098,7 +2101,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV444P:
                 if (useSSE2())
                 {
-                    yuv444_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv444_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2200,18 +2203,16 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {
-    return (d->features() & QnGlFunctions::ArbPrograms)
-        && (d->features() & QnGlFunctions::OpenGL1_3)
-        && !(d->features() & QnGlFunctions::ShadersBroken)
+    return (d->functions->features() & QnGlFunctions::ArbPrograms)
+        && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_yv12SharedUsed
         && !m_forceSoftYUV;
 }
 
 bool DecodedPictureToOpenGLUploader::usingShaderNV12ToRgb() const
 {
-    return (d->features() & QnGlFunctions::ArbPrograms)
-        && (d->features() & QnGlFunctions::OpenGL1_3)
-        && !(d->features() & QnGlFunctions::ShadersBroken)
+    return (d->functions->features() & QnGlFunctions::ArbPrograms)
+        && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_nv12SharedUsed
         && !m_forceSoftYUV;
 }
@@ -2343,7 +2344,7 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
 		pic->width,
 		pic->height,
         QImage::Format_ARGB32 );	//QImage::Format_ARGB4444_Premultiplied );
-    const QString& fileName = QString::fromAscii("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
+    const QString& fileName = QString::fromLatin1("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
     img.save(fileName, "png");
     /*if( !img.save( fileName, "bmp" ) )
         int x = 0;*/

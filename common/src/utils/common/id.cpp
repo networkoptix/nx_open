@@ -1,6 +1,7 @@
 #include "id.h"
 
 #include <QtCore/QMutex>
+#include <limits.h>
 
 namespace {
     static const int firstCustomId = INT_MAX / 2;

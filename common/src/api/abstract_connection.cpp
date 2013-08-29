@@ -73,7 +73,7 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestHeaderL
 }
 
 int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(object, QnRequestHeaderList(), params, replyTypeName, target, slot);
+    return sendAsyncGetRequest(object, m_headers, params, replyTypeName, target, slot);
 }
 
 int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
@@ -104,3 +104,8 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
     return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
 }
 
+
+void QnAbstractConnection::setExtraHeaders(const QnRequestHeaderList& headers)
+{
+    m_headers = headers;
+}

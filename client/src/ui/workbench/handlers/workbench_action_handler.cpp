@@ -4,15 +4,15 @@
 
 #include <QtCore/QProcess>
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QtGui/QImage>
-#include <QtGui/QWhatsThis>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLineEdit>
-#include <QtGui/QCheckBox>
+#include <QtWidgets/QWhatsThis>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QCheckBox>
 #include <QtGui/QImageWriter>
 
 #include <api/session_manager.h>
@@ -789,6 +789,30 @@ QnWorkbenchNotificationsHandler* QnWorkbenchActionHandler::notificationsHandler(
     return context()->instance<QnWorkbenchNotificationsHandler>();
 }
 
+QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
+    return m_cameraSettingsDialog.data();
+}
+
+QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
+    return m_businessRulesDialog.data();
+}
+
+QnEventLogDialog *QnWorkbenchActionHandler::businessEventsLogDialog() const {
+    return m_businessEventsLogDialog.data();
+}
+
+QnCameraListDialog *QnWorkbenchActionHandler::cameraListDialog() const {
+    return m_cameraListDialog.data();
+}
+
+QnCameraAdditionDialog *QnWorkbenchActionHandler::cameraAdditionDialog() const {
+    return m_cameraAdditionDialog.data();
+}
+
+QnLoginDialog *QnWorkbenchActionHandler::loginDialog() const {
+    return m_loginDialog.data();
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -1000,7 +1024,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
     if(!widget)
         return;
-    QWeakPointer<QnResourceWidget> guard(widget);
+    QPointer<QnResourceWidget> guard(widget);
 
     
 
@@ -1236,7 +1260,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     QnLayoutResourcePtr newLayout;
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-    newLayout->setGuid(QUuid::createUuid());
+    newLayout->setGuid(QUuid::createUuid().toString());
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: #Elric this does not belong here.
@@ -1690,7 +1714,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QUrl url(QnAppServerConnectionFactory::defaultUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    url.setPath(QLatin1String("web"));
+    url.setPath(QLatin1String("/web/"));
     QDesktopServices::openUrl(url);
 }
 
@@ -2071,7 +2095,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid());
+    layout->setGuid(QUuid::createUuid().toString());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: #Elric this does not belong here.
     if(context()->user())
@@ -2499,7 +2523,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         return;
 
     dialog->submitToResource();
-    user->setGuid(QUuid::createUuid());
+    user->setGuid(QUuid::createUuid().toString());
 
     connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     user->setPassword(QString()); // forget the password now
@@ -2544,7 +2568,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     } while (button != QMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid());
+    layout->setGuid(QUuid::createUuid().toString());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);

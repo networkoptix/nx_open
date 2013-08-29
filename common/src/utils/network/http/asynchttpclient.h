@@ -8,9 +8,9 @@
 
 #include <map>
 
-#include <QMutex>
-#include <QObject>
-#include <QUrl>
+#include <QtCore/QMutex>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
 #include <QSharedPointer>
 
 #include "httpstreamreader.h"

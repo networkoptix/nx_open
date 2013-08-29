@@ -3,6 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
+#include <QtGui/QOpenGLFunctions>
 #include <QtOpenGL/QGLContext>
 
 #include <utils/media/frame_info.h>
@@ -43,9 +44,7 @@ public:
 };
 
 
-class QnGLRenderer
-:
-    public QnGlFunctions
+class QnGLRenderer : protected QnGlFunctions, protected QOpenGLFunctions
 {
 public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);

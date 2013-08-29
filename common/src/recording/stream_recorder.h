@@ -1,7 +1,7 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
 extern "C"

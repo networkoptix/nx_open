@@ -2,8 +2,8 @@
 
 #include <limits>
 
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QMessageBox>
 
 #include <QtOpenGL/QGLWidget>
 

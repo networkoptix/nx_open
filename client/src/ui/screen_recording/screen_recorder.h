@@ -1,8 +1,8 @@
 #ifndef QN_SCREEN_RECORDER_H
 #define QN_SCREEN_RECORDER_H
 
-#include <QObject>
-#include <QScopedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 class QGLWidget;
 class QnDesktopFileEncoder;

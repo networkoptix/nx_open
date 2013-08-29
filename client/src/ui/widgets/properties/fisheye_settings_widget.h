@@ -1,7 +1,7 @@
 #ifndef QN_FISHEYE_SETTINGS_WIDGET_H
 #define QN_FISHEYE_SETTINGS_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/resource/camera_resource.h>
 

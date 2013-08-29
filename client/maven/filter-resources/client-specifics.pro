@@ -1,4 +1,6 @@
 TEMPLATE = app
+
+DEFINES += CL_FORCE_LOGO USE_NX_HTTP
 TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ru.ts \
 				${basedir}/translations/client_zh-CN.ts \
@@ -7,7 +9,12 @@ TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ko.ts \
 				${basedir}/translations/client_pt-BR.ts \
 
-include(${environment.dir}/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
+include(${environment.dir}/qt5/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
+
+win* {
+INCLUDEPATH += ${environment.dir}/qt5/qtbase-${arch}/include/QtWidgets/$$QT_VERSION/ \
+               ${environment.dir}/qt5/qtbase-${arch}/include/QtWidgets/$$QT_VERSION/QtWidgets/
+}
 
 
 mac {
@@ -15,5 +22,11 @@ mac {
 }
 
 unix: !mac {
-  LIBS += -lX11
+  LIBS += -lX11 -lXfixes
+  QT += x11extras  
 }
+
+unix: {
+  LIBS += -lGL -lGLU
+}
+

@@ -2,8 +2,8 @@
 #define QN_GRAPHICS_TOOL_TIP_H
 
 #include <QtCore/QString>
-#include <QtGui/QGraphicsItem>
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsView>
 
 class GraphicsToolTip {
 public:

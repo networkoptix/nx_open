@@ -446,14 +446,14 @@ QByteArray CLSimpleHTTPClient::basicAuth() const
 QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url)
 {
     QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
-    HA1 = QString::fromAscii(QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    HA1 = QString::fromLatin1(QCryptographicHash::hash(HA1.toLatin1(), QCryptographicHash::Md5).toHex().constData());
 
     QString HA2 = method + QLatin1Char(':') + url;
-    HA2 = QString::fromAscii(QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    HA2 = QString::fromLatin1(QCryptographicHash::hash(HA2.toLatin1(), QCryptographicHash::Md5).toHex().constData());
 
     QString response = HA1 + QLatin1Char(':') + nonce + QLatin1Char(':') + HA2;
 
-    response = QString::fromAscii(QCryptographicHash::hash(response.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    response = QString::fromLatin1(QCryptographicHash::hash(response.toLatin1(), QCryptographicHash::Md5).toHex().constData());
 
 
     QString result;

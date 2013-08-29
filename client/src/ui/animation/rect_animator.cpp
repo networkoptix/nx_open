@@ -1,6 +1,6 @@
 #include "rect_animator.h"
 #include <cmath> /* For std::abs, std::exp & std::log. */
-#include <QRectF>
+#include <QtCore/QRectF>
 #include <utils/common/warnings.h>
 #include <ui/common/geometry.h>
 
@@ -14,7 +14,7 @@ RectAnimator::RectAnimator(QObject *parent):
 RectAnimator::~RectAnimator() {}
 
 void RectAnimator::updateInternalType(int newType) {
-    if(newType != QMetaType::Void && newType != QMetaType::QRectF)
+    if(newType != QMetaType::UnknownType && newType != QMetaType::Void && newType != QMetaType::QRectF)
         qnWarning("Type '%1' is not supported by this animator.", QMetaType::typeName(newType));
 
     base_type::updateInternalType(newType);

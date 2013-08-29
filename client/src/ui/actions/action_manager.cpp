@@ -2,9 +2,9 @@
 
 #include <cassert>
 
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QGraphicsItem>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>

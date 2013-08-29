@@ -5,7 +5,7 @@
 #ifndef PLUGINUSAGERECORD_H
 #define PLUGINUSAGERECORD_H
 
-#include <QtCore>
+#include <QtCore/QtCore>
 
 
 static const quint64 USAGE_RECORD_EXPIRE_PERIOD = 1000;

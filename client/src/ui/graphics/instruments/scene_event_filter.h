@@ -1,7 +1,7 @@
 #ifndef QN_SCENE_EVENT_FILTER_H
 #define QN_SCENE_EVENT_FILTER_H
 
-#include <QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 
 class SceneEventFilterItem;
 

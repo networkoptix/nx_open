@@ -1,7 +1,7 @@
 #include "click_instrument.h"
-#include <QGraphicsSceneMouseEvent>
-#include <QWeakPointer>
-#include <QApplication>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+
+#include <QtWidgets/QApplication>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 #include <ui/common/weak_graphics_item_pointer.h>
@@ -27,8 +27,8 @@ struct ClickInstrument::ClickData {
 
     QGraphicsSceneMouseEvent event;
     WeakGraphicsItemPointer item;
-    QWeakPointer<QGraphicsScene> scene;
-    QWeakPointer<QGraphicsView> view;
+    QPointer<QGraphicsScene> scene;
+    QPointer<QGraphicsView> view;
 };
 
 ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent): 

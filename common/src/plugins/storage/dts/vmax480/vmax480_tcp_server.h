@@ -1,8 +1,8 @@
 #ifndef __VMAX480_TCP_SERVER_H__
 #define __VMAX480_TCP_SERVER_H__
 
-#include <QMutex>
-#include <QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QMap>
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
 #include "core/datapacket/media_data_packet.h"

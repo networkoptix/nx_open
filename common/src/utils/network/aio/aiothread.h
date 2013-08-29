@@ -6,7 +6,7 @@
 #ifndef AIOTHREAD_H
 #define AIOTHREAD_H
 
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include "aioeventhandler.h"
 #include "pollset.h"

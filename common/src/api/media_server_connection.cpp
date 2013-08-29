@@ -4,9 +4,8 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <QImage>
-#include <QNetworkProxy>
-#include <QNetworkReply>
+#include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QNetworkReply>
 #include <QSharedPointer>
 
 #include "utils/common/util.h"
@@ -22,6 +21,9 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtGui/QImage>
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
@@ -129,7 +131,7 @@ protected:
         QUrl url = query.url();
         url.setPath(QString());
         url.setUserInfo(QString());
-        url.setQueryItems(QList<QPair<QString, QString> >());
+        url.setQuery(QUrlQuery());
 
         QMutexLocker locker(&m_mutex);
         QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
@@ -153,7 +155,7 @@ private:
 
 Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
 
-QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
+QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
 
     /* Qt will take ownership of the supplied instance. */
@@ -162,11 +164,11 @@ QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     return result;
 }
 
-Q_GLOBAL_STATIC_WITH_ARGS(QWeakPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
+Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
 
 QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 {
-    QWeakPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
+    QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
     if(*result) {
         return result->data();
     } else {
@@ -382,12 +384,16 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
-    setUrl(mediaServerApiUrl);
+    setUrl(mserver->getApiUrl());
     setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+
+    QnRequestHeaderList extraHeaders;
+    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    setExtraHeaders(extraHeaders);
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {

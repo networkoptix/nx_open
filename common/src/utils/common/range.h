@@ -93,7 +93,7 @@
 //#include <arx/config.h>
 #include <utility> /* For std::pair & std::forward. */
 //#include <boost/iterator/iterator_adaptor.hpp>
-#include <QtGlobal> /* For QT_BEGIN_NAMESPACE & other macros. */
+#include <QtCore/QtGlobal> /* For QT_BEGIN_NAMESPACE & other macros. */
 
 QT_BEGIN_NAMESPACE
   template<class Key, class T> class QHash;

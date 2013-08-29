@@ -1,7 +1,7 @@
 #include "smtp_settings_widget.h"
 #include "ui_smtp_settings_widget.h"
 
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 

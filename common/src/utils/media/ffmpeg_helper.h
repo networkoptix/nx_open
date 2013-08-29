@@ -8,7 +8,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <QIODevice>
+#include <QtCore/QIODevice>
 
 
 QString codecIDToString(CodecID codecID);

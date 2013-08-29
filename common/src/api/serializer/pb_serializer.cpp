@@ -19,7 +19,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include <business/business_action_factory.h>
 
-#include <QSqlRecord>
+#include <QtSql/QSqlRecord>
 
 /* Prohibit the usage of std::string-QString conversion functions that do not 
  * explicitly state the encoding used for conversion. 
@@ -551,7 +551,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
     pb_layoutResource.set_parentid(layoutIn->getParentId().toInt());
     pb_layoutResource.set_name(layoutIn->getName().toUtf8().constData());
-    pb_layoutResource.set_guid(layoutIn->getGuid().toAscii().constData());
+    pb_layoutResource.set_guid(layoutIn->getGuid().toLatin1().constData());
 
     pb_layout.set_cellaspectratio(layoutIn->cellAspectRatio());
     pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
@@ -850,7 +850,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
     pb_serverResource.set_id(serverPtr->getId().toInt());
     pb_serverResource.set_name(serverPtr->getName().toUtf8().constData());
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
-    pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
+    pb_serverResource.set_guid(serverPtr->getGuid().toLatin1().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
     pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));

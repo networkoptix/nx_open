@@ -3,7 +3,7 @@
 
 #include "core/resource/resource_consumer.h"
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 
 class QnColdStoreIOBuffer : public QBuffer, public QnResourceConsumer
 {

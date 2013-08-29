@@ -18,9 +18,10 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QTranslator>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
+#include <QtCore/QStandardPaths>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
 
 #include <QtSingleApplication>
@@ -241,12 +242,12 @@ void initAppServerConnection()
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
-static QtMsgHandler defaultMsgHandler = 0;
+static QtMessageHandler defaultMsgHandler = 0;
 
-static void myMsgHandler(QtMsgType type, const char *msg)
+static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
     if (defaultMsgHandler) {
-        defaultMsgHandler(type, msg);
+        defaultMsgHandler(type, ctx, msg);
     } else { /* Default message handler. */
 #ifndef QN_NO_STDERR_MESSAGE_OUTPUT
         QTextStream err(stderr);
@@ -254,12 +255,14 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #endif
     }
 
-    qnLogMsgHandler( type, msg );
+    qnLogMsgHandler(type, ctx, msg);
 }
 
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
 #endif
+
+#include <iostream>
 
 #ifndef API_TEST_MAIN
 
@@ -273,6 +276,15 @@ int main(int argc, char **argv)
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::install_handler();
 #endif
+
+    //QApplication::setGraphicsSystem(QLatin1String("raster")); //TODO: #ak could not find sinonym in qt5.1
+    //QApplication::setColorSpec(QApplication::ManyColor);
+
+    QStringList pluginDirs = QApplication::libraryPaths();
+    pluginDirs << QString::fromLatin1("/usr/local/Qt-5.0.2//plugins/");
+    QApplication::setLibraryPaths( pluginDirs );
+//    foreach( QString str, QApplication::libraryPaths() )
+//        std::cout << str.toStdString()<<"\n";
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
     QnClientModule client(argc, argv);
@@ -376,7 +388,7 @@ int main(int argc, char **argv)
 
 
         /* Initialize log. */
-        const QString dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+        const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
         if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
             return 0;
         if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
@@ -391,7 +403,7 @@ int main(int argc, char **argv)
         cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
         cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-        defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
+        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
 
         // Create and start SessionManager

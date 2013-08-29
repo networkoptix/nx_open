@@ -44,8 +44,8 @@ private slots:
 private:
     QSizeF m_fixedSize;
     bool m_inUpdateScale;
-    QWeakPointer<QGraphicsView> m_lastView;
-    QWeakPointer<Instrument> m_instrument;
+    QPointer<QGraphicsView> m_lastView;
+    QPointer<Instrument> m_instrument;
     QGraphicsScale *m_scale;
 };
 

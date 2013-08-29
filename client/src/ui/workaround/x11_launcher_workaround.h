@@ -1,7 +1,7 @@
 #ifndef X11_LAUNCHER_WORKAROUND_H
 #define X11_LAUNCHER_WORKAROUND_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 /**
  * This class implements a workaround for Linux X11 Gnome Launcher

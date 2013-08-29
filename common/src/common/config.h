@@ -2,18 +2,6 @@
 #define QN_COMMON_CONFIG_H
 
 // -------------------------------------------------------------------------- //
-// Application settings. OK to change.
-// -------------------------------------------------------------------------- //
-/** 
- * \def QN_HAS_PRIVATE_INCLUDES
- * 
- * Define if Qt private headers are available on your system.
- */
-#define QN_HAS_PRIVATE_INCLUDES
-
-
-
-// -------------------------------------------------------------------------- //
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
@@ -40,7 +28,7 @@
 
 
 /* Don't use deprecated Qt functions. */
-#define QT_NO_DEPRECATED
+//#define QT_NO_DEPRECATED
 
 
 /* Use variadic macros in boost even for older GCC versions. */
@@ -62,17 +50,17 @@
 
 
 /* Define noexcept. */
-#if defined(_MSC_VER)
-#   define noexcept throw()
-#elif defined(__GNUC__)
-#   if (GCC_VERSION >= 40600)
-#       define noexcept noexcept
-#   else
-#       define noexcept throw()
-#   endif
-#else
-#   define noexcept
-#endif
+//#if defined(_MSC_VER) && _MSC_VER < 1700
+//#   define noexcept throw()
+//#elif defined(__GNUC__)
+//#   if (GCC_VERSION >= 40600)
+//#       define noexcept noexcept
+//#   else
+//#       define noexcept throw()
+//#   endif
+////#else
+////#   define noexcept
+//#endif
 
 
 /* Define foreach */

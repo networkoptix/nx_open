@@ -1,7 +1,9 @@
 
 #include <memory>
 
-#include <QSettings>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSettings>
+#include <QtCore/QUrlQuery>
 #include "progressive_downloading_server.h"
 #include <utils/fs/file.h>
 #include "utils/network/tcp_connection_priv.h"
@@ -433,8 +435,10 @@ void QnProgressiveDownloadingConsumer::run()
         }
         updateCodecByFormat(d->streamingFormat);
 
+        const QUrlQuery decodedUrlQuery( getDecodedUrl() );
+
         QSize videoSize(640,480);
-        QByteArray resolutionStr = getDecodedUrl().queryItemValue("resolution").toLocal8Bit().toLower();
+        QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLocal8Bit().toLower();
         if (resolutionStr.endsWith('p'))
             resolutionStr = resolutionStr.left(resolutionStr.length()-1);
         QList<QByteArray> resolution = resolutionStr.split('x');
@@ -451,11 +455,11 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         Qn::StreamQuality quality = Qn::QualityNormal;
-        if( getDecodedUrl().hasQueryItem(QnCodecParams::quality) )
-            quality = Qn::fromString<Qn::StreamQuality>(getDecodedUrl().queryItemValue(QnCodecParams::quality));
+        if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
+            quality = Qn::fromString<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality));
 
         QnCodecParams::Value codecParams;
-        QList<QPair<QString, QString> > queryItems = getDecodedUrl().queryItems();
+        QList<QPair<QString, QString> > queryItems = decodedUrlQuery.queryItems();
         for( QList<QPair<QString, QString> >::const_iterator
             it = queryItems.begin();
             it != queryItems.end();
@@ -496,16 +500,16 @@ void QnProgressiveDownloadingConsumer::run()
         //taking max send queue size from url
         bool dropLateFrames = d->streamingFormat == "mpjpeg";
         unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
-        if( getDecodedUrl().hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
+        if( decodedUrlQuery.hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
         {
-            maxFramesToCacheBeforeDrop = getDecodedUrl().queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
+            maxFramesToCacheBeforeDrop = decodedUrlQuery.queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
             dropLateFrames = true;
         }
 
-        const bool standFrameDuration = getDecodedUrl().hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
+        const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
-        QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
-        bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
+        QByteArray position = decodedUrlQuery.queryItemValue("pos").toLocal8Bit();
+        bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
 
         //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
@@ -589,7 +593,7 @@ void QnProgressiveDownloadingConsumer::run()
                     }
 
                     QByteArray ts("\"now\"");
-                    QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                    QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLocal8Bit();
                     if (timestamp != (qint64)AV_NOPTS_VALUE)
                     {
                         if (utcFormatOK)
@@ -634,7 +638,11 @@ void QnProgressiveDownloadingConsumer::run()
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
+#ifdef USE_NX_HTTP
+        d->response.headers["Cache-Control"] = "no-cache";
+#else
         d->responseHeaders.setValue("Cache-Control", "no-cache");
+#endif
         sendResponse("HTTP", CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();

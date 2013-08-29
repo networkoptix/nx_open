@@ -1,7 +1,7 @@
 #ifndef __BITSTREAM_H
 #define __BITSTREAM_H
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <assert.h>
 #include <limits.h>
@@ -19,13 +19,13 @@ public:
     //BitStreamException(const std::string& str): std::exception(str.c_str()) {}
     BitStreamException(): std::exception() {}
     ~BitStreamException() throw() {}
-    BitStreamException(const std::string& str): message(QString::fromAscii(str.c_str())) {}
-    BitStreamException(const QString& str): message(QString::fromAscii(str.toAscii())) {}
-    BitStreamException(const char* str): message(QString::fromAscii(str)) {}
+    BitStreamException(const std::string& str): message(QString::fromLatin1(str.c_str())) {}
+    BitStreamException(const QString& str): message(QString::fromLatin1(str.toLatin1())) {}
+    BitStreamException(const char* str): message(QString::fromLatin1(str)) {}
 
     virtual const char* what() const throw()
     {
-        return message.toAscii();
+        return message.toLatin1();
     }
 private:
     QString message;

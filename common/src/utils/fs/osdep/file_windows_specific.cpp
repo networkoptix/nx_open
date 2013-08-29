@@ -6,7 +6,7 @@
 
 #ifdef Q_OS_WIN
 
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "../file.h"
 
 #include <sstream>

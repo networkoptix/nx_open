@@ -2,9 +2,9 @@
 #define QN_DMW_H
 
 #include <QtCore/QMargins>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
-#if defined(Q_OS_WIN) && defined(QN_HAS_PRIVATE_INCLUDES)
+#ifdef Q_OS_WIN
 #   define QN_HAS_DWM
 #endif
 

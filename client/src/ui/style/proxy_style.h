@@ -3,7 +3,7 @@
 
 #include <QtCore/QPointer>
 
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 /**
  * This class implements a proxy style that doesn't affect its base style in any way,
@@ -90,7 +90,7 @@ protected slots:
 private:
     Q_DISABLE_COPY(QnProxyStyle)
 
-    QWeakPointer<QStyle> m_style;
+    QPointer<QStyle> m_style;
 };
 
 #endif // QN_PROXY_STYLE_H

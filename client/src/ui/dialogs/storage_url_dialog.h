@@ -2,7 +2,7 @@
 #define QN_STORAGE_URL_DIALOG_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/resource_fwd.h"

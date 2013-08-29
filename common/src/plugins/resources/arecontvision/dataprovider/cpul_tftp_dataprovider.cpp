@@ -3,7 +3,7 @@
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
-#include <QMutex>
+#include <QtCore/QMutex>
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
