@@ -3,6 +3,7 @@
 #include <cmath> /* For std::sin. */
 
 #include <QtCore/QDateTime>
+#include <QtCore/QtMath>
 
 #include <utils/common/scoped_painter_rollback.h>
 
