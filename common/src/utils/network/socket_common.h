@@ -27,11 +27,18 @@ class HostAddress
 public:
     HostAddress();
     HostAddress( struct in_addr& sinAddr );
+    /*!
+        \param _ipv4 ipv4 address in local byte order
+    */
+    HostAddress( uint32_t _ipv4 );
     HostAddress( const QString& addrStr );
 
     //!Returns ip in local byte order
     uint32_t ipv4() const;
     QString toString() const;
+
+    static const HostAddress localhost;
+    static const HostAddress anyHost;
 
 private:
     mutable boost::optional<QString> m_addrStr;

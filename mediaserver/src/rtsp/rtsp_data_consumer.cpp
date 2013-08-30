@@ -436,7 +436,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
         }
         else  if (metadataTrack->mediaSocket) {
             Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-            metadataTrack->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            metadataTrack->mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
         metadataTrack->sequence++;
@@ -579,8 +579,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         }
         else {
             Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-            UDPSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
-            mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
+            mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
         m_sendBuffer.resize(4); // reserve space for RTP TCP header

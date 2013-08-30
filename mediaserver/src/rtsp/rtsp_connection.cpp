@@ -54,28 +54,28 @@ const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
 QMutex RtspServerTrackInfo::m_createSocketMutex;
 
-bool updatePort(UDPSocket* &socket, int port)
+bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
     delete socket;
-    socket = new UDPSocket();
-    return socket->setLocalPort(port);
+    socket = SocketFactory::createDatagramSocket();
+    return socket->bind( SocketAddress( HostAddress::anyHost, port ) );
 }
 
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
     QMutexLocker lock(&m_createSocketMutex);
-    mediaSocket = new UDPSocket();
-    rtcpSocket = new UDPSocket();
+    mediaSocket = SocketFactory::createDatagramSocket();
+    rtcpSocket = SocketFactory::createDatagramSocket();
 
-    bool opened = mediaSocket->setLocalPort(0);
+    bool opened = mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
     if (!opened)
         return false;
-    int startPort = mediaSocket->getLocalPort();
+    int startPort = mediaSocket->getLocalAddress().port;
     if(startPort&1) 
         opened = updatePort(mediaSocket, ++startPort);
     if (opened)
-        opened = rtcpSocket->setLocalPort(startPort+1);
+        opened = rtcpSocket->bind( SocketAddress( HostAddress::anyHost, startPort+1 ) );
 
     while (!opened && startPort < 65534) {
         startPort+=2;

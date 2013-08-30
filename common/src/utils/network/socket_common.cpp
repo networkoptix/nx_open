@@ -6,6 +6,9 @@
 #include "socket_common.h"
 
 
+const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
+const HostAddress HostAddress::anyHost( INADDR_ANY );
+
 HostAddress::HostAddress()
 {
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
@@ -14,6 +17,12 @@ HostAddress::HostAddress()
 HostAddress::HostAddress( struct in_addr& sinAddr )
 {
     memcpy( &m_sinAddr, &sinAddr, sizeof(sinAddr) );
+}
+
+HostAddress::HostAddress( uint32_t _ipv4 )
+{
+    memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
+    m_sinAddr.s_addr = htonl( _ipv4 );
 }
 
 HostAddress::HostAddress( const QString& addrStr )

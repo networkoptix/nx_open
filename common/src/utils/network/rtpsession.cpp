@@ -10,6 +10,7 @@
 #include <QUuid>
 
 #include "utils/common/util.h"
+#include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
 #include "../common/sleep.h"
 #include "tcp_connection_processor.h"
@@ -17,6 +18,7 @@
 #include "utils/media/bitStream.h"
 #include "../common/synctime.h"
 #include "tcp_connection_priv.h"
+
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -61,10 +63,12 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_tcpMode = useTCP;
     if (!m_tcpMode) 
     {
-        m_mediaSocket = new UDPSocket(0);
+        m_mediaSocket = SocketFactory::createDatagramSocket();
+        m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
         m_mediaSocket->setRecvTimeout(500);
 
-        m_rtcpSocket = new UDPSocket(0);
+        m_rtcpSocket = SocketFactory::createDatagramSocket();
+        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
         m_rtcpSocket->setRecvTimeout(500);
     }
 }
@@ -387,7 +391,7 @@ RTPSession::RTPSession():
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 
-    m_tcpSock.reset( new TCPSocket() );
+    m_tcpSock.reset( SocketFactory::createStreamSocket() );
 
     // todo: debug only remove me
 }

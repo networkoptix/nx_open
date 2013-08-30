@@ -25,7 +25,7 @@ PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     m_h264Parser(0),
     m_gotSDP(0)
 {
-    m_tcpSock.reset( new TCPSocket() );
+    m_tcpSock.reset( SocketFactory::createStreamSocket() );
 
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
 

@@ -11,6 +11,8 @@
 #include "utils/network/socket.h"
 
 
+class UDPSocket;
+
 class QnMdnsListener
 {
 public:
@@ -43,10 +45,10 @@ private:
     void readDataFromSocket();
     void deleteSocketList();
     QString getBestLocalAddress(const QString& remoteAddress);
-    void readSocketInternal(UDPSocket* socket, QString localAddress);
+    void readSocketInternal(AbstractDatagramSocket* socket, QString localAddress);
 
 private:
-    QList<UDPSocket*> m_socketList;
+    QList<AbstractDatagramSocket*> m_socketList;
     UDPSocket* m_receiveSocket;
     QTime m_socketLifeTime;
     //!list<pair<consumer id, consumer data> >. List is required to garantee, that consumers receive data in order they were registered

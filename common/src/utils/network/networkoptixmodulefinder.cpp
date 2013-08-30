@@ -12,6 +12,7 @@
 #include <QScopedArrayPointer>
 
 #include "socket.h"
+#include "system_socket.h"
 #include "../common/log.h"
 #include "../common/systemerror.h"
 #include "../../common/customization.h"
@@ -54,7 +55,8 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
         {
             //if( addressToUse == QHostAddress(QString::fromAscii("127.0.0.1")) )
             //    continue;
-            std::auto_ptr<UDPSocket> sock( new UDPSocket(addressToUse.toString(), 0) );
+            std::auto_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
+            sock->bind( addressToUse.toString(), 0 );
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr( multicastGroupAddress.toString(), multicastGroupPort );
             m_sockets.push_back( sock.release() );
@@ -117,7 +119,7 @@ void NetworkOptixModuleFinder::run()
         Q_ASSERT( false );
     }
 
-    for( std::vector<UDPSocket*>::const_iterator
+    for( std::vector<AbstractDatagramSocket*>::const_iterator
         it = m_sockets.begin();
         it != m_sockets.end();
         ++it )
@@ -137,12 +139,12 @@ void NetworkOptixModuleFinder::run()
         if( currentClock - m_prevPingClock >= m_pingTimeoutMillis )
         {
             //sending request via each socket
-            for( std::vector<UDPSocket*>::const_iterator
+            for( std::vector<AbstractDatagramSocket*>::const_iterator
                 it = m_sockets.begin();
                 it != m_sockets.end();
                 ++it )
             {
-                if( !(*it)->sendTo( searchPacket, searchPacketBufStart - searchPacket ) )
+                if( !(*it)->send( searchPacket, searchPacketBufStart - searchPacket ) )
                 {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
@@ -175,7 +177,8 @@ void NetworkOptixModuleFinder::run()
             if( !(it.eventType() & PollSet::etRead) )
                 continue;
 
-            UDPSocket* udpSocket = static_cast<UDPSocket*>(it.socket());
+            AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
+            Q_ASSERT( udpSocket );
 
             //reading socket response
             QString remoteAddressStr;

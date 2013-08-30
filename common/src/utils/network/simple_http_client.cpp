@@ -58,7 +58,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
 
 void CLSimpleHTTPClient::initSocket()
 {
-    m_sock = TCPSocketPtr(new TCPSocket());
+    m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );
 
     m_sock->setRecvTimeout(m_timeout);
     m_sock->setSendTimeout(m_timeout);

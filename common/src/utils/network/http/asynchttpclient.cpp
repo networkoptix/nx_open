@@ -61,7 +61,7 @@ namespace nx_http
     }
 
     //!Implementation of aio::AIOEventHandler::eventTriggered
-    void AsyncHttpClient::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
+    void AsyncHttpClient::eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw()
     {
         ScopedDestructionProhibition undestructable( this );    //~ScopedDestructionProhibition can call delete *this, which will lock m_mutex
 
@@ -91,8 +91,7 @@ namespace nx_http
 
                         case PollSet::etTimedOut:
                         case PollSet::etError:
-                            cl_log.log( QString::fromLatin1("Failed to connect to %1:%2. %3").arg(m_url.host()).arg(m_url.port()).
-                                arg(SystemError::toString(eventType != PollSet::etTimedOut ? m_socket->prevErrorCode() : SystemError::timedOut)), cl_logWARNING );
+                            cl_log.log( QString::fromLatin1("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logWARNING );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
@@ -112,8 +111,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        cl_log.log( QString::fromLatin1("Error sending http request to %1. %2").
-                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                        cl_log.log( QString::fromLatin1("Error sending http request to %1").arg(m_url.toString()), cl_logWARNING );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -147,8 +145,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        cl_log.log( QString::fromLatin1("Error reading http response from %1. %2").
-                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                        cl_log.log( QString::fromLatin1("Error reading http response from %1").arg(m_url.toString()), cl_logWARNING );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -234,8 +231,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        cl_log.log( QString::fromLatin1("Error reading http response message body from %1. %2").
-                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                        cl_log.log( QString::fromLatin1("Error reading http response message body from %1").arg(m_url.toString()), cl_logWARNING );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -399,7 +395,7 @@ namespace nx_http
 
         m_httpStreamReader.resetState();
 
-        m_socket = QSharedPointer<TCPSocket>( new TCPSocket() );
+        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
         if( !m_socket->setNonBlockingMode( true ) )
         {
             cl_log.log( QString::fromLatin1("Failed to put socket to non blocking mode. %1").

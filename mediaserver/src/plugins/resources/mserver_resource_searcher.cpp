@@ -1,6 +1,7 @@
 #include "mserver_resource_searcher.h"
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"
+#include "utils/network/system_socket.h"
 #include "utils/common/sleep.h"
 #include "serverutil.h"
 #include "utils/common/synctime.h"
@@ -219,7 +220,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        UDPSocket* sock = m_socketList[i];
+        AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
         QByteArray datagram = DiscoveryPacket::getRequest(m_appServerGuid);
@@ -240,7 +241,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
     }
 }
 
-void QnMServerResourceSearcher::readSocketInternal(UDPSocket* socket, QSet<QByteArray>& conflictList)
+void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QSet<QByteArray>& conflictList)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())

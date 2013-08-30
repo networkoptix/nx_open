@@ -33,8 +33,8 @@ struct RtspServerTrackInfo
     int clientRtcpPort;
     quint16 sequence;
     qint64 firstRtpTime;
-    UDPSocket* mediaSocket;
-    UDPSocket* rtcpSocket;
+    AbstractDatagramSocket* mediaSocket;
+    AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
     static QMutex m_createSocketMutex;
 };

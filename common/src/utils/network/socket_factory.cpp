@@ -5,7 +5,7 @@
 
 #include "socket_factory.h"
 
-#include "socket.h"
+#include "system_socket.h"
 
 
 AbstractDatagramSocket* SocketFactory::createDatagramSocket()

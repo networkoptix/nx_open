@@ -15,7 +15,7 @@ public:
 };
 
 QnProxySenderConnection::QnProxySenderConnection(const QUrl& proxyServerUrl, const QString& guid, QnTcpListener* owner):
-    QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, new TCPSocket(), owner)
+    QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, SocketFactory::createStreamSocket(), owner)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
@@ -84,7 +84,7 @@ void QnProxySenderConnection::run()
 
     if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
         doDelay();
-        addNewProxyConnect();
+        //addNewProxyConnect();
         return;
     }
 

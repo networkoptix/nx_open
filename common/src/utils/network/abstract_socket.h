@@ -34,6 +34,7 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool bind( const SocketAddress& localAddress ) = 0;
+    bool bind( const QString& localAddress, unsigned short localPort ) { return bind( SocketAddress( localAddress, localPort ) ); };
     //!Bind to local network interface by its name
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -264,6 +265,14 @@ public:
         unsigned int bufferLen,
         const QString& foreignAddress,
         unsigned short foreignPort ) = 0;
+    //!Send the given \a buffer as a datagram to the specified address/port
+    /*!
+        Same as previous method
+    */
+    bool sendTo(
+        const void* buffer,
+        unsigned int bufferLen,
+        const SocketAddress& foreignAddress ) { return sendTo( buffer, bufferLen, foreignAddress.address.toString(), foreignAddress.port ); }
     //!Read read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
     /*!
         \param buffer buffer to receive data
