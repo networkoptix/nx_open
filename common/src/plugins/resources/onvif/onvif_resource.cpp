@@ -2363,7 +2363,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
         return false;
     }
-    localAddress = sock.getLocalAddress();
+    localAddress = sock.getLocalAddress().address.toString();
 
     const QAuthenticator& auth = getAuth();
     NotificationProducerSoapWrapper soapWrapper(

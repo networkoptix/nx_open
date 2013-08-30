@@ -19,7 +19,7 @@ public:
         localPort = 0;
         ctx = 0;
     }
-    TCPServerSocket* serverSocket;
+    AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
     mutable QMutex portMutex;
@@ -64,15 +64,21 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     try {
         d->serverAddress = address;
         d->localPort = port;
-        d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
+        d->serverSocket = new TCPServerSocket();
+        //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
         d->maxConnections = maxConnections;
         d->ddosWarned = false;
-        if( d->serverSocket->failed() )
+        if( !d->serverSocket->setReuseAddrFlag(true) ||
+            !d->serverSocket->bind(SocketAddress(address.toString(), port)) ||
+            !d->serverSocket->listen() )
+        //if( d->serverSocket->failed() )
         {
+            const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+
             NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-                arg(d->serverSocket->prevErrorCode()).arg(d->serverSocket->lastError()), cl_logWARNING );
+                arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
             qCritical() << "Can't start TCP listener at address" << address << ":" << port << ". "
-                "Reason: " << d->serverSocket->lastError() << "("<<d->serverSocket->prevErrorCode()<<")";
+                "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
         }
         else {
             cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
@@ -223,11 +229,16 @@ void QnTcpListener::run()
                 NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
-                d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
-                if( d->serverSocket->failed() )
+                //d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
+                //if( d->serverSocket->failed() )
+                d->serverSocket = new TCPServerSocket();
+                if( !d->serverSocket->setReuseAddrFlag(true) ||
+                    !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->newPort)) ||
+                    !d->serverSocket->listen() )
                 {
+                    const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
                     NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Bind failed: %3").arg(d->serverAddress.toString()).arg(d->localPort).
-                        arg(d->serverSocket->lastError()), cl_logWARNING );
+                        arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
                     continue;
                 }
@@ -237,10 +248,11 @@ void QnTcpListener::run()
                 d->newPort = 0;
             }
 
-            TCPSocket* clientSocket = d->serverSocket->accept();
+            AbstractStreamSocket* clientSocket = d->serverSocket->accept();
 //            delete clientSocket;
 //            clientSocket = NULL;
-            if (clientSocket) {
+            if( clientSocket )
+            {
                 if (d->connections.size() > d->maxConnections)
                 {
                     if (!d->ddosWarned) {
@@ -251,10 +263,10 @@ void QnTcpListener::run()
                     continue;
                 }
                 d->ddosWarned = false;
-                NX_LOG( QString::fromLatin1("New client connection from %1:%2").arg(clientSocket->getPeerAddress()).arg(clientSocket->getForeignPort()), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1("New client connection from %1").arg(clientSocket->getForeignAddress().address.toString()), cl_logDEBUG1 );
                 QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
-                clientSocket->setReadTimeOut(processor->getSocketTimeout());
-                clientSocket->setWriteTimeOut(processor->getSocketTimeout());
+                clientSocket->setRecvTimeout(processor->getSocketTimeout());
+                clientSocket->setSendTimeout(processor->getSocketTimeout());
                 
                 QMutexLocker lock(&d->connectionMtx);
                 d->connections << processor;
@@ -262,13 +274,14 @@ void QnTcpListener::run()
             }
             else
             {
-                if( d->serverSocket->failed() )
-                {
-                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-                        arg(d->serverSocket->prevErrorCode()).arg(d->serverSocket->lastError()), cl_logWARNING );
-                    QThread::msleep(1000);
-                    d->newPort = d->localPort; // reopen tcp socket
-                }
+                const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                if( prevErrorCode == SystemError::timedOut )
+                    continue;
+
+                NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+                    arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
+                QThread::msleep(1000);
+                d->newPort = d->localPort; // reopen tcp socket
             }
             doPeriodicTasks();
         }
@@ -293,5 +306,5 @@ int QnTcpListener::getPort() const
 {
     Q_D(const QnTcpListener);
     QMutexLocker lock(&d->portMutex);
-    return d->serverSocket->getLocalPort();
+    return d->serverSocket->getLocalAddress().port;
 }

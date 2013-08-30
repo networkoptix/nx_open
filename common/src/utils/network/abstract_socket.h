@@ -6,32 +6,27 @@
 #ifndef ABSTRACT_SOCKET_H
 #define ABSTRACT_SOCKET_H
 
+#ifdef _WIN32
+#   include <winsock2.h>
+#endif
+
 #include <QByteArray>
-#include <QString>
 
 #include "nettools.h"
+#include "socket_common.h"
 #include "../common/byte_array.h"
 
-
-//!Pair "host address":port
-class SocketAddress
-{
-public:
-    QString address;
-    unsigned short port;
-
-    SocketAddress( const QString& _address = QString(), unsigned short _port = 0 )
-    :
-        address( _address ),
-        port( _port )
-    {
-    }
-};
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class AbstractSocket
 {
 public:
+#ifdef _WIN32
+    typedef SOCKET SOCKET_HANDLE;
+#else
+    typedef int SOCKET_HANDLE;
+#endif
+
     virtual ~AbstractSocket() {}
 
     //!Bind to local address/port
@@ -48,6 +43,10 @@ public:
     virtual SocketAddress getLocalAddress() const = 0;
     //!Get peer address
     virtual SocketAddress getPeerAddress() const = 0;
+    //!Close socket
+    virtual void close() = 0;
+    //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
+    virtual bool isClosed() const = 0;
 
     //!Allows mutiple sockets to bind to same address and port
     /*!
@@ -122,6 +121,11 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendTimeout( unsigned int* millis ) = 0;
+    //!Returns system-specific socket handle
+    /*!
+        TODO: #ak remove this method after complete move to the new socket
+    */
+    virtual SOCKET_HANDLE handle() const = 0;
 };
 
 //!Interface for writing to/reading from socket
@@ -132,14 +136,19 @@ class AbstractCommunicatingSocket
 public:
     virtual ~AbstractCommunicatingSocket() {}
 
+    static const int DEFAULT_TIMEOUT_MILLIS = 3000;
+
     //!Establish connection to specified foreign address
     /*!
         \param foreignAddress foreign address (IP address or name)
         \param foreignPort foreign port
+        \param timeoutMillis connection timeout, 0 - no timeout
         \return false if unable to establish connection
-        \note To connect with timeout, set write timeout before calling this method (AbstractCommunicatingSocket::setWriteTimeOut)
      */
-    virtual bool connect( const QString &foreignAddress, unsigned short foreignPort ) = 0;
+    virtual bool connect(
+        const QString& foreignAddress,
+        unsigned short foreignPort,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::recv()
@@ -149,7 +158,7 @@ public:
         \return number of bytes read, 0 for EOF, and -1 for error. Use \a SystemError::getLastOSErrorCode() to get error code
         \note If socket is in non-blocking mode and non-blocking send is not possible, method will return -1 and set error code to \a SystemError::wouldBlock
      */
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) = 0;
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) = 0;
     //!Write the given buffer to this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::send()
@@ -183,6 +192,11 @@ class AbstractStreamSocket
 public:
     virtual ~AbstractStreamSocket() {}
 
+    //!Reopenes previously closed socket
+    /*!
+        TODO #ak this class is not a right place for this method
+    */
+    virtual bool reopen() = 0;
     //!Set TCP_NODELAY option (disable data aggregation)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -229,7 +243,13 @@ class AbstractDatagramSocket
 {
 public:
     virtual ~AbstractDatagramSocket() {}
-    
+
+    //!Set destination address for use by \a AbstractCommunicatingSocket::send() method
+    /*!
+        Difference from \a AbstractCommunicatingSocket::connect() method is this method does not enable filtering incoming datagrams by (\a foreignAddress, \a foreignPort),
+            and \a AbstractCommunicatingSocket::connect() does
+    */
+    virtual bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) = 0;
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         \param buffer buffer to be written
@@ -237,6 +257,7 @@ public:
         \param foreignAddress address (IP address or name) to send to
         \param foreignPort port number to send to
         \return true if whole data has been sent
+        \note Remebers new destination address (as if \a AbstractDatagramSocket::setDestAddr( \a foreignAddress, \a foreignPort ) has been called)
     */
     virtual bool sendTo(
         const void* buffer,
@@ -249,13 +270,18 @@ public:
         \param bufferLen maximum number of bytes to receive
         \param sourceAddress address of datagram source
         \param sourcePort port of data source
-        \return number of bytes received and -1 for error
+        \return number of bytes received and -1 in case of error
     */
     virtual int recvFrom(
         void* buffer,
         int bufferLen,
         QString& sourceAddress,
         unsigned short& sourcePort ) = 0;
+    //!Checks, whether data is available for reading in non-blocking mode. Does not block for timeout, returns immediately
+    /*!
+        TODO: #ak remove this method, since it requires use of \a select(), which is heavy, use \a MSG_DONTWAIT instead
+    */
+    virtual bool hasData() const = 0;
 };
 
 #endif  //ABSTRACT_SOCKET_H

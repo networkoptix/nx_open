@@ -281,8 +281,8 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    TCPSocket sock;
-    return sock.connect( getHostAddress(), httpPort() );
+    std::auto_ptr<AbstractStreamSocket> sock( new TCPSocket() );
+    return sock->connect( getHostAddress(), httpPort() );
 }
 
 /*

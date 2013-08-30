@@ -62,10 +62,10 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     if (!m_tcpMode) 
     {
         m_mediaSocket = new UDPSocket(0);
-        m_mediaSocket->setReadTimeOut(500);
+        m_mediaSocket->setRecvTimeout(500);
 
         m_rtcpSocket = new UDPSocket(0);
-        m_rtcpSocket->setReadTimeOut(500);
+        m_rtcpSocket->setRecvTimeout(500);
     }
 }
 
@@ -98,10 +98,10 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
     return readed;
 }
 
-CommunicatingSocket* RTPIODevice::getMediaSocket()
+AbstractCommunicatingSocket* RTPIODevice::getMediaSocket()
 { 
     if (m_tcpMode) 
-        return &m_owner->m_tcpSock;
+        return m_owner->m_tcpSock.get();
     else
         return m_mediaSocket; 
 }
@@ -119,10 +119,10 @@ void RTPIODevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
-    while (m_rtcpSocket->hasData())
+    while( m_rtcpSocket->hasData() )
     {
         QString lastReceivedAddr;
-        unsigned short lastReceivedPort;
+        unsigned short lastReceivedPort = 0;
         int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
         if (readed > 0)
         {
@@ -130,7 +130,7 @@ void RTPIODevice::processRtcpData()
             {
                 if (!m_rtcpSocket->setDestAddr(lastReceivedAddr, lastReceivedPort))
                 {
-                    qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << m_rtcpSocket->lastError();
+                    qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << SystemError::getLastOSErrorText();
                 }
             }
             bool gotValue = false;
@@ -139,9 +139,7 @@ void RTPIODevice::processRtcpData()
                 m_statistic = stats;
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
-            {
-                m_rtcpSocket->sendTo(sendBuffer, outBufSize);
-            }
+                m_rtcpSocket->send(sendBuffer, outBufSize);
         }
     }
 }
@@ -389,12 +387,14 @@ RTPSession::RTPSession():
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 
+    m_tcpSock.reset( new TCPSocket() );
+
     // todo: debug only remove me
 }
 
 RTPSession::~RTPSession()
 {
-    m_tcpSock.close();
+    m_tcpSock->close();
     delete [] m_responseBuffer;
 }
 
@@ -639,10 +639,10 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 
     //unsigned int port = DEFAULT_RTP_PORT;
 
-    if (m_tcpSock.isClosed())
-        m_tcpSock.reopen();
+    if (m_tcpSock->isClosed())
+        m_tcpSock->reopen();
 
-    m_tcpSock.setReadTimeOut(TCP_CONNECT_TIMEOUT);
+    m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT);
 
     QString targetAddress;
     int destinationPort = 0;
@@ -656,13 +656,13 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         targetAddress = m_proxyAddr;
         destinationPort = m_proxyPort;
     }
-    if( !m_tcpSock.connect(targetAddress, destinationPort) )
+    if( !m_tcpSock->connect(targetAddress, destinationPort) )
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, destinationPort);
 
-    m_tcpSock.setNoDelay(true);
+    m_tcpSock->setNoDelay(true);
 
-    m_tcpSock.setReadTimeOut(m_tcpTimeout);
-    m_tcpSock.setWriteTimeOut(m_tcpTimeout);
+    m_tcpSock->setRecvTimeout(m_tcpTimeout);
+    m_tcpSock->setSendTimeout(m_tcpTimeout);
 
     if (m_numOfPredefinedChannels) {
         usePredefinedTracks();
@@ -670,21 +670,21 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     }
 
     if (!sendDescribe()) {
-        m_tcpSock.close();
+        m_tcpSock->close();
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
     QByteArray response;
 
     if (!readTextResponce(response)) {
-        m_tcpSock.close();
+        m_tcpSock->close();
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
     // check digest authentication here
     if (!checkIfDigestAuthIsneeded(response))
     {
-        m_tcpSock.close();
+        m_tcpSock->close();
         return CameraDiagnostics::CameraResponseParseErrorResult( url, QLatin1String("DESCRIBE") );
     }
         
@@ -695,7 +695,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         response.clear();
         if (!sendDescribe() || !readTextResponce(response)) 
         {
-            m_tcpSock.close();
+            m_tcpSock->close();
             return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
         }
     }
@@ -717,17 +717,17 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         case CL_HTTP_SUCCESS:
             break;
         case CL_HTTP_AUTH_REQUIRED:
-            m_tcpSock.close();
+            m_tcpSock->close();
             return CameraDiagnostics::NotAuthorisedResult( url );
         default:
-            m_tcpSock.close();
+            m_tcpSock->close();
             return CameraDiagnostics::RequestFailedResult( QString::fromLatin1("DESCRIBE %1").arg(url), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
-        m_tcpSock.close();
+        m_tcpSock->close();
         return CameraDiagnostics::NoMediaTrackResult( url );
     }
 
@@ -735,7 +735,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     parseSDP();
 
     if (m_sdpTracks.size()<=0) {
-        m_tcpSock.close();
+        m_tcpSock->close();
         result = CameraDiagnostics::NoMediaTrackResult( url );
     }
 
@@ -763,13 +763,13 @@ bool RTPSession::stop()
 {
     //delete m_tcpSock;
     //m_tcpSock = 0;
-    m_tcpSock.close();
+    m_tcpSock->close();
     return true;
 }
 
 bool RTPSession::isOpened() const
 {
-    return m_tcpSock.isConnected();
+    return m_tcpSock->isConnected();
 }
 
 unsigned int RTPSession::sessionTimeoutMs()
@@ -820,7 +820,7 @@ bool RTPSession::sendDescribe()
 
     //qDebug() << request;
 
-    return (m_tcpSock.send(request.data(), request.size()));
+    return (m_tcpSock->send(request.data(), request.size()));
 }
 
 bool RTPSession::sendOptions()
@@ -837,7 +837,7 @@ bool RTPSession::sendOptions()
     addAuth(request);
     request += "\r\n";
 
-    return (m_tcpSock.send(request.data(), request.size()));
+    return (m_tcpSock->send(request.data(), request.size()));
 }
 
 RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
@@ -950,9 +950,9 @@ bool RTPSession::sendSetup()
         if (m_prefferedTransport == TRANSPORT_UDP)
         {
             request += "client_port=";
-            request += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalPort());
+            request += QString::number(trackInfo->ioDevice->getMediaSocket()->getLocalAddress().port);
             request += '-';
-            request += QString::number(trackInfo->ioDevice->getRtcpSocket()->getLocalPort());
+            request += QString::number(trackInfo->ioDevice->getRtcpSocket()->getLocalAddress().port);
         }
         else
         {
@@ -973,7 +973,7 @@ bool RTPSession::sendSetup()
 
         //qDebug() << request;
 
-        if (!m_tcpSock.send(request.data(), request.size()))
+        if (!m_tcpSock->send(request.data(), request.size()))
             return 0;
 
         QByteArray responce;
@@ -1100,7 +1100,7 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
         request += requestBody;
     }
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         return false;
 
     return true;
@@ -1178,7 +1178,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     
     request += QLatin1String("\r\n");
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         return false;
 
 
@@ -1233,7 +1233,7 @@ bool RTPSession::sendPause()
 
     request += "\r\n";
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         return false;
 
 
@@ -1268,7 +1268,7 @@ bool RTPSession::sendTeardown()
     request += m_SessionId;
     request += "\r\n\r\n";
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         return false;
 
     return true;
@@ -1401,7 +1401,7 @@ bool RTPSession::sendKeepAlive()
     request += "\r\n\r\n";
     //
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         return false;
     return true;
     //return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
@@ -1411,7 +1411,7 @@ bool RTPSession::sendKeepAlive()
 /*
 int RTPSession::readRAWData()
 {
-    int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, qMin(RTSP_BUFFER_LEN - m_responseBufferLen, MAX_RTSP_DATA_LEN));
+    int readed = m_tcpSock->recv(m_responseBuffer + m_responseBufferLen, qMin(RTSP_BUFFER_LEN - m_responseBufferLen, MAX_RTSP_DATA_LEN));
     if (readed > 0)
     {
         m_responseBufferLen += readed;
@@ -1423,14 +1423,14 @@ int RTPSession::readRAWData()
 
 void RTPSession::sendBynaryResponse(quint8* buffer, int size)
 {
-    m_tcpSock.send(buffer, size);
+    m_tcpSock->send(buffer, size);
 }
 
 
 bool RTPSession::processTextResponseInsideBinData()
 {
     // have text response or part of text response.
-    int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+    int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
     if (readed <= 0)
         return false;
     m_responseBufferLen += readed;
@@ -1454,10 +1454,10 @@ bool RTPSession::processTextResponseInsideBinData()
 
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
-    while (m_tcpSock.isConnected())
+    while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
+            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
             if (readed <= 0)
                 return readed;
             m_responseBufferLen += readed;
@@ -1480,7 +1480,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = m_tcpSock.recv(data, dataRestLen);
+        int readed = m_tcpSock->recv(data, dataRestLen);
         if (readed <= 0)
             return readed;
         dataRestLen -= readed;
@@ -1503,10 +1503,10 @@ quint8* RTPSession::prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int c
 
 int RTPSession::readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber)
 {
-    while (m_tcpSock.isConnected())
+    while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
+            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
             if (readed <= 0)
                 return readed;
             m_responseBufferLen += readed;
@@ -1530,7 +1530,7 @@ int RTPSession::readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& chan
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = m_tcpSock.recv(data, dataRestLen);
+        int readed = m_tcpSock->recv(data, dataRestLen);
         if (readed <= 0)
             return readed;
         dataRestLen -= readed;
@@ -1545,21 +1545,21 @@ bool RTPSession::readTextResponce(QByteArray& response)
 {
     bool readMoreData = m_responseBufferLen == 0;
     int ignoreDataSize = 0;
-    for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock.isConnected(); ++i)
+    for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
         if (readMoreData) {
-            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
             if (readed <= 0)
             {
                 if( readed == 0 )
                 {
-                    NX_LOG( QString::fromLatin1("RTSP connection to %1:%2 has been unexpectedly closed").
-                        arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()), cl_logINFO );
+                    NX_LOG( QString::fromLatin1("RTSP connection to %1 has been unexpectedly closed").
+                        arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
                 }
                 else
                 {
-                    NX_LOG( QString::fromLatin1("Error reading RTSP response from %1:%2. %3").
-                        arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    NX_LOG( QString::fromLatin1("Error reading RTSP response from %1. %2").
+                        arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
                 }
                 return false;	//error occured or connection closed
             }
@@ -1588,8 +1588,8 @@ bool RTPSession::readTextResponce(QByteArray& response)
         readMoreData = true;
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
-            NX_LOG( QString::fromLatin1("RTSP response from %1:%2 has exceeded max response size (%3)").
-                arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()).arg(RTSP_BUFFER_LEN), cl_logINFO );
+            NX_LOG( QString::fromLatin1("RTSP response from %1 has exceeded max response size (%2)").
+                arg(m_tcpSock->getForeignAddress().toString()).arg(RTSP_BUFFER_LEN), cl_logINFO );
             return false;
         }
     }
@@ -1602,7 +1602,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
     bool readMore = false;
     QByteArray textResponse;
-    while (m_tcpSock.isConnected())
+    while (m_tcpSock->isConnected())
     {
         if (readMore) {
              int readed = readRAWData();
@@ -1911,7 +1911,7 @@ void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)
 
 bool RTPSession::setTCPReadBufferSize(int value)
 {
-    return m_tcpSock.setReadBufferSize(value);
+    return m_tcpSock->setRecvBufferSize(value);
 }
 
 QString RTPSession::getVideoLayout() const

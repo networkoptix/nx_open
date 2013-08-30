@@ -193,7 +193,7 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner)
 {
 }
@@ -230,7 +230,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->useProprietaryFormat = true;
     else {
         d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT;
-        d->socket->setReadTimeOut(d->sessionTimeOut * 1500);
+        d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
     }
 
     QString pos = url.queryItemValue("pos").split('/')[0];
@@ -286,7 +286,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getPeerAddressUint());
+    return QHostAddress(d->socket->getPeerAddress().address.ipv4());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
@@ -608,7 +608,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     sdp << "v=0" << ENDL;
     sdp << "s=" << d->mediaRes->toResource()->getName() << ENDL;
-    sdp << "c=IN IP4 " << d->socket->getLocalAddress() << ENDL;
+    sdp << "c=IN IP4 " << d->socket->getLocalAddress().address.toString() << ENDL;
 
     int i = 0;
     for (; i < numVideo + numAudio; ++i)
@@ -746,9 +746,9 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientPort = ports[0].toInt();
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
-                        if (trackInfo->openServerSocket(d->socket->getPeerAddress())) {
-                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalPort()));
-                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalPort()));
+                        if (trackInfo->openServerSocket(d->socket->getPeerAddress().address.toString())) {
+                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalAddress().port));
+                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalAddress().port));
                         }
                     }
                     //if (trackInfo->getSSRC())
@@ -842,7 +842,7 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     if (cameraResource) {
         if (cameraResource->isAudioEnabled() != d->audioEnabled) {
             m_needStop = true;
-            d->socket->shutdown();
+            d->socket->close();
         }
     }
 }
@@ -854,7 +854,7 @@ void QnRtspConnectionProcessor::at_camera_disabledChanged()
     QMutexLocker lock(&d->mutex);
     if (d->mediaRes->toResource()->isDisabled()) {
         m_needStop = true;
-        d->socket->shutdown();
+        d->socket->close();
     }
 }
 
@@ -974,8 +974,8 @@ int QnRtspConnectionProcessor::composePlay()
         d->clientGuid = d->requestHeaders.value("x-guid").toUtf8();
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        //d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
-        //d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
+        //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
+        //d->socket->setSendTimeout(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
         const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
         if (videoLayout) {
@@ -1304,8 +1304,8 @@ void QnRtspConnectionProcessor::run()
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
-    //d->socket->setReadTimeOut(1000*1000);
-    //d->socket->setWriteTimeOut(1000*1000);
+    //d->socket->setRecvTimeout(1000*1000);
+    //d->socket->setSendTimeout(1000*1000);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();

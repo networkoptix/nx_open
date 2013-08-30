@@ -15,7 +15,7 @@ m_timeout(timeout)
 {
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
-    m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
+    m_sock.setRecvTimeout(max(m_timeout,1000)); // minimum timeout is 1000 ms
     if (!m_sock.setDestAddr(resolveAddress(host).toString(), SERVER_TFTP_PORT))
     {
         qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << m_sock.lastError();
@@ -124,7 +124,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                 while(1)
                 {
                     m_prevResult = CameraDiagnostics::NoErrorResult();
-                    len_recv = m_sock.recv(buff_recv, sizeof(buff_recv));
+                    len_recv = m_sock.recv(buff_recv, sizeof(buff_recv), 0);
 
                     if (len_recv < 4)// unexpected answer or did not get anything
                     {

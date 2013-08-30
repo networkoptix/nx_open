@@ -80,14 +80,14 @@ struct AnDroidDev
         QString request;
 
         TCPSocket sock;
-        sock.setReadTimeOut(500);
-        sock.setWriteTimeOut(500);
+        sock.setRecvTimeout(500);
+        sock.setSendTimeout(500);
 
-        if (sock.connect(QHostAddress(ip).toString(), 8080))
+        if (sock.connect(QHostAddress(ip).toString(), 8080, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS))
         {
             android = true;
             
-            localAddr = sock.getLocalAddress();
+            localAddr = sock.getLocalAddress().address.toString();
         }
 
     }

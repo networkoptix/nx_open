@@ -301,7 +301,7 @@ void PollSet::interrupt()
 {
     //introduce overlapped IO
     quint8 buf[128];
-    m_impl->dummySocket.sendTo( buf, sizeof(buf), m_impl->dummySocket.getLocalAddress(), m_impl->dummySocket.getLocalPort() );
+    m_impl->dummySocket.sendTo( buf, sizeof(buf), m_impl->dummySocket.getLocalAddress().address.toString(), m_impl->dummySocket.getLocalPort() );
 }
 
 //!Add socket to set. Does not take socket ownership
@@ -395,7 +395,7 @@ int PollSet::poll( int millisToWait )
     {
         //reading dummy socket
         quint8 buf[128];
-        m_impl->dummySocket.recv( buf, sizeof(buf) );   //ignoring result and data...
+        m_impl->dummySocket.recv( buf, sizeof(buf), 0 );   //ignoring result and data...
          --result;
     }
     return result;

@@ -129,7 +129,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
 {
     UDPSocket* qSocket = reinterpret_cast<UDPSocket*>(soap->user);
-    int readed = qSocket->recv(data, maxSize);
+    int readed = qSocket->recv(data, maxSize, 0);
     return (size_t) qMax(0, readed);
 }
 
@@ -634,7 +634,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     //UDPSocket socket;
     //if (!socket.bindToInterface(iface))
     //    return;
-    //socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
+    //socket.setRecvTimeout(SOAP_DISCOVERY_TIMEOUT * 1000);
 
     QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
     wsddProxy soapWsddProxy(SOAP_IO_UDP);

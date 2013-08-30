@@ -24,7 +24,7 @@ protected:
     virtual void updateStreamParamsBasedOnFps() override;
     int receiveData(quint8* buffer, int size);
 private:
-    TCPSocket m_tcpSock;
+    std::auto_ptr<AbstractStreamSocket> m_tcpSock;
     QnMediaContextPtr m_context;
 };
 

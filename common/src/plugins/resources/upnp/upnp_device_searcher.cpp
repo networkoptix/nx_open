@@ -273,7 +273,7 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
 
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append("\r\n");
+        data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
         data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");
@@ -301,7 +301,7 @@ QSharedPointer<UDPSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAn
         !sock->setLocalAddressAndPort( localAddress, GROUP_PORT ) ||
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
-        !sock->setReadBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
+        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
         !aio::AIOService::instance()->watchSocket( sock, PollSet::etRead, this ) )
     {
         QMutexLocker lk( &m_mutex );

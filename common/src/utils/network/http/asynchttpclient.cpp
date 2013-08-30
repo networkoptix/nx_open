@@ -409,7 +409,7 @@ namespace nx_http
         }
 
         //starting async connect
-        if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT) ) )
+        if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT), 0 ) )
         {
             cl_log.log( QString::fromLatin1("Failed to perform async connect to %1:%2. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
@@ -434,7 +434,7 @@ namespace nx_http
 
     int AsyncHttpClient::readAndParseHttp()
     {
-        int bytesRead = m_socket->recv( m_responseBuffer.data(), m_responseBuffer.size() );
+        int bytesRead = m_socket->recv( m_responseBuffer.data(), m_responseBuffer.size(), 0 );
         if( bytesRead < 0 )         //read error
         {
             if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock )

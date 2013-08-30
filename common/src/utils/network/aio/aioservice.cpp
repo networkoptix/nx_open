@@ -76,9 +76,21 @@ namespace aio
     {
         QMutexLocker lk( &m_mutex );
 
-        const int sockTimeoutMS = eventToWatch == PollSet::etRead
-            ? sock->getReadTimeOut()
-            : (eventToWatch == PollSet::etWrite ? sock->getWriteTimeOut() : 0);
+        unsigned int sockTimeoutMS = 0;
+        if( eventToWatch == PollSet::etRead )
+        {
+            if( !sock->getRecvTimeout( &sockTimeoutMS ) )
+                return false;
+        }
+        else if( eventToWatch == PollSet::etWrite )
+        {
+            if( !sock->getSendTimeout( &sockTimeoutMS ) )
+                return false;
+        }
+
+        //const int sockTimeoutMS = eventToWatch == PollSet::etRead
+        //    ? sock->getReadTimeOut()
+        //    : (eventToWatch == PollSet::etWrite ? sock->getWriteTimeOut() : 0);
 
         //checking, if that socket is already monitored
         const pair<Socket*, PollSet::EventType>& sockCtx = make_pair( sock.data(), eventToWatch );
