@@ -2,6 +2,10 @@
 #include "device_plugins/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "ui/style/skin.h"
+#include "core/resource/media_server_resource.h"
+#include "device_plugins/desktop_camera/desktop_camera_connection.h"
+
+static QnDesktopResource* instance = 0;
 
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
 {
@@ -13,11 +17,14 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setUrl(name);
     m_desktopDataProvider = 0;
     setGuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}")); // only one desktop resource is allowed)
+    Q_ASSERT_X(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
+    instance = this;
 }
 
 QnDesktopResource::~QnDesktopResource()
 {
     delete m_desktopDataProvider;
+    instance = 0;
 }
 
 QString QnDesktopResource::toString() const {
@@ -91,4 +98,16 @@ bool QnDesktopResource::isRendererSlow() const
     QnVideoRecorderSettings recorderSettings;
     Qn::CaptureMode captureMode = recorderSettings.captureMode();
     return captureMode == Qn::FullScreenMode;
+}
+
+void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)
+{
+    if (m_connectionPool.contains(mServer))
+        return;
+    m_connectionPool[mServer] = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, mServer));
+}
+
+void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
+{
+    m_connectionPool.remove(mServer);
 }

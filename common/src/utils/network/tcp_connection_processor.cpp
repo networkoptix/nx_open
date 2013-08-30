@@ -15,25 +15,25 @@
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, void* _sslContext):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->owner = _owner;
     d->chunkedMode = false;
     d->ssl = 0;
+    d->sslContext = (SSL_CTX*) _sslContext;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, void* _sslContext):
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     //d->socket->setNoDelay(true);
-    d->owner = _owner;
     d->chunkedMode = false;
     d->ssl = 0;
+    d->sslContext = (SSL_CTX*) _sslContext;
 }
 
 
@@ -329,9 +329,9 @@ bool QnTCPConnectionProcessor::readRequest()
     d->requestBody.clear();
     d->responseBody.clear();
 
-    if (d->owner->getOpenSSLContext() && !d->ssl)
+    if (d->sslContext && !d->ssl)
     {
-        d->ssl = SSL_new((SSL_CTX*) d->owner->getOpenSSLContext());  // get new SSL state with context 
+        d->ssl = SSL_new(d->sslContext);  // get new SSL state with context 
         if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
             return false;
         if (SSL_accept(d->ssl) != 1) 

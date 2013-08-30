@@ -15,7 +15,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(TCPSocket* socket, void* sslContext);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -38,6 +38,7 @@ public:
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
 
+    bool readRequest();
 protected:
     virtual void parseRequest();
     QString extractPath() const;
@@ -52,9 +53,8 @@ protected:
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
-    bool readRequest();
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, void* _sslContext);
 private:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }

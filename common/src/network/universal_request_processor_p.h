@@ -8,6 +8,7 @@ class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
 public:
     QnTCPConnectionProcessor* processor;
     QMutex mutex;
+    QnTcpListener* owner;
 };
 
 #endif // __UNIVERSAL_REQUEST_PROCESSOR_P_H__

@@ -15,8 +15,6 @@ class QnRtspConnectionProcessor;
 
 static const int MAX_RTP_CHANNELS = 32;
 static const int CLOCK_FREQUENCY = 1000000;
-static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
-static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 
 static const quint8 RTP_METADATA_CODE = 126;
 static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");

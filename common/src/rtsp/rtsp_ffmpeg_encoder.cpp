@@ -2,8 +2,9 @@
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/socket.h"
 #include "utils/media/ffmpeg_helper.h"
-#include "rtsp_data_consumer.h"
 #include "utils/common/util.h"
+#include "utils/network/rtpsession.h"
+#include "utils/network/rtp_stream_parser.h"
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
     m_gotLivePacket(false),
@@ -160,8 +161,8 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
     if (!m_codecCtxData.isEmpty()) {
-        QString result("a=fmtp:%1 config=%2\r\n");
-        return result.arg((int)getPayloadtype()).arg(QString(m_codecCtxData.toBase64())).toLocal8Bit();
+        QString result(lit("a=fmtp:%1 config=%2\r\n"));
+        return result.arg((int)getPayloadtype()).arg(lit(m_codecCtxData.toBase64())).toLocal8Bit();
     }
     else {
         return QByteArray();
