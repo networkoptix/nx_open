@@ -33,12 +33,6 @@ mac {
 }
 
 unix: !mac {
-  LIBS += -lX11 -lXfixes
+  LIBS += -lX11 -lXfixes -lGL -lGLU
   QT += x11extras  
 }
-
-unix: {
-  LIBS += -lGL -lGLU
-}
-
-
