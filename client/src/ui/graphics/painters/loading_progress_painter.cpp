@@ -56,7 +56,7 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
 }
 
 QnLoadingProgressPainter::~QnLoadingProgressPainter() {
-    if(m_initialized)
+    if(m_initialized && QOpenGLContext::currentContext())
         glDeleteBuffers(1, &m_buffer);
 }
 

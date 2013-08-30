@@ -505,7 +505,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_skippingForbidden( false ),
     m_flags( 0 ),
-    m_glFence( uploader->d->functions.data() ),
+    m_glFence(),
     m_displayedRect(0.0, 0.0, 1.0, 1.0)
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
@@ -2203,7 +2203,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {
-    return (d->functions->features() & QnGlFunctions::ArbPrograms)
+    return (d->functions->features())
         && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_yv12SharedUsed
         && !m_forceSoftYUV;
@@ -2211,7 +2211,7 @@ bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 
 bool DecodedPictureToOpenGLUploader::usingShaderNV12ToRgb() const
 {
-    return (d->functions->features() & QnGlFunctions::ArbPrograms)
+    return (d->functions->features())
         && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_nv12SharedUsed
         && !m_forceSoftYUV;

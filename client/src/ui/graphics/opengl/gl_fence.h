@@ -6,7 +6,9 @@
 #ifndef NX_GLFENCE_H
 #define NX_GLFENCE_H
 
-class QnGlFunctions;
+#include <QtGui/QOpenGLFunctions>
+
+class QOpenGLFunctions_3_2_Core;
 
 //!Incapsulates OpenGL sync object, defined in ARB_sync extension
 /*!
@@ -17,10 +19,10 @@ class QnGlFunctions;
     \note If no ARB_sync extension present, \a placeFence() method does glFlush(); glFinish(); instead of sync object creation. In this case, \a sync() does nothing
     \note Not thread-safe. Methods \a placeFence() and \a sync() can be called from different threads, but MUST be synchronized by caller.
 */
-class GLFence
+class GLFence: protected QOpenGLFunctions
 {
 public:
-    GLFence( QnGlFunctions* const glFunctions );
+    GLFence();
     ~GLFence();
 
     //!Creates ARB_sync object
@@ -34,9 +36,12 @@ public:
     bool trySync();
 
 private:
-    QnGlFunctions* const m_glFunctions;
+    QOpenGLFunctions_3_2_Core* versionFunctions();
+    bool arbSyncPresent();
+
     void* m_fenceSyncName;
-    bool m_arbSyncPresent;
+    QOpenGLFunctions_3_2_Core* m_versionFunctions;
+    bool m_versionFunctionsInitialized;
 };
 
 #endif  //NX_GLFENCE_H

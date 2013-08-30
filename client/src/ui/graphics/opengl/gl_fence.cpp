@@ -10,28 +10,31 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glext.h>
 
+#include <QtGui/QOpenGLFunctions_3_2_Core>
 
-GLFence::GLFence( QnGlFunctions* const glFunctions )
-:
-    m_glFunctions( glFunctions ),
+
+GLFence::GLFence() :
     m_fenceSyncName( 0 ),
-    m_arbSyncPresent( glFunctions->features() & QnGlFunctions::ArbSync )
+    m_versionFunctions(NULL),
+    m_versionFunctionsInitialized(false)
 {
 }
 
 GLFence::~GLFence()
 {
-    if( m_fenceSyncName )
-        m_glFunctions->glDeleteSync( (GLsync)m_fenceSyncName );
+    if (!m_fenceSyncName)
+        return;
+
+    versionFunctions()->glDeleteSync((GLsync)m_fenceSyncName);
 }
 
 bool GLFence::placeFence()
 {
-    if( m_arbSyncPresent )
+    if( arbSyncPresent() )
     {
         if( m_fenceSyncName )
-            m_glFunctions->glDeleteSync( (GLsync)m_fenceSyncName );
-        m_fenceSyncName = m_glFunctions->glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
+            versionFunctions()->glDeleteSync( (GLsync)m_fenceSyncName );
+        m_fenceSyncName = versionFunctions()->glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 );
         return m_fenceSyncName != 0;
     }
     else
@@ -44,17 +47,17 @@ bool GLFence::placeFence()
 
 void GLFence::sync()
 {
-    if( !m_arbSyncPresent || !m_fenceSyncName )
+    if( !arbSyncPresent() || !m_fenceSyncName )
         return;
 
     for( ;; )
     {
-        switch( m_glFunctions->glClientWaitSync( (GLsync)m_fenceSyncName, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000 ) )
+        switch( versionFunctions()->glClientWaitSync( (GLsync)m_fenceSyncName, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000 ) )
         {
             case GL_ALREADY_SIGNALED:
             case GL_CONDITION_SATISFIED:
             case GL_WAIT_FAILED:
-                m_glFunctions->glDeleteSync( (GLsync)m_fenceSyncName );
+                versionFunctions()->glDeleteSync( (GLsync)m_fenceSyncName );
                 m_fenceSyncName = 0;
                 return;
 
@@ -70,16 +73,16 @@ void GLFence::sync()
 
 bool GLFence::trySync()
 {
-    if( !m_arbSyncPresent || !m_fenceSyncName )
+    if( !arbSyncPresent() || !m_fenceSyncName )
         return false;
 
     for( ;; )
     {
-        switch( m_glFunctions->glClientWaitSync( (GLsync)m_fenceSyncName, GL_SYNC_FLUSH_COMMANDS_BIT, 0 ) )
+        switch( versionFunctions()->glClientWaitSync( (GLsync)m_fenceSyncName, GL_SYNC_FLUSH_COMMANDS_BIT, 0 ) )
         {
             case GL_ALREADY_SIGNALED:
             case GL_CONDITION_SATISFIED:
-                m_glFunctions->glDeleteSync( (GLsync)m_fenceSyncName );
+                versionFunctions()->glDeleteSync( (GLsync)m_fenceSyncName );
                 m_fenceSyncName = 0;
                 return true;
 
@@ -94,4 +97,22 @@ bool GLFence::trySync()
                 return false;
         }
     }
+}
+
+QOpenGLFunctions_3_2_Core* GLFence::versionFunctions() {
+    if (m_versionFunctionsInitialized)
+        return m_versionFunctions;
+
+    m_versionFunctionsInitialized = true;
+    m_versionFunctions = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_2_Core>();
+    if (!m_versionFunctions) {
+        qWarning() << "Could not obtain required OpenGL context version";
+    }
+    if (!m_versionFunctions->initializeOpenGLFunctions())
+        m_versionFunctions = NULL;
+    return m_versionFunctions;
+}
+
+bool GLFence::arbSyncPresent() {
+    return versionFunctions() != NULL;
 }

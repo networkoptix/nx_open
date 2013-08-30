@@ -5,14 +5,12 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QScopedPointer>
 
-
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "graphics_view.h" /* For QnLayerPainter. */
 
 class VariantAnimator;
 
-class QnGlFunctions;
 class QnClientSettings;
 class QnRadialGradientPainter;
 
@@ -49,7 +47,6 @@ protected slots:
     void updateBackgroundColor(bool animate = true);
 
 private:
-    QScopedPointer<QnGlFunctions> m_gl;
     QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
 
     VariantAnimator *m_backgroundColorAnimator;

@@ -534,7 +534,7 @@ bool QnGLRenderer::isHardwareDecoderUsed() const
 
 bool QnGLRenderer::isYV12ToRgbShaderUsed() const
 {
-    return (features() & QnGlFunctions::ArbPrograms)
+    return (features())
             && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->yv12ToRgb
@@ -543,7 +543,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
 
 bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
 {
-    return (features() & QnGlFunctions::ArbPrograms)
+    return (features())
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->yv12ToRgba
@@ -552,7 +552,7 @@ bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
 
 bool QnGLRenderer::isNV12ToRgbShaderUsed() const
 {
-    return (features() & QnGlFunctions::ArbPrograms)
+    return (features())
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->nv12ToRgb
