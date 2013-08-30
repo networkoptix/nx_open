@@ -122,7 +122,6 @@ mac {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines} override=
   CONFIG -= app_bundle objective_c
-  INCLUDEPATH +=  ${environment.dir}/include/glext/
 }
 
 
