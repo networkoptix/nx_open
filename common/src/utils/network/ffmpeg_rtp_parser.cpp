@@ -12,6 +12,11 @@ QnFfmpegRtpParser::~QnFfmpegRtpParser()
 
 }
 
+void QnFfmpegRtpParser::setSDPInfo(QList<QByteArray>)
+{
+
+}
+
 bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&, QnAbstractMediaDataPtr& result)
 {
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
