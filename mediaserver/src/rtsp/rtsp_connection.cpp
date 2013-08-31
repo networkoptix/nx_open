@@ -31,9 +31,9 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "device_plugins/server_archive/thumbnails_stream_reader.h"
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 #include "rtsp_h264_encoder.h"
-#include "rtsp_ffmpeg_encoder.h"
+#include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
 

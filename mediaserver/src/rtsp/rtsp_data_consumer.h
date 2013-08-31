@@ -8,7 +8,7 @@
 #include "core/datapacket/abstract_data_packet.h"
 #include "utils/network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
-#include "rtsp_ffmpeg_encoder.h"
+#include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "utils/common/adaptive_sleep.h"
 
 class QnRtspConnectionProcessor;
