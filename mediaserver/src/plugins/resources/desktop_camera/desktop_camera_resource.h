@@ -24,14 +24,19 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
+    virtual void setIframeDistance(int frames, int timems) {}
 
     bool isInitialized() const;
 
-    virtual bool shoudResolveConflicts() const override;
+    virtual bool shoudResolveConflicts() const override { return false; }
 
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+    virtual void setCropingPhysical(QRect croping) override {}
+
+    virtual bool isResourceAccessible() override;
 };
+typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 
 #endif // _DESKTOP_CAMERA_RESOURCE_SEARCHER_H__

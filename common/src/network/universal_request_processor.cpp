@@ -26,6 +26,7 @@ QnTCPConnectionProcessor(priv, socket, owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
+    d->owner = owner;
 }
 
 void QnUniversalRequestProcessor::run()

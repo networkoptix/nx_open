@@ -48,7 +48,6 @@ public:
     QnAbstractDataConsumer* dataConsumer;
 };
 
-
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(TCPSocket* socket, void* sslContext, QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket, sslContext)
 {
@@ -56,6 +55,11 @@ QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(TCPSocket
     d->desktop = desktop;
     d->dataProvider = 0;
     d->dataConsumer = 0;
+}
+
+QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
+{
+    stop();
 }
 
 void QnDesktopCameraConnectionProcessor::processRequest()
@@ -102,6 +106,7 @@ QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, Q
 
 QnDesktopCameraConnection::~QnDesktopCameraConnection()
 {
+    stop();
 }
 
 void QnDesktopCameraConnection::terminatedSleep(int sleep)
@@ -126,7 +131,7 @@ void QnDesktopCameraConnection::run()
         connection = new CLSimpleHTTPClient(m_mServer->getApiUrl(), CONNECT_TIMEOUT, auth);
         connection->addHeader("user-name", auth.user().toUtf8());
 
-        CLHttpStatus status = connection->doGET("desktopCamera");
+        CLHttpStatus status = connection->doGET("desktop_camera");
         if (status != CL_HTTP_SUCCESS) {
             terminatedSleep(1000 * 10);
             continue;
@@ -134,6 +139,11 @@ void QnDesktopCameraConnection::run()
 
         QByteArray data;
         connection->readAll(data); // server answer
+        if (!data.startsWith("HTTP 20 OK"))
+        {
+            terminatedSleep(1000 * 10);
+            continue;
+        }
 
         processor = new QnDesktopCameraConnectionProcessor(connection->getSocket().data(), 0, m_owner);
 

@@ -35,6 +35,7 @@ class QnDesktopCameraConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnDesktopCameraConnectionProcessor(TCPSocket* socket, void* sslContext, QnDesktopResource* desktop);
+    virtual ~QnDesktopCameraConnectionProcessor();
     void processRequest();
     void sendData(const QnByteArray& data);
 private:

@@ -95,6 +95,8 @@
 #include "plugins/plugin_manager.h"
 #include "core/resource_managment/camera_driver_restriction_list.h"
 #include <utils/network/multicodec_rtp_reader.h>
+#include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
+#include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -789,7 +791,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     
-    m_universalTcpListener->addHandler<QnDesktopCameraConnectionProcessor>("HTTP", "desktop_camera");
+    m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
     m_universalTcpListener->start();
 
 #else
@@ -1056,6 +1058,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopCameraResourceSearcher::instance());
 
 #ifdef Q_OS_WIN
     if (qnCustomization() == Qn::DwSpectrumCustomization)
