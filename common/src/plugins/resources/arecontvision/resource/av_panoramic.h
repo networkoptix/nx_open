@@ -8,6 +8,7 @@ class QnArecontPanoramicResource : public QnPlAreconVisionResource
 {
 public:
     QnArecontPanoramicResource(const QString& name);
+    ~QnArecontPanoramicResource();
     bool getDescription();
 
     bool getParamPhysical(int cannel, const QString& name, QVariant &val);
@@ -29,6 +30,7 @@ private:
 protected:
     QnResourceVideoLayout* m_vrl;
     bool m_isRotated;    
+    QnCustomResourceVideoLayout* m_rotatedLayout;
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;
