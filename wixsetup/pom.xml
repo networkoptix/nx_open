@@ -62,7 +62,7 @@
     <build>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
-        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}-${build.configuration}-beta</finalName>
+        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -158,7 +158,7 @@
                         <version>1.1.1</version>
                         <executions>
                             <execution>
-                                <id>wix-heat</id>
+                                <id>wix-gen</id>
                                 <phase>process-sources</phase>
                                 <goals>
                                     <goal>exec</goal>
@@ -166,56 +166,11 @@
                                 <configuration>
                                     <executable>${python.dir}/python</executable>
                                     <arguments>
-                                        <argument>generate-ec-wxs.py</argument>
+                                        <argument>wix-gen.py</argument>
                                     </arguments>
                                     <workingDirectory>${project.build.directory}</workingDirectory>
                                 </configuration>                    
                             </execution>
-
-                            <execution>
-                                <id>help-heat</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${python.dir}/python</executable>
-                                    <arguments>
-                                        <argument>generate-help-wxs.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>                    
-                            </execution>
-                            
-                            <execution>
-                                <id>vox-heat</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${python.dir}/python</executable>
-                                    <arguments>
-                                        <argument>generate-vox-wxs.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>                    
-                            </execution>                            
-
-                            <execution>
-                                <id>bg-heat</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${python.dir}/python</executable>
-                                    <arguments>
-                                        <argument>generate-bg-wxs.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>                    
-                            </execution>                            
 
                             <execution>
                                 <id>package-CustomActions-with-msbuild</id>
@@ -228,8 +183,22 @@
                                     <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
                                 </configuration>
                             </execution>
-
+                            
                             <execution>
+                                <id>wix-compile</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${python.dir}/python</executable>
+                                    <arguments>
+                                        <argument>wix-compile.py</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>                    
+                            </execution>
+<!--                            <execution>
                                 <id>wix-candle</id>
                                 <phase>process-resources</phase>
                                 <goals>
@@ -254,6 +223,7 @@
                                         <argument>-ext</argument> 
                                         <argument>WixUtilExtension.dll</argument>
                                         <argument>-ext</argument> 
+                                        <argument>wixext\WixSystemToolsExtension.dll</argument>
                                         <argument>wixext\WixSystemToolsExtension.dll</argument>
                                         <argument>UninstallOptionsDlg.wxs</argument> 
                                         <argument>Associations.wxs</argument>
@@ -332,29 +302,9 @@
                                         <argument>bin/${project.build.finalName}.msi</argument>
                                     </arguments>                            
                                 </configuration>
-                            </execution>
+                            </execution> -->            
 
-                            <!--<execution>
-                                <id>wix-pack-exe</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>setupbld</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                    <arguments>
-                                        <argument>-out</argument>
-                                        <argument>bin/${project.build.finalName}.exe</argument>
-                                        <argument>-ms</argument>
-                                        <argument>bin/${project.build.finalName}.msi</argument>
-                                        <argument>-setup</argument>
-                                        <argument>setup.exe</argument>
-                                    </arguments>        
-                                </configuration>                    
-                            </execution>    -->             
-
-                            <execution>
+                           <!-- <execution>
                                 <id>wix-sign</id>
                                 <phase>package</phase>
                                 <goals>
@@ -365,7 +315,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>
                                     <skip>${skip.sign}</skip>                       
                                 </configuration>                    
-                            </execution>                            
+                            </execution>     -->                       
 
                             <execution>
                                 <id>integration-test</id>
@@ -381,29 +331,6 @@
                             </execution>
                         </executions> 
                     </plugin>
-                    <!--<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.3</version>
-                <executions>
-                    <execution>
-                        <id>attach</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${basedir}/bin/${msbuild.configuration}/${pom.parent.artifact}-${release.version}.exe</file>
-                                    <type>exe</type>
-                                    <classifier>${platform}-x86-${msbuild.configuration}</classifier>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin> -->
                 </plugins>
             </build>
         </profile>
