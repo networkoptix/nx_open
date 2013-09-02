@@ -84,7 +84,7 @@ void QnProxySenderConnection::run()
 
     if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
         doDelay();
-        //addNewProxyConnect();
+        addNewProxyConnect();
         return;
     }
 
