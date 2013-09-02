@@ -824,7 +824,7 @@ bool RTPSession::sendDescribe()
 
     //qDebug() << request;
 
-    return (m_tcpSock->send(request.data(), request.size()));
+    return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
 bool RTPSession::sendOptions()
@@ -841,7 +841,7 @@ bool RTPSession::sendOptions()
     addAuth(request);
     request += "\r\n";
 
-    return (m_tcpSock->send(request.data(), request.size()));
+    return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
 RTPIODevice* RTPSession::getTrackIoByType(TrackType trackType)
@@ -977,8 +977,8 @@ bool RTPSession::sendSetup()
 
         //qDebug() << request;
 
-        if (!m_tcpSock->send(request.data(), request.size()))
-            return 0;
+        if( m_tcpSock->send(request.data(), request.size()) <= 0 )
+            return false;
 
         QByteArray responce;
 
@@ -1104,10 +1104,7 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
         request += requestBody;
     }
 
-    if (!m_tcpSock->send(request.data(), request.size()))
-        return false;
-
-    return true;
+    return m_tcpSock->send(request.data(), request.size()) > 0;
 
     /*
     if (!readTextResponce(responce))
@@ -1182,7 +1179,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     
     request += QLatin1String("\r\n");
 
-    if (!m_tcpSock->send(request.data(), request.size()))
+    if (m_tcpSock->send(request.data(), request.size()) <= 0)
         return false;
 
 
@@ -1237,11 +1234,8 @@ bool RTPSession::sendPause()
 
     request += "\r\n";
 
-    if (!m_tcpSock->send(request.data(), request.size()))
-        return false;
+    return m_tcpSock->send(request.data(), request.size()) > 0;
 
-
-    return true;
     /*
     if (!readTextResponce(response))
         return false;
@@ -1272,11 +1266,7 @@ bool RTPSession::sendTeardown()
     request += m_SessionId;
     request += "\r\n\r\n";
 
-    if (!m_tcpSock->send(request.data(), request.size()))
-        return false;
-
-    return true;
-    //return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
+    return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
 static const int RTCP_SENDER_REPORT = 200;
@@ -1405,10 +1395,7 @@ bool RTPSession::sendKeepAlive()
     request += "\r\n\r\n";
     //
 
-    if (!m_tcpSock->send(request.data(), request.size()))
-        return false;
-    return true;
-    //return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
+    return m_tcpSock->send(request.data(), request.size()) > 0;
 }
 
 // read RAW: combination of text and binary data
