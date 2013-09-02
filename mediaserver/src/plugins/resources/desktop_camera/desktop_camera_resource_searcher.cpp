@@ -44,7 +44,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
         QString userName = itr.key();
         cam->setName(lit("desktop-") + userName);
         cam->setModel(lit("virtual desktop camera"));
-        cam->setPhysicalId(QString(lit("desktop camera %1")).arg(userName));
+        cam->setPhysicalId(cam->gePhysicalIdPrefix() + userName);
         cam->setTypeId(rt);
         result << cam;
     }
@@ -93,4 +93,9 @@ QnDesktopCameraResourceSearcher& QnDesktopCameraResourceSearcher::instance()
 {
     static QnDesktopCameraResourceSearcher inst;
     return inst;
+}
+
+TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userName)
+{
+    return m_connections.value(userName);
 }

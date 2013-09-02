@@ -38,6 +38,9 @@ public:
     virtual ~QnDesktopCameraConnectionProcessor();
     void processRequest();
     void sendData(const QnByteArray& data);
+    void sendData(const char* data, int len);
+private:
+    void disconnectInternal();
 private:
     Q_DECLARE_PRIVATE(QnDesktopCameraConnectionProcessor);
 };

@@ -36,6 +36,9 @@ public:
     virtual void setCropingPhysical(QRect croping) override {}
 
     virtual bool isResourceAccessible() override;
+
+    QString gePhysicalIdPrefix() const;
+    QString getUserName() const;
 };
 typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 

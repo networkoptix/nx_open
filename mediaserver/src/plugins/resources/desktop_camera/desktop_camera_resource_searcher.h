@@ -23,6 +23,8 @@ public:
     virtual QnResourceList findResources(void) override;
 
     void registerCamera(TCPSocket* connection, const QString& userName);
+
+    TCPSocketPtr getConnection(const QString& userName);
 private:
     QMap<QString, TCPSocketPtr> m_connections;
     void cleanupConnections();

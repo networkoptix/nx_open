@@ -39,8 +39,8 @@ public:
     bool sendBuffer(const QByteArray& sendBuffer);
 
     bool readRequest();
-protected:
     virtual void parseRequest();
+protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 

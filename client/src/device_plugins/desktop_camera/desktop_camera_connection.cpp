@@ -31,7 +31,15 @@ protected:
     {
         m_serializer.setDataPacket(packet.dynamicCast<QnAbstractMediaData>());
         while(!m_needStop && m_serializer.getNextPacket(m_sendBuffer))
+        {
+            quint8 header[4];
+            header[0] = '$';
+            header[1] = 0;
+            header[2] = m_sendBuffer.size() >> 8;
+            header[3] = (quint8) m_sendBuffer.size();
+            m_owner->sendData((const char*) &header, 4);
             m_owner->sendData(m_sendBuffer);
+        }
         return true;
     }
 private:
@@ -59,7 +67,12 @@ QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(TCPSocket
 
 QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
 {
-    stop();
+    Q_D(QnDesktopCameraConnectionProcessor);
+
+
+    disconnectInternal();
+
+    d->socket = 0; // we have not ownership for socket in this class
 }
 
 void QnDesktopCameraConnectionProcessor::processRequest()
@@ -78,13 +91,27 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     }
     else if (method == lit("DISCONNECT"))
     {
-        d->dataProvider->removeDataProcessor(d->dataConsumer);
-        delete d->dataConsumer;
-        delete d->dataProvider;
-        d->dataProvider = 0;
+        disconnectInternal();
     }
 
     //sendResponse("HTTP", CODE_OK, QByteArray(), QByteArray());
+}
+
+void QnDesktopCameraConnectionProcessor::disconnectInternal()
+{
+    Q_D(QnDesktopCameraConnectionProcessor);
+
+    if (d->dataProvider && d->dataConsumer)
+        d->dataProvider->removeDataProcessor(d->dataConsumer);
+    if (d->dataProvider)
+        d->dataProvider->pleaseStop();
+    if (d->dataConsumer)
+        d->dataConsumer->pleaseStop();
+    delete d->dataConsumer;
+    delete d->dataProvider;
+
+    d->dataProvider = 0;
+    d->dataProvider = 0;
 }
 
 void QnDesktopCameraConnectionProcessor::sendData(const QnByteArray& data)
@@ -93,6 +120,11 @@ void QnDesktopCameraConnectionProcessor::sendData(const QnByteArray& data)
     d->socket->send(data);
 }
 
+void QnDesktopCameraConnectionProcessor::sendData(const char* data, int len)
+{
+    Q_D(QnDesktopCameraConnectionProcessor);
+    d->socket->send(data, len);
+}
 
 // --------------- QnDesktopCameraconnection ------------------
 
@@ -123,7 +155,9 @@ void QnDesktopCameraConnection::run()
     while (!m_needStop)
     {
         delete processor;
+        processor = 0;
         delete connection;
+        connection = 0;
 
         QAuthenticator auth;
         auth.setUser(QnAppServerConnectionFactory::defaultUrl().userName());
@@ -137,21 +171,14 @@ void QnDesktopCameraConnection::run()
             continue;
         }
 
-        QByteArray data;
-        connection->readAll(data); // server answer
-        if (!data.startsWith("HTTP 20 OK"))
-        {
-            terminatedSleep(1000 * 10);
-            continue;
-        }
-
         processor = new QnDesktopCameraConnectionProcessor(connection->getSocket().data(), 0, m_owner);
 
         QTime timeout;
         timeout.restart();
-        while (m_needStop && connection->getSocket()->isConnected())
+        while (!m_needStop && connection->getSocket()->isConnected())
         {
             if (processor->readRequest()) {
+                processor->parseRequest();
                 processor->processRequest();
                 timeout.restart();
             }

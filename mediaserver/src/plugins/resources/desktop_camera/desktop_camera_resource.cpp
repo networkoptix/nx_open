@@ -3,6 +3,8 @@
 
 const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
 
+static QByteArray ID_PREFIX("Desktop camera ");
+
 QString QnDesktopCameraResource::getDriverName() const
 {
     return QLatin1String(MANUFACTURE);
@@ -31,4 +33,14 @@ bool QnDesktopCameraResource::isResourceAccessible()
 QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 {
     return new QnDesktopCameraStreamReader(toSharedPointer());
+}
+
+QString QnDesktopCameraResource::gePhysicalIdPrefix() const
+{
+    return lit(ID_PREFIX);
+}
+
+QString QnDesktopCameraResource::getUserName() const 
+{ 
+    return getPhysicalId().mid(ID_PREFIX.size());
 }

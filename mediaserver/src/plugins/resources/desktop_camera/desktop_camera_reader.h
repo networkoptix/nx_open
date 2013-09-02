@@ -4,6 +4,8 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
+#include "utils/network/simple_http_client.h"
+#include "utils/network/ffmpeg_rtp_parser.h"
 
 class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 {
@@ -22,6 +24,11 @@ protected:
 
     virtual void pleaseStop() override;
 private:
+    TCPSocketPtr m_socket;
+    quint8 m_recvBuffer[65535];
+    int m_recvBufferSize;
+    QnFfmpegRtpParser parser;
+    QTime m_keepaliveTimer;
 };
 
 #endif // ACTI_STREAM_REDER_H__
