@@ -211,6 +211,9 @@ public:
 };
 
 //!Interface for server socket, accepting stream connections
+/*!
+    \note This socket has default recv timeout of 250ms for backward compatibility
+*/
 class AbstractStreamServerSocket
 :
     virtual public AbstractSocket

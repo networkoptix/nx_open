@@ -621,7 +621,8 @@ CommunicatingSocket::CommunicatingSocket(int type, int protocol)
 }
 
 CommunicatingSocket::CommunicatingSocket(int newConnSD) 
-    : Socket(newConnSD)
+    : Socket(newConnSD),
+      mConnected(true)
 {
 }
 
@@ -732,6 +733,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
 #endif
 
     mConnected = iSelRet > 0;
+
     //restoring original mode
     setNonBlockingMode( isNonBlockingModeBak );
     return mConnected;
@@ -741,16 +743,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
 int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
 {
 #ifdef _WIN32
-    int rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, flags);
-    if (rtn < 0)
-    {
-        int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
-            mConnected = false;
-    }
-    else if (rtn == 0)
-        mConnected = false;
-    return rtn;
+    int bytesRead = ::recv(sockDesc, (raw_type *) buffer, bufferLen, flags);
 #else
     unsigned int recvTimeout = 0;
     if( !getRecvTimeout( &recvTimeout ) )
@@ -759,12 +752,16 @@ int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
         recvTimeout );
-    if( bytesRead == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
-        mConnected = false;
-    else if (bytesRead == 0)
-        mConnected = false;
-    return bytesRead;
 #endif
+    if (bytesRead < 0)
+    {
+        const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+            mConnected = false;
+    }
+    else if (bytesRead == 0)
+        mConnected = false; //connection closed by remote host
+    return bytesRead;
 }
 
 //!Implementation of AbstractCommunicatingSocket::send
@@ -772,14 +769,6 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
 {
 #ifdef _WIN32
     int sended = ::send(sockDesc, (raw_type*) buffer, bufferLen, 0);
-    if (sended < 0) {
-        int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
-            mConnected = false;
-    }
-    else if (sended == 0)
-        mConnected = false;
-    return sended;
 #else
     unsigned int sendTimeout = 0;
     if( !getSendTimeout( &sendTimeout ) )
@@ -788,12 +777,16 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
     int sended = doInterruptableSystemCallWithTimeout<>(
         stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
         sendTimeout );
-    if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
-        mConnected = false;
+#endif
+    if (sended < 0)
+    {
+        const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+            mConnected = false;
+    }
     else if (sended == 0)
         mConnected = false;
     return sended;
-#endif
 }
 
 //!Implementation of AbstractCommunicatingSocket::getForeignAddress
@@ -925,41 +918,50 @@ TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 
 // TCPServerSocket Code
 
+static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
+/*! 
+    \return fd (>=0) on success, <0 on error (-2 if timed out)
+*/
+static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC )
+{
+    int result = 0;
+
+#ifdef _WIN32
+    fd_set read_set;
+    struct timeval timeout;
+    FD_ZERO(&read_set);
+    FD_SET(sockDesc, &read_set);
+    timeout.tv_sec = 0;
+    timeout.tv_usec = timeoutMillis * 1000;
+
+    result = ::select(sockDesc + 1, &read_set, NULL, NULL, &timeout);
+#else
+    struct pollfd sockPollfd;
+    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    sockPollfd.fd = sockDesc;
+    sockPollfd.events = POLLIN;
+#ifdef _GNU_SOURCE
+    sockPollfd.events |= POLLRDHUP;
+#endif
+    result = ::poll( &sockPollfd, 1, timeoutMillis );
+    if( result == 1 && (sockPollfd.revents & POLLIN) == 0 )
+        result = 0;
+#endif
+
+    if( result == 0 )
+        return -2;  //timed out
+    else if( result < 0 )
+        return -1;
+    return ::accept(sockDesc, NULL, NULL);
+}
+
+
+
 TCPServerSocket::TCPServerSocket()
 :
     Socket(SOCK_STREAM, IPPROTO_TCP)
 {
-}
-
-TCPServerSocket::TCPServerSocket( unsigned short localPort, int queueLen )
-:
-    Socket(SOCK_STREAM, IPPROTO_TCP)
-{
-    if( !setLocalPort(localPort) ||
-        !setListen(queueLen) )
-    {
-        saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
-        return;
-    }
-}
-
-TCPServerSocket::TCPServerSocket(
-    const QString &localAddress,
-    unsigned short localPort,
-    int queueLen,
-    bool reuseAddr )
-:
-    Socket(SOCK_STREAM, IPPROTO_TCP)
-{
-    if( !setReuseAddrFlag(reuseAddr) ||
-        !setLocalAddressAndPort(localAddress, localPort) ||
-        !setListen(queueLen) )
-    {
-        saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
-        return;
-    }
+    setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
 }
 
 int TCPServerSocket::accept(int sockDesc)
@@ -977,60 +979,32 @@ bool TCPServerSocket::listen( int queueLen )
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
-    int newConnSD = acceptWithTimeout(sockDesc);
+    unsigned int recvTimeoutMs = 0;
+    if( !getRecvTimeout( &recvTimeoutMs ) )
+        return false;
+    int newConnSD = acceptWithTimeout( sockDesc, recvTimeoutMs );
     if( newConnSD >= 0 )
     {
-        clearStatusBit( Socket::sbFailed );
-        TCPSocket* result = new TCPSocket(newConnSD);
-        result->mConnected = true;
-        return result;
+        //clearStatusBit( Socket::sbFailed );
+        return new TCPSocket(newConnSD);
     }
     else if( newConnSD == -2 )
     {
+        //setting system error code
+#ifdef _WIN32
+        ::SetLastError( SystemError::timedOut );
+#else
+        errno = SystemError::timedOut;
+#endif
         return NULL;    //timeout
     }
     else
     {
         //error
-        saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
+        //saveErrorInfo();
+        //setStatusBit( Socket::sbFailed );
         return NULL;
     }
-}
-
-int TCPServerSocket::acceptWithTimeout( int sockDesc )
-{
-    static const int ACCEPT_TIMEOUT_MSEC = 250;
-
-    int result = 0;
-
-#ifdef _WIN32
-    fd_set read_set;
-    struct timeval timeout;
-    FD_ZERO(&read_set);
-    FD_SET(sockDesc, &read_set);
-    timeout.tv_sec = 0;
-    timeout.tv_usec = ACCEPT_TIMEOUT_MSEC * 1000;
-
-    result = ::select(sockDesc + 1, &read_set, NULL, NULL, &timeout);
-#else
-    struct pollfd sockPollfd;
-    memset( &sockPollfd, 0, sizeof(sockPollfd) );
-    sockPollfd.fd = sockDesc;
-    sockPollfd.events = POLLIN;
-#ifdef _GNU_SOURCE
-    sockPollfd.events |= POLLRDHUP;
-#endif
-    result = ::poll( &sockPollfd, 1, ACCEPT_TIMEOUT_MSEC );
-    if( result == 1 && (sockPollfd.revents & POLLIN) == 0 )
-        result = 0;
-#endif
-
-    if( result == 0 )
-        return -2;  //timed out
-    else if( result < 0 )
-        return -1;
-    return ::accept(sockDesc, NULL, NULL);
 }
 
 bool TCPServerSocket::setListen(int queueLen)

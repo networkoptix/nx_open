@@ -323,29 +323,6 @@ class TCPServerSocket
 
 public:
     TCPServerSocket();
-    /**
-     *   Construct a TCP socket for use with a server, accepting connections
-     *   on the specified port on any interface
-     *   @param localPort local port of server socket, a value of zero will
-     *                   give a system-assigned unused port
-     *   @param queueLen maximum queue length for outstanding
-     *                   connection requests (default 5)
-     *   @exception SocketException thrown if unable to create TCP server socket
-     */
-    TCPServerSocket(unsigned short localPort, int queueLen = 5)
-    ;
-
-    /**
-     *   Construct a TCP socket for use with a server, accepting connections
-     *   on the specified port on the interface specified by the given address
-     *   @param localAddress local interface (address) of server socket
-     *   @param localPort local port of server socket
-     *   @param queueLen maximum queue length for outstanding
-     *                   connection requests (default 5)
-     *   @exception SocketException thrown if unable to create TCP server socket
-     */
-    TCPServerSocket(const QString &localAddress, unsigned short localPort,
-                    int queueLen = 5, bool reuseAddr = false) ;
 
     /**
      *   Blocks until a new connection is established on this socket or error
@@ -361,11 +338,6 @@ public:
     virtual AbstractStreamSocket* accept() override;
 
 private:
-    /*! 
-        \return fd (>=0) on success, <0 on error (-2 if timed out)
-    */
-    static int acceptWithTimeout( int sockDesc );
-
     bool setListen(int queueLen) ;
 };
 
