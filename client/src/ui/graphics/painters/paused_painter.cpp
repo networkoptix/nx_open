@@ -47,7 +47,7 @@ QnPausedPainter::QnPausedPainter(const QGLContext *context):
 }
 
 QnPausedPainter::~QnPausedPainter() {
-    if(m_initialized)
+    if(m_initialized && QOpenGLContext::currentContext())
         glDeleteBuffers(1, &m_buffer);
 }
 

@@ -23,13 +23,8 @@ typedef uint64_t GLuint64;
 class QnGlFunctions {
 public:
     enum Feature {
-        OpenGL3_2           = 0x00000008,   /**< Implements OpenGL3.2 spec. */
-
-        ArbPrograms         = 0x00010000,   /**< Supports ARB shader programs. */
-        ArbSync             = 0x00020000,   /**< Supports ARB sync primitives. */
-
         ShadersBroken       = 0x10000000,   /**< Vendor has messed something up, and shaders are not supported. */
-        NoOpenGLFullScreen  = 0x20000000,   /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
+        NoOpenGLFullScreen  = 0x20000000    /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -76,66 +71,10 @@ public:
      * \returns                         Whether warnings related to unsupported function calls are enabled.
      */
     static bool isWarningsEnabled();
-
-    /* ArbPrograms group. */
-
-    void glProgramStringARB(GLenum target, GLenum format, GLsizei len, const GLvoid *string) const;
-    void glBindProgramARB(GLenum target, GLuint program) const;
-    void glDeleteProgramsARB(GLsizei n, const GLuint *programs) const;
-    void glGenProgramsARB(GLsizei n, GLuint *programs) const;
-    void glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const;
-
-    /* OpenGL3_2 group. */
-
-    GLsync glFenceSync(GLenum condition, GLbitfield flags);
-    void glDeleteSync(GLsync sync);
-    void glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
-    GLenum glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
-
-    /* OpenGL4 group. */
-
-    void glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnGlFunctions::Features);
-
-
-#ifndef GL_FRAGMENT_PROGRAM_ARB
-#   define GL_FRAGMENT_PROGRAM_ARB              0x8804
-#endif
-#ifndef GL_PROGRAM_FORMAT_ASCII_ARB
-#   define GL_PROGRAM_FORMAT_ASCII_ARB          0x8875
-#endif
-
-#ifndef GL_CLAMP_TO_EDGE
-#   define GL_CLAMP_TO_EDGE                     0x812F
-#endif
-
-#ifndef GL_TEXTURE0
-#   define GL_TEXTURE0                          0x84C0
-#endif 
-#ifndef GL_TEXTURE1
-#   define GL_TEXTURE1                          0x84C1
-#endif
-#ifndef GL_TEXTURE2
-#   define GL_TEXTURE2                          0x84C2
-#endif
-
-#ifndef GL_VERSION_1_5
-#   define GL_ARRAY_BUFFER                      0x8892
-#   define GL_ELEMENT_ARRAY_BUFFER              0x8893
-#   define GL_STREAM_DRAW                       0x88E0
-#   define GL_STREAM_READ                       0x88E1
-#   define GL_STREAM_COPY                       0x88E2
-#   define GL_STATIC_DRAW                       0x88E4
-#   define GL_STATIC_READ                       0x88E5
-#   define GL_STATIC_COPY                       0x88E6
-#   define GL_DYNAMIC_DRAW                      0x88E8
-#   define GL_DYNAMIC_READ                      0x88E9
-#   define GL_DYNAMIC_COPY                      0x88EA
-#endif
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnGlFunctions::Features)
 
 #endif // QN_GL_FUNCTIONS_H

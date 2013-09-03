@@ -1,16 +1,4 @@
-
-//#ifdef __APPLE__
-//#include <GL/gl.h>
-//#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
-//#include <GL/glext.h> /* Pull in all non-standard OpenGL defines. */
-//#endif
-
 #include "gl_functions.h"
-
-//#ifndef __APPLE__
-#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
-#include <GL/glext.h>
-//#endif
 
 #include <boost/preprocessor/stringize.hpp>
 
@@ -20,11 +8,6 @@
 #include <utils/common/warnings.h>
 
 #include "gl_context_data.h"
-
-
-#ifndef APIENTRY
-#   define APIENTRY
-#endif
 
 namespace {
     bool qn_warnOnInvalidCalls = false;
@@ -37,45 +20,6 @@ namespace {
     };
 
 } // anonymous namespace
-
-namespace QnGl {
-#define WARN()                                                                  \
-    {                                                                           \
-        if(qn_warnOnInvalidCalls)                                               \
-            qnWarning("This function is not supported for current OpenGL context."); \
-    }
-
-    void APIENTRY glProgramStringARB(GLenum, GLenum, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glBindProgramARB(GLenum, GLuint) { WARN(); }
-    void APIENTRY glDeleteProgramsARB(GLsizei, const GLuint *) { WARN(); }
-    void APIENTRY glGenProgramsARB(GLsizei, GLuint *) { WARN(); }
-    void APIENTRY glProgramLocalParameter4fARB(GLenum, GLuint, GLfloat, GLfloat, GLfloat, GLfloat) { WARN(); }
-
-    void APIENTRY glActiveTexture(GLenum) { WARN(); }
-
-    void APIENTRY glBindBuffer(GLenum, GLuint) { WARN(); }
-    void APIENTRY glDeleteBuffers(GLsizei, const GLuint *) { WARN(); }
-    void APIENTRY glGenBuffers(GLsizei, GLuint *) { WARN(); }
-    void APIENTRY glBufferData(GLenum, GLsizeiptrARB, const GLvoid *, GLenum) { WARN(); }
-    void APIENTRY glBufferSubData(GLenum, GLintptrARB, GLsizeiptrARB, const GLvoid *) { WARN(); }
-    GLvoid* APIENTRY glMapBuffer(GLenum, GLenum) { WARN(); return NULL; }
-    GLboolean APIENTRY glUnmapBuffer(GLenum) { WARN(); return false; }
-
-    void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); }
-    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); }
-
-    GLsync APIENTRY glFenceSync(GLenum, GLbitfield) { WARN(); return 0; }
-    void APIENTRY glDeleteSync(GLsync) { WARN(); }
-    void APIENTRY glWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); }
-    GLAPI GLenum APIENTRY glClientWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); return 0; }
-
-    void APIENTRY glBlendColor(GLfloat, GLfloat, GLfloat, GLfloat) { WARN(); }
-
-#undef WARN
-
-} // namespace QnGl
-
 
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsGlobal
@@ -144,29 +88,6 @@ public:
     {
         qn_glFunctionsGlobal()->initialize(context);
 
-        bool status;
-#define RESOLVE(FUNCTION_TYPE, FUNCTION_NAME)                                   \
-        status &= resolve<FUNCTION_TYPE>(BOOST_PP_STRINGIZE(FUNCTION_NAME), &QnGl::FUNCTION_NAME, &FUNCTION_NAME)
-
-        status = true;
-        RESOLVE(PFNGLPROGRAMSTRINGARBPROC,              glProgramStringARB);
-        RESOLVE(PFNGLBINDPROGRAMARBPROC,                glBindProgramARB);
-        RESOLVE(PFNGLDELETEPROGRAMSARBPROC,             glDeleteProgramsARB);
-        RESOLVE(PFNGLGENPROGRAMSARBPROC,                glGenProgramsARB);
-        RESOLVE(PFNGLPROGRAMLOCALPARAMETER4FARBPROC,    glProgramLocalParameter4fARB);
-        if(status)
-            m_features |= QnGlFunctions::ArbPrograms;
-
-        status = true;
-        RESOLVE(PFNGLFENCESYNCPROC,                     glFenceSync);
-        RESOLVE(PFNGLDELETESYNCPROC,                    glDeleteSync);
-        RESOLVE(PFNGLCLIENTWAITSYNCPROC,                glClientWaitSync);
-        RESOLVE(PFNGLWAITSYNCPROC,                      glWaitSync);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
-
-#undef RESOLVE
-
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
@@ -191,38 +112,6 @@ public:
     {
         return m_context;
     }
-
-public:
-    PFNGLPROGRAMSTRINGARBPROC glProgramStringARB;
-    PFNGLBINDPROGRAMARBPROC glBindProgramARB;
-    PFNGLDELETEPROGRAMSARBPROC glDeleteProgramsARB;
-    PFNGLGENPROGRAMSARBPROC glGenProgramsARB;
-    PFNGLPROGRAMLOCALPARAMETER4FARBPROC glProgramLocalParameter4fARB;
-
-    PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-    PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
-    PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-
-    PFNGLFENCESYNCPROC glFenceSync;
-    PFNGLDELETESYNCPROC glDeleteSync;
-    PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
-    PFNGLWAITSYNCPROC glWaitSync;
-private:
-    template<class Function>
-    bool resolve(const char *name, const Function &defaultValue, Function *result) {
-        if(!m_context) {
-            *result = defaultValue;
-            return false;
-        }
-            
-        *result = (Function) m_context->getProcAddress(QLatin1String(name));
-        if(*result)
-            return true;
-
-        *result = defaultValue;
-        return false;
-    }
-
 private:
     const QGLContext *m_context;
     QnGlFunctions::Features m_features;
@@ -261,46 +150,6 @@ void QnGlFunctions::setWarningsEnabled(bool enable) {
 
 bool QnGlFunctions::isWarningsEnabled() {
     return qn_warnOnInvalidCalls;
-}
-
-void QnGlFunctions::glProgramStringARB(GLenum target, GLenum format, GLsizei len, const GLvoid *string) const {
-    d->glProgramStringARB(target, format, len, string);
-}
-
-void QnGlFunctions::glBindProgramARB(GLenum target, GLuint program) const {
-    d->glBindProgramARB(target, program);
-}
-
-void QnGlFunctions::glDeleteProgramsARB(GLsizei n, const GLuint *programs) const {
-    d->glDeleteProgramsARB(n, programs);
-}
-
-void QnGlFunctions::glGenProgramsARB(GLsizei n, GLuint *programs) const {
-    d->glGenProgramsARB(n, programs);
-}
-
-void QnGlFunctions::glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
-    d->glProgramLocalParameter4fARB(target, index, x, y, z, w);
-}
-
-GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags)
-{
-    return d->glFenceSync(condition, flags);
-}
-
-void QnGlFunctions::glDeleteSync(GLsync sync)
-{
-    d->glDeleteSync(sync);
-}
-
-void QnGlFunctions::glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
-{
-    d->glWaitSync(sync, flags, timeout);
-}
-
-GLenum QnGlFunctions::glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
-{
-    return d->glClientWaitSync(sync, flags, timeout);
 }
 
 #ifdef Q_OS_WIN
