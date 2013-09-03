@@ -1,28 +1,28 @@
 /**********************************************************
-* 22 apr 2013
+* 03 sep 2013
 * akolesnikov
 ***********************************************************/
 
-#ifndef GENERIC_RTSP_MEDIA_ENCODER_H
-#define GENERIC_RTSP_MEDIA_ENCODER_H
+#ifndef MEDIA_ENCODER_H
+#define MEDIA_ENCODER_H
 
 #include <plugins/camera_plugin.h>
 
 #include "common_ref_manager.h"
 
 
-class GenericRTSPCameraManager;
+class CameraManager;
 
 /*!
     \note Delegates reference counting to \a AxisCameraManager instance
 */
-class GenericRTSPMediaEncoder
+class MediaEncoder
 :
     public nxcip::CameraMediaEncoder
 {
 public:
-    GenericRTSPMediaEncoder( GenericRTSPCameraManager* const cameraManager );
-    virtual ~GenericRTSPMediaEncoder();
+    MediaEncoder( CameraManager* const cameraManager );
+    virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -48,7 +48,7 @@ public:
 
 private:
     CommonRefManager m_refManager;
-    GenericRTSPCameraManager* m_cameraManager;
+    CameraManager* m_cameraManager;
 };
 
-#endif  //GENERIC_RTSP_MEDIA_ENCODER_H
+#endif  //MEDIA_ENCODER_H

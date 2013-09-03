@@ -1,37 +1,28 @@
 /**********************************************************
-* 3 apr 2013
+* 03 sep 2013
 * akolesnikov
 ***********************************************************/
 
-#ifndef AXIS_CAMERA_MANAGER_H
-#define AXIS_CAMERA_MANAGER_H
-
-#include <memory>
-#include <vector>
-
-#include <QAuthenticator>
-#include <QString>
+#ifndef CAMERA_MANAGER_H
+#define CAMERA_MANAGER_H
 
 #include <plugins/camera_plugin.h>
 
 #include "common_ref_manager.h"
+#include "plugin.h"
 
 
-class AxisCameraPlugin;
-class AxisMediaEncoder;
-class AxisRelayIOManager;
-class SyncHttpClient;
+class MediaEncoder;
 
-//!Provides access to camera's properties and instanciates other managers (implements \a nxcip::BaseCameraManager)
-class AxisCameraManager
+class CameraManager
 :
     public nxcip::BaseCameraManager
 {
 public:
-    AxisCameraManager( const nxcip::CameraInfo& info );
-    virtual ~AxisCameraManager();
+    CameraManager( const nxcip::CameraInfo& info );
+    virtual ~CameraManager();
 
-    //!Implementaion of nxpl::PluginInterface::queryInterface
+    //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     //!Implementaion of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
@@ -59,30 +50,7 @@ public:
     //!Implementation of nxcip::BaseCameraManager::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
 
-    const nxcip::CameraInfo& cameraInfo() const;
-    nxcip::CameraInfo& cameraInfo();
-    const QAuthenticator& credentials() const;
-
-    bool isAudioEnabled() const;
-
-    //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
-    static int readAxisParameter(
-        SyncHttpClient* const httpClient,
-        const QByteArray& paramName,
-        QVariant* paramValue );
-    static int readAxisParameter(
-        SyncHttpClient* const httpClient,
-        const QByteArray& paramName,
-        QByteArray* paramValue );
-    static int readAxisParameter(
-        SyncHttpClient* const httpClient,
-        const QByteArray& paramName,
-        QString* paramValue );
-    static int readAxisParameter(
-        SyncHttpClient* const httpClient,
-        const QByteArray& paramName,
-        unsigned int* paramValue );
-
+    const nxcip::CameraInfo& info() const;
     CommonRefManager* refManager();
 
 private:
@@ -91,19 +59,10 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpl::ScopedRef<AxisCameraPlugin> m_pluginRef;
-    mutable nxcip::CameraInfo m_info;
-    const QString m_managementURL;
-    QAuthenticator m_credentials;
-    mutable std::vector<AxisMediaEncoder*> m_encoders;
-    bool m_audioEnabled;
-    mutable bool m_relayIOInfoRead;
-    mutable std::auto_ptr<AxisRelayIOManager> m_relayIOManager;
-    mutable unsigned int m_cameraCapabilities;
-    mutable unsigned int m_inputPortCount;
-    mutable unsigned int m_outputPortCount;
-
-    int updateCameraInfo() const;
+    nxpl::ScopedRef<ImageLibraryPlugin> m_pluginRef;
+    nxcip::CameraInfo m_info;
+    unsigned int m_capabilities;
+    std::auto_ptr<MediaEncoder> m_encoder;
 };
 
-#endif  //AXIS_CAMERA_MANAGER_H
+#endif  //CAMERA_MANAGER_H

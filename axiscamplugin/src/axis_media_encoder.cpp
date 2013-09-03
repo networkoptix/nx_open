@@ -154,6 +154,12 @@ int AxisMediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     return nxcip::NX_NO_ERROR;
 }
 
+//!Implementation of nxcip::CameraMediaEncoder::getLiveStreamReader
+nxcip::StreamReader* AxisMediaEncoder::getLiveStreamReader()
+{
+    return NULL;
+}
+
 int AxisMediaEncoder::fetchCameraResolutionList() const
 {
     // determin camera max resolution

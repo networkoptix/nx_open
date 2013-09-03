@@ -50,6 +50,8 @@ public:
     virtual int setFps( const float& fps, float* selectedFps ) override;
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
+    //!Implementation of nxcip::CameraMediaEncoder::getLiveStreamReader
+    virtual nxcip::StreamReader* getLiveStreamReader() override;
 
 private:
     CommonRefManager m_refManager;

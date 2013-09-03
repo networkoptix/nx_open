@@ -1,7 +1,3 @@
-/**********************************************************
-* 2 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
 
 #ifndef CAMERA_PLUGIN_TYPES_H
 #define CAMERA_PLUGIN_TYPES_H

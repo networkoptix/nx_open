@@ -45,10 +45,10 @@ public:
     virtual int setAudioEnabled( int audioEnabled ) override;
     //!Implementation of nxcip::BaseCameraManager::getPTZManager
     virtual nxcip::CameraPTZManager* getPTZManager() const override;
-    //!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
-    virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
     virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
+    //!Implementation of nxcip::BaseCameraManager::createDtsArchiveReader
+    virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
     //!Implementation of nxcip::BaseCameraManager::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
 

@@ -130,13 +130,6 @@ nxcip::CameraPTZManager* AxisCameraManager::getPTZManager() const
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
-nxcip::CameraMotionDataProvider* AxisCameraManager::getCameraMotionDataProvider() const
-{
-    //TODO/IMPL
-    return NULL;
-}
-
 //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
 nxcip::CameraRelayIOManager* AxisCameraManager::getCameraRelayIOManager() const
 {
@@ -155,6 +148,12 @@ nxcip::CameraRelayIOManager* AxisCameraManager::getCameraRelayIOManager() const
         m_relayIOManager.reset( new AxisRelayIOManager(const_cast<AxisCameraManager*>(this), m_inputPortCount, m_outputPortCount) );
     m_relayIOManager->addRef();
     return m_relayIOManager.get();
+}
+
+int AxisCameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
+{
+    //TODO/IMPL
+    return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getErrorString
