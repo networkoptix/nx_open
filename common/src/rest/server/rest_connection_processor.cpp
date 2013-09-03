@@ -22,7 +22,7 @@ class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 
-QnRestConnectionProcessor::QnRestConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
+QnRestConnectionProcessor::QnRestConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner)
 {
     Q_D(QnRestConnectionProcessor);

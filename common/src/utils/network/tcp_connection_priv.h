@@ -53,7 +53,7 @@ public:
     }
 
 public:
-    TCPSocket* socket;
+    AbstractStreamSocket* socket;
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;
 

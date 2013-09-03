@@ -13,7 +13,7 @@ QnDroidControlPortListener::~QnDroidControlPortListener()
     stop();
 }
 
-QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnDroidControlPortProcessor(clientSocket, owner);
 }
@@ -25,7 +25,7 @@ class QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 
-QnDroidControlPortProcessor::QnDroidControlPortProcessor(TCPSocket* socket, QnTcpListener* owner):
+QnDroidControlPortProcessor::QnDroidControlPortProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(socket, owner)
 {
 
@@ -46,7 +46,7 @@ void QnDroidControlPortProcessor::run()
         int readed = d->socket->recv(recvBuffer, sizeof(recvBuffer));
         if (readed > 0)
         {
-            quint32 removeIP = d->socket->getPeerAddressUint();
+            quint32 removeIP = d->socket->getPeerAddress().address.ipv4();
             PlDroidStreamReader::setSDPInfo(removeIP, QByteArray((const char*)recvBuffer, readed));
             break;
             

@@ -4,7 +4,10 @@
 #include <QObject>
 #include <QHttpRequestHeader>
 #include <QNetworkInterface>
+
+#include "abstract_socket.h"
 #include "utils/common/long_runnable.h"
+
 
 class TCPSocket;
 class QnTCPConnectionProcessor;
@@ -37,7 +40,7 @@ public slots:
 
 protected:
     virtual void run();
-    virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner) = 0;
     virtual void doPeriodicTasks();
 private:
     void removeDisconnectedConnections();

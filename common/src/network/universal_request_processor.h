@@ -8,8 +8,8 @@ class QnUniversalRequestProcessorPrivate;
 class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner);
-    QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, TCPSocket* socket, QnTcpListener* owner);
+    QnUniversalRequestProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, AbstractStreamSocket* socket, QnTcpListener* owner);
     virtual ~QnUniversalRequestProcessor();
 
 protected:

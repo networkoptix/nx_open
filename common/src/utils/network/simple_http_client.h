@@ -95,7 +95,7 @@ private:
     unsigned int m_contentLen;
     unsigned int m_readed;
 
-    typedef QSharedPointer<TCPSocket> TCPSocketPtr;
+    typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
     TCPSocketPtr m_sock;
     bool m_connected;

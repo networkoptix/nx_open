@@ -12,7 +12,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
 
-    QnRestConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
+    QnRestConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
 
     static void registerHandler(const QString& path, QnRestRequestHandler* handler);

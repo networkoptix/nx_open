@@ -9,7 +9,7 @@
 #include <cstddef>
 
 
-class Socket;
+class AbstractSocket;
 class PollSetImpl;
 class ConstIteratorImpl;
 
@@ -55,8 +55,8 @@ public:
         //!Selects next socket which state has been changed with previous \a poll call
         const_iterator& operator++();       //++it
 
-        Socket* socket();
-        const Socket* socket() const;
+        AbstractSocket* socket();
+        const AbstractSocket* socket() const;
         /*!
             \return Triggered event
         */
@@ -92,13 +92,13 @@ public:
         \note Ivalidates all iterators
         \note \a userData is associated with pair (\a sock, \a eventType)
     */
-    bool add( Socket* const sock, EventType eventType, void* userData = NULL );
+    bool add( AbstractSocket* const sock, EventType eventType, void* userData = NULL );
     //!Do not monitor event \a eventType on socket \a sock anymore
     /*!
         \return User data, associated with \a sock and \a eventType. NULL, if \a sock was not found
         \note Ivalidates all iterators
     */
-    void* remove( Socket* const sock, EventType eventType );
+    void* remove( AbstractSocket* const sock, EventType eventType );
     //!Returns number of sockets, monitored for \a eventType
     /*!
         Returned value should only be used for compare with \a maxPollSetSize(). Returned absolute value may be unexpected sometimes
@@ -107,7 +107,7 @@ public:
     /*!
         \return NULL if \a sock is not listnened for \a eventType
     */
-    void* getUserData( Socket* const sock, EventType eventType ) const;
+    void* getUserData( AbstractSocket* const sock, EventType eventType ) const;
 
     /*!
         \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.

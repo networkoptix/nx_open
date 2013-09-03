@@ -46,14 +46,14 @@ namespace aio
             \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
         */
         bool watchSocket(
-            const QSharedPointer<Socket>& sock,
+            const QSharedPointer<AbstractSocket>& sock,
             PollSet::EventType eventToWatch,
             AIOEventHandler* const eventHandler );
         //!Do not monitor \a sock for event \a eventType
         /*!
             Garantees that no \a eventTriggered will be called after return of this method
         */
-        void removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType );
+        void removeFromWatch( const QSharedPointer<AbstractSocket>& sock, PollSet::EventType eventType );
 
         /*!
             \param threadCount minimal thread count. Actual thread poll may exceed this value because PollSet can monitor limited number of sockets.
@@ -70,7 +70,7 @@ namespace aio
         };
 
         std::list<AIOThread*> m_threadPool;
-        std::map<std::pair<Socket*, PollSet::EventType>, AIOThread*> m_sockets;
+        std::map<std::pair<AbstractSocket*, PollSet::EventType>, AIOThread*> m_sockets;
         mutable QMutex m_mutex;
     };
 }
