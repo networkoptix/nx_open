@@ -151,7 +151,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                 if (m_nextDataPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
                     m_position = DATETIME_NOW;
                 else
-                    m_position = result->timestamp;
+                    m_position = m_nextDataPacket->timestamp;
             }
             result = m_nextDataPacket;
             m_nextDataPacket.clear(); // EOF video frame reached

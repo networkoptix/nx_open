@@ -45,6 +45,8 @@ public:
     */
     virtual bool isRtpHeaderExists() const = 0;
 
+    static void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
+
 protected:
     QnAbstractMediaDataPtr m_sdpMediaPacket;
 };

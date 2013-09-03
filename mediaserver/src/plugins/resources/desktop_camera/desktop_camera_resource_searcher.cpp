@@ -1,6 +1,8 @@
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
+static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
+
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher()
 {
 
@@ -19,7 +21,8 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 
 void QnDesktopCameraResourceSearcher::registerCamera(TCPSocket* connection, const QString& userName)
 {
-    m_connections[userName] = TCPSocketPtr(connection);
+    connection->setWriteTimeOut(1);
+    m_connections[userName] = ClientConnectionInfo(TCPSocketPtr(connection));
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -36,7 +39,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     if (!rt.isValid())
         return result;
 
-    QMap<QString, TCPSocketPtr>::Iterator itr = m_connections.begin();
+    QMap<QString, ClientConnectionInfo>::Iterator itr = m_connections.begin();
     
     for(; itr != m_connections.end(); ++itr)
     {
@@ -79,13 +82,28 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeI
 
 void QnDesktopCameraResourceSearcher::cleanupConnections()
 {
-    QMap<QString, TCPSocketPtr>::Iterator itr = m_connections.begin();
+    QMutexLocker lock(&m_mutex);
+
+    QMap<QString, ClientConnectionInfo>::Iterator itr = m_connections.begin();
     while(itr != m_connections.end())
     {
-        if (!itr.value()->isConnected())
+        if (!itr.value().socket->isConnected()) {
             itr = m_connections.erase(itr);
-        else
+        } 
+        else {
+            ClientConnectionInfo& conn = itr.value();
+            if (conn.useCount == 0 && conn.timer.elapsed() >= KEEP_ALIVE_INTERVAL)
+            {
+                conn.timer.restart();                
+                QString request = QString(lit("KEEP_ALIVE %1 HTTP/1.0\r\n\r\n")).arg("*");
+                if (conn.socket->send(request.toLocal8Bit()) < 1) {
+                    conn.socket->close();
+                    itr = m_connections.erase(itr);
+                    continue;
+                }
+            }
             ++itr;
+        }
     }
 }
 
@@ -97,5 +115,24 @@ QnDesktopCameraResourceSearcher& QnDesktopCameraResourceSearcher::instance()
 
 TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userName)
 {
-    return m_connections.value(userName);
+    QMutexLocker lock(&m_mutex);
+    QMap<QString, ClientConnectionInfo>::iterator itr = m_connections.find(userName);
+    if (itr != m_connections.end()) {
+        ClientConnectionInfo& conn = itr.value();
+        if (conn.useCount > 0)
+            return TCPSocketPtr();
+        conn.useCount++;
+        return conn.socket;
+    }
+    return TCPSocketPtr();
+}
+
+void QnDesktopCameraResourceSearcher::releaseConnection(const QString& userName)
+{
+    QMutexLocker lock(&m_mutex);
+    QMap<QString, ClientConnectionInfo>::iterator itr = m_connections.find(userName);
+    if (itr != m_connections.end()) {
+        ClientConnectionInfo& conn = itr.value();
+        conn.useCount--;
+    }
 }

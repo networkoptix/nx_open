@@ -7,15 +7,15 @@
 
 
 static const int CONNECT_TIMEOUT = 1000 * 5;
-static const int KEEP_ALIVE_TIMEOUT = 1000 * 60;
+static const int KEEP_ALIVE_TIMEOUT = 1000 * 120;
 
 class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
         QnAbstractDataConsumer(20), 
-        m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*64),
-        m_owner(owner)
+        m_owner(owner),
+        m_sequence(0)
     {
         m_serializer.setAdditionFlags(0);
         m_serializer.setLiveMarker(true);
@@ -29,22 +29,31 @@ protected:
 
     virtual bool processData(QnAbstractDataPacketPtr packet) override
     {
+        QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
         m_serializer.setDataPacket(packet.dynamicCast<QnAbstractMediaData>());
-        while(!m_needStop && m_serializer.getNextPacket(m_sendBuffer))
+        while(!m_needStop && m_serializer.getNextPacket(sendBuffer))
         {
             quint8 header[4];
             header[0] = '$';
             header[1] = 0;
-            header[2] = m_sendBuffer.size() >> 8;
-            header[3] = (quint8) m_sendBuffer.size();
+            header[2] = sendBuffer.size() >> 8;
+            header[3] = (quint8) sendBuffer.size();
             m_owner->sendData((const char*) &header, 4);
-            m_owner->sendData(m_sendBuffer);
+
+            static AVRational r = {1, 1000000};
+            AVRational time_base = {1, (int) m_serializer.getFrequency() };
+            qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
+
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializer.getSSRC(), m_serializer.getRtpMarker(), 
+                           packetTime, m_serializer.getPayloadtype(), m_sequence++); 
+            m_owner->sendData(sendBuffer);
+            sendBuffer.clear();
         }
         return true;
     }
 private:
+    quint32 m_sequence;
     QnRtspFfmpegEncoder m_serializer;
-    QnByteArray m_sendBuffer;
     QnDesktopCameraConnectionProcessor* m_owner;
 };
 
@@ -69,7 +78,7 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
 {
     Q_D(QnDesktopCameraConnectionProcessor);
 
-
+    stop();
     disconnectInternal();
 
     d->socket = 0; // we have not ownership for socket in this class
@@ -92,6 +101,10 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     else if (method == lit("DISCONNECT"))
     {
         disconnectInternal();
+    }
+    else if (method == lit("KEEP_ALIVE"))
+    {
+        // nothing to do. we restarting timer on any request
     }
 
     //sendResponse("HTTP", CODE_OK, QByteArray(), QByteArray());

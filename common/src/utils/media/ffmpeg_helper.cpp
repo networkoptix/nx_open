@@ -686,7 +686,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
     return ctx;
 
 error_label:
-    qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
+    qWarning() << Q_FUNC_INFO << __LINE__ << "Parse error in deserialize CodecContext";
     if (ctx->codec)
         avcodec_close(ctx);
     av_free(ctx);

@@ -3,7 +3,7 @@
 
 const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
 
-static QByteArray ID_PREFIX("Desktop camera ");
+static QByteArray ID_PREFIX("Desktop_camera_");
 
 QString QnDesktopCameraResource::getDriverName() const
 {

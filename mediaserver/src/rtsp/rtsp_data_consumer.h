@@ -60,7 +60,6 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
 protected:
-    void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
 

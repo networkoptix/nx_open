@@ -8,8 +8,7 @@
 static const int KEEP_ALIVE_TIMEOUT = 1000 * 40;
 
 QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(QnResourcePtr res):
-    CLServerPushStreamReader(res),
-    m_recvBufferSize(0)
+    CLServerPushStreamReader(res)
 {
 }
 
@@ -20,18 +19,17 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
 
 CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
 {
-    QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
-    m_socket = QnDesktopCameraResourceSearcher::instance().getConnection(userName);
-    if (!m_socket)
-        return CameraDiagnostics::CannotEstablishConnectionResult(0);
+   if (!m_socket) {
+        QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
+        m_socket = QnDesktopCameraResourceSearcher::instance().getConnection(userName);
+        if (!m_socket)
+            return CameraDiagnostics::CannotEstablishConnectionResult(0);
+        QString request = QString(lit("CONNECT %1 HTTP/1.0\r\n\r\n")).arg("*");
+        m_socket->send(request.toLocal8Bit());
+        m_keepaliveTimer.restart();
+    }
 
-    QString request = QString(lit("CONNECT %1 HTTP/1.0\r\n\r\n")).arg("*");
-    m_socket->send(request.toLocal8Bit());
-
-    m_keepaliveTimer.restart();
-
-    const CameraDiagnostics::Result result;
-    return result;
+    return CameraDiagnostics::Result();
 }
 
 void QnDesktopCameraStreamReader::closeStream()
@@ -39,9 +37,10 @@ void QnDesktopCameraStreamReader::closeStream()
     if (m_socket) {
         QString request = QString(lit("DISCONNECT %1 HTTP/1.0\r\n\r\n")).arg("*");
         m_socket->send(request.toLocal8Bit());
+        QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
+        QnDesktopCameraResourceSearcher::instance().releaseConnection(userName);
     }
     m_socket.clear();
-    m_recvBufferSize = 0;
 }
 
 bool QnDesktopCameraStreamReader::isStreamOpened() const
@@ -64,32 +63,40 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
 
     QnAbstractMediaDataPtr result;
 
-    while (!m_needStop && m_socket->isConnected()) {
-        int readed = m_socket->recv(m_recvBuffer + m_recvBufferSize, sizeof(m_recvBuffer) - m_recvBufferSize);
-        if (readed > 0)
-            m_recvBufferSize += readed;
-        if (m_recvBufferSize < 4)
-            continue;
-        
-        int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3] + 2;
-        while (!m_needStop && m_socket->isConnected() && m_recvBufferSize < packetSize)
-        {
-            readed = m_socket->recv(m_recvBuffer + m_recvBufferSize, sizeof(m_recvBuffer) - m_recvBufferSize);
+    int bufferSize = 0;
+    while (!m_needStop && m_socket->isConnected() && !result) 
+    {
+        if (bufferSize < 4) {
+            int readed = m_socket->recv(m_recvBuffer + bufferSize, 4 - bufferSize);
             if (readed > 0)
-                m_recvBufferSize += readed;
+                bufferSize += readed;
+            continue;
         }
-        if (m_recvBufferSize >= packetSize)
+        
+        int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3];
+        bufferSize = 0;
+        while (!m_needStop && m_socket->isConnected() && bufferSize < packetSize)
         {
-            parser.processData(m_recvBuffer + 4, 0, packetSize - 4, RtspStatistic(), result);
+            int readed = m_socket->recv(m_recvBuffer + bufferSize, packetSize - bufferSize);
+            if (readed > 0)
+                bufferSize += readed;
         }
-        memmove(m_recvBuffer, m_recvBuffer + packetSize, m_recvBufferSize - packetSize);
-        m_recvBufferSize -= packetSize;
+        if (bufferSize == packetSize)
+        {
+            parser.processData(m_recvBuffer, 0, packetSize, RtspStatistic(), result);
+        }
+        bufferSize = 0;
+
+        if (!m_needStop && m_socket->isConnected() && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_TIMEOUT) {
+            QString request = QString(lit("KEEP-ALIVE %1 HTTP/1.0\r\n\r\n")).arg("*");
+            m_socket->send(request.toLocal8Bit());
+            m_keepaliveTimer.restart();
+        }
     }
 
-    if (!m_needStop && m_socket->isConnected() && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_TIMEOUT) {
-        QString request = QString(lit("KEEP-ALIVE %1 HTTP/1.0\r\n\r\n")).arg("*");
-        m_socket->send(request.toLocal8Bit());
-        m_keepaliveTimer.restart();
+    if (result) {
+        result->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        result->opaque = 0;
     }
 
     return result;

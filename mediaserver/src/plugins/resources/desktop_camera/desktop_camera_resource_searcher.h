@@ -25,8 +25,24 @@ public:
     void registerCamera(TCPSocket* connection, const QString& userName);
 
     TCPSocketPtr getConnection(const QString& userName);
+    void releaseConnection(const QString& userName);
 private:
-    QMap<QString, TCPSocketPtr> m_connections;
+    struct ClientConnectionInfo
+    {
+        ClientConnectionInfo(TCPSocketPtr _socket = TCPSocketPtr())
+        {
+            socket = _socket;
+            useCount = 0;
+            timer.restart();       
+        }
+        TCPSocketPtr socket;
+        QTime timer;
+        int useCount;
+    };
+
+    QMap<QString, ClientConnectionInfo> m_connections;
+    QMutex m_mutex;
+private:
     void cleanupConnections();
 };
 

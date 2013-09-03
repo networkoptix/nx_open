@@ -25,8 +25,7 @@ protected:
     virtual void pleaseStop() override;
 private:
     TCPSocketPtr m_socket;
-    quint8 m_recvBuffer[65535];
-    int m_recvBufferSize;
+    quint8 m_recvBuffer[65536];
     QnFfmpegRtpParser parser;
     QTime m_keepaliveTimer;
 };
