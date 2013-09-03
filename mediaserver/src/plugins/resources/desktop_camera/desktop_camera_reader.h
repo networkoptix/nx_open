@@ -24,6 +24,8 @@ protected:
 
     virtual void pleaseStop() override;
 private:
+    int processTextResponse();
+private:
     TCPSocketPtr m_socket;
     quint8 m_recvBuffer[65536];
     QnFfmpegRtpParser parser;

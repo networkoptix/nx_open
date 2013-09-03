@@ -602,6 +602,10 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
         appendCtxField(data, Field_Sample_Fmt, (const char*) &ctx->sample_fmt, sizeof(AVSampleFormat));
     if (ctx->bits_per_coded_sample > 0)
         appendCtxField(data, Field_BitsPerSample, (const char*) &ctx->bits_per_coded_sample, sizeof(int));
+    if (ctx->coded_width > 0)
+        appendCtxField(data, Field_CodedWidth, (const char*) &ctx->coded_width, sizeof(int));
+    if (ctx->coded_height > 0)
+        appendCtxField(data, Field_CodedHeight, (const char*) &ctx->coded_height, sizeof(int));
 }
 
 AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
@@ -674,6 +678,14 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
                 break;
             case Field_BitsPerSample:
                 ctx->bits_per_coded_sample = *(int*) fieldData;
+                av_free(fieldData);
+                break;
+            case Field_CodedWidth:
+                ctx->coded_width = *(int*) fieldData;
+                av_free(fieldData);
+                break;
+            case Field_CodedHeight:
+                ctx->coded_height = *(int*) fieldData;
                 av_free(fieldData);
                 break;
         }

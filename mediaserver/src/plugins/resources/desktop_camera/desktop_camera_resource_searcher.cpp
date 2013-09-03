@@ -22,7 +22,7 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 void QnDesktopCameraResourceSearcher::registerCamera(TCPSocket* connection, const QString& userName)
 {
     connection->setWriteTimeOut(1);
-    m_connections[userName] = ClientConnectionInfo(TCPSocketPtr(connection));
+    m_connections << ClientConnectionInfo(TCPSocketPtr(connection), userName);
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -39,12 +39,12 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     if (!rt.isValid())
         return result;
 
-    QMap<QString, ClientConnectionInfo>::Iterator itr = m_connections.begin();
+    QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     
     for(; itr != m_connections.end(); ++itr)
     {
         QnDesktopCameraResourcePtr cam = QnDesktopCameraResourcePtr(new QnDesktopCameraResource);
-        QString userName = itr.key();
+        QString userName = itr->userName;
         cam->setName(lit("desktop-") + userName);
         cam->setModel(lit("virtual desktop camera"));
         cam->setPhysicalId(cam->gePhysicalIdPrefix() + userName);
@@ -84,18 +84,18 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
 {
     QMutexLocker lock(&m_mutex);
 
-    QMap<QString, ClientConnectionInfo>::Iterator itr = m_connections.begin();
+    QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     while(itr != m_connections.end())
     {
-        if (!itr.value().socket->isConnected()) {
+        if (!itr->socket->isConnected()) {
             itr = m_connections.erase(itr);
         } 
         else {
-            ClientConnectionInfo& conn = itr.value();
+            ClientConnectionInfo& conn = *itr;
             if (conn.useCount == 0 && conn.timer.elapsed() >= KEEP_ALIVE_INTERVAL)
             {
                 conn.timer.restart();                
-                QString request = QString(lit("KEEP_ALIVE %1 HTTP/1.0\r\n\r\n")).arg("*");
+                QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(++conn.cSeq);
                 if (conn.socket->send(request.toLocal8Bit()) < 1) {
                     conn.socket->close();
                     itr = m_connections.erase(itr);
@@ -116,24 +116,42 @@ QnDesktopCameraResourceSearcher& QnDesktopCameraResourceSearcher::instance()
 TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userName)
 {
     QMutexLocker lock(&m_mutex);
-    QMap<QString, ClientConnectionInfo>::iterator itr = m_connections.find(userName);
-    if (itr != m_connections.end()) {
-        ClientConnectionInfo& conn = itr.value();
-        if (conn.useCount > 0)
-            return TCPSocketPtr();
-        conn.useCount++;
-        return conn.socket;
+    for (int i = 0; i < m_connections.size(); ++i)
+    {
+        ClientConnectionInfo& conn = m_connections[i];
+        if (conn.useCount == 0) {
+            conn.useCount++;
+            return conn.socket;
+        }
     }
     return TCPSocketPtr();
 }
 
-void QnDesktopCameraResourceSearcher::releaseConnection(const QString& userName)
+quint32 QnDesktopCameraResourceSearcher::incCSeq(TCPSocketPtr socket)
 {
     QMutexLocker lock(&m_mutex);
-    QMap<QString, ClientConnectionInfo>::iterator itr = m_connections.find(userName);
-    if (itr != m_connections.end()) {
-        ClientConnectionInfo& conn = itr.value();
-        conn.useCount--;
-        conn.timer.restart();
+
+    for (int i = 0; i < m_connections.size(); ++i)
+    {
+        ClientConnectionInfo& conn = m_connections[i];
+        if (conn.socket == socket) {
+            return ++conn.cSeq;
+        }
+    }
+    return 0;
+}
+
+void QnDesktopCameraResourceSearcher::releaseConnection(TCPSocketPtr socket)
+{
+    QMutexLocker lock(&m_mutex);
+
+    for (int i = 0; i < m_connections.size(); ++i)
+    {
+        ClientConnectionInfo& conn = m_connections[i];
+        if (conn.socket == socket) {
+            conn.useCount--;
+            conn.timer.restart();
+            break;
+        }
     }
 }

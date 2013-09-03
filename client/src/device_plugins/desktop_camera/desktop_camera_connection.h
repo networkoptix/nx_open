@@ -10,6 +10,7 @@
 class QnDesktopResource;
 class QnTCPConnectionProcessor;
 class QnDesktopCameraConnectionProcessorPrivate;
+class QnDesktopCameraConnectionProcessor;
 
 /*
 *   This class used for connection from desktop camera to media server
@@ -20,6 +21,8 @@ class QnDesktopCameraConnection: public QnLongRunnable
 public:
     QnDesktopCameraConnection(QnDesktopResource* owner, QnMediaServerResourcePtr mServer);
     virtual ~QnDesktopCameraConnection();
+
+    virtual void pleaseStop() override;
 protected:
     virtual void run() override;
 private:
@@ -27,6 +30,9 @@ private:
 private:
     QnDesktopResource* m_owner;
     QnMediaServerResourcePtr m_mServer;
+    CLSimpleHTTPClient* connection;
+    QnDesktopCameraConnectionProcessor* processor;
+    QMutex m_mutex;
 };
 
 typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;
@@ -39,6 +45,10 @@ public:
     void processRequest();
     void sendData(const QnByteArray& data);
     void sendData(const char* data, int len);
+
+    void sendUnlock();
+    void sendLock();
+    bool isConnected() const;
 private:
     void disconnectInternal();
 private:

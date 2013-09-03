@@ -25,22 +25,27 @@ public:
     void registerCamera(TCPSocket* connection, const QString& userName);
 
     TCPSocketPtr getConnection(const QString& userName);
-    void releaseConnection(const QString& userName);
+    quint32 incCSeq(const TCPSocketPtr socket);
+    void releaseConnection(TCPSocketPtr socket);
 private:
     struct ClientConnectionInfo
     {
-        ClientConnectionInfo(TCPSocketPtr _socket = TCPSocketPtr())
+        ClientConnectionInfo(TCPSocketPtr _socket, const QString& _userName)
         {
             socket = _socket;
             useCount = 0;
-            timer.restart();       
+            cSeq = 0;
+            timer.restart();
+            userName = _userName;
         }
         TCPSocketPtr socket;
-        QTime timer;
         int useCount;
+        quint32 cSeq;
+        QTime timer;
+        QString userName;
     };
 
-    QMap<QString, ClientConnectionInfo> m_connections;
+    QQueue<ClientConnectionInfo> m_connections;
     QMutex m_mutex;
 private:
     void cleanupConnections();
