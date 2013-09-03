@@ -5,7 +5,7 @@
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
-static const int KEEP_ALIVE_TIMEOUT = 1000 * 40;
+static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
 QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(QnResourcePtr res):
     CLServerPushStreamReader(res)
@@ -87,9 +87,13 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         }
         bufferSize = 0;
 
-        if (!m_needStop && m_socket->isConnected() && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_TIMEOUT) {
+        if (!m_needStop && m_socket->isConnected() && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_INTERVAL) {
             QString request = QString(lit("KEEP-ALIVE %1 HTTP/1.0\r\n\r\n")).arg("*");
-            m_socket->send(request.toLocal8Bit());
+            if (m_socket->send(request.toLocal8Bit()) < 1)
+            {
+                m_socket->close();
+                return result;
+            }
             m_keepaliveTimer.restart();
         }
     }

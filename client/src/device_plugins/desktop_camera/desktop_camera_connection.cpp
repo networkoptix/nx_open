@@ -20,7 +20,7 @@ public:
         m_serializer.setAdditionFlags(0);
         m_serializer.setLiveMarker(true);
     }
-    ~QnDesktopCameraDataConsumer()
+    virtual ~QnDesktopCameraDataConsumer()
     {
         stop();
     }
@@ -124,7 +124,7 @@ void QnDesktopCameraConnectionProcessor::disconnectInternal()
     delete d->dataProvider;
 
     d->dataProvider = 0;
-    d->dataProvider = 0;
+    d->dataConsumer = 0;
 }
 
 void QnDesktopCameraConnectionProcessor::sendData(const QnByteArray& data)

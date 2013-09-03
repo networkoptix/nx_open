@@ -134,5 +134,6 @@ void QnDesktopCameraResourceSearcher::releaseConnection(const QString& userName)
     if (itr != m_connections.end()) {
         ClientConnectionInfo& conn = itr.value();
         conn.useCount--;
+        conn.timer.restart();
     }
 }
