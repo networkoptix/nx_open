@@ -79,12 +79,6 @@ cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.4/imageformats
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.5/imageformats
 #cp -r $CLIENT_SQLDRIVERS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/sqldrivers
 
-for f in `find $LIBSTAGE -type f` `find $BINSTAGE/**/styles -type f` $BINSTAGE/**/client-bin
-do
-    strip $f
-    chrpath -d $f
-done
-
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod 755 $BINSTAGE/1.*/* 
