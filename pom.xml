@@ -37,16 +37,18 @@
 
         <root.dir>${basedir}</root.dir>
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <libdir>${root.dir}/build_environment/target</libdir>
         <customization.dir>${basedir}/customization</customization.dir>
         <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
-        <ffmpeg.version>N-39672-g40b7a27-faac-1.5.2-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.0j-custom-1.5.2-SNAPSHOT</openssl.version>
-        <onvif.version>2.1.2-io-1.5.2-SNAPSHOT</onvif.version>
-        <sigar.version>1.6-1.5.2-SNAPSHOT</sigar.version>
-        <festival.version>2.1-1.5.2-SNAPSHOT</festival.version>
-        <boost.version>1.52-1.5.2-SNAPSHOT</boost.version>
+        <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
+        <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
+        <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
+        <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
+        <sigar.version>1.7-SNAPSHOT</sigar.version>
+        <festival.version>2.1-SNAPSHOT</festival.version>
+        <boost.version>1.54-SNAPSHOT</boost.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <qjson.version>0.8.1-SNAPSHOT</qjson.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
@@ -66,10 +68,11 @@
         <qtlib9>Concurrent</qtlib9>
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
-        <qtplugin2>sqldrivers</qtplugin2>
-        <qtplugin3>platforms</qtplugin3>	
+        <qtplugin2>platforms</qtplugin2>
+        <qtplugin3></qtplugin3>	
 
-        <toolchain.version></toolchain.version> <!-- defined only for cross compilation -->
+        <toolchain.version/>
+        <!-- defined only for cross compilation -->
     </properties>
 
     <modules>
@@ -195,9 +198,7 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
-                <protobuf.version>2.5.0</protobuf.version>
-                <boost.version>1.54-SNAPSHOT</boost.version>
-
+                <qt.dir>${env.ENVIRONMENT}/qt5/qtbase-${arch}</qt.dir>			
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
                 <compiler>msvc2012u3</compiler>
@@ -218,7 +219,6 @@
                 <protobuf.version>2.4.1</protobuf.version>
                 <boost.version>1.52-SNAPSHOT</boost.version>
                 <sigar.version>1.6-SNAPSHOT</sigar.version>
-
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin</python.dir>				
                 <qt.dir>${env.QTDIR}</qt.dir>				
@@ -230,7 +230,7 @@
         <profile>
             <id>linux-arm</id>
             <activation>
-		<activeByDefault>false</activeByDefault>
+                <activeByDefault>false</activeByDefault>
                 <os>
                     <family>unix</family>
                     <name>linux</name>
@@ -270,7 +270,7 @@
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
-       	        <module>client</module>		
+                <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
@@ -293,7 +293,7 @@
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
-       	        <module>client</module>		
+                <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
@@ -317,7 +317,7 @@
                 </os> 
             </activation>
             <modules>
-       	        <module>client</module>		
+                <module>client</module>		
                 <module>ios-client</module>
             </modules>
             <properties>

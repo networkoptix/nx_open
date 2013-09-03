@@ -17,28 +17,42 @@ for arch in ('x86', 'x64'):
     
     distutils.dir_util.copy_tree('help', join('${project.build.directory}', arch, 'bin/help'))                        
     #shutil.rmtree('help')
+
+    target_dir = join('${project.build.directory}', arch, 'bin')
+    bin_source_dir = '${qt.dir}/bin'
+    plugin_source_dir = '${qt.dir}/plugins'
+
+    if not os.path.exists(target_dir):
+        mkdir_p(target_dir)        
+    
+    for qtlib in qtlibs:
+        if qtlib != '':
+            for file in os.listdir(bin_source_dir):
+                if fnmatch.fnmatch(file, 'qt5%sd.dll' % qtlib):
+                    shutil.copy2(join(bin_source_dir, file), join(target_dir, 'debug'))
+                elif fnmatch.fnmatch(file, 'qt5%s.dll' % qtlib):
+                    shutil.copy2(join(bin_source_dir, file), join(target_dir, 'release'))
+    
+    
+
+
+    
+    for qtplugin in qtplugins:
+        for config in ('debug', 'release'):
+            if not os.path.exists(join(target_dir, config, qtplugin)):
+                os.makedirs (join(target_dir, config, qtplugin))    
+        
+        if qtplugin != '':
+            print join(plugin_source_dir, qtplugin)
+            for file in os.listdir(join(plugin_source_dir, qtplugin)):
+                if fnmatch.fnmatch(file, 'q*d.dll'):
+                    shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
+                else:
+                    shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
+            
+            #distutils.dir_util.copy_tree(join(plugin_source_dir, qtplugin), join(target_dir, qtplugin))                        
     
     for config in ('debug', 'release'):
-
-        target_dir = join('${project.build.directory}', arch, 'bin', config)
-        bin_source_dir = join('${environment.dir}/qt/bin', arch, config)
-        plugin_source_dir = join('${environment.dir}/qt/plugins', arch, config)
-
-        if not os.path.exists(target_dir):
-            mkdir_p(target_dir)        
-        
-        for qtlib in qtlibs:
-            if qtlib != '':
-                for file in os.listdir(bin_source_dir):
-                    if fnmatch.fnmatch(file, 'qt%s*.dll' % qtlib):
-                        shutil.copy2(join(bin_source_dir, file), target_dir)
-        
-        shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', target_dir)   
-                        
-        for qtplugin in qtplugins:
-            if qtplugin != '':
-                print join(plugin_source_dir, qtplugin)
-                distutils.dir_util.copy_tree(join(plugin_source_dir, qtplugin), join(target_dir, qtplugin))                        
-        
-        distutils.dir_util.copy_tree('vox', join(target_dir, 'vox'))                        
-        #shutil.rmtree('festival-vox')
+        distutils.dir_util.copy_tree('vox', join(target_dir, config, 'vox'))                        
+        shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))
+    #shutil.rmtree('festival-vox')
