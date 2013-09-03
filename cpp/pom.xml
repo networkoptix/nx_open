@@ -98,11 +98,6 @@
                     </execution>
                 </executions>
             </plugin>					
-									<exclude name="youtube/**" />									
-									<exclude name="**/*_${exclude_platform}/**" />	
-									<exclude name="**/*_${exclude_platform}.*" />																				
-									<exclude name="StdAfx.cpp" />
-
         </plugins>		
     </build>
     <profiles>
@@ -125,10 +120,10 @@
                         <version>1.1.1</version>
                         <executions>	
                             <execution>
-									<executable>${environment.dir}/qt5/qtbase-${arch}/bin/qmake</executable>
+                                <!--<executable>${environment.dir}/qt5/qtbase-${arch}/bin/qmake</executable>
 										<commandlineArgs>-spec</commandlineArgs>
 										<commandlineArgs>win32-msvc2012</commandlineArgs>
-										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</commandlineArgs>
+										<commandlineArgs>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</commandlineArgs> -->
                                 <id>default-cli</id>
                                 <phase>process-classes</phase>
                                 <goals>
@@ -142,30 +137,29 @@
                                     </arguments>
                                 </configuration>
                             </execution>							
-                        </executions>
-                    </plugin>	
-                                    <encoding>utf-8</encoding>
 
-							<!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
-							<execution>
-								<id>add_protoc_run</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
+                            <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
+                            <execution>
+                                <id>add_protoc_run</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
                                     <encoding>utf-8</encoding>
-									<unescape>no</unescape>
+                                    <unescape>no</unescape>
                                     <ignoreErrors>true</ignoreErrors>
-									<includes>
-										<include>**/${project.artifactId}-*.vcxproj</include>
-									</includes>
-									<replacements>
-										<!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
-										<replacement>
-											<xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
- 											<token><![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
-<value><![CDATA[
+                                    <includes>
+                                        <include>**/${project.artifactId}-*.vcxproj</include>
+                                    </includes>
+                                    <replacements>
+                                        <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
+                                            <token>
+                                                <![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
+                                            <value>
+                                                <![CDATA[
     <CustomBuild Include="$1/$2.$3">
       <AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3</AdditionalInputs>
       <Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/ ${root}/${project.artifactId}/src/$1/$2.$3</Command>
@@ -173,33 +167,35 @@
       <Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
     </CustomBuild>
 ]]></value>
-										</replacement>
+                                        </replacement>
 
-										<!-- Fixing compiling of *.pb.cc files -->
-										<replacement>
-											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
- 											<token>CustomBuild</token>
-											<value>ClCompile</value>
-										</replacement>
+                                        <!-- Fixing compiling of *.pb.cc files -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>ClCompile</value>
+                                        </replacement>
 
-										<!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
-										<replacement>
-											<xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
- 											<token>CustomBuild</token>
-											<value>None</value>
-										</replacement>
+                                        <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.res')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>None</value>
+                                        </replacement>
 
-										<!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
-										<replacement>
-											<xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
- 											<token>CustomBuild</token>
-											<value>None</value>
-										</replacement>
-   
-									</replacements>
-									<skip>${replace.skip}</skip>
-								</configuration>								
-							</execution>
+                                        <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
+                                        <replacement>
+                                            <xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
+                                            <token>CustomBuild</token>
+                                            <value>None</value>
+                                        </replacement>
+
+                                    </replacements>
+                                    <skip>${replace.skip}</skip>
+                                </configuration>								
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -225,8 +221,6 @@
                         <version>1.1.1</version>
                         <executions>	
                             <execution>
-									<executable>${environment.dir}/qt5/qtbase-${arch}/bin/qmake</executable>
-										<commandlineArgs>${qt.spec}</commandlineArgs>
                                 <id>process-with-make</id>
                                 <phase>process-classes</phase>
                                 <goals>
@@ -274,10 +268,6 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>
-
-									<executable>${environment.dir}/qt5/qtbase-${arch}/bin/qmake</executable>
-										<commandlineArgs>${qt.spec}</commandlineArgs>
-										<commandlineArgs>macx-g++47</commandlineArgs>
                             <execution>
                                 <id>process-with-make</id>
                                 <phase>process-classes</phase>

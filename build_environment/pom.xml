@@ -49,14 +49,14 @@
             <artifactId>boost</artifactId>
             <version>${boost.version}</version>
             <type>tar.gz</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
+            <classifier>${platform}-${arch}-${compiler}</classifier>
         </dependency>
         <dependency>
             <groupId>org.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>${ffmpeg.version}</version>
             <type>tar.gz</type>
-			<classifier>${platform}-${arch}</classifier>
+            <classifier>${platform}-${arch}</classifier>
         </dependency>      
         <dependency>
             <groupId>org</groupId>
@@ -200,38 +200,24 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
-								<!-- Qt debug libraries -->
-										<include>**/Qt5${qtlib1}d.*</include>
-										<include>**/Qt5${qtlib2}d.*</include>
-										<include>**/Qt5${qtlib3}d.*</include>
-										<include>**/Qt5${qtlib4}d.*</include>
-										<include>**/Qt5${qtlib5}d.*</include>
-										<include>**/Qt5${qtlib6}d.*</include>
-										<include>**/Qt5${qtlib7}d.*</include>
-										<include>**/Qt5${qtlib8}d.*</include>
-										<include>**/Qt5${qtlib9}d.*</include>												
-									</includes>
-									<excludes>
-										<exclude>**/*.lib</exclude>
-									</excludes>
-								</resource>
-
-								<!-- Qt release libraries -->
-								<resource>
-									<targetPath>${project.build.directory}/bin/release/</targetPath>
-									<directory>${environment.dir}/qt5/qtbase-${arch}/lib/</directory>
-									<preservePath>true</preservePath>
-									<includes>
-										<include>**/Qt5${qtlib1}.*</include>
-										<include>**/Qt5${qtlib2}.*</include>
-										<include>**/Qt5${qtlib3}.*</include>
-										<include>**/Qt5${qtlib4}.*</include>
-										<include>**/Qt5${qtlib5}.*</include>
-										<include>**/Qt5${qtlib6}.*</include>
-										<include>**/Qt5${qtlib7}.*</include>
-										<include>**/Qt5${qtlib8}.*</include>
-										<include>**/Qt5${qtlib9}.*</include>
-									<directory>${environment.dir}/qt5/qtbase-${arch}/plugins/</directory>
+                            <!-- Qt debug libraries -->
+                            <!-- Qt release libraries -->
+                            <resource>
+                                <targetPath>${project.build.directory}/bin/release/</targetPath>
+                                <directory>${environment.dir}/qt5/qtbase-${arch}/lib/</directory>
+                                <preservePath>true</preservePath>
+                                <includes>
+                                    <include>**/Qt5${qtlib1}.*</include>
+                                    <include>**/Qt5${qtlib2}.*</include>
+                                    <include>**/Qt5${qtlib3}.*</include>
+                                    <include>**/Qt5${qtlib4}.*</include>
+                                    <include>**/Qt5${qtlib5}.*</include>
+                                    <include>**/Qt5${qtlib6}.*</include>
+                                    <include>**/Qt5${qtlib7}.*</include>
+                                    <include>**/Qt5${qtlib8}.*</include>
+                                    <include>**/Qt5${qtlib9}.*</include>
+                                </includes>
+                            </resource>
                         </configuration>
                     </execution>							
                 </executions>
@@ -248,11 +234,12 @@
             </activation>
             <dependencies>
                 <dependency>
-					<groupId>com.google</groupId>
-					<artifactId>protobuf</artifactId>
-					<version>2.4.1</version>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>                           
+                    <groupId>com.google</groupId>
+                    <artifactId>protobuf</artifactId>
+                    <version>2.4.1</version>
+                    <classifier>${platform}-${arch}-${compiler}</classifier>
+                </dependency>                           
+                <dependency>                
                     <groupId>com.digitalwatchdog.dvr</groupId>
                     <artifactId>vmax-integration</artifactId>
                     <version>1.0-1.5.2-SNAPSHOT</version>
@@ -287,41 +274,45 @@
                     <type>tar.gz</type>
                     <classifier>${platform}</classifier>
                 </dependency>		
-				<dependency>
-					<groupId>org.festival</groupId>
-					<artifactId>festival-vox</artifactId>
-					<version>${festival.version}</version>
-					<type>zip</type>
-					<classifier>all-os</classifier>
-				</dependency>                         
+                <dependency>
+                    <groupId>org.festival</groupId>
+                    <artifactId>festival-vox</artifactId>
+                    <version>${festival.version}</version>
+                    <type>zip</type>
+                    <classifier>all-os</classifier>
+                </dependency>                         
             </dependencies>			
-					<plugin>
-						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>replacer</artifactId>
-						<version>1.5.2</version>
-						<executions>
-							<execution>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
-									<includes>
-										<include>**/libdir.properties</include>
-									</includes>
-									<replacements>
-										<replacement>
-											<token>\\\\</token>
-											<value>/</value>
-										</replacement>         
-									</replacements>
-									<skip>${replace.skip}</skip>
-								</configuration>								
-							</execution>
-						</executions>
-					</plugin>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>1.5.2</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <includes>
+                                        <include>**/libdir.properties</include>
+                                    </includes>
+                                    <replacements>
+                                        <replacement>
+                                            <token>\\\\</token>
+                                            <value>/</value>
+                                        </replacement>         
+                                    </replacements>
+                                    <skip>${replace.skip}</skip>
+                                </configuration>								
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
-<!--
+        <!--
         <profile>
             <id>linux</id>
             <activation>
