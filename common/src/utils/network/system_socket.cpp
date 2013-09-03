@@ -143,7 +143,7 @@ SocketAddress Socket::getPeerAddress() const
     unsigned int addr_len = sizeof(addr);
 
     if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
-        return QString();
+        return SocketAddress();
 
     return SocketAddress( addr.sin_addr, addr.sin_port );
 }
@@ -421,7 +421,9 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
 }
 
 void Socket::cleanUp()  {
+#ifdef _WIN32
     WSACleanup();
+#endif
 }
 
 unsigned short Socket::resolveService(const QString &service,
@@ -686,7 +688,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
     QElapsedTimer et;
     et.start();
     bool waitStartTimeActual = false;
-    if( timeoutMs >= 0 )
+    if( timeoutMs > 0 )
         waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
     for( ;; )
     {
@@ -707,7 +709,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
         if( iSelRet == -1 && errno == EINTR )
         {
             //modifying timeout for time we've already spent in select
-            if( timeoutMs < 0 ||  //no timeout
+            if( timeoutMs == 0 ||  //no timeout
                 !waitStartTimeActual )
             {
                 //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
@@ -720,7 +722,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
             const int millisAlreadySlept = et.elapsed();
             //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
             //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-            if( millisAlreadySlept >= timeoutMs )
+            if( millisAlreadySlept >= (int)timeoutMs )
                 break;
             timeoutMs -= millisAlreadySlept;
             continue;
@@ -797,7 +799,7 @@ const SocketAddress CommunicatingSocket::getForeignAddress()
 
     if (getpeername(sockDesc, (sockaddr *) &addr,(socklen_t *) &addr_len) < 0) {
         qnWarning("Fetch of foreign address failed (getpeername()).");
-        return QString();
+        return SocketAddress();
     }
     return SocketAddress( addr.sin_addr, addr.sin_port );
 }

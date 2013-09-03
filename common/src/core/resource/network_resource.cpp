@@ -1,4 +1,7 @@
+
 #include "network_resource.h"
+
+#include <memory>
 
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"

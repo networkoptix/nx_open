@@ -1,7 +1,10 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#include <memory>
+
 #include <QAuthenticator>
+
 #include "socket.h"
 
 extern "C"
