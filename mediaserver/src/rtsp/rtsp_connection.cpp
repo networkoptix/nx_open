@@ -36,6 +36,7 @@
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
+#include "utils/network/tcp_listener.h"
 
 class QnTcpListener;
 
@@ -194,7 +195,7 @@ public:
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
 {
 }
 
