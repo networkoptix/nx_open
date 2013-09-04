@@ -98,6 +98,10 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             int readed = m_socket->recv(m_recvBuffer + bufferSize, 4 - bufferSize);
             if (readed > 0)
                 bufferSize += readed;
+            else {
+                m_socket->close();
+                return result;
+            }
 
             if (bufferSize == 4 && (m_recvBuffer[0] != '$' || m_recvBuffer[1] > 1)) // check for streamID [0..1] as well
                 bufferSize = processTextResponse();
@@ -117,6 +121,10 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
                 if (m_recvBuffer[0] != 0x80) {
                     continue; // not a valid RTP packet. sync lost. find '$' again
                 }
+            }
+            else {
+                m_socket->close();
+                return result;
             }
         }
         if (bufferSize == packetSize)
