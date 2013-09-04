@@ -28,7 +28,7 @@ private:
 private:
     TCPSocketPtr m_socket;
     quint8 m_recvBuffer[65536];
-    QnFfmpegRtpParser parser;
+    QnFfmpegRtpParser m_parsers[2];
     QTime m_keepaliveTimer;
 };
 

@@ -99,22 +99,29 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             if (readed > 0)
                 bufferSize += readed;
 
-            const quint8 streamID = 0;
-            if (bufferSize == 4 && (m_recvBuffer[0] != '$' || m_recvBuffer[1] != streamID))
+            if (bufferSize == 4 && (m_recvBuffer[0] != '$' || m_recvBuffer[1] > 1)) // check for streamID [0..1] as well
                 bufferSize = processTextResponse();
         }
+        if (!m_socket->isConnected())
+            return result;
 
         int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3];
+        quint8 streamIndex = m_recvBuffer[1];
+        Q_ASSERT(streamIndex <= 1);
         bufferSize = 0;
         while (m_socket->isConnected() && bufferSize < packetSize)
         {
             int readed = m_socket->recv(m_recvBuffer + bufferSize, packetSize - bufferSize);
-            if (readed > 0)
+            if (readed > 0) {
                 bufferSize += readed;
+                if (m_recvBuffer[0] != 0x80) {
+                    continue; // not a valid RTP packet. sync lost. find '$' again
+                }
+            }
         }
         if (bufferSize == packetSize)
         {
-            parser.processData(m_recvBuffer, 0, packetSize, RtspStatistic(), result);
+            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, RtspStatistic(), result);
         }
         bufferSize = 0;
 

@@ -17,8 +17,10 @@ public:
         m_owner(owner),
         m_sequence(0)
     {
-        m_serializer.setAdditionFlags(0);
-        m_serializer.setLiveMarker(true);
+        for (int i = 0; i < 2; ++i) {
+            m_serializers[i].setAdditionFlags(0);
+            m_serializers[i].setLiveMarker(true);
+		}
     }
     virtual ~QnDesktopCameraDataConsumer()
     {
@@ -33,23 +35,30 @@ protected:
             return true;
 
         QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
-        m_serializer.setDataPacket(packet.dynamicCast<QnAbstractMediaData>());
+
+        QnAbstractMediaDataPtr media = packet.dynamicCast<QnAbstractMediaData>();
+        if (!media)
+            return false;
+
+        int streamIndex = media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1;
+
+        m_serializers[streamIndex].setDataPacket(media);
         m_owner->sendLock();
-        while(!m_needStop && m_owner->isConnected() && m_serializer.getNextPacket(sendBuffer))
+        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
         {
             quint8 header[4];
             header[0] = '$';
-            header[1] = 0;
+            header[1] = streamIndex;
             header[2] = sendBuffer.size() >> 8;
             header[3] = (quint8) sendBuffer.size();
             m_owner->sendData((const char*) &header, 4);
 
             static AVRational r = {1, 1000000};
-            AVRational time_base = {1, (int) m_serializer.getFrequency() };
+            AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializer.getSSRC(), m_serializer.getRtpMarker(), 
-                           packetTime, m_serializer.getPayloadtype(), m_sequence++); 
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(), 
+                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++); 
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -58,7 +67,7 @@ protected:
     }
 private:
     quint32 m_sequence;
-    QnRtspFfmpegEncoder m_serializer;
+    QnRtspFfmpegEncoder m_serializers[2]; // video + audio
     QnDesktopCameraConnectionProcessor* m_owner;
 };
 
