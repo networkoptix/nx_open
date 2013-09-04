@@ -56,6 +56,20 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
     initSocket();
 }
 
+CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth):
+    m_host(url.host()),
+    m_port(url.port()),
+    m_connected(false),
+    m_timeout(timeout),
+    m_auth(auth),
+    m_dataRestPtr(0),
+    m_dataRestLen(0),
+    m_localPort(0)
+{
+    initSocket();
+}
+
+
 void CLSimpleHTTPClient::initSocket()
 {
     m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );

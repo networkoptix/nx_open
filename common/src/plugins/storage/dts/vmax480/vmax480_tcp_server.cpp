@@ -25,15 +25,17 @@ public:
     VMaxStreamFetcher* streamFetcher;
     int openedChannels;
     static QMutex connectMutex;
+    QnTcpListener* owner;
 };
 QMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
     d->openedChannels = 0;
+    d->owner = _owner;
 }
 
 QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()

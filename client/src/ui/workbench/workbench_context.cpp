@@ -20,6 +20,7 @@
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include "workbench_license_notifier.h"
+#include "watchers/workbench_desktop_camera_watcher.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -37,6 +38,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
+    m_desktopCameraWatcher = instance<QnWorkbenchDesktopCameraWatcher>();
 
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,    SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
@@ -61,6 +63,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     QnInstanceStorage::clear();
     m_userWatcher = NULL;
     m_layoutWatcher = NULL;
+    m_desktopCameraWatcher = NULL;
 
     /* Destruction order of these objects is important. */
     m_navigator.reset();

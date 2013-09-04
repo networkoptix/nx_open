@@ -39,6 +39,7 @@ public:
     void setTruncateInterval(int seconds);
 
     void setFileName(const QString& fileName);
+    QString getFileName() const;
     
     /*
     * Export motion stream to separate file

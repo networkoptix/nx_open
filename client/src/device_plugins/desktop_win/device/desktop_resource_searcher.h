@@ -7,9 +7,8 @@ struct IDirect3D9;
 
 class QnDesktopResourceSearcher : public QnAbstractResourceSearcher
 {
-    QnDesktopResourceSearcher();
-
 public:
+    QnDesktopResourceSearcher(QGLWidget* mainWidget);
     ~QnDesktopResourceSearcher();
 
     static QnDesktopResourceSearcher& instance();
@@ -20,11 +19,13 @@ public:
 
     virtual bool isResourceTypeSupported(QnId resourceTypeId) const override;
 
+    static void initStaticInstance(QnDesktopResourceSearcher* instance);
 protected:
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
 
 private:
     IDirect3D9 *m_pD3D;
+    QGLWidget* m_mainWidget;
 };
 
 #endif // QN_DESKTOP_RESOURCE_SEARCHER_H

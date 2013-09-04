@@ -9,6 +9,7 @@
 #include "screen_grabber.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/threadqueue.h"
+#include "ui/screen_recording/video_recorder_settings.h"
 
 class QnBufferedScreenGrabber: public QnLongRunnable
 {
@@ -20,7 +21,7 @@ public:
     QnBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT,
                             int queueSize = DEFAULT_QUEUE_SIZE,
                             int frameRate = DEFAULT_FRAME_RATE,
-                            QnScreenGrabber::CaptureMode mode = QnScreenGrabber::CaptureMode_DesktopWithoutAero,
+                            Qn::CaptureMode mode = Qn::FullScreenNoAeroMode,
                             bool captureCursor = true,
                             const QSize& captureResolution = QSize(0, 0),
                             QWidget* widget = 0);
@@ -37,7 +38,6 @@ public:
     qint64 currentTime() const { return m_grabber.currentTime(); }
 
     bool capturedDataToFrame(QnScreenGrabber::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
-    void stop();
     void setLogo(const QPixmap& logo) { m_grabber.setLogo(logo); }
 
 protected:

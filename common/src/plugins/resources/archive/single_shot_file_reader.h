@@ -18,7 +18,7 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
 
 protected:
-    virtual QnAbstractMediaDataPtr getNextData() override;
+    virtual QnAbstractMediaDataPtr getNextData();
     virtual void run() override;
 private:
     QnStorageResourcePtr m_storage;

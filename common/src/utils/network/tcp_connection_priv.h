@@ -40,7 +40,9 @@ public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-        socket(0)
+        socket(0),
+        ssl(0),
+        sslContext(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -64,11 +66,10 @@ public:
     QByteArray receiveBuffer;
     QMutex sockMutex;
     quint8* tcpReadBuffer;
-    QnTcpListener* owner;
     int socketTimeout;
     bool chunkedMode;
     SSL* ssl;
-
+    SSL_CTX* sslContext;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

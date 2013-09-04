@@ -4,6 +4,9 @@
 #include <QMap>
 #include "rtsp_encoder.h"
 
+static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
+static const QString RTP_FFMPEG_GENERIC_STR(lit("FFMPEG"));
+
 class QnRtspFfmpegEncoder: public QnRtspEncoder
 {
 public:

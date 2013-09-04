@@ -13,6 +13,7 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <QTime>
+#include "ui/screen_recording/video_recorder_settings.h"
 
 class QnScreenGrabber: public QObject
 {
@@ -28,12 +29,10 @@ public:
         QPoint pos;
     };
 
-    enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
-
     // resolution (0,0) - use default(native resolution)
     // negative resolution - use specified scale factor
 
-    QnScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
+    QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor,
                     const QSize& captureResolution, QWidget* widget);
     virtual ~QnScreenGrabber();
 
@@ -79,7 +78,7 @@ private:
 
     static QMutex m_instanceMutex;
     static int m_aeroInstanceCounter;
-    CaptureMode m_mode;
+    Qn::CaptureMode m_mode;
     int m_poolSize;
     bool m_captureCursor;
     HDC m_cursorDC;
