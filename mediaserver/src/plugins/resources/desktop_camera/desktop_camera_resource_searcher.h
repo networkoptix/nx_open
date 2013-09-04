@@ -45,7 +45,7 @@ private:
         QString userName;
     };
 
-    QQueue<ClientConnectionInfo> m_connections;
+    QList<ClientConnectionInfo> m_connections;
     QMutex m_mutex;
 private:
     void cleanupConnections();

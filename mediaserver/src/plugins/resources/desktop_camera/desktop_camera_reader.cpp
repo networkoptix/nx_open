@@ -99,7 +99,8 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             if (readed > 0)
                 bufferSize += readed;
 
-            if (bufferSize == 4 && m_recvBuffer[0] != '$' || m_recvBuffer[1] != 0)
+            const quint8 streamID = 0;
+            if (bufferSize == 4 && (m_recvBuffer[0] != '$' || m_recvBuffer[1] != streamID))
                 bufferSize = processTextResponse();
         }
 

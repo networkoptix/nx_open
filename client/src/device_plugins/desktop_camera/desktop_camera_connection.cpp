@@ -35,7 +35,7 @@ protected:
         QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
         m_serializer.setDataPacket(packet.dynamicCast<QnAbstractMediaData>());
         m_owner->sendLock();
-        while(m_owner->isConnected() && m_serializer.getNextPacket(sendBuffer))
+        while(!m_needStop && m_owner->isConnected() && m_serializer.getNextPacket(sendBuffer))
         {
             quint8 header[4];
             header[0] = '$';
