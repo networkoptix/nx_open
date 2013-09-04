@@ -15,7 +15,7 @@
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, void* _sslContext):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -26,7 +26,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, void* _ssl
     d->sslContext = (SSL_CTX*) _sslContext;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, void* _sslContext):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -89,7 +89,7 @@ int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-    qDebug() << "Client request from " << d->socket->getPeerAddress();
+    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
     qDebug() << d->clientRequest;
 
     QList<QByteArray> lines = d->clientRequest.split('\n');
@@ -246,7 +246,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     }
 
     if (displayDebug) {
-        qDebug() << "Server response to " << d->socket->getPeerAddress();
+        qDebug() << "Server response to " << d->socket->getPeerAddress().address.toString();
         qDebug() << "\n" << response;
     }
 
@@ -307,7 +307,7 @@ void* QnTCPConnectionProcessor::ssl() const
     return d->ssl;
 }
 
-TCPSocket* QnTCPConnectionProcessor::socket() const
+AbstractStreamSocket* QnTCPConnectionProcessor::socket() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket;

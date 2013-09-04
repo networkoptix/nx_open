@@ -35,14 +35,14 @@ namespace aio
             tAll
         };
 
-        QSharedPointer<Socket> socket;
+        QSharedPointer<AbstractSocket> socket;
         PollSet::EventType eventType;
         AIOEventHandler* eventHandler;
         TaskType type;
         int timeout;
 
         SocketAddRemoveTask(
-            const QSharedPointer<Socket>& _socket,
+            const QSharedPointer<AbstractSocket>& _socket,
             PollSet::EventType _eventType,
             AIOEventHandler* const _eventHandler,
             TaskType _type,
@@ -92,7 +92,7 @@ namespace aio
     {
     public:
         QSharedPointer<AIOEventHandlingData> data;
-        Socket* socket;
+        AbstractSocket* socket;
 
         PeriodicTaskData()
         :
@@ -102,7 +102,7 @@ namespace aio
 
         PeriodicTaskData(
             const QSharedPointer<AIOEventHandlingData>& _data,
-            Socket* _socket )
+            AbstractSocket* _socket )
         :
             data( _data ),
             socket( _socket )
@@ -191,7 +191,7 @@ namespace aio
         }
 
         bool removeReverseTask(
-            const QSharedPointer<Socket>& sock,
+            const QSharedPointer<AbstractSocket>& sock,
             PollSet::EventType eventType,
             SocketAddRemoveTask::TaskType taskType,
             AIOEventHandler* const eventHandler,
@@ -302,7 +302,7 @@ namespace aio
         void addPeriodicTask(
             const qint64 taskClock,
             const QSharedPointer<AIOEventHandlingData>& handlingData,
-            Socket* _socket )
+            AbstractSocket* _socket )
         {
             QMutexLocker lk( &periodicTasksMutex );
             periodicTasksByClock.insert( std::make_pair(
@@ -339,7 +339,7 @@ namespace aio
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
     bool AIOThread::watchSocket(
-        const QSharedPointer<Socket>& sock,
+        const QSharedPointer<AbstractSocket>& sock,
         PollSet::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         int timeoutMs )
@@ -364,7 +364,7 @@ namespace aio
         return true;
     }
 
-    bool AIOThread::removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType )
+    bool AIOThread::removeFromWatch( const QSharedPointer<AbstractSocket>& sock, PollSet::EventType eventType )
     {
         //NOTE m_impl->mutex is locked up the stack
 

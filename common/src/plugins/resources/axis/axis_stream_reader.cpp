@@ -41,8 +41,9 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
             return 15;
         case Qn::QualityPreSet:
             return -1;
+        default:
+            return -1;
     }
-    return -1;
 }
 
 CameraDiagnostics::Result QnAxisStreamReader::openStream()

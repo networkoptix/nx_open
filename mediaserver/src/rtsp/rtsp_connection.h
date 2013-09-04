@@ -33,8 +33,8 @@ struct RtspServerTrackInfo
     int clientRtcpPort;
     quint16 sequence;
     qint64 firstRtpTime;
-    UDPSocket* mediaSocket;
-    UDPSocket* rtcpSocket;
+    AbstractDatagramSocket* mediaSocket;
+    AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
     static QMutex m_createSocketMutex;
 };
@@ -47,7 +47,7 @@ class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
-    QnRtspConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);

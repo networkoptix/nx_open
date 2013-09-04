@@ -468,7 +468,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             data += 4;
         }
         else {
-            rtpChannelNum = m_rtpData->getMediaSocket()->getLocalPort();
+            rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
         const QString format = m_rtspSession.getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
         if (format.isEmpty()) {

@@ -24,7 +24,7 @@ public:
     QnTcpListener* owner;
 };
 
-QnRestConnectionProcessor::QnRestConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
+QnRestConnectionProcessor::QnRestConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
 {
     Q_D(QnRestConnectionProcessor);

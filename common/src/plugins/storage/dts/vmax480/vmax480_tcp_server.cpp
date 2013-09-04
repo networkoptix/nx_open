@@ -29,7 +29,7 @@ public:
 };
 QMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
-QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
+QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
 {
     Q_D(QnVMax480ConnectionProcessor);
@@ -397,7 +397,7 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
 }
 
 
-QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnVMax480ConnectionProcessor(clientSocket, owner);
 }

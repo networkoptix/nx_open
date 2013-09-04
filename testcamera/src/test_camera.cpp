@@ -97,7 +97,7 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
     m_offlineFreq = offlineFreq;
 }
 
-bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket, int fps)
+bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps)
 {
     double streamingTime = 0;
     QTime timer;
@@ -155,7 +155,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
     return true;
 }
 
-void QnTestCamera::startStreaming(TCPSocket* socket, bool isSecondary, int fps)
+void QnTestCamera::startStreaming(AbstractStreamSocket* socket, bool isSecondary, int fps)
 {
     int fileIndex = 0;
     QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;

@@ -7,6 +7,7 @@
 #include <QXmlDefaultHandler>
 #include "core/resource_managment/resource_pool.h"
 #include "utils/network/nettools.h"
+#include "utils/network/system_socket.h"
 
 
 extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
@@ -87,25 +88,27 @@ QnUpnpResourceSearcher::QnUpnpResourceSearcher():
 
 QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
 {
-    foreach(UDPSocket* sock, m_socketList)
+    foreach(AbstractDatagramSocket* sock, m_socketList)
         delete sock;
     delete m_receiveSocket;
 }
 
-UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
+AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
 {
-    if (m_receiveSocket == 0) {
-        m_receiveSocket = new UDPSocket();
-        m_receiveSocket->setReuseAddrFlag(true);
-        m_receiveSocket->setLocalPort(GROUP_PORT);
+    if (m_receiveSocket == 0)
+    {
+        UDPSocket* udpSock = new UDPSocket();
+        udpSock->setReuseAddrFlag(true);
+        udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
         
         foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
-            m_receiveSocket->joinGroup(groupAddress.toString(), iface.address.toString());
+            udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
         }
+        m_receiveSocket = udpSock;
     }
 
 
-    QMap<QString, UDPSocket*>::iterator it = m_socketList.find(iface.address.toString());
+    QMap<QString, AbstractDatagramSocket*>::iterator it = m_socketList.find(iface.address.toString());
     if (it == m_socketList.end())
     {
         UDPSocket* sock = new UDPSocket();
@@ -127,7 +130,7 @@ UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
         }
         */
 
-        sock->setReadBufferSize(1024*512);
+        sock->setRecvBufferSize(1024*512);
 
         m_socketList.insert(iface.address.toString(), sock);
 
@@ -197,7 +200,7 @@ void QnUpnpResourceSearcher::processDeviceXml(const QByteArray& foundDeviceDescr
     processPacket(findBestIface(sender), host, xmlHandler.deviceInfo(), foundDeviceDescription, result);
 }
 
-void QnUpnpResourceSearcher::processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
+void QnUpnpResourceSearcher::processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result)
 {
     while(socket->hasData())
     {
@@ -245,7 +248,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        UDPSocket* sock = sockByName(iface);
+        AbstractDatagramSocket* sock = sockByName(iface);
         if (!sock)
             continue;
 
@@ -253,7 +256,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append("\r\n");
+        data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
         data.append("ST:urn:schemas-upnp-org:device:Network Optix Media Server:1\r\n");
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");

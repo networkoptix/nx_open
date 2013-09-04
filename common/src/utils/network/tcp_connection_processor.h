@@ -15,7 +15,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    QnTCPConnectionProcessor(TCPSocket* socket, void* sslContext);
+    QnTCPConnectionProcessor(AbstractStreamSocket* socket, void* sslContext);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -32,7 +32,7 @@ public:
 
     //!Returns SSL*. including ssl.h here causes numerous compilation problems
     void* ssl() const;
-    TCPSocket* socket() const;
+    AbstractStreamSocket* socket() const;
     QUrl getDecodedUrl() const;
 
     bool sendBuffer(const QnByteArray& sendBuffer);
@@ -53,8 +53,9 @@ protected:
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
+    bool readRequest();
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, void* _sslContext);
+    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, AbstractStreamSocket* socket, void* _sslContext);
 private:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
