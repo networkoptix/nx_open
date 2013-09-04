@@ -34,6 +34,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
     //d->socket->setNoDelay(true);
     d->chunkedMode = false;
     d->ssl = 0;
+    Q_ASSERT(_sslContext == 0); // for debug only!
     d->sslContext = (SSL_CTX*) _sslContext;
 }
 

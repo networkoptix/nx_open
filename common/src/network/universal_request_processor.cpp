@@ -22,7 +22,7 @@ QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, AbstractStreamSocket* socket, QnTcpListener* owner):
-QnTCPConnectionProcessor(priv, socket, owner)
+QnTCPConnectionProcessor(priv, socket, owner->getOpenSSLContext())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
