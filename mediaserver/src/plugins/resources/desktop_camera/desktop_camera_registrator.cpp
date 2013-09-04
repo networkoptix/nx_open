@@ -1,6 +1,7 @@
 #include "desktop_camera_registrator.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
+#include "utils/network/tcp_listener.h"
 
 class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -8,7 +9,7 @@ public:
 };
 
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, _owner->getOpenSSLContext())
 {
 
 }
