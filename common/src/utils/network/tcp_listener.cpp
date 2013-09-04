@@ -103,17 +103,25 @@ void QnTcpListener::doPeriodicTasks()
 void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
-    QMutexLocker lock(&d->connectionMtx);
-    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
+
+    QVector<QnLongRunnable*> toDeleteList;
+
     {
-        QnLongRunnable* processor = *itr;
-        if (!processor->isRunning()) {
-            delete processor;
-            itr = d->connections.erase(itr);
+        QMutexLocker lock(&d->connectionMtx);
+        for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
+        {
+            QnLongRunnable* processor = *itr;
+            if (!processor->isRunning()) {
+                toDeleteList << processor;
+                itr = d->connections.erase(itr);
+            }
+            else 
+                ++itr;
         }
-        else 
-            ++itr;
     }
+
+    foreach(QnLongRunnable* processor, toDeleteList)
+        delete processor;
 }
 
 void QnTcpListener::removeOwnership(QnLongRunnable* processor)
@@ -151,21 +159,24 @@ void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
 
-    QMutexLocker lock(&d->connectionMtx);
-
-    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    QList<QnLongRunnable*> oldConnections = d->connections;
     {
-        QnLongRunnable* processor = *itr;
-        processor->pleaseStop();
+        QMutexLocker lock(&d->connectionMtx);
+
+        for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+        {
+            QnLongRunnable* processor = *itr;
+            processor->pleaseStop();
+        }
+        d->connections.clear();
     }
 
-    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QList<QnLongRunnable*>::iterator itr = oldConnections.begin(); itr != oldConnections.end(); ++itr)
     {
         QnLongRunnable* processor = *itr;
         NX_LOG( QString::fromLatin1("TCPListener. Stopping processor (sysThreadID %1)").arg(processor->sysThreadID()), cl_logWARNING );
         delete processor;
     }
-    d->connections.clear();
 }
 
 void QnTcpListener::updatePort(int newPort)
