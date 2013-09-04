@@ -21,7 +21,7 @@ enum CLHttpStatus
 
 QString toString( CLHttpStatus status );
 
-typedef typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
+typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
 class CLSimpleHTTPClient
 {

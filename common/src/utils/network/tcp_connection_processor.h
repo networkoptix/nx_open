@@ -53,7 +53,6 @@ protected:
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
-    bool readRequest();
 
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, AbstractStreamSocket* socket, void* _sslContext);
 private:

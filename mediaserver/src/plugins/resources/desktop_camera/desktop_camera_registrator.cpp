@@ -7,7 +7,7 @@ class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(TCPSocket* socket, QnTcpListener* _owner):
+QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(AbstractStreamSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, _owner)
 {
 

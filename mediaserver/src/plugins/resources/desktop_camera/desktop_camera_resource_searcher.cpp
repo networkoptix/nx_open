@@ -19,9 +19,9 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(TCPSocket* connection, const QString& userName)
+void QnDesktopCameraResourceSearcher::registerCamera(AbstractStreamSocket* connection, const QString& userName)
 {
-    connection->setWriteTimeOut(1);
+    connection->setSendTimeout(1);
     m_connections << ClientConnectionInfo(TCPSocketPtr(connection), userName);
 }
 

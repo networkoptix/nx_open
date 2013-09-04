@@ -15,7 +15,7 @@
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, void* _sslContext):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -26,7 +26,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket,
     d->sslContext = (SSL_CTX*) _sslContext;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, AbstractStreamSocket* socket, void* _sslContext):
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);

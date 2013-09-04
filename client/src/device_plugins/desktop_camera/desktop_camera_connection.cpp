@@ -80,7 +80,7 @@ public:
     QMutex sendMutex;
 };
 
-QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(TCPSocket* socket, void* sslContext, QnDesktopResource* desktop):
+QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(AbstractStreamSocket* socket, void* sslContext, QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket, sslContext)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
