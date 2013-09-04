@@ -7,6 +7,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 #include "utils/common/byte_array.h"
+#include <openssl/ssl.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -15,7 +16,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    QnTCPConnectionProcessor(AbstractStreamSocket* socket, void* sslContext);
+    QnTCPConnectionProcessor(AbstractStreamSocket* socket, SSL_CTX* sslContext);
     virtual ~QnTCPConnectionProcessor();
 
     /**

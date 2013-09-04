@@ -26,7 +26,7 @@ class QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessorPrivate
 };
 
 QnDroidControlPortProcessor::QnDroidControlPortProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(socket, owner->getOpenSSLContext())
 {
 
 }

@@ -303,7 +303,7 @@ void QnTcpListener::run()
     NX_LOG( QString::fromLatin1("Exiting QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
 }
 
-void* QnTcpListener::getOpenSSLContext()
+SSL_CTX* QnTcpListener::getOpenSSLContext()
 {
     Q_D(QnTcpListener);
     return d->ctx;

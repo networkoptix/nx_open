@@ -1,7 +1,5 @@
 #include "tcp_connection_processor.h"
 
-#include <openssl/ssl.h>
-
 #include <QTime>
 
 #include "tcp_listener.h"
@@ -15,14 +13,13 @@
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, void* _sslContext):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, SSL_CTX* _sslContext):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     d->chunkedMode = false;
     d->ssl = 0;
-    Q_ASSERT(_sslContext == 0); // for debug only!
     d->sslContext = (SSL_CTX*) _sslContext;
 }
 
@@ -34,7 +31,6 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
     //d->socket->setNoDelay(true);
     d->chunkedMode = false;
     d->ssl = 0;
-    Q_ASSERT(_sslContext == 0); // for debug only!
     d->sslContext = (SSL_CTX*) _sslContext;
 }
 

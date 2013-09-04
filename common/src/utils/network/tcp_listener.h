@@ -7,6 +7,7 @@
 
 #include "abstract_socket.h"
 #include "utils/common/long_runnable.h"
+#include <openssl/ssl.h>
 
 
 class TCPSocket;
@@ -25,7 +26,7 @@ public:
     virtual ~QnTcpListener();
 
     void updatePort(int newPort);
-    void* getOpenSSLContext();
+    SSL_CTX* getOpenSSLContext();
     bool enableSSLMode();
 
     int getPort() const;
