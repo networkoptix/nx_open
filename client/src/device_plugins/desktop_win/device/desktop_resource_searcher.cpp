@@ -23,7 +23,7 @@ QnDesktopResourceSearcher &QnDesktopResourceSearcher::instance()
 
 void QnDesktopResourceSearcher::initStaticInstance(QnDesktopResourceSearcher* searcher)
 {
-    Q_ASSERT(inst == 0);
+    //Q_ASSERT(inst == 0); 
     inst = searcher;
 }
 
