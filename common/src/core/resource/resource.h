@@ -102,7 +102,8 @@ public:
         motion = 0x10000,       /**< Resource has motion */
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
 
-        foreigner = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+        foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
+        no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
 
         local_media = local | media,
         local_layout = local | layout,
