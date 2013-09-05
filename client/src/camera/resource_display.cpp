@@ -38,9 +38,12 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
             connect(this,                           SIGNAL(destroyed()),    m_camera,       SLOT(beforeStopDisplay()));
 
-            m_counter = new QnCounter(2);
+            m_counter = new QnCounter(1);
             connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     m_counter,      SLOT(decrement()));
-            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+            if (m_mediaProvider->hasThread()) {
+                connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+                m_counter->increment();
+            }
 
             connect(m_counter,                      SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
             connect(m_counter,                      SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
