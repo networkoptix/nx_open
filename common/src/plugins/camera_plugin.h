@@ -270,7 +270,7 @@ namespace nxcip
     class CameraMotionDataProvider;
     class CameraRelayIOManager;
 
-        // {B7AA2FE8-7592-4459-A52F-B05E8E089AFE}
+    // {B7AA2FE8-7592-4459-A52F-B05E8E089AFE}
     static const nxpl::NX_GUID IID_BaseCameraManager = { { 0xb7, 0xaa, 0x2f, 0xe8, 0x75, 0x92, 0x44, 0x59, 0xa5, 0x2f, 0xb0, 0x5e, 0x8e, 0x8, 0x9a, 0xfe } };
 
     //!Provides base camera operations: getting/settings fps, resolution, bitrate, media stream url(s). Also provides pointer to other camera-management interfaces
@@ -414,7 +414,7 @@ namespace nxcip
             AbsoluteTiltCapability              = 0x020,    //!< Camera supports absolute tilt.
             AbsoluteZoomCapability              = 0x040,    //!< Camera supports absolute zoom.
             LogicalPositionSpaceCapability      = 0x080,    //!< Camera supports absolute positioning in logical space ---
-                                                            //! degrees for pan and tilt and width-based 35mm-equivalent focal length for zoom.
+                                                            //! degrees for pan, tilt and fov (zoom).
 
             AutomaticStateUpdateCapability      = 0x100,    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
                                                             //! the user doesn't have to call \a updateState when it changes.
@@ -453,27 +453,27 @@ namespace nxcip
 
         //!Move to absolute logical position
         /*!
-            Pan and tilt values are in degrees, zoom is in width-based 35mm-equivalent focal length. 
+            Pan, tilt and fov values are in degrees. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
-        virtual int setLogicalPosition( double pan, double tilt, double zoom ) = 0;
+        virtual int setLogicalPosition( double pan, double tilt, double fov ) = 0;
 
         //!Get absolute logical position.
         /*!
-            Pan and tilt values are in degrees, zoom is in 35mm equivalent.
+            Pan, tilt and fov values are in degrees. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
-        virtual int getLogicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
+        virtual int getLogicalPosition( double* pan, double* tilt, double* fov ) const = 0;
 
         struct LogicalPtzLimits {
             double minPan;
             double maxPan;
             double minTilt;
             double maxTilt;
-            double minZoom;
-            double maxZoom;
+            double minFov;
+            double maxFov;
         };
 
         //!Get PTZ limits in logical space.
