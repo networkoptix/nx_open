@@ -76,6 +76,7 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMod
     m_initialized = InitD3D(GetDesktopWindow());
     m_cursorDC = CreateCompatibleDC(0);
     m_timer.start();
+    moveToThread(qApp->thread()); // to allow correct "InvokeMethod" call
 }
 
 QnScreenGrabber::~QnScreenGrabber()

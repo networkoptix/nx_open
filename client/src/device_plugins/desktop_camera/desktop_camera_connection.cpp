@@ -204,11 +204,13 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
 
 void QnDesktopCameraConnection::pleaseStop()
 {
-    if (processor)
-        processor->pleaseStop();
-
-    if (connection)
-        connection->getSocket()->close();
+    {
+        QMutexLocker lock(&m_mutex);
+        if (processor)
+            processor->pleaseStop();
+        if (connection)
+            connection->getSocket()->close();
+    }
 
     QnLongRunnable::pleaseStop();
 }
@@ -260,5 +262,6 @@ void QnDesktopCameraConnection::run()
     delete processor;
     delete connection;
 
+    processor = 0;
     connection = 0;
 }
