@@ -35,6 +35,12 @@ QnBufferedScreenGrabber::~QnBufferedScreenGrabber()
     stop();
 }
 
+void QnBufferedScreenGrabber::pleaseStop()
+{
+    m_grabber.pleaseStop();
+    QnLongRunnable::pleaseStop();
+}
+
 void QnBufferedScreenGrabber::run()
 {
     m_grabber.restartTimer();

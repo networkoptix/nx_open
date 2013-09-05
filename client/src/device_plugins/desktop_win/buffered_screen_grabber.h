@@ -39,7 +39,7 @@ public:
 
     bool capturedDataToFrame(QnScreenGrabber::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
     void setLogo(const QPixmap& logo) { m_grabber.setLogo(logo); }
-
+    virtual void pleaseStop() override;
 protected:
     virtual void run();
 

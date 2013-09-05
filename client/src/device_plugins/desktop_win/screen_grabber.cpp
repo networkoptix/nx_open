@@ -59,7 +59,8 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMod
     m_widget(widget),
     m_tmpFrameWidth(0),
     m_tmpFrameHeight(0),
-    m_colorBitsCapacity(0)
+    m_colorBitsCapacity(0),
+    m_needStop(false)
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
@@ -81,6 +82,8 @@ QnScreenGrabber::QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMod
 
 QnScreenGrabber::~QnScreenGrabber()
 {
+    pleaseStop();
+
     for (int i = 0; i < m_openGLData.size(); ++i)
         delete [] m_openGLData[i];
 
@@ -260,17 +263,32 @@ void QnScreenGrabber::captureFrameOpenGL(void* opaque)
     }
 
     glReadPixels(0, 0, data->w, data->h, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
+
+    m_waitMutex.lock();
+    m_waitCond.wakeOne();
+    m_waitMutex.unlock();
 }
 
 QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
 {
     CaptureInfo rez;
 
+    if (m_needStop)
+        return rez;
+
     if (m_mode == Qn::WindowMode)
     {
         rez.opaque = m_openGLData[m_currentIndex];
         QGenericReturnArgument ret;
-        QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, &rez));
+        
+        //QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, &rez));
+        m_waitMutex.lock();
+        QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::QueuedConnection, ret, Q_ARG(void*, &rez));
+        m_waitCond.wait(&m_waitMutex);
+        m_waitMutex.unlock();
+        if (m_needStop)
+            return rez;
+
         if (m_captureCursor)
             drawCursor((quint32*) rez.opaque, rez.w, rez.h, rez.pos.x(), rez.pos.y(), true);
     }
@@ -662,6 +680,13 @@ int QnScreenGrabber::screenWidth() const
 int QnScreenGrabber::screenHeight() const
 {
     return m_ddm.Height;
+}
+
+void QnScreenGrabber::pleaseStop()
+{
+    QMutexLocker lock(&m_waitMutex);
+    m_needStop = true;
+    m_waitCond.wakeAll();
 }
 
 #endif // Q_OS_WIN

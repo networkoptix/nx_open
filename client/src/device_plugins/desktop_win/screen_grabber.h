@@ -51,7 +51,7 @@ public:
     void setLogo(const QPixmap& logo);
     int screenWidth() const;
     int screenHeight() const;
-
+    void pleaseStop();
 private:
     HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
@@ -95,6 +95,10 @@ private:
     int m_tmpFrameHeight;
     mutable std::auto_ptr<quint8> m_colorBits;
     mutable size_t m_colorBitsCapacity;
+
+    QMutex m_waitMutex;
+    QWaitCondition m_waitCond;
+    bool m_needStop;
 };
 
 #endif // Q_OS_WIN
