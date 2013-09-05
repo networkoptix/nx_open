@@ -1,6 +1,7 @@
 #include "mdns_listener.h"
 #include "utils/network/nettools.h"
 #include "utils/network/mdns.h"
+#include "utils/network/system_socket.h"
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -82,7 +83,7 @@ void QnMdnsListener::readDataFromSocket()
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        UDPSocket* sock = m_socketList[i];
+        AbstractDatagramSocket* sock = m_socketList[i];
         
         // send request for next read
         MDNSPacket request;
@@ -93,7 +94,7 @@ void QnMdnsListener::readDataFromSocket()
     }
 }
 
-void QnMdnsListener::readSocketInternal(UDPSocket* socket, QString localAddress)
+void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString localAddress)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())

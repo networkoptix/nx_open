@@ -126,7 +126,7 @@ public:
         return result;
     }
 
-    virtual QString QnCustomResourceVideoLayout::toString() const override
+    virtual QString toString() const override
     {
         QString result(lit("width=%1;height=%2;sensors=%3"));
         QString sensors;

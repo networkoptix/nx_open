@@ -18,8 +18,8 @@ public:
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) override;
 private:
-    int makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt, u_char *cqt, u_short dri);
-    void updateHeaderTables(quint8* lummaTable, quint8* chromaTable);
+    int makeHeaders(quint8 *p, int type, int w, int h, const quint8 *lqt, const quint8 *cqt, u_short dri);
+    void updateHeaderTables(const quint8* lummaTable, const quint8* chromaTable);
 private:
     QnCompressedVideoDataPtr m_videoData;
     int m_frequency;

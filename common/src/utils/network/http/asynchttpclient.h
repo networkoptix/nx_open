@@ -111,12 +111,12 @@ namespace nx_http
         virtual ~AsyncHttpClient();
 
         //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) throw() override;
+        virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
 
     private:
         State m_state;
         Request m_request;
-        QSharedPointer<TCPSocket> m_socket;
+        QSharedPointer<AbstractStreamSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
         QUrl m_url;
@@ -150,7 +150,7 @@ namespace nx_http
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
-        void eventTriggeredPrivate( Socket* sock, PollSet::EventType eventType );
+        void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
 
         static const char* toString( State state );
     };

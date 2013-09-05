@@ -1,6 +1,10 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
+
+#include <memory>
+
 #include <QString>
+
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/network/socket.h"
 
@@ -50,8 +54,9 @@ private:
     int m_wish_blk_size;
     int m_curr_blk_size;
 
-    UDPSocket m_sock;
+    std::auto_ptr<AbstractDatagramSocket> m_sock;
     CameraDiagnostics::Result m_prevResult;
+    QString m_resolvedAddress;
 };
 
 #endif //__SIMPLE_TFTP_CLIENT__1117

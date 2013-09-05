@@ -10,7 +10,7 @@ qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime)
     {
         return DATETIME_NOW;
     }
-    else if (dateTime.contains(L'T') || dateTime.contains(L'-') && !dateTime.startsWith(L'-'))
+    else if( dateTime.contains(L'T') || (dateTime.contains(L'-') && !dateTime.startsWith(L'-')) )
     {
         QStringList dateTimeParts = dateTime.split(L'.');
         QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);

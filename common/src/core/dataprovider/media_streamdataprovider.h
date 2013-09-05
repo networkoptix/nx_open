@@ -41,7 +41,6 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
 
 protected:
-    virtual QnAbstractMediaDataPtr getNextData() = 0;
 
     virtual void sleepIfNeeded() {}
 

@@ -1,0 +1,38 @@
+/**********************************************************
+* 30 aug 2013
+* a.kolesnikov
+***********************************************************/
+
+#ifndef SOCKET_FACTORY_H
+#define SOCKET_FACTORY_H
+
+#include "abstract_socket.h"
+
+
+//!Contains factory methods for creating sockets
+/*!
+    All factory methods return object created new operator \a new
+*/
+class SocketFactory
+{
+public:
+    enum NatTraversalType
+    {
+        nttAuto,
+        nttEnabled,
+        nttDisabled
+    };
+
+    static AbstractDatagramSocket* createDatagramSocket();
+    static AbstractStreamSocket* createStreamSocket( bool sslRequired = false, NatTraversalType natTraversalRequired = nttAuto );
+    static AbstractStreamServerSocket* createStreamServerSocket( bool sslRequired = false, NatTraversalType natTraversalRequired = nttAuto );
+
+private:
+    SocketFactory();
+    SocketFactory( const SocketFactory& );
+    SocketFactory& operator=( const SocketFactory& );
+
+    ~SocketFactory();
+};
+
+#endif  //SOCKET_FACTORY_H

@@ -17,6 +17,7 @@
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
 #include "ui/screen_recording/qnaudio_device_info.h"
+#include "ui/screen_recording/video_recorder_settings.h"
 
 class CaptureAudioStream;
 
@@ -31,7 +32,7 @@ public:
                         int desktopNum,           // = 0,
                         const QnAudioDeviceInfo* audioDevice,
                         const QnAudioDeviceInfo* audioDevice2,
-                        QnScreenGrabber::CaptureMode mode,
+                        Qn::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
@@ -128,7 +129,7 @@ private:
     int m_maxAudioJitter;
     QVector <EncodedAudioInfo*> m_audioInfo;
 
-    QnScreenGrabber::CaptureMode m_captureMode;
+    Qn::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;

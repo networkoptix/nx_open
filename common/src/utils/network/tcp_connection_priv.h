@@ -41,7 +41,9 @@ public:
 
     QnTCPConnectionProcessorPrivate():
         socket(0),
-        clientRequestOffset(0)
+        clientRequestOffset(0),
+        ssl(0),
+        sslContext(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -54,7 +56,7 @@ public:
     }
 
 public:
-    TCPSocket* socket;
+    AbstractStreamSocket* socket;
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;
 
@@ -65,12 +67,12 @@ public:
     QByteArray receiveBuffer;
     QMutex sockMutex;
     quint8* tcpReadBuffer;
-    QnTcpListener* owner;
     int socketTimeout;
     bool chunkedMode;
     SSL* ssl;
-    int clientRequestOffset;
 
+    int clientRequestOffset;
+    SSL_CTX* sslContext;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

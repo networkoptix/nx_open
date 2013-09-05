@@ -31,20 +31,23 @@ public:
         assert(scene);
     }
 
+    virtual ~GraphicsWidgetSceneData() {
+        return;
+    }
+
     virtual bool event(QEvent *event) override {
         if(event->type() == HandlePendingLayoutRequests) {
-            GraphicsWidget::handlePendingLayoutRequests(scene);
+            if(scene)
+                GraphicsWidget::handlePendingLayoutRequests(scene.data());
             return true;
         } else {
             return QObject::event(event);
         }
     }
 
-    QGraphicsScene *scene;
+    QWeakPointer<QGraphicsScene> scene;
     QHash<QGraphicsItem *, QPointF> movingItemsInitialPositions;
     QSet<QGraphicsWidget *> pendingLayoutWidgets;
-
-    QHash<QGraphicsWidget *, const char *> names;
 };
 
 Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
@@ -84,7 +87,7 @@ GraphicsWidgetSceneData *GraphicsWidgetPrivate::ensureSceneData() {
     if(sceneData)
         return sceneData.data();
 
-    sceneData = new GraphicsWidgetSceneData(scene);
+    sceneData = new GraphicsWidgetSceneData(scene, scene);
     scene->setProperty(qn_sceneDataPropertyName, QVariant::fromValue<GraphicsWidgetSceneData *>(sceneData.data()));
 
     return sceneData.data();
@@ -326,7 +329,6 @@ void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
         sd->pendingLayoutWidgets.clear();
 
         foreach(QGraphicsWidget *widget, widgets) {
-            //const char *name = sd->names.value(widget);
             /* This code is copied from QGraphicsWidgetPrivate::_q_relayout(). */
             bool wasResized = widget->testAttribute(Qt::WA_Resized);
             widget->resize(widget->size());
@@ -369,7 +371,6 @@ void GraphicsWidget::updateGeometry() {
                 QApplication::postEvent(sd, new QEvent(GraphicsWidgetSceneData::HandlePendingLayoutRequests));
 
             sd->pendingLayoutWidgets.insert(this);
-            sd->names.insert(this, typeid(*this).name());
         } else {
             base_type::updateGeometry();
         }

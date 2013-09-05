@@ -259,11 +259,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
         if(m_videoIO)  {
             FD_SET(m_videoIO->getMediaSocket()->handle(), &read_set);
-            nfds = qMax(m_videoIO->getMediaSocket()->handle(), nfds);
+            nfds = qMax<int>(m_videoIO->getMediaSocket()->handle(), nfds);
         }
         if(m_audioIO) {
             FD_SET(m_audioIO->getMediaSocket()->handle(), &read_set);
-            nfds = qMax(m_audioIO->getMediaSocket()->handle(), nfds);
+            nfds = qMax<int>(m_audioIO->getMediaSocket()->handle(), nfds);
         }
         nfds++;
 

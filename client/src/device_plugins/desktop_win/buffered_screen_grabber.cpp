@@ -7,7 +7,7 @@ static const int MAX_JITTER = 60;
 QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
                                                  int queueSize,
                                                  int frameRate,
-                                                 QnScreenGrabber::CaptureMode mode,
+                                                 Qn::CaptureMode mode,
                                                  bool captureCursor,
                                                  const QSize& captureResolution,
                                                  QWidget* widget):
@@ -32,15 +32,7 @@ QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
 
 QnBufferedScreenGrabber::~QnBufferedScreenGrabber()
 {
-    // TODO: #VASILENKO call proper stop() here.
-    m_needStop = true;
-    wait();
-}
-
-void QnBufferedScreenGrabber::stop()
-{
-    // TODO: #VASILENKO this is bad. This override changes the semantics of stop(). Can we fix it?
-    m_needStop = true;
+    stop();
 }
 
 void QnBufferedScreenGrabber::run()

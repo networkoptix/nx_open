@@ -21,11 +21,11 @@ public:
 
     void setOfflineFreq(double offlineFreq);
 
-    void startStreaming(TCPSocket* socket, bool isSecondary, int fps);
+    void startStreaming(AbstractStreamSocket* socket, bool isSecondary, int fps);
 
     bool isEnabled();
 private:
-    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket, int fps);
+    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps);
     void makeOfflineFlood();
 private:
     quint32 m_num;

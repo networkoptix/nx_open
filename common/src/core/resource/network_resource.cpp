@@ -1,4 +1,7 @@
+
 #include "network_resource.h"
+
+#include <memory>
 
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
@@ -281,8 +284,8 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    TCPSocket sock;
-    return sock.connect( getHostAddress(), httpPort() );
+    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    return sock->connect( getHostAddress(), httpPort() );
 }
 
 /*

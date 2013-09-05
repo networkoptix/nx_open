@@ -27,6 +27,11 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
     return true;
 }
 
+int QnAbstractStreamDataProvider::processorsCount() const
+{
+    QMutexLocker mutex(&m_mutex);
+    return m_dataprocessors.size();
+}
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {

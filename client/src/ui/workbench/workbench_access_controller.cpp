@@ -95,6 +95,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return calculatePermissions(server);
 
+    if(QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
+        return calculatePermissions(archive);
+
     return 0;
 }
 

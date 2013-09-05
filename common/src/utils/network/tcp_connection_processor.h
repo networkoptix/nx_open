@@ -7,6 +7,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 #include "utils/common/byte_array.h"
+#include <openssl/ssl.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -15,7 +16,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(AbstractStreamSocket* socket, SSL_CTX* sslContext);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -33,14 +34,15 @@ public:
     virtual void pleaseStop();
     //!Returns SSL*. including ssl.h here causes numerous compilation problems
     void* ssl() const;
-    TCPSocket* socket() const;
+    AbstractStreamSocket* socket() const;
     QUrl getDecodedUrl() const;
 
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);
 
-protected:
+    bool readRequest();
     virtual void parseRequest();
+protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 
@@ -58,9 +60,8 @@ protected:
         \note Usage of this method MUST NOT be mixed with usage of \a readRequest / \a parseRequest
     */
     int readSocket( quint8* buffer, int bufSize );
-    bool readRequest();
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, AbstractStreamSocket* socket, void* _sslContext);
 private:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }

@@ -491,6 +491,12 @@ int main(int argc, char **argv)
         if(noVersionMismatchCheck)
             context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
+        /* Initialize desctop camera searcher. */
+        QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
+        QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
+        desktopSearcher.setLocal(true);
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
+
         //initializing plugin manager. TODO supply plugin dir (from settings)
         PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
@@ -567,6 +573,8 @@ int main(int argc, char **argv)
 
     delete TextToWaveServer::instance();
     TextToWaveServer::initStaticInstance( NULL );
+
+    QnDesktopResourceSearcher::initStaticInstance( NULL );
 
 //    qApp->processEvents(); //TODO: #Elric crashes
     return result;

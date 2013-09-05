@@ -364,7 +364,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
                    int desktopNum,
                    const QnAudioDeviceInfo* audioDevice,
                    const QnAudioDeviceInfo* audioDevice2,
-                   QnScreenGrabber::CaptureMode captureMode,
+                   Qn::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
