@@ -246,10 +246,14 @@ void QnScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format
 
 void QnScreenGrabber::captureFrameOpenGL(void* opaque)
 {
+    QMutexLocker lock (&m_waitMutex);
+
     CaptureInfo* data = (CaptureInfo*) opaque;
     glReadBuffer(GL_FRONT);
-    if (!m_widget)
+    if (!m_widget) {
+        m_waitCond.wakeOne();
         return;
+    }
     QRect rect = m_widget->geometry();
     data->width = m_widget->width() & ~31;
     data->height = m_widget->height() & ~1;
@@ -264,9 +268,7 @@ void QnScreenGrabber::captureFrameOpenGL(void* opaque)
 
     glReadPixels(0, 0, data->width, data->height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
 
-    m_waitMutex.lock();
     m_waitCond.wakeOne();
-    m_waitMutex.unlock();
 }
 
 QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
