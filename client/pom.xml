@@ -23,8 +23,8 @@
     <properties>  
         <product.title>${client.name}</product.title>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml multimedia</qt.libs>
-        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lqjson -lsigar -llibFestival -llibestbase -llibestools -llibeststring</global.libs>
+        <qt.libs>core gui network opengl xml multimedia concurrent</qt.libs>
+        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lsigar -llibFestival -llibestbase -llibestools -llibeststring</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release>

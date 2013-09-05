@@ -23,8 +23,8 @@
     <properties>
         <product.title>${mediaserver.name}</product.title>  
         <!--Global libs-->		
-        <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
-        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lqjson -lsigar -lonvif</global.libs>
+        <qt.libs>core network xml sql concurrent multimedia</qt.libs>
+        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -llibprotobuf -lsigar -lonvif</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lz</linux.oslibs>
@@ -33,7 +33,7 @@
         <postfix.libs>unix: !mac: LIBS += -lcrypto</postfix.libs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lavcodec -lswscale -lavutil -lavformat</mac.oslibs>
         <!--Global defines-->
-        <global.defines/>
+        <global.defines></global.defines>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>

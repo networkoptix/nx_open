@@ -50,7 +50,6 @@
         <festival.version>2.1-SNAPSHOT</festival.version>
         <boost.version>1.54-SNAPSHOT</boost.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
-        <qjson.version>0.8.1-SNAPSHOT</qjson.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
 
         <build.configuration>release</build.configuration>
@@ -79,8 +78,8 @@
         <module>build_environment</module>
         <module>appserver</module>
         <module>common</module>
-        <module>applauncher</module>
-        <module>axiscamplugin</module>
+        <!-- <module>applauncher</module> 
+        <module>axiscamplugin</module>-->
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
@@ -190,8 +189,7 @@
             </activation>
             <modules>
                 <module>client</module>		
-                <module>quicksyncdecoder</module>	
-                <module>axiscamplugin</module>
+<!--                <module>quicksyncdecoder</module>	-->
                 <module>genericrtspplugin</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
@@ -324,7 +322,6 @@
                 <sigar.version>1.6-SNAPSHOT</sigar.version>
                 <boost.version>1.52-SNAPSHOT</boost.version>
                 <protobuf.version>2.5.0</protobuf.version>
-
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
                 <qt.dir/>

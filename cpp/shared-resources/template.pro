@@ -10,7 +10,7 @@ CONFIG(release, debug|release) {
 }
 
 CONFIG -= flat app_bundle
-DEFINES += __STDC_CONSTANT_MACROS
+DEFINES += __STDC_CONSTANT_MACROS USE_NX_HTTP
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
@@ -123,7 +123,3 @@ mac {
   DEFINES += ${mac.defines} override=
   CONFIG -= app_bundle objective_c
 }
-
-
-
-

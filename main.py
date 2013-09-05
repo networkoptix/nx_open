@@ -53,6 +53,10 @@ def get_environment_variable(variable):
             config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/build-' + customization + '.properties'))
             return config.get("basic", variable)  
 
+def get_environment_build_dir():
+    build_dir = join((os.path.dirname(os.path.abspath(__file__))), 'build_environment', 'target')
+    return build_dir            
+            
 def get_executable_extension():
     if get_environment_variable('platform') == 'windows':
         return 'bat'

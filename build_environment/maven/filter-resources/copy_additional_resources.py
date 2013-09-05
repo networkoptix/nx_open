@@ -2,7 +2,7 @@ import io, sys, os, errno, platform, shutil, fnmatch, distutils.core
 from os.path import dirname, join, exists, isfile
 #from main import get_environment_variable, cd
 
-qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}']
+qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}']
 qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
 
 def mkdir_p(path):
@@ -32,10 +32,6 @@ for arch in ('x86', 'x64'):
                     shutil.copy2(join(bin_source_dir, file), join(target_dir, 'debug'))
                 elif fnmatch.fnmatch(file, 'qt5%s.dll' % qtlib):
                     shutil.copy2(join(bin_source_dir, file), join(target_dir, 'release'))
-    
-    
-
-
     
     for qtplugin in qtplugins:
         for config in ('debug', 'release'):

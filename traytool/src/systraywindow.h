@@ -1,10 +1,10 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <QDialog>
-#include <QString>
-#include <QStringListModel>
-#include <QSystemTrayIcon>
+#include <QtWidgets/QDialog>
+#include <QtCore/QString>
+#include <QtCore/QStringListModel>
+#include <QtWidgets/QSystemTrayIcon>
 
 class FoundEnterpriseControllersModel;
 

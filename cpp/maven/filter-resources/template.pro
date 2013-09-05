@@ -2,14 +2,13 @@ NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
-DEFINES += ${global.defines}
 QT += ${qt.libs}
 
 ## GLOBAL CONFIGURATIONS
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat
-DEFINES += __STDC_CONSTANT_MACROS 
+DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 CONFIG(debug, debug|release) {
@@ -22,6 +21,7 @@ CONFIG(debug, debug|release) {
   }
 }
 else {
+  CONFIG += silent
   CONFIGURATION=release
   win* {
     LIBS = ${windows.oslibs.release}
@@ -38,13 +38,18 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L${libdir}/${arch}/lib/$$CONFIGURATION -L${environment.dir}/qt/bin/${arch}/$$CONFIGURATION
+LIBS += -L${libdir}/${arch}/lib/$$CONFIGURATION -L${qt.dir}/lib
 LIBS += ${global.libs}
 
-!mac {
-    include(${environment.dir}/qt-custom/QtCore/private/qtcore.pri)
-}
-INCLUDEPATH += ${environment.dir}/qt/include ${environment.dir}/qt/include/QtCore ${project.build.sourceDirectory} ${project.build.directory} ${root.dir}/common/src ${libdir}/include ${environment.dir}/qt-custom ${environment.dir}/qt-custom/QtCore
+INCLUDEPATH +=  ${qt.dir}/include \
+                ${qt.dir}/include/QtCore \
+                ${project.build.sourceDirectory} \
+                ${project.build.directory} \
+                ${root.dir}/common/src \
+                ${libdir}/include \
+                ${qt.dir}/../qt-custom \
+                ${qt.dir}/include/QtCore/$$QT_VERSION/ \
+                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {

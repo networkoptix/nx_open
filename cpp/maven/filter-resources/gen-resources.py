@@ -1,4 +1,4 @@
-import os, sys, posixpath, platform, subprocess, fileinput, shutil
+import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
 from os.path import dirname, join, exists, isfile
 from os import listdir
 
@@ -65,7 +65,7 @@ def gentext(file, path, extensions, text):
         for f in files:
             f_short = os.path.splitext(f)[0]
             for extension in extensions:
-                if f.endswith(extension) and not f_short.endswith('_specific'):
+                if f.endswith(extension) and not f_short.endswith('_specific') and not f_short == 'StdAfx':
                 #and not parent.endswith('_specific'):
                     print >> file, '\n%s%s/%s' % (text, path, os.path.join(parent, f))
                 if f.endswith(extension) and f_short.endswith('${platform}_specific'):
@@ -74,7 +74,7 @@ def gentext(file, path, extensions, text):
 def replace(file,searchExp,replaceExp):
     for line in fileinput.input(file, inplace=1):
         if searchExp in line:
-            line = line.replace(searchExp,replaceExp)
+            line = re.sub(r'%s', r'%s', line.rstrip() % (searchExp, replaceExp))
         sys.stdout.write(line)
 
 def gen_includepath(file, path):      
@@ -114,10 +114,18 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
         print (' ++++++++++++++++++++++++++++++++generating project file ++++++++++++++++++++++++++++++++')
         if sys.platform == 'win32':
-            execute(['qmake', '-tp', 'vc', '-o', '${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', '${project.build.directory}/${project.artifactId}.pro'])
-            if '${arch}' == 'x64' and '${force_x86}' == 'false':
-                replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', 'Win32', '${arch}')
-                replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:x64"')
+            execute(['${qt.dir}/bin/qmake', '-spec', 'win32-msvc2012' ,'-tp', 'vc', '-o', '${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', '${project.build.directory}/${project.artifactId}.pro'])
+            
+            #if '${arch}' == 'x64' and '${force_x86}' == 'false':
+            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')
+            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:x64"')
+            #print ('f++++++++++++++++++++++++++++++++++++++ Replacing +++++++++++++++++++++++++++++++++++++++')
+            #replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', '<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>', '''    <CustomBuild Include="$1/$2.$3"> \n
+      #<AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3</AdditionalInputs> \n
+      #<Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/ ${root}/${project.artifactId}/src/$1/$2.$3</Command> \n
+      #<Message         >Generating code from $1/$2.$3 to $2.pb.cc</Message> \n
+      #<Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs> \n
+    #</CustomBuild>''')
         elif sys.platform == 'linux2':
             execute(['qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
         elif sys.platform == 'darwin':
