@@ -282,13 +282,12 @@ void QnTcpListener::run()
             else
             {
                 const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                if( prevErrorCode == SystemError::timedOut )
-                    continue;
-
-                NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-                    arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
-                QThread::msleep(1000);
-                d->newPort = d->localPort; // reopen tcp socket
+                if( prevErrorCode != SystemError::timedOut ) {
+                    NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+                        arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
+                    QThread::msleep(1000);
+                    d->newPort = d->localPort; // reopen tcp socket
+                }
             }
             doPeriodicTasks();
         }
