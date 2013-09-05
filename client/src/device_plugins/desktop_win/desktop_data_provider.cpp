@@ -715,7 +715,7 @@ void QnDesktopDataProvider::run()
         }
 
         QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
-        if (!capturedData.opaque || capturedData.w == 0 || capturedData.h == 0)
+        if (!capturedData.opaque || capturedData.width == 0 || capturedData.height == 0)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 

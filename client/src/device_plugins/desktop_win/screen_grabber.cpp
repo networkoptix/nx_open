@@ -251,8 +251,8 @@ void QnScreenGrabber::captureFrameOpenGL(void* opaque)
     if (!m_widget)
         return;
     QRect rect = m_widget->geometry();
-    data->w = m_widget->width() & ~31;
-    data->h = m_widget->height() & ~1;
+    data->width = m_widget->width() & ~31;
+    data->height = m_widget->height() & ~1;
     data->pos = QPoint(rect.left(), rect.top());
     QWidget* parent = (QWidget*) m_widget->parent();
     while (parent)
@@ -262,7 +262,7 @@ void QnScreenGrabber::captureFrameOpenGL(void* opaque)
         parent = (QWidget*) parent->parent();
     }
 
-    glReadPixels(0, 0, data->w, data->h, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
+    glReadPixels(0, 0, data->width, data->height, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
 
     m_waitMutex.lock();
     m_waitCond.wakeOne();
@@ -290,7 +290,7 @@ QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
             return rez;
 
         if (m_captureCursor)
-            drawCursor((quint32*) rez.opaque, rez.w, rez.h, rez.pos.x(), rez.pos.y(), true);
+            drawCursor((quint32*) rez.opaque, rez.width, rez.height, rez.pos.x(), rez.pos.y(), true);
     }
     else
     {   // direct3D capture mode
@@ -312,6 +312,9 @@ QnScreenGrabber::CaptureInfo QnScreenGrabber::captureFrame()
             }
         }
         rez.opaque = m_pSurface[m_currentIndex];
+        rez.width = m_ddm.Width;
+        rez.height = m_ddm.Height;
+
     }
     rez.pts = m_timer.elapsed();
     m_currentIndex = m_currentIndex < m_pSurface.size()-1 ? m_currentIndex+1 : 0;
@@ -641,7 +644,7 @@ bool QnScreenGrabber::capturedDataToFrame(const CaptureInfo& captureInfo, AVFram
 {
     bool rez = false;
     if (m_mode == Qn::WindowMode)
-        rez = dataToFrame((quint8*) captureInfo.opaque, captureInfo.w, captureInfo.h, pFrame);
+        rez = dataToFrame((quint8*) captureInfo.opaque, captureInfo.width, captureInfo.height, pFrame);
     else
         rez = direct3DDataToFrame(captureInfo.opaque, pFrame);
     pFrame->pts = captureInfo.pts;

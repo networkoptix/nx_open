@@ -21,11 +21,11 @@ class QnScreenGrabber: public QObject
 public:
     struct CaptureInfo
     {
-        CaptureInfo(): pts(0), opaque(0), w(0), h(0) {}
+        CaptureInfo(): pts(0), opaque(0), width(0), height(0) {}
         qint64 pts;
         void* opaque;
-        int w;
-        int h;
+        int width;
+        int height;
         QPoint pos;
     };
 
