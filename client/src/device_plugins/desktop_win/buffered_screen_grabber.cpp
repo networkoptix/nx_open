@@ -56,8 +56,8 @@ void QnBufferedScreenGrabber::run()
             break;
         AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
-        QnScreenGrabber::CaptureInfo info = m_grabber.captureFrame();
-        if (info.opaque == 0)
+        CaptureInfoPtr info = m_grabber.captureFrame();
+        if (!info || info->opaque == 0)
             continue;
         m_queue.push(info);
 
@@ -79,10 +79,9 @@ bool QnBufferedScreenGrabber::dataExist()
     return m_queue.size() > 0;
 }
 
-QnScreenGrabber::CaptureInfo QnBufferedScreenGrabber::getNextFrame()
+CaptureInfoPtr QnBufferedScreenGrabber::getNextFrame()
 {
-    QnScreenGrabber::CaptureInfo rez;
-    rez.opaque = 0;
+    CaptureInfoPtr rez;
     m_queue.pop(rez, 40);
     return rez;
 }
