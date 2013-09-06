@@ -59,6 +59,8 @@
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
+#include <ui/workaround/gl_widget_factory.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 
@@ -326,30 +328,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
 }
 
 QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const {
-    QGLFormat glFormat;
-    glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
-
-#ifdef Q_OS_LINUX
-    /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-     * VSync will be re-enabled later if drivers are not NVidia's. */
-    glFormat.setSwapInterval(0); /* Turn vsync off. */
-#else
-    glFormat.setSwapInterval(1); /* Turn vsync on. */
-#endif
-
-    QGLWidget *result = new QGLWidget(glFormat, parent, NULL, windowFlags);
-
-#ifdef Q_OS_LINUX
-    result->makeCurrent();
-    QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-    if (!vendor.toLower().contains("nvidia")) {
-        QGLFormat format = result->format();
-        format.setSwapInterval(1); /* Turn vsync on. */
-        result->setFormat(format);
-    }
-#endif
-
-    return result;
+    return QnGlWidgetFactory::create<QGLWidget>(parent, windowFlags);
 }
 
 void QnWorkbenchDisplay::initSceneView() {
