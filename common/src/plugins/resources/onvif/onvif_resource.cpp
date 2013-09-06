@@ -2880,14 +2880,14 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
+            //return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
         }
+        else {
+            const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
 
-        const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
-
-        if (!mac.isEmpty()) 
-            setMAC(mac);
-
+            if (!mac.isEmpty()) 
+                setMAC(mac);
+        }
         if (getPhysicalId().isEmpty())
         {
             setPhysicalId(hardwareId);
