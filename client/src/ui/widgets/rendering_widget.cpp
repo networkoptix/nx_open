@@ -8,23 +8,11 @@
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
-
-
 #include "ui/graphics/opengl/gl_shortcuts.h"
 
-namespace {
-    QGLFormat qn_renderingWidgetFormat() {
-        QGLFormat result;
-        result.setOption(QGL::SampleBuffers); /* Multisampling. */
-        result.setSwapInterval(1); /* Turn vsync on. */
-        return result;
-    }
 
-} // anonymous namespace
-
-
-QnRenderingWidget::QnRenderingWidget(QWidget *parent, Qt::WindowFlags f):
-    QGLWidget(qn_renderingWidgetFormat(), parent, NULL, f),
+QnRenderingWidget::QnRenderingWidget(const QGLFormat &format, QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f):
+    QGLWidget(format, parent, shareWidget, f),
     m_display(NULL),
     m_renderer(NULL)
 {
