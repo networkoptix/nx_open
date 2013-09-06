@@ -39,6 +39,8 @@ protected:
     virtual void beforeRun() override;
     virtual bool canChangeStatus() const;
 
+    virtual QnAbstractMediaDataPtr getNextData() = 0;
+
 private:
 	virtual void run() override; // in a loop: takes data from device and puts into queue
 

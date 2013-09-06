@@ -1395,6 +1395,14 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
     qint64 endMSec = dateTime.addSecs(60 * 60).toMSecsSinceEpoch() - m_dayTimeWidget->localOffset();
 
     m_timeSlider->finishAnimations();
-    m_timeSlider->setWindow(startMSec, endMSec, true);
+    if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
+        m_timeSlider->setWindow(
+            qMin(startMSec, m_timeSlider->windowStart()),
+            qMax(endMSec, m_timeSlider->windowEnd()),
+            true
+        );
+    } else {
+        m_timeSlider->setWindow(startMSec, endMSec, true);
+    }
 }
 

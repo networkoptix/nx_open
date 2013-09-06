@@ -602,6 +602,10 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
         appendCtxField(data, Field_Sample_Fmt, (const char*) &ctx->sample_fmt, sizeof(AVSampleFormat));
     if (ctx->bits_per_coded_sample > 0)
         appendCtxField(data, Field_BitsPerSample, (const char*) &ctx->bits_per_coded_sample, sizeof(int));
+    if (ctx->coded_width > 0)
+        appendCtxField(data, Field_CodedWidth, (const char*) &ctx->coded_width, sizeof(int));
+    if (ctx->coded_height > 0)
+        appendCtxField(data, Field_CodedHeight, (const char*) &ctx->coded_height, sizeof(int));
 }
 
 AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
@@ -676,6 +680,14 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
                 ctx->bits_per_coded_sample = *(int*) fieldData;
                 av_free(fieldData);
                 break;
+            case Field_CodedWidth:
+                ctx->coded_width = *(int*) fieldData;
+                av_free(fieldData);
+                break;
+            case Field_CodedHeight:
+                ctx->coded_height = *(int*) fieldData;
+                av_free(fieldData);
+                break;
         }
     }
 
@@ -686,7 +698,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
     return ctx;
 
 error_label:
-    qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
+    qWarning() << Q_FUNC_INFO << __LINE__ << "Parse error in deserialize CodecContext";
     if (ctx->codec)
         avcodec_close(ctx);
     av_free(ctx);
@@ -822,4 +834,18 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
         ioContext->opaque = 0;
         avio_close(ioContext);
     }
+}
+
+void QnFfmpegHelper::deleteCodecContext(AVCodecContext* ctx)
+{
+    if (!ctx)
+        return;
+    if (ctx->codec)
+        avcodec_close(ctx);
+    av_freep(&ctx->rc_override);
+    av_freep(&ctx->intra_matrix);
+    av_freep(&ctx->inter_matrix);
+    av_freep(&ctx->extradata);
+    av_freep(&ctx->rc_eq);
+    av_freep(&ctx);
 }

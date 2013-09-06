@@ -226,7 +226,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
-    quint8* bufferEnd = rtpBuffer + readed;
+    const quint8* bufferEnd = rtpBuffer + readed;
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
 
     if (rtpHeader->payloadType != m_rtpChannel)

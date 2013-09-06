@@ -317,12 +317,11 @@ void QnRtspClientArchiveDelegate::close()
     m_rtspSession.stop();
     m_rtpData = 0;
     m_lastPacketFlags = -1;
-    m_nextDataPacket.clear();
-    m_contextMap.clear();
     m_opened = false;
     delete m_audioLayout;
     m_audioLayout = 0;
     m_frameCnt = 0;
+    m_parsers.clear();
 }
 
 qint64 QnRtspClientArchiveDelegate::startTime()
@@ -469,7 +468,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             data += 4;
         }
         else {
-            rtpChannelNum = m_rtpData->getMediaSocket()->getLocalPort();
+            rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
         const QString format = m_rtspSession.getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
         if (format.isEmpty()) {
@@ -642,9 +641,9 @@ QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
 {
     if (m_audioLayout == 0) {
         m_audioLayout = new QnResourceCustomAudioLayout();
-        for (QMap<int, QnMediaContextPtr>::const_iterator itr = m_contextMap.begin(); itr != m_contextMap.end(); ++itr)
+        for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
-            QnMediaContextPtr context = itr.value();
+            QnMediaContextPtr context = itr.value()->mediaContext();
             if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
                 m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
         }
@@ -663,156 +662,18 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
         emit dataDropped(m_reader);
 }
 
-QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum)
+QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum)
 {
     QMutexLocker lock(&m_mutex);
 
-    QnAbstractDataPacketPtr result;
-    if (dataSize < RtpHeader::RTP_HEADER_SIZE)
-    {
-        qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP packet. len < RTP header size. Ignored";
-        return result;
-    }
+    QnAbstractMediaDataPtr result;
 
-    RtpHeader* rtpHeader = (RtpHeader*) data;
-    const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
-    dataSize -= RtpHeader::RTP_HEADER_SIZE;
-    const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
-    if (isCodecContext)
-    {
-        QnMediaContextPtr context(new QnMediaContext(payload, dataSize));
-        m_contextMap[channelNum] = context;
-    }
-    else
-    {
-        QMap<int, QnMediaContextPtr>::iterator itr = m_contextMap.find(channelNum);
-        QnMediaContextPtr context;
-        if (itr != m_contextMap.end())
-            context = itr.value();
-        //else 
-        //    return result;
-
-        if (rtpHeader->padding)
-            dataSize -= ntohl(rtpHeader->padding);
-        if (dataSize < 1)
-            return result;
-
-        QnAbstractDataPacketPtr nextPacket = m_nextDataPacket.value(channelNum);
-        QnAbstractMediaDataPtr mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
-        if (!nextPacket)
-        {
-            if (dataSize < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
-                return result;
-
-            QnAbstractMediaData::DataType dataType = (QnAbstractMediaData::DataType) *payload++;
-            quint32 timestampHigh = ntohl(*(quint32*) payload);
-            dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
-            payload  += 4; // deserialize timeStamp high part
-
-            quint8 cseq = *payload++;
-            quint16 flags = (payload[0]<<8) + payload[1];
-            payload += 2;
-
-            if (dataType == QnAbstractMediaData::EMPTY_DATA)
-            {
-                nextPacket = QnEmptyMediaDataPtr(new QnEmptyMediaData());
-                if (dataSize != 0)
-                {
-                    qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
-                    return result;
-                }
-            }
-            else if (dataType == QnAbstractMediaData::META_V1)
-            {
-                if (dataSize != MD_WIDTH*MD_HEIGHT/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
-                {
-                    qWarning() << "Unexpected data size for metadata. got" << dataSize << "expected" << MD_WIDTH*MD_HEIGHT/8 << "bytes. Packet ignored.";
-                    return result;
-                }
-                if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
-                    return result;
-
-                QnMetaDataV1 *metadata = new QnMetaDataV1(); 
-                metadata->data.clear();
-                context.clear();
-                metadata->m_duration = ntohl(*((quint32*)payload))*1000;
-                dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
-                payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
-
-                nextPacket = QnMetaDataV1Ptr(metadata);
-            }
-            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
-            {
-                if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
-                    return result;
-
-                quint32 fullPayloadLen = (payload[0] << 16) + (payload[1] << 8) + payload[2];
-
-                dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
-                payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
-
-                QnCompressedVideoData *video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
-                nextPacket = QnCompressedVideoDataPtr(video);
-                if (context) 
-                {
-                    video->width = context->ctx()->coded_width;
-                    video->height = context->ctx()->coded_height;
-                }
-            }
-            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
-            {
-                QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
-                audio->context = context;
-                //audio->format.fromAvStream(context->ctx());
-                nextPacket = QnCompressedAudioDataPtr(audio);
-            }
-            else
-            {
-                if (context && context->ctx())
-                    qWarning() << "Unsupported RTP codec or packet type. codec=" << context->ctx()->codec_type;
-                else if (dataType == QnAbstractMediaData::AUDIO)
-                    qWarning() << "Unsupported audio codec or codec params";
-                else if (dataType == QnAbstractMediaData::VIDEO)
-                    qWarning() << "Unsupported video or codec params";
-                else
-                    qWarning() << "Unsupported or unknown packet";
-                return result;
-            }
-
-            m_nextDataPacket[channelNum] = nextPacket;
-            mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
-            if (mediaPacket) 
-            {
-                mediaPacket->opaque = cseq;
-                mediaPacket->flags = flags;
-
-                if (context && context->ctx())
-                    mediaPacket->compressionType = context->ctx()->codec_id;
-                mediaPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
-                mediaPacket->channelNumber = channelNum;
-                /*
-                if (mediaPacket->timestamp < 0x40000000 && m_prevTimestamp[ssrc] > 0xc0000000)
-                    m_timeStampCycles[ssrc]++;
-                mediaPacket->timestamp += ((qint64) m_timeStampCycles[ssrc] << 32);
-                */
-            }
-        }
-        if (mediaPacket) {
-            mediaPacket->data.write((const char*)payload, dataSize);
-        }
-        if (rtpHeader->marker)
-        {
-            result = nextPacket;
-            m_nextDataPacket[channelNum] = QnAbstractDataPacketPtr(0); // EOF video frame reached
-            if (mediaPacket)
-            {
-                if (mediaPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
-                    m_position = DATETIME_NOW;
-                else
-                    m_position = mediaPacket->timestamp;
-            }
-        }
-    }
+    QMap<int, QnFfmpegRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
+    if (itr == m_parsers.end())
+        itr = m_parsers.insert(channelNum, QnFfmpegRtpParserPtr(new QnFfmpegRtpParser()));
+    QnFfmpegRtpParserPtr parser = itr.value();
+    parser->processData(data, 0, dataSize, RtspStatistic(), result);
+    m_position = parser->position();
     return result;
 }
 

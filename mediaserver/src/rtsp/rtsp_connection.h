@@ -7,7 +7,7 @@
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
 
@@ -33,8 +33,8 @@ struct RtspServerTrackInfo
     int clientRtcpPort;
     quint16 sequence;
     qint64 firstRtpTime;
-    UDPSocket* mediaSocket;
-    UDPSocket* rtcpSocket;
+    AbstractDatagramSocket* mediaSocket;
+    AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
     static QMutex m_createSocketMutex;
 };
@@ -47,7 +47,7 @@ class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
-    QnRtspConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);

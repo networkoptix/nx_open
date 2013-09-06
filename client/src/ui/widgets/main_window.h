@@ -48,6 +48,8 @@ public:
     Options options() const;
     void setOptions(Options options);
 
+    QWidget *viewport() const;
+
 public slots:
     void handleMessage(const QString &message);
 

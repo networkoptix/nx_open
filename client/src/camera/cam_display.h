@@ -153,6 +153,7 @@ private:
     void waitForFramesDisplayed();
     void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
+    bool needBuffering(qint64 vTime) const;
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -214,7 +215,8 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
-    bool m_useMTRealTimeDecode;
+    bool m_useMTRealTimeDecode; // multi thread decode for live temporary allowed
+    bool m_forceMtDecoding; // force multi thread decode in any case
 
     mutable QMutex m_timeMutex;
     QnMediaResourcePtr m_resource;

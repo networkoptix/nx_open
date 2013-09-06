@@ -32,7 +32,7 @@ QnProgressiveDownloadingServer::~QnProgressiveDownloadingServer()
 
 }
 
-QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnProgressiveDownloadingConsumer(clientSocket, owner);
 }
@@ -165,8 +165,8 @@ protected:
         QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
         if( !resultPtr )
         {
-            NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1:%2. Skipping frame...").
-                arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()), cl_logDEBUG2 );
+            NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1. Skipping frame...").
+                arg(m_owner->socket()->getForeignAddress().toString()), cl_logDEBUG2 );
         }
         int errCode = m_owner->getTranscoder()->transcodePacket(
             media,
@@ -237,8 +237,8 @@ protected:
         }
         else
         {
-            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2:%3 due to transcode error (%4)").
-                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()).arg(errCode), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress().toString()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
         }
 
@@ -320,7 +320,7 @@ static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
 
-QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* socket, QnTcpListener* _owner):
+QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(AbstractStreamSocket* socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
 {
     Q_D(QnProgressiveDownloadingConsumer);
@@ -328,8 +328,8 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
     d->streamingFormat = "webm";
     d->videoCodec = CODEC_ID_VP8;
 
-    d->foreignAddress = socket->getForeignAddress();
-    d->foreignPort = socket->getForeignPort();
+    d->foreignAddress = socket->getForeignAddress().address.toString();
+    d->foreignPort = socket->getForeignAddress().port;
 
     NX_LOG( QString::fromLatin1("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
@@ -407,8 +407,8 @@ void QnProgressiveDownloadingConsumer::run()
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
-    d->socket->setReadTimeOut(CONNECTION_TIMEOUT);
-    d->socket->setWriteTimeOut(CONNECTION_TIMEOUT);
+    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
+    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
 
     bool ready = true;
     if (d->clientRequest.isEmpty())
@@ -642,8 +642,8 @@ void QnProgressiveDownloadingConsumer::run()
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
 
-        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2:%3. Reason: %4").
-            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress()).arg(socket()->getForeignPort()).
+        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2. Reason: %3").
+            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress().toString()).
             arg((!dataConsumer.isRunning() ? QString::fromLatin1("Data consumer stopped") : 
                 (!d->socket->isConnected() ? QString::fromLatin1("Connection has been closed") :
                  QString::fromLatin1("Terminated")))), cl_logDEBUG1 );

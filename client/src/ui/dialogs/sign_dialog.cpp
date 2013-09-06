@@ -9,6 +9,7 @@
 #include "camera/cam_display.h"
 #include "camera/sync_dialog_display.h"
 
+#include "ui/workaround/gl_widget_factory.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/help/help_topic_accessor.h"
@@ -21,7 +22,8 @@
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
-    QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = 0): QGLWidget(format, parent)
+    QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0): 
+        QGLWidget(format, parent, shareWidget, windowFlags)
     {
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -89,10 +91,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_layout->setSpacing(0);
     m_layout->setContentsMargins(0,0,0,0);
 
-    QGLFormat glFormat;
-    glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
-    glFormat.setSwapInterval(1); /* Turn vsync on. */
-    m_glWindow = new QnSignDialogGlWidget(glFormat);
+    m_glWindow = QnGlWidgetFactory::create<QnSignDialogGlWidget>();
     m_layout->addWidget(m_glWindow);
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith( m_glWindow );
     

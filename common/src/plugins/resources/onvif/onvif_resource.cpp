@@ -21,6 +21,7 @@
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
 #include "utils/common/timermanager.h"
+#include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
 #include "soapStub.h"
@@ -2356,14 +2357,14 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
     QString localAddress;
-    TCPSocket sock( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) );
-    if( !sock.isConnected() )
+    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) ) )
     {
         cl_log.log( QString::fromLatin1("Failed to connect to %1:%2 to determine local address. %3").
             arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
         return false;
     }
-    localAddress = sock.getLocalAddress();
+    localAddress = sock->getLocalAddress().address.toString();
 
     const QAuthenticator& auth = getAuth();
     NotificationProducerSoapWrapper soapWrapper(
@@ -2880,14 +2881,14 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
+            //return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
         }
+        else {
+            const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
 
-        const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
-
-        if (!mac.isEmpty()) 
-            setMAC(mac);
-
+            if (!mac.isEmpty()) 
+                setMAC(mac);
+        }
         if (getPhysicalId().isEmpty())
         {
             setPhysicalId(hardwareId);

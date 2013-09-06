@@ -168,8 +168,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             if (!response.FirmwareVersion.empty())
                 firmware = QString::fromStdString(response.FirmwareVersion);
 
-            if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString())) ||
-                ignoreCamera(manufacturer, model))
+            if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
+                ignoreCamera(manufacturer, model) )
             {
                 qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
                 return;

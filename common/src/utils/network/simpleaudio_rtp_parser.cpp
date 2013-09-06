@@ -64,12 +64,12 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
-    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
+    const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     result.clear();
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
-    quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
-    quint8* end = rtpBuffer + bufferSize;
+    const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
+    const quint8* end = rtpBuffer + bufferSize;
     if (curPtr >= end)
         return false;
 

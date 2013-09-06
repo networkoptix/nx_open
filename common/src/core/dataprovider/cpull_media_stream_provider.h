@@ -19,6 +19,8 @@ public:
 protected:
     bool canChangeStatus() const;
     virtual void beforeRun() override;
+
+    virtual QnAbstractMediaDataPtr getNextData() = 0;
 private:
     void run(); // in a loop: takes images from camera and put into queue
 
