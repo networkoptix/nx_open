@@ -9,6 +9,7 @@
 #include <memory>
 
 #include <plugins/camera_plugin.h>
+#include <plugins/plugin_tools.h>
 
 #include "common_ref_manager.h"
 #include "generic_rtsp_plugin.h"
@@ -61,7 +62,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpl::ScopedRef<GenericRTSPPlugin> m_pluginRef;
+    nxpl_tools::ScopedRef<GenericRTSPPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::auto_ptr<GenericRTSPMediaEncoder> m_encoder;
