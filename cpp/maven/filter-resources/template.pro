@@ -50,6 +50,8 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/../qt-custom \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/
+                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
+
 DEPENDPATH *= $${INCLUDEPATH}
 
 !mac {

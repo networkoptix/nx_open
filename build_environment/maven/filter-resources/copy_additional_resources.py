@@ -2,7 +2,7 @@ import io, sys, os, errno, platform, shutil, fnmatch, distutils.core
 from os.path import dirname, join, exists, isfile
 #from main import get_environment_variable, cd
 
-qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}']
+qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}']
 qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
 
 def mkdir_p(path):

@@ -65,13 +65,16 @@
         <qtlib7>Sql</qtlib7>
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Concurrent</qtlib9>
+        <qtlib10>x11extras</qtlib10>
+        <qtlib11></qtlib11>
+        <qtlib12></qtlib12>
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3></qtplugin3>	
 
-        <toolchain.version/>
         <!-- defined only for cross compilation -->
+        <toolchain.version/>
     </properties>
 
     <modules>
