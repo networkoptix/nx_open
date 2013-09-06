@@ -10,6 +10,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "archive_reader.h"
 #include "media_encoder.h"
 
 
@@ -18,7 +19,9 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_refManager( this ),
     m_pluginRef( ImageLibraryPlugin::instance() ),
     m_info( info ),
-    m_capabilities( 0 )
+    m_capabilities( 
+        nxcip::BaseCameraManager::dtsArchiveCapability | 
+        nxcip::BaseCameraManager::nativeMediaStreamCapability )
 {
 }
 
@@ -32,6 +35,11 @@ void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         addRef();
         return this;
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
     }
     return NULL;
 }
@@ -90,8 +98,7 @@ void CameraManager::setCredentials( const char* username, const char* password )
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
 int CameraManager::setAudioEnabled( int audioEnabled )
 {
-    //TODO/IMPL
-    return 0;
+    return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
@@ -108,8 +115,8 @@ nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
 {
-    //TODO/IMPL
-    return nxcip::NX_NOT_IMPLEMENTED;
+    *dtsArchiveReader = new ArchiveReader( m_info.url );
+    return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getLastErrorString

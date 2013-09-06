@@ -7,6 +7,7 @@
 
 #include "camera_manager.h"
 #include "plugin.h"
+#include "settings.h"
 
 
 DiscoveryManager::DiscoveryManager()
@@ -21,6 +22,11 @@ void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         addRef();
         return this;
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
     }
     return NULL;
 }
@@ -44,19 +50,25 @@ void DiscoveryManager::getVendorName( char* buf ) const
 
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
 {
-#if 0
-    strcpy( cameras[0].url, "rtsp://192.168.0.31:554/axis-media/media.amp" );
-    strcpy( cameras[0].uid, "HUY" );
-    strcpy( cameras[0].modelName, "rtsp://192.168.0.31:554/axis-media/media.amp" );
-    return 1;
-#else
-    return 0;
-#endif
+    int i = 0;
+    for( std::list<std::string>::const_iterator
+        it = Settings::instance()->imageDirectories.begin();
+        it != Settings::instance()->imageDirectories.end();
+        ++it, ++i )
+    {
+        if( i == nxcip::CAMERA_INFO_ARRAY_SIZE )
+            break;
+        strcpy( cameras[0].url, it->c_str() );
+        strcpy( cameras[0].uid, it->c_str() );
+        strcpy( cameras[0].modelName, it->c_str() );
+    }
+
+    return nxcip::NX_NO_ERROR;
 }
 
 int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
-    return 0;
+    return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 int DiscoveryManager::fromMDNSData(

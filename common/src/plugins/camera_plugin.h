@@ -543,16 +543,19 @@ namespace nxcip
         virtual DataPacketType type() const = 0;
         /*!
             Data format for different codecs:\n
-                - h.264: [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
+                - h.264 (\a nxcip::CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
                     It is recommended that SPS and PPS are repeated before each group of pictures
-                - motion jpeg: TODO
-                - aac: ADTS stream
+                - motion jpeg (\a nxcip::CODEC_ID_MJPEG): Each packet is a complete jpeg picture
+                - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
         */
         virtual const void* data() const = 0;
         //!Returns size (in bytes) of packet's data
         virtual unsigned int dataSize() const = 0;
-        //!Returns number of encoder, generated data
-        virtual unsigned int encoderNumber() const = 0;
+        /*!
+            For video packet data contains number of camera sensor starting with 0 (e.g., panoramic camera has multiple sensors).\n
+            For audio, this is audio track number (in case of multiple microphones on camera device)
+        */
+        virtual unsigned int channelNumber() const = 0;
         //!Constant from \a nxcip::CompressionType enumeration
         virtual CompressionType codecType() const = 0;
     };
@@ -572,7 +575,7 @@ namespace nxcip
 
 
     // {A85D884B-F05E-4fff-8B5A-E36570E73067}
-    static const nxpl::NX_GUID IID_DataPacket = { { 0xa8, 0x5d, 0x88, 0x4b, 0xf0, 0x5e, 0x4f, 0xff, 0x8b, 0x5a, 0xe3, 0x65, 0x70, 0xe7, 0x30, 0x67 } };
+    static const nxpl::NX_GUID IID_VideoDataPacket = { { 0xa8, 0x5d, 0x88, 0x4b, 0xf0, 0x5e, 0x4f, 0xff, 0x8b, 0x5a, 0xe3, 0x65, 0x70, 0xe7, 0x30, 0x67 } };
 
     //!Video packet. MUST contain complete frame (or field in case of interlaced video)
     class VideoDataPacket
@@ -597,7 +600,8 @@ namespace nxcip
     /*!
         Provides synchronous API to receiving media stream
         \note returns stream of media data of different types (video, audio, motion)
-        \note This class itself does not add any delay into media stream. Data is returned upon its availability
+        \note This class itself does not add any delay into media stream. Data is returned upon its availability. 
+            E.g., while reading media stream from file with 30fps, actual data rate is not limited with 30fps, but with read speed only
     */
     class StreamReader
     :
@@ -607,9 +611,12 @@ namespace nxcip
         //!Returns media packet or NULL in case of error
         /*!
             If no data is available, blocks till some data becomes available or \a StreamReader::interrupt had been called
+            \param packet
+            \return error code (\a nxcip::NX_NO_ERROR on success)
             \note Returns packet has its ref counter set to 1
+            \note On end of data, \a nxcip::NX_NO_ERROR is returned and \a packet is set to NULL
         */
-        virtual MediaDataPacket* getNextData() = 0;
+        virtual int getNextData( MediaDataPacket** packet ) = 0;
 
         //!Interrupt \a StreamReader::getNextData blocked in other thread
         virtual void interrupt() = 0;
@@ -619,6 +626,7 @@ namespace nxcip
     // {B0F07EAF-A59E-41fc-8F9E-86C323218554}
     static const nxpl::NX_GUID IID_Iteratable = { { 0xb0, 0xf0, 0x7e, 0xaf, 0xa5, 0x9e, 0x41, 0xfc, 0x8f, 0x9e, 0x86, 0xc3, 0x23, 0x21, 0x85, 0x54 } };
 
+    //!Interface for class-container with element iterating support
     /*!
         \code{.cpp}
         Iteratable* it;
@@ -636,20 +644,9 @@ namespace nxcip
         //!Move cursor to the beginning (following \a Iteratable::next() call will move cursor to the first position of dataset)
         virtual void goToBeginning() = 0;
         /*!
-            \return true, if cursor is set to the next position. false, already at the end of data
+            \return true, if cursor is set to the next position. false, if already at the end of data
         */
         virtual bool next() = 0;
-    };
-
-
-
-    // {8968B0BA-F6C6-42a3-A707-FCE753130E89}
-    static const nxpl::NX_GUID IID_MotionMask = { { 0x89, 0x68, 0xb0, 0xba, 0xf6, 0xc6, 0x42, 0xa3, 0xa7, 0x7, 0xfc, 0xe7, 0x53, 0x13, 0xe, 0x89 } };
-
-    class MotionMask
-    {
-    public:
-        //TODO/IMPL
     };
 
 
@@ -668,6 +665,14 @@ namespace nxcip
             \return \a true, if data present (cursor is on valid position)
         */
         virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) = 0;
+    };
+
+
+    enum MediaStreamQuality
+    {
+        msqDefault = 0,
+        msqHigh,
+        msqLow
     };
 
 
@@ -695,8 +700,10 @@ namespace nxcip
                 This capability is not required but used for optimization
             */
             reverseModeCapability           = 0x01,
+            Flag_CanProcessMediaStep,
             //!motion data can be provided in media stream
             motionDataCapability            = 0x02,
+            //!if present, \a nxcip::DtsArchiveReader::find is implemented
             searchByMotionMaskCapability    = 0x04
         };
 
@@ -740,21 +747,23 @@ namespace nxcip
             \note This method is used only if \a DtsArchiveReader::reverseModeCapability is supported
             \return \a NX_NO_ERROR on success, otherwise - error code
         */
-        virtual int toggleReverseMode( bool isReverse, UsecUTCTimestamp timestamp ) = 0;
+        virtual int setReverseMode( bool isReverse, UsecUTCTimestamp timestamp ) = 0;
         //!Toggle motion data in media stream on/off
         /*!
             \return \a NX_NO_ERROR on success, otherwise - error code
         */
-        virtual int toggleMotionData( bool motionPresent ) = 0;
-        //!Select media stream source (camera's encoder)
+        virtual int setMotionData( bool motionPresent ) = 0;
+        //!Select media stream quality (used for dynamic media stream adaptation)
         /*!
             Media stream switching may not occur immediately, depending on \a waitForKeyFrame argument
-            \param[in] encoderNumber Encoder index as provided by \a nxcip::BaseCameraManager
-            \param[in] waitForKeyFrame If \a true, implementation SHOULD switch only on reaching next key frame of new (from encoder \a encoderNumber) stream.
+            \param[in] quality Media stream quality
+            \param[in] waitForKeyFrame If \a true, implementation SHOULD switch only on reaching next key frame of new stream.
                 If \a false, \a StreamReader instance SHOULD switch immediately to the key frame of new stream with greatest pts, not exceeding current
-            \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code
+            \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code.\n
+                If requested quality is not supported, \a NX_NO_DATA is returned
+            \note \a nxcip::msqDefault MUST always be supported
         */
-        virtual int selectEncoder( int encoderNumber, bool waitForKeyFrame ) = 0;
+        virtual int setQuality( MediaStreamQuality quality, bool waitForKeyFrame ) = 0;
         //!Find periods of archive, where motion occured on specified region of video
         /*!
             This method is only used when \a DtsArchiveReader::searchByMotionMaskCapability is present
@@ -763,7 +772,7 @@ namespace nxcip
             \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code
             \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
         */
-        virtual int find( MotionMask* motionMask, TimePeriods** timePeriods ) = 0;
+        virtual int find( MotionData* motionMask, TimePeriods** timePeriods ) = 0;
 
         //!Returns text description of the last error
         /*!

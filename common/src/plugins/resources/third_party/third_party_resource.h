@@ -29,6 +29,9 @@ public:
         const nxcip_qt::CameraDiscoveryManager& discoveryManager );
     virtual ~QnThirdPartyResource();
 
+    //!Implementation of QnSecurityCamResource::createArchiveDelegate
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+
     //!Implementation of QnResource::getPtzController
     virtual QnAbstractPtzController* getPtzController() override;
     //!Implementation of QnNetworkResource::isResourceAccessible

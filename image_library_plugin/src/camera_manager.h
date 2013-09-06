@@ -3,8 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef CAMERA_MANAGER_H
-#define CAMERA_MANAGER_H
+#ifndef ILP_CAMERA_MANAGER_H
+#define ILP_CAMERA_MANAGER_H
 
 #include <plugins/camera_plugin.h>
 
@@ -65,4 +65,4 @@ private:
     std::auto_ptr<MediaEncoder> m_encoder;
 };
 
-#endif  //CAMERA_MANAGER_H
+#endif  //ILP_CAMERA_MANAGER_H

@@ -79,7 +79,7 @@ namespace nxpl
 
         ~ScopedRef()
         {
-            release();
+            reset();
         }
 
         //!Returns protected pointer without releasing it

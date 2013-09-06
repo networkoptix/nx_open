@@ -12,6 +12,7 @@
 
 #include "api/app_server_connection.h"
 #include "third_party_stream_reader.h"
+#include "third_party_archive_delegate.h"
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
@@ -32,6 +33,25 @@ QnThirdPartyResource::QnThirdPartyResource(
 QnThirdPartyResource::~QnThirdPartyResource()
 {
     stopInputPortMonitoring();
+}
+
+QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
+{
+    unsigned int camCapabilities = 0;
+    if( m_camManager.getCameraCapabilities( &camCapabilities ) != nxcip::NX_NO_ERROR ||
+        (camCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability) == 0 )
+    {
+        return NULL;
+    }
+
+    nxcip::DtsArchiveReader* archiveReader = NULL;
+    if( m_camManager.getRef()->createDtsArchiveReader( &archiveReader ) != nxcip::NX_NO_ERROR ||
+        archiveReader == NULL )
+    {
+        return NULL;
+    }
+
+    return new ThirdPartyArchiveDelegate( toResourcePtr(), archiveReader );
 }
 
 QnAbstractPtzController* QnThirdPartyResource::getPtzController()
@@ -137,6 +157,11 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         addRef();
         return static_cast<nxcip::CameraInputEventHandler *>(this);
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
     }
     return NULL;
 }

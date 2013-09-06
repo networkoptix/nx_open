@@ -14,6 +14,8 @@
 #include "utils/media/nalUnits.h"
 
 
+//TODO/IMPL: #ak support nxcip::CameraMediaEncoder::getLiveStreamReader
+
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
     nxcip::BaseCameraManager* camManager )

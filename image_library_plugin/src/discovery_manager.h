@@ -3,17 +3,15 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef DISCOVERY_MANAGER_H
-#define DISCOVERY_MANAGER_H
+#ifndef ILP_DISCOVERY_MANAGER_H
+#define ILP_DISCOVERY_MANAGER_H
 
 #include <plugins/camera_plugin.h>
 
 #include "common_ref_manager.h"
 
 
-/*!
-    Supports only url check. Also, instansiates camera manager
-*/
+//!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager
 :
     public nxcip::CameraDiscoveryManager
@@ -54,4 +52,4 @@ private:
     CommonRefManager m_refManager;
 };
 
-#endif  //DISCOVERY_MANAGER_H
+#endif  //ILP_DISCOVERY_MANAGER_H
