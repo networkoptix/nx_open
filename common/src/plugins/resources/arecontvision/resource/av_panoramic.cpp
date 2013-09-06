@@ -10,6 +10,13 @@
 QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
+    m_isRotated = false;
+    m_rotatedLayout = 0;
+}
+
+QnArecontPanoramicResource::~QnArecontPanoramicResource()
+{
+    delete m_rotatedLayout;
 }
 
 
@@ -138,14 +145,25 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
     setParam(QLatin1String("CnannelEnable"), 15, QnDomainPhysical); // to enable all channels
 
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-    QString request = QLatin1String("set?rotate=0");
-    CLHttpStatus response = connection.doGET(request);
-    if (response != CL_HTTP_SUCCESS)
-        return CameraDiagnostics::RequestFailedResult(lit("set?rotate=0"), lit(nx_http::StatusCode::toString((int) response)));
+    updateFlipState();
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+void QnArecontPanoramicResource::updateFlipState()
+{
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QString request = QLatin1String("get?rotate");
+    CLHttpStatus responseCode = connection.doGET(request);
+    if (responseCode != CL_HTTP_SUCCESS)
+        return;
+
+    QByteArray response;
+    connection.readAll(response);
+    int valPos = response.indexOf('=');
+    if (valPos >= 0) {
+        m_isRotated = response.mid(valPos+1).trimmed().toInt();
+    }
 }
 
 //=======================================================================
@@ -171,3 +189,22 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
+const QnResourceVideoLayout* QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QnResourceVideoLayout* layout = const_cast<QnResourceVideoLayout*> (QnPlAreconVisionResource::getVideoLayout(dataProvider));
+    QnCustomResourceVideoLayout* customLayout = dynamic_cast<QnCustomResourceVideoLayout*>(layout);
+    if (m_isRotated && customLayout)
+    {
+        if (m_rotatedLayout == 0) {
+            m_rotatedLayout = new QnCustomResourceVideoLayout(customLayout->size());
+            QVector<int> channels = customLayout->getChannels();
+            std::reverse(channels.begin(), channels.end());
+            m_rotatedLayout->setChannels(channels);
+        }
+        return m_rotatedLayout;
+    }
+
+    return layout;
+}

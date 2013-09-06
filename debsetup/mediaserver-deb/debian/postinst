@@ -23,7 +23,7 @@ ECS_HOST_DEFAULT="localhost"
 if [ -f "$ECS_CONFIG_FILE" ]; then
     ECS_PORT_DEFAULT=$(cat $ECS_CONFIG_FILE | grep "^port=" | head -1 | sed 's/port=\(.*\)/\1/g')
 else
-    ECS_PORT_DEFAULT= "7001"
+    ECS_PORT_DEFAULT="7001"
 fi
 ECS_LOGIN_DEFAULT="admin"
 

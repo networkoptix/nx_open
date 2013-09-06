@@ -109,6 +109,11 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
 
 int QnOnvifPtzController::stopMove()
 {
+    // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
+    QString model = m_resource->getModel();
+    if(model == lit("SD8362") || model == lit("SD83X3"))
+        return startMove(0, 0, 0);
+
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
     _onvifPtz__Stop request;

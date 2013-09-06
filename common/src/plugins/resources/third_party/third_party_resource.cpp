@@ -221,6 +221,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayInputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability )
         setCameraCapability( Qn::RelayOutputCapability, true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
+        setCameraCapability( Qn::shareIpCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         setPtzCapability( Qn::AbsolutePtzCapability, true );

@@ -1032,6 +1032,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.resource.id = zoomTargetWidget->resource()->toResource()->getId().toInt();
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
+    data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     
     QnResourceWidget::Buttons buttons = widget->checkedButtons();

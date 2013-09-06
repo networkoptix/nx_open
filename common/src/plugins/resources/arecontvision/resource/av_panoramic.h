@@ -8,9 +8,12 @@ class QnArecontPanoramicResource : public QnPlAreconVisionResource
 {
 public:
     QnArecontPanoramicResource(const QString& name);
+    ~QnArecontPanoramicResource();
     bool getDescription();
 
     bool getParamPhysical(int cannel, const QString& name, QVariant &val);
+
+    void updateFlipState();
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -19,14 +22,15 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
+    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 private:
     bool setResolution(bool full);
     bool setCamQuality(int q);
 
 protected:
     QnResourceVideoLayout* m_vrl;
-
-    
+    bool m_isRotated;    
+    QnCustomResourceVideoLayout* m_rotatedLayout;
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;
