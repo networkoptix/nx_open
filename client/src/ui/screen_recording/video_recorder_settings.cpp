@@ -14,6 +14,7 @@
 #   include <device_plugins/desktop_win/desktop_file_encoder.h>
 #endif
 
+#include <utils/common/warnings.h>
 
 QRegExp QnVideoRecorderSettings::m_devNumberExpr(QLatin1String(" \\([0-9]+\\)$"));
 
