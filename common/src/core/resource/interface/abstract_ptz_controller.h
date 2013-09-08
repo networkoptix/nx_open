@@ -40,6 +40,16 @@ struct QnPtzLimits {
     qreal maxFov;
 };
 
+/**
+ * Interface for accessing camera's PTZ functions.
+ * 
+ * Note that it does not contain any accessors for flipped / mirrored state of
+ * the camera. This is intentional as it is supposed to be handled either
+ * at firmware or at controller implementation level. For example, if the camera
+ * is flipped, but firmware doesn't handle it correctly, then <tt>startMove</tt>
+ * implementation should invert the given speed values before passing them to
+ * the camera.
+ */
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
@@ -57,7 +67,7 @@ public:
     virtual int setLogicalPosition(qreal pan, qreal tilt, qreal fov) = 0;
     virtual int getLogicalPosition(qreal *pan, qreal *tilt, qreal *fov) const = 0;
     virtual int getLogicalLimits(QnPtzLimits *limits) = 0;
-        
+
     virtual int updateState() = 0;
 
 protected:
