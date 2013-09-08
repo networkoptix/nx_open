@@ -14,6 +14,21 @@ public:
     QnAxisPtzController(QnPlAxisResource* resource);
     virtual ~QnAxisPtzController();
 
+    virtual Qn::PtzCapabilities getCapabilities() override;
+
+    virtual int startMove(qreal panSpeed, qreal tiltSpeed, qreal zoomSpeed) override;
+    virtual int stopMove() override;
+
+    virtual int setPhysicalPosition(qreal pan, qreal tilt, qreal zoom) override;
+    virtual int getPhysicalPosition(qreal *pan, qreal *tilt, qreal *zoom) const override;
+
+    virtual int setLogicalPosition(qreal pan, qreal tilt, qreal fov) override;
+    virtual int getLogicalPosition(qreal *pan, qreal *tilt, qreal *fov) const override;
+    virtual int getLogicalLimits(QnPtzLimits *limits) override;
+
+    virtual int updateState() override;
+
+
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
     virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
     virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;

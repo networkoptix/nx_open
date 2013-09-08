@@ -31,50 +31,37 @@ namespace {
 } // anonymous namespace
 
 
-class QnPtzSpaceMapper;
+struct QnPtzLimits {
+    qreal minPan;
+    qreal maxPan;
+    qreal minTilt;
+    qreal maxTilt;
+    qreal minFov;
+    qreal maxFov;
+};
 
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
-    QnAbstractPtzController(QnResource* resource);
-    virtual ~QnAbstractPtzController();
+    QnAbstractPtzController(QnResource *resource): m_resource(resource) {}
+    virtual ~QnAbstractPtzController() {}
 
-    virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
-    virtual int stopMove() = 0;
-    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) = 0;
-    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) = 0;
     virtual Qn::PtzCapabilities getCapabilities() = 0;
-    virtual const QnPtzSpaceMapper *getSpaceMapper() = 0;
 
-    //bool calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
-    //void getCalibrate(qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);
+    virtual int startMove(qreal panSpeed, qreal tiltSpeed, qreal zoomSpeed) = 0;
+    virtual int stopMove() = 0;
 
-    static bool calibrate(QnVirtualCameraResourcePtr res, qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);
-    static void getCalibrate(QnVirtualCameraResourcePtr res, qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff);
+    virtual int setPhysicalPosition(qreal pan, qreal tilt, qreal zoom) = 0;
+    virtual int getPhysicalPosition(qreal *pan, qreal *tilt, qreal *zoom) const = 0;
 
-    qreal getXVelocityCoeff() const;
-    qreal getYVelocityCoeff() const;
-    qreal getZoomVelocityCoeff() const;
-
-    virtual bool isEnabled() const { return true; }
-    virtual void setEnabled(bool enabled) { Q_UNUSED(enabled); }
+    virtual int setLogicalPosition(qreal pan, qreal tilt, qreal fov) = 0;
+    virtual int getLogicalPosition(qreal *pan, qreal *tilt, qreal *fov) const = 0;
+    virtual int getLogicalLimits(QnPtzLimits *limits) = 0;
+        
+    virtual int updateState() = 0;
 
 protected:
-    QnMediaResource* m_resource;
-};
-
-class QnVirtualPtzController: public QnAbstractPtzController {
-    Q_OBJECT
-public:
-    QnVirtualPtzController(QnResource* resource): QnAbstractPtzController(resource), m_animationEnabled(false) {}
-    
-    bool isAnimationEnabled() const { return m_animationEnabled; }
-    void setAnimationEnabled(bool animationEnabled) { m_animationEnabled = animationEnabled; }
-
-    virtual void changePanoMode() = 0;
-    virtual QString getPanoModeText() const = 0;
-private:
-    bool m_animationEnabled;
+    QnResource* m_resource;
 };
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H

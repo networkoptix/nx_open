@@ -79,18 +79,28 @@ public:
 
 
     enum PtzCapability {
-        NoPtzCapabilities                   = 0x000,
-        AbsolutePtzCapability               = 0x020,
-        ContinuousPanTiltCapability         = 0x040,
-        ContinuousZoomCapability            = 0x080,
-        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
+        NoPtzCapabilities                   = 0x00000000,
+        
+        ContinuousPanCapability             = 0x00001000,
+        ContinuousTiltCapability            = 0x00002000,
+        ContinuousZoomCapability            = 0x00000080,
+
+        AbsolutePanCapability               = 0x00004000,
+        AbsoluteTiltCapability              = 0x00008000,
+        AbsoluteZoomCapability              = 0x00010000,
+
+        LogicalPositionSpaceCapability      = 0x00020000,
 
         /* Shortcuts */
-        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
+        ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
+        AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
 
         /* Deprecated capabilities. */
         DeprecatedContinuousPtzCapability   = 0x001,
         DeprecatedZoomCapability            = 0x002,
+        DeprecatedAbsolutePtzCapability     = 0x020,
+        DeprecatedContinuousPanTiltCapability = 0x040,
+        DeprecatedOctagonalPtzCapability    = 0x100,
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
@@ -104,12 +114,22 @@ public:
 
         if(result & Qn::DeprecatedContinuousPtzCapability) {
             result &= ~Qn::DeprecatedContinuousPtzCapability;
-            result |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability;
+            result |= Qn::ContinuousPtzCapabilities;
         }
 
         if(result & Qn::DeprecatedZoomCapability) {
             result &= ~Qn::DeprecatedZoomCapability;
             result |= Qn::ContinuousZoomCapability;
+        }
+
+        if(result & Qn::DeprecatedAbsolutePtzCapability) {
+            result &= ~Qn::DeprecatedAbsolutePtzCapability;
+            result |= Qn::AbsolutePtzCapabilities;
+        }
+
+        if(result & Qn::DeprecatedContinuousPanTiltCapability) {
+            result &= ~Qn::DeprecatedContinuousPanTiltCapability;
+            result |= Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
         }
 
         return result;

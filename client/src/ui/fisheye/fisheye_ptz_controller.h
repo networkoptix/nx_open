@@ -8,6 +8,20 @@
 
 class QnResourceWidgetRenderer;
 
+class QnVirtualPtzController: public QnAbstractPtzController {
+    Q_OBJECT
+public:
+    QnVirtualPtzController(QnResource* resource): QnAbstractPtzController(resource), m_animationEnabled(false) {}
+
+    bool isAnimationEnabled() const { return m_animationEnabled; }
+    void setAnimationEnabled(bool animationEnabled) { m_animationEnabled = animationEnabled; }
+
+    virtual void changePanoMode() = 0;
+    virtual QString getPanoModeText() const = 0;
+private:
+    bool m_animationEnabled;
+};
+
 class QnFisheyePtzController: public QnVirtualPtzController {
     Q_OBJECT
 public:
