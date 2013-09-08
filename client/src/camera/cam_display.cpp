@@ -127,7 +127,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_forceMtDecoding(false)
 {
 
-    if (resource->toResource()->hasFlags(QnResource::live_cam))
+    if (resource && resource->toResource()->hasFlags(QnResource::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;

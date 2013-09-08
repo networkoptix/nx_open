@@ -204,11 +204,13 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
 
 void QnDesktopCameraConnection::pleaseStop()
 {
-    if (processor)
-        processor->pleaseStop();
-
-    if (connection)
-        connection->getSocket()->close();
+    {
+        QMutexLocker lock(&m_mutex);
+        if (processor)
+            processor->pleaseStop();
+        if (connection)
+            connection->getSocket()->close();
+    }
 
     QnLongRunnable::pleaseStop();
 }
@@ -231,7 +233,7 @@ void QnDesktopCameraConnection::run()
             connection->addHeader("user-name", auth.user().toUtf8());
         }
 
-        CLHttpStatus status = connection->doGET("desktop_camera");
+        CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));
         if (status != CL_HTTP_SUCCESS) {
             terminatedSleep(1000 * 10);
             continue;
@@ -260,5 +262,6 @@ void QnDesktopCameraConnection::run()
     delete processor;
     delete connection;
 
+    processor = 0;
     connection = 0;
 }

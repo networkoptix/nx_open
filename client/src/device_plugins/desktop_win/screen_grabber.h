@@ -15,19 +15,27 @@
 #include <QTime>
 #include "ui/screen_recording/video_recorder_settings.h"
 
+struct CaptureInfo
+{
+    CaptureInfo(): pts(0), opaque(0), width(0), height(0), terminated(false) {}
+    qint64 pts;
+    void* opaque;
+    int width;
+    int height;
+    QPoint pos;
+    bool terminated;
+};
+
+typedef QSharedPointer<CaptureInfo> CaptureInfoPtr;
+
+Q_DECLARE_METATYPE(CaptureInfoPtr);
+
+
 class QnScreenGrabber: public QObject
 {
     Q_OBJECT
 public:
-    struct CaptureInfo
-    {
-        CaptureInfo(): pts(0), opaque(0), w(0), h(0) {}
-        qint64 pts;
-        void* opaque;
-        int w;
-        int h;
-        QPoint pos;
-    };
+
 
     // resolution (0,0) - use default(native resolution)
     // negative resolution - use specified scale factor
@@ -38,8 +46,8 @@ public:
 
     // capture screenshot in YUV 4:2:0 format
     // allocate frame data if frame is not initialized
-    CaptureInfo captureFrame();
-    bool capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* frame);
+    CaptureInfoPtr captureFrame();
+    bool capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* frame);
 
     PixelFormat format() const { return PIX_FMT_YUV420P; }
     //PixelFormat format() const { return PIX_FMT_BGRA; }
@@ -51,12 +59,12 @@ public:
     void setLogo(const QPixmap& logo);
     int screenWidth() const;
     int screenHeight() const;
-
+    void pleaseStop();
 private:
     HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
-    Q_INVOKABLE void captureFrameOpenGL(void* opaque);
+    Q_INVOKABLE void captureFrameOpenGL(CaptureInfoPtr data);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void drawLogo(quint8* data, int width, int height);
     void allocateTmpFrame(int width, int height, PixelFormat format);
@@ -95,6 +103,10 @@ private:
     int m_tmpFrameHeight;
     mutable std::auto_ptr<quint8> m_colorBits;
     mutable size_t m_colorBitsCapacity;
+
+    static QMutex m_guiWaitMutex;
+    QWaitCondition m_waitCond;
+    bool m_needStop;
 };
 
 #endif // Q_OS_WIN

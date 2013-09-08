@@ -19,6 +19,7 @@ public:
     virtual void start(Priority priority = InheritPriority) override;
     bool isInitialized() const;
     QString lastErrorStr() const;
+    virtual bool hasThread() const override { return false; }
 protected:
     virtual bool processData(QnAbstractDataPacketPtr /*data*/) { return true; }
 protected:

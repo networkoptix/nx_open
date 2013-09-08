@@ -809,8 +809,8 @@ void QnDesktopFileEncoder::run()
             m_capturingStopped = true;
         }
 
-        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
-        if (!capturedData.opaque)
+        CaptureInfoPtr capturedData = m_grabber->getNextFrame();
+        if (!capturedData->opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 
