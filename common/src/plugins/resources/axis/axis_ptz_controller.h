@@ -37,14 +37,14 @@ public:
     virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
 private:
-    void init(const QnAxisParameterMap &params);
+    void updateState(const QnAxisParameterMap &params);
 
     CLSimpleHTTPClient *newHttpClient() const;
     bool query(const QString &request, QByteArray *body = NULL) const;
     bool query(const QString &request, QnAxisParameterMap *params) const;
 
 private:
-    QnPlAxisResource* m_resource;
+    QnPlAxisResource *m_resource;
     Qn::PtzCapabilities m_capabilities;
     QnPtzSpaceMapper *m_spaceMapper;
 };

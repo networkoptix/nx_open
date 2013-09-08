@@ -9,17 +9,6 @@
 
 #include "interpolator.h"
 
-namespace Qn
-{
-    enum SpaceMapperFlag {
-        NoMapperFlags   = 0x00,
-
-        /** Mapper return Z pos as fov instead of 35mm equiv. It is necessary for large view angle. */
-        FovBasedMapper  = 0x01
-    };
-    Q_DECLARE_FLAGS(SpaceMapperFlags, SpaceMapperFlag);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(SpaceMapperFlags);
-};
 
 // -------------------------------------------------------------------------- //
 // QnScalarSpaceMapper
@@ -128,7 +117,6 @@ bool deserialize(const QVariant &value, QnVectorSpaceMapper *target);
 class QnPtzSpaceMapper 
 {
 public:
-
     QnPtzSpaceMapper() {}
     QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper, const QStringList &models): m_fromCamera(mapper), m_toCamera(mapper), m_models(models) {}
     QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera, const QStringList &models): m_fromCamera(fromCamera), m_toCamera(toCamera), m_models(models) {}

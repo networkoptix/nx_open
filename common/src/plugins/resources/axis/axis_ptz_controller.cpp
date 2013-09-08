@@ -9,6 +9,9 @@
 static const quint16 DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 
 
+// -------------------------------------------------------------------------- //
+// QnAxisParameterMap
+// -------------------------------------------------------------------------- //
 class QnAxisParameterMap {
 public:
     QnAxisParameterMap() {};
@@ -55,22 +58,35 @@ private:
 };
 
 
+// -------------------------------------------------------------------------- //
+// QnAxisPtzController
+// -------------------------------------------------------------------------- //
 QnAxisPtzController::QnAxisPtzController(QnPlAxisResource* resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),
     m_spaceMapper(NULL)
 {
-    QnAxisParameterMap params;
-    if(query(lit("param.cgi?action=list"), &params))
-        init(params);
+    updateState();
 }
 
 QnAxisPtzController::~QnAxisPtzController() {
     return;
 }
 
-void QnAxisPtzController::init(const QnAxisParameterMap &params) {
+int QnAxisPtzController::updateState() {
+    QnAxisParameterMap params;
+    if(!query(lit("param.cgi?action=list"), &params))
+        return 1;
+    
+    updateState(params);
+    return 0;
+}
+
+void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
+    m_capabilities = 0;
+    m_spaceMapper = NULL;
+
     QString ptzEnabled = params.value<QString>("root.Properties.PTZ.PTZ");
     if(ptzEnabled != lit("yes"))
         return;
