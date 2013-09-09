@@ -118,7 +118,7 @@ if __name__ == '__main__':
             print(vc_path)
             os.environ["path"] += os.pathsep + vc_path
             os.system('echo %PATH%')
-            execute(['${qt.dir}/bin/qmake', '-spec', 'win32-msvc2012' ,'-tp', 'vc', '-o', '${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', '${project.build.directory}/${project.artifactId}.pro'])
+            os.system('${qt.dir}/bin/qmake -spec win32-msvc2012 -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj ${project.build.directory}/${project.artifactId}.pro')
             
             #if '${arch}' == 'x64' and '${force_x86}' == 'false':
             #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')
