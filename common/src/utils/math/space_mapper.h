@@ -21,6 +21,15 @@ public:
 
 
 template<class T>
+class QnSpaceMapperPtr: public QSharedPointer<QnSpaceMapper<T> > {
+    typedef QSharedPointer<QnSpaceMapper<T> > base_type;
+public:
+    QnSpaceMapperPtr() {}
+    QnSpaceMapperPtr(QnSpaceMapper<T> *mapper): base_type(mapper) {}
+};
+
+
+template<class T>
 class QnIdentitySpaceMapper: public QnSpaceMapper<T> {
 public:
     virtual T sourceToTarget(const T &source) const override { return source; }
@@ -65,18 +74,10 @@ private:
 
 class QnSeparableVectorSpaceMapper: public QnSpaceMapper<QVector3D> {
 public:
-    QnSeparableVectorSpaceMapper(QnSpaceMapper<qreal> *xMapper, QnSpaceMapper<qreal> *yMapper, QnSpaceMapper<qreal> *zMapper) {
+    QnSeparableVectorSpaceMapper(const QnSpaceMapperPtr<qreal> &xMapper, const QnSpaceMapperPtr<qreal> &yMapper, const QnSpaceMapperPtr<qreal> &zMapper) {
         m_mappers[0] = xMapper;
         m_mappers[1] = yMapper;
         m_mappers[2] = zMapper;
-    }
-
-    virtual ~QnSeparableVectorSpaceMapper() {
-        delete m_mappers[0];
-        if(m_mappers[1] != m_mappers[0])
-            delete m_mappers[1];
-        if(m_mappers[2] != m_mappers[1] && m_mappers[2] != m_mappers[1])
-            delete m_mappers[2];
     }
 
     QVector3D sourceToTarget(const QVector3D &source) const { 
@@ -96,23 +97,29 @@ public:
     }
 
 private:
-    boost::array<QnSpaceMapper<qreal> *, 3> m_mappers;
+    boost::array<QnSpaceMapperPtr<qreal>, 3> m_mappers;
 };
 
-/*
-void serialize(const QnScalarSpaceMapper &value, QVariant *target);
-bool deserialize(const QVariant &value, QnScalarSpaceMapper *target);
 
+template<class T>
+class QnAssymetricSpaceMapper: public QnSpaceMapper<T> {
+public:
+    QnAssymetricSpaceMapper(const QnSpaceMapperPtr<T> &sourceToTarget, const QnSpaceMapperPtr<T> &targetToSource) {
+        m_sourceToTarget = sourceToTarget;
+        m_targetToSource = targetToSource;
+    }
 
-void serialize(const QnVectorSpaceMapper &value, QVariant *target);
-bool deserialize(const QVariant &value, QnVectorSpaceMapper *target);
+    virtual T sourceToTarget(const T &source) const override {
+        return m_sourceToTarget->sourceToTarget(source);
+    }
 
+    virtual T targetToSource(const T &target) const override {
+        return m_targetToSource->targetToSource(target);
+    }
 
-void serialize(const QnPtzSpaceMapper &value, QVariant *target);
-bool deserialize(const QVariant &value, QnPtzSpaceMapper *target);
-*/
-
-Q_DECLARE_METATYPE(QnPtzSpaceMapper);
+private:
+    QnSpaceMapperPtr<T> m_sourceToTarget, m_targetToSource;
+};
 
 
 #endif // QN_SPACE_MAPPER_H

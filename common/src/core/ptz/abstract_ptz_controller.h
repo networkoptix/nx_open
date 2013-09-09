@@ -39,20 +39,28 @@ struct QnPtzLimits {
     qreal maxFov;
 };
 
+
 /**
- * Interface for accessing camera's PTZ functions.
+ * A thread-safe interface for accessing camera's PTZ functions.
  * 
  * Note that most of the functions of this interface return integer status codes,
- * with 0 for success and non-zero for failure. 
+ * with 0 for success and non-zero for failure.
+ * 
+ * Also note that standard PTZ space refers to degrees for pan, tilt and fov.
  */
-class QnAbstractPtzController: public QObject {
+class QnAbstractPtzController: public QObject { // TODO: rename QnPtzController
     Q_OBJECT
 public:
     /**
      * \param resource                  Resource that this ptz controller belongs to.
      */
-    QnAbstractPtzController(QnResource *resource): m_resource(resource) {}
+    QnAbstractPtzController(const QnResourcePtr &resource): m_resource(resource) {}
     virtual ~QnAbstractPtzController() {}
+
+    /**
+     * \returns                         Resource that this ptz controller belongs to.
+     */
+    QnResourcePtr resource() const { return m_resource.toStrongRef(); }
 
     /**
      * \returns                         PTZ features that this controller implements.
@@ -130,7 +138,9 @@ public:
     virtual int relativeMove(const QRectF &viewport) = 0;
 
 protected:
-    QnResource *m_resource;
+    QWeakPointer<QnResource> m_resource;
 };
+
+typedef QSharedPointer<QnAbstractPtzController> QnPtzControllerPtr;
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H
