@@ -111,16 +111,15 @@ nxcip::CameraPTZManager* GenericRTSPCameraManager::getPTZManager() const
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
-nxcip::CameraRelayIOManager* GenericRTSPCameraManager::getCameraRelayIOManager() const
+nxcip::CameraMotionDataProvider* GenericRTSPCameraManager::getCameraMotionDataProvider() const
 {
     return NULL;
 }
 
-int GenericRTSPCameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
+//!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
+nxcip::CameraRelayIOManager* GenericRTSPCameraManager::getCameraRelayIOManager() const
 {
-    //TODO/IMPL
-    return nxcip::NX_NOT_IMPLEMENTED;
+    return NULL;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getLastErrorString

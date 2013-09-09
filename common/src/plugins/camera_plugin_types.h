@@ -22,7 +22,7 @@ namespace nxcip
         CODEC_ID_AAC,
         CODEC_ID_AC3,
         CODEC_ID_DTS,
-        CODEC_ID_VORBIS,
+        CODEC_ID_VORBIS
     };
 }
 

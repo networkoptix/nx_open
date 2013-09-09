@@ -78,9 +78,3 @@ int GenericRTSPMediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBit
 {
     return nxcip::NX_NO_ERROR;
 }
-
-nxcip::StreamReader* GenericRTSPMediaEncoder::getLiveStreamReader()
-{
-    //TODO/IMPL
-    return NULL;
-}

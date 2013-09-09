@@ -53,10 +53,10 @@ public:
     virtual int setAudioEnabled( int audioEnabled ) override;
     //!Implementation of nxcip::BaseCameraManager::getPTZManager
     virtual nxcip::CameraPTZManager* getPTZManager() const override;
+    //!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
+    virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
     virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
-    //!Implementation of nxcip::BaseCameraManager::createDtsArchiveReader
-    virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
     //!Implementation of nxcip::BaseCameraManager::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
 
@@ -92,7 +92,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpl_tools::ScopedRef<AxisCameraPlugin> m_pluginRef;
+    nxpt::ScopedRef<AxisCameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;
