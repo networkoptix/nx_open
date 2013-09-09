@@ -45,9 +45,11 @@ public:
     //!Implementation of nxcip::DtsArchiveReader::toggleReverseMode
     virtual int setReverseMode( bool isReverse, nxcip::UsecUTCTimestamp timestamp ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleMotionData
-    virtual int setMotionData( bool motionPresent ) override;
+    virtual int setMotionDataEnabled( bool motionPresent ) override;
     //!Implementation of nxcip::DtsArchiveReader::setQuality
     virtual int setQuality( nxcip::MediaStreamQuality quality, bool waitForKeyFrame ) override;
+    //!Implementation of nxcip::DtsArchiveReader::setSkipFrames
+    virtual int setSkipFrames( nxcip::UsecUTCTimestamp step ) override;
     //!Implementation of nxcip::DtsArchiveReader::find
     virtual int find( nxcip::MotionData* motionMask, nxcip::TimePeriods** timePeriods ) override;
     //!Implementation of nxcip::DtsArchiveReader::getLastErrorString

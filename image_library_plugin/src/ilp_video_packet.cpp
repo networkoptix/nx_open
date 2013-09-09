@@ -99,10 +99,10 @@ nxcip::CompressionType ILPVideoPacket::codecType() const
     return nxcip::CODEC_ID_MJPEG;
 }
 
-//!Implementation of nxpl::VideoDataPacket::isKeyFrame
-bool ILPVideoPacket::isKeyFrame() const
+unsigned int ILPVideoPacket::flags() const
 {
-    return true;
+    //TODO/IMPL
+    return 0;
 }
 
 //!Implementation of nxpl::VideoDataPacket::getMotionData

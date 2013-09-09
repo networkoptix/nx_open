@@ -150,8 +150,12 @@ Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
-    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
-        : QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
+    QnCompressedVideoData(
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    :
+        QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
     {
         dataType = VIDEO;
         //useTwice = false;
@@ -357,8 +361,12 @@ public:
 
 struct QnCompressedAudioData : public QnAbstractMediaData
 {
-    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
-        : QnAbstractMediaData(alignment, capacity)
+    QnCompressedAudioData (
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    :
+        QnAbstractMediaData(alignment, capacity)
     {
         dataType = AUDIO;
         duration = 0;

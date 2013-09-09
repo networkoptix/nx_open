@@ -31,10 +31,15 @@ CameraManager::~CameraManager()
 
 void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
+    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager2, sizeof(nxcip::IID_BaseCameraManager2) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxcip::BaseCameraManager2*>(this);
+    }
     if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager, sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
     {
         addRef();
-        return this;
+        return static_cast<nxcip::BaseCameraManager*>(this);
     }
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
@@ -107,16 +112,16 @@ nxcip::CameraPTZManager* CameraManager::getPTZManager() const
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
-nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
+//!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
+nxcip::CameraMotionDataProvider* CameraManager::getCameraMotionDataProvider() const
 {
     return NULL;
 }
 
-int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
+//!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
+nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 {
-    *dtsArchiveReader = new ArchiveReader( m_info.url );
-    return nxcip::NX_NO_ERROR;
+    return NULL;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getLastErrorString
@@ -124,6 +129,12 @@ void CameraManager::getLastErrorString( char* errorString ) const
 {
     errorString[0] = '\0';
     //TODO/IMPL
+}
+
+int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
+{
+    *dtsArchiveReader = new ArchiveReader( m_info.url );
+    return nxcip::NX_NO_ERROR;
 }
 
 const nxcip::CameraInfo& CameraManager::info() const

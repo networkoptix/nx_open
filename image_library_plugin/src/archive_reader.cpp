@@ -56,7 +56,7 @@ unsigned int ArchiveReader::releaseRef()
 //!Implementation of nxcip::DtsArchiveReader::getCapabilities
 unsigned int ArchiveReader::getCapabilities() const
 {
-    return nxcip::DtsArchiveReader::reverseModeCapability;
+    return nxcip::DtsArchiveReader::reverseGopModeCapability;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::open
@@ -99,11 +99,12 @@ int ArchiveReader::seek( nxcip::UsecUTCTimestamp /*timestamp*/, bool /*findKeyFr
 //!Implementation of nxcip::DtsArchiveReader::setReverseMode
 int ArchiveReader::setReverseMode( bool /*isReverse*/, nxcip::UsecUTCTimestamp /*timestamp*/ )
 {
+    //TODO/IMPL
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::setMotionData
-int ArchiveReader::setMotionData( bool /*motionPresent*/ )
+int ArchiveReader::setMotionDataEnabled( bool /*motionPresent*/ )
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
@@ -114,6 +115,11 @@ int ArchiveReader::setQuality( nxcip::MediaStreamQuality quality, bool /*waitFor
     if( quality == nxcip::msqDefault )
         return nxcip::NX_NO_ERROR;
     return nxcip::NX_NO_DATA;
+}
+
+int ArchiveReader::setSkipFrames( nxcip::UsecUTCTimestamp /*step*/ )
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::find

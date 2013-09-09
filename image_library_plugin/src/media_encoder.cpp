@@ -76,9 +76,3 @@ int MediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBitrateKbps*/ 
 {
     return nxcip::NX_NO_ERROR;
 }
-
-nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
-{
-    //TODO/IMPL
-    return NULL;
-}

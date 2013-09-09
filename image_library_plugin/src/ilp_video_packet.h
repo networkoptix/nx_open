@@ -38,9 +38,9 @@ public:
     virtual unsigned int channelNumber() const override;
     //!Implementation of nxpl::MediaDataPacket::codecType
     virtual nxcip::CompressionType codecType() const override;
+    //!Implementation of nxpl::MediaDataPacket::flags
+    virtual unsigned int flags() const override;
 
-    //!Implementation of nxpl::VideoDataPacket::isKeyFrame
-    virtual bool isKeyFrame() const override;
     //!Implementation of nxpl::VideoDataPacket::getMotionData
     virtual nxcip::MotionData* getMotionData() const override;
 

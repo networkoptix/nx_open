@@ -44,12 +44,17 @@ QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
         return NULL;
     }
 
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    if( !camManager2 )
+        return NULL;
+
     nxcip::DtsArchiveReader* archiveReader = NULL;
-    if( m_camManager.getRef()->createDtsArchiveReader( &archiveReader ) != nxcip::NX_NO_ERROR ||
+    if( camManager2->createDtsArchiveReader( &archiveReader ) != nxcip::NX_NO_ERROR ||
         archiveReader == NULL )
     {
         return NULL;
     }
+    camManager2->releaseRef();
 
     return new ThirdPartyArchiveDelegate( toResourcePtr(), archiveReader );
 }

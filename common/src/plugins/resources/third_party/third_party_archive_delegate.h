@@ -42,11 +42,17 @@ public:
     virtual void setSingleshotMode( bool value ) override;
     //!Implementation of QnAbstractArchiveDelegate::open
     virtual bool setQuality( MediaQuality quality, bool fastSwitch ) override;
+    //!Implementation of QnAbstractArchiveDelegate::setRange
+    virtual void setRange( qint64 startTime, qint64 endTime, qint64 frameStep ) override;
+    //!Implementation of QnAbstractArchiveDelegate::setSendMotion
+    virtual void setSendMotion( bool value ) override;
 
 private:
     QnResourcePtr m_resource;
     nxcip::DtsArchiveReader* m_archiveReader;
     nxcip::StreamReader* m_streamReader;
+
+    CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
 };
 
 #endif  //THIRD_PARTY_ARCHIVE_DELEGATE_H

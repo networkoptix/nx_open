@@ -7,6 +7,7 @@
 #define ILP_CAMERA_MANAGER_H
 
 #include <plugins/camera_plugin.h>
+#include <plugins/plugin_tools.h>
 
 #include "common_ref_manager.h"
 #include "plugin.h"
@@ -16,7 +17,7 @@ class MediaEncoder;
 
 class CameraManager
 :
-    public nxcip::BaseCameraManager
+    public nxcip::BaseCameraManager2
 {
 public:
     CameraManager( const nxcip::CameraInfo& info );
@@ -43,12 +44,15 @@ public:
     virtual int setAudioEnabled( int audioEnabled ) override;
     //!Implementation of nxcip::BaseCameraManager::getPTZManager
     virtual nxcip::CameraPTZManager* getPTZManager() const override;
+    //!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
+    virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
     virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
-    //!Implementation of nxcip::BaseCameraManager::createDtsArchiveReader
-    virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
     //!Implementation of nxcip::BaseCameraManager::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
+
+    //!Implementation of nxcip::BaseCameraManager2::createDtsArchiveReader
+    virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
 
     const nxcip::CameraInfo& info() const;
     CommonRefManager* refManager();
@@ -59,7 +63,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpl::ScopedRef<ImageLibraryPlugin> m_pluginRef;
+    nxpt::ScopedRef<ImageLibraryPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder;
