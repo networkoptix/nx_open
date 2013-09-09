@@ -50,11 +50,13 @@ if get_environment_variable('platform') == 'windows':
         
         for qtlib in qtlibs:
             if qtlib != '':
-                print(qtlib)
+                
                 for file in os.listdir(lib_source_dir):
                     if fnmatch.fnmatch(file, 'qt5%sd.dll' % qtlib):
+                        print (join(lib_source_dir, file))
                         shutil.copy2(join(lib_source_dir, file), join(target_dir, 'debug'))
                     elif fnmatch.fnmatch(file, 'qt5%s.dll' % qtlib):
+                        print (join(lib_source_dir, file))
                         shutil.copy2(join(lib_source_dir, file), join(target_dir, 'release'))    
         
         for qtplugin in qtplugins:
@@ -69,13 +71,10 @@ if get_environment_variable('platform') == 'windows':
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
                     else:
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
-                
-                #distutils.dir_util.copy_tree(join(plugin_source_dir, qtplugin), join(target_dir, qtplugin))                        
-        
+                        
         for config in ('debug', 'release'):
-            distutils.dir_util.copy_tree('vox', join(target_dir, config, 'vox'))                        
+            shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), join(target_dir, config, 'vox'))                        
             shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))
-    #shutil.rmtree('festival-vox')
 
 else:     
     lib_source_dir = '${qt.dir}/lib'

@@ -35,7 +35,7 @@
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
 
-        <qt.dir>${env.environment}/qt5/qtbase-${arch}</qt.dir>
+        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
@@ -313,9 +313,6 @@
                 <module>ios-client</module>
             </modules>
             <properties>
-                <sigar.version>1.6-SNAPSHOT</sigar.version>
-                <boost.version>1.52-SNAPSHOT</boost.version>
-                <protobuf.version>2.5.0</protobuf.version>
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
                 <qt.dir/>
