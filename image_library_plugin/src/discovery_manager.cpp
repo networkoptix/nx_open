@@ -63,7 +63,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* local
         strcpy( cameras[0].modelName, it->c_str() );
     }
 
-    return nxcip::NX_NO_ERROR;
+    return i;
 }
 
 int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )

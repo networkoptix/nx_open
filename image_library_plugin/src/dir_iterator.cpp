@@ -325,7 +325,7 @@ std::string DirIterator::entryPath() const
     return m_impl->entryPath;
 }
 
-std::string DirIterator::entryAbsolutePath() const
+std::string DirIterator::entryFullPath() const
 {
     return m_impl->dir + "/" + m_impl->entryPath;
 }

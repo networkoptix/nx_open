@@ -6,6 +6,8 @@
 #include "media_encoder.h"
 
 #include "camera_manager.h"
+#include "settings.h"
+#include "stream_reader.h"
 
 
 MediaEncoder::MediaEncoder( CameraManager* const cameraManager )
@@ -21,10 +23,15 @@ MediaEncoder::~MediaEncoder()
 
 void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
+    if( memcmp( &interfaceID, &nxcip::IID_CameraMediaEncoder2, sizeof(nxcip::IID_CameraMediaEncoder2) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxcip::CameraMediaEncoder2*>(this);
+    }
     if( memcmp( &interfaceID, &nxcip::IID_CameraMediaEncoder, sizeof(nxcip::IID_CameraMediaEncoder) ) == 0 )
     {
         addRef();
-        return this;
+        return static_cast<nxcip::CameraMediaEncoder*>(this);
     }
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
@@ -75,4 +82,17 @@ int MediaEncoder::setFps( const float& /*fps*/, float* /*selectedFps*/ )
 int MediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBitrateKbps*/ )
 {
     return nxcip::NX_NO_ERROR;
+}
+
+nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
+{
+    if( !m_streamReader.get() )
+        m_streamReader.reset( new StreamReader(
+            &m_refManager,
+            m_cameraManager->info().url,
+            Settings::instance()->frameDurationUsec,
+            true ) );
+
+    m_streamReader->addRef();
+    return m_streamReader.get();
 }

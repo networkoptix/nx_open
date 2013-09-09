@@ -6,9 +6,12 @@
 #ifndef ILP_MEDIA_ENCODER_H
 #define ILP_MEDIA_ENCODER_H
 
+#include <memory>
+
 #include <plugins/camera_plugin.h>
 
 #include "common_ref_manager.h"
+#include "stream_reader.h"
 
 
 class CameraManager;
@@ -18,7 +21,7 @@ class CameraManager;
 */
 class MediaEncoder
 :
-    public nxcip::CameraMediaEncoder
+    public nxcip::CameraMediaEncoder2
 {
 public:
     MediaEncoder( CameraManager* const cameraManager );
@@ -44,9 +47,13 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
+    //!Implementation of nxcip::CameraMediaEncoder::setBitrate
+    virtual nxcip::StreamReader* getLiveStreamReader() override;
+
 private:
     CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
+    std::auto_ptr<StreamReader> m_streamReader;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

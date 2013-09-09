@@ -7,6 +7,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include "third_party_stream_reader.h"
+
 
 ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     const QnResourcePtr& resource,
@@ -76,59 +78,9 @@ qint64 ThirdPartyArchiveDelegate::endTime()
 //!Implementation of QnAbstractArchiveDelegate::open
 QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
 {
-    nxcip::MediaDataPacket* packet = NULL;
-    if( m_streamReader->getNextData( &packet ) != nxcip::NX_NO_ERROR )
-        return QnAbstractMediaDataPtr();    //error reading data
-    if( packet == NULL )
-        return QnAbstractMediaDataPtr( new QnEmptyMediaData() );    //end of data
-
-    nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
-
-    QnAbstractMediaDataPtr mediaPacket;
-    switch( packet->type() )
-    {
-        case nxcip::dptVideo:
-        {
-            nxcip::VideoDataPacket* srcVideoPacket = static_cast<nxcip::VideoDataPacket*>(packet->queryInterface(nxcip::IID_VideoDataPacket));
-            if( !srcVideoPacket )
-                return QnAbstractMediaDataPtr();  //looks like bug in plugin implementation
-
-            mediaPacket = QnAbstractMediaDataPtr(new QnCompressedVideoData());
-            static_cast<QnCompressedVideoData*>(mediaPacket.data())->pts = packet->timestamp();
-            mediaPacket->dataType = QnAbstractMediaData::VIDEO;
-
-            //TODO/IMPL adding motion data
-            break;
-        }
-
-        case nxcip::dptAudio:
-            mediaPacket = QnAbstractMediaDataPtr(new QnCompressedAudioData());
-            mediaPacket->dataType = QnAbstractMediaData::AUDIO;
-            break;
-
-        default:
-            Q_ASSERT( false );
-            break;
-    }
-
-    mediaPacket->compressionType = toFFmpegCodecID( packet->codecType() );
-    mediaPacket->channelNumber = packet->channelNumber();
-    if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
-        mediaPacket->flags |= AV_PKT_FLAG_KEY;
-    if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
-        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-    if( packet->flags() & nxcip::MediaDataPacket::fReverseBlockStart )
-        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-    if( packet->flags() & nxcip::MediaDataPacket::fLowQuality )
-        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
-    if( packet->flags() & nxcip::MediaDataPacket::fStreamReset )
-        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_BOF;
-    //QnMediaContextPtr context;
-    //int opaque;
-
-    //TODO/IMPL data
-
-    return mediaPacket;
+    if( !m_streamReader )
+        return QnAbstractMediaDataPtr(0);
+    return ThirdPartyStreamReader::readStreamReader( m_streamReader );
 }
 
 //!Implementation of QnAbstractArchiveDelegate::open
@@ -187,41 +139,4 @@ void ThirdPartyArchiveDelegate::setRange( qint64 startTime, qint64 /*endTime*/, 
 void ThirdPartyArchiveDelegate::setSendMotion( bool value )
 {
     m_archiveReader->setMotionDataEnabled( value );
-}
-
-CodecID ThirdPartyArchiveDelegate::toFFmpegCodecID( nxcip::CompressionType compressionType )
-{
-    switch( compressionType )
-    {
-        case nxcip::CODEC_ID_MPEG2VIDEO:
-            return CODEC_ID_MPEG2VIDEO;
-        case nxcip::CODEC_ID_H263:
-            return CODEC_ID_H263;
-        case nxcip::CODEC_ID_MJPEG:
-            return CODEC_ID_MJPEG;
-        case nxcip::CODEC_ID_MPEG4:
-            return CODEC_ID_MPEG4;
-        case nxcip::CODEC_ID_H264:
-            return CODEC_ID_H264;
-        case nxcip::CODEC_ID_THEORA:
-            return CODEC_ID_THEORA;
-        case nxcip::CODEC_ID_PNG:
-            return CODEC_ID_PNG;
-        case nxcip::CODEC_ID_GIF:
-            return CODEC_ID_GIF;
-        case nxcip::CODEC_ID_MP2:
-            return CODEC_ID_MP2;
-        case nxcip::CODEC_ID_MP3:
-            return CODEC_ID_MP3;
-        case nxcip::CODEC_ID_AAC:
-            return CODEC_ID_AAC;
-        case nxcip::CODEC_ID_AC3:
-            return CODEC_ID_AC3;
-        case nxcip::CODEC_ID_DTS:
-            return CODEC_ID_DTS;
-        case nxcip::CODEC_ID_VORBIS:
-            return CODEC_ID_VORBIS;
-        default:
-            return CODEC_ID_NONE;
-    }
 }

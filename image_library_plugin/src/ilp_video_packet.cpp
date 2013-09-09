@@ -10,13 +10,17 @@
 #include <cstdlib>
 
 
-ILPVideoPacket::ILPVideoPacket( int channelNumber, nxcip::UsecUTCTimestamp _timestamp )
+ILPVideoPacket::ILPVideoPacket(
+    int channelNumber,
+    nxcip::UsecUTCTimestamp _timestamp,
+    unsigned int flags )
 :
     m_refManager( this ),
     m_channelNumber( channelNumber ),
     m_timestamp( _timestamp ),
     m_buffer( NULL ),
-    m_bufSize( 0 )
+    m_bufSize( 0 ),
+    m_flags( flags )
 {
 }
 
@@ -101,12 +105,11 @@ nxcip::CompressionType ILPVideoPacket::codecType() const
 
 unsigned int ILPVideoPacket::flags() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_flags;
 }
 
 //!Implementation of nxpl::VideoDataPacket::getMotionData
-nxcip::MotionData* ILPVideoPacket::getMotionData() const
+nxcip::Picture* ILPVideoPacket::getMotionData() const
 {
     return NULL;
 }

@@ -51,8 +51,6 @@ private:
     QnResourcePtr m_resource;
     nxcip::DtsArchiveReader* m_archiveReader;
     nxcip::StreamReader* m_streamReader;
-
-    CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
 };
 
 #endif  //THIRD_PARTY_ARCHIVE_DELEGATE_H

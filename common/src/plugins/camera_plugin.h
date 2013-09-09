@@ -469,7 +469,7 @@ namespace nxcip
             LogicalPositionSpaceCapability      = 0x080,    //!< Camera supports absolute positioning in logical space ---
                                                             //! degrees for pan and tilt and width-based 35mm-equivalent focal length for zoom.
 
-            AutomaticStateUpdateCapability      = 0x100,    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
+            AutomaticStateUpdateCapability      = 0x100    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
                                                             //! the user doesn't have to call \a updateState when it changes.
         };
 
@@ -611,16 +611,50 @@ namespace nxcip
     };
 
 
-    // {C693330F-B176-4915-A784-816A643F63F9}
-    static const nxpl::NX_GUID IID_MotionData = { { 0xc6, 0x93, 0x33, 0x0f, 0xb1, 0x76, 0x49, 0x15, 0xa7, 0x84, 0x81, 0x6a, 0x64, 0x3f, 0x63, 0xf9 } };
+    enum PixelFormat
+    {
+        //!planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
+        PIX_FMT_YUV420P,
+        //!planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
+        PIX_FMT_YUV422P,
+        //!planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
+        PIX_FMT_YUV444P,
+        //!1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb
+        PIX_FMT_MONOBLACK,
+        //!packed RGB 8:8:8, 24bpp, RGBRGB...
+        PIX_FMT_RGB24,
+        //!planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
+        PIX_FMT_NV12,
+        //!packed BGRA 8:8:8:8, 32bpp, BGRABGRA...
+        PIX_FMT_BGRA,
+        //!packed RGBA 8:8:8:8, 32bpp, RGBARGBA...
+        PIX_FMT_RGBA,
+        //!planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)
+        PIX_FMT_YUVA420P
+    };
 
-    //!Contains information about motion in different parts of video picture
-    class MotionData
+
+    // {A2017C29-CE9E-4829-87BE-9287598A1358}
+    static const nxpl::NX_GUID IID_Picture = { { 0xa2, 0x01, 0x7c, 0x29, 0xce, 0x9e, 0x48, 0x29, 0x87, 0xbe, 0x92, 0x87, 0x59, 0x8a, 0x13, 0x58 } };
+
+    //!Picture
+    class Picture
     :
         public nxpl::PluginInterface
     {
     public:
-        //TODO/DECL
+        virtual ~Picture() {}
+
+        //!Returns pixel format
+        virtual PixelFormat pixelFormat() const = 0;
+        //!Width (pixels)
+        virtual int width() const = 0;
+        //!Hidth (pixels)
+        virtual int height() const = 0;
+        //!Length of horizontal line in bytes
+        virtual int xStride() const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
+        virtual void* scanLine( int lineNumber ) const = 0;
     };
 
 
@@ -636,8 +670,10 @@ namespace nxcip
         //!Returns motion data. Can be NULL
         /*!
             Can return same object with each call, incrementing ref count
+            \return monochrome picture, set bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
+                those of video picture. Motion data just designates regions of video picture where motion has been detected
         */
-        virtual MotionData* getMotionData() const = 0;
+        virtual Picture* getMotionData() const = 0;
     };
 
 
@@ -871,12 +907,13 @@ namespace nxcip
         //!Find periods of archive, where motion occured on specified region of video
         /*!
             This method is only used when \a DtsArchiveReader::searchByMotionMaskCapability is present
-            \param[in] motionMask
+            \param[in] motionMask monochrome picture, 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
+                the same as those of video picture. Motion data just designates video frame regions that are of interest
             \param[out] timePeriods
             \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code
             \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
         */
-        virtual int find( MotionData* motionMask, TimePeriods** timePeriods ) = 0;
+        virtual int find( Picture* motionMask, TimePeriods** timePeriods ) = 0;
 
         //!Returns text description of the last error
         /*!

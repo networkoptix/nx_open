@@ -16,7 +16,10 @@ class ILPVideoPacket
     public nxcip::VideoDataPacket
 {
 public:
-    ILPVideoPacket( int channelNumber, nxcip::UsecUTCTimestamp _timestamp );
+    ILPVideoPacket(
+        int channelNumber,
+        nxcip::UsecUTCTimestamp _timestamp,
+        unsigned int flags );
     virtual ~ILPVideoPacket();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -42,7 +45,7 @@ public:
     virtual unsigned int flags() const override;
 
     //!Implementation of nxpl::VideoDataPacket::getMotionData
-    virtual nxcip::MotionData* getMotionData() const override;
+    virtual nxcip::Picture* getMotionData() const override;
 
     /*!
         \note Does keep contents of current buffer
@@ -56,6 +59,7 @@ private:
     nxcip::UsecUTCTimestamp m_timestamp;
     void* m_buffer;
     size_t m_bufSize;
+    unsigned int m_flags;
 };
 
 #endif  //ILP_VIDEO_PACKET_H

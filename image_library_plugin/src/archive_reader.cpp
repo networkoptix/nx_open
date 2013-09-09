@@ -18,7 +18,11 @@ ArchiveReader::ArchiveReader( const std::string& pictureDirectoryPath )
     m_refManager( this ),
     m_pictureDirectoryPath( pictureDirectoryPath )
 {
-    m_streamReader.reset( new StreamReader( this, pictureDirectoryPath, Settings::instance()->frameDurationUsec ) );
+    m_streamReader.reset( new StreamReader(
+        &m_refManager,
+        pictureDirectoryPath,
+        Settings::instance()->frameDurationUsec,
+        false ) );
 }
 
 ArchiveReader::~ArchiveReader()
@@ -78,15 +82,13 @@ nxcip::StreamReader* ArchiveReader::getStreamReader()
 //!Implementation of nxcip::DtsArchiveReader::startTime
 nxcip::UsecUTCTimestamp ArchiveReader::startTime() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_streamReader->minTimestamp();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::endTime
 nxcip::UsecUTCTimestamp ArchiveReader::endTime() const
 {
-    //TODO/IMPL
-    return 0;
+    return m_streamReader->maxTimestamp();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::seek
@@ -123,7 +125,7 @@ int ArchiveReader::setSkipFrames( nxcip::UsecUTCTimestamp /*step*/ )
 }
 
 //!Implementation of nxcip::DtsArchiveReader::find
-int ArchiveReader::find( nxcip::MotionData* /*motionMask*/, nxcip::TimePeriods** /*timePeriods*/ )
+int ArchiveReader::find( nxcip::Picture* /*motionMask*/, nxcip::TimePeriods** /*timePeriods*/ )
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
@@ -133,9 +135,4 @@ void ArchiveReader::getLastErrorString( char* errorString ) const
 {
     //TODO/IMPL
     errorString[0] = '\0';
-}
-
-CommonRefManager* ArchiveReader::refManager()
-{
-    return &m_refManager;
 }

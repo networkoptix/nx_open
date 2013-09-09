@@ -51,11 +51,9 @@ public:
     //!Implementation of nxcip::DtsArchiveReader::setSkipFrames
     virtual int setSkipFrames( nxcip::UsecUTCTimestamp step ) override;
     //!Implementation of nxcip::DtsArchiveReader::find
-    virtual int find( nxcip::MotionData* motionMask, nxcip::TimePeriods** timePeriods ) override;
+    virtual int find( nxcip::Picture* motionMask, nxcip::TimePeriods** timePeriods ) override;
     //!Implementation of nxcip::DtsArchiveReader::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
-
-    CommonRefManager* refManager();
 
 private:
     CommonRefManager m_refManager;

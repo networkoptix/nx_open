@@ -72,7 +72,8 @@ public:
 
     //!Returns path to current entry (path relative to \a dirPath, specified at initialization)
     std::string entryPath() const;
-    std::string entryAbsolutePath() const;
+    //!Returns "search dir path" / "entry path"
+    std::string entryFullPath() const;
     FsEntryType::Value entryType() const;
     uint64_t entrySize() const;
 

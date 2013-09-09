@@ -83,11 +83,6 @@ namespace nxpt
         ScopedRef& operator=( const ScopedRef& );
     };
 
-    /*!
-        Using this macro for systems with CHAR_BITS != 8, since sizeof returnes size in number of chars, but memcpy accepts bytes
-    */
-#define SIZEOF_IN_BYTES( type ) ((size_t)(((type*)0)+1) - (size_t)((type*)0))
-
     //!Allocate \a size bytes of data, aligned to \a alignment boundary
     /*!
         \note Allocated memory MUST be freed with \a freeAligned call
@@ -97,14 +92,14 @@ namespace nxpt
     {
         if( alignment == 0 )
             return 0;
-        void* ptr = ::malloc( size + alignment + SIZEOF_IN_BYTES(size_t) );
+        void* ptr = ::malloc( size + alignment + sizeof(alignment) );
         if( !ptr )   //allocation error
             return ptr;
 
-        void* aligned_ptr = (void*)((size_t)ptr + SIZEOF_IN_BYTES(size_t));  //leaving place to save unalignment
-        const size_t unalignment = alignment - ((size_t)aligned_ptr) % alignment;
-        memcpy( (void*)((size_t)ptr+unalignment), &unalignment, SIZEOF_IN_BYTES(size_t) );
-        return (void*)((size_t)aligned_ptr + unalignment);
+        void* aligned_ptr = (char*)ptr + sizeof(alignment);  //leaving place to save unalignment
+        const size_t unalignment = alignment - (((size_t)aligned_ptr) % alignment);
+        memcpy( (char*)ptr+unalignment, &unalignment, sizeof(unalignment) );
+        return (char*)aligned_ptr + unalignment;
     }
 
     //!free \a ptr allocated with a call to \a mallocAligned with \a alignment
@@ -116,10 +111,10 @@ namespace nxpt
         if( !ptr )
             return ::free( ptr );
 
-        ptr = (void*)((size_t)ptr - SIZEOF_IN_BYTES(size_t));
+        ptr = (char*)ptr - sizeof(size_t);
         size_t unalignment = 0;
-        memcpy( &unalignment, ptr, SIZEOF_IN_BYTES(size_t) );
-        ptr = (void*)((size_t)ptr -  unalignment);
+        memcpy( &unalignment, ptr, sizeof(unalignment) );
+        ptr = (char*)ptr - unalignment;
 
         ::free( ptr );
     }
