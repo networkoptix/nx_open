@@ -35,6 +35,7 @@
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
 
+        <qt.dir>${env.environment}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
@@ -49,7 +50,6 @@
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.1-SNAPSHOT</festival.version>
         <boost.version>1.54-SNAPSHOT</boost.version>
-        <sigar.version>1.7-SNAPSHOT</sigar.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
 
         <build.configuration>release</build.configuration>
@@ -65,13 +65,13 @@
         <qtlib7>Sql</qtlib7>
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Concurrent</qtlib9>
-        <qtlib10>x11extras</qtlib10>
-        <qtlib11></qtlib11>
-        <qtlib12></qtlib12>
+        <qtlib10>X11Extras</qtlib10>
+        <qtlib11/>
+        <qtlib12/>
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
-        <qtplugin3></qtplugin3>	
+        <qtplugin3/>	
 
         <!-- defined only for cross compilation -->
         <toolchain.version/>
@@ -192,14 +192,13 @@
             </activation>
             <modules>
                 <module>client</module>		
-<!--                <module>quicksyncdecoder</module>	-->
+                <!--                <module>quicksyncdecoder</module>	-->
                 <module>genericrtspplugin</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
                 <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${env.ENVIRONMENT}/qt5/qtbase-${arch}</qt.dir>			
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
                 <compiler>msvc2012u3</compiler>
@@ -217,12 +216,8 @@
                 </os> 
             </activation>
             <properties>
-                <protobuf.version>2.4.1</protobuf.version>
-                <boost.version>1.52-SNAPSHOT</boost.version>
-                <sigar.version>1.6-SNAPSHOT</sigar.version>
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin</python.dir>				
-                <qt.dir>${env.QTDIR}</qt.dir>				
                 <platform>linux</platform>
                 <compiler>gcc</compiler>
                 <qt.spec>linux-g++</qt.spec>
@@ -242,11 +237,7 @@
                 </property>
             </activation>
             <properties>
-                <protobuf.version>2.5.0</protobuf.version>
-                <boost.version>1.54-SNAPSHOT</boost.version>
                 <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version>
-                <sigar.version>1.7-SNAPSHOT</sigar.version>
-
                 <arch>${cross-arch}</arch>
                 <!-- <toolchain.version>2011.09</toolchain.version> -->
                 <toolchain.version>2009q3</toolchain.version>

@@ -1,4 +1,4 @@
-        <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>hdwitness</artifactId>
@@ -35,14 +35,14 @@
             <artifactId>protobuf</artifactId>
             <version>${protobuf.version}</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>                           
         <dependency>
             <groupId>org.openssl</groupId>
             <artifactId>openssl</artifactId>
             <version>${openssl.version}</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>
         <dependency>
             <groupId>org.boost</groupId>
@@ -56,35 +56,35 @@
             <artifactId>ffmpeg</artifactId>
             <version>${ffmpeg.version}</version>
             <type>tar.gz</type>
-            <classifier>${platform}</classifier>
+            <classifier>${profile.classifier}</classifier>
         </dependency>      
         <dependency>
             <groupId>org</groupId>
             <artifactId>onvif</artifactId>
             <version>${onvif.version}</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>		
-        <!--<dependency>
+        <dependency>
             <groupId>com.sourceforge.cloudcity</groupId>
             <artifactId>bespin</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2-SNAPSHOT</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
-        </dependency>                           -->    	
+            <classifier>${profile.classifier}-${compiler}</classifier>
+        </dependency>                           
         <dependency>
             <groupId>org.hyperic</groupId>
             <artifactId>sigar</artifactId>
             <version>${sigar.version}</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>                               	
         <dependency>
             <groupId>org</groupId>
             <artifactId>festival</artifactId>
             <version>${festival.version}</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>                               	
         <dependency>
             <groupId>org.festival</groupId>
@@ -93,19 +93,13 @@
             <type>tar.gz</type>
             <classifier>all-os</classifier>
         </dependency> 
-        <dependency>
-            <groupId>com.creativelabs</groupId>
-            <artifactId>openal</artifactId>
-            <version>1.1-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${platform}</classifier>
-        </dependency>
+
         <!--<dependency>
             <groupId>net.sourceforge</groupId>
             <artifactId>qjson</artifactId>
             <version>0.7.1-SNAPSHOT</version>
             <type>tar.gz</type>
-            <classifier>${platform}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>       
         <dependency>                 
             <groupId>com.nokia.qt.addons</groupId>
@@ -118,7 +112,24 @@
 
     <build>
         <defaultGoal>compile</defaultGoal>
-        <plugins>		
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy-platform-libs</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                        </configuration>                        
+                    </execution>							
+                </executions>
+            </plugin>  		
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -187,23 +198,6 @@
                     </execution>                       
                 </executions>
             </plugin>	
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>unpack-platform-libs</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                        </configuration>                        
-                    </execution>							
-                </executions>
-            </plugin>            			
         </plugins>		
     </build>
     <profiles>
@@ -214,37 +208,92 @@
                     <family>Windows</family>
                 </os>
             </activation>
+            <properties>
+                <profile.classifier>${platform}</profile.classifier>
+            </properties>            
             <dependencies>
+                <dependency>
+                    <groupId>com.creativelabs</groupId>
+                    <artifactId>openal</artifactId>
+                    <version>1.1-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>
                 <dependency>                
                     <groupId>com.digitalwatchdog.dvr</groupId>
                     <artifactId>vmax-integration</artifactId>
                     <version>1.0-SNAPSHOT</version>
                     <type>tar.gz</type>
-                    <classifier>${platform}</classifier>
+                    <classifier>${profile.classifier}</classifier>
                 </dependency>				
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>directx</artifactId>
                     <version>JUN2010-SNAPSHOT</version>
                     <type>tar.gz</type>
-                    <classifier>${platform}</classifier>
+                    <classifier>${profile.classifier}</classifier>
                 </dependency>
                 <dependency>
                     <groupId>com.intel</groupId>
                     <artifactId>mfx</artifactId>
                     <version>2012-R2-SNAPSHOT</version>
                     <type>tar.gz</type>
-                    <classifier>${platform}</classifier>
+                    <classifier>${profile.classifier}</classifier>
                 </dependency>                               	
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>redistributable</artifactId>
                     <version>vs2008-SNAPSHOT</version>
                     <type>tar.gz</type>
-                    <classifier>${platform}</classifier>
+                    <classifier>${profile.classifier}</classifier>
                 </dependency>		
-            </dependencies>			
+            </dependencies>	          
         </profile>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>		
+                <!--<property>
+                    <name>!cross-arch</name>
+                </property> -->
+            </activation>
+            <properties>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+            </properties>
+            <dependencies>
+
+            </dependencies> 
+          <!--  <build>	
+                <plugins>
+
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>unpack-platform-libs</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <failOnError>false</failOnError>
+                                    <target>							
+                                        <chmod file="${project.build.directory}/*.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="tar" failifexecutionfails="false">
+                                            <arg line="xvf *.tar.gz"/>
+                                        </exec>
+                                    </target>										
+                                </configuration>
+                            </execution>				
+                        </executions>
+                    </plugin>        
+                </plugins>	
+            </build>	-->                    
+        </profile>   
         <!--
         <profile>
             <id>linux</id>
@@ -311,38 +360,6 @@
 									<outputDirectory>${project.build.directory}</outputDirectory>
 								</configuration>
 							</execution>							
-						</executions>
-					</plugin>
-
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>generate-qt-project</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<failOnError>false</failOnError>
-									<target>							
-										<chmod file="${project.build.directory}/*.sh" perm="755"/>
-										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-											<arg line="-a -u *.zip -x **/include/** *.a"/>
-										</exec>
-										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-											<arg line="-a -u *.zip **/include/**"/>
-										</exec>
-										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-											<arg line="-a -u *.zip *.a"/>
-										</exec>
-										<exec dir="${libdir}" executable="rm" failifexecutionfails="false">
-											<arg line="*.zip"/>
-										</exec>
-									</target>										
-								</configuration>
-							</execution>				
 						</executions>
 					</plugin>					
 				</plugins>	
@@ -430,4 +447,3 @@
         </profile> -->
     </profiles>	
 </project>
-

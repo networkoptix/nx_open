@@ -18,7 +18,7 @@ class cd:
         os.chdir(self.savedPath)
     
 def get_environment_variable(variable):
-    print (os.path.abspath(__file__))
+    #print (os.path.abspath(__file__))
     try:
         with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration
     except IOError:
