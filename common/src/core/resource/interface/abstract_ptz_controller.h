@@ -30,7 +30,6 @@ namespace {
 
 } // anonymous namespace
 
-
 struct QnPtzLimits {
     qreal minPan;
     qreal maxPan;
@@ -43,35 +42,95 @@ struct QnPtzLimits {
 /**
  * Interface for accessing camera's PTZ functions.
  * 
- * Note that it does not contain any accessors for flipped / mirrored state of
- * the camera. This is intentional as it is supposed to be handled either
- * at firmware or at controller implementation level. For example, if the camera
- * is flipped, but firmware doesn't handle it correctly, then <tt>startMove</tt>
- * implementation should invert the given speed values before passing them to
- * the camera.
+ * Note that most of the functions of this interface return integer status codes,
+ * with 0 for success and non-zero for failure. 
  */
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
+    /**
+     * \param resource                  Resource that this ptz controller belongs to.
+     */
     QnAbstractPtzController(QnResource *resource): m_resource(resource) {}
     virtual ~QnAbstractPtzController() {}
 
+    /**
+     * \returns                         PTZ features that this controller implements.
+     */
     virtual Qn::PtzCapabilities getCapabilities() = 0;
 
-    virtual int startMove(qreal panSpeed, qreal tiltSpeed, qreal zoomSpeed) = 0;
+    /**
+     * Starts PTZ movement. Speed is specified in image-based coordinate space and
+     * all of its components are expected to be in range <tt>[-1, 1]</tt>. 
+     * This means that implementation must handle flipped / mirrored state of 
+     * the video stream. 
+     *
+     * \param speed                     Movement speed. 
+     * \returns                         Status code.
+     */
+    virtual int startMove(const QVector3D &speed) = 0;
+
+    /**
+     * Stops PTZ movement.
+     * 
+     * \returns                         Status code.
+     */
     virtual int stopMove() = 0;
 
-    virtual int setPhysicalPosition(qreal pan, qreal tilt, qreal zoom) = 0;
-    virtual int getPhysicalPosition(qreal *pan, qreal *tilt, qreal *zoom) const = 0;
+    /**
+     * \param[out] flip                 Flipped state of the camera's video stream.
+     * \returns                         Status code.
+     */
+    virtual int getFlip(Qt::Orientations *flip) = 0;
 
-    virtual int setLogicalPosition(qreal pan, qreal tilt, qreal fov) = 0;
-    virtual int getLogicalPosition(qreal *pan, qreal *tilt, qreal *fov) const = 0;
-    virtual int getLogicalLimits(QnPtzLimits *limits) = 0;
+    /**
+     * Sets camera PTZ position. If this controller has 
+     * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is expected to
+     * be in standard PTZ space. Otherwise it is expected to be in device-specific
+     * coordinates and thus only positions returned from a call to <tt>getPosition</tt>
+     * can be safely used.
+     *
+     * \param position                  Position to move to.
+     * \returns                         Status code.
+     */
+    virtual int setPosition(const QVector3D &position) = 0;
 
-    virtual int updateState() = 0;
+    /**
+     * Gets PTZ position from camera. If this controller has 
+     * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is returned in 
+     * standard PTZ space. Otherwise it's returned in device-specific coordinates.
+     *
+     * \param[out] position             Current ptz position. 
+     * \returns                         Status code.
+     */
+    virtual int getPosition(QVector3D *position) = 0;
+
+    /**
+     * Gets PTZ limits of the camera in standard PTZ space. 
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::LogicalPositionSpaceCapability<tt>.
+     * 
+     * \param[out] limits               Ptz limits.
+     * \returns                         Status code.
+     */
+    virtual int getLimits(QnPtzLimits *limits) = 0;
+
+    /**
+     * Moves camera's viewport relative to current viewport. New viewport 
+     * coordinates are provided in a coordinate space where current viewport
+     * is a square with side 2 centered at <tt>(0, 0)</tt>.
+     * 
+     * This function is expected to be implemented only if this controller has
+     * <tt>Qn::ScreenSpaceMovementCapability</tt>.
+     * 
+     * \param viewport                  New viewport position.
+     * \returns                         Status code.
+     */
+    virtual int relativeMove(const QRectF &viewport) = 0;
 
 protected:
-    QnResource* m_resource;
+    QnResource *m_resource;
 };
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H

@@ -90,6 +90,7 @@ public:
         AbsoluteZoomCapability              = 0x00010000,
 
         LogicalPositionSpaceCapability      = 0x00020000,
+        ScreenSpaceMovementCapability       = 0x00040000,
 
         /* Shortcuts */
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
