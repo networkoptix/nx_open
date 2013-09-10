@@ -384,7 +384,12 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
-    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String(MANUFACTURE), name);
+    QString shortModel = name;
+    int dashPos = name.indexOf(lit('-'));
+    if (dashPos > 0)
+        shortModel = name.left(dashPos);
+
+    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String(MANUFACTURE), shortModel);
     if (!rt.isValid())
     {
         cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);

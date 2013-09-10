@@ -15,8 +15,8 @@ public:
       }
 };
 
-QnTestCameraProcessor::QnTestCameraProcessor(TCPSocket* socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(socket, owner)
+QnTestCameraProcessor::QnTestCameraProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
+    QnTCPConnectionProcessor(socket, owner->getOpenSSLContext())
 {
 }
 

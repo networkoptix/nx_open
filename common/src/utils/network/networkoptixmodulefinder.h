@@ -17,7 +17,7 @@
 #include "../common/long_runnable.h"
 
 
-class UDPSocket;
+class AbstractDatagramSocket;
 
 //!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
@@ -120,7 +120,7 @@ private:
     };
 
     PollSet m_pollSet;
-    std::vector<UDPSocket*> m_sockets;
+    std::vector<AbstractDatagramSocket*> m_sockets;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;

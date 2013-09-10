@@ -17,7 +17,7 @@
 class SocketContext
 {
 public:
-    Socket* socket;
+    AbstractSocket* socket;
     void* userData;
 
     SocketContext()
@@ -28,7 +28,7 @@ public:
     }
 
     SocketContext(
-        Socket* _socket,
+        AbstractSocket* _socket,
         void* _userData = NULL )
     :
         socket( _socket ),
@@ -57,13 +57,15 @@ public:
     fd_set readfds;
     fd_set writefds;
     fd_set exceptfds;
-    UDPSocket dummySocket;
+    std::auto_ptr<AbstractDatagramSocket> dummySocket;
 
     PollSetImpl()
     {
         FD_ZERO( &readfds );
         FD_ZERO( &writefds );
         FD_ZERO( &exceptfds );
+
+        dummySocket.reset( SocketFactory::createDatagramSocket() );
     }
 
     void fillFDSet( fd_set* const dest, const std::vector<SocketContext>& src )
@@ -79,7 +81,7 @@ public:
     }
 
     std::vector<SocketContext>::iterator findSocketContextIter(
-        Socket* const sock,
+        AbstractSocket* const sock,
         PollSet::EventType eventType,
         std::vector<SocketContext>** setToUse )
     {
@@ -179,7 +181,7 @@ public:
                 break;  //reached end()
             }
 
-            if( currentSocket.socket == &pollSetImpl->dummySocket )
+            if( currentSocket.socket == pollSetImpl->dummySocket.get() )
                 continue;   //skipping dummy socket
 
             if( currentSocketREvent )
@@ -236,12 +238,12 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-Socket* PollSet::const_iterator::socket()
+AbstractSocket* PollSet::const_iterator::socket()
 {
     return m_impl->currentSocket.socket;
 }
 
-const Socket* PollSet::const_iterator::socket() const
+const AbstractSocket* PollSet::const_iterator::socket() const
 {
     return m_impl->currentSocket.socket;
 }
@@ -277,9 +279,9 @@ PollSet::PollSet()
 :
     m_impl( new PollSetImpl() )
 {
-    m_impl->readSockets.push_back( &m_impl->dummySocket );
-    m_impl->dummySocket.setNonBlockingMode( true );
-    m_impl->dummySocket.setLocalAddressAndPort( QString::fromLatin1("127.0.0.1") );
+    m_impl->readSockets.push_back( m_impl->dummySocket.get() );
+    m_impl->dummySocket->setNonBlockingMode( true );
+    m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
 }
 
 PollSet::~PollSet()
@@ -290,7 +292,7 @@ PollSet::~PollSet()
 
 bool PollSet::isValid() const
 {
-    return m_impl->dummySocket.handle() > 0;
+    return m_impl->dummySocket->handle() > 0;
 }
 
 //!Interrupts \a poll method, blocked in other thread
@@ -301,12 +303,12 @@ void PollSet::interrupt()
 {
     //introduce overlapped IO
     quint8 buf[128];
-    m_impl->dummySocket.sendTo( buf, sizeof(buf), m_impl->dummySocket.getLocalAddress(), m_impl->dummySocket.getLocalPort() );
+    m_impl->dummySocket->sendTo( buf, sizeof(buf), m_impl->dummySocket->getLocalAddress() );
 }
 
 //!Add socket to set. Does not take socket ownership
 bool PollSet::add(
-    Socket* const sock,
+    AbstractSocket* const sock,
     PollSet::EventType eventType,
     void* userData )
 {
@@ -337,7 +339,7 @@ bool PollSet::add(
 }
 
 //!Remove socket from set
-void* PollSet::remove( Socket* const sock, PollSet::EventType eventType )
+void* PollSet::remove( AbstractSocket* const sock, PollSet::EventType eventType )
 {
     std::vector<SocketContext>* setToUse = NULL;
     std::vector<SocketContext>::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
@@ -364,7 +366,7 @@ size_t PollSet::size( EventType eventType ) const
     }
 }
 
-void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
+void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
 {
     std::vector<SocketContext>* setToUse = NULL;
     std::vector<SocketContext>::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
@@ -391,11 +393,11 @@ int PollSet::poll( int millisToWait )
         timeout.tv_usec = (millisToWait % 1000) * 1000;
     }
     int result = select( 0, &m_impl->readfds, &m_impl->writefds, &m_impl->exceptfds, millisToWait >= 0 ? &timeout : NULL );
-    if( (result > 0) && FD_ISSET( m_impl->dummySocket.handle(), &m_impl->readfds ) )
+    if( (result > 0) && FD_ISSET( m_impl->dummySocket->handle(), &m_impl->readfds ) )
     {
         //reading dummy socket
         quint8 buf[128];
-        m_impl->dummySocket.recv( buf, sizeof(buf) );   //ignoring result and data...
+        m_impl->dummySocket->recv( buf, sizeof(buf), 0 );   //ignoring result and data...
          --result;
     }
     return result;

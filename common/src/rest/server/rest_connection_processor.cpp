@@ -24,13 +24,16 @@ QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
 
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
+public:
+    QnTcpListener* owner;
 };
 
-QnRestConnectionProcessor::QnRestConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner)
+QnRestConnectionProcessor::QnRestConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
 {
     Q_D(QnRestConnectionProcessor);
     d->socketTimeout = CONNECTION_TIMEOUT;
+    d->owner = _owner;
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()

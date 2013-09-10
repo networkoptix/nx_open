@@ -25,6 +25,8 @@ PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
     m_h264Parser(0),
     m_gotSDP(0)
 {
+    m_tcpSock.reset( SocketFactory::createStreamSocket() );
+
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
 
     m_connectionPort = 0;
@@ -88,15 +90,15 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
     //m_audioPort = ports[2].toInt();
     m_dataPort = ports[1].toInt();
 
-    m_tcpSock.setReadTimeOut(DROID_TIMEOUT);
-    m_tcpSock.setWriteTimeOut(DROID_TIMEOUT);
+    m_tcpSock->setRecvTimeout(DROID_TIMEOUT);
+    m_tcpSock->setSendTimeout(DROID_TIMEOUT);
 
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
     QString host = res->getHostAddress();
 
-    if (m_tcpSock.isClosed())
-        m_tcpSock.reopen();
-    if (!m_tcpSock.connect(host, m_connectionPort))
+    if (m_tcpSock->isClosed())
+        m_tcpSock->reopen();
+    if (!m_tcpSock->connect(host, m_connectionPort))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_resource->getUrl(), m_connectionPort);
@@ -111,10 +113,10 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
         quint32 ip = resolveAddress(res->getHostAddress()).toIPv4Address();
         m_allReaders.insert(ip, this);
     }
-    QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalPort()).
-                            arg(m_audioIoDevice->getMediaSocket()->getLocalPort()).arg(DROID_CONTROL_TCP_SERVER_PORT).toLatin1();
+    QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalAddress().port).
+            arg(m_audioIoDevice->getMediaSocket()->getLocalAddress().port).arg(DROID_CONTROL_TCP_SERVER_PORT).toLatin1();
     
-    int sendLen = m_tcpSock.send(request.data(), request.size());
+    int sendLen = m_tcpSock->send(request.data(), request.size());
     if (sendLen != request.size())
     {
         qWarning() << "Can't send request to droid device.";
@@ -153,12 +155,12 @@ void PlDroidStreamReader::closeStream()
     m_audioIoDevice = 0;
     m_h264Parser = 0;
 
-    m_tcpSock.close();
+    m_tcpSock->close();
 }
 
 bool PlDroidStreamReader::isStreamOpened() const
 {
-    return m_tcpSock.isConnected() && m_videoIoDevice != 0;
+    return m_tcpSock->isConnected() && m_videoIoDevice != 0;
 }
 
 void PlDroidStreamReader::updateStreamParamsBasedOnQuality()

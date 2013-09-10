@@ -7,6 +7,8 @@
 
 #include <QtCore/QMutexLocker>
 
+#include <utils/network/system_socket.h>
+
 #include "onvif_resource.h"
 #include "../../../utils/common/log.h"
 

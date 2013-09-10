@@ -56,12 +56,26 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
     initSocket();
 }
 
+CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth):
+    m_host(url.host()),
+    m_port(url.port()),
+    m_connected(false),
+    m_timeout(timeout),
+    m_auth(auth),
+    m_dataRestPtr(0),
+    m_dataRestLen(0),
+    m_localPort(0)
+{
+    initSocket();
+}
+
+
 void CLSimpleHTTPClient::initSocket()
 {
-    m_sock = TCPSocketPtr(new TCPSocket());
+    m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );
 
-    m_sock->setReadTimeOut(m_timeout);
-    m_sock->setWriteTimeOut(m_timeout);
+    m_sock->setRecvTimeout(m_timeout);
+    m_sock->setSendTimeout(m_timeout);
 }
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
@@ -70,7 +84,7 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 
 QHostAddress CLSimpleHTTPClient::getLocalHost() const
 {
-    return QHostAddress(m_sock->getLocalAddress());
+    return QHostAddress(m_sock->getLocalAddress().address.toString());
 }
 
 void CLSimpleHTTPClient::addHeader(const QByteArray& key, const QByteArray& value)
@@ -261,8 +275,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             }
         }
 
-        m_localAddress = m_sock->getLocalAddress();
-        m_localPort = m_sock->getLocalPort();
+        const SocketAddress& localHostAndPort = m_sock->getLocalAddress();
+        m_localAddress = localHostAndPort.address.toString();
+        m_localPort = localHostAndPort.port;
 
         QByteArray request;
 

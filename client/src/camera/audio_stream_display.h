@@ -34,8 +34,8 @@ public:
     // how many ms is buffered in audio buffers at this moment(!)
     int msInBuffer() const;
 
-    // returns true if audio is not playing, just accumulating 
-    bool isBuffering() const;
+    // returns start buffering time or AV_NOPTS_VALUE if audio is not buffering
+    qint64 startBufferingTime() const;
 
     // returns false if format is not supported 
     bool isFormatSupported() const;
@@ -74,6 +74,7 @@ private:
 
     QQueue<QnCompressedAudioDataPtr> m_audioQueue;
     QnByteArray m_decodedAudioBuffer;
+    qint64 m_startBufferingTime;
 };
 
 #endif //QN_AUDIO_STREAM_DISPLAY

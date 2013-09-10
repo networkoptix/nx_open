@@ -1,3 +1,5 @@
+#include <QGLWidget>
+
 #include "desktop_resource_searcher.h"
 #include "desktop_resource.h"
 
@@ -11,14 +13,23 @@
 
 #define ONLY_PRIMARY_DESKTOP
 
+static QnDesktopResourceSearcher* inst = 0;
+
 QnDesktopResourceSearcher &QnDesktopResourceSearcher::instance()
 {
-    static QnDesktopResourceSearcher inst;
-    return inst;
+    
+    return *inst;
 }
 
-QnDesktopResourceSearcher::QnDesktopResourceSearcher()
+void QnDesktopResourceSearcher::initStaticInstance(QnDesktopResourceSearcher* searcher)
 {
+    //Q_ASSERT(inst == 0); 
+    inst = searcher;
+}
+
+QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget)
+{
+    m_mainWidget = mainWidget;
 #ifdef Q_OS_WIN
     m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 #else 
@@ -52,7 +63,7 @@ QnResourceList QnDesktopResourceSearcher::findResources() {
         if(FAILED(m_pD3D->GetAdapterDisplayMode(i, &ddm)))
             break;
 
-        QnResourcePtr dev(new QnDesktopResource(i));
+        QnResourcePtr dev(new QnDesktopResource(m_mainWidget));
         result.push_back(dev);
     }
     return result;

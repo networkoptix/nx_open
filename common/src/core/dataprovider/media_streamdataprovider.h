@@ -40,8 +40,8 @@ public:
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
 
+    virtual bool hasThread() const { return true; }
 protected:
-    virtual QnAbstractMediaDataPtr getNextData() = 0;
 
     virtual void sleepIfNeeded() {}
 

@@ -257,21 +257,6 @@ void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
     m_newLiveQuality = liveQuality;
 }
 
-void QnRtspDataConsumer::buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence)
-{
-    RtpHeader* rtp = (RtpHeader*) buffer;
-    rtp->version = RtpHeader::RTP_VERSION;
-    rtp->padding = 0;
-    rtp->extension = 0;
-    rtp->CSRCCount = 0;
-    rtp->marker  =  markerBit;
-    rtp->payloadType = payloadType;
-    rtp->sequence = htons(sequence);
-    //rtp->timestamp = htonl(m_timer.elapsed());
-    rtp->timestamp = htonl(timestamp);
-    rtp->ssrc = htonl(ssrc); // source ID
-}
-
 /*
 QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(CodecID compressionType)
 {
@@ -424,7 +409,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     if (metadataTrack && metadataTrack->clientPort != -1)
     {
         m_sendBuffer.resize(16);
-        buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
+        QnRtspEncoder::buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
         m_sendBuffer.write(metadata);
 
         if (m_owner->isTcpMode()) {
@@ -436,7 +421,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
         }
         else  if (metadataTrack->mediaSocket) {
             Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-            metadataTrack->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            metadataTrack->mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
         metadataTrack->sequence++;
@@ -542,7 +527,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (trackInfo->firstRtpTime == -1)
         trackInfo->firstRtpTime = media->timestamp;
     static AVRational r = {1, 1000000};
-    AVRational time_base = {1, (int)codecEncoder->getFrequency() }; //TODO: #vasilenko assure that conversion to uint32->int is allowed
+    AVRational time_base = {1, (int)codecEncoder->getFrequency() };
 
     qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
 
@@ -567,7 +552,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             }
         }
         else {
-            buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
+            QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
         }
         
         if (m_owner->isTcpMode()) {
@@ -579,8 +564,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         }
         else {
             Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-            UDPSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
-            mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
+            mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
         m_sendBuffer.resize(4); // reserve space for RTP TCP header
@@ -621,10 +606,13 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     QnVideoCamera* camera = 0;
-    if (m_owner->getResource())
-        camera = qnCameraPool->getVideoCamera(m_owner->getResource()->toResourcePtr());
+    QnResourcePtr res;
+    if (m_owner->getResource()) {
+        res = m_owner->getResource()->toResourcePtr();
+        camera = qnCameraPool->getVideoCamera(res);
+    }
     int copySize = 0;
-    if (camera)
+    if (camera && !res->hasFlags(QnResource::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;

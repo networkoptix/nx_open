@@ -13,6 +13,7 @@
 #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
+#include "device_plugins/desktop_win/device/desktop_resource.h"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -50,7 +51,7 @@ static void updateActivity()
 
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
-#define CL_MAX_DISPLAY_QUEUE_SIZE 15
+#define CL_MAX_DISPLAY_QUEUE_SIZE 20
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 20
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
@@ -122,9 +123,11 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
-    m_multiView(false)
+    m_multiView(false),
+    m_forceMtDecoding(false)
 {
-    if (resource.dynamicCast<QnVirtualCameraResource>())
+
+    if (resource && resource->toResource()->hasFlags(QnResource::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
@@ -149,6 +152,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
     qnRedAssController->registerConsumer(this);
+
+#ifdef Q_OS_WIN
+    QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
+    if (desktopResource && desktopResource->isRendererSlow())
+        m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
+#endif
 }
 
 QnCamDisplay::~QnCamDisplay()
@@ -919,10 +928,23 @@ void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
 
 bool QnCamDisplay::canAcceptData() const
 {
-    if (m_processedPackets < m_dataQueue.maxSize())
-        return m_dataQueue.size() <= m_processedPackets;
+    if (m_isRealTimeSource)
+        return QnAbstractDataConsumer::canAcceptData();
+    else if (m_processedPackets < m_dataQueue.maxSize())
+        return m_dataQueue.size() <= m_processedPackets; // slowdown slightly to improve a lot of seek perfomance
     else 
         return QnAbstractDataConsumer::canAcceptData();
+}
+
+bool QnCamDisplay::needBuffering(qint64 vTime) const
+{
+    
+    qint64 aTime = m_audioDisplay->startBufferingTime();
+    if (aTime == AV_NOPTS_VALUE)
+        return false;
+
+    return vTime > aTime;
+    //return m_audioDisplay->isBuffering() && !flushCurrentBuffer;
 }
 
 bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
@@ -1232,8 +1254,9 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (flushCurrentBuffer)
             m_audioDisplay->playCurrentBuffer();
 
+        qint64 vTime = nextVideoImageTime(vd, channel);
         //2) we have audio and it's buffering( not playing yet )
-        if (m_audioDisplay->isBuffering() && !flushCurrentBuffer)
+        if (!flushCurrentBuffer && needBuffering(vTime))
         //if (m_audioDisplay->isBuffering() || m_audioDisplay->msInBuffer() < m_audioBufferSize / 10)
         {
             // audio is not playinf yet; video must not be played as well
@@ -1249,12 +1272,10 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             else {
                 result = false;
             }
-
             vd = nextInOutVideodata(incoming, channel);
 
             if (vd) {
-                // New av sync algorithm required MT decoding
-                if (!m_useMtDecoding && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE))
+                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMtDecoding))
                     setMTDecoding(true);
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
@@ -1325,7 +1346,7 @@ void QnCamDisplay::playAudio(bool play)
             m_audioDisplay->resume();
     }
     if (m_isRealTimeSource)
-        setMTDecoding(play && m_useMTRealTimeDecode);
+        setMTDecoding(play && (m_useMTRealTimeDecode || m_forceMtDecoding));
     else
         setMTDecoding(play);
 }

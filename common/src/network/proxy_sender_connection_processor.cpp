@@ -19,7 +19,7 @@ public:
 };
 
 QnProxySenderConnection::QnProxySenderConnection(const QUrl& proxyServerUrl, const QString& guid, QnTcpListener* owner):
-    QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, new TCPSocket(), owner)
+    QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate, SocketFactory::createStreamSocket(), owner)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
@@ -92,8 +92,8 @@ void QnProxySenderConnection::run()
         return;
     }
 
-    d->socket->setWriteTimeOut(SOCKET_TIMEOUT);
-    d->socket->setReadTimeOut(SOCKET_TIMEOUT);
+    d->socket->setSendTimeout(SOCKET_TIMEOUT);
+    d->socket->setRecvTimeout(SOCKET_TIMEOUT);
 
     QByteArray proxyRequest = QString(lit("CONNECT %1 PROXY/1.0\r\n\r\n")).arg(d->guid).toUtf8();
 

@@ -283,6 +283,10 @@ QnMainWindow::~QnMainWindow() {
     m_dwm = NULL;
 }
 
+QWidget *QnMainWindow::viewport() const {
+    return m_view->viewport();
+}
+
 void QnMainWindow::setTitleVisible(bool visible) {
     if(m_titleVisible == visible)
         return;

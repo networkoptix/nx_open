@@ -7,8 +7,12 @@
 #else
 #include <QHttpRequestHeader>
 #endif
+
 #include <QtNetwork/QNetworkInterface>
+#include "abstract_socket.h"
 #include "utils/common/long_runnable.h"
+#include <openssl/ssl.h>
+
 
 class TCPSocket;
 class QnTCPConnectionProcessor;
@@ -30,7 +34,7 @@ public:
     virtual ~QnTcpListener();
 
     void updatePort(int newPort);
-    void* getOpenSSLContext();
+    SSL_CTX* getOpenSSLContext();
     bool enableSSLMode();
 
     int getPort() const;
@@ -45,7 +49,7 @@ public slots:
 
 protected:
     virtual void run();
-    virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner) = 0;
     virtual void doPeriodicTasks();
 private:
     void removeDisconnectedConnections();

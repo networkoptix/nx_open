@@ -1,7 +1,7 @@
 #ifndef __RTP_FFMPEG_ENCODER_H__
 #define __RTP_FFMPEG_ENCODER_H__
 
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "utils/common/byte_array.h"

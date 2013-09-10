@@ -9,6 +9,9 @@
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 
+
+class UDPSocket;
+
 class QnMServerResourceSearcher : public QnLongRunnable
 {
 public:
@@ -24,10 +27,10 @@ private:
     void updateSocketList();
     void deleteSocketList();
     void readDataFromSocket();
-    void readSocketInternal(UDPSocket* socket, QSet<QByteArray>& conflictList);
+    void readSocketInternal(AbstractDatagramSocket* socket, QSet<QByteArray>& conflictList);
 private:
     QStringList m_localAddressList;
-    QList<UDPSocket*> m_socketList;
+    QList<AbstractDatagramSocket*> m_socketList;
     QTime m_socketLifeTime;
     UDPSocket* m_receiveSocket;
     QByteArray m_appServerGuid;

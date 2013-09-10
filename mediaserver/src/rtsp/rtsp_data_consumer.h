@@ -8,15 +8,13 @@
 #include "core/datapacket/abstract_data_packet.h"
 #include "utils/network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
-#include "rtsp_ffmpeg_encoder.h"
+#include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "utils/common/adaptive_sleep.h"
 
 class QnRtspConnectionProcessor;
 
 static const int MAX_RTP_CHANNELS = 32;
 static const int CLOCK_FREQUENCY = 1000000;
-static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
-static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 
 static const quint8 RTP_METADATA_CODE = 126;
 static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");
@@ -62,7 +60,6 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
 protected:
-    void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
 

@@ -659,6 +659,11 @@ void QnStreamRecorder::setFileName(const QString& fileName)
     m_fixedFileName = fileName;
 }
 
+QString QnStreamRecorder::getFileName() const
+{
+    return m_fixedFileName;
+}
+
 void QnStreamRecorder::setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS])
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)

@@ -10,6 +10,7 @@
 #include <QtCore/QDateTime>
 
 #include "socket.h"
+#include "system_socket.h"
 #include "../common/log.h"
 #include "../common/systemerror.h"
 
@@ -43,8 +44,9 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
         {
             //if( localAddressToUse == QHostAddress(QString::fromLatin1("127.0.0.1")) )
             //    continue;
-            std::auto_ptr<UDPSocket> sock( new UDPSocket(localAddressToUse.toString(), 0) );
-            if( !sock->setReuseAddrFlag(true) ||
+            std::auto_ptr<UDPSocket> sock( new UDPSocket() );
+            if( !sock->bind( SocketAddress(localAddressToUse.toString(), 0) ) ||
+                !sock->setReuseAddrFlag(true) ||
                 !sock->setLocalAddressAndPort( localAddressToUse.toString(), multicastGroupPort ) ||
                 !sock->joinGroup( multicastGroupAddress.toString(), localAddressToUse.toString() ) )
             {
@@ -65,7 +67,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
 NetworkOptixModuleRevealer::~NetworkOptixModuleRevealer()
 {
     stop();
-    for( std::vector<UDPSocket*>::size_type
+    for( std::vector<AbstractDatagramSocket*>::size_type
         i = 0;
         i < m_sockets.size();
         ++i )
@@ -98,7 +100,7 @@ void NetworkOptixModuleRevealer::run()
         Q_ASSERT( false );
     }
 
-    for( std::vector<UDPSocket*>::const_iterator
+    for( std::vector<AbstractDatagramSocket*>::const_iterator
         it = m_sockets.begin();
         it != m_sockets.end();
         ++it )
@@ -121,7 +123,7 @@ void NetworkOptixModuleRevealer::run()
             continue;    //timeout
         if( socketCount < 0 )
         {
-            SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+            const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
             cl_log.log( QString::fromLatin1("NetworkOptixModuleRevealer. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
             msleep( ERROR_WAIT_TIMEOUT_MS );
             continue;
@@ -136,7 +138,8 @@ void NetworkOptixModuleRevealer::run()
             if( !(it.eventType() & PollSet::etRead) )
                 continue;
 
-            UDPSocket* udpSocket = static_cast<UDPSocket*>(it.socket());
+            AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
+            Q_ASSERT( udpSocket );
 
             //reading socket response
             QString remoteAddressStr;
@@ -144,9 +147,9 @@ void NetworkOptixModuleRevealer::run()
             int bytesRead = udpSocket->recvFrom( readBuffer.data(), READ_BUFFER_SIZE, remoteAddressStr, remotePort );
             if( bytesRead == -1 )
             {
-                SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                cl_log.log( QString::fromLatin1("NetworkOptixModuleRevealer. Failed to read socket on local address (%1:%2). %3").
-                    arg(udpSocket->getLocalAddress()).arg(udpSocket->getLocalPort()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+                const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOG( QString::fromLatin1("NetworkOptixModuleRevealer. Failed to read socket on local address (%1). %2").
+                    arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
                 continue;
             }
 
@@ -156,19 +159,19 @@ void NetworkOptixModuleRevealer::run()
             if( !request.deserialize( &requestBufStart, readBuffer.data() + bytesRead ) )
             {
                 //invalid response
-                cl_log.log( QString::fromLatin1("NetworkOptixModuleRevealer. Received invalid request from (%1:%2) on local address %3").
-                    arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress()), cl_logINFO );
+                NX_LOG( QString::fromLatin1("NetworkOptixModuleRevealer. Received invalid request from (%1:%2) on local address %3").
+                    arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logINFO );
                 continue;
             }
 
-            cl_log.log( QString::fromLatin1("NetworkOptixModuleRevealer. Received valid reveal request from (%1:%2) on local address %3:%4").
-                arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress()).arg(udpSocket->getLocalPort()), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("NetworkOptixModuleRevealer. Received valid reveal request from (%1:%2) on local address %3").
+                arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1 );
 
             //received valid request, sending response
             if( !udpSocket->sendTo( revealPacketResponse, revealResponseBufStart-revealPacketResponse, remoteAddressStr, remotePort ) )
             {
-                SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                cl_log.log( QString::fromLatin1("NetworkOptixModuleRevealer. Failed to send reveal response to (%1:%2). %3").
+                const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOG( QString::fromLatin1("NetworkOptixModuleRevealer. Failed to send reveal response to (%1:%2). %3").
                     arg(remoteAddressStr).arg(remoteAddressStr).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
                 continue;
             }

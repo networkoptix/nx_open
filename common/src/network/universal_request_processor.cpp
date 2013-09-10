@@ -11,20 +11,22 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
     stop();
 }
 
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner):
-QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
+QnUniversalRequestProcessor::QnUniversalRequestProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
+QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->getOpenSSLContext())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
+    d->owner = owner;
 
     setObjectName( QLatin1String("QnUniversalRequestProcessor") );
 }
 
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, TCPSocket* socket, QnTcpListener* owner):
-QnTCPConnectionProcessor(priv, socket, owner)
+QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, AbstractStreamSocket* socket, QnTcpListener* owner):
+QnTCPConnectionProcessor(priv, socket, owner->getOpenSSLContext())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
+    d->owner = owner;
 }
 
 void QnUniversalRequestProcessor::run()

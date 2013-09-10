@@ -1,7 +1,10 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#include <memory>
+
 #include <QAuthenticator>
+
 #include "socket.h"
 
 extern "C"
@@ -94,8 +97,8 @@ public:
     
     const RtspStatistic& getStatistic() { return m_statistic;}
     void setStatistic(const RtspStatistic& value) { m_statistic = value; }
-    CommunicatingSocket* getMediaSocket();
-    UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    AbstractCommunicatingSocket* getMediaSocket();
+    AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
@@ -109,8 +112,8 @@ private:
     RTPSession* m_owner;
     bool m_tcpMode;
     RtspStatistic m_statistic;
-    UDPSocket* m_mediaSocket;
-    UDPSocket* m_rtcpSocket;
+    AbstractDatagramSocket* m_mediaSocket;
+    AbstractDatagramSocket* m_rtcpSocket;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
 };
@@ -323,7 +326,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    TCPSocket m_tcpSock;
+    std::auto_ptr<AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
     QUrl mUrl;

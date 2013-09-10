@@ -378,7 +378,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         foreach(QnVmax480DataConsumer* c, m_dataConsumers.keys())
         {
             if (!c->isStopping())
-                *count++;
+                (*count)++;
         }
     }
 

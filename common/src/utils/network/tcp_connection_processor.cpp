@@ -1,7 +1,5 @@
 #include "tcp_connection_processor.h"
 
-#include <openssl/ssl.h>
-
 #include <QtCore/QTime>
 
 #include "tcp_listener.h"
@@ -12,28 +10,30 @@
 #   include <netinet/tcp.h>
 #endif
 
+#include "ssl_socket.h"
+
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, SSL_CTX* _sslContext):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->owner = _owner;
     d->chunkedMode = false;
     d->ssl = 0;
+    d->sslContext = (SSL_CTX*) _sslContext;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, AbstractStreamSocket* socket, void* _sslContext):
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     //d->socket->setNoDelay(true);
-    d->owner = _owner;
     d->chunkedMode = false;
     d->ssl = 0;
+    d->sslContext = (SSL_CTX*) _sslContext;
 }
 
 
@@ -88,7 +88,7 @@ int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-    qDebug() << "Client request from " << d->socket->getPeerAddress();
+    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
     qDebug() << d->clientRequest;
 
 #ifdef USE_NX_HTTP
@@ -283,7 +283,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 #endif
 
     if (displayDebug) {
-        qDebug() << "Server response to " << d->socket->getPeerAddress();
+        qDebug() << "Server response to " << d->socket->getPeerAddress().address.toString();
         qDebug() << "\n" << response;
     }
 
@@ -344,7 +344,7 @@ void* QnTCPConnectionProcessor::ssl() const
     return d->ssl;
 }
 
-TCPSocket* QnTCPConnectionProcessor::socket() const
+AbstractStreamSocket* QnTCPConnectionProcessor::socket() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket;
@@ -372,9 +372,9 @@ bool QnTCPConnectionProcessor::readRequest()
     d->requestBody.clear();
     d->responseBody.clear();
 
-    if (d->owner->getOpenSSLContext() && !d->ssl)
+    if (d->sslContext && !d->ssl)
     {
-        d->ssl = SSL_new((SSL_CTX*) d->owner->getOpenSSLContext());  // get new SSL state with context 
+        d->ssl = SSL_new(d->sslContext);  // get new SSL state with context 
         if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
             return false;
         if (SSL_accept(d->ssl) != 1) 

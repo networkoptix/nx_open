@@ -57,7 +57,7 @@ GraphicsWidgetSceneData *GraphicsWidgetPrivate::ensureSceneData() {
     if(sceneData)
         return sceneData.data();
 
-    sceneData = new GraphicsWidgetSceneData(scene);
+    sceneData = new GraphicsWidgetSceneData(scene, scene);
     scene->setProperty(qn_sceneDataPropertyName, QVariant::fromValue<GraphicsWidgetSceneData *>(sceneData.data()));
 
     return sceneData.data();
@@ -299,7 +299,6 @@ void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
         sd->pendingLayoutWidgets.clear();
 
         foreach(QGraphicsWidget *widget, widgets) {
-            //const char *name = sd->names.value(widget);
             /* This code is copied from QGraphicsWidgetPrivate::_q_relayout(). */
             bool wasResized = widget->testAttribute(Qt::WA_Resized);
             widget->resize(widget->size());
@@ -342,7 +341,6 @@ void GraphicsWidget::updateGeometry() {
                 QApplication::postEvent(sd, new QEvent(GraphicsWidgetSceneData::HandlePendingLayoutRequests));
 
             sd->pendingLayoutWidgets.insert(this);
-            sd->names.insert(this, typeid(*this).name());
         } else {
             base_type::updateGeometry();
         }

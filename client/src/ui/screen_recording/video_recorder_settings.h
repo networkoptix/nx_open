@@ -67,6 +67,11 @@ public:
     static QString getFullDeviceName(const QString& shortName);
     static QStringList availableDeviceNames(QAudio::Mode mode);
     static void splitFullName(const QString& name, QString& shortName, int& index);
+
+
+    static int screenToAdapter(int screen);
+    static QSize resolutionToSize(Qn::Resolution resolution);
+    static float qualityToNumeric(Qn::DecoderQuality quality);
 private:
     QnAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0) const;
 private:

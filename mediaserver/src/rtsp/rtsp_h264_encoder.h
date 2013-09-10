@@ -2,7 +2,7 @@
 #define __RTSP_H264_ENCODER_H__
 
 #include <QtCore/QMap>
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 
 static const int RTSP_H264_PAYLOAD_TYPE = 96;
 static const int RTSP_H264_PAYLOAD_FREQ = 90000;

@@ -160,6 +160,10 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
         resource->setName(snapshot.name);
         resource->setCellAspectRatio(snapshot.cellAspectRatio);
         resource->setCellSpacing(snapshot.cellSpacing);
+        resource->setBackgroundSize(snapshot.backgroundSize);
+        resource->setBackgroundImageFilename(snapshot.backgroundImageFilename);
+        resource->setBackgroundOpacity(snapshot.backgroundOpacity);
+        resource->setLocked(snapshot.locked);
     }
     connectTo(resource);
 
@@ -174,6 +178,9 @@ void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &reso
     connect(resource.data(),  SIGNAL(lockedChanged(const QnLayoutResourcePtr &)),                           this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
     connect(resource.data(),  SIGNAL(cellAspectRatioChanged(const QnLayoutResourcePtr &)),                  this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
     connect(resource.data(),  SIGNAL(cellSpacingChanged(const QnLayoutResourcePtr &)),                      this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)),                  this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)),                   this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
+    connect(resource.data(),  SIGNAL(backgroundOpacityChanged(const QnLayoutResourcePtr &)),                this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
     connect(resource.data(),  SIGNAL(storeRequested(const QnLayoutResourcePtr &)),                          this,   SLOT(at_layout_storeRequested(const QnLayoutResourcePtr &)));
 }
 

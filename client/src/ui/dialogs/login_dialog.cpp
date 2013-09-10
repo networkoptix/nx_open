@@ -25,6 +25,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workaround/gl_widget_factory.h>
 
 #include <utils/applauncher_utils.h>
 
@@ -87,7 +88,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     if (FileTypeSupport::isImageFileExt(resourceName))
         resource->addFlags(QnResource::still_image);
 
-    m_renderingWidget = new QnRenderingWidget();
+    m_renderingWidget = QnGlWidgetFactory::create<QnRenderingWidget>();
     m_renderingWidget->setResource(resource);
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);

@@ -980,7 +980,7 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
     if(used) {
         m_titleUsed = used;
 
-        setTitleOpened(isTitleOpened(), false);
+        setTitleOpened(isTitleOpened(), false, false);
 
         at_titleItem_geometryChanged();
 

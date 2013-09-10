@@ -13,6 +13,7 @@
 #include <QtCore/QString>
 
 #include <plugins/camera_plugin.h>
+#include <plugins/plugin_tools.h>
 
 #include "common_ref_manager.h"
 
@@ -91,7 +92,7 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpl::ScopedRef<AxisCameraPlugin> m_pluginRef;
+    nxpl_tools::ScopedRef<AxisCameraPlugin> m_pluginRef;
     mutable nxcip::CameraInfo m_info;
     const QString m_managementURL;
     QAuthenticator m_credentials;

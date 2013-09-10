@@ -93,17 +93,17 @@ private:
     class ProbeContext
     {
     public:
-        std::auto_ptr<UDPSocket> sock;
+        std::auto_ptr<AbstractDatagramSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;
 
-        ProbeContext()
-        :
-            sock( NULL ),
-            soapWsddProxy( SOAP_IO_UDP )
-        {
-        }
+        ProbeContext();
+        ~ProbeContext();
+
+    private:
+        ProbeContext( const ProbeContext& );
+        ProbeContext& operator=( const ProbeContext& );
     };
 
     bool m_shouldStop;

@@ -33,11 +33,12 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "device_plugins/server_archive/thumbnails_stream_reader.h"
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 #include "rtsp_h264_encoder.h"
-#include "rtsp_ffmpeg_encoder.h"
+#include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
+#include "utils/network/tcp_listener.h"
 
 class QnTcpListener;
 
@@ -56,28 +57,28 @@ const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
 QMutex RtspServerTrackInfo::m_createSocketMutex;
 
-bool updatePort(UDPSocket* &socket, int port)
+bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
     delete socket;
-    socket = new UDPSocket();
-    return socket->setLocalPort(port);
+    socket = SocketFactory::createDatagramSocket();
+    return socket->bind( SocketAddress( HostAddress::anyHost, port ) );
 }
 
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
     QMutexLocker lock(&m_createSocketMutex);
-    mediaSocket = new UDPSocket();
-    rtcpSocket = new UDPSocket();
+    mediaSocket = SocketFactory::createDatagramSocket();
+    rtcpSocket = SocketFactory::createDatagramSocket();
 
-    bool opened = mediaSocket->setLocalPort(0);
+    bool opened = mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
     if (!opened)
         return false;
-    int startPort = mediaSocket->getLocalPort();
+    int startPort = mediaSocket->getLocalAddress().port;
     if(startPort&1) 
         opened = updatePort(mediaSocket, ++startPort);
     if (opened)
-        opened = rtcpSocket->setLocalPort(startPort+1);
+        opened = rtcpSocket->bind( SocketAddress( HostAddress::anyHost, startPort+1 ) );
 
     while (!opened && startPort < 65534) {
         startPort+=2;
@@ -195,8 +196,8 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner)
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
 {
 }
 
@@ -246,7 +247,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->useProprietaryFormat = true;
     else {
         d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT;
-        d->socket->setReadTimeOut(d->sessionTimeOut * 1500);
+        d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
     }
 
     const QUrlQuery urlQuery( url.query() );
@@ -308,7 +309,7 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return QHostAddress(d->socket->getPeerAddressUint());
+    return QHostAddress(d->socket->getPeerAddress().address.ipv4());
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
@@ -659,7 +660,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     sdp << "v=0" << ENDL;
     sdp << "s=" << d->mediaRes->toResource()->getName() << ENDL;
-    sdp << "c=IN IP4 " << d->socket->getLocalAddress() << ENDL;
+    sdp << "c=IN IP4 " << d->socket->getLocalAddress().address.toString() << ENDL;
 
     int i = 0;
     for (; i < numVideo + numAudio; ++i)
@@ -805,9 +806,9 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientPort = ports[0].toInt();
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
-                        if (trackInfo->openServerSocket(d->socket->getPeerAddress())) {
-                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalPort()));
-                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalPort()));
+                        if (trackInfo->openServerSocket(d->socket->getPeerAddress().address.toString())) {
+                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalAddress().port));
+                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalAddress().port));
                         }
                     }
                     //if (trackInfo->getSSRC())
@@ -909,7 +910,7 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     if (cameraResource) {
         if (cameraResource->isAudioEnabled() != d->audioEnabled) {
             m_needStop = true;
-            d->socket->shutdown();
+            d->socket->close();
         }
     }
 }
@@ -921,7 +922,7 @@ void QnRtspConnectionProcessor::at_camera_disabledChanged()
     QMutexLocker lock(&d->mutex);
     if (d->mediaRes->toResource()->isDisabled()) {
         m_needStop = true;
-        d->socket->shutdown();
+        d->socket->close();
     }
 }
 
@@ -1047,8 +1048,8 @@ int QnRtspConnectionProcessor::composePlay()
 #endif
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        //d->socket->setReadTimeOut(LARGE_RTSP_TIMEOUT);
-        //d->socket->setWriteTimeOut(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
+        //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
+        //d->socket->setSendTimeout(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
         const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
         if (videoLayout) {
@@ -1412,8 +1413,8 @@ void QnRtspConnectionProcessor::run()
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
-    //d->socket->setReadTimeOut(1000*1000);
-    //d->socket->setWriteTimeOut(1000*1000);
+    //d->socket->setRecvTimeout(1000*1000);
+    //d->socket->setSendTimeout(1000*1000);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();

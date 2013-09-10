@@ -24,7 +24,7 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
         delete itr.value().socket;
 }
 
-QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path)
+QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(AbstractStreamSocket* clientSocket, const QByteArray& protocol, const QString& path)
 {
     QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
     for (int i = 0; i < m_handlers.size(); ++i)
@@ -51,7 +51,7 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocke
     return 0;
 }
 
-QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
 {
     return new QnUniversalRequestProcessor(clientSocket, owner);
 }
@@ -74,7 +74,7 @@ void QnUniversalTcpListener::addProxySenderConnections(int size)
     }
 }
 
-TCPSocket* QnUniversalTcpListener::getProxySocket(const QString& guid, int timeout)
+AbstractStreamSocket* QnUniversalTcpListener::getProxySocket(const QString& guid, int timeout)
 {
     QMutexLocker lock(&m_proxyMutex);
     ProxyList::iterator itr = m_awaitingProxyConnections.find(guid);
@@ -86,7 +86,7 @@ TCPSocket* QnUniversalTcpListener::getProxySocket(const QString& guid, int timeo
 
     if (itr == m_awaitingProxyConnections.end())
         return 0;
-    TCPSocket* result = itr.value().socket;
+    AbstractStreamSocket* result = itr.value().socket;
     result->setNonBlockingMode(false);
     m_awaitingProxyConnections.erase(itr);
     return result;
@@ -97,7 +97,7 @@ void QnUniversalTcpListener::setProxyPoolSize(int value)
     m_proxyPoolSize = value;
 }
 
-bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid, TCPSocket* socket)
+bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid, AbstractStreamSocket* socket)
 {
     QMutexLocker lock(&m_proxyMutex);
     if (m_awaitingProxyConnections.size() < m_proxyPoolSize * 2) {
