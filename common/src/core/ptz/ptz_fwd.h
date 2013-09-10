@@ -9,6 +9,7 @@ class QnSpaceMapper;
 template<class T>
 class QnSpaceMapperPtr;
 
+typedef QnSpaceMapper<QVector3D> QnPtzMapper;
 typedef QnSpaceMapperPtr<QVector3D> QnPtzMapperPtr;
 
 class QnAbstractPtzController;

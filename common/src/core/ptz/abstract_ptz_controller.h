@@ -8,6 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/math/math.h>
 
+#include "ptz_fwd.h"
+
 namespace {
     qreal gradToRad(qreal x) { return x * M_PI / 180.0; }
     qreal radToGrad(qreal x) { return x * 180.0 / M_PI; }

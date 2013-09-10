@@ -12,42 +12,11 @@ QnPtzMapperPool::QnPtzMapperPool(QObject *parent):
 {}
 
 QnPtzMapperPool::~QnPtzMapperPool() {
-    qDeleteAll(m_mappers);
-    m_mappers.clear();
-    m_mapperByModel.clear();
+    return;
 }
 
-const QnPtzSpaceMapper *QnPtzMapperPool::mapper(const QString &model) const {
+QnPtzMapperPtr QnPtzMapperPool::mapper(const QString &model) const {
     return m_mapperByModel.value(model.toLower());    
-}
-
-void QnPtzMapperPool::addMapper(const QnPtzSpaceMapper *mapper) {
-    if(!mapper) {
-        qnNullWarning(mapper);
-        return;
-    }
-
-    if(m_mappers.contains(mapper)) {
-        qnWarning("Given mapper is already registered with this mapping manager.");
-        return;
-    }
-
-    m_mappers.push_back(mapper);
-    foreach(const QString &model, mapper->models())
-        m_mapperByModel[model.toLower()] = mapper;
-}
-
-void QnPtzMapperPool::removeMapper(const QnPtzSpaceMapper *mapper) {
-    if(!mapper) {
-        qnNullWarning(mapper);
-        return;
-    }
-
-    if(!m_mappers.removeOne(mapper))
-        return; /* Removing mapper that is not there is OK. */
-
-    foreach(const QString &model, mapper->models())
-        m_mapperByModel.remove(model);
 }
 
 bool QnPtzMapperPool::load(const QString &fileName) {
@@ -82,7 +51,13 @@ bool QnPtzMapperPool::loadInternal(const QString &fileName) {
         return false;
 
     QString version = map.value(lit("version")).toString();
-    if(version != lit("1.0"))
+    /* +------------------+-------------------------+
+     * | Software version | Ptz mapper file version |
+     * +------------------+-------------------------+
+     * | <= 2.0           | 1.0                     |
+     * | 2.1              | 1.1                     |
+     * +------------------+-------------------------+ */
+    if(version != lit("1.1"))
         return false;
 
     QList<QnPtzSpaceMapper> mappers;

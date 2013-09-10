@@ -32,7 +32,7 @@ private:
 private:
     QnPlAxisResource *m_resource;
     Qn::PtzCapabilities m_capabilities;
-    QnPtzSpaceMapper *m_spaceMapper;
+    //QnPtzSpaceMapper *m_spaceMapper;
 };
 
 

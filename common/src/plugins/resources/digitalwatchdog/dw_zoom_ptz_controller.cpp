@@ -13,9 +13,7 @@ QnDwZoomPtzController::~QnDwZoomPtzController() {
     return;
 }
 
-int QnDwZoomPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) {
-    Q_UNUSED(xVelocity)
-    Q_UNUSED(yVelocity)
+int QnDwZoomPtzController::startMove(const QVector3D &speed) {
     CameraSetting setting(
         QLatin1String("%%Lens%%Zoom"),
         QLatin1String("Zoom"),
@@ -29,11 +27,11 @@ int QnDwZoomPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoo
         QString()
     );
 
-    if(qFuzzyIsNull(zoomVelocity)) {
+    if(qFuzzyIsNull(speed.z())) {
         setting.setCurrent(setting.getStep());
-    } else if(zoomVelocity < 0.0) {
+    } else if(speed.z() < 0.0) {
         setting.setCurrent(setting.getMin());
-    } else if(zoomVelocity > 0.0) {
+    } else if(speed.z() > 0.0) {
         setting.setCurrent(setting.getMax());
     }
 
@@ -46,14 +44,11 @@ int QnDwZoomPtzController::stopMove() {
     return startMove(0.0, 0.0, 0.0);
 }
 
-int QnDwZoomPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) {
-    Q_UNUSED(xPos)
-    Q_UNUSED(yPos)
-    Q_UNUSED(zoomPos)
+int QnDwZoomPtzController::setPosition(const QVector3D &) {
     return 1;
 }
 
-int QnDwZoomPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) {
+int QnDwZoomPtzController::getPosition(QVector3D *) {
     Q_UNUSED(xPos)
     Q_UNUSED(yPos)
     Q_UNUSED(zoomPos)
