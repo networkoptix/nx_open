@@ -10,6 +10,7 @@
 #include <plugins/plugin_tools.h>
 
 #include "common_ref_manager.h"
+#include "dir_contents_manager.h"
 #include "plugin.h"
 
 
@@ -53,9 +54,12 @@ public:
 
     //!Implementation of nxcip::BaseCameraManager2::createDtsArchiveReader
     virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
+    //!Implementation of nxcip::BaseCameraManager2::find
+    virtual int find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const override;
 
     const nxcip::CameraInfo& info() const;
     CommonRefManager* refManager();
+    const DirContentsManager& dirContentsManager() const;
 
 private:
     CommonRefManager m_refManager;
@@ -67,6 +71,7 @@ private:
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder;
+    DirContentsManager m_dirContentsManager;
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

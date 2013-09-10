@@ -10,18 +10,20 @@
 
 #include <cstring>
 
-#include "settings.h"
+#include "dir_contents_manager.h"
 
 
-ArchiveReader::ArchiveReader( const std::string& pictureDirectoryPath )
+ArchiveReader::ArchiveReader(
+    const DirContentsManager& dirContentsManager,
+    unsigned int frameDurationUsec )
 :
     m_refManager( this ),
-    m_pictureDirectoryPath( pictureDirectoryPath )
+    m_dirContentsManager( dirContentsManager )
 {
     m_streamReader.reset( new StreamReader(
         &m_refManager,
-        pictureDirectoryPath,
-        Settings::instance()->frameDurationUsec,
+        m_dirContentsManager,
+        frameDurationUsec,
         false ) );
 }
 
@@ -66,10 +68,11 @@ unsigned int ArchiveReader::getCapabilities() const
 //!Implementation of nxcip::DtsArchiveReader::open
 bool ArchiveReader::open()
 {
-    //touching directory
-    struct stat st;
-    memset( &st, 0, sizeof(st) );
-    return stat( m_pictureDirectoryPath.c_str(), &st ) == 0;
+    return true;
+    ////touching directory
+    //struct stat st;
+    //memset( &st, 0, sizeof(st) );
+    //return stat( m_pictureDirectoryPath.c_str(), &st ) == 0;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::getStreamReader
@@ -82,20 +85,26 @@ nxcip::StreamReader* ArchiveReader::getStreamReader()
 //!Implementation of nxcip::DtsArchiveReader::startTime
 nxcip::UsecUTCTimestamp ArchiveReader::startTime() const
 {
-    return m_streamReader->minTimestamp();
+    return m_dirContentsManager.minTimestamp();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::endTime
 nxcip::UsecUTCTimestamp ArchiveReader::endTime() const
 {
-    return m_streamReader->maxTimestamp();
+    return m_dirContentsManager.maxTimestamp();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::seek
-int ArchiveReader::seek( nxcip::UsecUTCTimestamp /*timestamp*/, bool /*findKeyFrame*/, nxcip::UsecUTCTimestamp* /*selectedPosition*/ )
+int ArchiveReader::seek(
+    nxcip::UsecUTCTimestamp timestamp,
+    bool /*findKeyFrame*/,
+    nxcip::UsecUTCTimestamp* selectedPosition )
 {
-    //TODO/IMPL
-    return nxcip::NX_NOT_IMPLEMENTED;
+    *selectedPosition = m_streamReader->setPosition( timestamp );
+    if( *selectedPosition == nxcip::INVALID_TIMESTAMP_VALUE )
+        return nxcip::NX_NO_DATA;
+
+    return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::setReverseMode
@@ -120,12 +129,6 @@ int ArchiveReader::setQuality( nxcip::MediaStreamQuality quality, bool /*waitFor
 }
 
 int ArchiveReader::setSkipFrames( nxcip::UsecUTCTimestamp /*step*/ )
-{
-    return nxcip::NX_NOT_IMPLEMENTED;
-}
-
-//!Implementation of nxcip::DtsArchiveReader::find
-int ArchiveReader::find( nxcip::Picture* /*motionMask*/, nxcip::TimePeriods** /*timePeriods*/ )
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }

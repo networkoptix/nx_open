@@ -16,8 +16,6 @@
 #include "utils/network/http/httptypes.h"
 
 
-//TODO/IMPL: #ak support nxcip::CameraMediaEncoder::getLiveStreamReader
-
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
     nxcip::BaseCameraManager* camManager )
@@ -162,9 +160,17 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;
     for( int i = 0; i < MAX_TRIES_TO_READ_MEDIA_PACKET; ++i )
     {
-        rez = m_liveStreamReader
-            ? readStreamReader( m_liveStreamReader )
-            : m_rtpStreamParser.getNextData();
+        if( m_liveStreamReader )
+        {
+            rez = readStreamReader( m_liveStreamReader );
+            if( rez )
+                rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+        }
+        else
+        {
+            rez = m_rtpStreamParser.getNextData();
+        }
+
         if( rez )
         {
             if( rez->dataType == QnAbstractMediaData::VIDEO )

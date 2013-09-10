@@ -40,6 +40,7 @@ namespace nxcip
     static const int NX_NETWORK_ERROR = -22;
     static const int NX_MORE_DATA = -23;
     static const int NX_NO_DATA = -24;
+    static const int NX_IO_ERROR = -25;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -362,8 +363,8 @@ namespace nxcip
             shareFpsCapability          = 0x0020,     //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
             sharePixelsCapability       = 0x0040,     //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
             shareIpCapability           = 0x0080,     //!< allow multiple instances on a same IP address
-            dtsArchiveCapability        = 0x0100,    //!< camera has archive storage and provides access to its archive
-            nativeMediaStreamCapability = 0x0200     //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
+            dtsArchiveCapability        = 0x0100,     //!< camera has archive storage and provides access to its archive
+            nativeMediaStreamCapability = 0x0200      //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
         };
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
@@ -410,6 +411,115 @@ namespace nxcip
     };
 
 
+    // {A2017C29-CE9E-4829-87BE-9287598A1358}
+    static const nxpl::NX_GUID IID_Picture = { { 0xa2, 0x01, 0x7c, 0x29, 0xce, 0x9e, 0x48, 0x29, 0x87, 0xbe, 0x92, 0x87, 0x59, 0x8a, 0x13, 0x58 } };
+
+    //!Picture
+    class Picture
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        virtual ~Picture() {}
+
+        //!Returns pixel format
+        virtual PixelFormat pixelFormat() const = 0;
+        //!Width (pixels)
+        virtual int width() const = 0;
+        //!Hidth (pixels)
+        virtual int height() const = 0;
+        //!Length of horizontal line in bytes
+        virtual int xStride() const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
+        virtual void* scanLine( int lineNumber ) const = 0;
+    };
+
+
+    // {B0F07EAF-A59E-41fc-8F9E-86C323218554}
+    static const nxpl::NX_GUID IID_Iteratable = { { 0xb0, 0xf0, 0x7e, 0xaf, 0xa5, 0x9e, 0x41, 0xfc, 0x8f, 0x9e, 0x86, 0xc3, 0x23, 0x21, 0x85, 0x54 } };
+
+    //!Interface for class-container with element iterating support
+    /*!
+        \code{.cpp}
+        Iteratable* it;
+        for( it->goToBeginning(); !it->atEnd(); it->next() )
+        {
+            //processing data ...
+        }
+        \endcode
+    */
+    class Iteratable
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        //!Move cursor to the first position
+        virtual void goToBeginning() = 0;
+        /*!
+            \return true, if cursor is set to the next position. false, if already at the end of data
+        */
+        virtual bool next() = 0;
+        /*!
+            \return false, if cursor is already at end
+        */
+        virtual bool atEnd() const = 0;
+    };
+
+
+    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
+    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
+
+    //!Array of time periods
+    class TimePeriods
+    :
+        public Iteratable
+    {
+    public:
+        /*!
+            \param[out] start Start of time period (usec since 1970-01-01, UTC)
+            \param[out] end End of time period (usec since 1970-01-01, UTC)
+            \return \a true, if data present (cursor is on valid position)
+        */
+        virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) const = 0;
+    };
+
+
+    //!Set of options, used to search archive
+    struct ArchiveSearchOptions
+    {
+    public:
+        /*!
+            monochrome picture, 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
+                the same as those of video picture. Motion data just designates video frame regions that are of interest.
+                If \a motionMask is NULL, then whole picture is of interest
+            \return Can be NULL
+            \note Motion mask is OPTIONAL. It is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is set
+        */
+        Picture* motionMask;
+        //!Min data timestamp that is of interest
+        UsecUTCTimestamp startTime;
+        //!Max data timestamp that is of interest
+        UsecUTCTimestamp endTime;
+        /*!
+            Requried period detalization level.
+            E.g., if two time periods have gap between them less than this value, those time periods SHOULD be present as one.
+            0 means that all time periods MUSt be returned
+            \note This parameter is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is supported
+            \note Support of this parameter is OPTIONAL. Implementation is allowed to ignore this value. Although, implementing it helps for better performance
+        */
+        unsigned long long periodDetailLevel;
+
+        ArchiveSearchOptions()
+        :
+            motionMask( 0 ),
+            startTime( INVALID_TIMESTAMP_VALUE ),
+            endTime( INVALID_TIMESTAMP_VALUE ),
+            periodDetailLevel( 0 )
+        {
+        }
+    };
+
+
     // {1181F23B-071C-4608-89E3-648E1A735B54}
     static const nxpl::NX_GUID IID_BaseCameraManager2 = { { 0x11, 0x81, 0xf2, 0x3b, 0x07, 0x1c, 0x46, 0x08, 0x89, 0xe3, 0x64, 0x8e, 0x1a, 0x73, 0x5b, 0x54 } };
 
@@ -419,6 +529,12 @@ namespace nxcip
         public BaseCameraManager
     {
     public:
+        //!Enumeration of supported camera capabilities (bit flags)
+        enum CameraCapability2
+        { 
+            searchByMotionMaskCapability = 0x1000   //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+        };
+
         virtual ~BaseCameraManager2() {}
 
         //!Returns not NULL if \a BaseCameraManager::dtsArchiveCapability is supported
@@ -428,7 +544,17 @@ namespace nxcip
             \return \b NX_NO_ERROR on success, otherwise - error code (in this case \a *dtsArchiveReader set to NULL)
         */
         virtual int createDtsArchiveReader( DtsArchiveReader** dtsArchiveReader ) const = 0;
+        //!Find regions of archive, satisfying given conditions
+        /*!
+            \param[in] searchOptions Conditions filtering archive. Implementation MUST support filtering by
+                \a ArchiveSearchOptions::startTime and \a ArchiveSearchOptions::endTime
+            \param[out] timePeriods
+            \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code
+            \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
+        */
+        virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
     };
+
 
     // {8BAB5BC7-BEFC-4629-921F-8390A29D8A16}
     static const nxpl::NX_GUID IID_CameraPTZManager = { { 0x8b, 0xab, 0x5b, 0xc7, 0xbe, 0xfc, 0x46, 0x29, 0x92, 0x1f, 0x83, 0x90, 0xa2, 0x9d, 0x8a, 0x16 } };
@@ -611,53 +737,6 @@ namespace nxcip
     };
 
 
-    enum PixelFormat
-    {
-        //!planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
-        PIX_FMT_YUV420P,
-        //!planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
-        PIX_FMT_YUV422P,
-        //!planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
-        PIX_FMT_YUV444P,
-        //!1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb
-        PIX_FMT_MONOBLACK,
-        //!packed RGB 8:8:8, 24bpp, RGBRGB...
-        PIX_FMT_RGB24,
-        //!planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
-        PIX_FMT_NV12,
-        //!packed BGRA 8:8:8:8, 32bpp, BGRABGRA...
-        PIX_FMT_BGRA,
-        //!packed RGBA 8:8:8:8, 32bpp, RGBARGBA...
-        PIX_FMT_RGBA,
-        //!planar YUV 4:2:0, 20bpp, (1 Cr & Cb sample per 2x2 Y & A samples)
-        PIX_FMT_YUVA420P
-    };
-
-
-    // {A2017C29-CE9E-4829-87BE-9287598A1358}
-    static const nxpl::NX_GUID IID_Picture = { { 0xa2, 0x01, 0x7c, 0x29, 0xce, 0x9e, 0x48, 0x29, 0x87, 0xbe, 0x92, 0x87, 0x59, 0x8a, 0x13, 0x58 } };
-
-    //!Picture
-    class Picture
-    :
-        public nxpl::PluginInterface
-    {
-    public:
-        virtual ~Picture() {}
-
-        //!Returns pixel format
-        virtual PixelFormat pixelFormat() const = 0;
-        //!Width (pixels)
-        virtual int width() const = 0;
-        //!Hidth (pixels)
-        virtual int height() const = 0;
-        //!Length of horizontal line in bytes
-        virtual int xStride() const = 0;
-        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-        virtual void* scanLine( int lineNumber ) const = 0;
-    };
-
-
     // {A85D884B-F05E-4fff-8B5A-E36570E73067}
     static const nxpl::NX_GUID IID_VideoDataPacket = { { 0xa8, 0x5d, 0x88, 0x4b, 0xf0, 0x5e, 0x4f, 0xff, 0x8b, 0x5a, 0xe3, 0x65, 0x70, 0xe7, 0x30, 0x67 } };
 
@@ -704,51 +783,6 @@ namespace nxcip
 
         //!Interrupt \a StreamReader::getNextData blocked in other thread
         virtual void interrupt() = 0;
-    };
-
-
-    // {B0F07EAF-A59E-41fc-8F9E-86C323218554}
-    static const nxpl::NX_GUID IID_Iteratable = { { 0xb0, 0xf0, 0x7e, 0xaf, 0xa5, 0x9e, 0x41, 0xfc, 0x8f, 0x9e, 0x86, 0xc3, 0x23, 0x21, 0x85, 0x54 } };
-
-    //!Interface for class-container with element iterating support
-    /*!
-        \code{.cpp}
-        Iteratable* it;
-        for( it->goToBeginning(); it->next(); )
-        {
-            //processing data ...
-        }
-        \endcode
-    */
-    class Iteratable
-    :
-        public nxpl::PluginInterface
-    {
-    public:
-        //!Move cursor to the beginning (following \a Iteratable::next() call will move cursor to the first position of dataset)
-        virtual void goToBeginning() = 0;
-        /*!
-            \return true, if cursor is set to the next position. false, if already at the end of data
-        */
-        virtual bool next() = 0;
-    };
-
-
-    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
-    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
-
-    //!Array of time periods
-    class TimePeriods
-    :
-        public Iteratable
-    {
-    public:
-        /*!
-            \param[out] start Start of time period (usec since 1970-01-01, UTC)
-            \param[out] end End of time period (usec since 1970-01-01, UTC)
-            \return \a true, if data present (cursor is on valid position)
-        */
-        virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) = 0;
     };
 
 
@@ -827,9 +861,7 @@ namespace nxcip
             */
             skipFramesCapability            = 0x02,
             //!motion data can be provided in media stream
-            motionDataCapability            = 0x04,
-            //!if present, \a nxcip::DtsArchiveReader::find is implemented
-            searchByMotionMaskCapability    = 0x08
+            motionDataCapability            = 0x04
         };
 
         //!Returns bit mask with supported capabilities
@@ -904,16 +936,6 @@ namespace nxcip
             \note This funtionality is optional
         */
         virtual int setSkipFrames( UsecUTCTimestamp step ) = 0;
-        //!Find periods of archive, where motion occured on specified region of video
-        /*!
-            This method is only used when \a DtsArchiveReader::searchByMotionMaskCapability is present
-            \param[in] motionMask monochrome picture, 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
-                the same as those of video picture. Motion data just designates video frame regions that are of interest
-            \param[out] timePeriods
-            \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code
-            \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
-        */
-        virtual int find( Picture* motionMask, TimePeriods** timePeriods ) = 0;
 
         //!Returns text description of the last error
         /*!

@@ -377,6 +377,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
+    qDebug() << "isBOF=" << (vd->flags & QnAbstractMediaData::MediaFlags_BOF);
+
     if (vd->flags & QnAbstractMediaData::MediaFlags_BOF)
         m_lastSleepInterval = needToSleep = 0;
     

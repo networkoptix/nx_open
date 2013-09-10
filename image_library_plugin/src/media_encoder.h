@@ -1,6 +1,6 @@
 /**********************************************************
 * 03 sep 2013
-* akolesnikov
+* akolesnikov@networkoptix.com
 ***********************************************************/
 
 #ifndef ILP_MEDIA_ENCODER_H
@@ -24,7 +24,9 @@ class MediaEncoder
     public nxcip::CameraMediaEncoder2
 {
 public:
-    MediaEncoder( CameraManager* const cameraManager );
+    MediaEncoder(
+        CameraManager* const cameraManager,
+        unsigned int frameDurationUsec );
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -54,6 +56,7 @@ private:
     CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
+    unsigned int m_frameDurationUsec;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

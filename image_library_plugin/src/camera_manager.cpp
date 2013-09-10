@@ -12,7 +12,11 @@
 
 #include "archive_reader.h"
 #include "media_encoder.h"
+#include "time_periods.h"
 
+
+//
+static const int FRAME_DURATION = 1*1000*1000;
 
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
 :
@@ -21,7 +25,10 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_info( info ),
     m_capabilities( 
         nxcip::BaseCameraManager::dtsArchiveCapability | 
-        nxcip::BaseCameraManager::nativeMediaStreamCapability )
+        nxcip::BaseCameraManager::nativeMediaStreamCapability ),
+    m_dirContentsManager(
+        info.url,
+        FRAME_DURATION )
 {
 }
 
@@ -73,7 +80,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
     if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this) );
+        m_encoder.reset( new MediaEncoder(this, FRAME_DURATION) );
     m_encoder->addRef();
     *encoderPtr = m_encoder.get();
 
@@ -133,7 +140,15 @@ void CameraManager::getLastErrorString( char* errorString ) const
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
 {
-    *dtsArchiveReader = new ArchiveReader( m_info.url );
+    *dtsArchiveReader = new ArchiveReader( m_dirContentsManager, FRAME_DURATION );
+    return nxcip::NX_NO_ERROR;
+}
+
+int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
+{
+    std::auto_ptr<TimePeriods> resTimePeriods( new TimePeriods() );
+    resTimePeriods->timePeriods.push_back( std::make_pair( m_dirContentsManager.minTimestamp(), m_dirContentsManager.maxTimestamp() ) );
+    *timePeriods = resTimePeriods.release();
     return nxcip::NX_NO_ERROR;
 }
 
@@ -145,4 +160,9 @@ const nxcip::CameraInfo& CameraManager::info() const
 CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
+}
+
+const DirContentsManager& CameraManager::dirContentsManager() const
+{
+    return m_dirContentsManager;
 }

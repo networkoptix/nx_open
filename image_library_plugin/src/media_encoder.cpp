@@ -6,14 +6,16 @@
 #include "media_encoder.h"
 
 #include "camera_manager.h"
-#include "settings.h"
 #include "stream_reader.h"
 
 
-MediaEncoder::MediaEncoder( CameraManager* const cameraManager )
+MediaEncoder::MediaEncoder(
+    CameraManager* const cameraManager,
+    unsigned int frameDurationUsec )
 :
     m_refManager( cameraManager->refManager() ),
-    m_cameraManager( cameraManager )
+    m_cameraManager( cameraManager ),
+    m_frameDurationUsec( frameDurationUsec )
 {
 }
 
@@ -89,8 +91,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     if( !m_streamReader.get() )
         m_streamReader.reset( new StreamReader(
             &m_refManager,
-            m_cameraManager->info().url,
-            Settings::instance()->frameDurationUsec,
+            m_cameraManager->dirContentsManager(),
+            m_frameDurationUsec,
             true ) );
 
     m_streamReader->addRef();

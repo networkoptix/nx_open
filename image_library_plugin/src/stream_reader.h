@@ -6,14 +6,18 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
-#include <list>
+#include <stdint.h>
+
+#include <map>
 #include <string>
 
 #include <plugins/camera_plugin.h>
 
 #include "common_ref_manager.h"
-#include "dir_iterator.h"
+#include "mutex.h"
 
+
+class DirContentsManager;
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -26,7 +30,7 @@ public:
     */
     StreamReader(
         CommonRefManager* const parentRefManager,
-        const std::string& imageDirectoryPath,
+        const DirContentsManager& dirContentsManager,
         unsigned int frameDurationUsec,
         bool liveMode );
     virtual ~StreamReader();
@@ -43,44 +47,23 @@ public:
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 
-    nxcip::UsecUTCTimestamp minTimestamp() const;
-    nxcip::UsecUTCTimestamp maxTimestamp() const;
+    nxcip::UsecUTCTimestamp setPosition( nxcip::UsecUTCTimestamp timestamp );
 
 private:
-    class DirEntry
-    {
-    public:
-        std::string path;
-        uint64_t size;
-
-        DirEntry()
-        :
-            size( 0 )
-        {
-        }
-
-        DirEntry( const std::string& _path, uint64_t _size )
-        :
-            path( _path ),
-            size( _size )
-        {
-        }
-    };
-
     CommonRefManager m_refManager;
-    const std::string m_imageDirectoryPath;
-    DirIterator m_dirIterator;
+    const DirContentsManager& m_dirContentsManager;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
     unsigned int m_frameDuration;
     bool m_liveMode;
-    std::list<DirEntry> m_dirEntries;
-    std::list<DirEntry>::const_iterator m_curPos;
-    nxcip::UsecUTCTimestamp m_lastPicTimestamp;
+    std::map<nxcip::UsecUTCTimestamp, std::string> m_dirEntries;
+    std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator m_curPos;
     bool m_streamReset;
     nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
+    mutable Mutex m_mutex;
 
     void doLiveDelay();
+    void readDirContents();
 };
 
 #endif  //ILP_STREAM_READER_H

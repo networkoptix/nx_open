@@ -13,7 +13,6 @@
 class Settings
 {
 public:
-    std::list<std::string> imageDirectories;
     //!Period (in microseconds) for picture to stay on screen. By default, 3000000
     unsigned int frameDurationUsec;
 

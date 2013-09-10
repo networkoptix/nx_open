@@ -14,10 +14,13 @@
 
 #include <sys/timeb.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #include <fstream>
 #include <memory>
 
+#include "dir_contents_manager.h"
+#include "dir_iterator.h"
 #include "ilp_video_packet.h"
 
 
@@ -27,36 +30,23 @@ static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 
 StreamReader::StreamReader(
     CommonRefManager* const parentRefManager,
-    const std::string& imageDirectoryPath,
+    const DirContentsManager& dirContentsManager,
     unsigned int frameDurationUsec,
     bool liveMode )
 :
     m_refManager( parentRefManager ),
-    m_imageDirectoryPath( imageDirectoryPath ),
-    m_dirIterator( imageDirectoryPath ),
+    m_dirContentsManager( dirContentsManager ),
     m_encoderNumber( 0 ),
     m_curTimestamp( 0 ),
     m_frameDuration( frameDurationUsec ),
     m_liveMode( liveMode ),
-    m_lastPicTimestamp( 0 ),
     m_streamReset( true ),
     m_nextFrameDeployTime( 0 )
 {
-    struct timeb curTime;
-    memset( &curTime, 0, sizeof(curTime) );
-    ftime( &curTime );
-    m_lastPicTimestamp = curTime.time * USEC_IN_SEC + curTime.millitm * USEC_IN_MS;
-
-    m_dirIterator.setRecursive( true );
-    m_dirIterator.setEntryTypeFilter( FsEntryType::etRegularFile );
-    m_dirIterator.setWildCardMask( "*.jpg" );
-
-    //reading directory
-    while( m_dirIterator.next() )
-        m_dirEntries.push_back( DirEntry( m_dirIterator.entryFullPath(), m_dirIterator.entrySize() ) );
+    readDirContents();
 
     m_curPos = m_dirEntries.begin();
-    m_curTimestamp = minTimestamp();
+    m_curTimestamp = m_dirContentsManager.minTimestamp();
 }
 
 StreamReader::~StreamReader()
@@ -105,7 +95,16 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         nxcip::MediaDataPacket::fKeyPacket | (m_streamReset ? nxcip::MediaDataPacket::fStreamReset : 0)) );
     if( m_streamReset )
         m_streamReset = false;
-    packet->resizeBuffer( m_curPos->size );
+
+    struct stat fStat;
+    memset( &fStat, 0, sizeof(fStat) );
+    if( ::stat( m_curPos->second.c_str(), &fStat ) != 0 )
+    {
+        ++m_curPos;
+        return nxcip::NX_IO_ERROR;
+    }
+
+    packet->resizeBuffer( fStat.st_size );
     if( !packet->data() )
     {
         ++m_curPos;
@@ -113,10 +112,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
 
     //reading file into 
-    std::ifstream f( m_curPos->path.c_str(), std::ios_base::in | std::ios_base::binary );
+    std::ifstream f( m_curPos->second.c_str(), std::ios_base::in | std::ios_base::binary );
     if( !f.is_open() )
         return nxcip::NX_OTHER_ERROR;
-    packet->resizeBuffer( m_curPos->size );
     for( size_t
         bytesRead = 0;
         bytesRead < packet->dataSize() && !f.eof();
@@ -127,13 +125,16 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
     f.close();
 
-    if( m_liveMode )
-        doLiveDelay();  //emulating LIVE data delay
-
     m_curTimestamp += m_frameDuration;
     ++m_curPos;
     if( m_liveMode && m_curPos == m_dirEntries.end() )
+    {
+        readDirContents();
         m_curPos = m_dirEntries.begin();
+    }
+
+    if( m_liveMode )
+        doLiveDelay();  //emulating LIVE data delay
 
     *lpPacket = packet.release();
     return nxcip::NX_NO_ERROR;
@@ -144,18 +145,21 @@ void StreamReader::interrupt()
     //TODO/IMPL
 }
 
-nxcip::UsecUTCTimestamp StreamReader::minTimestamp() const
+nxcip::UsecUTCTimestamp StreamReader::setPosition( nxcip::UsecUTCTimestamp timestamp )
 {
-    if( m_dirEntries.empty() )
-        return nxcip::INVALID_TIMESTAMP_VALUE;
-    return m_lastPicTimestamp - (m_dirEntries.size() - 1) * m_frameDuration;
-}
+    Mutex::ScopedLock lk( &m_mutex );
 
-nxcip::UsecUTCTimestamp StreamReader::maxTimestamp() const
-{
     if( m_dirEntries.empty() )
         return nxcip::INVALID_TIMESTAMP_VALUE;
-    return m_lastPicTimestamp;
+    std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator it = m_dirEntries.upper_bound( timestamp );
+    if( it != m_dirEntries.begin() )
+        --it;   //taking frame before requested
+
+    m_curPos = it;
+    m_curTimestamp = it->first;
+    m_streamReset = true;
+
+    return m_curTimestamp;
 }
 
 void StreamReader::doLiveDelay()
@@ -182,4 +186,10 @@ void StreamReader::doLiveDelay()
     ftime( &curBTime );
 
     m_nextFrameDeployTime = (curBTime.time * USEC_IN_SEC + curBTime.millitm * USEC_IN_MS) + m_frameDuration;
+}
+
+void StreamReader::readDirContents()
+{
+    Mutex::ScopedLock lk( &m_mutex );
+    m_dirEntries = m_dirContentsManager.dirContents();
 }

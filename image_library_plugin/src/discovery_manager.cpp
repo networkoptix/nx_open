@@ -5,9 +5,16 @@
 
 #include "discovery_manager.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef _POSIX_C_SOURCE
+#include <unistd.h>
+#endif
+#include <cstdio>
+
 #include "camera_manager.h"
+#include "dir_iterator.h"
 #include "plugin.h"
-#include "settings.h"
 
 
 DiscoveryManager::DiscoveryManager()
@@ -48,27 +55,67 @@ void DiscoveryManager::getVendorName( char* buf ) const
     strcpy( buf, VENDOR_NAME );
 }
 
-int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
-{
-    int i = 0;
-    for( std::list<std::string>::const_iterator
-        it = Settings::instance()->imageDirectories.begin();
-        it != Settings::instance()->imageDirectories.end();
-        ++it, ++i )
-    {
-        if( i == nxcip::CAMERA_INFO_ARRAY_SIZE )
-            break;
-        strcpy( cameras[0].url, it->c_str() );
-        strcpy( cameras[0].uid, it->c_str() );
-        strcpy( cameras[0].modelName, it->c_str() );
-    }
-
-    return i;
-}
-
-int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
+int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
 {
     return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
+{
+    const size_t addressLen = strlen( address );
+    if( addressLen == 0 || addressLen > FILENAME_MAX )
+        return 0;
+
+    struct stat fStat;
+    memset( &fStat, 0, sizeof(fStat) );
+
+    if( address[addressLen-1] == '/' || address[addressLen-1] == '\\' )
+    {
+        //removing trailing separator
+        char tmpNameBuf[FILENAME_MAX+1];
+        strcpy( tmpNameBuf, address );
+        for( char* pos = tmpNameBuf+addressLen-1;
+            pos >= tmpNameBuf && (*pos == '/' || *pos == '\\');
+            --pos )
+        {
+            *pos = '\0';
+        }
+        if( stat( tmpNameBuf, &fStat ) != 0 )
+            return 0;
+    }
+    else
+    {
+        if( stat( address, &fStat ) != 0 )
+            return 0;
+    }
+
+    if( !(fStat.st_mode & S_IFDIR) )
+        return 0;
+
+    //address is a path to local directory
+
+    //checking, whether address dir contains jpg images
+    DirIterator dirIterator( address );
+
+    //m_dirIterator.setRecursive( true );
+    dirIterator.setEntryTypeFilter( FsEntryType::etRegularFile );
+    dirIterator.setWildCardMask( "*.jp*g" );    //jpg or jpeg
+
+    //reading directory
+    bool isImageLibrary = false;
+    while( dirIterator.next() )
+    {
+        isImageLibrary = true;
+        break;
+    }
+    if( !isImageLibrary )
+        return 0;
+
+    strcpy( cameras[0].url, address );
+    strcpy( cameras[0].uid, address );
+    strcpy( cameras[0].modelName, address );
+
+    return 1;
 }
 
 int DiscoveryManager::fromMDNSData(

@@ -11,6 +11,7 @@
 #include <QStringList>
 
 #include "api/app_server_connection.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 #include "third_party_stream_reader.h"
 #include "third_party_archive_delegate.h"
 
@@ -33,6 +34,16 @@ QnThirdPartyResource::QnThirdPartyResource(
 QnThirdPartyResource::~QnThirdPartyResource()
 {
     stopInputPortMonitoring();
+}
+
+QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
+{
+    QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+    QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    if (hasFlags(still_image) || hasFlags(utc))
+        archiveReader->setCycleMode(false);
+    return archiveReader;
 }
 
 QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
@@ -155,6 +166,37 @@ bool QnThirdPartyResource::setRelayOutputState(
         autoResetTimeoutMS ) == nxcip::NX_NO_ERROR;
 }
 
+static const unsigned int USEC_IN_MS = 1000;
+
+QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel )
+{
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    Q_ASSERT( camManager2 );
+
+    QnTimePeriodList resultTimePeriods;
+
+    nxcip::ArchiveSearchOptions searchOptions;
+    searchOptions.startTime = startTimeMs * USEC_IN_MS;
+    searchOptions.endTime = endTimeMs * USEC_IN_MS;
+    searchOptions.periodDetailLevel = detailLevel;
+    nxcip::TimePeriods* timePeriods = NULL;
+    if( camManager2->find( &searchOptions, &timePeriods ) != nxcip::NX_NO_ERROR || !timePeriods )
+        return resultTimePeriods;
+    camManager2->releaseRef();
+
+    for( timePeriods->goToBeginning(); !timePeriods->atEnd(); timePeriods->next() )
+    {
+        nxcip::UsecUTCTimestamp periodStart = nxcip::INVALID_TIMESTAMP_VALUE;
+        nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
+        timePeriods->get( &periodStart, &periodEnd );
+
+        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+    }
+    timePeriods->releaseRef();
+
+    return resultTimePeriods;
+}
+
 //!Implementation of nxpl::NXPluginInterface::queryInterface
 void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
@@ -260,6 +302,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
+        setParam( lit("dts"), 1, QnDomainMemory );
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )

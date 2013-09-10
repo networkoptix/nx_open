@@ -92,18 +92,18 @@ qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
     return selectedPosition;
 }
 
+static QnDefaultResourceVideoLayout videoLayout;
 //!Implementation of QnAbstractArchiveDelegate::open
 QnResourceVideoLayout* ThirdPartyArchiveDelegate::getVideoLayout()
 {
-    //TODO/IMPL
-    return NULL;
+    return &videoLayout;
 }
 
+static QnEmptyResourceAudioLayout audioLayout;
 //!Implementation of QnAbstractArchiveDelegate::open
 QnResourceAudioLayout* ThirdPartyArchiveDelegate::getAudioLayout()
 {
-    //TODO/IMPL
-    return NULL;
+    return &audioLayout;
 }
 
 //!Implementation of QnAbstractArchiveDelegate::open

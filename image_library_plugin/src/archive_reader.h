@@ -15,12 +15,16 @@
 #include "stream_reader.h"
 
 
+class DirContentsManager;
+
 class ArchiveReader
 :
     public nxcip::DtsArchiveReader
 {
 public:
-    ArchiveReader( const std::string& pictureDirectoryPath );
+    ArchiveReader(
+        const DirContentsManager& dirContentsManager,
+        unsigned int frameDurationUsec );
     virtual ~ArchiveReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -41,7 +45,10 @@ public:
     //!Implementation of nxcip::DtsArchiveReader::endTime
     virtual nxcip::UsecUTCTimestamp endTime() const override;
     //!Implementation of nxcip::DtsArchiveReader::seek
-    virtual int seek( nxcip::UsecUTCTimestamp timestamp, bool findKeyFrame, nxcip::UsecUTCTimestamp* selectedPosition ) override;
+    virtual int seek(
+        nxcip::UsecUTCTimestamp timestamp,
+        bool findKeyFrame,
+        nxcip::UsecUTCTimestamp* selectedPosition ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleReverseMode
     virtual int setReverseMode( bool isReverse, nxcip::UsecUTCTimestamp timestamp ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleMotionData
@@ -50,15 +57,13 @@ public:
     virtual int setQuality( nxcip::MediaStreamQuality quality, bool waitForKeyFrame ) override;
     //!Implementation of nxcip::DtsArchiveReader::setSkipFrames
     virtual int setSkipFrames( nxcip::UsecUTCTimestamp step ) override;
-    //!Implementation of nxcip::DtsArchiveReader::find
-    virtual int find( nxcip::Picture* motionMask, nxcip::TimePeriods** timePeriods ) override;
     //!Implementation of nxcip::DtsArchiveReader::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
 
 private:
     CommonRefManager m_refManager;
-    std::string m_pictureDirectoryPath;
     std::auto_ptr<StreamReader> m_streamReader;
+    const DirContentsManager& m_dirContentsManager;
 };
 
 #endif  //ILP_ARCHIVE_READER_H
