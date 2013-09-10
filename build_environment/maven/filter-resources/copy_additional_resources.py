@@ -94,6 +94,8 @@ else:
                         print (join(lib_source_dir, file))
                         srcname = join(lib_source_dir, file)
                         dstname = join(lib_target_dir, config, file)
+                        if os.path.exists(dstname):
+                            os.unlink(dstname)
                         if os.path.islink(srcname):
                             linkto = os.readlink(srcname)
                             os.symlink(linkto, dstname)

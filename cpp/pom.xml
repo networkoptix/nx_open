@@ -97,7 +97,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>process-with-make</id>
+                        <id>default-cli</id>
                         <phase>process-classes</phase>
                         <goals>
                             <goal>exec</goal>

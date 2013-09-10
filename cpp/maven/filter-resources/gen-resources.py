@@ -114,7 +114,9 @@ if __name__ == '__main__':
         f.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
-        print (' ++++++++++++++++++++++++++++++++generating project file ++++++++++++++++++++++++++++++++')
+        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
+        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
+        execute(['${qt.dir}/bin/qmake -query'])        
         if '${platform}' == 'windows':
             vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
             print(vc_path)
@@ -133,6 +135,6 @@ if __name__ == '__main__':
       #<Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs> \n
     #</CustomBuild>''')
         elif sys.platform == 'linux2':
-            execute(['qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
+            execute(['${qt.dir}/bin/qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
         elif sys.platform == 'darwin':
-            execute(['qmake -spec macx-g++47 CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
+            execute(['${qt.dir}/bin/qmake -spec macx-g++47 CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])

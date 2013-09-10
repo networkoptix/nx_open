@@ -28,17 +28,23 @@ else {
   }
 }
 
-isEmpty(BUILDLIB) {
-DESTDIR = ${libdir}/${arch}/bin/$$CONFIGURATION
+win* {
+  OUTPUT_PATH = ${libdir}/${arch}
 } else {
-  DESTDIR = ${libdir}/${arch}/lib/$$CONFIGURATION
+  OUTPUT_PATH = ${libdir}
+}  
+    
+isEmpty(BUILDLIB) {
+DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+} else {
+  DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
 }  
 
 OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L${libdir}/${arch}/lib/$$CONFIGURATION -L${qt.dir}/lib
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
