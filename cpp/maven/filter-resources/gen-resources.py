@@ -77,8 +77,9 @@ def replace(file,searchExp,replaceExp):
             line = re.sub(r'%s', r'%s', line.rstrip() % (searchExp, replaceExp))
         sys.stdout.write(line)
 
+        
+
 def gen_includepath(file, path):      
-    os.path = posixpath
     for dirs in os.walk(path).next()[1]:
         print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
                     
@@ -108,12 +109,13 @@ if __name__ == '__main__':
         gentext(f, '${project.build.sourceDirectory}', ['.proto'], 'PB_FILES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         gen_includepath(f, '${libdir}/include')
-        gen_includepath(f, '${environment.dir}/include')
+        if '${platform}' == 'windows':
+            gen_includepath(f, '${environment.dir}/include')
         f.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
         print (' ++++++++++++++++++++++++++++++++generating project file ++++++++++++++++++++++++++++++++')
-        if sys.platform == 'win32':
+        if '${platform}' == 'windows':
             vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
             print(vc_path)
             os.environ["path"] += os.pathsep + vc_path

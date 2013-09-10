@@ -96,6 +96,20 @@
                             <workingDirectory>${project.build.directory}</workingDirectory>		
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>process-with-make</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>${project.build.directory}/build.py</argument>
+                            </arguments>                                    
+                            <workingDirectory>${project.build.directory}</workingDirectory>		
+                        </configuration>
+                    </execution>                    
                 </executions>
             </plugin>					
         </plugins>		
@@ -119,7 +133,7 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>	
-                            <execution>
+                           <!-- <execution>
                                 <id>default-cli</id>
                                 <phase>process-classes</phase>
                                 <goals>
@@ -132,7 +146,7 @@
                                         <commandlineArgs>${build.configuration}</commandlineArgs>
                                     </arguments>
                                 </configuration>
-                            </execution>							
+                            </execution>	-->						
                         </executions>
                     </plugin>
                     <plugin>
@@ -249,19 +263,9 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>	
-                            <execution>
-                                <id>process-with-make</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/build.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                </configuration>
-                            </execution>
 
-                            <execution>
+
+                            <!--<execution>
                                 <id>prepare-deb</id>
                                 <phase>prepare-package</phase>
                                 <goals>
@@ -272,7 +276,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>		
                                     <skip>${assembly-skip}</skip>
                                 </configuration>
-                            </execution>
+                            </execution> -->
                         </executions>
                     </plugin>
                 </plugins>	
