@@ -5,15 +5,20 @@
 
 class QnMappedPtzController: public QnProxyPtzController {
     Q_OBJECT;
-public:
-    QnMappedPtzController(const QnPtzControllerPtr &baseController):
-        QnProxyPtzController(baseController)
-    {
-    }
+    typedef QnProxyPtzController base_type;
 
+public:
+    QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController);
+
+    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual int setPosition(const QVector3D &position) override;
+    virtual int getPosition(QVector3D *position) override;
+    virtual int getLimits(QnPtzLimits *limits) override;
 
 private:
     QnPtzControllerPtr m_controller;
+    QnPtzMapperPtr m_mapper;
+    QnPtzLimits m_limits;
 };
 
 
