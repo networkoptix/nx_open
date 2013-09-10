@@ -117,12 +117,12 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
         print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
         print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
-        execute(['${qt.dir}/bin/qmake -query'])        
+        os.system('${qt.dir}/bin/qmake -query')
         if '${platform}' == 'windows':
-            vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
-            print(vc_path)
-            os.environ["path"] += os.pathsep + vc_path
-            os.system('echo %PATH%')
+            #vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
+            #print(vc_path)
+            #os.environ["path"] += os.pathsep + vc_path
+            #os.system('echo %PATH%')
             os.system('${qt.dir}/bin/qmake -spec win32-msvc2012 -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj ${project.build.directory}/${project.artifactId}.pro')
             
             #if '${arch}' == 'x64' and '${force_x86}' == 'false':

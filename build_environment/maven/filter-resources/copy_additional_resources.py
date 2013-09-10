@@ -73,7 +73,10 @@ if get_environment_variable('platform') == 'windows':
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
                         
         for config in ('debug', 'release'):
-            shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), join(target_dir, config, 'vox'))                        
+            target = join(target_dir, config, 'vox')
+            if os.path.exists(target):
+                shutil.rmtree(target)            
+            shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target)                        
             shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))
 
 else:     

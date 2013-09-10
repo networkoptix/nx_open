@@ -133,7 +133,7 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>	
-                           <!-- <execution>
+                            <!-- <execution>
                                 <id>default-cli</id>
                                 <phase>process-classes</phase>
                                 <goals>
@@ -164,7 +164,8 @@
                                     <file>${project.build.sourceDirectory}/${artifactId}-x64.vcxproj</file>
                                     <!-- <excludes>
 										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->									
+									</excludes> -->	
+                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
                                     <replacements>
                                         <replacement>
                                             <token>Win32</token>
