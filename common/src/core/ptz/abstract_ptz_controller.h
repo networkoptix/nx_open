@@ -54,13 +54,13 @@ public:
     /**
      * \param resource                  Resource that this ptz controller belongs to.
      */
-    QnAbstractPtzController(const QnResourcePtr &resource): m_resource(resource) {}
-    virtual ~QnAbstractPtzController() {}
+    QnAbstractPtzController(const QnResourcePtr &resource);
+    virtual ~QnAbstractPtzController();
 
     /**
      * \returns                         Resource that this ptz controller belongs to.
      */
-    QnResourcePtr resource() const { return m_resource.toStrongRef(); }
+    const QnResourcePtr &resource() const { return m_resource; }
 
     /**
      * \returns                         PTZ features that this controller implements.
@@ -138,9 +138,7 @@ public:
     virtual int relativeMove(const QRectF &viewport) = 0;
 
 protected:
-    QWeakPointer<QnResource> m_resource;
+    QnResourcePtr m_resource;
 };
-
-typedef QSharedPointer<QnAbstractPtzController> QnPtzControllerPtr;
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H

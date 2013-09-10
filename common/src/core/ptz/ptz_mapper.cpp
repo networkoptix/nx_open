@@ -1,5 +1,6 @@
 #include "ptz_mapper.h"
 
+#include <utils/math/space_mapper.h>
 #include <utils/common/enum_name_mapper.h>
 
 namespace {

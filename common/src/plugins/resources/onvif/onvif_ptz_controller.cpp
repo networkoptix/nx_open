@@ -143,7 +143,7 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
     return rez;
 }
 
-int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity)
+int QnOnvifPtzController::startMove(const QVector3D &speed)
 {
     if(m_horizontalFlipped)
         xVelocity = -xVelocity;
@@ -164,9 +164,9 @@ int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoom
     request.Velocity->PanTilt = new onvifXsd__Vector2D();
     request.Velocity->Zoom = new onvifXsd__Vector1D();
 
-    request.Velocity->PanTilt->x = normalizeSpeed(xVelocity, m_xNativeVelocityCoeff, getXVelocityCoeff());
-    request.Velocity->PanTilt->y = normalizeSpeed(yVelocity, m_yNativeVelocityCoeff, getYVelocityCoeff());
-    request.Velocity->Zoom->x = normalizeSpeed(zoomVelocity, m_zoomNativeVelocityCoeff, getZoomVelocityCoeff());
+    request.Velocity->PanTilt->x = normalizeSpeed(speed.x(), m_xNativeVelocityCoeff, getXVelocityCoeff());
+    request.Velocity->PanTilt->y = normalizeSpeed(speed.y(), m_yNativeVelocityCoeff, getYVelocityCoeff());
+    request.Velocity->Zoom->x = normalizeSpeed(speed.z(), m_zoomNativeVelocityCoeff, getZoomVelocityCoeff());
 
 
     int rez = ptz.doContinuousMove(request, response);
@@ -192,7 +192,7 @@ void QnOnvifPtzController::setMediaProfileToken(const QString& value)
     m_mediaProfile = value;
 }
 
-int QnOnvifPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
+int QnOnvifPtzController::setPosition(const QVector3D &position)
 {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
@@ -209,17 +209,17 @@ int QnOnvifPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     request.Position->PanTilt = new onvifXsd__Vector2D();
     if (zoomPos != INT_MAX)
         request.Position->Zoom = new onvifXsd__Vector1D();
-    request.Position->PanTilt->x = xPos;
-    request.Position->PanTilt->y = yPos;
+    request.Position->PanTilt->x = position.x();
+    request.Position->PanTilt->y = position.y();
     if (request.Position->Zoom)
-        request.Position->Zoom->x = zoomPos;
+        request.Position->Zoom->x = position.z();
 
-    request.Speed  = new onvifXsd__PTZSpeed();
-    request.Speed ->PanTilt = new onvifXsd__Vector2D();
-    request.Speed ->Zoom = new onvifXsd__Vector1D();
-    request.Speed ->PanTilt->x = 1.0;
-    request.Speed ->PanTilt->y = 1.0;
-    request.Speed ->Zoom->x = 1.0;
+    request.Speed = new onvifXsd__PTZSpeed();
+    request.Speed->PanTilt = new onvifXsd__Vector2D();
+    request.Speed->Zoom = new onvifXsd__Vector1D();
+    request.Speed->PanTilt->x = 1.0;
+    request.Speed->PanTilt->y = 1.0;
+    request.Speed->Zoom->x = 1.0;
 
     int rez = ptz.doAbsoluteMove(request, response);
     if (rez != SOAP_OK)
@@ -239,7 +239,7 @@ int QnOnvifPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     return rez;
 }
 
-int QnOnvifPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
+int QnOnvifPtzController::getPosition(QVector3D *position)
 {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
@@ -251,7 +251,7 @@ int QnOnvifPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
         request.ProfileToken = m_mediaProfile.toStdString();
     }
 
-    *xPos = *yPos = *zoomPos = 0;
+    *position = QVector3D();
 
     int rez = ptz.doGetStatus(request, response);
     if (rez != SOAP_OK)
@@ -261,11 +261,11 @@ int QnOnvifPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     else {
         if (response.PTZStatus && response.PTZStatus->Position && response.PTZStatus->Position->PanTilt)
         {
-            *xPos = response.PTZStatus->Position->PanTilt->x;
-            *yPos = response.PTZStatus->Position->PanTilt->y;
+            position->setX(response.PTZStatus->Position->PanTilt->x);
+            position->setY(response.PTZStatus->Position->PanTilt->y);
         }
         if (response.PTZStatus && response.PTZStatus->Position && response.PTZStatus->Position->Zoom)
-            *zoomPos = response.PTZStatus->Position->Zoom->x;
+            position->setZ(response.PTZStatus->Position->Zoom->x);
     }
 
     return rez;

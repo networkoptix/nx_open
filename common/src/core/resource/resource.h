@@ -17,7 +17,7 @@
 #include "param.h"
 #include "resource_type.h"
 #include "shared_resource_pointer.h"
-#include "interface/abstract_ptz_controller.h"
+#include <core/ptz/abstract_ptz_controller.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;

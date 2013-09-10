@@ -1,8 +1,8 @@
 #ifndef QN_DW_ZOOM_PTZ_CONTROLLER_H
 #define QN_DW_ZOOM_PTZ_CONTROLLER_H
 
-#include <core/resource/interface/abstract_ptz_controller.h>
-#include "core/resource/media_resource.h"
+#include <core/ptz/abstract_ptz_controller.h>
+#include <core/resource/media_resource.h>
 
 
 class QnDwZoomPtzController: public QnAbstractPtzController {

@@ -2,6 +2,7 @@
 #define QN_MAPPED_PTZ_CONTROLLER_H
 
 #include "proxy_ptz_controller.h"
+#include "ptz_mapper.h"
 
 class QnMappedPtzController: public QnProxyPtzController {
     Q_OBJECT;

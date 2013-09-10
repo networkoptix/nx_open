@@ -6,7 +6,7 @@
 #include <QtGui/QMatrix4x4>
 
 #include "core/resource/resource_fwd.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
+#include "core/ptz/abstract_ptz_controller.h"
 
 class QnPtzSpaceMapper;
 
@@ -15,12 +15,12 @@ class QnOnvifPtzController: public QnAbstractPtzController {
 public:
     QnOnvifPtzController(QnPlOnvifResource* resource);
 
-    virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
+    virtual int startMove(const QVector3D &speed) override;
     virtual int stopMove() override;
-    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
-    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
+    virtual int setPosition(const QVector3D &position) override;
+    virtual int getPosition(QVector3D *position) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual const QnPtzSpaceMapper *getSpaceMapper() override;
+    //virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
     // TODO: #Elric need to implement this one properly.
     void setFlipped(bool horizontal, bool vertical);

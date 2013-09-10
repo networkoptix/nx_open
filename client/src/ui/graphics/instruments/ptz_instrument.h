@@ -13,7 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "drag_processing_instrument.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
+#include "core/ptz/abstract_ptz_controller.h"
 
 class FixedArSelectionItem;
 class QnSplashItem;

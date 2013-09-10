@@ -203,16 +203,16 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-int QnAxisPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) {
+int QnAxisPtzController::startMove(const QVector3D &speed) {
      // TODO: #Elric *90? Just move all logical-physical transformations to mediaserver.
-    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(xVelocity * 90).arg(yVelocity * 90).arg(zoomVelocity));
+    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
 }
 
-int QnAxisPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) {
-    return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(xPos).arg(yPos).arg(zoomPos));
+int QnAxisPtzController::setPosition(const QVector3D &position) {
+    return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(position.z()));
 }
 
-int QnAxisPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) {
+int QnAxisPtzController::getPosition(QVector3D *position) {
     QnAxisParameterMap params;
     int status = !query(lit("com/ptz.cgi?query=position"), &params);
     if(status != 0)
@@ -220,9 +220,9 @@ int QnAxisPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) {
 
     qreal pan, tilt, zoom;
     if(params.value("pan", &pan) && params.value("tilt", &tilt) && params.value("zoom", &zoom)) {
-        *xPos = pan;
-        *yPos = tilt;
-        *zoomPos = zoom;
+        position->setX(pan);
+        position->setY(tilt);
+        position->setZ(zoom);
     } else {
         qnWarning("Failed to get PTZ position from camera %1. Malformed response.", m_resource->getName());
         return 1;

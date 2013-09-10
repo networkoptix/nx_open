@@ -225,29 +225,29 @@ int QnActiPtzController::stopMove()
     return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }
 
-int QnActiPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) 
+int QnActiPtzController::startMove(const QVector3D &speed) 
 {
     QMutexLocker lock(&m_mutex);
 
     int errCode1 = 0, errCode2 = 0;
 
-    if (zoomVelocity) 
-        errCode1 = startZoomInternal(zoomVelocity);
-    if (xVelocity || yVelocity) 
-        errCode2 = startMoveInternal(xVelocity, yVelocity);
+    if (!qFuzzyIsNull(speed.z())) 
+        errCode1 = startZoomInternal(speed.z());
+    if (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y())) 
+        errCode2 = startMoveInternal(speed.x(), speed.y());
 
     return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }
 
-int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) 
+int QnActiPtzController::setPosition(const QVector3D &position) 
 {
     QMutexLocker lock(&m_mutex);
 
-    zoomPos = qMax(0.0, (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
+    qreal zoomPos = qMax(0.0, (position.z()-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
 
     CLHttpStatus status;
 
-    QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION=ABSOLUTE,%1,%2,5,5").arg(int(xPos)).arg(int(yPos)), status);
+    QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION=ABSOLUTE,%1,%2,5,5").arg(int(position.x())).arg(int(position.y())), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
 
@@ -258,11 +258,13 @@ int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     return 0;
 }
 
-int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) 
+int QnActiPtzController::getPosition(QVector3D *position) 
 {
     QMutexLocker lock(&m_mutex);
 
     CLHttpStatus status;
+
+    *position = QVector3D();
 
     QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION_GET"), status);
     if (status != CL_HTTP_SUCCESS)
@@ -270,14 +272,14 @@ int QnActiPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
     QList<QByteArray> params = result.split(',');
     if (params.size() != 2)
         return -2;
-    *xPos = params[0].toInt();
-    *yPos = params[1].toInt();
+    position->setX(params[0].toInt());
+    position->setY(params[1].toInt());
 
     result = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_POSITION"), status);
     if (status != CL_HTTP_SUCCESS)
         return -1;
-    
-    *zoomPos = result.toInt();
+
+    position->setZ(result.toInt());
 
     return 0;
 }

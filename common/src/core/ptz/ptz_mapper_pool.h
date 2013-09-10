@@ -5,7 +5,7 @@
 #include <QtCore/QList>
 #include <QtCore/QHash>
 
-class QnPtzSpaceMapper;
+
 
 /**
  * Pool for manually created ptz mappers.

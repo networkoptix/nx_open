@@ -3,7 +3,7 @@
 
 #include <QVector3D>
 
-#include <core/resource/interface/abstract_ptz_controller.h>
+#include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/dewarping_params.h>
 
 class QnResourceWidgetRenderer;
@@ -11,13 +11,17 @@ class QnResourceWidgetRenderer;
 class QnVirtualPtzController: public QnAbstractPtzController {
     Q_OBJECT
 public:
-    QnVirtualPtzController(QnResource* resource): QnAbstractPtzController(resource), m_animationEnabled(false) {}
+    QnVirtualPtzController(const QnResourcePtr &resource): QnAbstractPtzController(resource), m_animationEnabled(false) {}
 
     bool isAnimationEnabled() const { return m_animationEnabled; }
     void setAnimationEnabled(bool animationEnabled) { m_animationEnabled = animationEnabled; }
 
     virtual void changePanoMode() = 0;
     virtual QString getPanoModeText() const = 0;
+
+    virtual void setEnabled(bool value) = 0;
+    virtual bool isEnabled() const = 0;
+
 private:
     bool m_animationEnabled;
 };
@@ -28,12 +32,12 @@ public:
     QnFisheyePtzController(QnResource* resource);
     virtual ~QnFisheyePtzController();
 
-    virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
+    virtual int startMove(const QVector3D &speed) override;
     virtual int stopMove() override;
-    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
-    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
+    virtual int setPosition(const QVector3D &position) override;
+    virtual int getPosition(QVector3D *position) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual const QnPtzSpaceMapper *getSpaceMapper() override;
+    //virtual const QnPtzSpaceMapper *getSpaceMapper() override;
 
     void addRenderer(QnResourceWidgetRenderer* renderer);
     //void setAspectRatio(float aspectRatio);
@@ -69,7 +73,7 @@ private:
     DewarpingParams m_dstPos;
     qint64 m_lastTime;
     bool m_moveToAnimation;
-    QnPtzSpaceMapper* m_spaceMapper;
+    //QnPtzSpaceMapper* m_spaceMapper;
 
     struct SpaceRange {
         SpaceRange(): min(0.0), max(0.0) {}

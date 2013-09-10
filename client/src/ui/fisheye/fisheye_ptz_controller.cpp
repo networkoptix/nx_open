@@ -69,9 +69,9 @@ void QnFisheyePtzController::addRenderer(QnResourceWidgetRenderer* renderer)
     m_renderer->setFisheyeController(this);
 }
 
-int QnFisheyePtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity)
+int QnFisheyePtzController::startMove(const QVector3D &speed)
 {
-    m_motion = QVector3D(xVelocity, yVelocity, zoomVelocity);
+    m_motion = speed;
     m_lastTime = getUsecTimer();
     m_moveToAnimation = false;
     return 0;
@@ -104,14 +104,14 @@ qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov, qreal aspectRa
         return qBound(m_yRange.min, value, m_yRange.max - yFov);
 }
 
-int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
+int QnFisheyePtzController::setPosition(const QVector3D &position)
 {
     m_motion = QVector3D();
 
-    m_dstPos.fov = qBound(MIN_FOV, zoomPos, MAX_FOV * m_dewarpingParams.panoFactor);
+    m_dstPos.fov = qBound(MIN_FOV, position.z(), MAX_FOV * m_dewarpingParams.panoFactor);
 
-    m_dstPos.xAngle = boundXAngle(gradToRad(xPos), m_dstPos.fov);
-    m_dstPos.yAngle = boundYAngle(gradToRad(yPos), m_dstPos.fov, m_dewarpingParams.panoFactor*m_lastAR, m_dewarpingParams.viewMode);
+    m_dstPos.xAngle = boundXAngle(gradToRad(position.x()), m_dstPos.fov);
+    m_dstPos.yAngle = boundYAngle(gradToRad(position.y()), m_dstPos.fov, m_dewarpingParams.panoFactor*m_lastAR, m_dewarpingParams.viewMode);
     m_srcPos = m_dewarpingParams;
 
     if (m_dstPos.xAngle - m_srcPos.xAngle > M_PI)
@@ -123,11 +123,11 @@ int QnFisheyePtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
     return 0;
 }
 
-int QnFisheyePtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
+int QnFisheyePtzController::getPosition(QVector3D *position)
 {
-    *xPos = radToGrad(m_dewarpingParams.xAngle);
-    *yPos = radToGrad(m_dewarpingParams.yAngle);
-    *zoomPos = m_dewarpingParams.fov;
+    position->setX(radToGrad(m_dewarpingParams.xAngle));
+    position->setY(radToGrad(m_dewarpingParams.yAngle));
+    position->setZ(m_dewarpingParams.fov);
 
     return 0;
 }
