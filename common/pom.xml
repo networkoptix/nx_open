@@ -22,9 +22,9 @@
 
 	<properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
-		<!--Global libs-->
+	<!--Global libs-->
         <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
-		<global.libs/>
+		<global.libs>-lprotobuf -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lsigar -lonvif -lssl</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
 		<linux.oslibs></linux.oslibs>
