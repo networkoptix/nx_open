@@ -18,6 +18,12 @@ public:
     qreal cellAspectRatio;
     QSizeF cellSpacing;
 
+    QSize backgroundSize;
+    QString backgroundImageFilename;
+    qreal backgroundOpacity;
+
+    bool locked;
+
     friend bool operator==(const QnWorkbenchLayoutSnapshot &l, const QnWorkbenchLayoutSnapshot &r);
 };
 
