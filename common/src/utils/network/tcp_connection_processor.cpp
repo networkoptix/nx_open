@@ -10,6 +10,8 @@
 #   include <netinet/tcp.h>
 #endif
 
+#include "ssl_socket.h"
+
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 

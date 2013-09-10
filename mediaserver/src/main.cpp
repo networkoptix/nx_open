@@ -97,6 +97,7 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
+#include "utils/network/ssl_socket.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -859,6 +860,16 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
 
+    QFile f(QLatin1String(":/cert.pem"));
+    if (!f.open(QIODevice::ReadOnly)) 
+    {
+        qWarning() << "No SSL sertificate for mediaServer!";
+    }
+    else {
+        QByteArray certData = f.readAll();
+        QnSSLSocket::initSSLEngine(certData);
+    }
+
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -1185,6 +1196,8 @@ void QnMain::run()
     // This method will set flag on message channel to threat next connection close as normal
     appServerConnection->disconnectSync();
     qSettings.setValue("lastRunningTime", 0);
+
+    QnSSLSocket::releaseSSLEngine();
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
