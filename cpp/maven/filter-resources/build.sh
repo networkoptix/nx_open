@@ -3,6 +3,8 @@
 CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
 
+export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
+
 case `uname -s` in
     "Linux")
         PLATFORM=linux

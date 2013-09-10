@@ -107,5 +107,8 @@ else:
 
         for qtplugin in qtplugins:
             if qtplugin != '':
-                print join(plugin_source_dir, qtplugin)
-                shutil.copytree(join(plugin_source_dir, qtplugin), join(target_dir, config, qtplugin))                          
+                target = join(target_dir, config, qtplugin)
+                print target
+                if os.path.exists(target):
+                    shutil.rmtree(target)
+                shutil.copytree(join(plugin_source_dir, qtplugin), target)                          

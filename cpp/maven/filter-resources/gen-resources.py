@@ -84,7 +84,8 @@ def gen_includepath(file, path):
         print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
                     
 if __name__ == '__main__':
-    os.system('mkdir build')
+    if not os.path.exists('${project.build.directory}/build'):
+        os.makedirs('${project.build.directory}/build') 
     gencomp_cpp(open('${project.build.sourceDirectory}/compatibility_info.cpp', 'w'))
     if not os.path.exists(translations_target_dir):
         os.makedirs(translations_target_dir) 
