@@ -174,6 +174,8 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket):
     BIO_set_nbio(d->write, 1);
 
     d->ssl = SSL_new(sslCTX);  // get new SSL state with context 
+    SSL_set_verify(d->ssl, SSL_VERIFY_NONE, NULL);
+    SSL_set_session_id_context(d->ssl, sid, 4);
     SSL_set_bio(d->ssl, d->read, d->write);
 }
 
@@ -192,8 +194,6 @@ bool QnSSLSocket::doServerHandshake()
 {
     Q_D(QnSSLSocket);
     SSL_set_accept_state(d->ssl);
-    SSL_set_verify(d->ssl, SSL_VERIFY_NONE, NULL);
-    SSL_set_session_id_context(d->ssl, sid, 4);
 
     return SSL_do_handshake(d->ssl) == 1;
 }
@@ -202,8 +202,6 @@ bool QnSSLSocket::doClientHandshake()
 {
     Q_D(QnSSLSocket);
     SSL_set_connect_state(d->ssl);
-    SSL_set_verify(d->ssl, SSL_VERIFY_NONE, NULL);
-    SSL_set_session_id_context(d->ssl, sid, 4);
 
     return SSL_do_handshake(d->ssl) == 1;
 }
