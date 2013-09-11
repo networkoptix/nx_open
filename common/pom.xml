@@ -24,7 +24,7 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
 	<!--Global libs-->
         <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
-		<global.libs>-lprotobuf -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lsigar -lonvif -lFestival -lestbase -lestools -leststring</global.libs>
+		<global.libs>-lprotobuf -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lsigar -lonvif</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
 		<linux.oslibs>-lssl</linux.oslibs>
