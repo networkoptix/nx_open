@@ -116,12 +116,12 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
         print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
         print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
-        os.system('${qt.dir}/bin/qmake -query')
+        execute(['${qt.dir}/bin/qmake -query'])        
         if '${platform}' == 'windows':
-            #vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
-            #print(vc_path)
-            #os.environ["path"] += os.pathsep + vc_path
-            #os.system('echo %PATH%')
+            vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
+            print(vc_path)
+            os.environ["path"] += os.pathsep + vc_path
+            os.system('echo %PATH%')
             os.system('${qt.dir}/bin/qmake -spec win32-msvc2012 -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj ${project.build.directory}/${project.artifactId}.pro')
             
             #if '${arch}' == 'x64' and '${force_x86}' == 'false':
@@ -135,6 +135,7 @@ if __name__ == '__main__':
       #<Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs> \n
     #</CustomBuild>''')
         elif sys.platform == 'linux2':
+            os.environ["LD_LIBRARY_PATH"] = '${qt.dir}/lib'
             execute(['${qt.dir}/bin/qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
         elif sys.platform == 'darwin':
             execute(['${qt.dir}/bin/qmake -spec macx-g++47 CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
