@@ -20,7 +20,7 @@ void QnDesktopCameraRegistrator::run()
 
     parseRequest();
     sendResponse("HTTP", 200, QByteArray());
-    QString userName = d->requestHeaders.value("user-name");
+    QByteArray userName = d->request.headers["user-name"];
     QnDesktopCameraResourceSearcher::instance().registerCamera(d->socket, userName);
         d->socket = 0; // remove ownership from socket
 }
