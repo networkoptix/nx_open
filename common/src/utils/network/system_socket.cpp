@@ -110,7 +110,7 @@ bool Socket::bindToInterface( const QnInterfaceAndAddr& iface )
 {
 #ifdef Q_OS_LINUX
     setLocalPort(0);
-    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length()) >= 0;
+    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length()) >= 0;
 #else
     bool res = setLocalAddressAndPort(iface.address.toString(), 0);
 #endif
