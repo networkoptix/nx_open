@@ -16,9 +16,9 @@
 
     <properties>
         <!--Global libs-->
-        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -llibprotobuf</global.libs>
+        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lprotobuf</global.libs>
         <!--Specific os libs used-->
-        <qt.libs>core network multimedia concurrent</qt.libs>
+        <qt.libs>core network multimedia concurrent xml</qt.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32 -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>  
@@ -29,6 +29,6 @@
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
-        <mac.defines/>		
+        <mac.defines/>
     </properties>  
 </project>
