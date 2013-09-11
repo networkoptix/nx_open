@@ -1,4 +1,3 @@
-
 #ifndef GRAPHICS_WIDGET_SCENE_DATA_H
 #define GRAPHICS_WIDGET_SCENE_DATA_H
 
@@ -11,25 +10,40 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsWidget>
 
+#include "graphics_widget.h"
 
 class GraphicsWidgetSceneData: public QObject {
-
-    Q_OBJECT
+    Q_OBJECT;
 public:
     /** Event type for scene-wide layout requests. */
     static const QEvent::Type HandlePendingLayoutRequests = static_cast<QEvent::Type>(QEvent::User + 0x19FA);
 
-    GraphicsWidgetSceneData(QGraphicsScene *scene, QObject *parent = NULL);
+    GraphicsWidgetSceneData(QGraphicsScene *scene, QObject *parent = NULL): 
+        QObject(parent), 
+        scene(scene) 
+    {
+        assert(scene);
+    }
 
-    virtual bool event(QEvent *event) override;
+    virtual ~GraphicsWidgetSceneData() {
+        return;
+    }
 
-    QGraphicsScene *scene;
+    virtual bool event(QEvent *event) override {
+        if(event->type() == HandlePendingLayoutRequests) {
+            if(scene)
+                GraphicsWidget::handlePendingLayoutRequests(scene.data());
+            return true;
+        } else {
+            return QObject::event(event);
+        }
+    }
+
+    QPointer<QGraphicsScene> scene;
     QHash<QGraphicsItem *, QPointF> movingItemsInitialPositions;
     QSet<QGraphicsWidget *> pendingLayoutWidgets;
-
-    QHash<QGraphicsWidget *, const char *> names;
 };
 
-//Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
+Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
 
 #endif	//GRAPHICS_WIDGET_SCENE_DATA_H

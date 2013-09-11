@@ -1,5 +1,5 @@
 #include "desktop_resource.h"
-#include "device_plugins/desktop_win/desktop_data_provider.h"
+#include "device_plugins/desktop_windows_specific/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "ui/style/skin.h"
 #include "core/resource/media_server_resource.h"

@@ -12,8 +12,8 @@
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
-#   include <device_plugins/desktop_win/screen_grabber.h>
-#   include <device_plugins/desktop_win/desktop_file_encoder.h>
+#   include <device_plugins/desktop_windows_specific/screen_grabber.h>
+#   include <device_plugins/desktop_windows_specific/desktop_file_encoder.h>
 #endif
 
 #include <utils/common/warnings.h>

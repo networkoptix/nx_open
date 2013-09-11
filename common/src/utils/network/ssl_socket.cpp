@@ -150,8 +150,9 @@ void QnSSLSocket::releaseSSLEngine()
     }
 }
 
-struct QnSSLSocketPrivate
+class QnSSLSocketPrivate
 {
+public:
     AbstractStreamSocket* wrappedSocket;
     SSL* ssl;
     BIO* read;

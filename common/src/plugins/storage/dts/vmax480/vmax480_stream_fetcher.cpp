@@ -1,4 +1,7 @@
 #include "vmax480_stream_fetcher.h"
+
+#include <QtCore/QCoreApplication>
+
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 #include "core/resource/network_resource.h"

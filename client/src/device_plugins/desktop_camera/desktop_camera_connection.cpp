@@ -2,7 +2,7 @@
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
-#include "../desktop_win/device/desktop_resource.h"
+#include "../desktop_windows_specific/device/desktop_resource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 
 
@@ -102,8 +102,8 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
 void QnDesktopCameraConnectionProcessor::processRequest()
 {
     Q_D(QnDesktopCameraConnectionProcessor);
-    QString method = d->requestHeaders.method();
-    if (method == lit("PLAY"))
+    QByteArray method = d->request.requestLine.method;
+    if (method == "PLAY")
     {
         if (d->dataProvider == 0) {
             d->dataProvider = d->desktop->createDataProvider(QnResource::Role_Default);
@@ -113,15 +113,15 @@ void QnDesktopCameraConnectionProcessor::processRequest()
             d->dataProvider->start();
         }
     }
-    else if (method == lit("TEARDOWN"))
+    else if (method == "TEARDOWN")
     {
         disconnectInternal();
     }
-    else if (method == lit("KEEP-ALIVE"))
+    else if (method == "KEEP-ALIVE")
     {
         // nothing to do. we restarting timer on any request
     }
-    d->responseHeaders.setValue(lit("cSeq"), d->requestHeaders.value(lit("cSeq")));
+    d->response.headers.insert(std::make_pair("cSeq", d->request.headers["cSeq"]));
     //QMutexLocker lock(&d->sendMutex);
     //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
