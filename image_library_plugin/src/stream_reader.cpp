@@ -16,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <QDebug>
+
 #include <fstream>
 #include <memory>
 
@@ -41,7 +43,8 @@ StreamReader::StreamReader(
     m_frameDuration( frameDurationUsec ),
     m_liveMode( liveMode ),
     m_streamReset( true ),
-    m_nextFrameDeployTime( 0 )
+    m_nextFrameDeployTime( 0 ),
+    m_isReverse( false )
 {
     readDirContents();
 
@@ -86,6 +89,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     nxcip::UsecUTCTimestamp curTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     bool streamReset = false;
     std::string fileName;
+    bool isReverse = false;
 
     {
         Mutex::ScopedLock lk( &m_mutex );
@@ -96,17 +100,21 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             return nxcip::NX_NO_ERROR;    //end-of-data
         }
 
+        //copying data for consistency
         curTimestamp = m_curTimestamp;
         streamReset = m_streamReset;
         if( m_streamReset )
             m_streamReset = false;
         fileName = m_curPos->second;
+        isReverse = m_isReverse;
     }
 
     std::auto_ptr<ILPVideoPacket> packet( new ILPVideoPacket(
         m_encoderNumber,
         curTimestamp,
-        nxcip::MediaDataPacket::fKeyPacket | (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0)) );
+        nxcip::MediaDataPacket::fKeyPacket |
+            (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0) |
+            (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0) ) );
 
     struct stat fStat;
     memset( &fStat, 0, sizeof(fStat) );
@@ -139,6 +147,8 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
     f.close();
 
+    //qDebug()<<"Produced packet for file "<<QString::fromStdString(fileName)<<", ts "<<packet->timestamp();
+
     {
         Mutex::ScopedLock lk( &m_mutex );
         moveCursorToNextFrame();
@@ -162,15 +172,41 @@ nxcip::UsecUTCTimestamp StreamReader::setPosition( nxcip::UsecUTCTimestamp times
 
     if( m_dirEntries.empty() )
         return nxcip::INVALID_TIMESTAMP_VALUE;
-    std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator it = m_dirEntries.upper_bound( timestamp );
-    if( it != m_dirEntries.begin() )
-        --it;   //taking frame before requested
+
+    std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator it = m_dirEntries.begin();
+    if( m_isReverse )
+    {
+        it = m_dirEntries.lower_bound( timestamp );
+        if( it == m_dirEntries.end() )
+            --it;   //taking last frame
+    }
+    else
+    {
+        it = m_dirEntries.upper_bound( timestamp );
+        if( it != m_dirEntries.begin() )
+            --it;   //taking frame before requested
+    }
 
     m_curPos = it;
     m_curTimestamp = it->first;
     m_streamReset = true;
 
     return m_curTimestamp;
+}
+
+nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
+    bool isReverse,
+    nxcip::UsecUTCTimestamp timestamp )
+{
+    Mutex::ScopedLock lk( &m_mutex );
+
+    if( m_isReverse == isReverse && timestamp == nxcip::INVALID_TIMESTAMP_VALUE )
+        return m_curTimestamp;
+
+    qDebug()<<"Switched to"<<(isReverse ? "reverse" : "forward")<<"stream, ts "<<timestamp;
+
+    m_isReverse = isReverse;
+    return timestamp == nxcip::INVALID_TIMESTAMP_VALUE ? m_curTimestamp : setPosition( timestamp );
 }
 
 void StreamReader::doLiveDelay()
@@ -206,11 +242,31 @@ void StreamReader::readDirContents()
 
 void StreamReader::moveCursorToNextFrame()
 {
-    m_curTimestamp += m_frameDuration;
-    ++m_curPos;
+    if( m_isReverse )
+    {
+        if( m_curPos == m_dirEntries.begin() )
+        {
+            m_curPos = m_dirEntries.end();
+            return;
+        }
+        else
+        {
+            --m_curPos;
+        }
+    }
+    else
+    {
+        ++m_curPos;
+    }
+
     if( m_liveMode && m_curPos == m_dirEntries.end() )
     {
         readDirContents();
         m_curPos = m_dirEntries.begin();
     }
+
+    if( m_liveMode )
+        m_curTimestamp += m_frameDuration;
+    else
+        m_curTimestamp = m_curPos != m_dirEntries.end() ? m_curPos->first : nxcip::INVALID_TIMESTAMP_VALUE;
 }

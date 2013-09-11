@@ -10,13 +10,16 @@
 #include "third_party_stream_reader.h"
 
 
+static QAtomicInt ThirdPartyArchiveDelegate_count = 0;
+
 ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     const QnResourcePtr& resource,
     nxcip::DtsArchiveReader* archiveReader )
 :
     m_resource( resource ),
     m_archiveReader( archiveReader ),
-    m_streamReader( NULL )
+    m_streamReader( NULL ),
+    m_reverseModeEnabled( false )
 {
     unsigned int caps = m_archiveReader->getCapabilities();
     if( caps & nxcip::DtsArchiveReader::reverseGopModeCapability )
@@ -28,6 +31,8 @@ ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     m_flags |= QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
     m_flags |= QnAbstractArchiveDelegate::Flag_CanOfflineLayout;
     m_flags |= QnAbstractArchiveDelegate::Flag_UnsyncTime;
+
+    ThirdPartyArchiveDelegate_count.fetchAndAddOrdered( 1 );
 }
 
 ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
@@ -35,9 +40,10 @@ ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
     if( m_streamReader )
         m_streamReader->releaseRef();
     m_archiveReader->releaseRef();
+
+    ThirdPartyArchiveDelegate_count.fetchAndAddOrdered( -1 );
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
 {
     if( m_resource != resource )
@@ -53,7 +59,6 @@ bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
     return true;
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 void ThirdPartyArchiveDelegate::close()
 {
     if( m_streamReader )
@@ -63,19 +68,16 @@ void ThirdPartyArchiveDelegate::close()
     }
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 qint64 ThirdPartyArchiveDelegate::startTime()
 {
     return m_archiveReader->startTime();
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 qint64 ThirdPartyArchiveDelegate::endTime()
 {
     return m_archiveReader->endTime();
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
 {
     if( !m_streamReader )
@@ -83,42 +85,49 @@ QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
     return ThirdPartyStreamReader::readStreamReader( m_streamReader );
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
 {
     nxcip::UsecUTCTimestamp selectedPosition = 0;
-    if( m_archiveReader->seek( time, findIFrame, &selectedPosition ) != nxcip::NX_NO_ERROR )
+    int res = m_reverseModeEnabled
+        ? m_archiveReader->setReverseMode( false, time, &selectedPosition )
+        : m_archiveReader->seek( time, findIFrame, &selectedPosition );
+    if( res != nxcip::NX_NO_ERROR )
         return nxcip::INVALID_TIMESTAMP_VALUE;
+    m_reverseModeEnabled = false;
     return selectedPosition;
 }
 
 static QnDefaultResourceVideoLayout videoLayout;
-//!Implementation of QnAbstractArchiveDelegate::open
 QnResourceVideoLayout* ThirdPartyArchiveDelegate::getVideoLayout()
 {
     return &videoLayout;
 }
 
 static QnEmptyResourceAudioLayout audioLayout;
-//!Implementation of QnAbstractArchiveDelegate::open
 QnResourceAudioLayout* ThirdPartyArchiveDelegate::getAudioLayout()
 {
     return &audioLayout;
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
 {
-    m_archiveReader->setReverseMode( value, displayTime );
+    nxcip::UsecUTCTimestamp actualSelectedTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
+    if( m_archiveReader->setReverseMode(
+            value,
+            (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
+                ? nxcip::INVALID_TIMESTAMP_VALUE
+                : displayTime,
+            &actualSelectedTimestamp ) == nxcip::NX_NO_ERROR )
+    {
+        m_reverseModeEnabled = true;
+    }
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 void ThirdPartyArchiveDelegate::setSingleshotMode( bool /*value*/ )
 {
     //TODO/IMPL
 }
 
-//!Implementation of QnAbstractArchiveDelegate::open
 bool ThirdPartyArchiveDelegate::setQuality( MediaQuality quality, bool fastSwitch )
 {
     return m_archiveReader->setQuality(

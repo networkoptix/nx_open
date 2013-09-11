@@ -906,11 +906,12 @@ namespace nxcip
             If \a timestamp is not equal to \a INVALID_TIMESTAMP_VALUE, seek is performed along with playback direction change
             \param[in] isReverse If true, playback 
             \param[in] position if not \a INVALID_TIMESTAMP_VALUE, playback SHOULD jump to this position (with rules, defined for \a DtsArchiveReader::seek)
+            \param[out] selectedPosition Timestamp of actually selected position
             \note This method is used only if \a DtsArchiveReader::reverseModeCapability is supported
             \return \a NX_NO_ERROR on success, otherwise - error code
             \note This funtionality is optional
         */
-        virtual int setReverseMode( bool isReverse, UsecUTCTimestamp timestamp ) = 0;
+        virtual int setReverseMode( bool isReverse, UsecUTCTimestamp timestamp, UsecUTCTimestamp* selectedPosition ) = 0;
         //!Toggle motion data in media stream on/off
         /*!
             \return \a NX_NO_ERROR on success, otherwise - error code

@@ -290,10 +290,14 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     mediaPacket->compressionType = toFFmpegCodecID( packet->codecType() );
     mediaPacket->channelNumber = packet->channelNumber();
     mediaPacket->timestamp = packet->timestamp();
+    qDebug()<<"Produced packet, ts "<<mediaPacket->timestamp;
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
         mediaPacket->flags |= AV_PKT_FLAG_KEY;
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
+    {
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_ReverseReordered;
+    }
     if( packet->flags() & nxcip::MediaDataPacket::fReverseBlockStart )
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
     if( packet->flags() & nxcip::MediaDataPacket::fLowQuality )
@@ -301,8 +305,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     if( packet->flags() & nxcip::MediaDataPacket::fStreamReset )
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_BOF;
 
-
-    mediaPacket->flags |= QnAbstractMediaData::MediaFlags_StillImage;
     //QnMediaContextPtr context;
     //int opaque;
 

@@ -22,25 +22,25 @@ public:
 
     //!Implementation of QnAbstractArchiveDelegate::open
     virtual bool open( QnResourcePtr resource ) override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::close
     virtual void close() override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::startTime
     virtual qint64 startTime() override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::endTime
     virtual qint64 endTime() override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::getNextData
     virtual QnAbstractMediaDataPtr getNextData() override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::seek
     virtual qint64 seek( qint64 time, bool findIFrame ) override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::getVideoLayout
     virtual QnResourceVideoLayout* getVideoLayout() override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::getAudioLayout
     virtual QnResourceAudioLayout* getAudioLayout() override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::onReverseMode
     virtual void onReverseMode( qint64 displayTime, bool value ) override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::setSingleshotMode
     virtual void setSingleshotMode( bool value ) override;
-    //!Implementation of QnAbstractArchiveDelegate::open
+    //!Implementation of QnAbstractArchiveDelegate::setQuality
     virtual bool setQuality( MediaQuality quality, bool fastSwitch ) override;
     //!Implementation of QnAbstractArchiveDelegate::setRange
     virtual void setRange( qint64 startTime, qint64 endTime, qint64 frameStep ) override;
@@ -51,6 +51,7 @@ private:
     QnResourcePtr m_resource;
     nxcip::DtsArchiveReader* m_archiveReader;
     nxcip::StreamReader* m_streamReader;
+    bool m_reverseModeEnabled;
 };
 
 #endif  //THIRD_PARTY_ARCHIVE_DELEGATE_H

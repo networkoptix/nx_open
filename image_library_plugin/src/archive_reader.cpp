@@ -108,10 +108,13 @@ int ArchiveReader::seek(
 }
 
 //!Implementation of nxcip::DtsArchiveReader::setReverseMode
-int ArchiveReader::setReverseMode( bool /*isReverse*/, nxcip::UsecUTCTimestamp /*timestamp*/ )
+int ArchiveReader::setReverseMode(
+    bool isReverse,
+    nxcip::UsecUTCTimestamp timestamp,
+    nxcip::UsecUTCTimestamp* selectedPosition )
 {
-    //TODO/IMPL
-    return nxcip::NX_NOT_IMPLEMENTED;
+    *selectedPosition = m_streamReader->setReverseMode( isReverse, timestamp );
+    return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::setMotionData

@@ -50,7 +50,10 @@ public:
         bool findKeyFrame,
         nxcip::UsecUTCTimestamp* selectedPosition ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleReverseMode
-    virtual int setReverseMode( bool isReverse, nxcip::UsecUTCTimestamp timestamp ) override;
+    virtual int setReverseMode(
+        bool isReverse,
+        nxcip::UsecUTCTimestamp timestamp,
+        nxcip::UsecUTCTimestamp* selectedPosition ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleMotionData
     virtual int setMotionDataEnabled( bool motionPresent ) override;
     //!Implementation of nxcip::DtsArchiveReader::setQuality
