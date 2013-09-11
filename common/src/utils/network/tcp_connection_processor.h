@@ -7,7 +7,6 @@
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 #include "utils/common/byte_array.h"
-#include <openssl/ssl.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -16,7 +15,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    QnTCPConnectionProcessor(AbstractStreamSocket* socket, SSL_CTX* sslContext);
+    QnTCPConnectionProcessor(AbstractStreamSocket* socket);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -31,8 +30,6 @@ public:
     void execute(QMutex& mutex);
     virtual void pleaseStop();
 
-    //!Returns SSL*. including ssl.h here causes numerous compilation problems
-    void* ssl() const;
     AbstractStreamSocket* socket() const;
     QUrl getDecodedUrl() const;
 
@@ -55,7 +52,7 @@ protected:
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, AbstractStreamSocket* socket, void* _sslContext);
+    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, AbstractStreamSocket* socket);
 private:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }

@@ -30,7 +30,7 @@ public:
 QMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket)
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;

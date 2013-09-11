@@ -81,7 +81,7 @@ public:
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(AbstractStreamSocket* socket, void* sslContext, QnDesktopResource* desktop):
-  QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket, sslContext)
+  QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
     d->desktop = desktop;

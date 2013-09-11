@@ -12,7 +12,7 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
-QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->getOpenSSLContext())
+QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -22,7 +22,7 @@ QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, AbstractStreamSocket* socket, QnTcpListener* owner):
-QnTCPConnectionProcessor(priv, socket, owner->getOpenSSLContext())
+QnTCPConnectionProcessor(priv, socket)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -48,7 +48,6 @@ void QnUniversalRequestProcessor::processRequest()
         if (d->processor && !needToStop()) 
         {
             copyClientRequestTo(*d->processor);
-            d->ssl = 0;
             d->socket = 0;
             d->processor->execute(d->mutex);
         }
