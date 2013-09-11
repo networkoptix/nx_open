@@ -54,7 +54,7 @@ private:
     const DirContentsManager& m_dirContentsManager;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
-    unsigned int m_frameDuration;
+    const unsigned int m_frameDuration;
     bool m_liveMode;
     std::map<nxcip::UsecUTCTimestamp, std::string> m_dirEntries;
     std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator m_curPos;
@@ -64,6 +64,7 @@ private:
 
     void doLiveDelay();
     void readDirContents();
+    void moveCursorToNextFrame();
 };
 
 #endif  //ILP_STREAM_READER_H

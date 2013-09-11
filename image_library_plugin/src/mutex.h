@@ -7,7 +7,12 @@
 #define MUTEX_H
 
 
-//!Implementing our own mutex so that no to use any third party library
+class MutexImpl;
+
+//!Non-recursive non-named mutex
+/*!
+    Implementing our own mutex so that no to use any third party library
+*/
 class Mutex
 {
 public:
@@ -33,6 +38,8 @@ public:
     ~Mutex();
 
 private:
+    MutexImpl* m_impl;
+
     void lock();
     void unlock();
 };

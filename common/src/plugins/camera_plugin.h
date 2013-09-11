@@ -685,6 +685,8 @@ namespace nxcip
 
     // {763C93DC-A77D-41ff-8071-B64C4D3AFCFF}
     static const nxpl::NX_GUID IID_MediaDataPacket = { { 0x76, 0x3c, 0x93, 0xdc, 0xa7, 0x7d, 0x41, 0xff, 0x80, 0x71, 0xb6, 0x4c, 0x4d, 0x3a, 0xfc, 0xff } };
+    //!Required alignment of \a MediaDataPacket::data() buffer
+    static const unsigned int MEDIA_DATA_BUFFER_ALIGNMENT = 32;
 
     //!Portion of media data
     class MediaDataPacket
@@ -720,7 +722,8 @@ namespace nxcip
                     It is recommended that SPS and PPS are repeated before each group of pictures
                 - motion jpeg (\a nxcip::CODEC_ID_MJPEG): Each packet is a complete jpeg picture
                 - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
-            \return Media data. Returned buffer MUST be aligned on 32-byte boundary (this restriction helps for some optimization)
+            \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
+                \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
         */
         virtual const void* data() const = 0;
         //!Returns size (in bytes) of packet's data
@@ -778,6 +781,7 @@ namespace nxcip
             \return error code (\a nxcip::NX_NO_ERROR on success)
             \note Returns packet has its ref counter set to 1
             \note On end of data, \a nxcip::NX_NO_ERROR is returned and \a packet is set to NULL
+            \note If two subsequent packets has timestamp difference greater than 2 seconds it is considered that timestamp discontinuity has occured
         */
         virtual int getNextData( MediaDataPacket** packet ) = 0;
 

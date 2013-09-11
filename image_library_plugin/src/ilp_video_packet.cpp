@@ -9,6 +9,8 @@
 #include <cstring>
 #include <cstdlib>
 
+#include <plugins/plugin_tools.h>
+
 
 ILPVideoPacket::ILPVideoPacket(
     int channelNumber,
@@ -28,7 +30,7 @@ ILPVideoPacket::~ILPVideoPacket()
 {
     if( m_buffer )
     {
-        ::free( m_buffer );
+        nxpt::freeAligned( m_buffer );
         m_buffer = NULL;
         m_bufSize = 0;
     }
@@ -122,13 +124,13 @@ void ILPVideoPacket::resizeBuffer( unsigned int bufSize )
         return;
     }
 
-    void* newBuffer = ::malloc( bufSize );
+    void* newBuffer = nxpt::mallocAligned( bufSize, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
 
     if( m_bufSize > 0 )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        ::free( m_buffer );
+        nxpt::freeAligned( m_buffer );
         m_buffer = NULL;
         m_bufSize = 0;
     }

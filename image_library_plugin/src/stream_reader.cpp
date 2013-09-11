@@ -83,36 +83,50 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
-    if( m_curPos == m_dirEntries.end() )
+    nxcip::UsecUTCTimestamp curTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
+    bool streamReset = false;
+    std::string fileName;
+
     {
-        *lpPacket = NULL;
-        return nxcip::NX_NO_ERROR;    //end-of-data
+        Mutex::ScopedLock lk( &m_mutex );
+
+        if( m_curPos == m_dirEntries.end() )
+        {
+            *lpPacket = NULL;
+            return nxcip::NX_NO_ERROR;    //end-of-data
+        }
+
+        curTimestamp = m_curTimestamp;
+        streamReset = m_streamReset;
+        if( m_streamReset )
+            m_streamReset = false;
+        fileName = m_curPos->second;
     }
 
     std::auto_ptr<ILPVideoPacket> packet( new ILPVideoPacket(
         m_encoderNumber,
-        m_curTimestamp,
-        nxcip::MediaDataPacket::fKeyPacket | (m_streamReset ? nxcip::MediaDataPacket::fStreamReset : 0)) );
-    if( m_streamReset )
-        m_streamReset = false;
+        curTimestamp,
+        nxcip::MediaDataPacket::fKeyPacket | (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0)) );
 
     struct stat fStat;
     memset( &fStat, 0, sizeof(fStat) );
-    if( ::stat( m_curPos->second.c_str(), &fStat ) != 0 )
+    if( ::stat( fileName.c_str(), &fStat ) != 0 )
     {
-        ++m_curPos;
+        Mutex::ScopedLock lk( &m_mutex );
+        moveCursorToNextFrame();
         return nxcip::NX_IO_ERROR;
     }
 
     packet->resizeBuffer( fStat.st_size );
     if( !packet->data() )
     {
-        ++m_curPos;
+        Mutex::ScopedLock lk( &m_mutex );
+        moveCursorToNextFrame();
         return nxcip::NX_OTHER_ERROR;
     }
 
     //reading file into 
-    std::ifstream f( m_curPos->second.c_str(), std::ios_base::in | std::ios_base::binary );
+    std::ifstream f( fileName.c_str(), std::ios_base::in | std::ios_base::binary );
     if( !f.is_open() )
         return nxcip::NX_OTHER_ERROR;
     for( size_t
@@ -125,12 +139,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
     f.close();
 
-    m_curTimestamp += m_frameDuration;
-    ++m_curPos;
-    if( m_liveMode && m_curPos == m_dirEntries.end() )
     {
-        readDirContents();
-        m_curPos = m_dirEntries.begin();
+        Mutex::ScopedLock lk( &m_mutex );
+        moveCursorToNextFrame();
     }
 
     if( m_liveMode )
@@ -190,6 +201,16 @@ void StreamReader::doLiveDelay()
 
 void StreamReader::readDirContents()
 {
-    Mutex::ScopedLock lk( &m_mutex );
     m_dirEntries = m_dirContentsManager.dirContents();
+}
+
+void StreamReader::moveCursorToNextFrame()
+{
+    m_curTimestamp += m_frameDuration;
+    ++m_curPos;
+    if( m_liveMode && m_curPos == m_dirEntries.end() )
+    {
+        readDirContents();
+        m_curPos = m_dirEntries.begin();
+    }
 }

@@ -15,8 +15,7 @@
 #include "time_periods.h"
 
 
-//
-static const int FRAME_DURATION = 1*1000*1000;
+static const int FRAME_DURATION_USEC = 1*1000*1000;
 
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
 :
@@ -28,7 +27,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
         nxcip::BaseCameraManager::nativeMediaStreamCapability ),
     m_dirContentsManager(
         info.url,
-        FRAME_DURATION )
+        FRAME_DURATION_USEC )
 {
 }
 
@@ -80,7 +79,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
     if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this, FRAME_DURATION) );
+        m_encoder.reset( new MediaEncoder(this, FRAME_DURATION_USEC) );
     m_encoder->addRef();
     *encoderPtr = m_encoder.get();
 
@@ -140,7 +139,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
 {
-    *dtsArchiveReader = new ArchiveReader( m_dirContentsManager, FRAME_DURATION );
+    *dtsArchiveReader = new ArchiveReader( m_dirContentsManager, FRAME_DURATION_USEC );
     return nxcip::NX_NO_ERROR;
 }
 
