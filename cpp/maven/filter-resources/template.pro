@@ -53,6 +53,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${libdir}/include \
+                ${environment.dir}/include \
                 ${qt.dir}/../qt-custom \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \

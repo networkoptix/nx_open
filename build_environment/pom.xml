@@ -45,13 +45,6 @@
             <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>
         <dependency>
-            <groupId>org.boost</groupId>
-            <artifactId>boost</artifactId>
-            <version>${boost.version}</version>
-            <type>tar.gz</type>
-            <classifier>${platform}</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.ffmpeg</groupId>
             <artifactId>ffmpeg</artifactId>
             <version>${ffmpeg.version}</version>

@@ -110,8 +110,7 @@ if __name__ == '__main__':
         gentext(f, '${project.build.sourceDirectory}', ['.proto'], 'PB_FILES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         gen_includepath(f, '${libdir}/include')
-        if '${platform}' == 'windows':
-            gen_includepath(f, '${environment.dir}/include')
+        gen_includepath(f, '${environment.dir}/include')
         f.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):

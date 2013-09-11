@@ -24,13 +24,13 @@
         <product.title>${mediaserver.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lsigar -lonvif -lssl</global.libs>
+        <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lsigar -lonvif</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lz</linux.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>                
-        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lavcodec -lswscale -lavutil -lavformat</mac.oslibs>
+        <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lavcodec -lswscale -lavutil -lavformat</mac.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
