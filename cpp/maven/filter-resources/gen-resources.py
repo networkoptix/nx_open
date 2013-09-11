@@ -93,7 +93,7 @@ if __name__ == '__main__':
     if os.path.exists(translations_dir):    
         for f in listdir(translations_dir):
             if f.endswith('.ts'):
-                os.system('lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${libdir}/icons'], [''],'vmsclient.png')  
     
