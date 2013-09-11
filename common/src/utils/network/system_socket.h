@@ -341,6 +341,12 @@ private:
     bool setListen(int queueLen) ;
 };
 
+class TCPSslServerSocket: public TCPServerSocket
+{
+public:
+    virtual AbstractStreamSocket* accept() override;
+};
+
 /**
   *   UDP socket class
   */

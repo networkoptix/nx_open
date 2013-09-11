@@ -18,7 +18,10 @@ AbstractStreamSocket* SocketFactory::createStreamSocket( bool /*sslRequired*/, S
     return new TCPSocket();
 }
 
-AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool /*sslRequired*/, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
+AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslRequired, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
 {
-    return new TCPServerSocket();
+    if (sslRequired)
+        return new TCPSslServerSocket();
+    else
+        return new TCPServerSocket();
 }
