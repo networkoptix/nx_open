@@ -61,25 +61,8 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
-    //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
+    d->serverSocket = 0;
     d->maxConnections = maxConnections;
-    d->ddosWarned = false;
-    if( !d->serverSocket->setReuseAddrFlag(true) ||
-        !d->serverSocket->bind(SocketAddress(address.toString(), port)) ||
-        !d->serverSocket->listen() )
-    //if( d->serverSocket->failed() )
-    {
-        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-
-        NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
-            arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
-        qCritical() << "Can't start TCP listener at address" << address << ":" << port << ". "
-            "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
-    }
-    else {
-        cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
-    }
 }
 
 QnTcpListener::~QnTcpListener()
@@ -191,9 +174,29 @@ void QnTcpListener::enableSSLMode()
 
 void QnTcpListener::run()
 {
+    Q_D(QnTcpListener);
+
     saveSysThreadID();
 
-    Q_D(QnTcpListener);
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
+    //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
+    d->ddosWarned = false;
+    if( !d->serverSocket->setReuseAddrFlag(true) ||
+        !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->localPort)) ||
+        !d->serverSocket->listen() )
+        //if( d->serverSocket->failed() )
+    {
+        const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+
+        NX_LOG( QString::fromLatin1("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
+            arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
+        qCritical() << "Can't start TCP listener at address" << d->serverAddress << ":" << d->localPort << ". "
+            "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
+    }
+    else {
+        cl_log.log("Server started at ", d->serverAddress.toString() + QLatin1String(":") + QString::number(d->localPort), cl_logINFO);
+    }
+
 
     NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(sysThreadID()), cl_logWARNING );
     try
