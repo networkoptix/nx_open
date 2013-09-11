@@ -201,8 +201,8 @@
                                             <value>
                                                 <![CDATA[
     <CustomBuild Include="$1/$2.$3">
-      <AdditionalInputs>\$(OutputDirectory)../../bin/protoc;$1/$2.$3</AdditionalInputs>
-      <Command>\$(OutputDirectory)\..\\..\\bin\\protoc --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
+      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc;$1/$2.$3</AdditionalInputs>
+      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
       <Message>Generating code from $1/$2.$3 to $2.pb.cc</Message>
       <Outputs>../${arch}/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
     </CustomBuild>
