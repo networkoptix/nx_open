@@ -74,6 +74,12 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
+# ensure QMAKE_MOC contains the moc executable path
+load(moc) 
+
+# Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
+QMAKE_MOC += -DBOOST_MPL_IF_HPP_INCLUDED
+
 win* {
   isEmpty(BUILDLIB) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
@@ -101,7 +107,7 @@ win* {
     DEFINES += QN_EXPORT=
   }
   
-  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
+  QMAKE_MOC += -DQ_OS_WIN
 }
 
 unix:!mac {
@@ -111,7 +117,7 @@ unix:!mac {
   
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
-  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
+  QMAKE_MOC += -DQ_OS_LINUX
   DEFINES += override=
 }
 

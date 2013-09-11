@@ -6,6 +6,7 @@
 #define INSTALLATION_MANAGER_H
 
 #include <map>
+#include <functional>
 
 #include <QObject>
 

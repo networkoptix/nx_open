@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-include(${environment.dir}/qt5/qt-custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
+include(${environment.dir}/qt5/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
 
 TRANSLATIONS += ${basedir}/translations/traytool_en.ts \
 				${basedir}/translations/traytool_ru.ts \

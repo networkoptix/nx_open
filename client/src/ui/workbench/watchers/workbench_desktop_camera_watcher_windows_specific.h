@@ -1,8 +1,6 @@
 #ifndef QN_WORKBENCH_DESKTOP_CAMERA_WATCHER_H
 #define QN_WORKBENCH_DESKTOP_CAMERA_WATCHER_H
 
-#ifdef Q_OS_WIN
-
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QDateTime>
@@ -34,7 +32,5 @@ private:
 private:
     QSet<QnMediaServerResourcePtr> m_serverList;
 };
-
-#endif
 
 #endif // QN_WORKBENCH_DESKTOP_CAMERA_WATCHER_H
