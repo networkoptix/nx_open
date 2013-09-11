@@ -1,6 +1,5 @@
 #include "ssl_socket.h"
 
-#include <openssl/ssl.h>
 #include <openssl/err.h>
 
 static const int BUFFER_SIZE = 1024;
@@ -9,13 +8,13 @@ static SSL_CTX *sslCTX = 0;
 
 static int sock_read(BIO *b, char *out, int outl)
 {
-    AbstractStreamSocket* wrappedSocket = (AbstractStreamSocket*) BIO_get_app_data(b, wrappedSocket);
+    QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     int ret=0;
 
     if (out != NULL)
     {
         //clear_socket_error();
-        ret = wrappedSocket->recv(out, outl);
+        ret = sslSock->recvInternal(out, outl, 0);
         BIO_clear_retry_flags(b);
         if (ret <= 0)
         {
@@ -28,9 +27,9 @@ static int sock_read(BIO *b, char *out, int outl)
 
 static int sock_write(BIO *b, const char *in, int inl)
 {
-    AbstractStreamSocket* wrappedSocket = (AbstractStreamSocket*) BIO_get_app_data(b, wrappedSocket);
+    QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     //clear_socket_error();
-    int ret = wrappedSocket->send(in, inl);
+    int ret = sslSock->sendInternal(in, inl);
     BIO_clear_retry_flags(b);
     if (ret <= 0)
     {
@@ -93,9 +92,9 @@ static int sock_free(BIO *a)
     {
         if (a->init)
         {
-            AbstractStreamSocket* wrappedSocket = (AbstractStreamSocket*) BIO_get_app_data(a, wrappedSocket);
-            if (wrappedSocket)
-                wrappedSocket->close();
+            QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(a);
+            if (sslSock)
+                sslSock->close();
         }
         a->init=0;
         a->flags=0;
@@ -156,21 +155,43 @@ struct QnSSLSocketPrivate
     SSL* ssl;
     BIO* read;
     BIO* write;
+    bool isServerSide;
+    quint8 extraBuffer[32];
+    int extraBufferLen;
 };
 
-QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket):
+QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide):
     d_ptr(new QnSSLSocketPrivate())
 {
     Q_D(QnSSLSocket);
-
     d->wrappedSocket = wrappedSocket;
+    d->isServerSide = isServerSide;
+    d->extraBufferLen = 0;
+
+    init();
+}
+
+QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide):
+    d_ptr(priv)
+{
+    Q_D(QnSSLSocket);
+    d->wrappedSocket = wrappedSocket;
+    d->isServerSide = isServerSide;
+    d->extraBufferLen = 0;
+
+    init();
+}
+
+void QnSSLSocket::init()
+{
+    Q_D(QnSSLSocket);
 
     d->read = BIO_new(&Proxy_server_socket);
     BIO_set_nbio(d->read, 1);
-    BIO_set_app_data(d->read, wrappedSocket);
+    BIO_set_app_data(d->read, this);
 
     d->write = BIO_new(&Proxy_server_socket);
-    BIO_set_app_data(d->write, wrappedSocket);
+    BIO_set_app_data(d->write, this);
     BIO_set_nbio(d->write, 1);
 
     d->ssl = SSL_new(sslCTX);  // get new SSL state with context 
@@ -206,10 +227,45 @@ bool QnSSLSocket::doClientHandshake()
     return SSL_do_handshake(d->ssl) == 1;
 }
 
+int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
+{
+    Q_D(QnSSLSocket);
+
+    if (d->extraBufferLen > 0)
+    {
+        int toReadLen = qMin((int)bufferLen, d->extraBufferLen);
+        memcpy(buffer, d->extraBuffer, toReadLen);
+        memmove(d->extraBuffer, d->extraBuffer + toReadLen, d->extraBufferLen - toReadLen);
+        d->extraBufferLen -= toReadLen;
+        int readRest = bufferLen - toReadLen;
+        if (toReadLen > 0) {
+            int readed = d->wrappedSocket->recv((char*) buffer + toReadLen, readRest);
+            if (readed > 0)
+                toReadLen += readed;
+        }
+        return toReadLen;
+    }
+
+    return d->wrappedSocket->recv(buffer, bufferLen);
+}
+
 int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnSSLSocket);
+    if (!SSL_is_init_finished(d->ssl)) {
+        if (d->isServerSide)
+            doServerHandshake();
+        else
+            doClientHandshake();
+    }
+
     return SSL_read(d->ssl, (char*) buffer, bufferLen);
+}
+
+int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
+{
+    Q_D(QnSSLSocket);
+    return d->wrappedSocket->send(buffer, bufferLen);
 }
 
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
@@ -375,4 +431,68 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->handle();
+}
+
+// ------------------------------ QnMixedSSLSocket -------------------------------------------------------
+static const int TEST_DATA_LEN = 3;
+
+struct QnMixedSSLSocketPrivate: public QnSSLSocketPrivate
+{
+    bool initState;
+    bool useSSL;
+};
+
+QnMixedSSLSocket::QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket):
+    QnSSLSocket(new QnMixedSSLSocketPrivate, wrappedSocket, true)
+{
+    Q_D(QnMixedSSLSocket);
+    d->initState = true;
+    d->useSSL = false;
+}
+
+int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
+{
+    Q_D(QnMixedSSLSocket);
+
+    // check for SSL pattern 0x80 (v2) or 0x16 03 (v3)
+    if (d->initState) 
+    {
+        if (d->extraBufferLen == 0) {
+            int readed = d->wrappedSocket->recv(d->extraBuffer, 1);
+            if (readed < 1)
+                return readed;
+            d->extraBufferLen += readed;
+        }
+
+        if (d->extraBuffer[0] == 0x80)
+        {
+            d->useSSL = true;
+            d->initState = false;
+        }
+        else if (d->extraBuffer[0] == 0x16)
+        {
+            int readed = d->wrappedSocket->recv(d->extraBuffer+1, 1);
+            if (readed < 1)
+                return readed;
+            d->extraBufferLen += readed;
+
+            if (d->extraBuffer[1] == 0x03)
+                d->useSSL = true;
+        }
+        d->initState = false;
+    }
+
+    if (d->useSSL)
+        return QnSSLSocket::recv((char*) buffer, bufferLen, flags);
+    else 
+        return recvInternal(buffer, bufferLen, flags);
+}
+
+int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
+{
+    Q_D(QnMixedSSLSocket);
+    if (d->useSSL)
+        return QnSSLSocket::send((char*) buffer, bufferLen);
+    else 
+        return d->wrappedSocket->send(buffer, bufferLen);
 }

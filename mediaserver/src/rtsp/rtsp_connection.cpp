@@ -195,7 +195,7 @@ public:
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
 }
 

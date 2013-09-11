@@ -32,17 +32,13 @@ static const int CODE_UNSPOORTED_TRANSPORT = 461;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 
-#include <openssl/ssl.h>
-
 class QnTCPConnectionProcessorPrivate
 {
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-        socket(0),
-        ssl(0),
-        sslContext(0)
+        socket(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -68,8 +64,6 @@ public:
     quint8* tcpReadBuffer;
     int socketTimeout;
     bool chunkedMode;
-    SSL* ssl;
-    SSL_CTX* sslContext;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

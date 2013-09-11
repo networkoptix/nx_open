@@ -2,7 +2,6 @@
 #include "socket.h"
 #include "utils/common/log.h"
 #include "tcp_connection_processor.h"
-#include <openssl/ssl.h>
 
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
@@ -16,9 +15,8 @@ public:
     QnTcpListenerPrivate() {
         serverSocket = 0;
         newPort = 0;
-        method = 0;
         localPort = 0;
-        ctx = 0;
+        useSSL = false;
     }
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
@@ -28,8 +26,7 @@ public:
     int newPort;
     QHostAddress serverAddress;
     int localPort;
-    const SSL_METHOD *method;
-    SSL_CTX *ctx;
+    bool useSSL;
     int maxConnections;
     bool ddosWarned;
 };
@@ -64,7 +61,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;
-    d->serverSocket = SocketFactory::createStreamServerSocket();
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
     //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
     d->maxConnections = maxConnections;
     d->ddosWarned = false;
@@ -186,35 +183,10 @@ void QnTcpListener::updatePort(int newPort)
     d->newPort = newPort;
 }
 
-bool QnTcpListener::enableSSLMode()
+void QnTcpListener::enableSSLMode()
 {
     Q_D(QnTcpListener);
-
-    QFile f(QLatin1String(":/cert.pem"));
-    if (!f.open(QIODevice::ReadOnly)) 
-    {
-        qWarning() << "No SSL sertificate for mediaServer!";
-        return false;
-    }
-    QByteArray certData = f.readAll();
-
-    SSL_library_init();
-    OpenSSL_add_all_algorithms();   
-    SSL_load_error_strings();     
-    d->method = SSLv23_server_method();
-    d->ctx = SSL_CTX_new(d->method);
-
-    BIO *bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    X509 *x = PEM_read_bio_X509_AUX(bufio, NULL, d->ctx->default_passwd_callback, d->ctx->default_passwd_callback_userdata);
-    SSL_CTX_use_certificate(d->ctx, x);
-    BIO_free(bufio);
-
-    bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bufio, NULL, d->ctx->default_passwd_callback, d->ctx->default_passwd_callback_userdata);
-    SSL_CTX_use_PrivateKey(d->ctx, pkey);
-    BIO_free(bufio);
-
-    return true;
+    d->useSSL = true;
 }
 
 void QnTcpListener::run()
@@ -238,7 +210,7 @@ void QnTcpListener::run()
                 delete d->serverSocket;
                 //d->serverSocket = new TCPServerSocket(d->serverAddress.toString(), d->newPort);
                 //if( d->serverSocket->failed() )
-                d->serverSocket = SocketFactory::createStreamServerSocket();
+                d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
                 if( !d->serverSocket->setReuseAddrFlag(true) ||
                     !d->serverSocket->bind(SocketAddress(d->serverAddress.toString(), d->newPort)) ||
                     !d->serverSocket->listen() )
@@ -300,12 +272,6 @@ void QnTcpListener::run()
             arg(d->serverAddress.toString()).arg(d->localPort).arg(QString::fromLatin1(e.what())), cl_logWARNING );
     }
     NX_LOG( QString::fromLatin1("Exiting QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
-}
-
-SSL_CTX* QnTcpListener::getOpenSSLContext()
-{
-    Q_D(QnTcpListener);
-    return d->ctx;
 }
 
 int QnTcpListener::getPort() const
