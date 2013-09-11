@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include <QtSingleApplication>
-#include <qtservice.h>
 #include <QDir>
 
 #include <utils/common/command_line_parser.h>
@@ -16,6 +15,10 @@
 
 //!if defined, launcher compiles as daemon (linux) or win32 service
 //#define I_AM_DAEMON
+
+#ifdef I_AM_DAEMON
+#   include <qtservice.h>
+#endif
 
 #ifdef _WIN32
 #include <windows.h>
