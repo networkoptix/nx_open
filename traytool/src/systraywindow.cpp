@@ -2,7 +2,7 @@
 #include <QtCore/QThreadPool>
 #include <QtCore/QProcess>
 #include <QtNetwork/QTcpServer>
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 #include <QtGui/QCloseEvent>
 #include <QtWidgets/QMessageBox>
 
