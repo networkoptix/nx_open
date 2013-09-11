@@ -191,7 +191,7 @@
                                     <encoding>utf-8</encoding>
                                     <unescape>no</unescape>
                                     <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.sourceDirectory}/${artifactId}-x64.vcxproj</file>
+                                    <file>${project.build.sourceDirectory}/${artifactId}-${arch}.vcxproj</file>
                                     <replacements>
                                         <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
                                         <replacement>
