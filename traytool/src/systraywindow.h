@@ -4,10 +4,16 @@
 #include <QtWidgets/QDialog>
 #include <QtCore/QString>
 #include <QtCore/QStringListModel>
+#include <QtCore/QRunnable>
+#include <QtCore/QTimer>
+#include <QtCore/QTime>
+#include <QtCore/QQueue>
+#include <QtCore/QSettings>
 #include <QtWidgets/QSystemTrayIcon>
 
 class FoundEnterpriseControllersModel;
 
+class QAbstractButton;
 class QAction;
 class QCheckBox;
 class QComboBox;

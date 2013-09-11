@@ -1,5 +1,10 @@
-#include <QtGui>
-#include <QTcpServer>
+#include <QtCore/QSettings>
+#include <QtCore/QThreadPool>
+#include <QtCore/QProcess>
+#include <QtNetwork/QTcpServer>
+#include <QtGui/QMenu>
+#include <QtGui/QCloseEvent>
+#include <QtWidgets/QMessageBox>
 
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
@@ -813,7 +818,7 @@ bool QnSystrayWindow::isAppServerParamChanged() const
 bool QnSystrayWindow::isMediaServerParamChanged() const
 {
     QUrl savedURL = getAppServerURL();
-    QUrl currentURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
+    QUrl currentURL( QString::fromLatin1("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
     if (savedURL.host() != currentURL.host() || savedURL.port(DEFAULT_APP_SERVER_PORT) != currentURL.port(DEFAULT_APP_SERVER_PORT))
         return true;
 

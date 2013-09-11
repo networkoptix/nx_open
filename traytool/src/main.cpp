@@ -2,8 +2,10 @@
 #include "version.h"
 
 #include <QtSingleApplication>
-#include <QtGui>
-#include <QMetaType>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QMetaType>
+#include <QtCore/QDir>
+#include <QtCore/QSettings>
 
 #include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
