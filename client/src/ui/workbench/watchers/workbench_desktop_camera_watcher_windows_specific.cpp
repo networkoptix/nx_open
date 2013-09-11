@@ -1,6 +1,4 @@
-#ifdef Q_OS_WIN
-
-#include "workbench_desktop_camera_watcher.h"
+#include "workbench_desktop_camera_watcher_windows_specific.h"
 
 #include <utils/common/checked_cast.h>
 
@@ -102,4 +100,3 @@ void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr ser
     }
 }
 
-#endif
