@@ -1,6 +1,7 @@
 #include "simple_http_client.h"
 
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QUrl>
 
 #include <sstream>
 #include "../common/util.h"

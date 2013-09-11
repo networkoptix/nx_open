@@ -15,8 +15,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "../socket.h"
-#include "../socket_impl.h"
+#include "../system_socket.h"
+#include "../system_socket_impl.h"
 
 
 using namespace std;
@@ -156,7 +156,7 @@ PollSet::EventType PollSet::const_iterator::eventType() const
 
 void* PollSet::const_iterator::userData()
 {
-    return static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->getUserData(eventType());
+    return dynamic_cast<Socket*>(static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata))->impl()->getUserData(eventType());
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -228,7 +228,7 @@ bool PollSet::add( AbstractSocket* const sock, EventType eventType, void* userDa
     EV_SET( &_newEvent, sock->handle(), kfilterType, EV_ADD, 0, 0, sock );
     if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
     {
-        sock->impl()->getUserData(eventType) = userData;
+        dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType) = userData;
         return true;
     }
 
@@ -250,8 +250,8 @@ void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
     kevent( m_impl->kqueueFD, &_eventChange, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
     m_impl->monitoredEvents.erase( it );
 
-    void* userData = sock->impl()->getUserData(eventType);
-    sock->impl()->getUserData(eventType) = NULL;
+    void* userData = dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
+    dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType) = NULL;
     return userData;
 }
 
@@ -262,7 +262,7 @@ size_t PollSet::size( EventType /*eventType*/ ) const
 
 void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
 {
-    return sock->impl()->getUserData(eventType);
+    return dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
 }
 
 static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;

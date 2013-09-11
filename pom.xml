@@ -315,7 +315,6 @@
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
-                <qt.dir/>
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>
                 <arch>x64</arch>

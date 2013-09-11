@@ -249,12 +249,12 @@ bool Socket::getNonBlockingMode( bool* val ) const
 //!Implementation of AbstractSocket::getMtu
 bool Socket::getMtu( unsigned int* mtuValue )
 {
-#ifdef _WIN32
-    *mtuValue = 1500;   //in winsock there is no IP_MTU, returning 1500 as most common value
-    return true;
-#else
+#ifdef IP_MTU
     socklen_t optLen = 0;
     return ::getsockopt(sockDesc, IPPROTO_IP, IP_MTU, (char*)mtuValue, &optLen) == 0;
+#else
+    *mtuValue = 1500;   //in winsock there is no IP_MTU, returning 1500 as most common value
+    return true;
 #endif
 }
 

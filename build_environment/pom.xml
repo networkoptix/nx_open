@@ -247,7 +247,7 @@
             <activation>
                 <os>
                     <family>unix</family>
-                    <name>linux</name>
+                    <!-- <name>linux</name> -->
                 </os>		
                 <!--<property>
                     <name>!cross-arch</name>
