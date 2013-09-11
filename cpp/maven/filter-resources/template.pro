@@ -66,6 +66,9 @@ DEPENDPATH *= $${INCLUDEPATH}
   PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 }
 
+# Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
+QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_INCLUDED -DBOOST_MPL_NOT_HPP_INCLUDED -DBOOST_MPL_VOID_HPP_INCLUDED
+
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${libdir}/icons/hdw_logo.ico	
@@ -87,7 +90,7 @@ win* {
     DEFINES += QN_EXPORT=
   }
   
-  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
+  QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
 ## BOTH LINUX AND MAC
@@ -102,7 +105,7 @@ unix:!mac {
   QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
-  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
+  QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 }
 
 ## MAC OS
