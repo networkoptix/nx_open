@@ -10,38 +10,30 @@
 #   include <netinet/tcp.h>
 #endif
 
-#include "ssl_socket.h"
-
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket, SSL_CTX* _sslContext):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     d->chunkedMode = false;
-    d->ssl = 0;
-    d->sslContext = (SSL_CTX*) _sslContext;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, AbstractStreamSocket* socket, void* _sslContext):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, AbstractStreamSocket* socket):
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     //d->socket->setNoDelay(true);
     d->chunkedMode = false;
-    d->ssl = 0;
-    d->sslContext = (SSL_CTX*) _sslContext;
 }
 
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
-    if (d_ptr->ssl)
-        SSL_free(d_ptr->ssl);
     delete d_ptr;
 }
 
@@ -197,10 +189,7 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     while (!needToStop() && size > 0 && d->socket->isConnected())
     {
         int sended = 0;
-        if (d->ssl)
-            sended = SSL_write(d->ssl, data, size);
-        else
-            sended = d->socket->send(data, size);
+        sended = d->socket->send(data, size);
         if (sended > 0) {
 #ifdef DEBUG_RTSP
             dumpRtspData(data, sended);
@@ -288,10 +277,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     }
 
     QMutexLocker lock(&d->sockMutex);
-    if (d->ssl)
-        SSL_write(d->ssl, response.data(), response.size());
-    else
-        sendData(response.data(), response.size());
+    sendData(response.data(), response.size());
 }
 
 bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
@@ -303,10 +289,7 @@ bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
     result.append("\r\n");
 
     int sended;
-    if (d->ssl)
-        sended = SSL_write(d->ssl, result.data(), result.size());
-    else
-        sended = d->socket->send(result);
+    sended = d->socket->send(result);
     return sended == result.size();
 }
 
@@ -338,12 +321,6 @@ void QnTCPConnectionProcessor::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-void* QnTCPConnectionProcessor::ssl() const
-{
-    Q_D(const QnTCPConnectionProcessor);
-    return d->ssl;
-}
-
 AbstractStreamSocket* QnTCPConnectionProcessor::socket() const
 {
     Q_D(const QnTCPConnectionProcessor);
@@ -372,23 +349,10 @@ bool QnTCPConnectionProcessor::readRequest()
     d->requestBody.clear();
     d->responseBody.clear();
 
-    if (d->sslContext && !d->ssl)
-    {
-        d->ssl = SSL_new(d->sslContext);  // get new SSL state with context 
-        if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
-            return false;
-        if (SSL_accept(d->ssl) != 1) 
-            return false; // ssl error
-        
-    }
-
     while (!needToStop() && d->socket->isConnected())
     {
         int readed;
-        if (d->ssl) 
-            readed = SSL_read(d->ssl, d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-        else
-            readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) 
         {
             globalTimeout.restart();
@@ -415,7 +379,6 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
 {
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
-    other.d_ptr->ssl = d->ssl;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
