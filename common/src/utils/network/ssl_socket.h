@@ -5,13 +5,15 @@
 
 #include "socket_common.h"
 #include "abstract_socket.h"
+#include <openssl/ssl.h>
 
 class QnSSLSocketPrivate;
+class QnMixedSSLSocketPrivate;
 
 class QnSSLSocket: public AbstractStreamSocket
 {
 public:
-    QnSSLSocket(AbstractStreamSocket* wrappedSocket);
+    QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide);
     virtual ~QnSSLSocket();
 
     static void initSSLEngine(const QByteArray& certData);
@@ -54,9 +56,28 @@ public:
 
     bool doServerHandshake();
     bool doClientHandshake();
+protected:
+    friend int sock_read(BIO *b, char *out, int outl);
+    friend int sock_write(BIO *b, const char *in, int inl);
+
+    QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide);
+    int recvInternal(void* buffer, unsigned int bufferLen, int flags);
+    int sendInternal( const void* buffer, unsigned int bufferLen );
 private:
+    void init();
+protected:
     Q_DECLARE_PRIVATE(QnSSLSocket);
     QnSSLSocketPrivate *d_ptr;
+};
+
+class QnMixedSSLSocket: public QnSSLSocket
+{
+public:
+    QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket);
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags) override;
+    virtual int send( const void* buffer, unsigned int bufferLen ) override;
+private:
+    Q_DECLARE_PRIVATE(QnMixedSSLSocket);
 };
 
 #endif // __SSL_SOCKET_H_

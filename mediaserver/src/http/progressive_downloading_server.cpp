@@ -323,7 +323,7 @@ static const int MS_PER_SEC = 1000;
 extern QSettings qSettings;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;

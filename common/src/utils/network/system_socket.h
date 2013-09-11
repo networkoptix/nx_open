@@ -344,7 +344,14 @@ private:
 class TCPSslServerSocket: public TCPServerSocket
 {
 public:
+    /*
+    *   allowNonSecureConnect - allow mixed ssl and non ssl connect for socket
+    */
+    TCPSslServerSocket(bool allowNonSecureConnect = true);
+
     virtual AbstractStreamSocket* accept() override;
+private:
+    bool m_allowNonSecureConnect;
 };
 
 /**

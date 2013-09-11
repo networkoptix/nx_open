@@ -9,7 +9,7 @@ public:
 };
 
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, _owner->getOpenSSLContext())
+    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket)
 {
 
 }

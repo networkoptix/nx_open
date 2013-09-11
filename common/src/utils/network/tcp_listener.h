@@ -11,7 +11,6 @@
 #include <QtNetwork/QNetworkInterface>
 #include "abstract_socket.h"
 #include "utils/common/long_runnable.h"
-#include <openssl/ssl.h>
 
 
 class TCPSocket;
@@ -34,8 +33,7 @@ public:
     virtual ~QnTcpListener();
 
     void updatePort(int newPort);
-    SSL_CTX* getOpenSSLContext();
-    bool enableSSLMode();
+    void enableSSLMode();
 
     int getPort() const;
 

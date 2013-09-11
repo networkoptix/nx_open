@@ -3,7 +3,7 @@
 #include "utils/network/tcp_listener.h"
 
 QnDefaultTcpConnectionProcessor::QnDefaultTcpConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner): 
-    QnTCPConnectionProcessor(socket, owner->getOpenSSLContext())
+    QnTCPConnectionProcessor(socket)
 {
 
 }

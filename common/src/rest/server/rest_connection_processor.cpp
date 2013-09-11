@@ -29,7 +29,7 @@ public:
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->getOpenSSLContext())
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket)
 {
     Q_D(QnRestConnectionProcessor);
     d->socketTimeout = CONNECTION_TIMEOUT;
