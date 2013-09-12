@@ -16,8 +16,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <QDebug>
-
 #include <fstream>
 #include <memory>
 
@@ -147,8 +145,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
     f.close();
 
-    //qDebug()<<"Produced packet for file "<<QString::fromStdString(fileName)<<", ts "<<packet->timestamp();
-
     {
         Mutex::ScopedLock lk( &m_mutex );
         moveCursorToNextFrame();
@@ -202,8 +198,6 @@ nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
 
     if( m_isReverse == isReverse && timestamp == nxcip::INVALID_TIMESTAMP_VALUE )
         return m_curTimestamp;
-
-    qDebug()<<"Switched to"<<(isReverse ? "reverse" : "forward")<<"stream, ts "<<timestamp;
 
     m_isReverse = isReverse;
     return timestamp == nxcip::INVALID_TIMESTAMP_VALUE ? m_curTimestamp : setPosition( timestamp );
