@@ -224,9 +224,10 @@ genericrtspplugin/x64
 genericrtspplugin/arm
 
 
-nx_sdk/nx_sdk 
+nx_sdk/nx_sdk
 
 
 libonvif/.build/
 
 .vagrant
+**/Makefile
