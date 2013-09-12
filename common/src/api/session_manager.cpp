@@ -14,6 +14,7 @@
 #include "utils/common/delete_later.h"
 #include "utils/common/object_thread_puller.h"
 #include "common/common_module.h"
+#include "app_server_connection.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -250,16 +251,20 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
-void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & proxy, QAuthenticator * authenticator )
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * )
 {
-    int gg = 4;
+    // not used
 }
+
 
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
-    authenticator->setUser(lit("admin"));
-    authenticator->setPassword(lit("123"));
+    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
+    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QAuthenticator auth;
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
 
 void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {
