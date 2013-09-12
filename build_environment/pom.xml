@@ -201,9 +201,6 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <properties>
-                <profile.classifier>${platform}</profile.classifier>
-            </properties>            
             <dependencies>
                 <dependency>
                     <groupId>com.creativelabs</groupId>
@@ -242,51 +239,6 @@
                 </dependency>		
             </dependencies>	          
         </profile>
-        <profile>
-            <id>linux</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <!-- <name>linux</name> -->
-                </os>		
-                <!--<property>
-                    <name>!cross-arch</name>
-                </property> -->
-            </activation>
-            <properties>
-                <profile.classifier>${platform}-${arch}</profile.classifier>
-            </properties>
-            <dependencies>
-
-            </dependencies> 
-          <!--  <build>	
-                <plugins>
-
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>unpack-platform-libs</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <failOnError>false</failOnError>
-                                    <target>							
-                                        <chmod file="${project.build.directory}/*.sh" perm="755"/>
-                                        <exec dir="${project.build.directory}" executable="tar" failifexecutionfails="false">
-                                            <arg line="xvf *.tar.gz"/>
-                                        </exec>
-                                    </target>										
-                                </configuration>
-                            </execution>				
-                        </executions>
-                    </plugin>        
-                </plugins>	
-            </build>	-->                    
-        </profile>   
         <!--
         <profile>
             <id>linux</id>
@@ -302,62 +254,6 @@
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>                               	                        
 			</dependencies>
-			<build>	
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>rsync-buildenv</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>${environment.dir}/get_buildenv.sh</executable>
- 									<workingDirectory>${environment.dir}</workingDirectory>		
-                                                                        <arguments>
-                                                                                <commandlineArgs>${arch} ${toolchain.version}</commandlineArgs>
-                                                                        </arguments>
-									<skip>${rsync.skip}</skip>
-								</configuration>
-							</execution>
-							<execution>
-								<id>prepare-deb</id>
-								<phase>compile</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>${project.build.directory}/prepare-package.sh</executable>
-									<workingDirectory>${project.build.directory}</workingDirectory>		
-		    							<skip>${assembly-skip}</skip>
-								</configuration>
-							</execution>							
-						</executions>
-					</plugin>				
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>copy-platform-libs</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>							
-						</executions>
-					</plugin>					
-				</plugins>	
-			</build>			
-		</profile>		
 
 		<profile>
 			<id>linux-arm</id>
@@ -402,41 +298,6 @@
                     </plugin>				
                 </plugins>
             </build>						
-        </profile>		
-
-        <profile>
-            <id>macosx</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                                                        <arguments>
-                                                                                <commandlineArgs>${arch}</commandlineArgs>
-                                                                        </arguments>
-                                <id>prepare-deb</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/prepare-package.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <skip>${assembly-skip}</skip>
-                                </configuration>
-                            </execution>							
-                        </executions>
-                    </plugin>				
-                </plugins>
-            </build>
-        </profile> -->
+        </profile>		-->
     </profiles>	
 </project>

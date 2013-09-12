@@ -200,13 +200,31 @@
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
+                <python.dir>${environment.dir}/python/${arch}</python.dir>				
+                <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
                 <arch>x86</arch>
                 <force_x86>false</force_x86>
-                <platform>windows</platform>
+                <qt.spec>win32-msvc2012</qt.spec>
+                <profile.classifier>${platform}</profile.classifier>                
             </properties>
         </profile>
+        <profile>
+            <!-- Common Profile for Linux, Mac, Arm -->
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>
+            <properties>
+                <environment.dir>${env.environment}</environment.dir>
+                <python.dir>${environment.dir}/python/bin</python.dir>				
+                <common.platform>unix</common.platform>
+                <compiler>gcc</compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+            </properties>
+        </profile>        
         <profile>
             <id>linux</id>
             <activation>
@@ -215,92 +233,18 @@
                     <name>linux</name>
                 </os> 
             </activation>
-            <properties>
-                <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin</python.dir>				
+            <properties>			
                 <platform>linux</platform>
-                <compiler>gcc</compiler>
                 <qt.spec>linux-g++</qt.spec>
             </properties>
-        </profile>	
-        <profile>
-            <id>linux-arm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os> 
-                <property>
-                    <name>cross-arch</name>
-                    <value>arm</value>
-                </property>
-            </activation>
-            <properties>
-                <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version>
-                <arch>${cross-arch}</arch>
-                <!-- <toolchain.version>2011.09</toolchain.version> -->
-                <toolchain.version>2009q3</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
-                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-            </properties>
-        </profile>	
-        <profile>
-            <id>linux-x64</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>amd64</arch>
-                </os> 
-                <property>
-                    <name>!cross-arch</name>
-                </property>
-            </activation>
-            <properties>
-                <arch>x64</arch>
-            </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
                 <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>linux-x86</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>
-                </os>
-                <property>
-                    <name>!cross-arch</name>
-                </property>
-            </activation>
-            <properties>
-                <arch>x86</arch>
-            </properties>
-            <modules>
-                <!--<module>xvbadecoder</module>-->
-                <module>client</module>		
-                <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/appserver-deb</module>
-            </modules>
+            </modules>            
         </profile>	
-        <profile>
-            <id>android</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>android-client/protobuf-classes</module>
-                <module>android-client/android-main</module>
-            </modules>
-        </profile>		
         <profile>
             <id>macosx</id>
             <activation>
@@ -320,8 +264,71 @@
                 <arch>x64</arch>
                 <qt.spec>macx-g++47</qt.spec>
             </properties>
+        </profile>        
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version> 
+                <arch>${cross-arch}</arch>
+                <toolchain.version>2011.09</toolchain.version>
+                <toolchain.version>2009q3</toolchain.version>
+                <compiler>${toolchain.version}</compiler> -->
+                <arch>arm</arch>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+            </properties>
         </profile>	
+        <profile>
+            <id>linux-x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os> 
+                <property>
+                    <name>!cross-arch</name>
+                </property>
+            </activation>
+            <properties>
+                <arch>x64</arch>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux-x86</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>i386</arch>
+                </os>
+                <property>
+                    <name>!cross-arch</name>
+                </property>
+            </activation>
+            <properties>
+                <arch>x86</arch>
+            </properties>
+        </profile>	
+        <profile>
+            <id>android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>android-client/protobuf-classes</module>
+                <module>android-client/android-main</module>
+            </modules>
+        </profile>		
     </profiles>	
-
 </project>
-

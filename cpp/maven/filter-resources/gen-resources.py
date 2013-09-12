@@ -59,7 +59,7 @@ def gentext(file, path, extensions, text):
         parent = root[len(path) + 1:]
         
         for dir in dirs:
-            if dir.endswith('_specific')and not dir.endswith('${platform}_specific'):
+            if dir.endswith('_specific') and (not dir.endswith('${common.platform}_specific') or not dir.endswith('${platform}_specific')):
                 dirs.remove(dir)  
         
         for f in files:
@@ -68,7 +68,7 @@ def gentext(file, path, extensions, text):
                 if f.endswith(extension) and not f_short.endswith('_specific') and not f_short == 'StdAfx':
                 #and not parent.endswith('_specific'):
                     print >> file, '\n%s%s/%s' % (text, path, os.path.join(parent, f))
-                if f.endswith(extension) and f_short.endswith('${platform}_specific'):
+                if f.endswith(extension) and (f_short.endswith('${platform}_specific') or f_short.endswith('${common.platform}_specific')):
                     print >> file, '\n%s%s/%s' % (text, path, os.path.join(parent, f))
 
 def replace(file,searchExp,replaceExp):
@@ -122,7 +122,7 @@ if __name__ == '__main__':
             print(vc_path)
             os.environ["path"] += os.pathsep + vc_path
             os.system('echo %PATH%')
-            os.system('${qt.dir}/bin/qmake -spec win32-msvc2012 -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj ${project.build.directory}/${project.artifactId}.pro')
+            os.system('${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file)
             
             #if '${arch}' == 'x64' and '${force_x86}' == 'false':
             #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     #</CustomBuild>''')
         elif sys.platform == 'linux2':
             os.environ["LD_LIBRARY_PATH"] = '${qt.dir}/lib'
-            execute(['${qt.dir}/bin/qmake -spec linux-g++ CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
+            os.system('${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % output_pro_file)
         elif sys.platform == 'darwin':
-            execute(['${qt.dir}/bin/qmake -spec macx-g++47 CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} ${project.build.directory}/${project.artifactId}.pro'])
+            os.environ["DYLD_LIBRARY_PATH"] = '${qt.dir}/lib'
+            os.system('${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % output_pro_file)

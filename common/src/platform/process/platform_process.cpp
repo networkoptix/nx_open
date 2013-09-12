@@ -3,7 +3,7 @@
 #if defined(Q_OS_WIN)
 #include "process_windows_specific.h"
 #else
-#include "process_linux_specific.h"
+#include "process_unix_specific.h"
 #endif
 
 QnPlatformProcess *QnPlatformProcess::newInstance(QProcess *process, QObject *parent) {
