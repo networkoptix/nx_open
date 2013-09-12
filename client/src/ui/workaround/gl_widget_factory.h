@@ -3,7 +3,6 @@
 
 #include <QGLFormat>
 #include <QGLWidget>
-#include <GL/gl.h>
 
 class QnGlWidgetFactory {
 public:

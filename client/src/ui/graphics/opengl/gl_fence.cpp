@@ -8,7 +8,11 @@
 #include <ui/graphics/opengl/gl_functions.h>
 
 #define GL_GLEXT_PROTOTYPES
+#ifdef Q_OS_MACX
+#include <glext.h>
+#else
 #include <GL/glext.h>
+#endif
 
 #include <QtGui/QOpenGLFunctions_3_2_Core>
 

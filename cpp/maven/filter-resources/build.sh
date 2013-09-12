@@ -4,6 +4,8 @@ CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
 
 export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
+export DYLD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
+export DYLD_FRAMEWORK_PATH=${qt.dir}/lib
 
 case `uname -s` in
     "Linux")

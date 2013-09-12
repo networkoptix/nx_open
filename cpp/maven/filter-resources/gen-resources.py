@@ -11,6 +11,9 @@ output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
+os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
+os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
+os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 
 def execute(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

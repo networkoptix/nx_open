@@ -31,14 +31,13 @@
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -lswscale -lavformat -lavcodec -lavutil</mac.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap</mac.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
-        <postfix.libs>unix: LIBS += -ltermcap</postfix.libs>
     </properties>   
     <profiles>
         <profile>

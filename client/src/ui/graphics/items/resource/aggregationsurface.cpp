@@ -8,7 +8,11 @@
 #include <QtCore/QMutexLocker>
 
 #define GL_GLEXT_PROTOTYPES 1
+#ifdef Q_OS_MACX
+#include <glext.h>
+#else
 #include <GL/glext.h>
+#endif
 
 #include <utils/math/math.h>
 #include <utils/common/log.h>
