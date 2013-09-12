@@ -436,8 +436,9 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
 // ------------------------------ QnMixedSSLSocket -------------------------------------------------------
 static const int TEST_DATA_LEN = 3;
 
-struct QnMixedSSLSocketPrivate: public QnSSLSocketPrivate
+class QnMixedSSLSocketPrivate: public QnSSLSocketPrivate
 {
+public:
     bool initState;
     bool useSSL;
 };
