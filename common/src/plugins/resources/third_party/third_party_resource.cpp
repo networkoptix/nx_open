@@ -225,7 +225,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::shareIpCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        setPtzCapability( Qn::AbsolutePtzCapability, true );
+        //setPtzCapability( Qn::AbsolutePtzCapability, true );
         //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )

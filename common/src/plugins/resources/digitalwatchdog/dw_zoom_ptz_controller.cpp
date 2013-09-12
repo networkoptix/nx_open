@@ -4,7 +4,7 @@
 
 #include "digital_watchdog_resource.h"
 
-QnDwZoomPtzController::QnDwZoomPtzController(QnPlWatchDogResource* resource):
+QnDwZoomPtzController::QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource):
     QnAbstractPtzController(resource),
     m_resource(resource)
 {}
@@ -41,7 +41,7 @@ int QnDwZoomPtzController::startMove(const QVector3D &speed) {
 }
 
 int QnDwZoomPtzController::stopMove() {
-    return startMove(0.0, 0.0, 0.0);
+    return startMove(QVector3D(0.0, 0.0, 0.0));
 }
 
 int QnDwZoomPtzController::setPosition(const QVector3D &) {
@@ -49,9 +49,6 @@ int QnDwZoomPtzController::setPosition(const QVector3D &) {
 }
 
 int QnDwZoomPtzController::getPosition(QVector3D *) {
-    Q_UNUSED(xPos)
-    Q_UNUSED(yPos)
-    Q_UNUSED(zoomPos)
     return 1;
 }
 
@@ -59,6 +56,3 @@ Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
     return Qn::ContinuousZoomCapability;
 }
 
-const QnPtzSpaceMapper *QnDwZoomPtzController::getSpaceMapper() {
-    return NULL;
-}

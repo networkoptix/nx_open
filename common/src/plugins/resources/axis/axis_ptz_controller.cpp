@@ -208,6 +208,10 @@ int QnAxisPtzController::startMove(const QVector3D &speed) {
     return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
 }
 
+int QnAxisPtzController::getFlip(Qt::Orientations *flip) {
+    return 1; // TODO
+}
+
 int QnAxisPtzController::setPosition(const QVector3D &position) {
     return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(position.z()));
 }
@@ -241,4 +245,12 @@ Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
 
 const QnPtzSpaceMapper *QnAxisPtzController::getSpaceMapper() {
     return m_spaceMapper;
+}
+
+int QnAxisPtzController::getLimits(QnPtzLimits *limits) {
+    return 1;
+}
+
+int QnAxisPtzController::relativeMove(const QRectF &viewport) {
+    return 1;
 }
