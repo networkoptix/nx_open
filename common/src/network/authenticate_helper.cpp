@@ -136,12 +136,12 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, QHttpResponseHeader& 
         if (user->getName().toUtf8() == userName)
         {
             QList<QByteArray> pswdData = user->getPassword().toUtf8().split('$');
-            if (pswdData.size() == 2)
+            if (pswdData.size() == 3)
             {
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
                 md5Hash.addData(pswdData[1]);
                 md5Hash.addData(password);
-                QByteArray incomeHash = md5Hash.result();
+                QByteArray incomeHash = md5Hash.result().toHex();
                 if (incomeHash == pswdData[2])
                     return true;
             }
