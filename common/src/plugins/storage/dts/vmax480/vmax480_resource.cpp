@@ -185,7 +185,7 @@ void QnPlVmax480Resource::setEndTime(qint64 valueUsec)
     m_endTime = valueUsec;
 }
 
-void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec)
+void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive)
 {
     {
         QMutexLocker lock(&m_mutex);
@@ -193,13 +193,13 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
         m_endTime = endTimeUsec;
     }
 
-    if (getChannel() == 0) 
+    if (recursive) 
     {
-        for (int i = 1; i < VMAX_MAX_CH; ++i)
+        for (int i = 0; i < VMAX_MAX_CH; ++i)
         {
             QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
-            if (otherRes)
-                otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec);
+            if (otherRes.data() != this)
+                otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
 }
