@@ -11,6 +11,7 @@
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
 static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
+static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -46,6 +47,7 @@ private:
     bool m_isSecondaryStream;
     QnVideoCamera* m_camera;
     bool m_activityStarted;
+    qint64 m_activityStartTime;
     QnResource::ConnectionRole m_role;
     qint64 m_nextMinTryTime;
 };
@@ -58,6 +60,7 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, QnResource
     m_allChannelsMask(0),
     m_camera(camera),
     m_activityStarted(false),
+    m_activityStartTime(0),
     m_role(role),
     m_nextMinTryTime(0)
 {
@@ -197,11 +200,17 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     {
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;
+            m_activityStartTime = usecTime;
             m_nextMinTryTime = usecTime + (rand()%100 + 60) * 1000000ll;
             m_camera->inUse(this);
             QnAbstractMediaStreamDataProviderPtr provider = m_camera->getLiveReader(m_role);
             if (provider)
                 provider->start();
+        }
+        else if (m_activityStarted && usecTime - m_activityStartTime > GET_FRAME_MAX_TIME )
+        {
+            m_activityStarted = false;
+            m_camera->notInUse(this);
         }
     }
     else {
