@@ -231,6 +231,10 @@ void QnSessionManager::at_aboutToBeStarted() {
         return;
 
     m_accessManager = new QNetworkAccessManager(this);
+
+    //m_accessManager->moveToThread(m_thread.data());
+    connect(m_accessManager, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
+    connect(m_accessManager, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), this, SLOT(at_proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), Qt::DirectConnection);
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
@@ -244,6 +248,18 @@ void QnSessionManager::at_aboutToBeStopped() {
      * so access manager will be deleted even if deleteLater is not delivered. */
     m_accessManager->deleteLater();
     m_accessManager = 0;
+}
+
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & proxy, QAuthenticator * authenticator )
+{
+    int gg = 4;
+}
+
+
+void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
+{
+    authenticator->setUser(lit("admin"));
+    authenticator->setPassword(lit("123"));
 }
 
 void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {
@@ -264,7 +280,9 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
         request.setRawHeader(header.first.toAscii(), header.second.toUtf8());
     }
 
-    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    QString userInfo = url.userInfo();
+    if (!userInfo.isEmpty())
+        request.setRawHeader("Authorization", "Basic " + userInfo.toLatin1().toBase64());
     if (!skipContentType)
         request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
