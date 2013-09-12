@@ -201,7 +201,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;
             m_activityStartTime = usecTime;
-            m_nextMinTryTime = usecTime + (rand()%100 + 60) * 1000000ll;
+            m_nextMinTryTime = usecTime + (rand()%100 + 60*5) * 1000000ll;
             m_camera->inUse(this);
             QnAbstractMediaStreamDataProviderPtr provider = m_camera->getLiveReader(m_role);
             if (provider)
