@@ -3,14 +3,8 @@
 
 #include <QtCore/QSharedPointer>
 
-template<class T>
-class QnSpaceMapper;
-
-template<class T>
-class QnSpaceMapperPtr;
-
-typedef QnSpaceMapper<QVector3D> QnPtzMapper;
-typedef QnSpaceMapperPtr<QVector3D> QnPtzMapperPtr;
+class QnPtzMapper;
+typedef QSharedPointer<QnPtzMapper> QnPtzMapperPtr;
 
 class QnAbstractPtzController;
 typedef QSharedPointer<QnAbstractPtzController> QnPtzControllerPtr;

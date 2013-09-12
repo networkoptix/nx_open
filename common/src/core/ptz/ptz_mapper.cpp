@@ -9,6 +9,21 @@ namespace {
 
 } // anonymous namespace
 
+QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &logicalToDevice, const QnSpaceMapperPtr<QVector3D> &deviceToLogical):
+    m_deviceToLogical(deviceToLogical),
+    m_logicalToDevice(logicalToDevice)
+{
+    QVector3D lo = m_logicalToDevice->targetToSource(m_logicalToDevice->sourceToTarget(QVector3D(-180, -90, 0)));
+    QVector3D hi = m_logicalToDevice->targetToSource(m_logicalToDevice->sourceToTarget(QVector3D(180, 90, 360)));
+
+    m_logicalLimits.minPan = lo.x();
+    m_logicalLimits.maxPan = hi.x();
+    m_logicalLimits.minTilt = lo.y();
+    m_logicalLimits.maxTilt = hi.y();
+    m_logicalLimits.minFov = lo.z();
+    m_logicalLimits.maxFov = hi.z();
+}
+
 bool deserialize(const QVariant &value, QnSpaceMapperPtr<qreal> *logical) {
     if(value.type() == QVariant::Invalid) {
         /* That's null mapper. */
@@ -103,9 +118,9 @@ bool deserialize(const QVariant &value, QnPtzMapperPtr *target) {
         }
     }
 
-    *target = QnPtzMapperPtr(new QnAssymetricSpaceMapper<QVector3D>(
-        QnPtzMapperPtr(new QnSeparableVectorSpaceMapper(fromCamera[0], fromCamera[1], fromCamera[2])),
-        QnPtzMapperPtr(new QnSeparableVectorSpaceMapper(toCamera[0], toCamera[1], toCamera[2])),
+    *target = QnPtzMapperPtr(new QnPtzMapper(
+        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(fromCamera[0], fromCamera[1], fromCamera[2])),
+        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(toCamera[0], toCamera[1], toCamera[2])),
     ));
     return true;
 }
