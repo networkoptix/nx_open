@@ -2207,7 +2207,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {
-    return (d->functions->features())
+    return (d->functions)
         && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_yv12SharedUsed
         && !m_forceSoftYUV;
@@ -2215,7 +2215,7 @@ bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 
 bool DecodedPictureToOpenGLUploader::usingShaderNV12ToRgb() const
 {
-    return (d->functions->features())
+    return (d->functions)
         && !(d->functions->features() & QnGlFunctions::ShadersBroken)
         && m_nv12SharedUsed
         && !m_forceSoftYUV;
