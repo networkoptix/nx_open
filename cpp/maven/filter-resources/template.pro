@@ -56,15 +56,12 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${environment.dir}/include \
                 ${qt.dir}/../qt-custom \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
-                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ 
+                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/
 
 DEPENDPATH *= $${INCLUDEPATH}
 
-!mac {
-  PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
-  PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
-}
+PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
+PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
 # Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
 QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_INCLUDED -DBOOST_MPL_NOT_HPP_INCLUDED -DBOOST_MPL_VOID_HPP_INCLUDED
@@ -97,12 +94,13 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
+  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
 }
 
 ## LINUX
 unix:!mac {
   LIBS += ${linux.oslibs}
-  QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
+  QMAKE_CXXFLAGS += -msse2
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
@@ -110,18 +108,9 @@ unix:!mac {
 
 ## MAC OS
 mac {
-  QMAKE_CXXFLAGS += -msse4.1 -std=c++0x -fpermissive
+  QMAKE_CXXFLAGS += -msse4.1
   QMAKE_CFLAGS += -msse4.1
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
-  INCLUDEPATH +=  ${environment.dir}/include/glext/
-  QMAKE_CFLAGS_PPC_64     -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
-  QMAKE_OBJECTIVE_CFLAGS_PPC_64  -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
-  QMAKE_CFLAGS_X86_64     -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
-  QMAKE_OBJECTIVE_CFLAGS_X86_64  -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
-  QMAKE_CXXFLAGS_PPC_64   -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
-  QMAKE_CXXFLAGS_X86_64   -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
-  QMAKE_LFLAGS_PPC_64     -= -arch ppc64 -Xarch_ppc64 -mmacosx-version-min=10.5
-  QMAKE_LFLAGS_X86_64     -= -arch x86_64 -Xarch_x86_64 -mmacosx-version-min=10.5
 }
