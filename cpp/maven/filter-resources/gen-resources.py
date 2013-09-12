@@ -10,6 +10,7 @@ specifics_file='${project.artifactId}-specifics.pro'
 output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
+ldpath='${qt.dir}/lib'
 
 def execute(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -93,7 +94,7 @@ if __name__ == '__main__':
     if os.path.exists(translations_dir):    
         for f in listdir(translations_dir):
             if f.endswith('.ts'):
-                os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${libdir}/icons'], [''],'vmsclient.png')  
     
@@ -134,9 +135,5 @@ if __name__ == '__main__':
       #<Message         >Generating code from $1/$2.$3 to $2.pb.cc</Message> \n
       #<Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs> \n
     #</CustomBuild>''')
-        elif sys.platform == 'linux2':
-            os.environ["LD_LIBRARY_PATH"] = '${qt.dir}/lib'
-            os.system('${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % output_pro_file)
-        elif sys.platform == 'darwin':
-            os.environ["DYLD_LIBRARY_PATH"] = '${qt.dir}/lib'
-            os.system('${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % output_pro_file)
+        else:
+            os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
