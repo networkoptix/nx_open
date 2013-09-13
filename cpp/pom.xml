@@ -47,7 +47,7 @@
                                     <filtering>true</filtering>
                                 </resource>	
                                 <resource>
-                                    <directory>${root.dir}/build_environment/maven/bin-resources/include</directory>
+                                    <directory>${root.dir}/build_environment/maven/filter-resources/include</directory>
                                     <includes>
                                         <include>version.h</include>
                                     </includes>
