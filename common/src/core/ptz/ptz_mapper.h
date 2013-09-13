@@ -1,9 +1,12 @@
 #ifndef QN_PTZ_MAPPER_H
 #define QN_PTZ_MAPPER_H
 
-#include "ptz_fwd.h"
+#include <QtCore/QMetaType>
 
 #include <utils/math/space_mapper.h>
+
+#include "ptz_fwd.h"
+#include "ptz_limits.h"
 
 class QnPtzMapperPrivate;
 
@@ -29,5 +32,7 @@ private:
 };
 
 bool deserialize(const QVariant &value, QnPtzMapperPtr *target);
+
+Q_DECLARE_METATYPE(QnPtzMapperPtr)
 
 #endif // QN_PTZ_MAPPER_H

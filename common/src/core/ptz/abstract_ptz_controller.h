@@ -9,6 +9,7 @@
 #include <utils/math/math.h>
 
 #include "ptz_fwd.h"
+#include "ptz_limits.h"
 
 namespace {
     qreal gradToRad(qreal x) { return x * M_PI / 180.0; }
@@ -31,16 +32,6 @@ namespace {
     }
 
 } // anonymous namespace
-
-struct QnPtzLimits {
-    qreal minPan;
-    qreal maxPan;
-    qreal minTilt;
-    qreal maxTilt;
-    qreal minFov;
-    qreal maxFov;
-};
-
 
 /**
  * A thread-safe interface for accessing camera's PTZ functions.
