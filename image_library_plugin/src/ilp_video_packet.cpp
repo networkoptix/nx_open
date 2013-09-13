@@ -22,7 +22,8 @@ ILPVideoPacket::ILPVideoPacket(
     m_timestamp( _timestamp ),
     m_buffer( NULL ),
     m_bufSize( 0 ),
-    m_flags( flags )
+    m_flags( flags ),
+    m_motionData( NULL )
 {
 }
 
@@ -33,6 +34,12 @@ ILPVideoPacket::~ILPVideoPacket()
         nxpt::freeAligned( m_buffer );
         m_buffer = NULL;
         m_bufSize = 0;
+    }
+
+    if( m_motionData )
+    {
+        m_motionData->releaseRef();
+        m_motionData = NULL;
     }
 }
 
@@ -113,7 +120,9 @@ unsigned int ILPVideoPacket::flags() const
 //!Implementation of nxpl::VideoDataPacket::getMotionData
 nxcip::Picture* ILPVideoPacket::getMotionData() const
 {
-    return NULL;
+    if( m_motionData )
+        m_motionData->addRef();
+    return m_motionData;
 }
 
 void ILPVideoPacket::resizeBuffer( unsigned int bufSize )
@@ -143,4 +152,11 @@ void ILPVideoPacket::resizeBuffer( unsigned int bufSize )
 void* ILPVideoPacket::data()
 {
     return m_buffer;
+}
+
+void ILPVideoPacket::setMotionData( nxcip::Picture* motionData )
+{
+    m_motionData = motionData;
+    if( m_motionData )
+        m_motionData->addRef();
 }

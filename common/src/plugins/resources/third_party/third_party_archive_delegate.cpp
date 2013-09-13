@@ -18,8 +18,7 @@ ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
 :
     m_resource( resource ),
     m_archiveReader( archiveReader ),
-    m_streamReader( NULL ),
-    m_reverseModeEnabled( false )
+    m_streamReader( NULL )
 {
     unsigned int caps = m_archiveReader->getCapabilities();
     if( caps & nxcip::DtsArchiveReader::reverseGopModeCapability )
@@ -82,19 +81,47 @@ QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
 {
     if( !m_streamReader )
         return QnAbstractMediaDataPtr(0);
-    return ThirdPartyStreamReader::readStreamReader( m_streamReader );
+
+    QnAbstractMediaDataPtr rez;
+
+    if( m_savedMediaPacket )
+    {
+        rez = m_savedMediaPacket;
+        m_savedMediaPacket = QnAbstractMediaDataPtr();
+    }
+    else
+    {
+        rez = ThirdPartyStreamReader::readStreamReader( m_streamReader );
+        if( rez )
+        {
+            QnCompressedVideoDataPtr videoData = rez.dynamicCast<QnCompressedVideoData>();
+            if( videoData && videoData->motion )
+            {
+                rez = videoData->motion;
+                videoData->motion = QnMetaDataV1Ptr();
+                m_savedMediaPacket = videoData;
+            }
+        }
+    }
+
+    return rez;
 }
 
 qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
 {
     nxcip::UsecUTCTimestamp selectedPosition = 0;
-    int res = m_reverseModeEnabled
-        ? m_archiveReader->setReverseMode( false, time, &selectedPosition )
-        : m_archiveReader->seek( time, findIFrame, &selectedPosition );
-    if( res != nxcip::NX_NO_ERROR )
-        return nxcip::INVALID_TIMESTAMP_VALUE;
-    m_reverseModeEnabled = false;
-    return selectedPosition;
+    switch( m_archiveReader->seek( time, findIFrame, &selectedPosition ) )
+    {
+        case nxcip::NX_NO_ERROR:
+            return selectedPosition;
+
+        case nxcip::NX_NO_DATA:
+            //returning zero in case of reverse play, DATETIME_NOW in case of forward play
+            return m_archiveReader->isReverseModeEnabled() ? 0 : DATETIME_NOW;
+
+        default:
+            return AV_NOPTS_VALUE;
+    }
 }
 
 static QnDefaultResourceVideoLayout videoLayout;
@@ -112,15 +139,12 @@ QnResourceAudioLayout* ThirdPartyArchiveDelegate::getAudioLayout()
 void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
 {
     nxcip::UsecUTCTimestamp actualSelectedTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
-    if( m_archiveReader->setReverseMode(
-            value,
-            (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
-                ? nxcip::INVALID_TIMESTAMP_VALUE
-                : displayTime,
-            &actualSelectedTimestamp ) == nxcip::NX_NO_ERROR )
-    {
-        m_reverseModeEnabled = true;
-    }
+    m_archiveReader->setReverseMode(
+        value,
+        (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
+            ? nxcip::INVALID_TIMESTAMP_VALUE
+            : displayTime,
+        &actualSelectedTimestamp );
 }
 
 void ThirdPartyArchiveDelegate::setSingleshotMode( bool /*value*/ )

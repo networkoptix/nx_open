@@ -143,9 +143,6 @@ void ThirdPartyStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
-    if( getRole() == QnResource::Role_LiveVideo )
-        readMotionInfo();
-
     if( !isStreamOpened() )
     {
         openStream();
@@ -162,9 +159,26 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     {
         if( m_liveStreamReader )
         {
-            rez = readStreamReader( m_liveStreamReader );
-            if( rez )
-                rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            if( m_savedMediaPacket )
+            {
+                rez = m_savedMediaPacket;
+                m_savedMediaPacket = QnAbstractMediaDataPtr();
+            }
+            else
+            {
+                rez = readStreamReader( m_liveStreamReader );
+                if( rez )
+                {
+                    rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+                    QnCompressedVideoDataPtr videoData = rez.dynamicCast<QnCompressedVideoData>();
+                    if( videoData && videoData->motion )
+                    {
+                        rez = videoData->motion;
+                        videoData->motion = QnMetaDataV1Ptr();
+                        m_savedMediaPacket = videoData;
+                    }
+                }
+            }
         }
         else
         {
@@ -180,6 +194,10 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 break;
             }
             else if (rez->dataType == QnAbstractMediaData::AUDIO) {
+                break;
+            }
+            else if (rez->dataType == QnAbstractMediaData::META_V1)
+            {
                 break;
             }
         }
@@ -271,7 +289,22 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             static_cast<QnCompressedVideoData*>(mediaPacket.data())->pts = packet->timestamp();
             mediaPacket->dataType = QnAbstractMediaData::VIDEO;
 
-            //TODO/IMPL adding motion data
+            nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
+            if( srcMotionData )
+            {
+                static const int DEFAULT_MOTION_DURATION = 35*1000; //~ 30 fps
+
+                if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                {
+                    //adding motion data
+                    QnMetaDataV1Ptr motion( new QnMetaDataV1() );
+                    motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                    motion->timestamp = srcVideoPacket->timestamp();
+                    motion->channelNumber = packet->channelNumber();
+                    static_cast<QnCompressedVideoData*>(mediaPacket.data())->motion = motion;
+                }
+                srcMotionData->releaseRef();
+            }
 
             srcVideoPacket->releaseRef();
             break;
@@ -290,7 +323,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     mediaPacket->compressionType = toFFmpegCodecID( packet->codecType() );
     mediaPacket->channelNumber = packet->channelNumber();
     mediaPacket->timestamp = packet->timestamp();
-    qDebug()<<"Produced packet, ts "<<mediaPacket->timestamp;
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
         mediaPacket->flags |= AV_PKT_FLAG_KEY;
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
@@ -338,9 +370,4 @@ nxcip::Resolution ThirdPartyStreamReader::getNearestResolution( int encoderNumbe
         }
     }
     return foundResolution;
-}
-
-void ThirdPartyStreamReader::readMotionInfo()
-{
-    //TODO/IMPL reading motion info using nxcip::CameraMotionDataProvider
 }

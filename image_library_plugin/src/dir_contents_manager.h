@@ -11,7 +11,7 @@
 
 #include <plugins/camera_plugin.h>
 
-//#include "mutex.h"
+#include "mutex.h"
 
 
 //!Manages information about image directory contents: Provides file list, generates timestamps of files, keep track of directory contents
@@ -26,6 +26,7 @@ public:
         \return map<timestamp, file full path>
     */
     std::map<nxcip::UsecUTCTimestamp, std::string> dirContents() const;
+    void add( const nxcip::UsecUTCTimestamp& timestamp, const std::string& filePath );
 
     nxcip::UsecUTCTimestamp minTimestamp() const;
     nxcip::UsecUTCTimestamp maxTimestamp() const;
@@ -34,7 +35,7 @@ private:
     std::string m_imageDir;
     std::map<nxcip::UsecUTCTimestamp, std::string> m_dirContents;
     unsigned int m_frameDurationUsec;
-    //mutable Mutex m_mutex;
+    mutable Mutex m_mutex;
 
     void readDirContents();
 };

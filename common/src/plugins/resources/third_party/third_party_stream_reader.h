@@ -49,11 +49,11 @@ private:
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
     nxcip::StreamReader* m_liveStreamReader;
+    QnAbstractMediaDataPtr m_savedMediaPacket;
 
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
     nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
-    void readMotionInfo();
     QnAbstractMediaDataPtr readLiveStreamReader();
 };
 

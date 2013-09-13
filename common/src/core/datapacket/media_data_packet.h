@@ -9,6 +9,7 @@ extern "C"
     #include "libavcodec/avcodec.h"
 }
 #include "abstract_data_packet.h"
+#include <plugins/camera_plugin.h>
 #include "utils/common/byte_array.h"
 #include "utils/media/sse_helper.h"
 
@@ -260,6 +261,9 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     /** returns true if no motion detected */
     bool isEmpty() const;
+
+    //!Copies \a motionPicture data
+    void assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration );
 
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);

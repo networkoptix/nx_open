@@ -13,7 +13,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 #include "mutex.h"
 
 
@@ -29,8 +29,8 @@ public:
         \param liveMode In this mode, plays all pictures in a loop
     */
     StreamReader(
-        CommonRefManager* const parentRefManager,
-        const DirContentsManager& dirContentsManager,
+        nxpt::CommonRefManager* const parentRefManager,
+        DirContentsManager* const dirContentsManager,
         unsigned int frameDurationUsec,
         bool liveMode );
     virtual ~StreamReader();
@@ -54,10 +54,11 @@ public:
     nxcip::UsecUTCTimestamp setReverseMode(
         bool isReverse,
         nxcip::UsecUTCTimestamp timestamp );
+    bool isReverse() const;
 
 private:
-    CommonRefManager m_refManager;
-    const DirContentsManager& m_dirContentsManager;
+    nxpt::CommonRefManager m_refManager;
+    DirContentsManager* const m_dirContentsManager;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
     const unsigned int m_frameDuration;

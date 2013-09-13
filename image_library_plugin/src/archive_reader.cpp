@@ -14,7 +14,7 @@
 
 
 ArchiveReader::ArchiveReader(
-    const DirContentsManager& dirContentsManager,
+    DirContentsManager* const dirContentsManager,
     unsigned int frameDurationUsec )
 :
     m_refManager( this ),
@@ -85,13 +85,13 @@ nxcip::StreamReader* ArchiveReader::getStreamReader()
 //!Implementation of nxcip::DtsArchiveReader::startTime
 nxcip::UsecUTCTimestamp ArchiveReader::startTime() const
 {
-    return m_dirContentsManager.minTimestamp();
+    return m_dirContentsManager->minTimestamp();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::endTime
 nxcip::UsecUTCTimestamp ArchiveReader::endTime() const
 {
-    return m_dirContentsManager.maxTimestamp();
+    return m_dirContentsManager->maxTimestamp();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::seek
@@ -115,6 +115,11 @@ int ArchiveReader::setReverseMode(
 {
     *selectedPosition = m_streamReader->setReverseMode( isReverse, timestamp );
     return nxcip::NX_NO_ERROR;
+}
+
+bool ArchiveReader::isReverseModeEnabled() const
+{
+    return m_streamReader->isReverse();
 }
 
 //!Implementation of nxcip::DtsArchiveReader::setMotionData

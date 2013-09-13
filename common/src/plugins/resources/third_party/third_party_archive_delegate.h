@@ -51,7 +51,7 @@ private:
     QnResourcePtr m_resource;
     nxcip::DtsArchiveReader* m_archiveReader;
     nxcip::StreamReader* m_streamReader;
-    bool m_reverseModeEnabled;
+    QnAbstractMediaDataPtr m_savedMediaPacket;
 };
 
 #endif  //THIRD_PARTY_ARCHIVE_DELEGATE_H

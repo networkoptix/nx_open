@@ -11,7 +11,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 #include "stream_reader.h"
 
 
@@ -23,7 +23,7 @@ class ArchiveReader
 {
 public:
     ArchiveReader(
-        const DirContentsManager& dirContentsManager,
+        DirContentsManager* const dirContentsManager,
         unsigned int frameDurationUsec );
     virtual ~ArchiveReader();
 
@@ -54,6 +54,8 @@ public:
         bool isReverse,
         nxcip::UsecUTCTimestamp timestamp,
         nxcip::UsecUTCTimestamp* selectedPosition ) override;
+    //!Implementation of nxcip::DtsArchiveReader::isReverseModeEnabled
+    virtual bool isReverseModeEnabled() const override;
     //!Implementation of nxcip::DtsArchiveReader::toggleMotionData
     virtual int setMotionDataEnabled( bool motionPresent ) override;
     //!Implementation of nxcip::DtsArchiveReader::setQuality
@@ -64,9 +66,9 @@ public:
     virtual void getLastErrorString( char* errorString ) const override;
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     std::auto_ptr<StreamReader> m_streamReader;
-    const DirContentsManager& m_dirContentsManager;
+    DirContentsManager* const m_dirContentsManager;
 };
 
 #endif  //ILP_ARCHIVE_READER_H

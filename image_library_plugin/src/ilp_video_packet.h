@@ -8,7 +8,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 class ILPVideoPacket
@@ -53,13 +53,17 @@ public:
     void resizeBuffer( size_t bufSize );
     void* data();
 
+    //!Adds reference to \a motionData
+    void setMotionData( nxcip::Picture* motionData );
+
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     const int m_channelNumber;
     nxcip::UsecUTCTimestamp m_timestamp;
     void* m_buffer;
     size_t m_bufSize;
     unsigned int m_flags;
+    nxcip::Picture* m_motionData;
 };
 
 #endif  //ILP_VIDEO_PACKET_H

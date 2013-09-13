@@ -5,6 +5,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
+#include "utils/media/bitStream.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
@@ -241,6 +242,51 @@ bool QnMetaDataV1::isEmpty() const
         return metadataIsEmpty_sse41((__m128i*) data.data());
     else 
         return metadataIsEmpty_sse2((__m128i*) data.data());
+}
+
+void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration )
+{
+    if( motionPicture.pixelFormat() != nxcip::PIX_FMT_MONOBLACK )
+        return;
+
+    memset( data.data(), 0, data.size() );
+
+#if 0
+    const int fullBytesPerSrcLine = std::min<int>(motionPicture.width(), MD_WIDTH) / CHAR_BIT;
+    const int leftBits = motionPicture.width() - fullBytesPerSrcLine*CHAR_BIT;
+    for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); y+=2 )
+    {
+        //line in data is not aligned to byte-boundary, so copying two lines per time
+        quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
+        //even line
+        quint8* evenLine = (quint8*)data.data() + y*MD_WIDTH/CHAR_BIT;
+        memcpy( evenLine, srcMotionDataLine, fullBytesPerSrcLine );
+
+        //odd line
+        srcMotionDataLine = (quint8*)motionPicture.scanLine( y+1 );
+        memcpy( evenLine + fullBytesPerSrcLine, srcMotionDataLine, fullBytesPerSrcLine );
+        moveBits( evenLine + fullBytesPerSrcLine, 0, 4, fullBytesPerSrcLine*CHAR_BIT );
+
+        if( leftBits > 0 )
+            *(evenLine + fullBytesPerSrcLine) |= (*(srcMotionDataLine + fullBytesPerSrcLine)) & (~(0xff>>leftBits));
+    }
+#else
+    for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); ++y )
+    {
+        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
+        for( int x = 0; x < std::min<int>(motionPicture.width(), MD_WIDTH); ++x )
+        {
+            int pixel = *(srcMotionDataLine + x/CHAR_BIT) & (1 << (x%CHAR_BIT));
+            if( pixel )
+                setMotionAt( x, y );
+        }
+    }
+#endif
+
+    //TODO/IMPL optimize with sse
+
+    m_firstTimestamp = timestamp;
+    m_duration = duration;
 }
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)

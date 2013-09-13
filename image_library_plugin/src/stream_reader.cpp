@@ -22,6 +22,12 @@
 #include "dir_contents_manager.h"
 #include "dir_iterator.h"
 #include "ilp_video_packet.h"
+#include "motion_data_picture.h"
+
+#define GENERATE_RANDOM_MOTION
+#ifdef GENERATE_RANDOM_MOTION
+static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
+#endif
 
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
@@ -29,8 +35,8 @@ static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
 static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 
 StreamReader::StreamReader(
-    CommonRefManager* const parentRefManager,
-    const DirContentsManager& dirContentsManager,
+    nxpt::CommonRefManager* const parentRefManager,
+    DirContentsManager* const dirContentsManager,
     unsigned int frameDurationUsec,
     bool liveMode )
 :
@@ -47,7 +53,7 @@ StreamReader::StreamReader(
     readDirContents();
 
     m_curPos = m_dirEntries.begin();
-    m_curTimestamp = m_dirContentsManager.minTimestamp();
+    m_curTimestamp = m_dirContentsManager->minTimestamp();
 }
 
 StreamReader::~StreamReader()
@@ -107,12 +113,31 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         isReverse = m_isReverse;
     }
 
-    std::auto_ptr<ILPVideoPacket> packet( new ILPVideoPacket(
+    std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         m_encoderNumber,
         curTimestamp,
         nxcip::MediaDataPacket::fKeyPacket |
             (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0) |
             (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0) ) );
+
+#ifdef GENERATE_RANDOM_MOTION
+    {
+        if( rand() < RAND_MAX / 100.0 * MOTION_PRESENCE_CHANCE_PERCENT )
+        {
+            //generating random motion
+            MotionDataPicture* motionData = new MotionDataPicture();
+
+            const int motionRectX = rand() % (motionData->width() - 1);
+            const int motionRectY = rand() % (motionData->height() - 1);
+            const int motionRectWidth = rand() % (motionData->width() - motionRectX);
+            const int motionRectHeight = rand() % (motionData->height() - motionRectY);
+            motionData->fillRect( motionRectX, motionRectY, motionRectWidth, motionRectHeight, 1 );
+
+            videoPacket->setMotionData( motionData );
+            motionData->releaseRef();   //videoPacket takes reference to motionData
+        }
+    }
+#endif
 
     struct stat fStat;
     memset( &fStat, 0, sizeof(fStat) );
@@ -123,8 +148,8 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_IO_ERROR;
     }
 
-    packet->resizeBuffer( fStat.st_size );
-    if( !packet->data() )
+    videoPacket->resizeBuffer( fStat.st_size );
+    if( !videoPacket->data() )
     {
         Mutex::ScopedLock lk( &m_mutex );
         moveCursorToNextFrame();
@@ -137,13 +162,16 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_OTHER_ERROR;
     for( size_t
         bytesRead = 0;
-        bytesRead < packet->dataSize() && !f.eof();
+        bytesRead < videoPacket->dataSize() && !f.eof();
          )
     {
-        f.read( (char*)packet->data() + bytesRead, packet->dataSize() - bytesRead );
+        f.read( (char*)videoPacket->data() + bytesRead, videoPacket->dataSize() - bytesRead );
         bytesRead += f.gcount();
     }
     f.close();
+
+    //if( m_liveMode )
+    //    m_dirContentsManager->add( curTimestamp, fileName );
 
     {
         Mutex::ScopedLock lk( &m_mutex );
@@ -153,7 +181,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     if( m_liveMode )
         doLiveDelay();  //emulating LIVE data delay
 
-    *lpPacket = packet.release();
+    *lpPacket = videoPacket.release();
     return nxcip::NX_NO_ERROR;
 }
 
@@ -170,21 +198,22 @@ nxcip::UsecUTCTimestamp StreamReader::setPosition( nxcip::UsecUTCTimestamp times
         return nxcip::INVALID_TIMESTAMP_VALUE;
 
     std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator it = m_dirEntries.begin();
-    if( m_isReverse )
+    if( !m_isReverse )
     {
+        //forward direction
         it = m_dirEntries.lower_bound( timestamp );
-        if( it == m_dirEntries.end() )
-            --it;   //taking last frame
     }
     else
     {
         it = m_dirEntries.upper_bound( timestamp );
         if( it != m_dirEntries.begin() )
-            --it;   //taking frame before requested
+            --it;   //taking last frame
+        else
+            it = m_dirEntries.end();
     }
 
     m_curPos = it;
-    m_curTimestamp = it->first;
+    m_curTimestamp = it == m_dirEntries.end() ? nxcip::INVALID_TIMESTAMP_VALUE : it->first;
     m_streamReset = true;
 
     return m_curTimestamp;
@@ -201,6 +230,11 @@ nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
 
     m_isReverse = isReverse;
     return timestamp == nxcip::INVALID_TIMESTAMP_VALUE ? m_curTimestamp : setPosition( timestamp );
+}
+
+bool StreamReader::isReverse() const
+{
+    return m_isReverse;
 }
 
 void StreamReader::doLiveDelay()
@@ -231,7 +265,7 @@ void StreamReader::doLiveDelay()
 
 void StreamReader::readDirContents()
 {
-    m_dirEntries = m_dirContentsManager.dirContents();
+    m_dirEntries = m_dirContentsManager->dirContents();
 }
 
 void StreamReader::moveCursorToNextFrame()

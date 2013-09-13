@@ -431,7 +431,15 @@ namespace nxcip
         //!Length of horizontal line in bytes
         virtual int xStride() const = 0;
         //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-        virtual void* scanLine( int lineNumber ) const = 0;
+        virtual const void* scanLine( int lineNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
+        virtual void* scanLine( int lineNumber ) = 0;
+        /*!
+            \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
+                \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+        */
+        virtual void* data() = 0;
+        virtual const void* data() const = 0;
     };
 
 
@@ -489,10 +497,11 @@ namespace nxcip
     {
     public:
         /*!
-            monochrome picture, 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
+            monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
                 the same as those of video picture. Motion data just designates video frame regions that are of interest.
                 If \a motionMask is NULL, then whole picture is of interest
-            \return Can be NULL
+            \note Can be NULL
             \note Motion mask is OPTIONAL. It is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is set
         */
         Picture* motionMask;
@@ -740,6 +749,10 @@ namespace nxcip
     };
 
 
+    static const unsigned int DEFAULT_MOTION_DATA_PICTURE_WIDTH = 44;
+    static const unsigned int DEFAULT_MOTION_DATA_PICTURE_HEIGHT = 32;
+
+
     // {A85D884B-F05E-4fff-8B5A-E36570E73067}
     static const nxpl::NX_GUID IID_VideoDataPacket = { { 0xa8, 0x5d, 0x88, 0x4b, 0xf0, 0x5e, 0x4f, 0xff, 0x8b, 0x5a, 0xe3, 0x65, 0x70, 0xe7, 0x30, 0x67 } };
 
@@ -752,8 +765,11 @@ namespace nxcip
         //!Returns motion data. Can be NULL
         /*!
             Can return same object with each call, incrementing ref count
-            \return monochrome picture, set bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
+            \return monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                set bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
                 those of video picture. Motion data just designates regions of video picture where motion has been detected
+            \note size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels is required!
+                If picture has greater size, only required region will be used. If picture has less size, considering that missing region contains no motion
         */
         virtual Picture* getMotionData() const = 0;
     };
@@ -893,11 +909,14 @@ namespace nxcip
         virtual UsecUTCTimestamp endTime() const = 0;
         //!Seek to specified posiition in stream
         /*!
-            Implementation is allowed to jump to point preceding requested \a timestamp
+            Implementation is allowed to jump to frame with timestamp next to requested (i.e., \a lower_bound algorithm is implied to find frame)
             \param[in] timestamp timestamp to seek to
             \param[in] findKeyFrame If \a true, MUST jump to key-frame only (selected frame timestamp MUST be equal or less than requested)
             \param[out] selectedPosition Timestamp of actually selected position
-            \return \a NX_NO_ERROR on success, otherwise - error code
+            \return\n
+                - \a NX_NO_ERROR on success
+                - \a NX_NO_DATA if \a timestamp is greater than timestamp of the last frame of the archive (in case of if forward play) and 
+                    if \a timestamp is less than timestamp of the first frame of the archive (in case of reverse play)
             \note This funtionality is required
         */
         virtual int seek( UsecUTCTimestamp timestamp, bool findKeyFrame, UsecUTCTimestamp* selectedPosition ) = 0;
@@ -912,6 +931,8 @@ namespace nxcip
             \note This funtionality is optional
         */
         virtual int setReverseMode( bool isReverse, UsecUTCTimestamp timestamp, UsecUTCTimestamp* selectedPosition ) = 0;
+        //!Returns \a true if reverse mode is currently on
+        virtual bool isReverseModeEnabled() const = 0;
         //!Toggle motion data in media stream on/off
         /*!
             \return \a NX_NO_ERROR on success, otherwise - error code
