@@ -10,17 +10,9 @@
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
 
-int QnFileSystemHandler::executeGet(const QString &, const QnRequestParamList &params, JsonResult &result)
+int QnFileSystemHandler::executeGet(const QString &, const QnRequestParams &params, JsonResult &result)
 {
-    QString storageUrl;
-    QString error;
-
-    for (int i = 0; i < params.size(); ++i) {
-        if (params[i].first == "path") {
-            storageUrl = params[i].second;
-            break;
-        }
-    }
+    QString storageUrl = params.value("path");
     if (storageUrl.isEmpty()) {
         result.setErrorText("Parameter 'path' is absent or empty.");
         return CODE_INVALID_PARAMETER;

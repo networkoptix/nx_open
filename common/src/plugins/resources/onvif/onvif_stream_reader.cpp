@@ -540,6 +540,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
+#if 0 // TODO
         if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: #Elric EVIL!
         {
             bool ptzMatched = profile && profile->PTZConfiguration;
@@ -566,6 +567,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
                 ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
             }
         }
+#endif
     }
 
 

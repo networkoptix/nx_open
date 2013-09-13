@@ -8,10 +8,10 @@ QnRelativePtzController::QnRelativePtzController(const QnPtzControllerPtr &baseC
     assert(baseController->getCapabilities() & Qn::LogicalPositionSpaceCapability);
 }
 
-Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
+/*Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::ScreenSpaceMovementCapability;
 }
 
 int QnRelativePtzController::relativeMove(const QRectF &viewport) {
     
-}
+}*/

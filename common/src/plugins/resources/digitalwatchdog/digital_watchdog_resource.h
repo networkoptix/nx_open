@@ -23,7 +23,7 @@ public:
 
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
-    virtual QnAbstractPtzController *getPtzController() override;
+    virtual QnAbstractPtzController *createPtzController() override;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

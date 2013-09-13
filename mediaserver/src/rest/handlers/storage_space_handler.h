@@ -11,7 +11,7 @@ public:
     QnStorageSpaceHandler();
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) override;
     virtual QString description() const override;
 
     QnPlatformMonitor *m_monitor;

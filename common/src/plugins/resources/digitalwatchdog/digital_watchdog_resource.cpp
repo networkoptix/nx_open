@@ -151,11 +151,12 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
     return qMax(1024,result);
 }
 
-QnAbstractPtzController *QnPlWatchDogResource::getPtzController() {
-    QnAbstractPtzController *result = base_type::getPtzController();
-    if(result)
-        return result; /* Use PTZ controller from ONVIF if one is present. */
-    return m_ptzController.data();
+QnAbstractPtzController *QnPlWatchDogResource::createPtzController() {
+    return NULL;
+    //QnAbstractPtzController *result = base_type::createPtzController();
+    //if(result)
+    //    return result; /* Use PTZ controller from ONVIF if one is present. */
+    //return m_ptzController.data();
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()

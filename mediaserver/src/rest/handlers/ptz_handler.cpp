@@ -17,7 +17,7 @@ QMutex QnPtzHandler::m_sequenceMutex;
 
 QnPtzHandler::QnPtzHandler()
 {
-
+    
 }
 
 void QnPtzHandler::cleanupOldSequence()
@@ -47,20 +47,40 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(contentType)
-
-    QnVirtualCameraResourcePtr res;
-    QnAbstractPtzController* ptz = 0;
-    QString errStr;
-
+int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) {
     QString localPath = path;
     while(localPath.endsWith('/'))
         localPath.chop(1);
-
     QString action = localPath.mid(localPath.lastIndexOf('/') + 1);
     
+    QString resourceId = params.value("res_id");
+    if(resourceId.isEmpty()) {
+        result.setErrorText("Parameter 'res_id' is absent or empty.");
+        return CODE_INVALID_PARAMETER;
+    }
+
+    QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(resourceId).dynamicCast<QnVirtualCameraResource>();
+    if(!camera) {
+        result.setErrorText(QString("Camera resource '%1' not found.").arg(resourceId));
+        return CODE_INVALID_PARAMETER;
+    }
+
+    if (camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+        result.setErrorText(QString("Camera resource '%1' is not ready yet.").arg(resourceId));
+        return CODE_INVALID_PARAMETER;
+    }
+
+    //QnAbstractPtzControllerPtr ptzController = ;
+    if (ptz == 0) {
+        result.setErrorText(QString("PTZ is not supported by camera '%1'").arg(resourceId));
+        return CODE_INVALID_PARAMETER;
+    }
+
+
+
+
+    QnVirtualCameraResourcePtr resource;
+
     qreal xSpeed = 0;
     qreal ySpeed = 0;
     qreal zoomSpeed = 0;

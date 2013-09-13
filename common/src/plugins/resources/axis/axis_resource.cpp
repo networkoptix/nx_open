@@ -917,7 +917,7 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     Q_UNUSED(http)
     // TODO: #Elric make configurable.
-    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
+    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL}; // TODO
 
     // TODO: #Elric use QHash here, +^
     QString localModel = getModel();
@@ -925,13 +925,14 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-    //m_ptzController.reset(new QnAxisPtzController(this));
-    //Qn::PtzCapabilities ptzCapabilities = m_ptzController->getCapabilities();
-    //if(ptzCapabilities == Qn::NoCapabilities)
-        //m_ptzController.reset();
-    //setPtzCapabilities(ptzCapabilities);
+    QScopedPointer<QnAxisPtzController> controller(new QnAxisPtzController(toSharedPointer(this)));
+    setPtzCapabilities(controller->getCapabilities());
 }
 
-QnAbstractPtzController* QnPlAxisResource::getPtzController() {
-    return m_ptzController.data();
+QnAbstractPtzController *QnPlAxisResource::createPtzController() {
+    if(getPtzCapabilities() == 0) {
+        return NULL;
+    } else {
+        return new QnAxisPtzController(toSharedPointer(this));
+    }
 }

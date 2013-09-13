@@ -532,9 +532,10 @@ bool QnActiResource::hasDualStreaming() const
     return mediaVariant.toInt();
 }
 
-QnAbstractPtzController* QnActiResource::getPtzController()
+QnAbstractPtzController *QnActiResource::createPtzController()
 {
-    return m_ptzController.data();
+    return NULL;
+    //return m_ptzController.data();
 }
 
 QStringList QnActiResource::getRelayOutputList() const

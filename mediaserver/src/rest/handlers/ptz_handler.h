@@ -3,23 +3,24 @@
 
 #include <QElapsedTimer>
 #include <QMutex>
-#include "rest/server/request_handler.h"
 
-class QnPtzHandler: public QnRestRequestHandler
-{
+#include <rest/server/json_rest_handler.h>
+
+class QnPtzHandler: public QnJsonRestHandler {
+    Q_OBJECT
 public:
     QnPtzHandler();
 
 protected:
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
+    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) override;
     virtual QString description() const;
+
 private:
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
+
 private:
-    struct SequenceInfo
-    {
+    struct SequenceInfo {
         SequenceInfo(int seq = 0): sequence(seq) { m_timer.restart(); }
 
         QElapsedTimer m_timer;

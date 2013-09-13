@@ -14,15 +14,13 @@
 
 class QnVideoCamera;
 
-class QnCameraDiagnosticsHandler
-:
-    public QnJsonRestHandler
-{
+class QnCameraDiagnosticsHandler: public QnJsonRestHandler {
+    Q_OBJECT
 public:
     QnCameraDiagnosticsHandler();
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) override;
     virtual QString description() const override;
 
 private:

@@ -4,13 +4,12 @@
 #include <rest/server/json_rest_handler.h>
 
 // TODO: #Elric QnStorageStatusHandler
-class QnFileSystemHandler: public QnJsonRestHandler
-{
+class QnFileSystemHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) override;
     virtual QString description() const override;
 };
 

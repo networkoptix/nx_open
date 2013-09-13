@@ -1,6 +1,8 @@
 #ifndef QN_RELATIVE_PTZ_CONTROLLER_H
 #define QN_RELATIVE_PTZ_CONTROLLER_H
 
+#include "proxy_ptz_controller.h"
+
 class QnRelativePtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;

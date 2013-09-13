@@ -65,7 +65,7 @@ public:
 
     virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override {
         JsonResult jsonResult;
-        int returnCode = executeGet(path, params, jsonResult);
+        int returnCode = executeGet(path, processParams(params), jsonResult);
 
         result = jsonResult.serialize();
         contentType = m_contentType;
@@ -75,7 +75,7 @@ public:
 
     virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) override {
         JsonResult jsonResult;
-        int returnCode = executePost(path, params, body, jsonResult);
+        int returnCode = executePost(path, processParams(params), body, jsonResult);
         
         result = jsonResult.serialize();
         contentType = m_contentType;
@@ -83,11 +83,19 @@ public:
         return returnCode;
     }
 
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) = 0;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) = 0;
     
-    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, JsonResult &result) {
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, JsonResult &result) {
         Q_UNUSED(body);
         return executeGet(path, params, result);
+    }
+
+protected:
+    QnRequestParams processParams(const QnRequestParamList &params) {
+        QnRequestParams result;
+        foreach(const QnRequestParam &param, params)
+            result.insert(param.first, param.second);
+        return result;
     }
 
 private:

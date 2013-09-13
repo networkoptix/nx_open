@@ -940,9 +940,8 @@ bool QnResource::isInitialized() const
     return m_initialized;
 }
 
-QnAbstractPtzController* QnResource::getPtzController()
-{
-    return 0;
+QnAbstractPtzController *QnResource::createPtzController() {
+    return NULL;
 }
 
 void QnResource::setUniqId(const QString& value)

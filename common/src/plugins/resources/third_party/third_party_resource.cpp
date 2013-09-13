@@ -34,7 +34,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
     stopInputPortMonitoring();
 }
 
-QnAbstractPtzController* QnThirdPartyResource::getPtzController()
+QnAbstractPtzController *QnThirdPartyResource::createPtzController()
 {
     //TODO/IMPL
     return NULL;

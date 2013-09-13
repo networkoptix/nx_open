@@ -250,6 +250,6 @@ int QnAxisPtzController::getLimits(QnPtzLimits *limits) {
     return 1;
 }
 
-int QnAxisPtzController::relativeMove(const QRectF &viewport) {
+int QnAxisPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
     return 1;
 }

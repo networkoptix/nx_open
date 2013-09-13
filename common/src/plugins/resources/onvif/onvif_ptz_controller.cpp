@@ -3,7 +3,6 @@
 #include "soap_wrapper.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "common/common_module.h"
-#include "utils/common/ptz_mapper_pool.h"
 
 
 // -------------------------------------------------------------------------- //

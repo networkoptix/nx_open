@@ -250,7 +250,7 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
+    virtual QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
     static void stopAsyncTasks();
 

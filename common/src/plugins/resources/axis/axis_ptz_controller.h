@@ -22,7 +22,7 @@ public:
     virtual int setPosition(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
     virtual int getLimits(QnPtzLimits *limits) override;
-    virtual int relativeMove(const QRectF &viewport) override;
+    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
 private:
     void updateState();
