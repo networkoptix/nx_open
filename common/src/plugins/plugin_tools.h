@@ -2,8 +2,14 @@
 #ifndef PLUGIN_TOOLS_H
 #define PLUGIN_TOOLS_H
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include <cstdlib>
 #include <cstring>
+
+#include "plugin_api.h"
 
 
 namespace nxpt
@@ -83,6 +89,15 @@ namespace nxpt
         ScopedRef& operator=( const ScopedRef& );
     };
 
+    //!Alignes \a val up to the boundary \a alignment
+    static size_t alignUp( size_t val, size_t alignment )
+    {
+        const size_t remainder = val % alignment;
+        if( remainder == 0 )
+            return val;
+        return val + (alignment - remainder);
+    }
+
     //!Allocate \a size bytes of data, aligned to \a alignment boundary
     /*!
         \note Allocated memory MUST be freed with \a freeAligned call
@@ -118,6 +133,102 @@ namespace nxpt
 
         ::free( ptr );
     }
+
+    namespace atomic
+    {
+#ifdef _WIN32
+        typedef volatile LONG AtomicLong;
+#elif __GNUC__
+        typedef volatile long AtomicLong;
+#else
+#error "Unsupported compiler is used"
+#endif
+
+        //!Increments \a *val, returns new value
+        /*!
+            \return new (incremented) value
+        */
+        static AtomicLong inc( AtomicLong* val )
+        {
+#ifdef _WIN32
+            return InterlockedIncrement( val );
+#elif __GNUC__
+            return __sync_add_and_fetch( val, 1 );
+#endif
+        }
+
+        //!Decrements \a *val, returns new value
+        /*!
+            \return new (decremented) value
+        */
+        static AtomicLong dec( AtomicLong* val )
+        {
+#ifdef _WIN32
+            return InterlockedDecrement( val );
+#elif __GNUC__
+            return __sync_sub_and_fetch( val, 1 );
+#endif
+        }
+    }
+
+    //!Implements \a nxpl::PluginInterface reference counting. Can delegate reference counting to another \a CommonRefManager instance
+    /*!
+        This class does not inherit nxpl::PluginInterface because it would require virtual inheritance.
+        This class is supposed to be nested to monitored class
+    */
+    class CommonRefManager
+    {
+    public:
+        //!Use this constructor delete \a objToWatch when reference counter drops to zero
+        /*!
+            \note Initially, reference counter is 1
+        */
+        CommonRefManager( nxpl::PluginInterface* objToWatch )
+        :
+            m_refCount( 1 ),
+            m_objToWatch( objToWatch ),
+            m_refCountingDelegate( 0 )
+        {
+        }
+
+        //!Use this constructor to delegate reference counting to another object
+        /*!
+            \note Does not increment \a refCountingDelegate reference counter
+        */
+        CommonRefManager( CommonRefManager* refCountingDelegate )
+        :
+            m_refCountingDelegate( refCountingDelegate )
+        {
+        }
+
+        //!Implementaion of nxpl::PluginInterface::addRef
+        unsigned int addRef()
+        {
+            return m_refCountingDelegate
+                ? m_refCountingDelegate->addRef()
+                : atomic::inc(&m_refCount);
+        }
+
+        //!Implementaion of nxpl::PluginInterface::releaseRef
+        /*!
+            Deletes monitored object if reference counter reached zero
+        */
+        unsigned int releaseRef()
+        {
+            if( m_refCountingDelegate )
+                return m_refCountingDelegate->releaseRef();
+
+            unsigned int newRefCounter = atomic::dec(&m_refCount);
+            if( newRefCounter == 0 )
+                delete m_objToWatch;
+            return newRefCounter;
+        }
+
+    private:
+        atomic::AtomicLong m_refCount;
+        nxpl::PluginInterface* m_objToWatch;
+        CommonRefManager* m_refCountingDelegate;
+    };
 }
 
 #endif  //PLUGIN_TOOLS_H
