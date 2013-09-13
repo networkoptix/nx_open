@@ -21,7 +21,6 @@
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-
         <appserver.name>Enterprise Controller</appserver.name>
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>

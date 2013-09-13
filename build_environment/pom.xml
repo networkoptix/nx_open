@@ -157,7 +157,7 @@
                             <arguments>
                                 <argument>buildenv.py</argument>
                             </arguments>
-                            <workingDirectory>${basedir}/python</workingDirectory>		
+                            <workingDirectory>${project.build.directory}</workingDirectory>		
                             <skip>${rsync.skip}</skip>
                         </configuration>
                     </execution>          
