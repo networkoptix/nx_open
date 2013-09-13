@@ -66,7 +66,7 @@
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Concurrent</qtlib9>
         <qtlib10>X11Extras</qtlib10>
-        <qtlib11/>
+        <!-- qtlib11 is used in macos profile -->
         <qtlib12/>
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
@@ -263,6 +263,7 @@
                 <compiler>gcc</compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-g++47</qt.spec>
+                <qtlib11>PrintSupport</qtlib11>
             </properties>
         </profile>        
         <profile>
