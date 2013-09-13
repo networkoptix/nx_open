@@ -207,7 +207,7 @@
             </dependencies>	          
         </profile>
         <profile>
-            <id>linux-noarm</id>
+            <id>noarm</id>
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>

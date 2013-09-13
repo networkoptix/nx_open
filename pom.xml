@@ -56,22 +56,23 @@
         <customization>default</customization>
         <!--QT libs used--> 
         <qtlib1>Core</qtlib1>
-        <qtlib2>Gui</qtlib2>
-        <qtlib3>Network</qtlib3>
-        <qtlib4>Opengl</qtlib4>
-        <qtlib5>Xml</qtlib5>
+        <qtlib2>Network</qtlib2>
+        <qtlib3>Xml</qtlib3>
+        <qtlib4>Concurrent</qtlib4>
+        <qtlib5>Sql</qtlib5>
         <qtlib6>Multimedia</qtlib6>
-        <qtlib7>Sql</qtlib7>
+        <qtlib7>Opengl</qtlib7>
         <qtlib8>Widgets</qtlib8>
-        <qtlib9>Concurrent</qtlib9>
-        <qtlib10>X11Extras</qtlib10>
-        <!-- qtlib11 is used in macos profile -->
+        <qtlib9>Gui</qtlib9>
+        <qtlib10>X11Extras</qtlib10>                    
+
+        <!-- qtlib11 is used in macos profile only -->
         <qtlib12/>
+        
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3/>	
-
         <!-- defined only for cross compilation -->
         <toolchain.version/>
     </properties>
