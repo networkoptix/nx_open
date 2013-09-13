@@ -23,13 +23,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>help</artifactId>
-            <version>${project.version}</version>
-            <type>tar.gz</type>
-            <classifier>${customization}</classifier>
-        </dependency>
+
         <dependency>
             <groupId>com.google</groupId>
             <artifactId>protobuf</artifactId>
@@ -57,14 +51,7 @@
             <version>${onvif.version}</version>
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>		
-        <dependency>
-            <groupId>com.sourceforge.cloudcity</groupId>
-            <artifactId>bespin</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>                           
+        </dependency>		                        
         <dependency>
             <groupId>org.hyperic</groupId>
             <artifactId>sigar</artifactId>
@@ -72,28 +59,8 @@
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>                               	
-        <dependency>
-            <groupId>org</groupId>
-            <artifactId>festival</artifactId>
-            <version>${festival.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>                               	
-        <dependency>
-            <groupId>org.festival</groupId>
-            <artifactId>festival-vox</artifactId>
-            <version>${festival.version}</version>
-            <type>tar.gz</type>
-            <classifier>all-os</classifier>
-        </dependency> 
 
-        <!--<dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>qjson</artifactId>
-            <version>0.7.1-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>       
+        <!--   
         <dependency>                 
             <groupId>com.nokia.qt.addons</groupId>
             <artifactId>qtcolorpicker</artifactId>
@@ -239,6 +206,39 @@
                 </dependency>		
             </dependencies>	          
         </profile>
+        <profile>
+            <id>linux-noarm</id>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>help</artifactId>
+                    <version>${project.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${customization}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>                               	
+                <dependency>
+                    <groupId>org.festival</groupId>
+                    <artifactId>festival-vox</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>all-os</classifier>
+                </dependency> 		
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>1.2-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>                   
+            </dependencies>	            
+        </profile>      
         <!--
         <profile>
             <id>linux</id>

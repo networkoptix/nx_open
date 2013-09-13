@@ -234,7 +234,6 @@
             </activation>
             <properties>			
                 <platform>linux</platform>
-                <qt.spec>linux-g++</qt.spec>
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
@@ -266,6 +265,15 @@
             </properties>
         </profile>        
         <profile>
+            <id>linux-noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>!cross-arch</name>
+                </property>
+            </activation>
+        </profile>        
+        <profile>
             <id>linux-arm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -274,7 +282,7 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>arch</name>
+                    <name>cross-arch</name>
                     <value>arm</value>
                 </property>
             </activation>
@@ -302,6 +310,7 @@
             </activation>
             <properties>
                 <arch>x64</arch>
+                <qt.spec>linux-g++</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -318,6 +327,7 @@
             </activation>
             <properties>
                 <arch>x86</arch>
+                <qt.spec>linux-g++</qt.spec>
             </properties>
         </profile>	
         <profile>
