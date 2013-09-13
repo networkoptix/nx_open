@@ -10,7 +10,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 #include "stream_reader.h"
 
 
@@ -53,7 +53,7 @@ public:
     virtual nxcip::StreamReader* getLiveStreamReader() override;
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
     unsigned int m_frameDurationUsec;

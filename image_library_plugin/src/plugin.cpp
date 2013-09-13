@@ -64,7 +64,7 @@ unsigned int ImageLibraryPlugin::releaseRef()
     return m_refManager.releaseRef();
 }
 
-CommonRefManager* ImageLibraryPlugin::refManager()
+nxpt::CommonRefManager* ImageLibraryPlugin::refManager()
 {
     return &m_refManager;
 }

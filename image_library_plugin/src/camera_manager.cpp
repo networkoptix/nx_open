@@ -139,7 +139,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
 
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
 {
-    *dtsArchiveReader = new ArchiveReader( m_dirContentsManager, FRAME_DURATION_USEC );
+    *dtsArchiveReader = new ArchiveReader( &m_dirContentsManager, FRAME_DURATION_USEC );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -156,7 +156,7 @@ const nxcip::CameraInfo& CameraManager::info() const
     return m_info;
 }
 
-CommonRefManager* CameraManager::refManager()
+nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
 }
@@ -164,4 +164,9 @@ CommonRefManager* CameraManager::refManager()
 const DirContentsManager& CameraManager::dirContentsManager() const
 {
     return m_dirContentsManager;
+}
+
+DirContentsManager* CameraManager::dirContentsManager()
+{
+    return &m_dirContentsManager;
 }

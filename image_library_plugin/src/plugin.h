@@ -6,7 +6,7 @@
 #ifndef IMAGE_LIBRARY_PLUGIN_H
 #define IMAGE_LIBRARY_PLUGIN_H
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 #include <memory>
 
@@ -42,12 +42,12 @@ public:
     //!Implementaion of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
-    CommonRefManager* refManager();
+    nxpt::CommonRefManager* refManager();
 
     static ImageLibraryPlugin* instance();
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     std::auto_ptr<DiscoveryManager> m_discoveryManager;
 };
 

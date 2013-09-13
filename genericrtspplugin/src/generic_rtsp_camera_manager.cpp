@@ -134,7 +134,7 @@ const nxcip::CameraInfo& GenericRTSPCameraManager::info() const
     return m_info;
 }
 
-CommonRefManager* GenericRTSPCameraManager::refManager()
+nxpt::CommonRefManager* GenericRTSPCameraManager::refManager()
 {
     return &m_refManager;
 }

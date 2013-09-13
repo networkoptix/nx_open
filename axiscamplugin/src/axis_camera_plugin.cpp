@@ -77,7 +77,7 @@ unsigned int AxisCameraPlugin::releaseRef()
     return m_refManager.releaseRef();
 }
 
-CommonRefManager* AxisCameraPlugin::refManager()
+nxpt::CommonRefManager* AxisCameraPlugin::refManager()
 {
     return &m_refManager;
 }

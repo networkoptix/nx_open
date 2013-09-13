@@ -15,7 +15,7 @@
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 class AxisCameraPlugin;
@@ -84,10 +84,10 @@ public:
         const QByteArray& paramName,
         unsigned int* paramValue );
 
-    CommonRefManager* refManager();
+    nxpt::CommonRefManager* refManager();
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object

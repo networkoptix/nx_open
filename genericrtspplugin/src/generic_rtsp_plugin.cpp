@@ -70,7 +70,7 @@ unsigned int GenericRTSPPlugin::releaseRef()
     return m_refManager.releaseRef();
 }
 
-CommonRefManager* GenericRTSPPlugin::refManager()
+nxpt::CommonRefManager* GenericRTSPPlugin::refManager()
 {
     return &m_refManager;
 }

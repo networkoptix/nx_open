@@ -11,7 +11,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 class TimePeriods
@@ -41,7 +41,7 @@ public:
     virtual bool atEnd() const override;
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     container_type::const_iterator m_pos;
 };
 

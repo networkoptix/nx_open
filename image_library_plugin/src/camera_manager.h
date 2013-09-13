@@ -9,7 +9,7 @@
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 #include "dir_contents_manager.h"
 #include "plugin.h"
 
@@ -58,11 +58,12 @@ public:
     virtual int find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const override;
 
     const nxcip::CameraInfo& info() const;
-    CommonRefManager* refManager();
+    nxpt::CommonRefManager* refManager();
     const DirContentsManager& dirContentsManager() const;
+    DirContentsManager* dirContentsManager();
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
@@ -71,7 +72,7 @@ private:
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder;
-    DirContentsManager m_dirContentsManager;
+    mutable DirContentsManager m_dirContentsManager;
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

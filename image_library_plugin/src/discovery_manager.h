@@ -8,7 +8,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 //!Represents defined (in settings) image directories as cameras with dts archive storage
@@ -49,7 +49,7 @@ public:
     virtual int getReservedModelList( char** modelList, int* count ) override;
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H

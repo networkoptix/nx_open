@@ -11,7 +11,7 @@
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 #include "generic_rtsp_plugin.h"
 
 
@@ -54,10 +54,10 @@ public:
     virtual void getLastErrorString( char* errorString ) const override;
 
     const nxcip::CameraInfo& info() const;
-    CommonRefManager* refManager();
+    nxpt::CommonRefManager* refManager();
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object

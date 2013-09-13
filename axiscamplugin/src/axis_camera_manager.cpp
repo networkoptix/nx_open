@@ -187,7 +187,7 @@ bool AxisCameraManager::isAudioEnabled() const
     return m_audioEnabled;
 }
 
-CommonRefManager* AxisCameraManager::refManager()
+nxpt::CommonRefManager* AxisCameraManager::refManager()
 {
     return &m_refManager;
 }
