@@ -129,27 +129,6 @@
             <build>
                 <plugins>					
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>	
-                            <!-- <execution>
-                                <id>default-cli</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>build.bat</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <arguments>
-                                        <commandlineArgs>${build.configuration}</commandlineArgs>
-                                    </arguments>
-                                </configuration>
-                            </execution>	-->						
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
                         <version>1.5.2</version>
@@ -243,9 +222,14 @@
                 </plugins>
             </build>
         </profile>
-	
+
         <profile>
             <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>            
             <properties>
                 <rename-skip>false</rename-skip>
             </properties>

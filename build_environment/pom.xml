@@ -208,6 +208,12 @@
         </profile>
         <profile>
             <id>noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>!cross-arch</name>
+                </property>
+            </activation>            
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -239,65 +245,5 @@
                 </dependency>                   
             </dependencies>	            
         </profile>      
-        <!--
-        <profile>
-            <id>linux</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>		
-				<property>
-					<name>!cross-arch</name>
-				</property>
-            </activation>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>                               	                        
-			</dependencies>
-
-		<profile>
-			<id>linux-arm</id>
-			<activation>
-				<os>
-					<family>unix</family>
-					<name>linux</name>
-				</os> 
-				<property>
-					<name>cross-arch</name>
-					<value>arm</value>
-				</property>
-			</activation>
-			<properties>
-				<rename-skip>false</rename-skip>
-			</properties>
-			<dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                                                        <arguments>
-                                                                                <commandlineArgs>${arch}</commandlineArgs>
-                                                                                <commandlineArgs>${toolchain.version}</commandlineArgs>
-                                                                        </arguments>
-                                <id>prepare-deb</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/prepare-package.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <skip>${assembly-skip}</skip>
-                                </configuration>
-                            </execution>							
-                        </executions>
-                    </plugin>				
-                </plugins>
-            </build>						
-        </profile>		-->
     </profiles>	
 </project>
