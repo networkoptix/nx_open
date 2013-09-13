@@ -78,7 +78,7 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamLi
 
 int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
     QnHTTPRawResponse response;
-    QnSessionManager::instance()->sendSyncRequest(
+    int status = QnSessionManager::instance()->sendSyncRequest(
         operation,
         m_url,
         nameMapper()->name(object),
@@ -86,7 +86,10 @@ int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnReq
         params,
         data,
         response
-    );
+        );
+    if (status) {
+        return status;
+    }
 
     QScopedPointer<QnAbstractReplyProcessor> processor(newReplyProcessor(object));
     processor->processReply(response, -1);
