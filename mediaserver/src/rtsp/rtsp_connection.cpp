@@ -1314,13 +1314,17 @@ void QnRtspConnectionProcessor::run()
     
     parseRequest();
     bool authOK = false;
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3 && !m_needStop; ++i)
     {
         if(!qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
         {
             sendResponse(CODE_AUTH_REQUIRED);
-            readRequest();
-            parseRequest();
+            if (readRequest()) 
+                parseRequest();
+            else {
+                authOK = false;
+                break;
+            }
         }
         else {
             authOK = true;

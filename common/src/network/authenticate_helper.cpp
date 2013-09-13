@@ -1,14 +1,14 @@
 #include "authenticate_helper.h"
 
 #include <QUuid>
-#include <QElapsedTimer>
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "utils/common/util.h"
+#include "utils/common/synctime.h"
 
 QnAuthHelper* QnAuthHelper::m_instance;
 
-static const int NONCE_TIMEOUT = 1000 * 60 * 5;
+static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
 static const QString REALM(lit("NetworkOptix"));
 
 QnAuthHelper::QnAuthHelper()
@@ -35,7 +35,6 @@ QnAuthHelper* QnAuthHelper::instance()
 
 bool QnAuthHelper::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders)
 {
-    removeOldNonces();
 
     // implement me
     QString authorization = headers.value(lit("Authorization"));
@@ -96,11 +95,10 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     md5Hash.addData(uri);
     QByteArray ha2 = md5Hash.result().toHex();
 
-    QMutexLocker lock(&m_mutex);
-
-    if (!m_nonces.contains(nonce))
+    if (!isNonceValid(nonce))
         return false;
 
+    QMutexLocker lock(&m_mutex);
     foreach(QnUserResourcePtr user, m_users)
     {
         if (user->getName().toUtf8() == userName)
@@ -119,6 +117,8 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
                 return true;
         }
     }
+    
+    addAuthHeader(responseHeaders);
     return false;
 }
 
@@ -158,28 +158,16 @@ void QnAuthHelper::addAuthHeader(QHttpResponseHeader& responseHeaders)
     responseHeaders.setValue(lit("WWW-Authenticate"), auth.arg(REALM).arg(lit(getNonce())));
 }
 
-void QnAuthHelper::removeOldNonces()
+bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const
 {
-    QMutexLocker lock(&m_mutex);
-    for(QMap<QByteArray, QElapsedTimer>::iterator itr = m_nonces.begin(); itr != m_nonces.end();)
-    {
-        if (itr.value().elapsed() >= NONCE_TIMEOUT)
-            itr = m_nonces.erase(itr);
-        else
-            ++itr;
-    }
+    qint64 n1 = nonce.toLongLong(0, 16);
+    qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
+    return qAbs(n2 - n1) < NONCE_TIMEOUT;
 }
 
 QByteArray QnAuthHelper::getNonce()
 {
-    QByteArray rez = QByteArray::number(getUsecTimer(), 16);
-    //QString rez = QUuid::createUuid().toString();
-    //rez = rez.mid(1, rez.length() - 2);
-
-    QMutexLocker lock(&m_mutex);
-    QMap<QString, QElapsedTimer>::iterator itr = m_nonces.insert(rez, QElapsedTimer());
-    itr.value().restart();
-    return rez;
+    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch() , 16);
 }
 
 void QnAuthHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)

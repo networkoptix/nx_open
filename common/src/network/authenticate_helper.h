@@ -21,15 +21,15 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
 private:
-    void removeOldNonces();
     void addAuthHeader(QHttpResponseHeader& responseHeaders);
     QByteArray getNonce();
+    bool isNonceValid(const QByteArray& nonce) const;
     bool doDigestAuth(const QByteArray& method, const QByteArray& authData, QHttpResponseHeader& responseHeaders);
     bool doBasicAuth(const QByteArray& authData, QHttpResponseHeader& responseHeaders);
 private:
     QMutex m_mutex;
     static QnAuthHelper* m_instance;
-    QMap<QByteArray, QElapsedTimer> m_nonces;
+    //QMap<QByteArray, QElapsedTimer> m_nonces;
     QMap<QnId, QnUserResourcePtr> m_users;
 };
 

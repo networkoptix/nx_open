@@ -817,7 +817,7 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     auth.setUser(user);
     auth.setPassword(password);
     
-    m_rtspSession.setAuth(auth);
+    m_rtspSession.setAuth(auth, RTPSession::authDigest);
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
