@@ -1672,6 +1672,12 @@ bool QnCamDisplay::isBuffering() const
     return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
 }
 
+void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        m_display[i]->setOverridenAspectRatio(aspectRatio);
+    }
+}
+
 // -------------------------------- QnFpsStatistics -----------------------
 
 void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)

@@ -8,6 +8,7 @@
 #include "rest_server.h"
 #include "request_handler.h"
 #include <QTime>
+#include "network/authenticate_helper.h"
 
 extern "C" {
     quint32 crc32 (quint32 crc, char *buf, quint32 len);
@@ -95,15 +96,24 @@ void QnRestConnectionProcessor::run()
             }
 
             d->responseBody.clear();
-            int rez = CODE_OK;
-            QByteArray contentType = "application/xml";
+
             QUrl url = getDecodedUrl();
-            QnRestRequestHandlerPtr handler = findHandler(url.path());
-            if (handler) 
+            QString path = url.path();
+            bool needAuth = path != lit("/api/ping/") && path != lit("/api/ping/");
+
+            if (needAuth && !qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
             {
-                QList<QPair<QString, QString> > params = url.queryItems();
-                if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
+                d->responseBody = STATIC_UNAUTHORIZED_HTML;
+                sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
+            }
+            else 
+            {
+                int rez = CODE_OK;
+                QByteArray contentType = "application/xml";
+                QnRestRequestHandlerPtr handler = findHandler(url.path());
+                if (handler) 
                 {
+                    QList<QPair<QString, QString> > params = url.queryItems();
                     if (d->requestHeaders.method().toUpper() == QLatin1String("GET")) {
                         rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
                     }
@@ -118,50 +128,45 @@ void QnRestConnectionProcessor::run()
                     }
                 }
                 else {
+                    qWarning() << "Unknown REST path " << url.path();
                     contentType = "text/html";
-                    d->responseBody = STATIC_UNAUTHORIZED_HTML;
-                    rez = CODE_AUTH_REQUIRED;
-                }
-            }
-            else {
-                qWarning() << "Unknown REST path " << url.path();
-                contentType = "text/html";
-                d->responseBody.clear();
-                d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-                d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
-                d->responseBody.append("<head>\n");
-                d->responseBody.append("<b>Requested method is absent. Allowed methods:</b>\n");
-                d->responseBody.append("</head>\n");
-                d->responseBody.append("<body>\n");
+                    d->responseBody.clear();
+                    d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+                    d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
+                    d->responseBody.append("<head>\n");
+                    d->responseBody.append("<b>Requested method is absent. Allowed methods:</b>\n");
+                    d->responseBody.append("</head>\n");
+                    d->responseBody.append("<body>\n");
 
-                d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
-                for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
-                {
-                    QString str = itr.key();
-                    if (str.startsWith(QLatin1String("api/")))
+                    d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
+                    for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
                     {
-                        d->responseBody.append("<TR><TD>");
-                        d->responseBody.append(str.toAscii());
-                        d->responseBody.append("<TD>");
-                        d->responseBody.append(itr.value()->description());
-                        d->responseBody.append("</TD>");
-                        d->responseBody.append("</TD></TR>\n");
+                        QString str = itr.key();
+                        if (str.startsWith(QLatin1String("api/")))
+                        {
+                            d->responseBody.append("<TR><TD>");
+                            d->responseBody.append(str.toAscii());
+                            d->responseBody.append("<TD>");
+                            d->responseBody.append(itr.value()->description());
+                            d->responseBody.append("</TD>");
+                            d->responseBody.append("</TD></TR>\n");
+                        }
                     }
+                    d->responseBody.append("</TABLE>\n");
+
+                    d->responseBody.append("</body>\n");
+                    d->responseBody.append("</html>\n");
+                    rez = CODE_NOT_FOUND;
                 }
-                d->responseBody.append("</TABLE>\n");
 
-                d->responseBody.append("</body>\n");
-                d->responseBody.append("</html>\n");
-                rez = CODE_NOT_FOUND;
+                QByteArray contentEncoding;
+                if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
+                    d->responseBody = compressData(d->responseBody);
+                    contentEncoding = "gzip";
+                }
+
+                sendResponse("HTTP", rez, contentType, contentEncoding, false);
             }
-
-            QByteArray contentEncoding;
-            if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
-                d->responseBody = compressData(d->responseBody);
-                contentEncoding = "gzip";
-            }
-
-            sendResponse("HTTP", rez, contentType, contentEncoding, false);
         }
         if (!isKeepAlive || t.elapsed() >= d->socketTimeout || !d->socket->isConnected())
             break;

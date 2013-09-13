@@ -101,6 +101,7 @@
 #include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
 #include "utils/network/ssl_socket.h"
+#include "network/authenticate_helper.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -883,6 +884,8 @@ void QnMain::run()
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+    QnAuthHelper::initStaticInstance(new QnAuthHelper());
+
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
 
@@ -1202,6 +1205,7 @@ void QnMain::run()
     qSettings.setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();
+    QnAuthHelper::initStaticInstance(NULL);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>

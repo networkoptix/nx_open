@@ -4,7 +4,9 @@
 
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
-static SSL_CTX *sslCTX = 0;
+
+static SSL_CTX *serverCTX = 0;
+static SSL_CTX *clientCTX = 0;
 
 static int sock_read(BIO *b, char *out, int outl)
 {
@@ -120,32 +122,35 @@ static BIO_METHOD Proxy_server_socket =
 
 void QnSSLSocket::initSSLEngine(const QByteArray& certData)
 {
-    Q_ASSERT(sslCTX == 0);
+    Q_ASSERT(serverCTX == 0);
+    Q_ASSERT(clientCTX == 0);
 
     SSL_library_init();
-    OpenSSL_add_all_algorithms();   
+    OpenSSL_add_all_algorithms();
     SSL_load_error_strings(); 
-    sslCTX = SSL_CTX_new(SSLv23_server_method());
+    serverCTX = SSL_CTX_new(SSLv23_server_method());
+    clientCTX = SSL_CTX_new(SSLv23_client_method());
 
     BIO *bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    X509 *x = PEM_read_bio_X509_AUX(bufio, NULL, sslCTX->default_passwd_callback, sslCTX->default_passwd_callback_userdata);
-    SSL_CTX_use_certificate(sslCTX, x);
+    X509 *x = PEM_read_bio_X509_AUX(bufio, NULL, serverCTX->default_passwd_callback, serverCTX->default_passwd_callback_userdata);
+    SSL_CTX_use_certificate(serverCTX, x);
+    SSL_CTX_use_certificate(clientCTX, x);
     BIO_free(bufio);
 
     bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bufio, NULL, sslCTX->default_passwd_callback, sslCTX->default_passwd_callback_userdata);
-    SSL_CTX_use_PrivateKey(sslCTX, pkey);
+    EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bufio, NULL, serverCTX->default_passwd_callback, serverCTX->default_passwd_callback_userdata);
+    SSL_CTX_use_PrivateKey(serverCTX, pkey);
     BIO_free(bufio);
 
-    SSL_CTX_set_options(sslCTX, SSL_OP_SINGLE_DH_USE);
-    SSL_CTX_set_session_id_context(sslCTX, sid, 4);
+    SSL_CTX_set_options(serverCTX, SSL_OP_SINGLE_DH_USE);
+    SSL_CTX_set_session_id_context(serverCTX, sid, 4);
 }
 
 void QnSSLSocket::releaseSSLEngine()
 {
-    if (sslCTX) {
-        SSL_CTX_free(sslCTX);
-        sslCTX = 0;
+    if (serverCTX) {
+        SSL_CTX_free(serverCTX);
+        serverCTX = 0;
     }
 }
 
@@ -194,7 +199,7 @@ void QnSSLSocket::init()
     BIO_set_app_data(d->write, this);
     BIO_set_nbio(d->write, 1);
 
-    d->ssl = SSL_new(sslCTX);  // get new SSL state with context 
+    d->ssl = SSL_new(d->isServerSide ? serverCTX : clientCTX);  // get new SSL state with context 
     SSL_set_verify(d->ssl, SSL_VERIFY_NONE, NULL);
     SSL_set_session_id_context(d->ssl, sid, 4);
     SSL_set_bio(d->ssl, d->read, d->write);
@@ -224,7 +229,10 @@ bool QnSSLSocket::doClientHandshake()
     Q_D(QnSSLSocket);
     SSL_set_connect_state(d->ssl);
 
-    return SSL_do_handshake(d->ssl) == 1;
+    int ret = SSL_do_handshake(d->ssl);
+    //int err2 = SSL_get_error(d->ssl, ret);
+    //const char* err = ERR_reason_error_string(ERR_get_error());
+    return ret == 1;
 }
 
 int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
@@ -271,6 +279,14 @@ int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
+
+    if (!SSL_is_init_finished(d->ssl)) {
+        if (d->isServerSide)
+            doServerHandshake();
+        else
+            doClientHandshake();
+    }
+
     return SSL_write(d->ssl, buffer, bufferLen);
 }
 

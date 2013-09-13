@@ -20,6 +20,7 @@ extern "C"
 #include "core/resource/media_server_resource.h"
 #include "redass/redass_controller.h"
 #include "device_plugins/server_camera/server_camera.h"
+#include "api/app_server_connection.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -809,6 +810,14 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
             numOfVideoChannels = videoLayout->channelCount();
     }
     m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
+    
+    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
+    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+    
+    m_rtspSession.setAuth(auth, RTPSession::authDigest);
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
