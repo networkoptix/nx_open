@@ -2328,14 +2328,23 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     if (!resource)
         return;
 
-#ifdef Q_OS_WIN
-    QString cmd = QLatin1String("cmd /C ping %1 -t");
-#else
-    QString cmd = QLatin1String("xterm -e ping %1");
-#endif //TODO: #ivan MacOS ping?
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
+#ifdef Q_OS_WIN
+    QString cmd = QLatin1String("cmd /C ping %1 -t");
     QProcess::startDetached(cmd.arg(host));
+#endif
+#ifdef Q_OS_LINUX
+    QString cmd = QLatin1String("xterm -e ping %1");
+    QProcess::startDetached(cmd.arg(host));
+#endif
+#ifdef Q_OS_MACX
+   QString cmd = QLatin1String("osascript");
+   QStringList args = QStringList() << lit("-e") << QString(lit("tell application \"Terminal\" to do script \"ping %1\"")).arg(host)
+                                    << lit("-e") << lit("tell application \"Terminal\" to activate");
+   QProcess::startDetached(cmd, args);
+#endif
+
 }
 
 void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
