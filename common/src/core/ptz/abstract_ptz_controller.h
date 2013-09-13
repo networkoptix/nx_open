@@ -120,15 +120,16 @@ public:
     /**
      * Moves camera's viewport relative to current viewport. New viewport 
      * coordinates are provided in a coordinate space where current viewport
-     * is a square with side 2 centered at <tt>(0, 0)</tt>.
+     * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
      * 
      * This function is expected to be implemented only if this controller has
      * <tt>Qn::ScreenSpaceMovementCapability</tt>.
      * 
+     * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
      * \returns                         Status code.
      */
-    virtual int relativeMove(const QRectF &viewport) = 0;
+    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
 protected:
     QnResourcePtr m_resource;

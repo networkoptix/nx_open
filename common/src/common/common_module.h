@@ -7,6 +7,7 @@
 #include <utils/common/instance_storage.h>
 
 class QnSessionManager;
+class QnResourceDataPool;
 
 /**
  * Storage for common module's global state.
@@ -25,6 +26,9 @@ public:
 
     using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
+
+protected:
+    void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
 
 private:
     QnSessionManager *m_sessionManager;

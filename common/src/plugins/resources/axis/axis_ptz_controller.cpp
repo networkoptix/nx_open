@@ -61,11 +61,10 @@ private:
 // -------------------------------------------------------------------------- //
 // QnAxisPtzController
 // -------------------------------------------------------------------------- //
-QnAxisPtzController::QnAxisPtzController(QnPlAxisResource* resource):
+QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
-    m_capabilities(Qn::NoCapabilities),
-    m_spaceMapper(NULL)
+    m_capabilities(Qn::NoCapabilities)
 {
     updateState();
 }

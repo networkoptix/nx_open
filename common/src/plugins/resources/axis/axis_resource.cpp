@@ -925,11 +925,11 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-    m_ptzController.reset(new QnAxisPtzController(this));
-    Qn::PtzCapabilities ptzCapabilities = m_ptzController->getCapabilities();
-    if(ptzCapabilities == Qn::NoCapabilities)
-        m_ptzController.reset();
-    setPtzCapabilities(ptzCapabilities);
+    //m_ptzController.reset(new QnAxisPtzController(this));
+    //Qn::PtzCapabilities ptzCapabilities = m_ptzController->getCapabilities();
+    //if(ptzCapabilities == Qn::NoCapabilities)
+        //m_ptzController.reset();
+    //setPtzCapabilities(ptzCapabilities);
 }
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {

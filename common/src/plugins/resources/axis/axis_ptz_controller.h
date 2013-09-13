@@ -11,7 +11,7 @@ class QnAxisParameterMap;
 class QnAxisPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
-    QnAxisPtzController(QnPlAxisResource* resource);
+    QnAxisPtzController(const QnPlAxisResourcePtr &resource);
     virtual ~QnAxisPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
@@ -25,6 +25,7 @@ public:
     virtual int relativeMove(const QRectF &viewport) override;
 
 private:
+    void updateState();
     void updateState(const QnAxisParameterMap &params);
 
     CLSimpleHTTPClient *newHttpClient() const;
@@ -32,9 +33,8 @@ private:
     bool query(const QString &request, QnAxisParameterMap *params) const;
 
 private:
-    QnPlAxisResource *m_resource;
+    QnPlAxisResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
-    //QnPtzSpaceMapper *m_spaceMapper;
 };
 
 

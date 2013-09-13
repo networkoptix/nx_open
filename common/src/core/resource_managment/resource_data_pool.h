@@ -13,7 +13,16 @@ public:
     QnResourceDataPool(QObject *parent = NULL);
     virtual ~QnResourceDataPool();
 
+    /**
+     * \param key                       Key to get data for. Note that keys are case-insensitive.
+     * \returns                         Resource data for the given key.
+     */
     QnResourceData data(const QString &key) const;
+
+    /**
+     * \param                           Camera resource to get data for.
+     * \returns                         Resource data for the given camera.
+     */
     QnResourceData data(const QnVirtualCameraResourcePtr &camera) const;
     
     bool load(const QString &fileName);
