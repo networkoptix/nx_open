@@ -14,10 +14,18 @@ static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 QMap<QString, QnPtzHandler::SequenceInfo> QnPtzHandler::m_sequencedRequests;
 QMutex QnPtzHandler::m_sequenceMutex;
 
+enum PtzAction {
+    PtzContinousMoveAction,
+    PtzAbsoluteMoveAction,
+    PtzRelativeMoveAction,
+    PtzGetPositionAction,
+};
 
-QnPtzHandler::QnPtzHandler()
-{
-    
+QnPtzHandler::QnPtzHandler() {
+    m_actionByName.insert("continuousMove", PtzContinousMoveAction);
+    m_actionByName.insert("absoluteMove", PtzAbsoluteMoveAction);
+    m_actionByName.insert("relativeMove", PtzRelativeMoveAction);
+    m_actionByName.insert("getPosition", PtzGetPositionAction);
 }
 
 void QnPtzHandler::cleanupOldSequence()
@@ -51,7 +59,13 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
     QString localPath = path;
     while(localPath.endsWith('/'))
         localPath.chop(1);
-    QString action = localPath.mid(localPath.lastIndexOf('/') + 1);
+    
+    QString actionName = localPath.mid(localPath.lastIndexOf('/') + 1);
+    int action = m_actionByName.value(actionName, -1);
+    if(action == -1) {
+        result.setErrorText(QString("Unknown action '%1'.").arg(actionName));
+        return CODE_INVALID_PARAMETER;
+    }
     
     QString resourceId = params.value("res_id");
     if(resourceId.isEmpty()) {
@@ -70,16 +84,23 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
         return CODE_INVALID_PARAMETER;
     }
 
-    //QnAbstractPtzControllerPtr ptzController = ;
+    QnAbstractPtzControllerPtr ptzController;
     if (ptz == 0) {
         result.setErrorText(QString("PTZ is not supported by camera '%1'").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
 
+    switch(action) {
+    case PtzContinousMoveAction: {
+        QVector3D speed;
+
+    }
+
+    }
 
 
 
-    QnVirtualCameraResourcePtr resource;
+    /*QnVirtualCameraResourcePtr resource;
 
     qreal xSpeed = 0;
     qreal ySpeed = 0;
@@ -88,7 +109,7 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
     qreal yPos = INT_MAX;
     qreal zoomPos = INT_MAX;
     QString seqId;
-    int seqNum = 0;
+    int seqNum = 0;*/
     
     bool resParamFound = false;
 
@@ -176,6 +197,7 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
+
 
 
     if (action == "move")

@@ -27,6 +27,7 @@ private:
         int sequence;
     };
 
+    QHash<QString, int> m_actionByName;
     bool m_detectAvailableOnly;
     
     static QMap<QString, SequenceInfo> m_sequencedRequests;
