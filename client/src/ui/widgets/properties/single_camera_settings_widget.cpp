@@ -801,9 +801,16 @@ void QnSingleCameraSettingsWidget::updateIpAddressText() {
 void QnSingleCameraSettingsWidget::updateWebPageText() {
     if(m_camera) {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
+        
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80 && url.port() > 0)
-            webPageAddress += QLatin1Char(':') + QString::number(url.port());
+        if(url.isValid()) {
+            int port = url.queryItemValue(lit("http_port")).toInt();
+            if(port == 0)
+                port = url.port(80);
+            
+            if (port != 80 && port > 0)
+                webPageAddress += QLatin1Char(':') + QString::number(url.port());
+        }
 
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
 
