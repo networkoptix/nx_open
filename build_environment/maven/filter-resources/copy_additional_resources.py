@@ -89,21 +89,32 @@ else:
         shutil.rmtree(help_dir)
         shutil.copytree('help', help_dir)    
     
-    for qtlib in qtlibs:
-        if qtlib != '': 
-            for file in os.listdir(lib_source_dir):            
-                for config in ('debug', 'release'):
-                    if fnmatch.fnmatch(file, 'libQt5%s.so.*' % qtlib):
-                        print (join(lib_source_dir, file))
-                        srcname = join(lib_source_dir, file)
-                        dstname = join(lib_target_dir, config, file)
-                        if os.path.exists(dstname):
-                            os.unlink(dstname)
-                        if os.path.islink(srcname):
-                            linkto = os.readlink(srcname)
-                            os.symlink(linkto, dstname)
-                        else:
-                            shutil.copy2(srcname, dstname)       
+    if get_environment_variable('platform') == 'linux':
+        for qtlib in qtlibs:
+            if qtlib != '': 
+                for file in os.listdir(lib_source_dir):            
+                    for config in ('debug', 'release'):
+                        if fnmatch.fnmatch(file, 'libQt5%s.so.*' % qtlib):
+                            print (join(lib_source_dir, file))
+                            srcname = join(lib_source_dir, file)
+                            dstname = join(lib_target_dir, config, file)
+                            if os.path.exists(dstname):
+                                os.unlink(dstname)
+                            if os.path.islink(srcname):
+                                linkto = os.readlink(srcname)
+                                os.symlink(linkto, dstname)
+                            else:
+                                shutil.copy2(srcname, dstname)       
+    elif get_environment_variable('platform') == 'macosx':
+        for qtlib in qtlibs:
+            if qtlib != '': 
+                for root, dirs, files in os.walk(lib_source_dir):
+                    for dir in dirs:
+                        if dir.endswith('Qt%s.framework' % qtlib):
+                            print (join(dir))
+                            shutil.copy2(join(lib_source_dir, dir, 'Versions/5', 'Qt%s_debug' % qtlib), join(lib_target_dir, 'debug'))
+                            shutil.copy2(join(lib_source_dir, dir, 'Versions/5', 'Qt%s' % qtlib), join(lib_target_dir, 'release'))                                      
+    else: print '+++++++++++++++++++++++ Could not recognize platform +++++++++++++++++++++++'
                               
     for config in ('debug', 'release'):
         shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))  
