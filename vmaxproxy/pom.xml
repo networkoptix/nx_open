@@ -23,7 +23,6 @@
     <properties>
         <!--This module is forced to be built under x86. This is done by "replace.skip" property and ./maven/vmaxproxy-specifics.pro-->
         <!--Skipping replace plugin. It replaces Win32->x64 in vcproj files for x64 build.-->
-        <replace.skip>true</replace.skip>
         <product.title>${vmaxproxy.name}</product.title>	
         <force_x86>true</force_x86>
         <!--Global libs-->
