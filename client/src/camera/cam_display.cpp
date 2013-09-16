@@ -1080,6 +1080,9 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         //    afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
 
+
+    qDebug() << "process packet time=" << QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString();
+
     if (emptyData && !flushCurrentBuffer)
     {
         if (speed == 0)
