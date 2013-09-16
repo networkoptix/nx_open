@@ -1,27 +1,27 @@
 /**********************************************************
-* 05 sep 2013
+* 16 sep 2013
 * akolesnikov
 ***********************************************************/
 
-#ifndef ILP_VIDEO_PACKET_H
-#define ILP_VIDEO_PACKET_H
+#ifndef ELP_EMPTY_PACKET_H
+#define ELP_EMPTY_PACKET_H
 
 #include <plugins/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
 
 
-class ILPVideoPacket
+class ILPEmptyPacket
 :
     public nxcip::VideoDataPacket
 {
 public:
-    ILPVideoPacket(
+    ILPEmptyPacket(
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
         unsigned int cSeq );
-    virtual ~ILPVideoPacket();
+    virtual ~ILPEmptyPacket();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -50,24 +50,12 @@ public:
     //!Implementation of nxpl::VideoDataPacket::getMotionData
     virtual nxcip::Picture* getMotionData() const override;
 
-    /*!
-        \note Does keep contents of current buffer
-    */
-    void resizeBuffer( size_t bufSize );
-    void* data();
-
-    //!Adds reference to \a motionData
-    void setMotionData( nxcip::Picture* motionData );
-
 private:
     nxpt::CommonRefManager m_refManager;
     const int m_channelNumber;
     nxcip::UsecUTCTimestamp m_timestamp;
-    void* m_buffer;
-    size_t m_bufSize;
     unsigned int m_flags;
-    nxcip::Picture* m_motionData;
     unsigned int m_cSeq;
 };
 
-#endif  //ILP_VIDEO_PACKET_H
+#endif  //ELP_EMPTY_PACKET_H

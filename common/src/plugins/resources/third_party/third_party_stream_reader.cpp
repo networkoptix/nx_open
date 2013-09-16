@@ -271,8 +271,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     nxcip::MediaDataPacket* packet = NULL;
     if( streamReader->getNextData( &packet ) != nxcip::NX_NO_ERROR )
         return QnAbstractMediaDataPtr();    //error reading data
-    if( packet == NULL )
-        return QnAbstractMediaDataPtr( new QnEmptyMediaData() );    //end of data
 
     nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
 
@@ -315,14 +313,35 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             mediaPacket->dataType = QnAbstractMediaData::AUDIO;
             break;
 
+        case nxcip::dptEmpty:
+            mediaPacket = QnAbstractMediaDataPtr(new QnEmptyMediaData());
+            break;    //end of data
+
         default:
             Q_ASSERT( false );
             break;
     }
 
     mediaPacket->compressionType = toFFmpegCodecID( packet->codecType() );
+    mediaPacket->opaque = packet->cSeq();
     mediaPacket->channelNumber = packet->channelNumber();
-    mediaPacket->timestamp = packet->timestamp();
+    if( packet->type() != nxcip::dptEmpty )
+    {
+        mediaPacket->timestamp = packet->timestamp();
+    }
+    else
+    {
+        if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
+        {
+            mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+            mediaPacket->flags |= QnAbstractMediaData::MediaFlags_ReverseReordered;
+            mediaPacket->timestamp = 0;
+        }
+        else
+        {
+            mediaPacket->timestamp = DATETIME_NOW;
+        }
+    }
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
         mediaPacket->flags |= AV_PKT_FLAG_KEY;
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
@@ -341,7 +360,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     //int opaque;
 
     //TODO/IMPL get rid of following copy by modifying QnAbstractMediaData class
-    mediaPacket->data.write( (const char*)packet->data(), packet->dataSize() );
+    if( packet->data() )
+        mediaPacket->data.write( (const char*)packet->data(), packet->dataSize() );
     return mediaPacket;
 }
 

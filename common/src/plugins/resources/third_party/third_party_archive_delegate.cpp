@@ -18,7 +18,8 @@ ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
 :
     m_resource( resource ),
     m_archiveReader( archiveReader ),
-    m_streamReader( NULL )
+    m_streamReader( NULL ),
+    m_cSeq( 0 )
 {
     unsigned int caps = m_archiveReader->getCapabilities();
     if( caps & nxcip::DtsArchiveReader::reverseGopModeCapability )
@@ -110,7 +111,7 @@ QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
 qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
 {
     nxcip::UsecUTCTimestamp selectedPosition = 0;
-    switch( m_archiveReader->seek( time, findIFrame, &selectedPosition ) )
+    switch( m_archiveReader->seek( time, findIFrame, &selectedPosition, &m_cSeq ) )
     {
         case nxcip::NX_NO_ERROR:
             return selectedPosition;
@@ -144,7 +145,8 @@ void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
         (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
             ? nxcip::INVALID_TIMESTAMP_VALUE
             : displayTime,
-        &actualSelectedTimestamp );
+        &actualSelectedTimestamp,
+        &m_cSeq );
 }
 
 void ThirdPartyArchiveDelegate::setSingleshotMode( bool /*value*/ )
@@ -158,15 +160,12 @@ bool ThirdPartyArchiveDelegate::setQuality( MediaQuality quality, bool fastSwitc
         quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh
             ? nxcip::msqHigh
             : (quality == MEDIA_Quality_Low ? nxcip::msqLow : nxcip::msqDefault),
-        fastSwitch );
+        fastSwitch ) == nxcip::NX_IO_ERROR;
 }
 
-void ThirdPartyArchiveDelegate::setRange( qint64 startTime, qint64 /*endTime*/, qint64 frameStep )
+void ThirdPartyArchiveDelegate::setRange( qint64 startTime, qint64 endTime, qint64 frameStep )
 {
-    nxcip::UsecUTCTimestamp selectedPosition = 0;
-    m_archiveReader->seek( startTime, true, &selectedPosition );
-    m_archiveReader->setSkipFrames( frameStep );
-    //TODO: #ak when disable setSkipFrames ???
+    m_archiveReader->playRange( startTime, endTime, frameStep, &m_cSeq );
 }
 
 void ThirdPartyArchiveDelegate::setSendMotion( bool value )
