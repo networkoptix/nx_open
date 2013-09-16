@@ -502,8 +502,12 @@ int main(int argc, char **argv)
         }
 
         mainWindow->show();
+#ifndef Q_OS_MACX
         if (!noFullScreen)
             context->action(Qn::EffectiveMaximizeAction)->trigger();
+        else
+#endif
+            context->action(Qn::MaximizeAction)->trigger();
         if(noVersionMismatchCheck)
             context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
