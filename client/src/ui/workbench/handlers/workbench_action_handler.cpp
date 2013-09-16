@@ -2036,15 +2036,15 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
 
             if(step < dayMSecs) {
-                QTime base;
+                QTime base = QDateTime::fromMSecsSinceEpoch(0).time();
 
                 int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
                 int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime.setTime(QTime());
+                startDateTime.setTime(base);
                 startDateTime = startDateTime.addMSecs(startMSecs);
 
-                endDateTime.setTime(QTime());
+                endDateTime.setTime(base);
                 endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
@@ -2063,7 +2063,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             period = QnTimePeriod(startTime, endTime - startTime);
         }
 
-        itemCount = period.durationMs / step;
+        itemCount = qMin(period.durationMs / step, maxItems);
     }
 
     /* Adjust for chunks. */
