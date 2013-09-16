@@ -125,6 +125,7 @@ namespace nx_http
     }
 
 
+    //!Parses \a data and saves header name and data to \a *headerName and \a *headerValue
     bool parseHeader(
         StringType* const headerName,
         StringType* const headerValue,
