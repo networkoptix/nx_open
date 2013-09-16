@@ -58,9 +58,46 @@ bool QnAuthHelper::authenticate(const QHttpRequestHeader& headers, QHttpResponse
         return false;
 }
 
+//!Splits \a data by \a delimiter not closed within quotes
+/*!
+    E.g.: 
+    \code
+    one, two, "three, four"
+    \endcode
+
+    will be splitted to 
+    \code
+    one
+    two
+    "three, four"
+    \endcode
+*/
+static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
+{
+    bool quoted = false;
+    QList<QByteArray> rez;
+    if (data.isEmpty())
+        return rez;
+
+    int lastPos = 0;
+    for (int i = 0; i < data.size(); ++i)
+    {
+        if (data[i] == '\"')
+            quoted = !quoted;
+        else if (data[i] == delimiter && !quoted)
+        {
+            rez << QByteArray(data.constData() + lastPos, i - lastPos);
+            lastPos = i + 1;
+        }
+    }
+    rez << QByteArray(data.constData() + lastPos, data.size() - lastPos);
+
+    return rez;
+}
+
 bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, QHttpResponseHeader& responseHeaders)
 {
-    QList<QByteArray> authParams = authData.split(',');
+    const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
     QByteArray userName;
     QByteArray response;
