@@ -22,6 +22,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QMainWindow>
 #include <QtGui/QDesktopServices>
 
 #include <QtSingleApplication>
@@ -484,8 +485,11 @@ int main(int argc, char **argv)
         context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
         /* Create main window. */
-        QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
+        QScopedPointer<QMainWindow> mainWindow(new QMainWindow());
         context->setMainWindow(mainWindow.data());
+
+        QnMainWindow* qnMainWindow = new QnMainWindow(context.data());
+        mainWindow->setCentralWidget(qnMainWindow);
         mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
         if(screen != -1) {
@@ -516,9 +520,9 @@ int main(int argc, char **argv)
 
         /* Process input files. */
         for (int i = 1; i < argc; ++i)
-            mainWindow->handleMessage(QFile::decodeName(argv[i]));
+            qnMainWindow->handleMessage(QFile::decodeName(argv[i]));
         if(!noSingleApplication)
-            QObject::connect(application.data(), SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
+            QObject::connect(application.data(), SIGNAL(messageReceived(const QString &)), qnMainWindow, SLOT(handleMessage(const QString &)));
 
 #ifdef TEST_RTSP_SERVER
         addTestData();

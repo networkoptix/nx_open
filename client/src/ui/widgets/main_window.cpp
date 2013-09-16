@@ -131,7 +131,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
-    setWindowTitle(QApplication::applicationName());
+    context->mainWindow()->setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
     setMinimumWidth(minimalWindowWidth);
     setMinimumHeight(minimalWindowHeight);
@@ -320,31 +320,31 @@ void QnMainWindow::setWindowButtonsVisible(bool visible) {
 }
 
 void QnMainWindow::setMaximized(bool maximized) {
-    if(maximized == isMaximized())
+    if(maximized == context()->mainWindow()->isMaximized())
         return;
 
     if(maximized) {
-        showMaximized();
-    } else if(isMaximized()) {
-        showNormal();
+        context()->mainWindow()->showMaximized();
+    } else if(context()->mainWindow()->isMaximized()) {
+        context()->mainWindow()->showNormal();
     }
 }
 
 void QnMainWindow::setFullScreen(bool fullScreen) {
-    if(fullScreen == isFullScreen())
+    if(fullScreen == context()->mainWindow()->isFullScreen())
         return;
 
     if(fullScreen) {
-        m_storedGeometry = geometry();
-        showFullScreen();
-    } else if(isFullScreen()) {
-        showNormal();
-        setGeometry(m_storedGeometry);
+        m_storedGeometry = context()->mainWindow()->geometry();
+        context()->mainWindow()->showFullScreen();
+    } else if(context()->mainWindow()->isFullScreen()) {
+        context()->mainWindow()->showNormal();
+        context()->mainWindow()->setGeometry(m_storedGeometry);
     }
 }
 
 void QnMainWindow::minimize() {
-    setWindowState(Qt::WindowMinimized | windowState());
+    context()->mainWindow()->setWindowState(Qt::WindowMinimized | windowState());
 }
 
 void QnMainWindow::toggleTitleVisibility() {
@@ -372,8 +372,8 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
-    bool fullScreen = isFullScreen();
-    bool maximized = isMaximized();
+    bool fullScreen = context()->mainWindow()->isFullScreen();
+    bool maximized = context()->mainWindow()->isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
@@ -386,7 +386,7 @@ void QnMainWindow::updateDecorationsState() {
 }
 
 void QnMainWindow::updateDwmState() {
-    if(isFullScreen()) {
+    if(context()->mainWindow()->isFullScreen()) {
         /* Full screen mode. */
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
@@ -434,7 +434,7 @@ void QnMainWindow::updateDwmState() {
     } else {
         /* Windowed or maximized without aero glass. */
         m_drawCustomFrame = true;
-        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
+        m_frameMargins = !context()->mainWindow()->isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
 
         if(m_dwm->isSupported()) {
             setAttribute(Qt::WA_NoSystemBackground, false);
@@ -592,7 +592,7 @@ bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long 
 #endif
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
-    if(isFullScreen())
+    if(context()->mainWindow()->isFullScreen())
         return Qt::NoSection;
 
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
