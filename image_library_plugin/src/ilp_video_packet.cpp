@@ -125,7 +125,7 @@ nxcip::Picture* ILPVideoPacket::getMotionData() const
     return m_motionData;
 }
 
-void ILPVideoPacket::resizeBuffer( unsigned int bufSize )
+void ILPVideoPacket::resizeBuffer( size_t bufSize )
 {
     if( bufSize < m_bufSize && bufSize > 0 )
     {
