@@ -1424,7 +1424,7 @@ void QnRtspConnectionProcessor::run()
     bool authOK = false;
     for (int i = 0; i < 3 && !m_needStop; ++i)
     {
-        if(!qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
+        if(!qnAuthHelper->authenticate(d->request, d->response))
         {
             sendResponse(CODE_AUTH_REQUIRED);
             if (readRequest()) 

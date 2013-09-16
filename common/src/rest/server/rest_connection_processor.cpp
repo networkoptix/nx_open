@@ -114,7 +114,7 @@ void QnRestConnectionProcessor::run()
             QString path = url.path();
             bool needAuth = path != lit("/api/ping/") && path != lit("/api/ping/");
 
-            if (needAuth && !qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
+            if (needAuth && !qnAuthHelper->authenticate(d->request, d->response))
             {
                 d->responseBody = STATIC_UNAUTHORIZED_HTML;
                 sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
@@ -169,17 +169,17 @@ void QnRestConnectionProcessor::run()
                     d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
                     for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
                     {
+                        QString str = itr.key();
                         d->responseBody.append("<TR><TD>");
                         d->responseBody.append(str.toLatin1());
                         d->responseBody.append("<TD>");
                         d->responseBody.append(itr.value()->description());
                         d->responseBody.append("</TD>");
                         d->responseBody.append("</TD></TR>\n");
-                        QString str = itr.key();
                         if (str.startsWith(QLatin1String("api/")))
                         {
                             d->responseBody.append("<TR><TD>");
-                            d->responseBody.append(str.toAscii());
+                            d->responseBody.append(str.toLatin1());
                             d->responseBody.append("<TD>");
                             d->responseBody.append(itr.value()->description());
                             d->responseBody.append("</TD>");
@@ -194,19 +194,14 @@ void QnRestConnectionProcessor::run()
                 }
 
                 QByteArray contentEncoding;
+    #ifdef USE_NX_HTTP
+                if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
+    #else
                 if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
+    #endif
                     d->responseBody = compressData(d->responseBody);
                     contentEncoding = "gzip";
                 }
-
-            QByteArray contentEncoding;
-#ifdef USE_NX_HTTP
-            if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
-#else
-            if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
-#endif
-                d->responseBody = compressData(d->responseBody);
-                contentEncoding = "gzip";
                 sendResponse("HTTP", rez, contentType, contentEncoding, false);
             }
         }
