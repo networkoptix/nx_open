@@ -672,6 +672,9 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::number(screen);
     }
 
+    if (qnSettings->isDevMode())
+        arguments << QLatin1String("--dev-mode-key=razrazraz");
+
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
