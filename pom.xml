@@ -74,6 +74,7 @@
         <module>mediaproxy</module>
         <module>client</module>		
         <module>testcamera</module>
+	<module>image_library_plugin</module>
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>

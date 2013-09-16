@@ -32,6 +32,7 @@ public:
     static QList<QDate> recordedMonth(const QString& macAddress);
 
     QnMotionHelper();
+
 private:
     static QString getBaseDir(const QString& macAddress);
 
@@ -40,6 +41,13 @@ private:
 
     // mach one motion image by mask
     bool mathImage(const __m128i* data);
+    void mathImage(
+        const QList<QRegion>& regions,
+        QnResourcePtr res,
+        qint64 msStartTime,
+        qint64 msEndTime,
+        int detailLevel,
+        QVector<QnTimePeriodList>* const timePeriods );
 
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;

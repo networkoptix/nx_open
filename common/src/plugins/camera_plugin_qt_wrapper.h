@@ -150,8 +150,6 @@ namespace nxcip_qt
 
         //!See nxcip::BaseCameraManager::getPTZManager
         nxcip::CameraPTZManager* getPTZManager() const;
-        //!See nxcip::BaseCameraManager::getCameraMotionDataProvider
-        nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const;
         //!See nxcip::BaseCameraManager::getCameraRelayIOManager
         nxcip::CameraRelayIOManager* getCameraRelayIOManager() const;
 

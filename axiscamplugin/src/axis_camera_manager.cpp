@@ -53,6 +53,11 @@ void* AxisCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
         addRef();
         return this;
     }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
     return NULL;
 }
 
@@ -130,10 +135,8 @@ nxcip::CameraPTZManager* AxisCameraManager::getPTZManager() const
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
 nxcip::CameraMotionDataProvider* AxisCameraManager::getCameraMotionDataProvider() const
 {
-    //TODO/IMPL
     return NULL;
 }
 
@@ -184,7 +187,7 @@ bool AxisCameraManager::isAudioEnabled() const
     return m_audioEnabled;
 }
 
-CommonRefManager* AxisCameraManager::refManager()
+nxpt::CommonRefManager* AxisCameraManager::refManager()
 {
     return &m_refManager;
 }

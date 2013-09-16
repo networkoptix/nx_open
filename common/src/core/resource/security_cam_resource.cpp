@@ -645,3 +645,17 @@ bool QnSecurityCamResource::needCheckIpConflicts() const
 {
     return getChannel() == 0 && !hasCameraCapabilities(Qn::shareIpCapability);
 }
+
+QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
+    const QList<QRegion>& regions,
+    qint64 msStartTime,
+    qint64 msEndTime,
+    int detailLevel )
+{
+    Q_UNUSED( regions );
+    Q_UNUSED( msStartTime );
+    Q_UNUSED( msEndTime );
+    Q_UNUSED( detailLevel );
+
+    return QnTimePeriodList();
+};

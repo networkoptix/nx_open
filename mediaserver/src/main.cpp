@@ -1,3 +1,6 @@
+
+#include <cstdlib>
+
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -1275,6 +1278,8 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+    ::srand( ::time(NULL) );
+
     QnVideoService service(argc, argv);
 
     int result = service.exec();
