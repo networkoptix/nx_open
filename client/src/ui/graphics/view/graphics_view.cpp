@@ -25,7 +25,10 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene *scene, QWidget * parent):
     QGraphicsView(scene, parent),
     m_paintFlags(0),
     m_behaviorFlags(0)
-{}
+{
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+}
 
 QnGraphicsView::~QnGraphicsView() {
     while(!m_backgroundPainters.empty())
