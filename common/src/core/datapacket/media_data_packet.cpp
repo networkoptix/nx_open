@@ -251,26 +251,12 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
 
     memset( data.data(), 0, data.size() );
 
-#if 0
-    const int fullBytesPerSrcLine = std::min<int>(motionPicture.width(), MD_WIDTH) / CHAR_BIT;
-    const int leftBits = motionPicture.width() - fullBytesPerSrcLine*CHAR_BIT;
-    for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); y+=2 )
-    {
-        //line in data is not aligned to byte-boundary, so copying two lines per time
-        quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
-        //even line
-        quint8* evenLine = (quint8*)data.data() + y*MD_WIDTH/CHAR_BIT;
-        memcpy( evenLine, srcMotionDataLine, fullBytesPerSrcLine );
+    //TODO/IMPL some optimization would be appropriate, but is difficult, 
+        //since data has following format:
+            //column1
+            //column2
+            //.. columnN
 
-        //odd line
-        srcMotionDataLine = (quint8*)motionPicture.scanLine( y+1 );
-        memcpy( evenLine + fullBytesPerSrcLine, srcMotionDataLine, fullBytesPerSrcLine );
-        moveBits( evenLine + fullBytesPerSrcLine, 0, 4, fullBytesPerSrcLine*CHAR_BIT );
-
-        if( leftBits > 0 )
-            *(evenLine + fullBytesPerSrcLine) |= (*(srcMotionDataLine + fullBytesPerSrcLine)) & (~(0xff>>leftBits));
-    }
-#else
     for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); ++y )
     {
         const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
@@ -281,9 +267,6 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
                 setMotionAt( x, y );
         }
     }
-#endif
-
-    //TODO/IMPL optimize with sse
 
     m_firstTimestamp = timestamp;
     m_duration = duration;
