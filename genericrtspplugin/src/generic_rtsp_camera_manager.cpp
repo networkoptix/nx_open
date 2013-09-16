@@ -39,6 +39,11 @@ void* GenericRTSPCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID
         addRef();
         return this;
     }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
     return NULL;
 }
 
@@ -106,7 +111,6 @@ nxcip::CameraPTZManager* GenericRTSPCameraManager::getPTZManager() const
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
 nxcip::CameraMotionDataProvider* GenericRTSPCameraManager::getCameraMotionDataProvider() const
 {
     return NULL;
@@ -130,7 +134,7 @@ const nxcip::CameraInfo& GenericRTSPCameraManager::info() const
     return m_info;
 }
 
-CommonRefManager* GenericRTSPCameraManager::refManager()
+nxpt::CommonRefManager* GenericRTSPCameraManager::refManager()
 {
     return &m_refManager;
 }

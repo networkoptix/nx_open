@@ -48,7 +48,8 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_prevSrcWidth(0),
     m_prevSrcHeight(0),
     m_lastIgnoreTime(AV_NOPTS_VALUE),
-    m_isPaused(false)
+    m_isPaused(false),
+    m_overridenAspectRatio(0.0)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
@@ -326,7 +327,9 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
     while (dec->decode(emptyData, &tmpFrame)) 
     {
-        outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+        qreal sampleAr = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
+        outFrame->sample_aspect_ratio = qFuzzyIsNull(m_overridenAspectRatio) ? dec->getSampleAspectRatio() : sampleAr / m_overridenAspectRatio;
+
         pixFmt = dec->GetPixelFormat();
 
         if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
@@ -541,7 +544,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             if (outFrame->data[0])
                 m_reverseSizeInBytes -= avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
 
-            outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+            qreal sampleAr = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
+            outFrame->sample_aspect_ratio = qFuzzyIsNull(m_overridenAspectRatio) ? dec->getSampleAspectRatio() : sampleAr / m_overridenAspectRatio;
+
             if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
                 return Status_Displayed;
             else
@@ -565,7 +570,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             decodeToFrame->data[2] += (2592-1920)/4;
         }
         */
-        QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
+
+        qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
+        qreal ar = qFuzzyIsNull(m_overridenAspectRatio) ? dec->getSampleAspectRatio() : sampleAr / m_overridenAspectRatio;
+
+        QSize imageSize(decodeToFrame->width*ar, decodeToFrame->height);
         QMutexLocker lock(&m_imageSizeMtx);
         m_imageSize = imageSize;
     }
@@ -650,7 +659,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             m_reverseSizeInBytes -= avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
     }
 
-    outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+    qreal sampleAr = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
+    outFrame->sample_aspect_ratio = qFuzzyIsNull(m_overridenAspectRatio) ? dec->getSampleAspectRatio() : sampleAr / m_overridenAspectRatio;
 
     //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
@@ -707,7 +717,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     }
     outFrame->pkt_dts = m_tmpFrame->pkt_dts;
     outFrame->metadata = m_tmpFrame->metadata;
-    outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+
+    qreal sampleAr = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
+    outFrame->sample_aspect_ratio = qFuzzyIsNull(m_overridenAspectRatio) ? dec->getSampleAspectRatio() : sampleAr / m_overridenAspectRatio;
 
     if (processDecodedFrame(dec, outFrame, false, false))
         return Status_Displayed;
@@ -772,6 +784,10 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
 bool QnVideoStreamDisplay::selfSyncUsed() const
 {
     return m_bufferedFrameDisplayer;
+}
+
+void QnVideoStreamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
+    m_overridenAspectRatio = aspectRatio;
 }
 
 void QnVideoStreamDisplay::flushFramesToRenderer()

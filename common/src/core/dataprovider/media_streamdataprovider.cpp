@@ -165,7 +165,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr media)
     {
         // correct packets timestamp if we have got several packets very fast
 
-        if (media->flags & QnAbstractMediaData::MediaFlags_BOF) {
+        if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart)) {
             resetTimeCheck();
         }
         else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE) {

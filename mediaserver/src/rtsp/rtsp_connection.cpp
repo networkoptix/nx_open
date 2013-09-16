@@ -39,6 +39,7 @@
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
 #include "utils/network/tcp_listener.h"
+#include "network/authenticate_helper.h"
 
 class QnTcpListener;
 
@@ -1416,10 +1417,32 @@ void QnRtspConnectionProcessor::run()
     //d->socket->setRecvTimeout(1000*1000);
     //d->socket->setSendTimeout(1000*1000);
 
-    if (!d->clientRequest.isEmpty()) {
-        parseRequest();
-        processRequest();
+    if (d->clientRequest.isEmpty()) 
+        readRequest();
+    
+    parseRequest();
+    bool authOK = false;
+    for (int i = 0; i < 3 && !m_needStop; ++i)
+    {
+        if(!qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
+        {
+            sendResponse(CODE_AUTH_REQUIRED);
+            if (readRequest()) 
+                parseRequest();
+            else {
+                authOK = false;
+                break;
+            }
+        }
+        else {
+            authOK = true;
+            break;
+        }
     }
+    if (!authOK)
+        return;
+
+    processRequest();
 
     QTime t;
     while (!m_needStop && d->socket->isConnected())

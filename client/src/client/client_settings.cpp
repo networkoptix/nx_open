@@ -51,8 +51,8 @@ namespace {
 
 QnClientSettings::QnClientSettings(QObject *parent):
     base_type(parent),
-    m_settings(new QSettings(this)),
     m_accessManager(new QNetworkAccessManager(this)),
+    m_settings(new QSettings(this)),
     m_loading(true)
 {
     connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_accessManager_finished(QNetworkReply *)));

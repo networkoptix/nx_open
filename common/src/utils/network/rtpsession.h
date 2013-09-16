@@ -122,6 +122,11 @@ class RTPSession: public QObject
 {
     Q_OBJECT;
 public:
+    enum DefaultAuthScheme {
+        authNone,
+        authBasic,
+        authDigest // generate nonce as current time in usec
+    };
 
     //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
 
@@ -225,7 +230,11 @@ public:
 
     void parseRangeHeader(const QString& rangeStr);
 
-    void setAuth(const QAuthenticator& auth);
+    /*
+    * Client will use any AuthScheme corresponding to server requirements (authenticate server request)
+    * defaultAuthScheme is used for first client request only
+    */
+    void setAuth(const QAuthenticator& auth, DefaultAuthScheme defaultAuthScheme);
     QAuthenticator getAuth() const;
 
     void setProxyAddr(const QString& addr, int port);
@@ -296,11 +305,13 @@ private:
     void updateResponseStatus(const QByteArray& response);
 
     // in case of error return false
-    bool checkIfDigestAuthIsneeded(const QByteArray& response);
+    bool isDigestAuthRequired(const QByteArray& response);
     void usePredefinedTracks();
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
+    QByteArray calcDefaultNonce() const;
+    bool sendPlayInternal(qint64 startPos, qint64 endPos);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
