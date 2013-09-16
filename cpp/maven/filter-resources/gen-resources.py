@@ -63,7 +63,7 @@ def gentext(file, path, extensions, text):
         parent = root[len(path) + 1:]
         
         for dir in dirs:
-            if dir.endswith('_specific') and (not dir.endswith('${common.platform}_specific') or not dir.endswith('${platform}_specific')):
+            if dir.endswith('_specific') and not dir.endswith('${platform}_specific'):
                 if not dir.endswith('${common.platform}_specific'):
                     dirs.remove(dir)              
         
