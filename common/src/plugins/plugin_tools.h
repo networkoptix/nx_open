@@ -2,8 +2,17 @@
 #ifndef PLUGIN_TOOLS_H
 #define PLUGIN_TOOLS_H
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
-namespace nxpl_tools
+#include <cstdlib>
+#include <cstring>
+
+#include "plugin_api.h"
+
+
+namespace nxpt
 {
     //!Automatic scoped pointer class which uses \a PluginInterface reference counting interface (\a PluginInterface::addRef and \a PluginInterface::releaseRef) instead of new/delete
     /*!
@@ -15,12 +24,14 @@ namespace nxpl_tools
     class ScopedRef
     {
     public:
-        //!Calls \a ptr->addRef() if \a ptr is not 0
-        ScopedRef( T* ptr = 0 )
+        //!Calls \a ptr->addRef() if \a ptr is not 0 and \a increaseRef is true
+        ScopedRef( T* ptr = 0, bool increaseRef = true )
         :
             m_ptr( 0 )
         {
-            take( ptr );
+            m_ptr = ptr;
+            if( m_ptr && increaseRef )
+                m_ptr->addRef();
         }
 
         ~ScopedRef()
@@ -76,6 +87,147 @@ namespace nxpl_tools
 
         ScopedRef( const ScopedRef& );
         ScopedRef& operator=( const ScopedRef& );
+    };
+
+    //!Alignes \a val up to the boundary \a alignment
+    static size_t alignUp( size_t val, size_t alignment )
+    {
+        const size_t remainder = val % alignment;
+        if( remainder == 0 )
+            return val;
+        return val + (alignment - remainder);
+    }
+
+    //!Allocate \a size bytes of data, aligned to \a alignment boundary
+    /*!
+        \note Allocated memory MUST be freed with \a freeAligned call
+        \note Function is as safe as \a ::malloc is
+    */
+    static void* mallocAligned( size_t size, size_t alignment )
+    {
+        if( alignment == 0 )
+            return 0;
+        void* ptr = ::malloc( size + alignment + sizeof(alignment) );
+        if( !ptr )   //allocation error
+            return ptr;
+
+        void* aligned_ptr = (char*)ptr + sizeof(alignment);  //leaving place to save unalignment
+        const size_t unalignment = alignment - (((size_t)aligned_ptr) % alignment);
+        memcpy( (char*)ptr+unalignment, &unalignment, sizeof(unalignment) );
+        return (char*)aligned_ptr + unalignment;
+    }
+
+    //!free \a ptr allocated with a call to \a mallocAligned with \a alignment
+    /*!
+        \note Function is as safe as \a ::free is
+    */
+    static void freeAligned( void* ptr )
+    {
+        if( !ptr )
+            return ::free( ptr );
+
+        ptr = (char*)ptr - sizeof(size_t);
+        size_t unalignment = 0;
+        memcpy( &unalignment, ptr, sizeof(unalignment) );
+        ptr = (char*)ptr - unalignment;
+
+        ::free( ptr );
+    }
+
+    namespace atomic
+    {
+#ifdef _WIN32
+        typedef volatile LONG AtomicLong;
+#elif __GNUC__
+        typedef volatile long AtomicLong;
+#else
+#error "Unsupported compiler is used"
+#endif
+
+        //!Increments \a *val, returns new value
+        /*!
+            \return new (incremented) value
+        */
+        static AtomicLong inc( AtomicLong* val )
+        {
+#ifdef _WIN32
+            return InterlockedIncrement( val );
+#elif __GNUC__
+            return __sync_add_and_fetch( val, 1 );
+#endif
+        }
+
+        //!Decrements \a *val, returns new value
+        /*!
+            \return new (decremented) value
+        */
+        static AtomicLong dec( AtomicLong* val )
+        {
+#ifdef _WIN32
+            return InterlockedDecrement( val );
+#elif __GNUC__
+            return __sync_sub_and_fetch( val, 1 );
+#endif
+        }
+    }
+
+    //!Implements \a nxpl::PluginInterface reference counting. Can delegate reference counting to another \a CommonRefManager instance
+    /*!
+        This class does not inherit nxpl::PluginInterface because it would require virtual inheritance.
+        This class is supposed to be nested to monitored class
+    */
+    class CommonRefManager
+    {
+    public:
+        //!Use this constructor delete \a objToWatch when reference counter drops to zero
+        /*!
+            \note Initially, reference counter is 1
+        */
+        CommonRefManager( nxpl::PluginInterface* objToWatch )
+        :
+            m_refCount( 1 ),
+            m_objToWatch( objToWatch ),
+            m_refCountingDelegate( 0 )
+        {
+        }
+
+        //!Use this constructor to delegate reference counting to another object
+        /*!
+            \note Does not increment \a refCountingDelegate reference counter
+        */
+        CommonRefManager( CommonRefManager* refCountingDelegate )
+        :
+            m_refCountingDelegate( refCountingDelegate )
+        {
+        }
+
+        //!Implementaion of nxpl::PluginInterface::addRef
+        unsigned int addRef()
+        {
+            return m_refCountingDelegate
+                ? m_refCountingDelegate->addRef()
+                : atomic::inc(&m_refCount);
+        }
+
+        //!Implementaion of nxpl::PluginInterface::releaseRef
+        /*!
+            Deletes monitored object if reference counter reached zero
+        */
+        unsigned int releaseRef()
+        {
+            if( m_refCountingDelegate )
+                return m_refCountingDelegate->releaseRef();
+
+            unsigned int newRefCounter = atomic::dec(&m_refCount);
+            if( newRefCounter == 0 )
+                delete m_objToWatch;
+            return newRefCounter;
+        }
+
+    private:
+        atomic::AtomicLong m_refCount;
+        nxpl::PluginInterface* m_objToWatch;
+        CommonRefManager* m_refCountingDelegate;
     };
 }
 

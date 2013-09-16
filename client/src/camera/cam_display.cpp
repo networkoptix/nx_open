@@ -379,9 +379,14 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (vd->flags & QnAbstractMediaData::MediaFlags_BOF)
         m_lastSleepInterval = needToSleep = 0;
-    
+
     if (vd->flags & AV_REVERSE_BLOCK_START)
-        needToSleep = m_lastSleepInterval;
+    {
+        const long frameTimeDiff = abs((long)(currentTime - m_previousVideoTime));
+        needToSleep = (m_lastSleepInterval == 0) && (frameTimeDiff < MAX_FRAME_DURATION * 1000)
+            ? frameTimeDiff
+            : m_lastSleepInterval;
+    }
     else {
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
