@@ -132,29 +132,29 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     md5Hash.addData(uri);
     QByteArray ha2 = md5Hash.result().toHex();
 
-    if (!isNonceValid(nonce))
-        return false;
-
-    QMutexLocker lock(&m_mutex);
-    foreach(QnUserResourcePtr user, m_users)
+    if (isNonceValid(nonce)) 
     {
-        if (user->getName().toUtf8() == userName)
+        QMutexLocker lock(&m_mutex);
+        foreach(QnUserResourcePtr user, m_users)
         {
-            QByteArray dbHash = user->getDigest().toUtf8();
+            if (user->getName().toUtf8() == userName)
+            {
+                QByteArray dbHash = user->getDigest().toUtf8();
 
-            QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-            md5Hash.addData(dbHash);
-            md5Hash.addData(":");
-            md5Hash.addData(nonce);
-            md5Hash.addData(":");
-            md5Hash.addData(ha2);
-            QByteArray calcResponse = md5Hash.result().toHex();
+                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+                md5Hash.addData(dbHash);
+                md5Hash.addData(":");
+                md5Hash.addData(nonce);
+                md5Hash.addData(":");
+                md5Hash.addData(ha2);
+                QByteArray calcResponse = md5Hash.result().toHex();
 
-            if (calcResponse == response)
-                return true;
+                if (calcResponse == response)
+                    return true;
+            }
         }
     }
-    
+
     addAuthHeader(responseHeaders);
     return false;
 }
