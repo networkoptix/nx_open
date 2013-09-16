@@ -1,7 +1,7 @@
 TEMPLATE = app
 
-LIBS -= -L${environment.dir}/qt/bin/x64/$$CONFIGURATION
-LIBS += -L${environment.dir}/qt/bin/x86/$$CONFIGURATION
+LIBS -= -L${qt.dir}/lib
+LIBS += -L${qt.dir}/../qtbase-x86/lib
 DESTDIR = ${libdir}/${arch}/bin/$$CONFIGURATION/${project.artifactId}
 
 win* {

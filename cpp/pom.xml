@@ -155,7 +155,7 @@
                                             <value>Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:${arch}"</value>
                                         </replacement>         
                                     </replacements>
-                                    <skip>${replace.skip}</skip>
+                                    <skip>${force_x86}</skip>
                                 </configuration>								
                             </execution>
 
