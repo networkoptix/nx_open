@@ -5,6 +5,7 @@
 
 #include "motion_data_picture.h"
 
+#include <climits>
 #include <cstring>
 
 #include <plugins/plugin_tools.h>

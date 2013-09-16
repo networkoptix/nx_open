@@ -46,10 +46,10 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
     m_audioLayout(0),
-    m_customVideoLayout(0),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_customVideoLayout(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;

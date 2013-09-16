@@ -114,17 +114,17 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
+    m_forceMtDecoding(false),
     m_timeMutex(QMutex::Recursive),
     m_resource(resource),
-	m_firstAfterJumpTime(AV_NOPTS_VALUE),
-	m_receivedInterval(0),
+    m_firstAfterJumpTime(AV_NOPTS_VALUE),
+    m_receivedInterval(0),
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
-    m_multiView(false),
-    m_forceMtDecoding(false)
+    m_multiView(false)
 {
 
     if (resource && resource->toResource()->hasFlags(QnResource::live_cam))

@@ -101,13 +101,13 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
-void CameraManager::setCredentials( const char* username, const char* password )
+void CameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
 {
     //TODO/IMPL
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
-int CameraManager::setAudioEnabled( int audioEnabled )
+int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
 {
     return nxcip::NX_NO_ERROR;
 }

@@ -10,6 +10,7 @@
 #else
 #include <pthread.h>
 #endif
+#include <cstring>
 
 
 class MutexImpl

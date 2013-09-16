@@ -47,7 +47,7 @@ public:
         Initially, iterator is pointing to some undefined position
         \param dirPath Directory to iterate
     */
-    DirIterator( const std::string& dirPath ) throw();
+    DirIterator( const std::string& dirPath );
     ~DirIterator();
 
     //!Enable/disable reading child directories. By default recursive mode is off

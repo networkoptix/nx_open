@@ -10,9 +10,12 @@
 #elif __linux__
 #   include <sys/types.h>
 #   include <dirent.h>
+#   include <sys/stat.h>
 #else
 #   error "Unsupported platform"
 #endif
+
+#include <cstring>
 
 #include <list>
 
@@ -199,7 +202,7 @@ public:
 		    if( readdir_r( dp, &entry, &result ) != 0 )
             {
                 //error occured
-                const int findErrBak = errno();
+                const int findErrBak = errno;
                 closedir( dp );
                 dp = NULL;
                 dirQueue.clear();
@@ -217,22 +220,22 @@ public:
                 continue;
             }
 
-		    if( !strcmp( result->d_name, "." ) )
-			    continue;
-		    if( !strcmp( result->d_name, ".." ) )
-			    continue;
+            if( !strcmp( result->d_name, "." ) )
+                continue;
+            if( !strcmp( result->d_name, ".." ) )
+                continue;
 
             entryName = string(result->d_name);
-	        entryPath = currentDir.empty() ? string(result->d_name) : currentDir+"/"+result->d_name;
+                entryPath = currentDir.empty() ? string(result->d_name) : currentDir+"/"+result->d_name;
 
 #ifdef _BSD_SOURCE
-		    entrySize = (uint64_t)-1;
+            entrySize = (uint64_t)-1;
             switch( result->d_type )
             {
                 case DT_DIR:
                     entryType = FsEntryType::etDirectory;
-			        if( recursive )
-				        dirQueue.push_back( entryPath );
+                    if( recursive )
+                        dirQueue.push_back( entryPath );
                     return true;
 
                 case DT_REG:
@@ -247,29 +250,29 @@ public:
                     return true;
             }
 #endif
-            struct stat64 st;
-		    const string fullName = dir+"/"+currentDir+"/"+string(result->d_name);
-		    if( stat64( fullName.c_str(), &st ) )
-			    continue;
+            struct stat st;	//linux uses most recent API (stat64 since 2.4.x)
+            const string fullName = dir+"/"+currentDir+"/"+string(result->d_name);
+            if( stat( fullName.c_str(), &st ) )
+                continue;
 
-		    if( st.st_mode & S_IFDIR )
-		    {
+            if( st.st_mode & S_IFDIR )
+            {
                 entryType = FsEntryType::etDirectory;
-			    if( recursive )
-				    dirQueue.push_back( entryPath );
-		    }
-		    else if( st.st_mode & S_IFREG )
-		    {
+                if( recursive )
+                    dirQueue.push_back( entryPath );
+            }
+            else if( st.st_mode & S_IFREG )
+            {
                 entryType = FsEntryType::etRegularFile;
             }
             else
             {
-		        entryType = FsEntryType::etOther;
+                entryType = FsEntryType::etOther;
             }
-		    entrySize = st.st_size;
-		    //creationTimestamp.m_val = st.st_ctime;
+            entrySize = st.st_size;
+            //creationTimestamp.m_val = st.st_ctime;
 
-	        return true;
+            return true;
         }
     }
 #endif
@@ -344,7 +347,7 @@ uint64_t DirIterator::entrySize() const
         struct stat64 st;
         memset( &st, 0, sizeof(st) );
         if( stat64( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
-            break;
+            return 0;
         m_impl->entrySize = st.st_size;
     }
 #endif

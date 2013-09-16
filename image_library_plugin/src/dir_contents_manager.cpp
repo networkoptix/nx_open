@@ -7,6 +7,7 @@
 
 #include <sys/timeb.h>
 #include <sys/types.h>
+#include <cstring>
 
 #include "dir_iterator.h"
 

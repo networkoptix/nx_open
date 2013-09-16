@@ -14,8 +14,8 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
         QnAbstractDataConsumer(20), 
-        m_owner(owner),
-        m_sequence(0)
+        m_sequence(0),
+        m_owner(owner)
     {
         for (int i = 0; i < 2; ++i) {
             m_serializers[i].setAdditionFlags(0);
