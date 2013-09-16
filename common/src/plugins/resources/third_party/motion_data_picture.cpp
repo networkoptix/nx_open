@@ -68,7 +68,7 @@ int MotionDataPicture::width() const
     return nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH;
 }
 
-//!Height (pixels)
+//!Hidth (pixels)
 int MotionDataPicture::height() const
 {
     return nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT;

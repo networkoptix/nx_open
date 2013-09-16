@@ -181,7 +181,7 @@ namespace nxcip
     {
         //!Width in pixels
         int width;
-        //!Hidth in pixels
+        //!Height in pixels
         int height;
 
         Resolution( int _width = 0, int _height = 0 )
@@ -426,7 +426,7 @@ namespace nxcip
         virtual PixelFormat pixelFormat() const = 0;
         //!Width (pixels)
         virtual int width() const = 0;
-        //!Hidth (pixels)
+        //!Height (pixels)
         virtual int height() const = 0;
         //!Length of horizontal line in bytes
         virtual int xStride() const = 0;
@@ -503,6 +503,7 @@ namespace nxcip
                 If \a motionMask is NULL, then whole picture is of interest
             \note Can be NULL
             \note Motion mask is OPTIONAL. It is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is set
+                If plugin does not support \a BaseCameraManager2::searchByMotionMaskCapability capabilitym it MUST ignore this value
         */
         Picture* motionMask;
         //!Min data timestamp that is of interest
@@ -511,8 +512,8 @@ namespace nxcip
         UsecUTCTimestamp endTime;
         /*!
             Requried period detalization level.
-            E.g., if two time periods have gap between them less than this value, those time periods SHOULD be present as one.
-            0 means that all time periods MUSt be returned
+            E.g., if two time periods have gap between them less than this value, those time periods SHOULD be reported as one.
+            0 means that all time periods MUST be returned
             \note This parameter is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is supported
             \note Support of this parameter is OPTIONAL. Implementation is allowed to ignore this value. Although, implementing it helps for better performance
         */

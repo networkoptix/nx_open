@@ -32,7 +32,7 @@ public:
     virtual nxcip::PixelFormat pixelFormat() const override;
     //!Width (pixels)
     virtual int width() const override;
-    //!Height (pixels)
+    //!Hidth (pixels)
     virtual int height() const override;
     //!Length of horizontal line in bytes
     virtual int xStride() const override;

@@ -29,11 +29,6 @@ public:
         const nxcip_qt::CameraDiscoveryManager& discoveryManager );
     virtual ~QnThirdPartyResource();
 
-    //!Implementation of QnSecurityCamResource::createArchiveDataProvider
-    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
-    //!Implementation of QnSecurityCamResource::createArchiveDelegate
-    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
-
     //!Implementation of QnResource::getPtzController
     virtual QnAbstractPtzController* getPtzController() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
@@ -57,6 +52,16 @@ public:
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
+    //!Implementation of QnSecurityCamResource::createArchiveDataProvider
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
+    //!Implementation of QnSecurityCamResource::createArchiveDelegate
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    //!Implementation of QnSecurityCamResource::getDtsTimePeriodsByMotionRegion
+    virtual QnTimePeriodList getDtsTimePeriodsByMotionRegion(
+        const QList<QRegion>& regions,
+        qint64 msStartTime,
+        qint64 msEndTime,
+        int detailLevel ) override;
 
     //!Implementation of QnNetworkResource::getDtsTimePeriods
     virtual QnTimePeriodList getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel ) override;

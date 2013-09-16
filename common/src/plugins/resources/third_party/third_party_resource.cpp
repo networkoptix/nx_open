@@ -11,6 +11,7 @@
 #include <QStringList>
 
 #include "api/app_server_connection.h"
+#include "motion_data_picture.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "third_party_stream_reader.h"
 #include "third_party_archive_delegate.h"
@@ -34,40 +35,6 @@ QnThirdPartyResource::QnThirdPartyResource(
 QnThirdPartyResource::~QnThirdPartyResource()
 {
     stopInputPortMonitoring();
-}
-
-QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
-{
-    QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
-    QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
-    archiveReader->setArchiveDelegate(archiveDelegate);
-    if (hasFlags(still_image) || hasFlags(utc))
-        archiveReader->setCycleMode(false);
-    return archiveReader;
-}
-
-QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
-{
-    unsigned int camCapabilities = 0;
-    if( m_camManager.getCameraCapabilities( &camCapabilities ) != nxcip::NX_NO_ERROR ||
-        (camCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability) == 0 )
-    {
-        return NULL;
-    }
-
-    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
-    if( !camManager2 )
-        return NULL;
-
-    nxcip::DtsArchiveReader* archiveReader = NULL;
-    if( camManager2->createDtsArchiveReader( &archiveReader ) != nxcip::NX_NO_ERROR ||
-        archiveReader == NULL )
-    {
-        return NULL;
-    }
-    camManager2->releaseRef();
-
-    return new ThirdPartyArchiveDelegate( toResourcePtr(), archiveReader );
 }
 
 QnAbstractPtzController* QnThirdPartyResource::getPtzController()
@@ -166,9 +133,47 @@ bool QnThirdPartyResource::setRelayOutputState(
         autoResetTimeoutMS ) == nxcip::NX_NO_ERROR;
 }
 
+QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
+{
+    QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+    QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    if (hasFlags(still_image) || hasFlags(utc))
+        archiveReader->setCycleMode(false);
+    return archiveReader;
+}
+
+QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
+{
+    unsigned int camCapabilities = 0;
+    if( m_camManager.getCameraCapabilities( &camCapabilities ) != nxcip::NX_NO_ERROR ||
+        (camCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability) == 0 )
+    {
+        return NULL;
+    }
+
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    if( !camManager2 )
+        return NULL;
+
+    nxcip::DtsArchiveReader* archiveReader = NULL;
+    if( camManager2->createDtsArchiveReader( &archiveReader ) != nxcip::NX_NO_ERROR ||
+        archiveReader == NULL )
+    {
+        return NULL;
+    }
+    camManager2->releaseRef();
+
+    return new ThirdPartyArchiveDelegate( toResourcePtr(), archiveReader );
+}
+
 static const unsigned int USEC_IN_MS = 1000;
 
-QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel )
+QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
+    const QList<QRegion>& regions,
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    int detailLevel )
 {
     nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
     Q_ASSERT( camManager2 );
@@ -176,6 +181,30 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qi
     QnTimePeriodList resultTimePeriods;
 
     nxcip::ArchiveSearchOptions searchOptions;
+    if( !regions.isEmpty() )
+    {
+        //filling in motion mask
+        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture() );
+
+        QRegion unitedRegion;
+        for( QList<QRegion>::const_iterator
+            it = regions.begin();
+            it != regions.end();
+            ++it )
+        {
+            unitedRegion = unitedRegion.united( *it );
+        }
+
+        const QVector<QRect>& rects = unitedRegion.rects();
+        foreach( QRect r, rects )
+        {
+            for( int y = r.top(); y < std::min<int>(motionDataPicture->height(), r.bottom()); ++y )
+                for( int x = r.left(); x < std::min<int>(motionDataPicture->width(), r.right()); ++x )
+                    motionDataPicture->setPixel( x, y, 1 );
+        }
+
+        searchOptions.motionMask = motionDataPicture.release();
+    }
     searchOptions.startTime = startTimeMs * USEC_IN_MS;
     searchOptions.endTime = endTimeMs * USEC_IN_MS;
     searchOptions.periodDetailLevel = detailLevel;
@@ -195,6 +224,15 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qi
     timePeriods->releaseRef();
 
     return resultTimePeriods;
+}
+
+QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel )
+{
+    return getDtsTimePeriodsByMotionRegion(
+        QList<QRegion>(),
+        startTimeMs,
+        endTimeMs,
+        detailLevel );
 }
 
 //!Implementation of nxpl::NXPluginInterface::queryInterface
