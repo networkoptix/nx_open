@@ -68,7 +68,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>            
             <properties>
@@ -84,12 +85,12 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>cross-arch</name>
+                    <name>arch</name>
                     <value>arm</value>
                 </property>
             </activation>            
             <properties>
-                <qt.libs>core network xml multimedia sql</qt.libs>
+                <qt.libs>core network xml sql</qt.libs>
             </properties>
         </profile>          
     </profiles>	

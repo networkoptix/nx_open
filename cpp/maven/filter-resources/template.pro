@@ -100,7 +100,9 @@ unix: {
 ## LINUX
 unix:!mac {
   LIBS += ${linux.oslibs}
-  QMAKE_CXXFLAGS += -msse2
+  ${arch}:!arm {
+    QMAKE_CXXFLAGS += -msse2
+  }  
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX

@@ -211,7 +211,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>            
             <dependencies>

@@ -68,13 +68,11 @@
 
         <!-- qtlib11 is used in macos profile only -->
         <qtlib12/>
-        
+
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3/>	
-        <!-- defined only for cross compilation -->
-        <toolchain.version/>
     </properties>
 
     <modules>
@@ -235,6 +233,7 @@
             </activation>
             <properties>			
                 <platform>linux</platform>
+                <qt.spec>linux-g++</qt.spec>
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
@@ -270,7 +269,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
         </profile>        
@@ -283,7 +283,7 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>cross-arch</name>
+                    <name>arch</name>
                     <value>arm</value>
                 </property>
             </activation>
@@ -291,10 +291,9 @@
                 <!-- <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version> 
                 <arch>${cross-arch}</arch>
                 <toolchain.version>2011.09</toolchain.version>
-                <toolchain.version>2009q3</toolchain.version>
                 <compiler>${toolchain.version}</compiler> -->
-                <arch>arm</arch>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <toolchain.version>2009q3</toolchain.version>
             </properties>
         </profile>	
         <profile>
@@ -306,12 +305,12 @@
                     <arch>amd64</arch>
                 </os> 
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <properties>
                 <arch>x64</arch>
-                <qt.spec>linux-g++</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -323,12 +322,12 @@
                     <arch>i386</arch>
                 </os>
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <properties>
                 <arch>x86</arch>
-                <qt.spec>linux-g++</qt.spec>
             </properties>
         </profile>	
         <profile>

@@ -251,19 +251,6 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>		
                                 </configuration>
                             </execution>
-
-                            <execution>
-                                <id>prepare-deb</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/prepare-package.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <skip>${assembly-skip}</skip>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                 </plugins>	
