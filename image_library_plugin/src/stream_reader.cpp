@@ -22,6 +22,7 @@
 #include "dir_contents_manager.h"
 #include "dir_iterator.h"
 #include "ilp_video_packet.h"
+#include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
 
 #define GENERATE_RANDOM_MOTION
@@ -48,7 +49,8 @@ StreamReader::StreamReader(
     m_liveMode( liveMode ),
     m_streamReset( true ),
     m_nextFrameDeployTime( 0 ),
-    m_isReverse( false )
+    m_isReverse( false ),
+    m_cSeq( 0 )
 {
     readDirContents();
 
@@ -94,23 +96,30 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     bool streamReset = false;
     std::string fileName;
     bool isReverse = false;
+    unsigned int cSeq = 0;
 
     {
         Mutex::ScopedLock lk( &m_mutex );
-
-        if( m_curPos == m_dirEntries.end() )
-        {
-            *lpPacket = NULL;
-            return nxcip::NX_NO_ERROR;    //end-of-data
-        }
 
         //copying data for consistency
         curTimestamp = m_curTimestamp;
         streamReset = m_streamReset;
         if( m_streamReset )
             m_streamReset = false;
-        fileName = m_curPos->second;
+        fileName = m_curPos == m_dirEntries.end() ? std::string() : m_curPos->second;
         isReverse = m_isReverse;
+        cSeq = m_cSeq;
+    }
+
+    if( fileName.empty() )
+    {
+        //end of data
+        *lpPacket = new ILPEmptyPacket(
+            m_encoderNumber,
+            curTimestamp,
+            isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0,
+            cSeq );
+        return nxcip::NX_NO_ERROR;
     }
 
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
@@ -118,7 +127,8 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         curTimestamp,
         nxcip::MediaDataPacket::fKeyPacket |
             (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0) |
-            (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0) ) );
+            (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0),
+        cSeq ) );
 
 #ifdef GENERATE_RANDOM_MOTION
     {
@@ -190,7 +200,9 @@ void StreamReader::interrupt()
     //TODO/IMPL
 }
 
-nxcip::UsecUTCTimestamp StreamReader::setPosition( nxcip::UsecUTCTimestamp timestamp )
+nxcip::UsecUTCTimestamp StreamReader::setPosition(
+    nxcip::UsecUTCTimestamp timestamp,
+    unsigned int* const cSeq )
 {
     Mutex::ScopedLock lk( &m_mutex );
 
@@ -215,13 +227,15 @@ nxcip::UsecUTCTimestamp StreamReader::setPosition( nxcip::UsecUTCTimestamp times
     m_curPos = it;
     m_curTimestamp = it == m_dirEntries.end() ? nxcip::INVALID_TIMESTAMP_VALUE : it->first;
     m_streamReset = true;
+    *cSeq = ++m_cSeq;
 
     return m_curTimestamp;
 }
 
 nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
     bool isReverse,
-    nxcip::UsecUTCTimestamp timestamp )
+    nxcip::UsecUTCTimestamp timestamp,
+    unsigned int* const cSeq )
 {
     Mutex::ScopedLock lk( &m_mutex );
 
@@ -229,7 +243,15 @@ nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
         return m_curTimestamp;
 
     m_isReverse = isReverse;
-    return timestamp == nxcip::INVALID_TIMESTAMP_VALUE ? m_curTimestamp : setPosition( timestamp );
+    if( timestamp == nxcip::INVALID_TIMESTAMP_VALUE )
+    {
+        *cSeq = ++m_cSeq;
+        return m_curTimestamp;
+    }
+    else
+    {
+        return setPosition( timestamp, cSeq );
+    }
 }
 
 bool StreamReader::isReverse() const

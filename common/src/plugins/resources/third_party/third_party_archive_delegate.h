@@ -52,6 +52,7 @@ private:
     nxcip::DtsArchiveReader* m_archiveReader;
     nxcip::StreamReader* m_streamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
+    unsigned int m_cSeq;
 };
 
 #endif  //THIRD_PARTY_ARCHIVE_DELEGATE_H

@@ -689,7 +689,12 @@ namespace nxcip
     enum DataPacketType
     {
         dptAudio,
-        dptVideo
+        dptVideo,
+        //!Packet containing no data (e.g., signals end of stream)
+        /*!
+            Packet of this type MUST have \a MediaDataPacket::fReverseStream flag set properly
+        */
+        dptEmpty
     };
 
 
@@ -708,7 +713,7 @@ namespace nxcip
         {
             //!e.g., h.264 IDR frame
             fKeyPacket          = 0x01,
-            //!packet has been generated during playback of reverse stream
+            //!packet has been generated during playback of reverse stream. Packets of type \a dptEmpty MUST have this flag set if end-of-stream has been reached with reverse mode
             fReverseStream      = 0x02,
             //!set in first packet of gop block of reverse stream (see \a nxcip::DtsArchiveReader::setReverseMode)
             fReverseBlockStart  = 0x04,
@@ -747,6 +752,11 @@ namespace nxcip
         virtual CompressionType codecType() const = 0;
         //!Returns combination of values from \a MediaDataPacket::Flags enumeration
         virtual unsigned int flags() const = 0;
+        //!Returns sequence number of command, this packet has been generated in response to
+        /*!
+            Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange
+        */
+        virtual unsigned int cSeq() const = 0;
     };
 
 
@@ -782,7 +792,7 @@ namespace nxcip
     //!Used for reading media stream from camera
     /*!
         Provides synchronous API to receiving media stream
-        \note returns stream of media data of different types (video, audio, motion)
+        \note returns stream of media data of different types (video, audio)
         \note This class itself does not add any delay into media stream. Data is returned upon its availability. 
             E.g., while reading media stream from file with 30fps, actual data rate is not limited with 30fps, but with read speed only
     */
@@ -794,11 +804,12 @@ namespace nxcip
         //!Returns media packet or NULL in case of error
         /*!
             If no data is available, blocks till some data becomes available or \a StreamReader::interrupt had been called
-            \param packet
+            \param packet MUST NOT be \a NULL if \a nxcip::NX_NO_ERROR is returned
             \return error code (\a nxcip::NX_NO_ERROR on success)
-            \note Returns packet has its ref counter set to 1
-            \note On end of data, \a nxcip::NX_NO_ERROR is returned and \a packet is set to NULL
+            \note Returned packet has its ref counter set to 1
+            \note On end of data, \a nxcip::NX_NO_ERROR is returned and \a packet MUST have type \a dptEmpty
             \note If two subsequent packets has timestamp difference greater than 2 seconds it is considered that timestamp discontinuity has occured
+            \note Packets of type \a dptEmpty MUST have flag \a MediaDataPacket::fReverseStream set if end-of-stream has been reached with reverse mode
         */
         virtual int getNextData( MediaDataPacket** packet ) = 0;
 
@@ -824,8 +835,15 @@ namespace nxcip
         Does not provide media stream itself, but provides methods to manage (seek, select playback direction, select stream source (encoder) ) stream, 
             provided by \a StreamReader instance
 
+        \par \b cSeq (command sequence counter)
+        Every instance of this interface operates with command sequence number. It is an integer value, which is incremented by implementation
+            with each call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange.
+            This is required functionality, since command is allowed to be executed with some delay.
+            Each mentioned function returnes new \a cSeq. Initial \a cSeq value if implementation-dependent
+
         It is not required, that archive contains data from all encoders
         \note By default, archive is positioned to the beginning, quality set to high and playback direction is forward
+        \note Methods of this class can be called in thread different from thread calling \a StreamReader::getNextData()
     */
     class DtsArchiveReader
     :
@@ -914,24 +932,35 @@ namespace nxcip
             \param[in] timestamp timestamp to seek to
             \param[in] findKeyFrame If \a true, MUST jump to key-frame only (selected frame timestamp MUST be equal or less than requested)
             \param[out] selectedPosition Timestamp of actually selected position
+            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \return\n
                 - \a NX_NO_ERROR on success
                 - \a NX_NO_DATA if \a timestamp is greater than timestamp of the last frame of the archive (in case of if forward play) and 
                     if \a timestamp is less than timestamp of the first frame of the archive (in case of reverse play)
             \note This funtionality is required
         */
-        virtual int seek( UsecUTCTimestamp timestamp, bool findKeyFrame, UsecUTCTimestamp* selectedPosition ) = 0;
+        virtual int seek(
+            UsecUTCTimestamp timestamp,
+            bool findKeyFrame,
+            UsecUTCTimestamp* selectedPosition,
+            unsigned int* const cSeq ) = 0;
         //!Set playback direction (forward/reverse)
         /*!
             If \a timestamp is not equal to \a INVALID_TIMESTAMP_VALUE, seek is performed along with playback direction change
             \param[in] isReverse If true, playback 
             \param[in] position if not \a INVALID_TIMESTAMP_VALUE, playback SHOULD jump to this position (with rules, defined for \a DtsArchiveReader::seek)
             \param[out] selectedPosition Timestamp of actually selected position
+            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \note This method is used only if \a DtsArchiveReader::reverseModeCapability is supported
             \return \a NX_NO_ERROR on success, otherwise - error code
             \note This funtionality is optional
+            \note If end-of-stream reached with reverse mode, packets of type \a dptEmpty MUST have flag \a MediaDataPacket::fReverseStream set
         */
-        virtual int setReverseMode( bool isReverse, UsecUTCTimestamp timestamp, UsecUTCTimestamp* selectedPosition ) = 0;
+        virtual int setReverseMode(
+            bool isReverse,
+            UsecUTCTimestamp timestamp,
+            UsecUTCTimestamp* selectedPosition,
+            unsigned int* const cSeq ) = 0;
         //!Returns \a true if reverse mode is currently on
         virtual bool isReverseModeEnabled() const = 0;
         //!Toggle motion data in media stream on/off
@@ -946,23 +975,33 @@ namespace nxcip
             \param[in] quality Media stream quality
             \param[in] waitForKeyFrame If \a true, implementation SHOULD switch only on reaching next key frame of new stream.
                 If \a false, \a StreamReader instance SHOULD switch immediately to the key frame of new stream with greatest pts, not exceeding current
+            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code.\n
                 If requested quality is not supported, \a NX_NO_DATA is returned
             \note \a nxcip::msqDefault MUST always be supported
             \note This funtionality is optional
         */
-        virtual int setQuality( MediaStreamQuality quality, bool waitForKeyFrame ) = 0;
-        //!Enable/disable skipping frames
+        virtual int setQuality(
+            MediaStreamQuality quality,
+            bool waitForKeyFrame ) = 0;
+        //!Play time range [start; end) skipping frames
         /*!
             Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec.
             When frame skipping is implied, audio packets SHOULD not be reported
+            \param start Position to seek to
+            \param endTimeHint Used to hint implementation that packets with greater timestamp are of no interest. Implementation MAY NOT cache (if it does) data with greater timestamp
             \param step If 0, no frames MUST be skipped
+            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \note Used only if \a DtsArchiveReader::skipFramesCapability is set
             \note If frame skipping is enabled only key frames SHOULD be provided by \a StreamReader::getNextData call
             \note This is used to generate thumbnails
             \note This funtionality is optional
         */
-        virtual int setSkipFrames( UsecUTCTimestamp step ) = 0;
+        virtual int playRange(
+            UsecUTCTimestamp start,
+            UsecUTCTimestamp endTimeHint,
+            unsigned int step,
+            unsigned int* const cSeq ) = 0;
 
         //!Returns text description of the last error
         /*!

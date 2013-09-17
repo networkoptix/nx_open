@@ -15,7 +15,8 @@
 ILPVideoPacket::ILPVideoPacket(
     int channelNumber,
     nxcip::UsecUTCTimestamp _timestamp,
-    unsigned int flags )
+    unsigned int flags,
+    unsigned int cSeq )
 :
     m_refManager( this ),
     m_channelNumber( channelNumber ),
@@ -23,7 +24,8 @@ ILPVideoPacket::ILPVideoPacket(
     m_buffer( NULL ),
     m_bufSize( 0 ),
     m_flags( flags ),
-    m_motionData( NULL )
+    m_motionData( NULL ),
+    m_cSeq( cSeq )
 {
 }
 
@@ -115,6 +117,11 @@ nxcip::CompressionType ILPVideoPacket::codecType() const
 unsigned int ILPVideoPacket::flags() const
 {
     return m_flags;
+}
+
+unsigned int ILPVideoPacket::cSeq() const
+{
+    return m_cSeq;
 }
 
 //!Implementation of nxpl::VideoDataPacket::getMotionData

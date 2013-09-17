@@ -48,12 +48,14 @@ public:
     virtual int seek(
         nxcip::UsecUTCTimestamp timestamp,
         bool findKeyFrame,
-        nxcip::UsecUTCTimestamp* selectedPosition ) override;
+        nxcip::UsecUTCTimestamp* selectedPosition,
+        unsigned int* const cSeq ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleReverseMode
     virtual int setReverseMode(
         bool isReverse,
         nxcip::UsecUTCTimestamp timestamp,
-        nxcip::UsecUTCTimestamp* selectedPosition ) override;
+        nxcip::UsecUTCTimestamp* selectedPosition,
+        unsigned int* const cSeq ) override;
     //!Implementation of nxcip::DtsArchiveReader::isReverseModeEnabled
     virtual bool isReverseModeEnabled() const override;
     //!Implementation of nxcip::DtsArchiveReader::toggleMotionData
@@ -61,7 +63,11 @@ public:
     //!Implementation of nxcip::DtsArchiveReader::setQuality
     virtual int setQuality( nxcip::MediaStreamQuality quality, bool waitForKeyFrame ) override;
     //!Implementation of nxcip::DtsArchiveReader::setSkipFrames
-    virtual int setSkipFrames( nxcip::UsecUTCTimestamp step ) override;
+    virtual int playRange(
+        nxcip::UsecUTCTimestamp start,
+        nxcip::UsecUTCTimestamp endTimeHint,
+        unsigned int step,
+        unsigned int* const cSeq ) override;
     //!Implementation of nxcip::DtsArchiveReader::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
 

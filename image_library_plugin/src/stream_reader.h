@@ -47,13 +47,16 @@ public:
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 
-    nxcip::UsecUTCTimestamp setPosition( nxcip::UsecUTCTimestamp timestamp );
+    nxcip::UsecUTCTimestamp setPosition(
+        nxcip::UsecUTCTimestamp timestamp,
+        unsigned int* const cSeq );
     /*!
         \return Actually selected timestamp
     */
     nxcip::UsecUTCTimestamp setReverseMode(
         bool isReverse,
-        nxcip::UsecUTCTimestamp timestamp );
+        nxcip::UsecUTCTimestamp timestamp,
+        unsigned int* const cSeq );
     bool isReverse() const;
 
 private:
@@ -69,6 +72,7 @@ private:
     nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
     mutable Mutex m_mutex;
     bool m_isReverse;
+    unsigned int m_cSeq;
 
     void doLiveDelay();
     void readDirContents();
