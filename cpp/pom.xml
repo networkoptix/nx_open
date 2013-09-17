@@ -161,7 +161,7 @@
 
                             <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
                             <execution>
-                                <id>add_protoc_run</id>
+                                <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
                                 <phase>process-resources</phase>
                                 <goals>
                                     <goal>replace</goal>
@@ -173,6 +173,12 @@
                                     <file>${project.build.sourceDirectory}/${artifactId}-${arch}.vcxproj</file>
                                     <replacements>
                                         <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[${build.configuration}</ProgramDataBaseFileName>]]></token>
+                                            <value>
+                                                <![CDATA[${build.configuration}.pdb</ProgramDataBaseFileName>]]></value>
+                                        </replacement>
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
