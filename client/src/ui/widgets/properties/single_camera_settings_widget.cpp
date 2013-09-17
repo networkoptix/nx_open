@@ -27,6 +27,7 @@
 #include <ui/style/warning_style.h>
 
 #include <utils/license_usage_helper.h>
+#include "core/resource/media_resource.h"
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
@@ -417,7 +418,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         Qn::PtzCapabilities ptzCaps = m_camera->getPtzCapabilities();
         ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")) &&
-                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled));
+                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled) &&
+                                          m_camera->getVideoLayout()->channelCount() == 1);
         
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
