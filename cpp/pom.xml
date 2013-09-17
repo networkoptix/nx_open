@@ -173,6 +173,12 @@
                                     <file>${project.build.sourceDirectory}/${artifactId}-${arch}.vcxproj</file>
                                     <replacements>
                                         <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+                                        <!--<replacement>
+                                            <token>
+                                                <![CDATA[<RootNamespace>${artifactId}</RootNamespace>]]></token>
+                                            <value>
+                                                <![CDATA[<RootNamespace>${artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
+                                        </replacement> -->
                                         <replacement>
                                             <token>
                                                 <![CDATA[${build.configuration}</ProgramDataBaseFileName>]]></token>

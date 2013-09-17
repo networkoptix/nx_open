@@ -84,7 +84,7 @@
         <module>mediaserver</module>
         <module>mediaproxy</module>
         <module>testcamera</module>
-	<module>image_library_plugin</module>
+        <module>image_library_plugin</module>
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>
@@ -193,7 +193,10 @@
             <modules>		                
                 <module>applauncher</module> 
                 <module>client</module>		
-            </modules>		
+            </modules>	
+            <properties>
+                <toolchain.version>none</toolchain.version>            
+            </properties>
         </profile>  
         <profile>
             <id>windows</id>
