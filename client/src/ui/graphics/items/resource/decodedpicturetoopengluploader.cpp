@@ -163,6 +163,7 @@ public:
     bool forceSoftYUV;
     bool yv12SharedUsed;
     bool nv12SharedUsed;
+    QScopedPointer<QnGlFunctions> functions;
 
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
         QOpenGLFunctions(context->contextHandle()),
@@ -220,25 +221,18 @@ public:
         return filler.data;
     }
 
-public:
-    GLint clampConstant;
-    bool supportsNonPower2Textures;
-    QScopedPointer<QnGlFunctions> functions;
-
     bool usingShaderYuvToRgb() const
     {
-        return (features() & QnGlFunctions::ArbPrograms)
-            && (features() & QnGlFunctions::OpenGL1_3)
-            && !(features() & QnGlFunctions::ShadersBroken)
+        return 
+            !(functions->features() & QnGlFunctions::ShadersBroken)
             && yv12SharedUsed
             && !forceSoftYUV;
     }
 
     bool usingShaderNV12ToRgb() const
     {
-        return (features() & QnGlFunctions::ArbPrograms)
-            && (features() & QnGlFunctions::OpenGL1_3)
-            && !(features() & QnGlFunctions::ShadersBroken)
+        return 
+            !(functions->features() & QnGlFunctions::ShadersBroken)
             && nv12SharedUsed
             && !forceSoftYUV;
     }
