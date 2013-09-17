@@ -24,11 +24,11 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
         <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
-        <global.libs>-lprotobuf -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lsigar -lonvif</global.libs>
+        <global.libs>-lprotobuf -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lonvif</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
-        <linux.oslibs>-lssl</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent</mac.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
+        <linux.oslibs>-lssl -lsigar</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
