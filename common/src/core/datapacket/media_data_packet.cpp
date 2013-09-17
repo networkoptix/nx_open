@@ -5,6 +5,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
+#include "utils/media/bitStream.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
@@ -264,6 +265,34 @@ bool QnMetaDataV1::isEmpty() const
 #else
     //TODO
 #endif
+}
+
+void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration )
+{
+    if( motionPicture.pixelFormat() != nxcip::PIX_FMT_MONOBLACK )
+        return;
+
+    memset( data.data(), 0, data.size() );
+
+    //TODO/IMPL some optimization would be appropriate, but is difficult, 
+        //since data has following format:
+            //column1
+            //column2
+            //.. columnN
+
+    for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); ++y )
+    {
+        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
+        for( int x = 0; x < std::min<int>(motionPicture.width(), MD_WIDTH); ++x )
+        {
+            int pixel = *(srcMotionDataLine + x/CHAR_BIT) & (1 << (x%CHAR_BIT));
+            if( pixel )
+                setMotionAt( x, y );
+        }
+    }
+
+    m_firstTimestamp = timestamp;
+    m_duration = duration;
 }
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)

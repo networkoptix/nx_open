@@ -98,6 +98,8 @@ public:
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
 
+    void setOverridenAspectRatio(qreal aspectRatio);
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);

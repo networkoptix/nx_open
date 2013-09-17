@@ -355,6 +355,8 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
     user->setGuid(QString::fromUtf8(pb_userResource.guid().c_str()));
     if (pb_user.has_email())
         user->setEmail(QString::fromUtf8(pb_user.email().c_str()));
+    user->setPassword(QString::fromUtf8(pb_user.password().c_str()));
+    user->setDigest(QString::fromUtf8(pb_user.digest().c_str()));
 }
 
 void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)

@@ -25,6 +25,17 @@ void QnUserResource::setPassword(const QString& password)
     m_password = password;
 }
 
+void QnUserResource::setDigest(const QString& digest)
+{
+    QMutexLocker locker(&m_mutex);
+    m_digest = digest;
+}
+
+QString QnUserResource::getDigest() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_digest;
+}
 quint64 QnUserResource::getPermissions() const
 {
     QMutexLocker locker(&m_mutex);
@@ -73,6 +84,7 @@ void QnUserResource::updateInner(QnResourcePtr other)
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
         setPassword(localOther->getPassword());
+        setDigest(localOther->getDigest());
         setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());
         setEmail(localOther->getEmail());

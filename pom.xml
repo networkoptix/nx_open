@@ -84,6 +84,7 @@
         <module>mediaserver</module>
         <module>mediaproxy</module>
         <module>testcamera</module>
+	<module>image_library_plugin</module>
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>

@@ -301,5 +301,7 @@ int QnTcpListener::getPort() const
 {
     Q_D(const QnTcpListener);
     QMutexLocker lock(&d->portMutex);
+    if (!d->serverSocket)
+        return -1;
     return d->serverSocket->getLocalAddress().port;
 }

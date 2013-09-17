@@ -144,6 +144,20 @@ public:
     void removeStatusFlags(StatusFlags value);
 
     bool needCheckIpConflicts() const;
+
+    //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
+    /*!
+        \param detailLevel Minimal time period gap (usec) that is of interest to the caller. 
+            Two time periods lying closer to each other than \a detailLevel usec SHOULD be reported as one
+        \note Used only if \a QnSecurityCamResource::isDtsBased() is \a true
+        \note Default implementation does nothing
+    */
+    virtual QnTimePeriodList getDtsTimePeriodsByMotionRegion(
+        const QList<QRegion>& regions,
+        qint64 msStartTime,
+        qint64 msEndTime,
+        int detailLevel );
+    
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

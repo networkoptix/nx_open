@@ -13,6 +13,7 @@ copy /Y readme.txt %TARGET_DIR%\
 
 @rem Copying integration headers
 copy /Y ..\common\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
+copy /Y ..\common\src\plugins\plugin_tools.h %TARGET_DIR%\include\plugins\
 copy /Y ..\common\src\plugins\camera_plugin.h %TARGET_DIR%\include\plugins\
 
 @rem Copying AXIS plugin

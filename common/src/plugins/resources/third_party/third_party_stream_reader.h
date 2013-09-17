@@ -25,6 +25,9 @@ public:
 
     const QnResourceAudioLayout* getDPAudioLayout() const;
 
+    static CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
+    static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader );
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStream() override;
@@ -45,11 +48,13 @@ private:
     QnMulticodecRtpReader m_rtpStreamParser;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
+    nxcip::StreamReader* m_liveStreamReader;
+    QnAbstractMediaDataPtr m_savedMediaPacket;
 
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
     nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
-    void readMotionInfo();
+    QnAbstractMediaDataPtr readLiveStreamReader();
 };
 
 #endif // THIRD_PARTY_STREAM_READER_H

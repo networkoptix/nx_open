@@ -307,6 +307,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
+    connect(action(Qn::SetCurrentItemAspectRatioAutoAction),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatioAutoAction_triggered()));
+    connect(action(Qn::SetCurrentItemAspectRatio4x3Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio4x3Action_triggered()));
+    connect(action(Qn::SetCurrentItemAspectRatio16x9Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -3527,6 +3530,39 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
         camera->stopExport();
     m_exportedCamera = 0;
     QMessageBox::warning(mainWindow(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentItemAspectRatioAutoAction_triggered() {
+
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(0.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio4x3Action_triggered() {
+
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(4.0 / 3.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio16x9Action_triggered() {
+
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
