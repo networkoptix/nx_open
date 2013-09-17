@@ -1,6 +1,6 @@
 @echo off
 rem del /F /Q ${libdir}//$arch//bin//${build.configuration}//${artifactId}.exe
-IF ["${force_x86}"] == ["true"] (set ARCH="x86") ELSE (set ARCH="${arch}")
+IF ["${force_x86}"] == ["true"] (set ARCH=x86) ELSE (set ARCH=${arch})
 
 call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat" %ARCH%
 

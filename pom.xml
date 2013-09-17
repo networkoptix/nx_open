@@ -79,8 +79,7 @@
         <module>build_environment</module>
         <module>appserver</module>
         <module>common</module>
-        <!-- <module>applauncher</module> 
-        <module>axiscamplugin</module>-->
+        <!--<module>axiscamplugin</module>-->
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
@@ -182,6 +181,20 @@
 
     <profiles>
         <profile>
+            <id>noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>		                
+                <module>applauncher</module> 
+                <module>client</module>		
+            </modules>		
+        </profile>  
+        <profile>
             <id>windows</id>
             <activation>
                 <os>
@@ -237,7 +250,6 @@
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
-                <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
@@ -251,7 +263,6 @@
                 </os> 
             </activation>
             <modules>
-                <module>client</module>		
                 <module>ios-client</module>
             </modules>
             <properties>
@@ -264,16 +275,7 @@
                 <qtlib11>PrintSupport</qtlib11>
             </properties>
         </profile>        
-        <profile>
-            <id>linux-noarm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>arch</name>
-                    <value>!arm</value>
-                </property>
-            </activation>
-        </profile>        
+
         <profile>
             <id>linux-arm</id>
             <activation>
@@ -288,10 +290,6 @@
                 </property>
             </activation>
             <properties>
-                <!-- <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version> 
-                <arch>${cross-arch}</arch>
-                <toolchain.version>2011.09</toolchain.version>
-                <compiler>${toolchain.version}</compiler> -->
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <toolchain.version>2009q3</toolchain.version>
             </properties>
