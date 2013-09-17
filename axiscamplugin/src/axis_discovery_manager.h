@@ -8,7 +8,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 //!Discovers AXIS cameras with MDNS search method (implements \a nxcip::CameraDiscoveryManager)
@@ -52,7 +52,7 @@ public:
     virtual int getReservedModelList( char** modelList, int* count ) override;
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
 };
 
 #endif  //AXIS_DISCOVERY_MANAGER_H

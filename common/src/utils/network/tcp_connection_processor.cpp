@@ -2,6 +2,8 @@
 
 #include <QtCore/QTime>
 
+#include <utils/network/http/httptypes.h>
+
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 #include "err.h"
@@ -124,9 +126,10 @@ void QnTCPConnectionProcessor::parseRequest()
         }
         else
         {
-            QList<QByteArray> params = line.split(':');
-            if (params.size() > 1)
-                d->requestHeaders.addValue(QLatin1String(params[0].trimmed()), QLatin1String(params[1].trimmed()));
+            QByteArray headerName;
+            QByteArray headerValue;
+            nx_http::parseHeader( &headerName, &headerValue, line );
+            d->requestHeaders.addValue( QLatin1String(headerName), QLatin1String(headerValue) );
         }
     }
     QByteArray delimiter = "\n";

@@ -17,8 +17,7 @@
 #include <QtCore/QWaitCondition>
 
 #include <plugins/camera_plugin.h>
-
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 class AxisCameraManager;
@@ -93,7 +92,7 @@ private:
         readingData
     };
 
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     AxisCameraManager* m_cameraManager;
     unsigned int m_inputPortCount;
     unsigned int m_outputPortCount;

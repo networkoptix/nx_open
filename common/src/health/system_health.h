@@ -20,7 +20,7 @@ namespace QnSystemHealth {
 
         NotDefined,
 
-        MessageTypeCount = NotDefined
+        MessageTypeCount = StoragesAreFull
     };
 }
 
