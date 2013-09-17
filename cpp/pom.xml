@@ -174,6 +174,10 @@
                                     <replacements>
                                         <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
                                         <replacement>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
+                                        </replacement>         
+                                        <replacement>
                                             <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
                                             <token>
                                                 <![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
