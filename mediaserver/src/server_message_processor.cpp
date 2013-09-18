@@ -57,6 +57,7 @@ void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
 {
     QnAppServerConnectionFactory::setSystemName(message.systemName);
     QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+    QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
 
     qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
     if (lastRunningTime)

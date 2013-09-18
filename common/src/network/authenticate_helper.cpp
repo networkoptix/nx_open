@@ -5,6 +5,7 @@
 #include "core/resource/user_resource.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
+#include "api/app_server_connection.h"
 
 QnAuthHelper* QnAuthHelper::m_instance;
 
@@ -36,7 +37,13 @@ QnAuthHelper* QnAuthHelper::instance()
 bool QnAuthHelper::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders)
 {
     QList<QPair<QString, QString> > values = headers.values();
-    QString cooke = headers.value(lit("Cookie"));
+    QString cookie = headers.value(lit("Cookie"));
+    int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
+    if (customAuthInfoPos >= 0) {
+        QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
+        return doCustomAuthorization(digest.toLatin1(), responseHeaders);
+    }
+
     QString authorization = headers.value(lit("Authorization"));
     if (authorization.isEmpty()) {
         addAuthHeader(responseHeaders);
@@ -183,6 +190,25 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, QHttpResponseHeader& 
                     return true;
             }
         }
+    }
+    return false;
+}
+
+bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, QHttpResponseHeader& responseHeaders)
+{
+    QByteArray digest = QByteArray::fromHex(authData);
+    QByteArray origKey = QnAppServerConnectionFactory::sessionKey();
+    QByteArray sessionKey = QByteArray::fromHex(QnAppServerConnectionFactory::sessionKey());
+    int size = qMin(digest.length(), sessionKey.length());
+    for (int i = 0; i < size; ++i)
+        digest[i] = digest[i] ^ sessionKey[i];
+    digest = digest.toHex();
+
+    foreach(QnUserResourcePtr user, m_users)
+    {
+        QByteArray userDigest = user->getDigest().toLatin1();
+        if (user->getDigest().toLatin1() == digest)
+            return true;
     }
     return false;
 }

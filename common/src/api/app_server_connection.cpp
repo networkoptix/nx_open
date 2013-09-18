@@ -932,6 +932,23 @@ QString QnAppServerConnectionFactory::systemName()
     return QString();
 }
 
+QByteArray QnAppServerConnectionFactory::sessionKey()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        if (!factory->m_sessionKey.isEmpty())
+            return factory->m_sessionKey;
+    }
+
+    return QByteArray();
+}
+
+void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_sessionKey = sessionKey.trimmed();
+    }
+}
+
 void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {

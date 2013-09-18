@@ -222,6 +222,7 @@ public:
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
+    static QByteArray sessionKey();
     static QString systemName();
     static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
@@ -236,6 +237,8 @@ public:
     static void setPublicIp(const QString &publicIp);
     static void setSystemName(const QString& systemName);
 
+    static void setSessionKey(const QByteArray& sessionKey);
+
     static QnAppServerConnectionPtr createConnection();
     static QnAppServerConnectionPtr createConnection(const QUrl &url);
 
@@ -246,6 +249,7 @@ private:
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
     QString m_systemName;
+    QByteArray m_sessionKey;
 
     int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;

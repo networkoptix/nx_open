@@ -72,6 +72,7 @@ struct QnMessage
     QByteArray oldHardwareId;
     QByteArray hardwareId1;
     QByteArray hardwareId2;
+    QByteArray sessionKey;
 
     QString filename;
     QString publicIp;
