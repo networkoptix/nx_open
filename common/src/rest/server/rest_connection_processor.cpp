@@ -93,19 +93,20 @@ void QnRestConnectionProcessor::run()
         {
             t.restart();
             parseRequest();
-#ifdef USE_NX_HTTP
             isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
-#else
-            isKeepAlive = d->requestHeaders.value(QLatin1String("Connection")).toLower() == QString(QLatin1String("keep-alive"));
-#endif
             if (isKeepAlive) {
-#ifdef USE_NX_HTTP
-                d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
-                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", QString::fromLatin1("timeout=%1").arg(d->socketTimeout/1000).toLatin1()) );
-#else
-                d->responseHeaders.addValue(QLatin1String("Connection"), QLatin1String("Keep-Alive"));
-                d->responseHeaders.addValue(QLatin1String("Keep-Alive"), QString(QLatin1String("timeout=%1")).arg(d->socketTimeout/1000));
-#endif
+                // hack for web client
+                QUrl refererUrl( QLatin1String(nx_http::getHeaderValue(d->request.headers, "Referer")) );
+                if (refererUrl.path().startsWith(lit("/web")))
+                {
+                    isKeepAlive = false;
+                    d->response.headers.insert(nx_http::HttpHeader("Connection", "Close"));
+                }
+                else
+                {
+                    d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
+                    d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", QString::fromLatin1("timeout=%1").arg(d->socketTimeout/1000).toLatin1()) );
+                }
             }
 
             d->responseBody.clear();

@@ -111,7 +111,7 @@ QnAbstractMediaDataPtr ThirdPartyArchiveDelegate::getNextData()
 qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
 {
     nxcip::UsecUTCTimestamp selectedPosition = 0;
-    switch( m_archiveReader->seek( time, findIFrame, &selectedPosition, &m_cSeq ) )
+    switch( m_archiveReader->seek( ++m_cSeq, time, findIFrame, &selectedPosition ) )
     {
         case nxcip::NX_NO_ERROR:
             return selectedPosition;
@@ -141,12 +141,12 @@ void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
 {
     nxcip::UsecUTCTimestamp actualSelectedTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     m_archiveReader->setReverseMode(
+        ++m_cSeq,
         value,
         (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
             ? nxcip::INVALID_TIMESTAMP_VALUE
             : displayTime,
-        &actualSelectedTimestamp,
-        &m_cSeq );
+        &actualSelectedTimestamp );
 }
 
 void ThirdPartyArchiveDelegate::setSingleshotMode( bool /*value*/ )
@@ -165,7 +165,7 @@ bool ThirdPartyArchiveDelegate::setQuality( MediaQuality quality, bool fastSwitc
 
 void ThirdPartyArchiveDelegate::setRange( qint64 startTime, qint64 endTime, qint64 frameStep )
 {
-    m_archiveReader->playRange( startTime, endTime, frameStep, &m_cSeq );
+    m_archiveReader->playRange( ++m_cSeq, startTime, endTime, frameStep );
 }
 
 void ThirdPartyArchiveDelegate::setSendMotion( bool value )

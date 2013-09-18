@@ -201,8 +201,8 @@ void StreamReader::interrupt()
 }
 
 nxcip::UsecUTCTimestamp StreamReader::setPosition(
-    nxcip::UsecUTCTimestamp timestamp,
-    unsigned int* const cSeq )
+    unsigned int cSeq,
+    nxcip::UsecUTCTimestamp timestamp )
 {
     Mutex::ScopedLock lk( &m_mutex );
 
@@ -227,15 +227,15 @@ nxcip::UsecUTCTimestamp StreamReader::setPosition(
     m_curPos = it;
     m_curTimestamp = it == m_dirEntries.end() ? nxcip::INVALID_TIMESTAMP_VALUE : it->first;
     m_streamReset = true;
-    *cSeq = ++m_cSeq;
+    m_cSeq = cSeq;
 
     return m_curTimestamp;
 }
 
 nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
+    unsigned int cSeq,
     bool isReverse,
-    nxcip::UsecUTCTimestamp timestamp,
-    unsigned int* const cSeq )
+    nxcip::UsecUTCTimestamp timestamp )
 {
     Mutex::ScopedLock lk( &m_mutex );
 
@@ -245,12 +245,12 @@ nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
     m_isReverse = isReverse;
     if( timestamp == nxcip::INVALID_TIMESTAMP_VALUE )
     {
-        *cSeq = ++m_cSeq;
+        m_cSeq = cSeq;
         return m_curTimestamp;
     }
     else
     {
-        return setPosition( timestamp, cSeq );
+        return setPosition( cSeq, timestamp );
     }
 }
 

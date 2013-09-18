@@ -752,7 +752,7 @@ namespace nxcip
         virtual CompressionType codecType() const = 0;
         //!Returns combination of values from \a MediaDataPacket::Flags enumeration
         virtual unsigned int flags() const = 0;
-        //!Returns sequence number of command, this packet has been generated in response to
+        //!Returns sequence number of command this packet belongs to
         /*!
             Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange
         */
@@ -836,10 +836,8 @@ namespace nxcip
             provided by \a StreamReader instance
 
         \par \b cSeq (command sequence counter)
-        Every instance of this interface operates with command sequence number. It is an integer value, which is incremented by implementation
-            with each call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange.
-            This is required functionality, since command is allowed to be executed with some delay.
-            Each mentioned function returnes new \a cSeq. Initial \a cSeq value if implementation-dependent
+        Methods \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange accept \a cSeq value which
+        they MUST use in every media packet generated in response to this command
 
         It is not required, that archive contains data from all encoders
         \note By default, archive is positioned to the beginning, quality set to high and playback direction is forward
@@ -929,10 +927,10 @@ namespace nxcip
         //!Seek to specified posiition in stream
         /*!
             Implementation is allowed to jump to frame with timestamp next to requested (i.e., \a lower_bound algorithm is implied to find frame)
+            \param[in] cSeq New value of command sequence counter
             \param[in] timestamp timestamp to seek to
             \param[in] findKeyFrame If \a true, MUST jump to key-frame only (selected frame timestamp MUST be equal or less than requested)
             \param[out] selectedPosition Timestamp of actually selected position
-            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \return\n
                 - \a NX_NO_ERROR on success
                 - \a NX_NO_DATA if \a timestamp is greater than timestamp of the last frame of the archive (in case of if forward play) and 
@@ -940,27 +938,27 @@ namespace nxcip
             \note This funtionality is required
         */
         virtual int seek(
+            unsigned int cSeq,
             UsecUTCTimestamp timestamp,
             bool findKeyFrame,
-            UsecUTCTimestamp* selectedPosition,
-            unsigned int* const cSeq ) = 0;
+            UsecUTCTimestamp* selectedPosition ) = 0;
         //!Set playback direction (forward/reverse)
         /*!
             If \a timestamp is not equal to \a INVALID_TIMESTAMP_VALUE, seek is performed along with playback direction change
+            \param[in] cSeq New value of command sequence counter
             \param[in] isReverse If true, playback 
             \param[in] position if not \a INVALID_TIMESTAMP_VALUE, playback SHOULD jump to this position (with rules, defined for \a DtsArchiveReader::seek)
             \param[out] selectedPosition Timestamp of actually selected position
-            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \note This method is used only if \a DtsArchiveReader::reverseModeCapability is supported
             \return \a NX_NO_ERROR on success, otherwise - error code
             \note This funtionality is optional
             \note If end-of-stream reached with reverse mode, packets of type \a dptEmpty MUST have flag \a MediaDataPacket::fReverseStream set
         */
         virtual int setReverseMode(
+            unsigned int cSeq,
             bool isReverse,
             UsecUTCTimestamp timestamp,
-            UsecUTCTimestamp* selectedPosition,
-            unsigned int* const cSeq ) = 0;
+            UsecUTCTimestamp* selectedPosition ) = 0;
         //!Returns \a true if reverse mode is currently on
         virtual bool isReverseModeEnabled() const = 0;
         //!Toggle motion data in media stream on/off
@@ -975,7 +973,6 @@ namespace nxcip
             \param[in] quality Media stream quality
             \param[in] waitForKeyFrame If \a true, implementation SHOULD switch only on reaching next key frame of new stream.
                 If \a false, \a StreamReader instance SHOULD switch immediately to the key frame of new stream with greatest pts, not exceeding current
-            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code.\n
                 If requested quality is not supported, \a NX_NO_DATA is returned
             \note \a nxcip::msqDefault MUST always be supported
@@ -988,20 +985,20 @@ namespace nxcip
         /*!
             Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec.
             When frame skipping is implied, audio packets SHOULD not be reported
+            \param[in] cSeq New value of command sequence counter
             \param start Position to seek to
             \param endTimeHint Used to hint implementation that packets with greater timestamp are of no interest. Implementation MAY NOT cache (if it does) data with greater timestamp
             \param step If 0, no frames MUST be skipped
-            \param[out] cSeq Assigned to new command sequence value in case of success. If return value is not \a nxcip::NX_NO_ERROR, this value is undefined
             \note Used only if \a DtsArchiveReader::skipFramesCapability is set
             \note If frame skipping is enabled only key frames SHOULD be provided by \a StreamReader::getNextData call
             \note This is used to generate thumbnails
             \note This funtionality is optional
         */
         virtual int playRange(
+            unsigned int cSeq,
             UsecUTCTimestamp start,
             UsecUTCTimestamp endTimeHint,
-            unsigned int step,
-            unsigned int* const cSeq ) = 0;
+            unsigned int step ) = 0;
 
         //!Returns text description of the last error
         /*!

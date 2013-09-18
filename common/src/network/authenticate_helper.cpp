@@ -7,6 +7,7 @@
 #include "core/resource/user_resource.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
+#include "api/app_server_connection.h"
 
 QnAuthHelper* QnAuthHelper::m_instance;
 
@@ -37,8 +38,16 @@ QnAuthHelper* QnAuthHelper::instance()
 
 bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response)
 {
+    QString cookie = QLatin1String(nx_http::getHeaderValue( response.headers, "Cookie" ));
+    int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
+    if (customAuthInfoPos >= 0) {
+        QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
+        if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::sessionKey()))
+            return true;
+        if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::prevSessionKey()))
+            return true;
+    }
 
-    // implement me
     nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
     if (authorization.isEmpty()) {
         addAuthHeader(response);
@@ -185,6 +194,23 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse
                     return true;
             }
         }
+    }
+    return false;
+}
+
+bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::HttpResponse& /*response*/, const QByteArray& sesionKey)
+{
+    QByteArray digestBin = QByteArray::fromHex(authData);
+    QByteArray sessionKeyBin = QByteArray::fromHex(sesionKey);
+    int size = qMin(digestBin.length(), sessionKeyBin.length());
+    for (int i = 0; i < size; ++i)
+        digestBin[i] = digestBin[i] ^ sessionKeyBin[i];
+    QByteArray digest = digestBin.toHex();
+
+    foreach(QnUserResourcePtr user, m_users)
+    {
+        if (user->getDigest().toLatin1() == digest)
+            return true;
     }
     return false;
 }
