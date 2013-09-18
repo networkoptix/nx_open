@@ -17,8 +17,13 @@ using namespace std;
 
 namespace aio
 {
+    static unsigned int threadCountArgValue = 0;
+
     AIOService::AIOService( unsigned int threadCount )
     {
+        if( !threadCount )
+            threadCount = threadCountArgValue;
+
         if( !threadCount )
         {
             //TODO/IMPL calculating optimal thread count
@@ -166,8 +171,9 @@ namespace aio
 
     Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
     
-    AIOService* AIOService::instance( unsigned int /*threadCount*/ )
+    AIOService* AIOService::instance( unsigned int threadCount )
     {
+        threadCountArgValue = threadCount;
         return aioServiceInstance();
     }
 }

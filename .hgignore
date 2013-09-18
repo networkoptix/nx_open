@@ -230,6 +230,11 @@ image_library_plugin/x64
 image_library_plugin/arm
 
 
+holepuncher/x86
+holepuncher/x64
+holepuncher/arm
+
+
 nx_sdk/nx_sdk 
 
 
