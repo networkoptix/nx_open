@@ -371,7 +371,7 @@ void QnWorkbenchDisplay::initSceneView() {
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
 
-#ifndef __APPLE__
+#ifndef Q_OS_MACX
         /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif
@@ -1444,10 +1444,14 @@ void QnWorkbenchDisplay::updateFrameWidths() {
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
+#ifdef Q_OS_MACX
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
+#else
     bool curtained = m_curtainAnimator->isCurtained();
-
     if(m_view != NULL)
         m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+#endif
 }
 
 

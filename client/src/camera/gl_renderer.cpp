@@ -1,10 +1,9 @@
+#include "gl_renderer.h"
 
-#ifndef __APPLE__
+#ifndef Q_OS_MACX
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glext.h>
 #endif
-
-#include "gl_renderer.h"
 
 #include <cassert>
 
