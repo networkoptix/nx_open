@@ -96,12 +96,12 @@ nxcip::UsecUTCTimestamp ArchiveReader::endTime() const
 
 //!Implementation of nxcip::DtsArchiveReader::seek
 int ArchiveReader::seek(
+    unsigned int cSeq,
     nxcip::UsecUTCTimestamp timestamp,
     bool /*findKeyFrame*/,
-    nxcip::UsecUTCTimestamp* selectedPosition,
-    unsigned int* const cSeq )
+    nxcip::UsecUTCTimestamp* selectedPosition )
 {
-    *selectedPosition = m_streamReader->setPosition( timestamp, cSeq );
+    *selectedPosition = m_streamReader->setPosition( cSeq, timestamp );
     if( *selectedPosition == nxcip::INVALID_TIMESTAMP_VALUE )
         return nxcip::NX_NO_DATA;
 
@@ -110,12 +110,12 @@ int ArchiveReader::seek(
 
 //!Implementation of nxcip::DtsArchiveReader::setReverseMode
 int ArchiveReader::setReverseMode(
+    unsigned int cSeq,
     bool isReverse,
     nxcip::UsecUTCTimestamp timestamp,
-    nxcip::UsecUTCTimestamp* selectedPosition,
-    unsigned int* const cSeq )
+    nxcip::UsecUTCTimestamp* selectedPosition )
 {
-    *selectedPosition = m_streamReader->setReverseMode( isReverse, timestamp, cSeq );
+    *selectedPosition = m_streamReader->setReverseMode( cSeq, isReverse, timestamp );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -139,10 +139,10 @@ int ArchiveReader::setQuality( nxcip::MediaStreamQuality quality, bool /*waitFor
 }
 
 int ArchiveReader::playRange(
+    unsigned int /*cSeq*/,
     nxcip::UsecUTCTimestamp /*start*/,
     nxcip::UsecUTCTimestamp /*endTimeHint*/,
-    unsigned int /*step*/,
-    unsigned int* const /*cSeq*/ )
+    unsigned int /*step*/ )
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
