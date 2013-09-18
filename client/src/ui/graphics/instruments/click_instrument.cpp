@@ -1,6 +1,7 @@
 #include "click_instrument.h"
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
+#include <QtCore/QThread>
 #include <QtWidgets/QApplication>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
@@ -103,6 +104,9 @@ void ClickInstrument::restartClickTimer() {
     killClickTimer();
 
     m_clickTimer = startTimer(m_clickDelayMSec);
+    qDebug() << this << "timer id" << m_clickTimer << "thread" << this->thread()->currentThreadId();
+
+
 }
 
 template<class T>
