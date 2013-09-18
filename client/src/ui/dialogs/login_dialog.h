@@ -52,8 +52,6 @@ protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void hideEvent(QHideEvent *event) override;
 
-    virtual void timerEvent(QTimerEvent *event) override;
-
     /**
      * Reset connections model to its initial state. Select last used connection.
      */
@@ -101,8 +99,6 @@ private:
 
     bool m_restartPending;
     bool m_autoConnectPending;
-
-    int m_timerId;
 };
 
 #endif // LOGINDIALOG_H

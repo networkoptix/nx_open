@@ -69,8 +69,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_renderingWidget(NULL),
     m_entCtrlFinder(NULL),
     m_restartPending(false),
-    m_autoConnectPending(false),
-    m_timerId(0)
+    m_autoConnectPending(false)
 {
     ui->setupUi(this);
 
@@ -124,18 +123,18 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-   /* m_entCtrlFinder = new NetworkOptixModuleFinder();
+    m_entCtrlFinder = new NetworkOptixModuleFinder();
     if (qnSettings->isDevMode())
         m_entCtrlFinder->setCompatibilityMode(true);
     connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
-    m_entCtrlFinder->start();*/
+    m_entCtrlFinder->start();
 }
 
 QnLoginDialog::~QnLoginDialog() {
-//    delete m_entCtrlFinder;
+    delete m_entCtrlFinder;
     return;
 }
 
@@ -226,16 +225,6 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
     m_renderingWidget->stopPlayback();
 }
 
-void QnLoginDialog::timerEvent(QTimerEvent *event) {
-    if (event->timerId() != m_timerId)
-        return;
-
-    qDebug() << "TIMER EVENT OCCURED";
-    ui->testButton->setText(QString::number(m_timerId) + QLatin1String(" success"));
-    killTimer(m_timerId);
-    m_timerId = 0;
-}
-
 void QnLoginDialog::resetConnectionsModel() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
@@ -300,7 +289,7 @@ void QnLoginDialog::updateAcceptibility() {
         ui->portSpinBox->value() != 0;
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(acceptable);
-    ui->testButton->setEnabled(true);
+    ui->testButton->setEnabled(acceptable);
 }
 
 void QnLoginDialog::updateUsability() {
@@ -440,11 +429,6 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
 }
 
 void QnLoginDialog::at_testButton_clicked() {
-    if(m_timerId)
-        killTimer(m_timerId);
-    m_timerId = startTimer(300);
-    return;
-
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
