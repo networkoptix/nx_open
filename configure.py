@@ -22,7 +22,7 @@ if __name__ == '__main__':
     else:
         build_customization = 'default'          
 
-    f = open('configure_settings_tmp.py', 'w')
+    zf = open('configure_settings_tmp.py', 'w')
     print >> f, \
     'customization = "%s" \nconfiguration = "%s"' %(build_customization, build_configuration)
 
