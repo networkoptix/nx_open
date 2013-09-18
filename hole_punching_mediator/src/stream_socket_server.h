@@ -17,6 +17,7 @@
 class StreamSocketServer
 {
 public:
+    //!Initialization. Binds to adddress \a addrToListen
     StreamSocketServer( const SocketAddress& addrToListen );
 
     //!Calls \a AbstractStreamServerSocket::listen

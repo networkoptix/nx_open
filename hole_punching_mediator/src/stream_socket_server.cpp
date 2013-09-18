@@ -4,3 +4,15 @@
 ***********************************************************/
 
 #include "stream_socket_server.h"
+
+
+StreamSocketServer::StreamSocketServer( const SocketAddress& addrToListen )
+{
+    //TODO/IMPL
+}
+
+bool StreamSocketServer::listen()
+{
+    //TODO/IMPL
+    return false;
+}

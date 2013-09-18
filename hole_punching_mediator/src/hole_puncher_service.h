@@ -15,8 +15,10 @@
 
 #include <utils/common/stoppable.h>
 
+#include "hole_punching_requests_processor.h"
+#include "stream_socket_server.h"
 
-class HolePunchingRequestsProcessor;
+
 class StreamSocketServer;
 
 class HolePuncherProcess

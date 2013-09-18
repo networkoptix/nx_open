@@ -16,8 +16,6 @@
 #include <utils/common/log.h>
 #include <utils/network/aio/aioservice.h>
 
-#include "hole_punching_requests_processor.h"
-#include "stream_socket_server.h"
 #include "version.h"
 
 

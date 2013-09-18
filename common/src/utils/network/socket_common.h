@@ -6,7 +6,7 @@
 #ifndef SOCKET_COMMON_H
 #define SOCKET_COMMON_H
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #   include <winsock2.h>
 #else
 #   include <sys/socket.h>
