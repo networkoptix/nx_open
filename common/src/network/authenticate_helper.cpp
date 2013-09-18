@@ -35,8 +35,8 @@ QnAuthHelper* QnAuthHelper::instance()
 
 bool QnAuthHelper::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders)
 {
-
-    // implement me
+    QList<QPair<QString, QString> > values = headers.values();
+    QString cooke = headers.value(lit("Cookie"));
     QString authorization = headers.value(lit("Authorization"));
     if (authorization.isEmpty()) {
         addAuthHeader(responseHeaders);
