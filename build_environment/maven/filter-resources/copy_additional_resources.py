@@ -35,13 +35,11 @@ if get_environment_variable('platform') == 'windows':
 
         lib_source_dir = '${qt.dir}/bin'
         target_dir = join('${project.build.directory}', arch, 'bin')
-
-
         help_dir = join('${project.build.directory}', arch, 'bin/help')
             
         if os.path.exists(help_dir):
             shutil.rmtree(help_dir)
-            shutil.copytree('help', help_dir)                        
+            shutil.copytree(join(basedir, 'help'), help_dir)                        
 
         #shutil.rmtree('help')
 
