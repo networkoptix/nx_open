@@ -83,7 +83,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     }
 
     if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
-        qDebug() << "popup received, ignoring" << QnBusinessStringsHelper::eventName(eventType);
+//        qDebug() << "popup received, ignoring" << QnBusinessStringsHelper::eventName(eventType);
         return;
     }
 
@@ -91,7 +91,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
     QString resource = res ? res->getName() : QString();
 
-    qDebug() << "popup received" << eventType << QnBusinessStringsHelper::eventName(eventType) << "from" << resource << "(" << id << ")";
+//    qDebug() << "popup received" << eventType << QnBusinessStringsHelper::eventName(eventType) << "from" << resource << "(" << id << ")";
     emit businessActionAdded(businessAction);
 }
 
