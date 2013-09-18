@@ -16,13 +16,16 @@
 #include <utils/common/stoppable.h>
 
 
-class HolePuncherService
+class HolePunchingRequestsProcessor;
+class StreamSocketServer;
+
+class HolePuncherProcess
 :
     public QtService<QtSingleCoreApplication>,
     public QnStoppable
 {
 public:
-    HolePuncherService( int argc, char **argv );
+    HolePuncherProcess( int argc, char **argv );
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop() override;
@@ -36,6 +39,8 @@ private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
+    std::unique_ptr<HolePunchingRequestsProcessor> m_requestsProcessor;
+    std::list<std::unique_ptr<StreamSocketServer> > m_listeners;
 
     bool initialize();
     void deinitialize();

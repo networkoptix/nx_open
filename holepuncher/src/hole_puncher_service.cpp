@@ -5,7 +5,9 @@
 
 #include "hole_puncher_service.h"
 
+#include <algorithm>
 #include <iostream>
+#include <list>
 
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
@@ -14,10 +16,12 @@
 #include <utils/common/log.h>
 #include <utils/network/aio/aioservice.h>
 
+#include "hole_punching_requests_processor.h"
+#include "stream_socket_server.h"
 #include "version.h"
 
 
-HolePuncherService::HolePuncherService( int argc, char **argv )
+HolePuncherProcess::HolePuncherProcess( int argc, char **argv )
 : 
     QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
     m_argc( argc ),
@@ -26,19 +30,19 @@ HolePuncherService::HolePuncherService( int argc, char **argv )
     setServiceDescription(QN_APPLICATION_NAME);
 }
 
-void HolePuncherService::pleaseStop()
+void HolePuncherProcess::pleaseStop()
 {
     application()->quit();
 }
 
-int HolePuncherService::executeApplication()
+int HolePuncherProcess::executeApplication()
 { 
     int result = application()->exec();
     deinitialize();
     return result;
 }
 
-void HolePuncherService::start()
+void HolePuncherProcess::start()
 {
     QtSingleCoreApplication* application = this->application();
 
@@ -53,12 +57,12 @@ void HolePuncherService::start()
         application->quit();
 }
 
-void HolePuncherService::stop()
+void HolePuncherProcess::stop()
 {
     application()->quit();
 }
 
-bool HolePuncherService::initialize()
+bool HolePuncherProcess::initialize()
 {
     //reading settings
 #ifdef _WIN32
@@ -89,20 +93,49 @@ bool HolePuncherService::initialize()
             std::wcerr<<L"Failed to create log file "<<logFileName.toStdWString()<<std::endl;
     }
 
-    //TODO/IMPL starting aio
+    const QStringList& addrToListenStrList = m_settings->value("addressToListen", ":3345").toString().split(',');
+    std::list<SocketAddress> addrToListenList;
+    std::transform(
+        addrToListenStrList.begin(),
+        addrToListenStrList.end(),
+        std::back_inserter(addrToListenList),
+        [] (const QString& str) { return SocketAddress(str); } );
+    if( addrToListenList.empty() )
+    {
+        NX_LOG( "No address to listen", cl_logALWAYS );
+        return false;
+    }
 
+    m_requestsProcessor.reset( new HolePunchingRequestsProcessor() );
 
-    //TODO/IMPL listening for incoming requests
+    //binding to address(-es) to listen
+    for( const SocketAddress& addr : addrToListenList )
+        m_listeners.push_back( std::unique_ptr<StreamSocketServer>(new StreamSocketServer(addr)) );
+
+    //TODO: process privilege reduction can occur here
+
+    //listening for incoming requests
+    for( std::unique_ptr<StreamSocketServer>& server : m_listeners )
+    {
+        if( !server->listen() )
+        {
+            m_listeners.clear();
+            return false;
+        }
+    }
 
     return true;
 }
 
-void HolePuncherService::deinitialize()
+void HolePuncherProcess::deinitialize()
 {
-    //TODO/IMPL
+    //stopping accepting incoming connections
+    m_listeners.clear();
+
+    m_requestsProcessor.reset();
 }
 
-QString HolePuncherService::getDataDirectory()
+QString HolePuncherProcess::getDataDirectory()
 {
     const QString& dataDirFromSettings = m_settings->value( "dataDir" ).toString();
     if( !dataDirFromSettings.isEmpty() )

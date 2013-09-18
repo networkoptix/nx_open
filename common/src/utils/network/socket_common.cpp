@@ -53,6 +53,11 @@ SocketAddress::SocketAddress( const HostAddress& _address, unsigned short _port 
 {
 }
 
+SocketAddress::SocketAddress( const QString& addrStr )
+{
+    //TODO/IMPL
+}
+
 QString SocketAddress::toString() const
 {
     return QString::fromLatin1("%1:%2").arg(address.toString()).arg(port);

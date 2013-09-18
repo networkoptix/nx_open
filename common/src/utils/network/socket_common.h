@@ -53,6 +53,12 @@ public:
     unsigned short port;
 
     SocketAddress( const HostAddress& _address = HostAddress(), unsigned short _port = 0 );
+    /*!
+        \param addrStr. String in format "host:port". Also, following strings are valid:\n
+            - :port (host is considered \a HostAddress::anyHost)
+            - host (port is zero)
+    */
+    SocketAddress( const QString& addrStr );
 
     QString toString() const;
 };

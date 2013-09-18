@@ -10,7 +10,7 @@
 #endif
 
 
-static HolePuncherService* serviceInstance = NULL;
+static HolePuncherProcess* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    HolePuncherService service(argc, argv);
+    HolePuncherProcess service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

@@ -85,7 +85,7 @@
         <module>mediaproxy</module>
         <module>testcamera</module>
         <module>image_library_plugin</module>
-        <module>holepuncher</module>
+        <module>hole_punching_mediator</module>
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>
