@@ -48,15 +48,15 @@ public:
     virtual void interrupt() override;
 
     nxcip::UsecUTCTimestamp setPosition(
-        nxcip::UsecUTCTimestamp timestamp,
-        unsigned int* const cSeq );
+        unsigned int cSeq,
+        nxcip::UsecUTCTimestamp timestamp );
     /*!
         \return Actually selected timestamp
     */
     nxcip::UsecUTCTimestamp setReverseMode(
+        unsigned int cSeq,
         bool isReverse,
-        nxcip::UsecUTCTimestamp timestamp,
-        unsigned int* const cSeq );
+        nxcip::UsecUTCTimestamp timestamp );
     bool isReverse() const;
 
 private:

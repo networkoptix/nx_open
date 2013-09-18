@@ -46,16 +46,16 @@ public:
     virtual nxcip::UsecUTCTimestamp endTime() const override;
     //!Implementation of nxcip::DtsArchiveReader::seek
     virtual int seek(
+        unsigned int cSeq,
         nxcip::UsecUTCTimestamp timestamp,
         bool findKeyFrame,
-        nxcip::UsecUTCTimestamp* selectedPosition,
-        unsigned int* const cSeq ) override;
+        nxcip::UsecUTCTimestamp* selectedPosition ) override;
     //!Implementation of nxcip::DtsArchiveReader::toggleReverseMode
     virtual int setReverseMode(
+        unsigned int cSeq,
         bool isReverse,
         nxcip::UsecUTCTimestamp timestamp,
-        nxcip::UsecUTCTimestamp* selectedPosition,
-        unsigned int* const cSeq ) override;
+        nxcip::UsecUTCTimestamp* selectedPosition ) override;
     //!Implementation of nxcip::DtsArchiveReader::isReverseModeEnabled
     virtual bool isReverseModeEnabled() const override;
     //!Implementation of nxcip::DtsArchiveReader::toggleMotionData
@@ -64,10 +64,10 @@ public:
     virtual int setQuality( nxcip::MediaStreamQuality quality, bool waitForKeyFrame ) override;
     //!Implementation of nxcip::DtsArchiveReader::setSkipFrames
     virtual int playRange(
+        unsigned int cSeq,
         nxcip::UsecUTCTimestamp start,
         nxcip::UsecUTCTimestamp endTimeHint,
-        unsigned int step,
-        unsigned int* const cSeq ) override;
+        unsigned int step ) override;
     //!Implementation of nxcip::DtsArchiveReader::getLastErrorString
     virtual void getLastErrorString( char* errorString ) const override;
 
