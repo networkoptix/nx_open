@@ -96,7 +96,7 @@ void QnRestConnectionProcessor::run()
             isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
             if (isKeepAlive) {
                 // hack for web client
-                QUrl refererUrl( nx_http::getHeaderValue(d->request.headers, "Referer") );
+                QUrl refererUrl( QLatin1String(nx_http::getHeaderValue(d->request.headers, "Referer")) );
                 if (refererUrl.path().startsWith(lit("/web")))
                 {
                     isKeepAlive = false;

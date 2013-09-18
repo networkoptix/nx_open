@@ -424,7 +424,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         QTime t;
         t.restart();
-        while (!qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
+        while (!qnAuthHelper->authenticate(d->request, d->response))
         {
             if (t.elapsed() >= AUTH_TIMEOUT)
                 return; // close connection
