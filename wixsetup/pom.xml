@@ -21,11 +21,11 @@
     <name>HD Witness Installer</name>
 
     <properties>
+        <root.dir>${basedir}/..</root.dir>
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <install.type>all</install.type>
-        <ClientBgSourceDir>${basedir}/../client/resource/common/backgrounds</ClientBgSourceDir>
     </properties>
 
     <dependencies>
@@ -76,9 +76,9 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>../build-${customization}.properties</file>
-                                <file>../build_environment/${arch}/libdir.properties</file>
-                                <file>../appserver/setup/build/appserver-${arch}.properties</file>
+                                <file>${root.dir}/build-${customization}.properties</file>
+                                <!-- <file>../build_environment/${arch}/libdir.properties</file>
+                                <file>../appserver/setup/build/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
                     </execution>
