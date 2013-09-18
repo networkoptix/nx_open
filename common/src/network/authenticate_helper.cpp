@@ -36,12 +36,14 @@ QnAuthHelper* QnAuthHelper::instance()
 
 bool QnAuthHelper::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders)
 {
-    QList<QPair<QString, QString> > values = headers.values();
     QString cookie = headers.value(lit("Cookie"));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
         QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
-        return doCustomAuthorization(digest.toLatin1(), responseHeaders);
+        if (doCustomAuthorization(digest.toLatin1(), responseHeaders, QnAppServerConnectionFactory::sessionKey()))
+            return true;
+        if (doCustomAuthorization(digest.toLatin1(), responseHeaders, QnAppServerConnectionFactory::prevSessionKey()))
+            return true;
     }
 
     QString authorization = headers.value(lit("Authorization"));
@@ -194,19 +196,17 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, QHttpResponseHeader& 
     return false;
 }
 
-bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, QHttpResponseHeader& responseHeaders)
+bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, QHttpResponseHeader& responseHeaders, const QByteArray& sesionKey)
 {
-    QByteArray digest = QByteArray::fromHex(authData);
-    QByteArray origKey = QnAppServerConnectionFactory::sessionKey();
-    QByteArray sessionKey = QByteArray::fromHex(QnAppServerConnectionFactory::sessionKey());
-    int size = qMin(digest.length(), sessionKey.length());
+    QByteArray digestBin = QByteArray::fromHex(authData);
+    QByteArray sessionKeyBin = QByteArray::fromHex(sesionKey);
+    int size = qMin(digestBin.length(), sessionKeyBin.length());
     for (int i = 0; i < size; ++i)
-        digest[i] = digest[i] ^ sessionKey[i];
-    digest = digest.toHex();
+        digestBin[i] = digestBin[i] ^ sessionKeyBin[i];
+    QByteArray digest = digestBin.toHex();
 
     foreach(QnUserResourcePtr user, m_users)
     {
-        QByteArray userDigest = user->getDigest().toLatin1();
         if (user->getDigest().toLatin1() == digest)
             return true;
     }

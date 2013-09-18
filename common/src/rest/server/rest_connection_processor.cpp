@@ -89,10 +89,21 @@ void QnRestConnectionProcessor::run()
         {
             t.restart();
             parseRequest();
+            QList<QPair<QString, QString> > values = d->requestHeaders.values();
             isKeepAlive = d->requestHeaders.value(QLatin1String("Connection")).toLower() == QString(QLatin1String("keep-alive"));
-            if (isKeepAlive) {
-                d->responseHeaders.addValue(QLatin1String("Connection"), QLatin1String("Keep-Alive"));
-                d->responseHeaders.addValue(QLatin1String("Keep-Alive"), QString(QLatin1String("timeout=%1")).arg(d->socketTimeout/1000));
+            if (isKeepAlive) 
+            {
+                // hack for web client
+                QUrl refererUrl(d->requestHeaders.value(lit("Referer")));
+                if (refererUrl.path().startsWith(lit("/web")))
+                {
+                    isKeepAlive = false;
+                    d->responseHeaders.addValue(QLatin1String("Connection"), QLatin1String("Close"));
+                }
+                else {
+                    d->responseHeaders.addValue(QLatin1String("Connection"), QLatin1String("Keep-Alive"));
+                    d->responseHeaders.addValue(QLatin1String("Keep-Alive"), QString(QLatin1String("timeout=%1")).arg(d->socketTimeout/1000));
+                }
             }
 
             d->responseBody.clear();

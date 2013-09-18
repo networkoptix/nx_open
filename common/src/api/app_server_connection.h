@@ -222,6 +222,7 @@ public:
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
+    static QByteArray prevSessionKey();
     static QByteArray sessionKey();
     static QString systemName();
     static int defaultMediaProxyPort();
@@ -250,6 +251,7 @@ private:
     QUrl m_publicUrl;
     QString m_systemName;
     QByteArray m_sessionKey;
+    QByteArray m_prevSessionKey;
 
     int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;

@@ -26,7 +26,7 @@ private:
     bool isNonceValid(const QByteArray& nonce) const;
     bool doDigestAuth(const QByteArray& method, const QByteArray& authData, QHttpResponseHeader& responseHeaders);
     bool doBasicAuth(const QByteArray& authData, QHttpResponseHeader& responseHeaders);
-    bool doCustomAuthorization(const QByteArray& authData, QHttpResponseHeader& responseHeaders);
+    bool doCustomAuthorization(const QByteArray& authData, QHttpResponseHeader& responseHeaders, const QByteArray& sesionKey);
 private:
     QMutex m_mutex;
     static QnAuthHelper* m_instance;
