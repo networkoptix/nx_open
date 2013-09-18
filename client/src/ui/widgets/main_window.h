@@ -2,6 +2,7 @@
 #define QN_MAIN_WINDOW_H
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 #include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
@@ -25,6 +26,16 @@ class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
+
+class QnContextAwareMainWindow: public QMainWindow, public QnWorkbenchContextAware {
+    Q_OBJECT
+public:
+    QnContextAwareMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0) :
+        QMainWindow(parent, flags),
+        QnWorkbenchContextAware(context)
+    {
+    }
+};
 
 class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
