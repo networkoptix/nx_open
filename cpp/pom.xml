@@ -140,7 +140,7 @@
                                 </goals>
                                 <configuration>
                                     <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${artifactId}-x64.vcxproj</file>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
                                     <!-- <excludes>
 										<exclude>**/vmaxproxy-x64.vcproj</exclude>
 									</excludes> -->	
@@ -170,20 +170,26 @@
                                     <encoding>utf-8</encoding>
                                     <unescape>no</unescape>
                                     <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.sourceDirectory}/${artifactId}-${arch}.vcxproj</file>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
                                     <replacements>
                                         <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
                                         <!--<replacement>
                                             <token>
-                                                <![CDATA[<RootNamespace>${artifactId}</RootNamespace>]]></token>
+                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace>]]></token>
                                             <value>
-                                                <![CDATA[<RootNamespace>${artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
+                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
                                         </replacement> -->
                                         <replacement>
                                             <token>
-                                                <![CDATA[${build.configuration}</ProgramDataBaseFileName>]]></token>
+                                                <![CDATA[release</ProgramDataBaseFileName>]]></token>
                                             <value>
-                                                <![CDATA[${build.configuration}.pdb</ProgramDataBaseFileName>]]></value>
+                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[debug</ProgramDataBaseFileName>]]></token>
+                                            <value>
+                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
                                         </replacement>
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
@@ -196,8 +202,8 @@
                                             <value>
                                                 <![CDATA[
     <CustomBuild Include="$1/$2.$3">
-      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc;$1/$2.$3</AdditionalInputs>
-      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
+      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc.exe;$1/$2.$3</AdditionalInputs>
+      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc.exe --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
       <Message>Generating code from $1/$2.$3 to $2.pb.cc</Message>
       <Outputs>../${arch}/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
     </CustomBuild>
