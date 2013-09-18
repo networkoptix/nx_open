@@ -423,6 +423,7 @@ void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
 
     m_footerLeftLabel->setText(leftText);
     m_footerRightLabel->setText(rightText);
+    m_footerOverlayWidget->updateScale();
 }
 
 QString QnResourceWidget::calculateInfoText() const {
