@@ -277,16 +277,13 @@ int main(int argc, char **argv)
     win32_exception::install_handler();
 #endif
 
-    //QApplication::setGraphicsSystem(QLatin1String("raster")); //TODO: #ak could not find sinonym in qt5.1
-    //QApplication::setColorSpec(QApplication::ManyColor);
-
-    QStringList pluginDirs = QApplication::libraryPaths();
-    pluginDirs << QString::fromLatin1("/usr/local/Qt-5.0.2//plugins/");
-    QApplication::setLibraryPaths( pluginDirs );
-//    foreach( QString str, QApplication::libraryPaths() )
-//        std::cout << str.toStdString()<<"\n";
-
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
+
+    //adding exe dir to plugin search path
+    QStringList pluginDirs = QCoreApplication::libraryPaths();
+    pluginDirs << QCoreApplication::applicationDirPath();
+    QCoreApplication::setLibraryPaths( pluginDirs );
+    
     QnClientModule client(argc, argv);
 
     QnSessionManager::instance();
