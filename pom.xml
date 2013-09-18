@@ -54,7 +54,7 @@
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <customization>default</customization>
-        <!--QT libs used--> 
+        <!--QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules)--> 
         <qtlib1>Core</qtlib1>
         <qtlib2>Network</qtlib2>
         <qtlib3>Xml</qtlib3>
