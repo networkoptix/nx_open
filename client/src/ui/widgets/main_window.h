@@ -7,7 +7,6 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "emulated_frame_widget.h"
 
 class QTabBar;
 class QBoxLayout;
@@ -37,10 +36,10 @@ public:
     }
 };
 
-class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
+class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
+    Q_OBJECT
 
-    typedef QnEmulatedFrameWidget base_type;
+    typedef QWidget base_type;
 
 public:
     enum Option {
@@ -77,7 +76,7 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
 
-    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
+    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const;
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
