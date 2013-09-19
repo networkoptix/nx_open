@@ -273,7 +273,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     int apiPort = VMAX_API_PORT;
     int httpPort = 80;
     QString httpPortStr = QUrlQuery(url.query()).queryItemValue(lit("http_port"));
-    int channelNum = url.queryItemValue(lit("channel")).toInt();
+    int channelNum = QUrlQuery(url.query()).queryItemValue(lit("channel")).toInt();
 
     if (httpPortStr.isEmpty())
     {
