@@ -87,6 +87,8 @@ public:
 
     virtual QRectF boundingRect() const override;
 
+    virtual void setGeometry(const QRectF &rect) override;
+
 signals:
     void tailPosChanged();
 
@@ -94,7 +96,6 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void updateGeometry() override;
 
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
