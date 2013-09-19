@@ -133,12 +133,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     QComboBox* comboBox = new QComboBox(parent);
                     comboBox->addItem(tr("For All Users"), QnBusinessActionParameters::EveryOne);
                     comboBox->addItem(tr("For Administrators Only"), QnBusinessActionParameters::AdminOnly);
-                    connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
                 } else if (actionType == BusinessActionType::PlaySound) {
                     QComboBox* comboBox = new QComboBox(parent);
                     comboBox->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
-                    connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     return comboBox;
                 } else if (actionType == BusinessActionType::SayText) {
                     return base_type::createEditor(parent, option, index);
@@ -166,7 +164,6 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                     BusinessEventType::Value val = (BusinessEventType::Value)i;
                     comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
                 }
-                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
             }
         case QnBusiness::ActionColumn:
@@ -179,14 +176,12 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                         continue;
                     comboBox->addItem(BusinessActionType::toString(val), val);
                 }
-                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                 return comboBox;
             }
         case QnBusiness::AggregationColumn:
             {
                 QnAggregationWidget* widget = new QnAggregationWidget(parent);
-                widget->setShort(true);
-                connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
+                widget->setShort(true);   
                 return widget;
             }
         default:
@@ -216,6 +211,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                 if (actionType == BusinessActionType::ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
+                        connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     }
                     return;
                 }
@@ -224,6 +220,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
                         comboBox->setCurrentIndex(soundModel->rowByFilename(index.data(Qt::EditRole).toString()));
+                        connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
                     }
                     return;
                 }
@@ -243,16 +240,19 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
         case QnBusiness::EventColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::EventTypeRole)));
+                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case QnBusiness::ActionColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
                 comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::ActionTypeRole)));
+                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case QnBusiness::AggregationColumn:
             if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor)) {
                 widget->setValue(index.data(Qt::EditRole).toInt());
+                connect(widget, SIGNAL(valueChanged()), this, SLOT(at_editor_commit()));
             }
             return;
         default:
@@ -322,6 +322,13 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             break;
     }
     base_type::setModelData(editor, model, index);
+}
+
+bool QnBusinessRuleItemDelegate::eventFilter(QObject *object, QEvent *event) {
+    QComboBox *editor = qobject_cast<QComboBox*>(object);
+    if (editor && event->type() == QEvent::FocusOut)
+        return false;
+    return base_type::eventFilter(object, event);
 }
 
 void QnBusinessRuleItemDelegate::at_editor_commit() {
