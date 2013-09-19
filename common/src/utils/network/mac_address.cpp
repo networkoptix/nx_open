@@ -73,7 +73,7 @@ bool QnMacAddress::operator<(const QnMacAddress &other) const
 }
 
 uint qHash(const QnMacAddress &value) {
-    static_assert(sizeof(QnMacAddress::m_data) == sizeof(quint32) + sizeof(quint16));
+    static_assert(sizeof(value.m_data) == sizeof(quint32) + sizeof(quint16), "Invalid MAC address data size.");
 
     return 
         *reinterpret_cast<const quint32 *>(value.m_data) * 863 +
