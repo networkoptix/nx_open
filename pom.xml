@@ -39,7 +39,7 @@
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
-        <ClientVoxSourceDir>${libdir}${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
+        <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <customization.dir>${basedir}/customization</customization.dir>
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
@@ -103,7 +103,8 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/rsa-key-${license.environment}.properties</file>
-                                <file>${root.dir}/build-${customization}.properties</file>								
+                                <file>${root.dir}/build-${customization}.properties</file>
+                                <file>${root.dir}/appserver/appserver-${arch}.properties</file>
                             </files>
                         </configuration>
                     </execution>                   
