@@ -983,12 +983,12 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             // if file is not exists then it is already deleted or just not downloaded yet
             // I think it should not be played when downloaded
             AudioPlayer::playFileAsync(filePath);
-            qDebug() << "play sound action received" << filename << filePath;
+//            qDebug() << "play sound action received" << filename << filePath;
             break;
         }
     case BusinessActionType::SayText: {
             AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
-            qDebug() << "speech action received" << businessAction->getParams().getSayText();
+//            qDebug() << "speech action received" << businessAction->getParams().getSayText();
             break;
         }
     default:

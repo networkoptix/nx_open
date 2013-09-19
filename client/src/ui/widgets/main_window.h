@@ -2,11 +2,11 @@
 #define QN_MAIN_WINDOW_H
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 #include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "emulated_frame_widget.h"
 
 class QTabBar;
 class QBoxLayout;
@@ -26,10 +26,20 @@ class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 
-class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
+class QnContextAwareMainWindow: public QMainWindow, public QnWorkbenchContextAware {
+    Q_OBJECT
+public:
+    QnContextAwareMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0) :
+        QMainWindow(parent, flags),
+        QnWorkbenchContextAware(context)
+    {
+    }
+};
 
-    typedef QnEmulatedFrameWidget base_type;
+class QnMainWindow: public QWidget, public QnWorkbenchContextAware {
+    Q_OBJECT
+
+    typedef QWidget base_type;
 
 public:
     enum Option {
@@ -66,7 +76,9 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
 
-    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
+    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const;
+
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 #ifdef Q_OS_WIN
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
