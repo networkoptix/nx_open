@@ -4,6 +4,7 @@
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
@@ -806,7 +807,8 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
         
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
         if(url.isValid()) {
-            int port = url.queryItemValue(lit("http_port")).toInt();
+            QUrlQuery query(url);
+            int port = query.queryItemValue(lit("http_port")).toInt();
             if(port == 0)
                 port = url.port(80);
             
