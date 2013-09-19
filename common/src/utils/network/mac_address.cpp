@@ -73,7 +73,9 @@ bool QnMacAddress::operator<(const QnMacAddress &other) const
 }
 
 uint qHash(const QnMacAddress &value) {
-	return 
-		*reinterpret_cast<const quint32 *>(value.m_data) * 863 +
-		*reinterpret_cast<const quint16 *>(value.m_data + 4);
+    static_assert(sizeof(QnMacAddress::m_data) == sizeof(quint32) + sizeof(quint16));
+
+    return 
+        *reinterpret_cast<const quint32 *>(value.m_data) * 863 +
+        *reinterpret_cast<const quint16 *>(value.m_data + sizeof(quint32));
 }
