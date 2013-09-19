@@ -23,6 +23,8 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
+    
+    virtual void destroyEditor(QWidget *editor, const QModelIndex &index) const override;
 
 private:
     QPointer<QnWorkbench> m_workbench;
