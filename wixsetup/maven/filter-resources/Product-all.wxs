@@ -13,7 +13,7 @@
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
-        
+
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
@@ -509,11 +509,15 @@
             <Custom Action="CertGenAction" After="CertGenAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="SyncDatabaseAction_Cmd" After="BackupDatabaseFile">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
@@ -529,8 +533,10 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-            <Custom Action="RestoreDatabaseFile_Cmd" After="StopServices"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
-            <Custom Action="RestoreDatabaseFile" After="RestoreDatabaseFile_Cmd"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
+            <Custom Action="RestoreDatabaseFile_Cmd" After="StopServices">
+                <![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
+            <Custom Action="RestoreDatabaseFile" After="RestoreDatabaseFile_Cmd">
+                <![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
                 <![CDATA[ (!AppServerFeature=3 OR INSTALL_ECS OR !ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
@@ -615,7 +621,9 @@
                         </Directory>
 
                         <Directory Id="${installer.customization}TrayToolDir" Name="TrayTool">
-                            <Component Id="traytool.exe">
+                            <Directory Id="TraytoolPlatforms" Name="platforms">                                   
+                            </Directory>     
+                            <Component Id="traytool.exe">   
                                 <File Id="traytool.exe" Name="traytool.exe" Source="$(var.SourceDir)/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallException${installer.customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
 
@@ -627,9 +635,8 @@
                                               WorkingDirectory='${installer.customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
-                            </Component>                                                
+                            </Component>                                  
                         </Directory>
-
                         <Directory Id="${installer.customization}ProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable">
                                 <File Id="ProxyExe" Name="mediaproxy.exe" Source="$(var.SourceDir)/mediaproxy.exe" KeyPath="yes">
@@ -731,6 +738,17 @@
         </Directory>
 
         <!-- Component groups -->
+        <ComponentGroup Id="TraytoolPlatforms" Directory="TraytoolPlatforms">
+            <Component>
+                <File Id="Traytoolqminimal$(var.suffix).dll" Name="Traytoolqminimal4.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Traytoolqoffscreen$(var.suffix).dll" Name="Traytoolqoffscreen4.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Traytoolqwindows$(var.suffix).dll" Name="Traytoolqwindows4.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
+            </Component>      
+        </ComponentGroup>         
         <ComponentGroup Id="TrayToolQTLibraries" Directory="${installer.customization}TrayToolDir">
             <Component>
                 <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />       
@@ -920,6 +938,7 @@
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
             <ComponentGroupRef Id="TrayToolOpenSSL"/>
+            <ComponentGroupRef Id="TraytoolPlatforms" />            
         </Feature>
 
         <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
