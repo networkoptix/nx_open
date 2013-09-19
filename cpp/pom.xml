@@ -129,27 +129,6 @@
             <build>
                 <plugins>					
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>	
-                            <!-- <execution>
-                                <id>default-cli</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>build.bat</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <arguments>
-                                        <commandlineArgs>${build.configuration}</commandlineArgs>
-                                    </arguments>
-                                </configuration>
-                            </execution>	-->						
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
                         <version>1.5.2</version>
@@ -161,7 +140,7 @@
                                 </goals>
                                 <configuration>
                                     <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${artifactId}-x64.vcxproj</file>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
                                     <!-- <excludes>
 										<exclude>**/vmaxproxy-x64.vcproj</exclude>
 									</excludes> -->	
@@ -176,13 +155,13 @@
                                             <value>Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:${arch}"</value>
                                         </replacement>         
                                     </replacements>
-                                    <skip>${replace.skip}</skip>
+                                    <skip>${force_x86}</skip>
                                 </configuration>								
                             </execution>
 
                             <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unneccessary (when qmake is fixed) -->
                             <execution>
-                                <id>add_protoc_run</id>
+                                <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
                                 <phase>process-resources</phase>
                                 <goals>
                                     <goal>replace</goal>
@@ -191,9 +170,31 @@
                                     <encoding>utf-8</encoding>
                                     <unescape>no</unescape>
                                     <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.sourceDirectory}/${artifactId}-${arch}.vcxproj</file>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
                                     <replacements>
                                         <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
+                                        <!--<replacement>
+                                            <token>
+                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace>]]></token>
+                                            <value>
+                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
+                                        </replacement> -->
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[release</ProgramDataBaseFileName>]]></token>
+                                            <value>
+                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[debug</ProgramDataBaseFileName>]]></token>
+                                            <value>
+                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
+                                        </replacement>         
                                         <replacement>
                                             <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
                                             <token>
@@ -201,8 +202,8 @@
                                             <value>
                                                 <![CDATA[
     <CustomBuild Include="$1/$2.$3">
-      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc;$1/$2.$3</AdditionalInputs>
-      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
+      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc.exe;$1/$2.$3</AdditionalInputs>
+      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc.exe --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
       <Message>Generating code from $1/$2.$3 to $2.pb.cc</Message>
       <Outputs>../${arch}/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
     </CustomBuild>
@@ -245,55 +246,14 @@
         </profile>
 
         <profile>
-            <id>linux</id>
+            <id>unix</id>
             <activation>
                 <os>
                     <family>unix</family>
-                    <name>linux</name>
-                </os>		
-            </activation>
+                </os> 
+            </activation>            
             <properties>
-                <compiler>gcc</compiler>
                 <rename-skip>false</rename-skip>
-                <exclude_platform>win</exclude_platform>				
-            </properties>
-            <build>	
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>	
-
-
-                            <!--<execution>
-                                <id>prepare-deb</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/prepare-package.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <skip>${assembly-skip}</skip>
-                                </configuration>
-                            </execution> -->
-                        </executions>
-                    </plugin>
-                </plugins>	
-            </build>			
-        </profile>	
-        <profile>
-            <id>macosx</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>		
-            </activation>
-            <properties>
-                <compiler>gcc</compiler>
-                <rename-skip>false</rename-skip>
-                <exclude_platform>win</exclude_platform>				
             </properties>
             <build>	
                 <plugins>
@@ -311,19 +271,6 @@
                                 <configuration>
                                     <executable>${project.build.directory}/build.sh</executable>
                                     <workingDirectory>${project.build.directory}</workingDirectory>		
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>prepare-deb</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/prepare-package.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <skip>${assembly-skip}</skip>
                                 </configuration>
                             </execution>
                         </executions>

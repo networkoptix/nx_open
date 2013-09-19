@@ -63,8 +63,9 @@ def gentext(file, path, extensions, text):
         parent = root[len(path) + 1:]
         
         for dir in dirs:
-            if dir.endswith('_specific') and (not dir.endswith('${common.platform}_specific') or not dir.endswith('${platform}_specific')):
-                dirs.remove(dir)  
+            if dir.endswith('_specific') and not dir.endswith('${platform}_specific'):
+                if not dir.endswith('${common.platform}_specific'):
+                    dirs.remove(dir)              
         
         for f in files:
             f_short = os.path.splitext(f)[0]
@@ -97,7 +98,10 @@ if __name__ == '__main__':
     if os.path.exists(translations_dir):    
         for f in listdir(translations_dir):
             if f.endswith('.ts'):
-                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                if '${platform}' == 'windows':
+                    os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                else:
+                    os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${libdir}/icons'], [''],'vmsclient.png')  
     

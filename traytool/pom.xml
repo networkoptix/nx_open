@@ -23,7 +23,7 @@
     <properties>
         <product.title>${traytool.name}</product.title>		
         <!--Global libs-->
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lprotobuf</global.libs>
         <!--Specific os libs used-->
         <qt.libs>core gui network xml multimedia concurrent widgets</qt.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32 -lssleay32 -llibeay32</windows.oslibs>

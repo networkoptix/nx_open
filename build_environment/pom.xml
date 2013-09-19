@@ -23,13 +23,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>help</artifactId>
-            <version>${project.version}</version>
-            <type>tar.gz</type>
-            <classifier>${customization}</classifier>
-        </dependency>
+
         <dependency>
             <groupId>com.google</groupId>
             <artifactId>protobuf</artifactId>
@@ -57,14 +51,7 @@
             <version>${onvif.version}</version>
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>		
-        <dependency>
-            <groupId>com.sourceforge.cloudcity</groupId>
-            <artifactId>bespin</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>                           
+        </dependency>		                        
         <dependency>
             <groupId>org.hyperic</groupId>
             <artifactId>sigar</artifactId>
@@ -72,28 +59,8 @@
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>                               	
-        <dependency>
-            <groupId>org</groupId>
-            <artifactId>festival</artifactId>
-            <version>${festival.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>                               	
-        <dependency>
-            <groupId>org.festival</groupId>
-            <artifactId>festival-vox</artifactId>
-            <version>${festival.version}</version>
-            <type>tar.gz</type>
-            <classifier>all-os</classifier>
-        </dependency> 
 
-        <!--<dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>qjson</artifactId>
-            <version>0.7.1-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>       
+        <!--   
         <dependency>                 
             <groupId>com.nokia.qt.addons</groupId>
             <artifactId>qtcolorpicker</artifactId>
@@ -239,65 +206,45 @@
                 </dependency>		
             </dependencies>	          
         </profile>
-        <!--
         <profile>
-            <id>linux</id>
+            <id>noarm</id>
             <activation>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>		
-				<property>
-					<name>!cross-arch</name>
-				</property>
-            </activation>
-					<classifier>${platform}-${arch}-${compiler}</classifier>
-				</dependency>                               	                        
-			</dependencies>
-
-		<profile>
-			<id>linux-arm</id>
-			<activation>
-				<os>
-					<family>unix</family>
-					<name>linux</name>
-				</os> 
-				<property>
-					<name>cross-arch</name>
-					<value>arm</value>
-				</property>
-			</activation>
-			<properties>
-				<rename-skip>false</rename-skip>
-			</properties>
-			<dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                                                        <arguments>
-                                                                                <commandlineArgs>${arch}</commandlineArgs>
-                                                                                <commandlineArgs>${toolchain.version}</commandlineArgs>
-                                                                        </arguments>
-                                <id>prepare-deb</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/prepare-package.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>		
-                                    <skip>${assembly-skip}</skip>
-                                </configuration>
-                            </execution>							
-                        </executions>
-                    </plugin>				
-                </plugins>
-            </build>						
-        </profile>		-->
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>            
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>help</artifactId>
+                    <version>${project.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${customization}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>                               	
+                <dependency>
+                    <groupId>org.festival</groupId>
+                    <artifactId>festival-vox</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>all-os</classifier>
+                </dependency> 		
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>1.2-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>                   
+            </dependencies>	            
+        </profile>      
     </profiles>	
 </project>

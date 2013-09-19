@@ -94,7 +94,7 @@ namespace aio
 
         //checking, if that socket is already monitored
         const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock.data(), eventToWatch );
-        map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::const_iterator it = m_sockets.lower_bound( sockCtx );
+        map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.lower_bound( sockCtx );
         if( it != m_sockets.end() && it->first == sockCtx )
             return true;    //socket already monitored for eventToWatch
 

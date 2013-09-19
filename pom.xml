@@ -54,38 +54,37 @@
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <customization>default</customization>
-        <!--QT libs used--> 
+        <!--QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules)--> 
         <qtlib1>Core</qtlib1>
-        <qtlib2>Gui</qtlib2>
-        <qtlib3>Network</qtlib3>
-        <qtlib4>Opengl</qtlib4>
-        <qtlib5>Xml</qtlib5>
+        <qtlib2>Network</qtlib2>
+        <qtlib3>Xml</qtlib3>
+        <qtlib4>Concurrent</qtlib4>
+        <qtlib5>Sql</qtlib5>
         <qtlib6>Multimedia</qtlib6>
-        <qtlib7>Sql</qtlib7>
+        <qtlib7>Opengl</qtlib7>
         <qtlib8>Widgets</qtlib8>
-        <qtlib9>Concurrent</qtlib9>
-        <qtlib10>X11Extras</qtlib10>
-        <!-- qtlib11 is used in macos profile -->
+        <qtlib9>Gui</qtlib9>
+        <qtlib10>X11Extras</qtlib10>                    
+
+        <!-- qtlib11 is used in macos profile only -->
         <qtlib12/>
+
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
         <qtplugin3/>	
-
-        <!-- defined only for cross compilation -->
-        <toolchain.version/>
     </properties>
 
     <modules>
         <module>build_environment</module>
         <module>appserver</module>
         <module>common</module>
-        <!-- <module>applauncher</module> 
-        <module>axiscamplugin</module>-->
+        <!--<module>axiscamplugin</module>-->
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
         <module>testcamera</module>
+        <module>image_library_plugin</module>
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>
@@ -183,6 +182,23 @@
 
     <profiles>
         <profile>
+            <id>noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>		                
+                <module>applauncher</module> 
+                <module>client</module>		
+            </modules>	
+            <properties>
+                <toolchain.version>none</toolchain.version>            
+            </properties>
+        </profile>  
+        <profile>
             <id>windows</id>
             <activation>
                 <os>
@@ -238,7 +254,6 @@
             </properties>
             <modules>
                 <!--<module>xvbadecoder</module>-->
-                <module>client</module>		
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
@@ -252,7 +267,6 @@
                 </os> 
             </activation>
             <modules>
-                <module>client</module>		
                 <module>ios-client</module>
             </modules>
             <properties>
@@ -265,6 +279,7 @@
                 <qtlib11>PrintSupport</qtlib11>
             </properties>
         </profile>        
+
         <profile>
             <id>linux-arm</id>
             <activation>
@@ -279,13 +294,8 @@
                 </property>
             </activation>
             <properties>
-                <!-- <ffmpeg.version>0.11.3-SNAPSHOT</ffmpeg.version> 
-                <arch>${cross-arch}</arch>
-                <toolchain.version>2011.09</toolchain.version>
-                <toolchain.version>2009q3</toolchain.version>
-                <compiler>${toolchain.version}</compiler> -->
-                <arch>arm</arch>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <toolchain.version>2009q3</toolchain.version>
             </properties>
         </profile>	
         <profile>
@@ -297,7 +307,8 @@
                     <arch>amd64</arch>
                 </os> 
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <properties>
@@ -313,7 +324,8 @@
                     <arch>i386</arch>
                 </os>
                 <property>
-                    <name>!cross-arch</name>
+                    <name>arch</name>
+                    <value>!arm</value>
                 </property>
             </activation>
             <properties>

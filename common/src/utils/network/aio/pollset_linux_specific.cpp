@@ -4,9 +4,9 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
-#include <qglobal.h>
+#ifdef __linux__
 
-#ifdef Q_OS_LINUX
+#include <qglobal.h>
 
 #include "pollset.h"
 
@@ -467,4 +467,5 @@ unsigned int PollSet::maxPollSetSize()
     return 128;
 }
 
-#endif
+#endif  //__linux__
+

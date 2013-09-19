@@ -46,6 +46,10 @@ void QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded(const QnReso
     if(server) 
     {
         connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));
+        if (!server->getPrimaryIF().isEmpty()) {
+            m_serverList << server;
+            processServer(server);
+        }
         connect(server.data(), SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
     }
     else if (desktop)

@@ -100,6 +100,9 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
+    if (message == QnSystemHealth::StoragesAreFull)
+        return; //Bug #2308: Need to remove notification "Storages are full"
+
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
     emit systemHealthEventAdded(message, resource);

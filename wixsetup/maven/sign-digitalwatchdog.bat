@@ -1,1 +1,2 @@
-${environment.dir}\bin\signtool.exe sign /ac thawte-intermediate-ca.cer /a /v /p qweasd123 /d "${company.name} ${product.name}" /f app.p12 bin\${project.build.finalName}.msi
+${environment.dir}\bin\signtool.exe sign /ac thawte-intermediate-ca.cer /a /v /p qweasd123 /d "${company.name} ${product.name}" /f app.p12 bin\${project.build.finalName}-full.msi
+${environment.dir}\bin\signtool.exe sign /ac thawte-intermediate-ca.cer /a /v /p qweasd123 /d "${company.name} ${product.name}" /f app.p12 bin\${project.build.finalName}-client.msi
