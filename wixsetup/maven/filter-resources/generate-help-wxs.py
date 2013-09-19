@@ -1,4 +1,5 @@
-import os
+import os, sys, subprocess
+from subprocess import Popen, PIPE
 
 def fixasfiles():
     fragments = (
@@ -14,6 +15,12 @@ def fixasfiles():
     open('ClientHelp.wxs', 'w').write(text)
 
 if __name__ == '__main__':
-    os.system(r'heat dir ${ClientHelpSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientHelp.wxs -cg ClientHelpComponent -dr ${installer.customization}HelpDir -var var.ClientHelpSourceDir')
+    p = subprocess.Popen(r'heat dir ${ClientHelpSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientHelp.wxs -cg ClientHelpComponent -dr ${installer.customization}HelpDir -var var.ClientHelpSourceDir', shell=True, stdout=PIPE)
+    out, err = p.communicate()
+    print out
+    p.wait()
+    if p.returncode:  
+        print "failed with code: %s" % str(p.returncode) 
+        sys.exit(1)
     fixasfiles()
 

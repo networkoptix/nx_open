@@ -1,4 +1,5 @@
-import os
+import os, sys, subprocess
+from subprocess import Popen, PIPE
 
 def fixasfiles():
     fragment1 = r"""            <Component Id="ecs.exe" Guid="*">
@@ -25,5 +26,12 @@ def fixasfiles():
     open('AppServerFiles.wxs', 'w').write(text)
 
 if __name__ == '__main__':
-    os.system(r'heat dir ${AppServerDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr ${installer.customization}AppServerDir -var var.AppServerSourceDir -wixvar')
+    p = subprocess.Popen(r'heat dir ${AppServerDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr ${installer.customization}AppServerDir -var var.AppServerSourceDir -wixvar', shell=True, stdout=PIPE)
+    out, err = p.communicate()
+    print out
+    p.wait()
+    if p.returncode:  
+        print "failed with code: %s" % str(p.returncode) 
+        sys.exit(1)
+
     fixasfiles()
