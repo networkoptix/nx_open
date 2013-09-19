@@ -486,7 +486,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize desctop camera searcher. */
 #ifdef Q_OS_WIN
-    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
+    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(qnMainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
     desktopSearcher.setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
