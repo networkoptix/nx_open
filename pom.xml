@@ -36,11 +36,11 @@
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
-        <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
-        <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
-        <libdir>${root.dir}/build_environment/target</libdir>
+        <libdir>${root.dir}/build_environment/target</libdir>        
+        <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
+        <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
+        <ClientVoxSourceDir>${libdir}${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <customization.dir>${basedir}/customization</customization.dir>
-        <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>

@@ -388,12 +388,12 @@ QUrl QnTCPConnectionProcessor::getDecodedUrl() const
 {
     Q_D(const QnTCPConnectionProcessor);
 #ifdef USE_NX_HTTP
-    QByteArray data = d->request.requestLine.url.path().toUtf8();
+    return d->request.requestLine.url;
 #else
     QByteArray data = d->requestHeaders.path().toUtf8();
-#endif
     data = data.replace("+", "%20");
     return QUrl::fromEncoded(data);
+#endif
 }
 
 void QnTCPConnectionProcessor::execute(QMutex& mutex)

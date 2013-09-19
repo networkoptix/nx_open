@@ -155,7 +155,7 @@
                             </arguments>
                             <workingDirectory>${basedir}/python</workingDirectory>		
                         </configuration>
-                    </execution>                       
+                    </execution>
                 </executions>
             </plugin>	
         </plugins>		

@@ -6,7 +6,6 @@ sys.path.append(basedir + '/' + '../..')
 
 from main import get_environment_variable, cd
 
-plugin_source_dir = '${qt.dir}/plugins'
 qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}']
 qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
 
@@ -32,16 +31,14 @@ print '+++++++++++++++++++++ COPYING QT LIBS +++++++++++++++++++++'
         
 if get_environment_variable('platform') == 'windows':        
     for arch in ('x86', 'x64'):
-
-        lib_source_dir = '${qt.dir}/bin'
+        plugin_source_dir = '${environment.dir}/qt5/qtbase-%s/plugins' % arch
+        lib_source_dir = '${environment.dir}/qt5/qtbase-%s/bin' % arch
         target_dir = join('${project.build.directory}', arch, 'bin')
-
-
         help_dir = join('${project.build.directory}', arch, 'bin/help')
             
         if os.path.exists(help_dir):
             shutil.rmtree(help_dir)
-            shutil.copytree('help', help_dir)                        
+            shutil.copytree(join(basedir, 'help'), help_dir)                        
 
         #shutil.rmtree('help')
 
@@ -82,6 +79,7 @@ if get_environment_variable('platform') == 'windows':
 else:     
     lib_source_dir = '${qt.dir}/lib'
     lib_target_dir = join('${project.build.directory}', 'lib')
+    plugin_source_dir = '${environment.dir}/qt5/qtbase-${arch}/plugins'	
     target_dir = join('${project.build.directory}', 'bin')
     help_dir = join('${project.build.directory}', 'bin/help')
     

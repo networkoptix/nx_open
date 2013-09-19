@@ -107,7 +107,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint | Qt::FramelessWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),

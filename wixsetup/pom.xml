@@ -21,11 +21,11 @@
     <name>HD Witness Installer</name>
 
     <properties>
+        <root.dir>${basedir}/..</root.dir>
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <install.type>all</install.type>
-        <ClientBgSourceDir>${basedir}/../client/resource/common/backgrounds</ClientBgSourceDir>
     </properties>
 
     <dependencies>
@@ -76,9 +76,9 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>../build-${customization}.properties</file>
-                                <file>../build_environment/${arch}/libdir.properties</file>
-                                <file>../appserver/setup/build/appserver-${arch}.properties</file>
+                                <file>${root.dir}/build-${customization}.properties</file>
+                                <!-- <file>../build_environment/${arch}/libdir.properties</file>
+                                <file>../appserver/setup/build/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
                     </execution>
@@ -95,7 +95,7 @@
             </activation>           
             <build>
                 <plugins>
-                    <plugin>
+                 <!--   <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
                         <version>2.5</version>
@@ -130,7 +130,7 @@
                                 </configuration>            
                             </execution>
                         </executions>
-                    </plugin>       
+                    </plugin>      --> 
 
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -157,20 +157,6 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1.1</version>
                         <executions>
-                            <execution>
-                                <id>wix-gen</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${python.dir}/python</executable>
-                                    <arguments>
-                                        <argument>wix-gen.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>                    
-                            </execution>
 
                             <execution>
                                 <id>package-CustomActions-with-msbuild</id>
@@ -183,10 +169,25 @@
                                     <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
                                 </configuration>
                             </execution>
+
+                            <execution>
+                                <id>wix-gen</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${python.dir}/python</executable>
+                                    <arguments>
+                                        <argument>wix-gen.py</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>                    
+                            </execution>
                             
                             <execution>
                                 <id>wix-compile</id>
-                                <phase>process-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
