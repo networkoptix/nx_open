@@ -969,7 +969,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::RemoveLayoutItemAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
-        shortcut(tr("Del")).
+        #ifdef Q_OS_MACX
+            shortcut(Qt::Key_Backspace).
+        #else
+            shortcut(tr("Del")).
+        #endif
         autoRepeat(false).
         condition(new QnLayoutItemRemovalActionCondition(this));
 
@@ -977,7 +981,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::RemovePermission).
         text(tr("Delete")).
-        shortcut(tr("Del")).
+        #ifdef Q_OS_MACX
+            shortcut(Qt::Key_Backspace).
+        #else
+            shortcut(tr("Del")).
+        #endif
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
