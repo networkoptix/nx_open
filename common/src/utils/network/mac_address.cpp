@@ -72,3 +72,8 @@ bool QnMacAddress::operator<(const QnMacAddress &other) const
     return memcmp(m_data, other.m_data, 6) < 0;
 }
 
+uint qHash(const QnMacAddress &value) {
+	return 
+		*reinterpret_cast<const quint32 *>(value.m_data) * 863 +
+		*reinterpret_cast<const quint16 *>(value.m_data + 4);
+}
