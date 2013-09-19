@@ -577,6 +577,12 @@ int main(int argc, char **argv)
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
+
+    //adding exe dir to plugin search path
+    QStringList pluginDirs = QCoreApplication::libraryPaths();
+    pluginDirs << QCoreApplication::applicationDirPath();
+    QCoreApplication::setLibraryPaths( pluginDirs );
+
     QnClientModule client(argc, argv);
 
     QnSessionManager::instance();
