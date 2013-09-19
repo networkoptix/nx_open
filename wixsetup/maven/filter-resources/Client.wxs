@@ -204,6 +204,12 @@
             <Component>
                 <File Id="ClientQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
+            <Component>
+                <File Id="ClientQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll"  />
+            </Component>
+            <Component>
+                <File Id="ClientQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>             
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">

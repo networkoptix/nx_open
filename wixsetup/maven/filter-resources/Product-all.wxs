@@ -733,8 +733,14 @@
         <!-- Component groups -->
         <ComponentGroup Id="TrayToolQTLibraries" Directory="${installer.customization}TrayToolDir">
             <Component>
-                <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />
+                <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />       
             </Component>
+            <Component>
+                <File Id="TrayToolQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll"  />
+            </Component>
+            <Component>
+                <File Id="TrayToolQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>            
             <Component>
                 <File Id="TrayToolQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll"  />
             </Component>
@@ -768,6 +774,9 @@
             <Component>
                 <File Id="ProxyQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
+            <Component>
+                <File Id="ProxyQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>             
         </ComponentGroup>
 
         <ComponentGroup Id="ServerFFmpegLibraries" Directory="${installer.customization}MediaServerDir">
@@ -810,6 +819,9 @@
             <Component>
                 <File Id="ServerQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll" />
             </Component>
+            <Component>
+                <File Id="ServerQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>              
             <Component>
                 <File Id="ServerQt5Multimedia$(var.suffix).dll" Name="Qt5Multimedia$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Multimedia$(var.suffix).dll" />
             </Component>
