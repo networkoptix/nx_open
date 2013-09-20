@@ -17,7 +17,7 @@
 #include "named_pipe_socket.h"
 
 
-TaskServerNew::TaskServerNew( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
+TaskServerNew::TaskServerNew( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue )
 :
     m_taskQueue( taskQueue ),
     m_terminated( false )
@@ -55,7 +55,6 @@ bool TaskServerNew::listen( const QString& pipeName )
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )
     {
-        const QString& str = SystemError::toString(osError);
         NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(SystemError::toString(osError)), cl_logDEBUG1 );
         return false;
     }
@@ -125,7 +124,7 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
     if( task->type == applauncher::api::TaskType::quit )
         m_terminated = true;
 
-    m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
+    m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
 }
 
 #endif

@@ -5,6 +5,8 @@
 #ifndef TASK_QUEUE_WATCHER_H
 #define TASK_QUEUE_WATCHER_H
 
+#include <memory>
+
 #include <QMutex>
 #include <QWaitCondition>
 #include <QThread>
@@ -25,7 +27,7 @@ class TaskQueueWatcher
     Q_OBJECT
 
 public:
-    TaskQueueWatcher( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
+    TaskQueueWatcher( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue );
     ~TaskQueueWatcher();
 
     virtual void pleaseStop() override;
@@ -41,7 +43,7 @@ protected:
     virtual void run();
 
 private:
-    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
+    BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const m_taskQueue;
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
     bool m_started;

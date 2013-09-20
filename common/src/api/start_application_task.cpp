@@ -31,12 +31,14 @@ namespace applauncher
         {
         }
 
-        BaseTask::~BaseTask(){}
+        BaseTask::~BaseTask()
+        {
+        }
 
 
         bool deserializeTask( const QByteArray& str, BaseTask** ptr )
         {
-            const int taskNameEnd = str.indexOf( '\n' );
+            const int taskNameEnd = str.indexOf('\n');
             if( taskNameEnd == -1 )
                 return false;
             const TaskType::Value taskType = TaskType::fromString( QnByteArrayConstRef(str, 0, taskNameEnd) );

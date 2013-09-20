@@ -52,7 +52,7 @@ private:
     const bool m_quitMode;
     InstallationManager m_installationManager;
     LauncherCommonData m_fsmSharedData;
-    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> > m_taskQueue;
+    BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> > m_taskQueue;
 #ifdef _WIN32
     TaskServerNew m_taskServer;
 #else

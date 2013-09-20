@@ -5,6 +5,8 @@
 #ifndef LAUNCHER_COMMON_DATA_H
 #define LAUNCHER_COMMON_DATA_H
 
+#include <memory>
+
 #include <QObject>
 #include <QSharedPointer>
 
@@ -27,7 +29,7 @@ class LauncherCommonData
     Q_PROPERTY( int currentTaskType READ currentTaskType )
 
 public: 
-    QSharedPointer<applauncher::api::BaseTask> currentTask;
+    std::shared_ptr<applauncher::api::BaseTask> currentTask;
     QString downloadedFilePath;
 
     LauncherCommonData( const InstallationManager& installationManager );

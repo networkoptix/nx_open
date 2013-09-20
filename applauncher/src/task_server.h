@@ -23,7 +23,7 @@ class TaskServer
     Q_OBJECT
 
 public:
-    TaskServer( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue );
+    TaskServer( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue );
 
     //!
     /*!
@@ -33,7 +33,7 @@ public:
     bool listen( const QString& pipeName );
 
 private:
-    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const m_taskQueue;
+    BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const m_taskQueue;
     QLocalServer m_server;
 
 private slots:

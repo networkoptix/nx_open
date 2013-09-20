@@ -14,7 +14,7 @@
 #include <utils/common/log.h>
 
 
-TaskServer::TaskServer( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
+TaskServer::TaskServer( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue )
 :
     m_taskQueue( taskQueue )
 {
@@ -77,5 +77,5 @@ void TaskServer::onNewConnection()
         ((applauncher::api::StartApplicationTask*)task)->version = "debug";
 #endif
 
-    m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
+    m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
 }

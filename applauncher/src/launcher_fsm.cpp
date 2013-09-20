@@ -192,7 +192,7 @@ bool LauncherFSM::addTaskToTheQueue()
     QString appArgs;
     if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
         return false;   //TODO/IMPL no single version installed
-    m_taskQueue.push( QSharedPointer<applauncher::api::BaseTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ) );
+    m_taskQueue.push( std::shared_ptr<applauncher::api::BaseTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ) );
     return true;
 }
 

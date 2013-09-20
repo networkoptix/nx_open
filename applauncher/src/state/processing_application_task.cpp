@@ -27,7 +27,7 @@ ProcessingApplicationTask::ProcessingApplicationTask(
     QSettings* const settings,
     InstallationManager* const installationManager,
     LauncherCommonData* const fsmSharedData,
-    BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
+    BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue )
 :
     QState( parent ),
     m_settings( settings ),

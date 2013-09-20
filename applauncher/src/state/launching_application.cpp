@@ -48,7 +48,7 @@ void LaunchingApplication::onEntry( QEvent* _event )
     NX_LOG( QString::fromLatin1("Entered LaunchingApplication"), cl_logDEBUG1 );
 
     Q_ASSERT( m_launcherCommonData.currentTask->type == applauncher::api::TaskType::startApplication );
-    applauncher::api::StartApplicationTask* startTask = m_launcherCommonData.currentTask.staticCast<applauncher::api::StartApplicationTask>().data();
+    applauncher::api::StartApplicationTask* startTask = std::static_pointer_cast<applauncher::api::StartApplicationTask>(m_launcherCommonData.currentTask).get();
 
     InstallationManager::AppData appData;
     for( ;; )

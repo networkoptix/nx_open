@@ -16,7 +16,7 @@ LauncherCommonData::LauncherCommonData( const InstallationManager& installationM
 bool LauncherCommonData::isRequiredVersionInstalled() const
 {
     Q_ASSERT( currentTask->type == applauncher::api::TaskType::startApplication );
-    return m_installationManager.isVersionInstalled( currentTask.staticCast<applauncher::api::StartApplicationTask>()->version );
+    return m_installationManager.isVersionInstalled( std::static_pointer_cast<applauncher::api::StartApplicationTask>(currentTask)->version );
 }
 
 bool LauncherCommonData::areThereAnyVersionInstalledBesidesJustTriedOne() const
