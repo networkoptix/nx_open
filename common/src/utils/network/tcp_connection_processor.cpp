@@ -86,6 +86,7 @@ void QnTCPConnectionProcessor::parseRequest()
     qDebug() << d->clientRequest;
 
 #ifdef USE_NX_HTTP
+    d->request = nx_http::HttpRequest();
     if( !d->request.parse( d->clientRequest ) )
     {
         qWarning() << Q_FUNC_INFO << "Invalid request format.";
