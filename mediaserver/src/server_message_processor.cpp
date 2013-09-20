@@ -78,6 +78,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 
         if (!message.systemName.isNull())
             QnAppServerConnectionFactory::setSystemName(message.systemName);
+
+        if (!message.sessionKey.isNull())
+            QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
     }
     else if (message.messageType == Qn::Message_Type_License)
     {
