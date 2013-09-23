@@ -136,6 +136,8 @@ bool QnThirdPartyResource::setRelayOutputState(
 QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
 {
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+    if( !archiveDelegate )
+        return QnSecurityCamResource::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
     if (hasFlags(still_image) || hasFlags(utc))
