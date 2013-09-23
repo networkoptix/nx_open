@@ -23,7 +23,7 @@
 /*!
     Plugins are searched for in following directories:\n
     - plugin directory, supplied in constructor
-    - on linux, directory, defined by environment variable NETWORK_OPTIX_PLUGIN_DIR, is searched
+    - on linux, directory, defined by environment variable VMS_PLUGIN_DIR, is searched
     - process current directory
     - process binary directory
 
