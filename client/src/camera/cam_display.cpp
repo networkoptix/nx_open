@@ -1081,8 +1081,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
 
 
-    qDebug() << "process packet time=" << QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString();
-
     if (emptyData && !flushCurrentBuffer)
     {
         if (speed == 0)
