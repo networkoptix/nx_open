@@ -240,6 +240,15 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //closeDecoder();
     //openDecoder();
     //return;
+
+    if (m_passedContext && data->context->ctx())
+        avcodec_copy_context(m_passedContext, data->context->ctx());
+    if (m_passedContext && m_passedContext->width && m_passedContext->height)
+    {
+        m_currentWidth = m_passedContext->width;
+        m_currentHeight = m_passedContext->height;
+    }
+    
     
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     if (m_context->codec)
@@ -307,6 +316,21 @@ void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
         avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
         m_deinterlacedFrame->width = m_context->width;
         m_deinterlacedFrame->height = m_context->height;
+    }
+}
+
+void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnCompressedVideoDataPtr data, int width, int height)
+{
+    if (m_currentWidth == -1) {
+        m_currentWidth = width;
+        m_currentHeight = height;
+    }
+    else if (width != m_currentWidth || height != m_currentHeight)
+    {
+        m_currentWidth = width;
+        m_currentHeight = height;
+        m_needRecreate = false;
+        resetDecoder(data);
     }
 }
 
@@ -416,18 +440,16 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
                 const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
                 sps.decodeBuffer(curPtr + nalLen, end);
                 sps.deserialize();
-                if (m_currentWidth == -1) {
-                    m_currentWidth = sps.getWidth();
-                    m_currentHeight = sps.getHeight();
-                }
-                else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
-                {
-                    m_currentWidth = sps.getWidth();
-                    m_currentHeight = sps.getHeight();
-                    resetDecoder(data);
-                }
+                processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
             }
         }
+        else if (data->context && data->context->ctx())
+        {
+            AVCodecContext* ctx = data->context->ctx();
+            if (ctx->width && ctx->height)
+                processNewResolutionIfChanged(data, ctx->width, ctx->height);
+        }
+
         if (data->motion) {
             while (m_motionMap.size() > MAX_DECODE_THREAD+1)
                 m_motionMap.remove(0);
