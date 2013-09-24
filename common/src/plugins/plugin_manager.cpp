@@ -94,7 +94,7 @@ void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
         directoriesToSearchForPlugins.insert( QDir(m_pluginDir).absolutePath() );
 
 #ifndef Q_OS_WIN32
-    char* netOptixPluginDir = getenv("NETWORK_OPTIX_PLUGIN_DIR");
+    char* netOptixPluginDir = getenv("VMS_PLUGIN_DIR");
     if( netOptixPluginDir )
         directoriesToSearchForPlugins.insert( QString::fromLatin1(netOptixPluginDir) );
 #endif
