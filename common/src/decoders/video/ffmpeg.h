@@ -68,6 +68,7 @@ private:
     void closeDecoder();
     int findMotionInfo(qint64 pkt_dts);
     void reallocateDeinterlacedFrame();
+    void processNewResolutionIfChanged(const QnCompressedVideoDataPtr data, int width, int height);
 private:
     AVCodecContext *m_passedContext;
 
