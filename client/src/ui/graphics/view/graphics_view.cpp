@@ -9,6 +9,21 @@
 #   include <QtCore/QDateTime>
 #endif
 
+namespace {
+    class PaintDevice: public QPaintDevice {
+    public:
+        QPaintDevice *invokeRedirected(QPoint *offset) const {
+            return redirected(offset);
+        }
+    };
+
+    PaintDevice *open(QPaintDevice *paintDevice) {
+        return static_cast<PaintDevice *>(paintDevice);
+    }
+
+} // anonymous namespace
+
+
 QnLayerPainter::QnLayerPainter(): m_view(NULL), m_layer(static_cast<QGraphicsScene::SceneLayer>(0)) {}
 
 QnLayerPainter::~QnLayerPainter() {
@@ -86,11 +101,14 @@ void QnGraphicsView::showEvent(QShowEvent *event) {
     }
 }
 
-void QnGraphicsView::paintEvent(QPaintEvent *event) {
-//    if(!(m_paintFlags & PaintOnExternalSurfaces) && QPainter::redirected(viewport(), NULL) != viewport())
-//        return;
+bool QnGraphicsView::isInRedirectedPaint() const {
+    QPoint offset;
+    return open(viewport())->invokeRedirected(&offset) != viewport();
+}
 
-    //TODO: #Elric #QT5PORT
+void QnGraphicsView::paintEvent(QPaintEvent *event) {
+    if(isInRedirectedPaint())
+        return;
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
     qint64 frequency = QnPerformance::currentCpuFrequency();
