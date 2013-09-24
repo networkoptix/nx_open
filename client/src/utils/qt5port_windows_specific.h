@@ -11,8 +11,9 @@
 
 #include "windef.h"
 
+HWND hwndForWidget(const QWidget *widget);
 
-QPixmap pixmapFromWinHICON(HICON handle);
+
 HWND widToHwnd(WId id);
 WId hwndToWid(HWND id);
 
