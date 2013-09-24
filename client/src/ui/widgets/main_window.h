@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/graphics/view/graphics_scene.h>
 
 class QTabBar;
 class QBoxLayout;
@@ -103,7 +104,7 @@ private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QScopedPointer<QnGraphicsView> m_view;
-    QScopedPointer<QGraphicsScene> m_scene;
+    QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
     QScopedPointer<QnWorkbenchUi> m_ui;
 

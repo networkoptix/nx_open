@@ -25,6 +25,7 @@
 #include "ui/common/frame_section.h"
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
+#include "ui/graphics/view/graphics_scene.h"
 #include "ui/graphics/view/gradient_background_painter.h"
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -141,7 +142,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up scene & view. */
-    m_scene.reset(new QGraphicsScene(this));
+    m_scene.reset(new QnGraphicsScene(this));
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
