@@ -9,8 +9,6 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
-#include "meta_handler.h"
-
 class QTextStream;
 
 struct QnCommandLineDefaultImpliedValue {};
@@ -35,19 +33,19 @@ public:
     }
 
     QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
-        init(NULL, NULL, type, longName, shortName, description, impliedValue);
+        init(NULL, type, longName, shortName, description, impliedValue);
     }
 
     QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
-        init(NULL, NULL, type, QLatin1String(longName), QLatin1String(shortName), description, impliedValue);
+        init(NULL, type, QLatin1String(longName), QLatin1String(shortName), description, impliedValue);
     }
 
     void *target() const {
         return m_target;
     }
 
-    QnMetaHandler *targetHandler() const {
-        return m_targetHandler.data();
+    QMetaType *metaType() const {
+        return m_metaType.data();
     }
 
     int type() const {
@@ -73,14 +71,14 @@ public:
 private:
     template<class T>
     void init(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
-        init(target, new QnTypedMetaHandler<T>(), qMetaTypeId<T>(), longName, shortName, description, impliedValue);
+        init(target, qMetaTypeId<T>(), longName, shortName, description, impliedValue);
     }
 
-    void init(void *target, QnMetaHandler *targetHandler, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue);
+    void init(void *target, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue);
 
 private:
     void *m_target;
-    QSharedPointer<QnMetaHandler> m_targetHandler;
+    QSharedPointer<QMetaType> m_metaType;
     int m_type;
     QString m_longName;
     QString m_shortName;
