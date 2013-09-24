@@ -34,6 +34,7 @@ private slots:
     void at_noStorages();
     void at_storageFailure(QnResourcePtr storage);
     void at_timer();
+    void at_connectionOpened();
 private:
     void initTcpListener();
     QHostAddress getPublicAddress();
@@ -41,6 +42,7 @@ private:
     int m_argc;
     char** m_argv;
     bool m_waitExtIpFinished;
+    qint64 m_firstRunningTime;
 
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;

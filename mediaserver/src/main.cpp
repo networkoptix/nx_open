@@ -561,7 +561,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
-    m_universalTcpListener(0)
+    m_universalTcpListener(0),
+    m_firstRunningTime(0)
 {
     serviceMainInstance = this;
 }
@@ -739,9 +740,18 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
         qWarning() << "Error saving server.";
 }
 
+void QnMain::at_connectionOpened()
+{
+    if (m_firstRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
+        m_firstRunningTime*1000,
+        QnBusiness::MServerIssueStarted);
+    m_firstRunningTime = 0;
+}
+
 void QnMain::at_timer()
 {
-    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qSettingsRunTime.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -1137,9 +1147,12 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
+    m_firstRunningTime = qSettingsRunTime.value("lastRunningTime").toLongLong();
+
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
     timer.start(60 * 1000);
 
 
@@ -1207,7 +1220,7 @@ void QnMain::run()
 
     // This method will set flag on message channel to threat next connection close as normal
     appServerConnection->disconnectSync();
-    qSettings.setValue("lastRunningTime", 0);
+    qSettingsRunTime.setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
