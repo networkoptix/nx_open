@@ -150,6 +150,10 @@ public:
     void setHardwareId2(const QByteArray& hardwareId);
     QByteArray hardwareId2() const;
 
+    void setHardwareId3(const QByteArray& hardwareId);
+    QByteArray hardwareId3() const;
+
+    QByteArray currentHardwareId() const;
 signals:
     void licensesChanged();
 
@@ -170,6 +174,9 @@ private:
 
     // The one 1.6 uses
     QByteArray m_hardwareId2;
+
+    // The one for 2.0.2 and later
+    QByteArray m_hardwareId3;
 
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
