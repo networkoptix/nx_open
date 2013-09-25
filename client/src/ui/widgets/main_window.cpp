@@ -213,7 +213,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
-//    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);//TODO: #Elric #QT5PORT
+    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
@@ -414,8 +414,8 @@ void QnMainWindow::updateDwmState() {
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
         /* Windowed or maximized with aero glass. */
-        m_drawCustomFrame = false;
-        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
+        m_drawCustomFrame = true;
+        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(1, 1, 1, 1);
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
@@ -517,13 +517,8 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(qnGlobals->frameColor(), 3));
-        painter.drawRect(QRect(
-            0,
-            0,
-            width() - 1,
-            height() - 1
-        ));
+        painter.setPen(QPen(Qt::black, 1));
+        painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
 }
 
