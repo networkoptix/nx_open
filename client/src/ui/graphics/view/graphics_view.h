@@ -101,6 +101,9 @@ protected:
     virtual void drawForeground(QPainter *painter, const QRectF &rect) override;
 
 private:
+    bool isInRedirectedPaint() const;
+
+private:
     PaintFlags m_paintFlags;
     BehaviorFlags m_behaviorFlags;
     QList<QnLayerPainter *> m_foregroundPainters;

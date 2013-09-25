@@ -4,9 +4,9 @@
 #include <QtCore/QMargins>
 #include <QtWidgets/QWidget>
 
-/*#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
 #   define QN_HAS_DWM
-#endif*/
+#endif
 
 class QnDwmPrivate;
 

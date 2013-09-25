@@ -7,9 +7,6 @@
 
 #include <cstring>
 
-#include <QString>
-#include <QStringList>
-
 #include "archive_reader.h"
 #include "media_encoder.h"
 #include "time_periods.h"

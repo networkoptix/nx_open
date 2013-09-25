@@ -22,6 +22,7 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 void QnDesktopCameraResourceSearcher::registerCamera(AbstractStreamSocket* connection, const QString& userName)
 {
     connection->setSendTimeout(1);
+    QMutexLocker lock(&m_mutex);
     m_connections << ClientConnectionInfo(TCPSocketPtr(connection), userName);
 }
 
@@ -38,6 +39,8 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
     if (!rt.isValid())
         return result;
+
+    QMutexLocker lock(&m_mutex);
 
     QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     

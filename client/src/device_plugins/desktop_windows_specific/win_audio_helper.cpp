@@ -17,13 +17,8 @@
 
 #include "utils/common/util.h"
 
-#ifdef Q_OS_WIN
-    #include <utils/qt5port_windows_specific.h>
-#endif
-
-#if _MSC_VER < 1600
-DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_JackSubType,0x1da5d803,0xd492,0x4edd,0x8c,0x23,0xe0,0xc0,0xff,0xee,0x7f,0x0e,8);
-#endif
+/* This one is private API, but it is exported from QtGui. */
+extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 
 bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
 {
@@ -163,7 +158,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
     HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
     QPixmap rez;
     if (hIcon)
-        rez = pixmapFromWinHICON(hIcon);
+        rez = qt_pixmapFromWinHICON(hIcon);
     DestroyIcon(hIcon);
     return rez;
 }

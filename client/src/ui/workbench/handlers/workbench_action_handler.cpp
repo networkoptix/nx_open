@@ -3207,10 +3207,19 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         if (m_exportStorage && (m_exportedMediaRes->toResource()->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         QnLayoutItemData itemData = m_exportLayout->getItem(uniqId);
+
+        QnMediaResourcePtr mediaRes = m_exportedMediaRes.dynamicCast<QnMediaResource>();
+        int timeOffset = 0;
+        if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+            // time difference between client and server
+            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0);
+        }
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll,
                                                       (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage,
                                                        role,
-                                                       0, 0,
+                                                       timeOffset, serverTimeZone,
                                                        itemData.zoomRect,
                                                        itemData.contrastParams,
                                                        itemData.dewarpingParams);

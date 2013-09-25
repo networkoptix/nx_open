@@ -22,7 +22,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QMainWindow>
 #include <QtGui/QDesktopServices>
 
 #include <QtSingleApplication>
@@ -458,11 +457,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
     /* Create main window. */
-    QScopedPointer<QnContextAwareMainWindow> mainWindow(new QnContextAwareMainWindow(context.data()));
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     context->setMainWindow(mainWindow.data());
-
-    QnMainWindow* qnMainWindow = new QnMainWindow(context.data());
-    mainWindow->setCentralWidget(qnMainWindow);
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
     if(screen != -1) {
@@ -475,18 +471,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     mainWindow->show();
-#ifndef Q_OS_MACX
     if (!noFullScreen)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
-    else
-#endif
-        context->action(Qn::MaximizeAction)->trigger();
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
     /* Initialize desctop camera searcher. */
 #ifdef Q_OS_WIN
-    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(qnMainWindow->viewport()));
+    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
     desktopSearcher.setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
@@ -497,9 +489,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
-        qnMainWindow->handleMessage(QFile::decodeName(argv[i]));
+        mainWindow->handleMessage(QFile::decodeName(argv[i]));
     if(!noSingleApplication)
-        QObject::connect(application, SIGNAL(messageReceived(const QString &)), qnMainWindow, SLOT(handleMessage(const QString &)));
+        QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
 #ifdef TEST_RTSP_SERVER
     addTestData();

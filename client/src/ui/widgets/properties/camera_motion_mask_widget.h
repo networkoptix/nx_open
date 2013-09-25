@@ -10,6 +10,7 @@
 class MotionSelectionInstrument;
 
 class QnGraphicsView;
+class QnGraphicsScene;
 class QnWorkbench;
 class QnWorkbenchDisplay;
 class QnWorkbenchController;
@@ -65,7 +66,7 @@ private:
 
     QScopedPointer<QnWorkbenchContext> m_context;
 
-    QScopedPointer<QGraphicsScene> m_scene;
+    QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnGraphicsView> m_view;
 
     QScopedPointer<QnWorkbenchController> m_controller;
