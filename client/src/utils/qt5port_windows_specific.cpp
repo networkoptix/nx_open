@@ -4,9 +4,5 @@ HWND widToHwnd(WId id) {
     return reinterpret_cast<HWND>(id);
 }
 
-WId hwndToWid(HWND id) {
-    return reinterpret_cast<WId>(id);
-}
-
 
 

@@ -10,7 +10,6 @@
 #include "windef.h"
 
 HWND widToHwnd(WId id);
-WId hwndToWid(HWND id);
 
 #endif
 
