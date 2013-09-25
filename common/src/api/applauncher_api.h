@@ -21,6 +21,7 @@ namespace applauncher
             {
                 startApplication,
                 quit,
+                install,
                 invalidTaskType
             };
 
@@ -65,6 +66,13 @@ namespace applauncher
             virtual bool deserialize( const QByteArray& data ) override;
         };
 
+        class StartInstallationTask
+        :
+            public BaseTask
+        {
+            //TODO/IMPL
+        };
+
         //!Applauncher process quits running on receiving this task
         class QuitTask
         :
@@ -75,6 +83,34 @@ namespace applauncher
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QByteArray& data ) override;
+        };
+
+        namespace ResultType
+        {
+            enum Value
+            {
+                ok,
+                versionNotInstalled,
+                ioError
+            };
+        }
+
+        class Response
+        {
+        public:
+            ResultType::Value result;
+
+            Response();
+
+            virtual QByteArray toString() const;
+        };
+
+        class InstallResponse
+        :
+            public Response
+        {
+        public:
+            virtual QByteArray toString() const override;
         };
     }
 }

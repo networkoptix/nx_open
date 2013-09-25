@@ -15,8 +15,9 @@
 
 ApplauncherProcess::ApplauncherProcess( bool quitMode )
 :
+    m_terminated( false ),
     m_quitMode( quitMode ),
-    m_taskServer( &m_taskQueue ),
+    m_taskServer( this ),
     m_settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ),
     m_bindTriesCount( 0 ),
     m_isLocalServerWasNotFound( false )
@@ -25,7 +26,42 @@ ApplauncherProcess::ApplauncherProcess( bool quitMode )
 
 void ApplauncherProcess::pleaseStop()
 {
-    m_taskQueue.push( std::shared_ptr<applauncher::api::BaseTask>( new applauncher::api::QuitTask() ) );
+    std::lock_guard<std::mutex> lk( m_mutex );
+    m_terminated = true;
+    m_cond.notify_all();
+}
+
+void ApplauncherProcess::processRequest(
+    const std::shared_ptr<applauncher::api::BaseTask>& request,
+    applauncher::api::Response** const response )
+{
+    switch( request->type )
+    {
+        case applauncher::api::TaskType::quit:
+            pleaseStop();
+            break;
+
+        case applauncher::api::TaskType::startApplication:
+        {
+            *response = new applauncher::api::Response();
+            startApplication(
+                std::static_pointer_cast<applauncher::api::StartApplicationTask>( request ),
+                *response );
+            break;
+        }
+
+        case applauncher::api::TaskType::install:
+        {
+            *response = new applauncher::api::InstallResponse();
+            startInstallation(
+                std::static_pointer_cast<applauncher::api::StartInstallationTask>( request ),
+                static_cast<applauncher::api::InstallResponse*>(*response) );
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 
 int ApplauncherProcess::run()
@@ -45,20 +81,15 @@ int ApplauncherProcess::run()
     QString versionToLaunch;
     QString appArgs;
     if( getVersionToLaunch( &versionToLaunch, &appArgs ) )
-        m_taskQueue.push( std::shared_ptr<applauncher::api::BaseTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ) );
-
-    for( ;; )
     {
-        std::shared_ptr<applauncher::api::BaseTask> task = m_taskQueue.front();
-        m_taskQueue.pop();
-
-        //processing task
-        if( task->type == applauncher::api::TaskType::quit )
-            break;
-        else if( task->type == applauncher::api::TaskType::startApplication )
-            startApplication( std::static_pointer_cast<applauncher::api::StartApplicationTask>( task ) );
+        applauncher::api::Response response;
+        startApplication(
+            std::shared_ptr<applauncher::api::StartApplicationTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ),
+            &response );
     }
 
+    std::unique_lock<std::mutex> lk( m_mutex );
+    m_cond.wait( lk, [this](){ return m_terminated; } );
     return 0;
 }
 
@@ -177,7 +208,9 @@ static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin
 static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
 static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
 
-bool ApplauncherProcess::startApplication( const std::shared_ptr<applauncher::api::StartApplicationTask>& task )
+bool ApplauncherProcess::startApplication(
+    const std::shared_ptr<applauncher::api::StartApplicationTask>& task,
+    applauncher::api::Response* const response )
 {
     NX_LOG( QString::fromLatin1("Entered LaunchingApplication"), cl_logDEBUG1 );
 
@@ -197,11 +230,14 @@ bool ApplauncherProcess::startApplication( const std::shared_ptr<applauncher::ap
             }
         }
         NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(task->version), cl_logDEBUG1 );
+        response->result = applauncher::api::ResultType::versionNotInstalled;
         return false;
     }
 
     if( task->version != m_installationManager.getMostRecentVersion() )
         task->appArgs += QString::fromLatin1(" ") + m_settings.value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
+
+    //TODO/IMPL start process asynchronously ?
 
     const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
@@ -211,11 +247,39 @@ bool ApplauncherProcess::startApplication( const std::shared_ptr<applauncher::ap
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
         m_settings.setValue( QLatin1String("previousLaunchedVersion"), task->version );
+        response->result = applauncher::api::ResultType::ok;
         return true;
     }
     else
     {
         NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
+        response->result = applauncher::api::ResultType::ioError;
         return false;
     }
+}
+
+bool ApplauncherProcess::startInstallation(
+    const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
+    applauncher::api::InstallResponse* const response )
+{
+    //TODO/IMPL detecting directory to download to 
+    QString targetDir;
+    //TODO/IMPL
+    std::forward_list<QUrl> mirrors;
+
+    int downloadingID = ++m_prevDownloadingID;
+
+    std::unique_ptr<RDirSyncher> syncher( new RDirSyncher( mirrors, targetDir, this ) );
+    //syncher->setFileProgressNotificationStep(  );
+
+    if( !syncher->startAsync() )
+    {
+        //TODO/IMPL filling in response
+        return false;
+    }
+
+    //TODO/IMPL filling in response
+
+    //TODO/IMPL
+    return true;
 }

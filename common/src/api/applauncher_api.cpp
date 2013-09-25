@@ -2,7 +2,7 @@
 // 15 mar 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#include "start_application_task.h"
+#include "applauncher_api.h"
 
 #include <QtCore/QList>
 
@@ -131,6 +131,32 @@ namespace applauncher
         bool QuitTask::deserialize( const QByteArray& data )
         {
             return data == "quit\n\n";
+        }
+
+
+        ////////////////////////////////////////////////////////////
+        //// class Response
+        ////////////////////////////////////////////////////////////
+        Response::Response()
+        :
+            result( ResultType::ok )
+        {
+        }
+
+        QByteArray Response::toString() const
+        {
+            //TODO/IMPL
+            return QByteArray();
+        }
+
+
+        ////////////////////////////////////////////////////////////
+        //// class InstallResponse
+        ////////////////////////////////////////////////////////////
+        QByteArray InstallResponse::toString() const
+        {
+            //TODO/IMPL
+            return QByteArray();
         }
     }
 }

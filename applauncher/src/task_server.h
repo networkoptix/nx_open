@@ -11,9 +11,11 @@
 #include <QLocalServer>
 #include <QSharedPointer>
 
-#include <api/start_application_task.h>
+#include <api/applauncher_api.h>
 #include "blocking_queue.h"
 
+
+class AbstractRequestProcessor;
 
 //!Accepts tasks from application instances and stores them in a task queue
 class TaskServer
@@ -23,7 +25,7 @@ class TaskServer
     Q_OBJECT
 
 public:
-    TaskServer( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue );
+    TaskServer( AbstractRequestProcessor* const requestProcessor );
 
     //!
     /*!
@@ -33,7 +35,7 @@ public:
     bool listen( const QString& pipeName );
 
 private:
-    BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const m_taskQueue;
+    AbstractRequestProcessor* const m_requestProcessor;
     QLocalServer m_server;
 
 private slots:

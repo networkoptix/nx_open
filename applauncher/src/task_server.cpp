@@ -13,10 +13,12 @@
 
 #include <utils/common/log.h>
 
+#include "abstract_request_processor.h"
 
-TaskServer::TaskServer( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue )
+
+TaskServer::TaskServer( AbstractRequestProcessor* const requestProcessor )
 :
-    m_taskQueue( taskQueue )
+    m_requestProcessor( requestProcessor )
 {
 }
 
@@ -62,8 +64,6 @@ void TaskServer::onNewConnection()
         return;
     }
     QByteArray data = conn->readAll();
-    conn->write( QByteArray("ok") );
-    conn->flush();
 
     applauncher::api::BaseTask* task = NULL;
     if( !applauncher::api::deserializeTask( data, &task ) )
@@ -77,5 +77,13 @@ void TaskServer::onNewConnection()
         ((applauncher::api::StartApplicationTask*)task)->version = "debug";
 #endif
 
-    m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
+    //m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
+    applauncher::api::Response* response = NULL;
+    m_requestProcessor->processRequest(
+        std::shared_ptr<applauncher::api::BaseTask>(task),
+        &response );
+
+    const QByteArray& responseMsg = response != NULL ? "ok" : response->toString();
+    conn->write( responseMsg );
+    conn->flush();
 }

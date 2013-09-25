@@ -418,7 +418,7 @@ namespace aio
     void AIOThread::run()
     {
         saveSysThreadID();
-        cl_log.log( QLatin1String("AIO thread started"), cl_logDEBUG1 );
+        NX_LOG( QLatin1String("AIO thread started"), cl_logDEBUG1 );
 
         while( !needToStop() )
         {
@@ -442,7 +442,7 @@ namespace aio
                 break;
             if( triggeredSocketCount < 0 )
             {
-                cl_log.log( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 msleep( ERROR_RESET_TIMEOUT );
                 continue;
             }
@@ -462,6 +462,6 @@ namespace aio
             m_impl->processSocketEvents( curClock );
         }
 
-        cl_log.log( QLatin1String("AIO thread stopped"), cl_logDEBUG1 );
+        NX_LOG( QLatin1String("AIO thread stopped"), cl_logDEBUG1 );
     }
 }

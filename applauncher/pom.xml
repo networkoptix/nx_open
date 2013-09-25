@@ -6,36 +6,36 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-	<parent>
-		<artifactId>cpp</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.0.1-SNAPSHOT</version>
-		<relativePath>../cpp</relativePath>
-	</parent>
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.0.1-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.0.1-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>applauncher</artifactId>
-	<packaging>pom</packaging>
-	<name>HD Witness Launcher</name>    
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.0.1-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>applauncher</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Launcher</name>    
 
-	<properties>
-		<product.title>${applauncher.name}</product.title>  
+    <properties>
+        <product.title>${applauncher.name}</product.title>  
         <!--Global libs-->		
-		<qt.libs>core gui network</qt.libs>
+        <qt.libs>core gui network xml widgets</qt.libs>
         <global.libs>-lcommon</global.libs>
-		<!--Specific os libs used-->
-		<windows.oslibs>DbgHelp.lib</windows.oslibs>
+        <!--Specific os libs used-->
+        <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 
         <windows.oslibs.debug></windows.oslibs.debug>        
-		<linux.oslibs></linux.oslibs>
-		<mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
-		<!--Global defines-->
-		<global.defines/>
-		<!--Specific os defines-->
-		<windows.defines/>
-		<linux.defines/>
-		<mac.defines/>      
-	</properties>	
+        <linux.oslibs>-lssleay32 -leay32</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
+        <!--Global defines-->
+        <global.defines/>
+        <!--Specific os defines-->
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>      
+    </properties>	
 </project>

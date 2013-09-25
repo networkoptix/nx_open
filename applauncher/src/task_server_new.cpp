@@ -14,12 +14,13 @@
 
 #include <utils/common/log.h>
 
+#include "abstract_request_processor.h"
 #include "named_pipe_socket.h"
 
 
-TaskServerNew::TaskServerNew( BlockingQueue<std::shared_ptr<applauncher::api::BaseTask> >* const taskQueue )
+TaskServerNew::TaskServerNew( AbstractRequestProcessor* const requestProcessor )
 :
-    m_taskQueue( taskQueue ),
+    m_requestProcessor( requestProcessor ),
     m_terminated( false )
 {
 }
@@ -105,11 +106,6 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
         return;
     }
 
-    QByteArray responseMsg("ok");
-    unsigned int bytesWritten = 0;
-    clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
-    clientConnection->flush();
-
     applauncher::api::BaseTask* task = NULL;
     if( !applauncher::api::deserializeTask( QByteArray::fromRawData(msgBuf, bytesRead), &task ) )
     {
@@ -124,7 +120,16 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
     if( task->type == applauncher::api::TaskType::quit )
         m_terminated = true;
 
-    m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
+    //m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
+    applauncher::api::Response* response = NULL;
+    m_requestProcessor->processRequest(
+        std::shared_ptr<applauncher::api::BaseTask>(task),
+        &response );
+
+    const QByteArray& responseMsg = response != NULL ? "ok" : response->toString();
+    unsigned int bytesWritten = 0;
+    clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
+    clientConnection->flush();
 }
 
 #endif
