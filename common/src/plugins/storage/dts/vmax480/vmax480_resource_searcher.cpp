@@ -271,6 +271,8 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     int apiPort = VMAX_API_PORT;
     int httpPort = 80;
     QString httpPortStr = url.queryItemValue(lit("http_port"));
+    int channelNum = url.queryItemValue(lit("channel")).toInt();
+
     if (httpPortStr.isEmpty())
     {
         // first discovery: port used as http port, API port is unknown
@@ -347,7 +349,14 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(url.host()).arg(apiPort);
     QString groupName = QString(QLatin1String("VMAX %1")).arg(url.host());
 
-    for (int i = 0; i < channels; ++i)
+    int minCh = 0;
+    int maxCh = channels;
+    if (!doMultichannelCheck)
+    {
+        minCh = channelNum-1;
+        maxCh = channelNum;
+    }
+    for (int i = minCh; i < maxCh; ++i)
     {
         QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
 

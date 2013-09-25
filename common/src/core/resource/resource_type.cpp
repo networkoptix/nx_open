@@ -181,6 +181,27 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
     return QnId();
 }
 
+QnId QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
+{
+    QMutexLocker lock(&m_mutex);
+    QnId result;
+    int bestLen = -1;
+    foreach(QnResourceTypePtr rt, m_resourceTypeMap)
+    {
+        if (rt->getManufacture() == manufacture)
+        {
+            int len = rt->getName().length();
+            if (len > bestLen && rt->getName() == name.left(len)) {
+                result = rt->getId();
+                bestLen = len;
+                if (len == name.length())
+                    break;
+            }
+        }
+    }
+    return result;
+}
+
 bool QnResourceTypePool::isEmpty() const
 {
     QMutexLocker lock(&m_mutex);
