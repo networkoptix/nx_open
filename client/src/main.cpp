@@ -478,7 +478,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize desctop camera searcher. */
 #ifdef Q_OS_WIN
-    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(qnMainWindow->viewport()));
+    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
     desktopSearcher.setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
@@ -491,7 +491,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
     if(!noSingleApplication)
-        QObject::connect(application.data(), SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
+        QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
 #ifdef TEST_RTSP_SERVER
     addTestData();

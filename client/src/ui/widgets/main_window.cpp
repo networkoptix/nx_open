@@ -117,9 +117,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 {
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
-    /* We want to receive system menu event on Windows. */
-    QnSystemMenuEvent::initialize();
-
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
     fileOpenSignalizer->setEventType(QEvent::FileOpen);
@@ -280,7 +277,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 }
 
 QnMainWindow::~QnMainWindow() {
-    QnSystemMenuEvent::deinitialize();
     m_dwm = NULL;
 }
 
