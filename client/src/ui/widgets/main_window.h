@@ -81,8 +81,6 @@ protected:
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
-    virtual bool eventFilter(QObject *object, QEvent *event) override;
-
 #ifdef Q_OS_WIN
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 #endif

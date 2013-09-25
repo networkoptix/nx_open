@@ -133,8 +133,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
-    context->mainWindow()->installEventFilter(this);
-
     setAcceptDrops(true);
     setMinimumWidth(minimalWindowWidth);
     setMinimumHeight(minimalWindowHeight);
@@ -275,11 +273,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Post-initialize. */
     updateDwmState();
-#ifdef Q_OS_MACX
-    setOptions(WindowButtonsVisible);
-#else
     setOptions(TitleBarDraggable | WindowButtonsVisible);
-#endif
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
@@ -621,13 +615,6 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     }
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
-}
-
-bool QnMainWindow::eventFilter(QObject *object, QEvent *event) {
-    if (object == context()->mainWindow() && event->type() == QEvent::WindowStateChange) {
-        updateDecorationsState();
-    }
-    return base_type::eventFilter(object, event);
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
