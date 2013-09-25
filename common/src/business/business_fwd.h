@@ -35,7 +35,8 @@ namespace QnBusiness {
         MServerIssueTerminated,
         MServerIssueStarted,
         StorageIssueIoError,
-        StorageIssueNotEnoughSpeed
+        StorageIssueNotEnoughSpeed,
+        StorageIssueNotEnoughSpace
     };
 }
 Q_DECLARE_METATYPE(QnBusiness::EventReason)

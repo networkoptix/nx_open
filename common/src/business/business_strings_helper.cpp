@@ -321,6 +321,10 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
             if (eventType == BusinessEventType::Storage_Failure)
                 result = QString(tr("Not enough HDD/SSD speed for recording to %1").arg(reasonText));
             break;
+        case QnBusiness::StorageIssueNotEnoughSpace:
+            if (eventType == BusinessEventType::Storage_Failure)
+                result = QString(tr("HDD/SSD disk %1 is full! Disk contains too much data out of VMS storage").arg(reasonText));
+            break;
         default:
             break;
     }
