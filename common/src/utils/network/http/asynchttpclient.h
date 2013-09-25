@@ -32,6 +32,7 @@ namespace nx_http
         \note It is strongly recommended to call terminate before scheduleForRemoval!
         \todo pipelining support
         \todo keep-alive connection support
+        \todo entity-body compression support
     */
     class AsyncHttpClient
     :
@@ -79,9 +80,10 @@ namespace nx_http
             \return false if failed to start reading message body
         */
         bool startReadMessageBody();
-        //!Returns current mesasge body buffer, clearing it
+        //!Returns current message body buffer, clearing it
         /*!
-            \note This method can be called only from slot directly connected to \a someMessageBodyAvailable()
+            \note If \a AsyncHttpClient::state() is less or equal \a AsyncHttpClient::sReadingMessageBody 
+                then this method can only be called from slot directly connected to \a AsyncHttpClient::someMessageBodyAvailable()
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
