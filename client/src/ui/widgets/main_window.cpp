@@ -108,7 +108,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint | Qt::FramelessWindowHint),
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
@@ -414,8 +414,8 @@ void QnMainWindow::updateDwmState() {
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
         /* Windowed or maximized with aero glass. */
-        m_drawCustomFrame = true;
-        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(1, 1, 1, 1);
+        m_drawCustomFrame = false;
+        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
