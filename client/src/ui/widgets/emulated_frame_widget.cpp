@@ -12,7 +12,7 @@ namespace {
 
 
 QnEmulatedFrameWidget::QnEmulatedFrameWidget(QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags)
+    QWidget(parent, windowFlags)
 {
     m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
