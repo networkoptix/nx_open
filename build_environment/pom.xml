@@ -216,6 +216,7 @@
                 </property>
             </activation>            
             <dependencies>
+<!--
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>help</artifactId>
@@ -223,6 +224,7 @@
                     <type>tar.gz</type>
                     <classifier>${customization}</classifier>
                 </dependency>
+-->
                 <dependency>
                     <groupId>org</groupId>
                     <artifactId>festival</artifactId>
