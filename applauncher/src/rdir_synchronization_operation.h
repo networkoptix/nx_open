@@ -44,6 +44,7 @@ namespace detail
             success,
             downloadFailure,
             writeFailure,
+            interrupted,
             unknownError
         };
 

@@ -63,6 +63,8 @@ namespace nx_http
         virtual void terminate();
 
         State state() const;
+        //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
+        bool failed() const;
         //!Start request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
@@ -82,8 +84,7 @@ namespace nx_http
         bool startReadMessageBody();
         //!Returns current message body buffer, clearing it
         /*!
-            \note If \a AsyncHttpClient::state() is less or equal \a AsyncHttpClient::sReadingMessageBody 
-                then this method can only be called from slot directly connected to \a AsyncHttpClient::someMessageBodyAvailable()
+            \note This method is thread-safe and can be called in any thread
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;

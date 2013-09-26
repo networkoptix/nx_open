@@ -290,6 +290,11 @@ namespace nx_http
         return m_state;
     }
 
+    bool AsyncHttpClient::failed() const
+    {
+        return m_state == sFailed;
+    }
+
     //!Start request to \a url
     /*!
         \return true, if socket is created and async connect is started. false otherwise

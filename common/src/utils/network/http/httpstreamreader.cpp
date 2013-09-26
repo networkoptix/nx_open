@@ -103,12 +103,14 @@ namespace nx_http
 
     size_t HttpStreamReader::messageBodyBufferSize() const
     {
+        std::unique_lock<std::mutex> lk( m_mutex );
         return m_msgBodyBuffer.size();
     }
 
     //!Returns internal message body buffer and clears internal buffer
     BufferType HttpStreamReader::fetchMessageBody()
     {
+        std::unique_lock<std::mutex> lk( m_mutex );
         //BufferType result;
         //m_msgBodyBuffer.swap( result );
         //return result;
@@ -131,7 +133,10 @@ namespace nx_http
         m_contentLength = 0;
         m_isChunkedTransfer = false;
         m_messageBodyBytesRead = 0;
-        m_msgBodyBuffer.clear();
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+            m_msgBodyBuffer.clear();
+        }
 
         m_chunkStreamParseState = waitingChunkStart;
         m_currentChunkSize = 0;
@@ -150,7 +155,10 @@ namespace nx_http
                 m_lineSplitter.reset();
                 m_contentLength = 0;
                 m_messageBodyBytesRead = 0;
-                m_msgBodyBuffer.clear();
+                {
+                    std::unique_lock<std::mutex> lk( m_mutex );
+                    m_msgBodyBuffer.clear();
+                }
 
             case waitingMessageStart:
             {
@@ -304,7 +312,10 @@ namespace nx_http
                     }
 
                     const size_t bytesToCopy = std::min<>( m_currentChunkSize - m_currentChunkBytesRead, maxOffset - currentOffset );
-                    m_msgBodyBuffer.append( data.data()+currentOffset, (int) bytesToCopy );
+                    {
+                        std::unique_lock<std::mutex> lk( m_mutex );
+                        m_msgBodyBuffer.append( data.data()+currentOffset, (int) bytesToCopy );
+                    }
                     m_messageBodyBytesRead += bytesToCopy;
                     m_currentChunkBytesRead += bytesToCopy;
                     currentOffset += bytesToCopy;
@@ -369,7 +380,10 @@ namespace nx_http
         const size_t bytesToCopy = m_contentLength > 0
             ? std::min<size_t>( count, m_contentLength-m_messageBodyBytesRead )
             : count;    //Content-Length is unknown
-        m_msgBodyBuffer.append( data.data() + offset, (int) bytesToCopy );
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+            m_msgBodyBuffer.append( data.data() + offset, (int) bytesToCopy );
+        }
         m_messageBodyBytesRead += bytesToCopy;
         return bytesToCopy;
     }

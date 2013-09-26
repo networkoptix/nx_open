@@ -7,9 +7,13 @@
 #ifndef _FS_FILE_H_
 #define _FS_FILE_H_
 
+#include <memory>
+
 #include <QtCore/QIODevice>
 #include <QtCore/QString>
 #include <fcntl.h>
+
+#include "../common/systemerror.h"
 
 #ifdef WIN32
 #pragma warning( disable : 4290 )
@@ -17,8 +21,39 @@
 
 
 class QN_EXPORT QnFile
+:
+    public std::enable_shared_from_this<QnFile>
 {
 public:
+    class AbstractWriteHandler
+    {
+    public:
+        virtual ~AbstractWriteHandler() {}
+
+        /*!
+            \param bytesWritten Can be valid even if \a errorCode is not \a SystemError::noError
+            \param errorCode Different from \a SystemError::noError if error occured
+        */
+        virtual void onAsyncWriteFinished(
+            const std::shared_ptr<QnFile>& file,
+            uint64_t bytesWritten,
+            SystemError::ErrorCode errorCode ) = 0;
+    };
+
+    class AbstractCloseHandler
+    {
+    public:
+        virtual ~AbstractCloseHandler() {}
+
+        /*!
+            File is closed even if error occured
+            \param errorCode Different from \a SystemError::noError if error occured
+        */
+        virtual void onAsyncCloseFinished(
+            const std::shared_ptr<QnFile>& file,
+            SystemError::ErrorCode errorCode ) = 0;
+    };
+
     QnFile();
     QnFile(const QString& fName);
     virtual ~QnFile();
@@ -35,6 +70,20 @@ public:
     virtual qint64 size() const;
     virtual bool seek( qint64 offset);
     virtual bool truncate( qint64 newFileSize);
+
+    //!Starts asynchronous write call. On completion \a handler->onAsyncWriteFinished() will be called
+    /*!
+        \note \a QnFile instance must be used with \a std::shared_ptr
+        \note Not all bytes of \a buffer can be written only in case of error
+        \return false if failed to start asynchronous call
+    */
+    bool writeAsync( const QByteArray& buffer, AbstractWriteHandler* handler );
+    //!Starts asynchronous close call. On completion \a handler->onAsyncCloseFinished() will be called
+    /*!
+        \note \a QnFile instance must be used with \a std::shared_ptr
+        \return false if failed to start asynchronous call
+    */
+    bool closeAsync( AbstractCloseHandler* handler );
 
     //!Returns true if file system entry with name \a fileName exists
     static bool fileExists( const QString& fileName );

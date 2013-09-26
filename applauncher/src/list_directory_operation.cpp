@@ -216,7 +216,18 @@ namespace detail
 
     void ListDirectoryOperation::onHttpDone( nx_http::AsyncHttpClient* httpClient )
     {
-        //TODO/IMPL check message body download result
+        //check message body download result
+        if( httpClient->failed() )
+        {
+            //downloading has been interrupted unexpectedly
+            setResult( ResultCode::downloadFailure );
+            setErrorText( httpClient->response()->statusLine.reasonPhrase );
+            m_httpClient->terminate();
+            m_httpClient->scheduleForRemoval();
+            m_httpClient = nullptr;
+            m_handler->operationDone( shared_from_this() );
+            return;
+        }
 
         nx_http::BufferType contentsXml = httpClient->fetchMessageBodyBuffer();
         m_httpClient->terminate();

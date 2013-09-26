@@ -6,6 +6,8 @@
 #ifndef HTTPSTREAMREADER_H
 #define HTTPSTREAMREADER_H
 
+#include <mutex>
+
 #include "httptypes.h"
 #include "linesplitter.h"
 
@@ -16,7 +18,7 @@ namespace nx_http
     /*!
         Can handle multiple subsequent messages
         \note Supports chunked stream
-        \note Class methods are not thread-safe
+        \note Thread safety: only message body buffer - related functionality is thread-safe (required by \a AsyncHttpClient class). All other methods are NOT thread-safe
         \note Assumes that any message is followed by message body
         \note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes 
             infinite content-length (even when identity encoding is used)
@@ -85,6 +87,7 @@ namespace nx_http
         BufferType::value_type m_prevChar;
 
         LineSplitter m_lineSplitter;
+        mutable std::mutex m_mutex;
 
         bool parseLine( const ConstBufferRefType& data );
         //!Determines, whether Message-Body is available and fills \a m_contentLength and \a m_isChunkedTransfer
