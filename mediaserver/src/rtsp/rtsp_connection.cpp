@@ -197,7 +197,7 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* _owner):
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
 }
@@ -354,7 +354,7 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number((long) d->socket);
+    d->sessionId = QString::number((long) d->socket.data());
     d->sessionId += QString::number(rand());
 }
 

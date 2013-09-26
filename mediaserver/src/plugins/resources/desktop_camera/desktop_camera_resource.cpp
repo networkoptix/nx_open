@@ -53,3 +53,8 @@ const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbs
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
+
+CameraDiagnostics::Result QnDesktopCameraResource::initInternal()
+{
+    return CameraDiagnostics::NoErrorResult();
+}

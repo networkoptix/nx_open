@@ -8,7 +8,7 @@
 #include "utils/network/tcp_connection_processor.h"
 
 template <class T>
-QnTCPConnectionProcessor* handlerInstance(AbstractStreamSocket* socket, QnTcpListener* owner)
+QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
 {
     return new T(socket, owner);
 };
@@ -21,7 +21,7 @@ public:
     {
         QByteArray protocol;
         QString path;
-        QnTCPConnectionProcessor* (*instanceFunc)(AbstractStreamSocket* socket, QnTcpListener* owner);
+        QnTCPConnectionProcessor* (*instanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     };
 
     static const int DEFAULT_RTSP_PORT = 554;
@@ -39,26 +39,28 @@ public:
         m_handlers.append(handler);
     }
 
-    QnTCPConnectionProcessor* createNativeProcessor(AbstractStreamSocket* clientSocket, const QByteArray& protocol, const QString& path);
+    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QString& path);
 
     /* proxy support functions */
 
     void setProxyParams(const QUrl& proxyServerUrl, const QString& selfId);
     void addProxySenderConnections(int size);
 
-    bool registerProxyReceiverConnection(const QString& url, AbstractStreamSocket* socket);
-    AbstractStreamSocket* getProxySocket(const QString& guid, int timeout);
+    bool registerProxyReceiverConnection(const QString& url, QSharedPointer<AbstractStreamSocket> socket);
+    QSharedPointer<AbstractStreamSocket> getProxySocket(const QString& guid, int timeout);
     void setProxyPoolSize(int value);
+
+    void disableAuth();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
     virtual void doPeriodicTasks() override;
 private:
     struct AwaitProxyInfo
     {
-        explicit AwaitProxyInfo(AbstractStreamSocket* _socket): socket(_socket) { timer.restart(); }
-        AwaitProxyInfo(): socket(0) { timer.restart(); }
+        explicit AwaitProxyInfo(QSharedPointer<AbstractStreamSocket> _socket): socket(_socket) { timer.restart(); }
+        AwaitProxyInfo() { timer.restart(); }
 
-        AbstractStreamSocket* socket;
+        QSharedPointer<AbstractStreamSocket> socket;
         QTime timer;
     };
 
@@ -73,6 +75,7 @@ private:
 
     QSet<QString> m_proxyConExists;
     int m_proxyPoolSize;
+    bool m_needAuth;
 };
 
 #endif // __UNIVERSAL_TCP_LISTENER_H__

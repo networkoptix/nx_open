@@ -44,8 +44,7 @@ class QnTCPConnectionProcessorPrivate
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
-    QnTCPConnectionProcessorPrivate():
-        socket(0)
+    QnTCPConnectionProcessorPrivate()
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -53,12 +52,11 @@ public:
 
     virtual ~QnTCPConnectionProcessorPrivate()
     {
-        delete socket;
         delete [] tcpReadBuffer;
     }
 
 public:
-    AbstractStreamSocket* socket;
+    QSharedPointer<AbstractStreamSocket> socket;
 #ifdef USE_NX_HTTP
     nx_http::HttpRequest request;
     nx_http::HttpResponse response;

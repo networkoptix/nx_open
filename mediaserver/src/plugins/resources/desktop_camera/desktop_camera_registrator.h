@@ -8,7 +8,9 @@ class QnDesktopCameraRegistratorPrivate;
 class QnDesktopCameraRegistrator: public QnTCPConnectionProcessor
 {
 public:
-    QnDesktopCameraRegistrator(AbstractStreamSocket* socket, QnTcpListener* _owner);
+    QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner);
+    
+    virtual bool isTakeSockOwnership() const override { return true; }
 protected:
     virtual void run();
 private:

@@ -1,39 +1,115 @@
 #include "universal_request_processor.h"
 
+#include <QtCore/QElapsedTimer>
 #include <QList>
 #include <QByteArray>
 #include "utils/network/tcp_connection_priv.h"
 #include "universal_tcp_listener.h"
 #include "universal_request_processor_p.h"
+#include "authenticate_helper.h"
+
+static const int AUTH_TIMEOUT = 60 * 1000;
 
 QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 {
     stop();
 }
 
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
+QnUniversalRequestProcessor::QnUniversalRequestProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth):
 QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
     d->owner = owner;
+    d->needAuth = needAuth;
 
     setObjectName( QLatin1String("QnUniversalRequestProcessor") );
 }
 
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, AbstractStreamSocket* socket, QnTcpListener* owner):
+QnUniversalRequestProcessor::QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth):
 QnTCPConnectionProcessor(priv, socket)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
     d->owner = owner;
+    d->needAuth = needAuth;
+}
+
+bool QnUniversalRequestProcessor::authenticate()
+{
+    Q_D(QnUniversalRequestProcessor);
+
+    if (d->needAuth &&  d->protocol.toLower() == "http")
+    {
+        QUrl url = getDecodedUrl();
+        QString path = url.path().trimmed();
+        if (path.endsWith(L'/'))
+            path = path.left(path.size()-1);
+        if (path.startsWith(L'/'))
+            path = path.mid(1);
+        bool needAuth = path != lit("api/ping");
+
+        QTime t;
+        t.restart();
+        while (needAuth && !qnAuthHelper->authenticate(d->request, d->response))
+        {
+            if (t.elapsed() >= AUTH_TIMEOUT)
+                return false; // close connection
+
+            d->responseBody = STATIC_UNAUTHORIZED_HTML;
+            sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
+            while (t.elapsed() < AUTH_TIMEOUT) 
+            {
+                if (readRequest()) {
+                    parseRequest();
+                    break;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 void QnUniversalRequestProcessor::run()
 {
+    Q_D(QnUniversalRequestProcessor);
+
     saveSysThreadID();
-    if (readRequest()) 
-        processRequest();
+
+    if (!readRequest()) 
+        return;
+
+    QElapsedTimer t;
+    t.restart();
+    bool ready = true;
+    bool isKeepAlive = false;
+
+    while (1)
+    {
+        if (ready) 
+        {
+            parseRequest();
+
+            if(!authenticate())
+                return;
+
+            d->response.headers.clear();
+            isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive" && d->protocol.toLower() == "http";
+            if (isKeepAlive) {
+                d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
+                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", QString::fromLatin1("timeout=%1").arg(d->socketTimeout/1000).toLatin1()) );
+            }
+            processRequest();
+        }
+
+        if (!d->socket)
+            break; // processor has token socket ownership
+
+        if (!isKeepAlive || t.elapsed() >= d->socketTimeout || !d->socket->isConnected())
+            break;
+
+        ready = readRequest();
+    }
 }
 
 void QnUniversalRequestProcessor::processRequest()
@@ -48,8 +124,10 @@ void QnUniversalRequestProcessor::processRequest()
         if (d->processor && !needToStop()) 
         {
             copyClientRequestTo(*d->processor);
-            d->socket = 0;
             d->processor->execute(d->mutex);
+            if (d->processor->isTakeSockOwnership()) {
+                d->socket.clear();
+            }
         }
         delete d->processor;
         d->processor = 0;

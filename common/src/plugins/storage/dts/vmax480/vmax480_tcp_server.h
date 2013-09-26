@@ -27,7 +27,7 @@ public:
 
     VMaxStreamFetcher* bindConnection(const QString& tcpID, QnVMax480ConnectionProcessor* connection);
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner) override;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
 private:
     QMap<QString, VMaxStreamFetcher*> m_providers;
     QMutex m_mutexProvider;
@@ -36,7 +36,7 @@ private:
 class QnVMax480ConnectionProcessor: virtual public QnTCPConnectionProcessor
 {
 public:
-    QnVMax480ConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnVMax480ConnectionProcessor();
 
     void vMaxConnect(const QString& url, int channel, const QAuthenticator& auth, bool isLive);

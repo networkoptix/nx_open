@@ -6,7 +6,7 @@
 class QnDefaultTcpConnectionProcessor: virtual public QnTCPConnectionProcessor
 {
 public:
-    QnDefaultTcpConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnDefaultTcpConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
 protected:
     virtual void run() override;
 };
