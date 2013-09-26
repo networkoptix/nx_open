@@ -393,7 +393,7 @@ void QnMainWindow::updateDwmState() {
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported()) {
+        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -412,7 +412,7 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
+    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false) { // TODO: Disable DWM for now.
         /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
         m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
@@ -435,10 +435,12 @@ void QnMainWindow::updateDwmState() {
         );
     } else {
         /* Windowed or maximized without aero glass. */
-        m_drawCustomFrame = true;
-        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
+        /*m_drawCustomFrame = true;
+        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
+        m_drawCustomFrame = false;
+        m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported()) {
+        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -449,7 +451,8 @@ void QnMainWindow::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
+        //m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(2, 0, 2, 0);
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
             isTitleVisible() ? 0 : m_frameMargins.top(),
@@ -577,16 +580,13 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
     menu()->trigger(Qn::ToggleTourModeAction);
 }
 
-#ifdef Q_OS_WIN
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     /* Note that we may get here from destructor, so check for dwm is needed. */
-    if(m_dwm && m_dwm->widgetWinEvent(static_cast<MSG*>(message), result))
+    if(m_dwm && m_dwm->widgetNativeEvent(eventType, message, result))
         return true;
 
     return base_type::nativeEvent(eventType, message, result);
 }
-
-#endif
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
     if(isFullScreen())
