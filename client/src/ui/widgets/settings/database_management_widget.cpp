@@ -34,7 +34,7 @@ QnDatabaseManagementWidget::~QnDatabaseManagementWidget() {
 }
 
 void QnDatabaseManagementWidget::at_backupButton_clicked() {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QFileDialog::DontUseNativeDialog);
     if(fileName.isEmpty())
         return;
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
@@ -68,7 +68,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
 }
 
 void QnDatabaseManagementWidget::at_restoreButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QFileDialog::DontUseNativeDialog);
     if(fileName.isEmpty())
         return;
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
