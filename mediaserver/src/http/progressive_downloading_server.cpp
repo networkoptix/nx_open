@@ -519,8 +519,6 @@ void QnProgressiveDownloadingConsumer::run()
         //    d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
         bool isLive = position.isEmpty() || position == "now";
 
-        d->response.headers["Connection"] = "Close";
-
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,
             standFrameDuration,
@@ -670,7 +668,7 @@ void QnProgressiveDownloadingConsumer::run()
             camera->notInUse(this);
     }
 
-    d->socket->close();
+    //d->socket->close();
 }
 
 void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )

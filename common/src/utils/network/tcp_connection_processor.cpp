@@ -405,3 +405,9 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
     run();
     mutex.lock();
 }
+
+void QnTCPConnectionProcessor::releaseSocket()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->socket.clear();    
+}

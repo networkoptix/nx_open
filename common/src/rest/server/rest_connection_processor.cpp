@@ -17,9 +17,6 @@
 #include "request_handler.h"
 #include "network/authenticate_helper.h"
 
-
-static const int CONNECTION_TIMEOUT = 60 * 1000;
-
 QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
 
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
@@ -32,7 +29,6 @@ QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStre
     QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket)
 {
     Q_D(QnRestConnectionProcessor);
-    d->socketTimeout = CONNECTION_TIMEOUT;
     d->owner = _owner;
 }
 
