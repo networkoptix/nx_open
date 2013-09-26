@@ -74,7 +74,12 @@ public:
     void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
     void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 
+    /* exact match name */
     QnId getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
+
+    /* match name using like operation */
+    QnId getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
+
     QnResourceTypeMap getResourceTypeMap() const;
 
     bool isEmpty() const;
