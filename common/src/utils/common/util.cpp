@@ -54,7 +54,7 @@ QString fromNativePath(const QString &path)
 QString getMoviesDirectory()
 {
     const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
-    return moviesDirs.isEmpty() ? QString() : moviesDirs[0];
+    return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME) );
 }
 
 QString getBackgroundsDirectory() {

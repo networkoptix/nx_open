@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <parent>
-        <artifactId>hdwitness</artifactId>
-        <groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.0.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
-    </parent>
+	<parent>
+		<artifactId>hdwitness</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.0.2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
 
-    <groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.0.1-SNAPSHOT</version>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>cpp</artifactId>
-    <packaging>pom</packaging>
-    <name>Common POM for cpp projects</name>
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.0.2-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cpp</artifactId>
+	<packaging>pom</packaging>
+	<name>Common POM for cpp projects</name>
 
     <properties>
         <!-- Change it to point relatively to the root-->

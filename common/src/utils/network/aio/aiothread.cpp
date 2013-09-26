@@ -458,6 +458,8 @@ namespace aio
 
             m_impl->removeSocketsFromPollSet();
 
+            //TODO/IMPL #ak recheck that PollSet::remove does not brake PollSet traversal
+
             m_impl->processPeriodicTasks( curClock );
             m_impl->processSocketEvents( curClock );
         }
