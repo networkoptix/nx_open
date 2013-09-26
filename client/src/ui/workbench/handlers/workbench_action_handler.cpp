@@ -876,7 +876,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             if(snapshotManager()->isLocal(layout)) {
                 if(layout->getItems().empty()) {
                     resourcePool()->removeResource(layout);
-                } else {
+                } else if(!snapshotManager()->isFile(layout)) {
                     layout->setParentId(user->getId());
                 }
             }

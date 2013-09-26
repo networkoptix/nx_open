@@ -51,7 +51,10 @@ QString fromNativePath(const QString &path)
 
 QString getMoviesDirectory()
 {
-    return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
+    return QDir::toNativeSeparators(
+                QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)
+                + QLatin1String("/")
+                + QLatin1String(QN_MEDIA_FOLDER_NAME));
 }
 
 QString getBackgroundsDirectory() {
