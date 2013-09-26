@@ -20,7 +20,6 @@ public:
     QnSystemMenuEvent(): QEvent(SystemMenu) {}
 
     static void initialize();
-    static void deinitialize();
 };
 
 #endif // QN_SYSTEM_MENU_EVENT_H

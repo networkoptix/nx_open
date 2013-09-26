@@ -11,7 +11,6 @@ public:
     QnGraphicsScene(QObject *parent = 0): base_type(parent) {}
     virtual ~QnGraphicsScene() {}
 
-
 protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
         /* #QTBUG 

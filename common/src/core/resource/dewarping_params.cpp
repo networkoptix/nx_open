@@ -27,7 +27,7 @@ QByteArray DewarpingParams::serialize() const {
     result.append(enabled ? '1' : '0').append(';');
     result.append(QByteArray::number(viewMode)).append(';');
     result.append(QByteArray::number(xAngle)).append(';');
-    result.append(QByteArray::number(xAngle)).append(';');
+    result.append(QByteArray::number(yAngle)).append(';');
     result.append(QByteArray::number(fov)).append(';');
     result.append(QByteArray::number(fovRot)).append(';');
     result.append(QByteArray::number(panoFactor)).append(';');

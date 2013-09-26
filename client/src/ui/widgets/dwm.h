@@ -4,9 +4,9 @@
 #include <QtCore/QMargins>
 #include <QtWidgets/QWidget>
 
-/*#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
 #   define QN_HAS_DWM
-#endif*/
+#endif
 
 class QnDwmPrivate;
 
@@ -93,16 +93,15 @@ public:
      */
     bool widgetEvent(QEvent *event);
 
-#if defined(Q_OS_WIN)
     /**
-     * This function is to be called from widget's <tt>winEvent</tt> handler.
+     * This function is to be called from widget's <tt>nativeEvent</tt> handler.
      * 
-     * \param message                   Windows message.
-     * \param[out] result               Result of message processing.
-     * \returns                         Whether the message was processsed.
+     * \param eventType
+     * \param message
+     * \param[out] result
+     * \returns                         Whether the event was processed.
      */
-    bool widgetWinEvent(MSG *message, long *result);
-#endif
+    bool widgetNativeEvent(const QByteArray &eventType, void *message, long *result);
 
 signals:
     /**

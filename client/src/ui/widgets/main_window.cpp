@@ -108,7 +108,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint | Qt::FramelessWindowHint),
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
@@ -116,9 +116,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_drawCustomFrame(false)
 {
     setAttribute(Qt::WA_AlwaysShowToolTips);
-
-    /* We want to receive system menu event on Windows. */
-    QnSystemMenuEvent::initialize();
 
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
@@ -132,9 +129,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
-    context->mainWindow()->setWindowTitle(QApplication::applicationName());
-    context->mainWindow()->installEventFilter(this);
-
+    setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
     setMinimumWidth(minimalWindowWidth);
     setMinimumHeight(minimalWindowHeight);
@@ -218,8 +213,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
-    //TODO: #Elric #QT5PORT
-//    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
+    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
@@ -275,18 +269,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Post-initialize. */
     updateDwmState();
-#ifdef Q_OS_MACX
-    setOptions(WindowButtonsVisible);
-#else
     setOptions(TitleBarDraggable | WindowButtonsVisible);
-#endif
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
 }
 
 QnMainWindow::~QnMainWindow() {
-    QnSystemMenuEvent::deinitialize();
     m_dwm = NULL;
 }
 
@@ -327,31 +316,31 @@ void QnMainWindow::setWindowButtonsVisible(bool visible) {
 }
 
 void QnMainWindow::setMaximized(bool maximized) {
-    if(maximized == context()->mainWindow()->isMaximized())
+    if(maximized == isMaximized())
         return;
 
     if(maximized) {
-        context()->mainWindow()->showMaximized();
-    } else if(context()->mainWindow()->isMaximized()) {
-        context()->mainWindow()->showNormal();
+        showMaximized();
+    } else if(isMaximized()) {
+        showNormal();
     }
 }
 
 void QnMainWindow::setFullScreen(bool fullScreen) {
-    if(fullScreen == context()->mainWindow()->isFullScreen())
+    if(fullScreen == isFullScreen())
         return;
 
     if(fullScreen) {
-        m_storedGeometry = context()->mainWindow()->geometry();
-        context()->mainWindow()->showFullScreen();
-    } else if(context()->mainWindow()->isFullScreen()) {
-        context()->mainWindow()->showNormal();
-        context()->mainWindow()->setGeometry(m_storedGeometry);
+        m_storedGeometry = geometry();
+        showFullScreen();
+    } else if(isFullScreen()) {
+        showNormal();
+        setGeometry(m_storedGeometry);
     }
 }
 
 void QnMainWindow::minimize() {
-    context()->mainWindow()->setWindowState(Qt::WindowMinimized | windowState());
+    setWindowState(Qt::WindowMinimized | windowState());
 }
 
 void QnMainWindow::toggleTitleVisibility() {
@@ -379,8 +368,8 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
-    bool fullScreen = context()->mainWindow()->isFullScreen();
-    bool maximized = context()->mainWindow()->isMaximized();
+    bool fullScreen = isFullScreen();
+    bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
@@ -399,12 +388,12 @@ void QnMainWindow::updateDecorationsState() {
 }
 
 void QnMainWindow::updateDwmState() {
-    if(context()->mainWindow()->isFullScreen()) {
+    if(isFullScreen()) {
         /* Full screen mode. */
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported()) {
+        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -423,7 +412,7 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
+    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false) { // TODO: Disable DWM for now.
         /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
         m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
@@ -446,10 +435,12 @@ void QnMainWindow::updateDwmState() {
         );
     } else {
         /* Windowed or maximized without aero glass. */
-        m_drawCustomFrame = true;
-        m_frameMargins = !context()->mainWindow()->isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
+        /*m_drawCustomFrame = true;
+        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
+        m_drawCustomFrame = false;
+        m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported()) {
+        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -460,7 +451,8 @@ void QnMainWindow::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
+        //m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(2, 0, 2, 0);
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
             isTitleVisible() ? 0 : m_frameMargins.top(),
@@ -528,13 +520,8 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(qnGlobals->frameColor(), 3));
-        painter.drawRect(QRect(
-            0,
-            0,
-            width() - 1,
-            height() - 1
-        ));
+        painter.setPen(QPen(Qt::black, 1));
+        painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
 }
 
@@ -593,19 +580,16 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
     menu()->trigger(Qn::ToggleTourModeAction);
 }
 
-#ifdef Q_OS_WIN
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     /* Note that we may get here from destructor, so check for dwm is needed. */
-    if(m_dwm && m_dwm->widgetWinEvent(static_cast<MSG*>(message), result))
+    if(m_dwm && m_dwm->widgetNativeEvent(eventType, message, result))
         return true;
 
     return base_type::nativeEvent(eventType, message, result);
 }
 
-#endif
-
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
-    if(context()->mainWindow()->isFullScreen())
+    if(isFullScreen())
         return Qt::NoSection;
 
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
@@ -621,13 +605,6 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     }
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
-}
-
-bool QnMainWindow::eventFilter(QObject *object, QEvent *event) {
-    if (object == context()->mainWindow() && event->type() == QEvent::WindowStateChange) {
-        updateDecorationsState();
-    }
-    return base_type::eventFilter(object, event);
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
