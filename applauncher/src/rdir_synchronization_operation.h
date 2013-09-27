@@ -65,7 +65,7 @@ namespace detail
             baseUrl( _baseUrl ),
             entryPath( _entryPath ),
             m_handler( handler ),
-            m_result( ResultCode::unknownError )
+            m_result( ResultCode::success )
         {
         }
 

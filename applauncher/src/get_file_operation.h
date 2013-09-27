@@ -65,8 +65,10 @@ namespace detail
             sCheckingHashPresence,
             sCheckingHash,
             sDownloadingFile,
-            //!Received all data from remote side, waiting for data to be written
+            //!Received all data from remote side, waiting for data to be written to the file
             sWaitingForWriteToFinish,
+            //!file download has been interrupted (because of error or \a GetFileOperation::pleaseStop() call)
+            sInterrupted,
             sFinished
         };
 
@@ -76,7 +78,7 @@ namespace detail
         const QString m_localDirPath;
         const QString m_hashTypeName;
         std::shared_ptr<QnFile> m_outFile;
-        std::atomic_int m_fileWritePending;
+        std::atomic<int> m_fileWritePending;
         mutable std::mutex m_mutex;
 
         //!Implementation of QnFile::AbstractWriteHandler::onAsyncWriteFinished
@@ -88,8 +90,8 @@ namespace detail
         virtual void onAsyncCloseFinished(
             const std::shared_ptr<QnFile>& file,
             SystemError::ErrorCode errorCode ) override;
-        bool onEnteredDownloadingFile();
-        void onSomeMessageBodyAvailableNonSafe( nx_http::AsyncHttpClient* httpClient );
+        bool startFileDownload();
+        void onSomeMessageBodyAvailableNonSafe();
 
     private slots:
         void onResponseReceived( nx_http::AsyncHttpClient* );

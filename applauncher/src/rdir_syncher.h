@@ -144,6 +144,13 @@ public:
     virtual void operationDone( const std::shared_ptr<detail::RDirSynchronizationOperation>& operation ) override;
 
 private:
+    enum class OperationStartResult
+    {
+        success,
+        nothingToDo,
+        failure
+    };
+
     class SynchronizationTask
     :
         public detail::RDirEntry
@@ -187,7 +194,7 @@ private:
     /*!
         \return started operation, or nullptr in case of failure
     */
-    std::shared_ptr<detail::RDirSynchronizationOperation> startNextOperation();
+    OperationStartResult startNextOperation( std::shared_ptr<detail::RDirSynchronizationOperation>* const operation );
     bool processOperation( const std::shared_ptr<detail::RDirSynchronizationOperation>& operation );
     //!Chooses for mirror next url after \a currentMirror
     /*!

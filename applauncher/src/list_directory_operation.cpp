@@ -6,6 +6,7 @@
 #include "list_directory_operation.h"
 
 #include <QtCore/QBuffer>
+#include <QtCore/QDir>
 #include <QtXml/QXmlDefaultHandler>
 #include <QtXml/QXmlInputSource>
 #include <QtXml/QXmlSimpleReader>
@@ -148,6 +149,7 @@ namespace detail
         int _id,
         const QUrl& baseUrl,
         const QString& _dirPath,
+        const QString& localTargetDirPath,
         AbstractRDirSynchronizationEventHandler* _handler )
     :
         RDirSynchronizationOperation(
@@ -156,7 +158,7 @@ namespace detail
             baseUrl,
             _dirPath,
             _handler ),
-        m_dirPath( _dirPath ),
+        m_localTargetDirPath( localTargetDirPath ),
         m_httpClient( new nx_http::AsyncHttpClient() )
     {
         connect( m_httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection );
@@ -256,6 +258,13 @@ namespace detail
             m_handler->operationDone( shared_from_this() );
             return;
         }
+
+        //TODO/IMPL asynchronously creating directory
+        QDir(m_localTargetDirPath).mkdir( entryPath );
+
+        if( entryPath != "/" )
+            for( detail::RDirEntry& entry: m_entries )
+                entry.entryPath = entryPath + "/" + entry.entryPath;
 
         setResult( ResultCode::success );
         m_handler->operationDone( shared_from_this() );

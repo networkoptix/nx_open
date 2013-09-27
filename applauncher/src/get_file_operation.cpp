@@ -26,7 +26,7 @@ namespace detail
             _handler ),
         m_localDirPath( localDirPath ),
         m_hashTypeName( hashTypeName ),
-        m_outFile( new QnFile() ),
+        m_fileWritePending( 0 ),
         m_httpClient( nullptr ),
         m_state( State::sInit )
     {
@@ -47,16 +47,22 @@ namespace detail
 
     GetFileOperation::~GetFileOperation()
     {
+        if( m_httpClient )
+        {
+            m_httpClient->terminate();
+            m_httpClient->scheduleForRemoval();
+            m_httpClient = nullptr;
+        }
     }
 
     void GetFileOperation::pleaseStop()
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 
-        if( m_state >= State::sWaitingForWriteToFinish )
+        if( m_state >= State::sInterrupted )
             return;
 
-        m_state = State::sWaitingForWriteToFinish;
+        m_state = State::sInterrupted;
         setResult( ResultCode::interrupted );
         if( m_httpClient )
         {
@@ -75,7 +81,7 @@ namespace detail
         //TODO/IMPL file hash check
 
         m_state = State::sDownloadingFile;
-        return onEnteredDownloadingFile();
+        return startFileDownload();
     }
 
     void GetFileOperation::onAsyncWriteFinished(
@@ -90,11 +96,11 @@ namespace detail
         if( errorCode != SystemError::noError )
         {
             setResult( ResultCode::writeFailure );
-            m_state = State::sWaitingForWriteToFinish;
+            m_state = State::sInterrupted;
         }
 
         // if have something to write and not interrupted, writing
-        if( !m_httpClient || m_state >= State::sWaitingForWriteToFinish )
+        if( !m_httpClient || m_state >= State::sInterrupted )
         {
             //closing file
             m_outFile->closeAsync( this );
@@ -107,16 +113,25 @@ namespace detail
             m_outFile->writeAsync( partialMsgBody, this );
             m_fileWritePending = 1;
         }
+        else if( m_state == State::sWaitingForWriteToFinish )
+        {
+            //read all source data
+            m_outFile->closeAsync( this );
+        }
     }
 
     void GetFileOperation::onAsyncCloseFinished(
         const std::shared_ptr<QnFile>& file,
         SystemError::ErrorCode /*errorCode*/ )
     {
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+            m_state = State::sFinished;
+        }
         m_handler->operationDone( shared_from_this() );
     }
 
-    void GetFileOperation::onSomeMessageBodyAvailableNonSafe( nx_http::AsyncHttpClient* httpClient )
+    void GetFileOperation::onSomeMessageBodyAvailableNonSafe()
     {
         switch( m_state )
         {
@@ -125,7 +140,7 @@ namespace detail
                 if( m_fileWritePending )
                     return; //not reading message body since previous message body buffer has not been written yet
 
-                const nx_http::BufferType& partialMsgBody = httpClient->fetchMessageBodyBuffer();
+                const nx_http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
                 if( partialMsgBody.isEmpty() )
                     return;
 
@@ -155,7 +170,7 @@ namespace detail
                     m_httpClient->terminate();
                     m_httpClient->scheduleForRemoval();
                     m_httpClient = nullptr;
-                    m_state = State::sWaitingForWriteToFinish;
+                    m_state = State::sInterrupted;
                     m_outFile->closeAsync( this );
                     return;
                 }
@@ -170,12 +185,15 @@ namespace detail
     void GetFileOperation::onSomeMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
-        onSomeMessageBodyAvailableNonSafe( httpClient );
+        assert( m_httpClient == httpClient );
+        onSomeMessageBodyAvailableNonSafe();
     }
 
     void GetFileOperation::onHttpDone( nx_http::AsyncHttpClient* httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
+
+        assert( m_httpClient == httpClient );
 
         //check message body download result
         if( httpClient->failed() )
@@ -186,12 +204,8 @@ namespace detail
         }
         else
         {
-            onSomeMessageBodyAvailableNonSafe( httpClient );
+            onSomeMessageBodyAvailableNonSafe();
         }
-
-        m_httpClient->terminate();
-        m_httpClient->scheduleForRemoval();
-        m_httpClient = nullptr;
 
         //waiting for pending file write to complete
         m_state = State::sWaitingForWriteToFinish;
@@ -201,8 +215,10 @@ namespace detail
         m_outFile->closeAsync( this );
     }
 
-    bool GetFileOperation::onEnteredDownloadingFile()
+    bool GetFileOperation::startFileDownload()
     {
+        m_outFile.reset( new QnFile( m_localDirPath + "/" + entryPath ) );
+
         //opening file
         if( !m_outFile->open( QIODevice::WriteOnly ) )  //TODO/IMPL have to do that asynchronously
             return false;

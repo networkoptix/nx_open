@@ -57,7 +57,8 @@ bool RDirSyncher::startAsync()
     std::lock_guard<std::mutex> lk( m_mutex );
 
     m_syncTasks.push_back( SynchronizationTask("/", detail::RSyncOperationType::listDirectory) );
-    if( startNextOperation() == nullptr )
+    std::shared_ptr<detail::RDirSynchronizationOperation> operation;
+    if( startNextOperation(&operation) != OperationStartResult::success )
         return false;
     m_state = sInProgress;
     return true;
@@ -105,13 +106,13 @@ RSyncEventTriggerImpl<_Func>* allocEventTrigger( const _Func& f )
 
 void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizationOperation>& operation )
 {
-    std::list<RSyncEventTrigger*> eventToTrigger;
-    //creating auto guard which will trigger all events stored in eventToTrigger
+    std::list<RSyncEventTrigger*> eventsToTrigger;
+    //creating auto guard which will trigger all events stored in eventsToTrigger
     auto triggerEventFunc = [](std::list<RSyncEventTrigger*>* events)
     {
         for( RSyncEventTrigger* event: *events ) { event->doAction(); delete event; }
     };
-    std::unique_ptr<std::list<RSyncEventTrigger*>, decltype(triggerEventFunc)> eventToTriggerGuard( &eventToTrigger, triggerEventFunc );
+    std::unique_ptr<std::list<RSyncEventTrigger*>, decltype(triggerEventFunc)> eventsToTriggerGuard( &eventsToTrigger, triggerEventFunc );
 
     //events are triggered with m_mutex unlocked, so that no dead-lock can occur if m_eventReceiver calls some method of this class 
 
@@ -142,14 +143,14 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
         {
             case detail::RSyncOperationType::getFile:
                 if( m_eventReceiver )
-                    eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileDone, m_eventReceiver, this, operation->entryPath) ) );
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileDone, m_eventReceiver, this, operation->entryPath) ) );
                 break;
 
             case detail::RSyncOperationType::listDirectory:
             {
-                //adding dir entries to download queue
                 std::shared_ptr<detail::ListDirectoryOperation> listDirOperation = std::static_pointer_cast<detail::ListDirectoryOperation>(operation);
                 const std::list<detail::RDirEntry>& entries = listDirOperation->entries();
+                //adding dir entries to download queue
                 std::transform(
                     entries.begin(),
                     entries.end(),
@@ -168,12 +169,12 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
             assert( m_runningOperations.empty() );
             m_state = sSucceeded;
             if( m_eventReceiver )
-                eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, true) ) );
+                eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, true) ) );
             return;
         }
 
         //starting next task(s)
-        startOperations( eventToTrigger );
+        startOperations( eventsToTrigger );
         return;
     }
 
@@ -192,47 +193,68 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 
         if( m_eventReceiver )
         {
-            eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, this, m_failedEntryPath, m_lastErrorText) ) );
-            eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, false) ) );
+            eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, this, m_failedEntryPath, m_lastErrorText) ) );
+            eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, false) ) );
         }
         return;
     }
 
     //repeating operation with new mirror
-    startOperations( eventToTrigger );
+    startOperations( eventsToTrigger );
 }
 
-void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventToTrigger )
+static const int MAX_SIMULTANEOUS_DOWNLOADS = 1;
+
+void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigger )
 {
-    //TODO/IMPL starting multiple operations
-
-    //starting next task
-    std::shared_ptr<detail::RDirSynchronizationOperation> newOperation = startNextOperation();
-    if( !newOperation )
+    //starting multiple operations
+    while( m_runningOperations.size() < MAX_SIMULTANEOUS_DOWNLOADS )
     {
-        //failure
-        m_state = sFailed;
-        //cancelling all active operations
-        for( auto val: m_runningOperations )
-            val.second->pleaseStop();
-
-        if( m_eventReceiver )
+        //starting next task
+        std::shared_ptr<detail::RDirSynchronizationOperation> newOperation;
+        switch( startNextOperation( &newOperation ) )
         {
-            eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, this, m_failedEntryPath, m_lastErrorText) ) );
-            eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, false) ) );
-        }
-        return;
-    }
+            case OperationStartResult::success:
+                if( newOperation->type == detail::RSyncOperationType::getFile && m_eventReceiver )
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileStarted, m_eventReceiver, this, newOperation->entryPath) ) );
+                break;
 
-    if( newOperation->type == detail::RSyncOperationType::getFile && m_eventReceiver )
-        eventToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileStarted, m_eventReceiver, this, newOperation->entryPath) ) );
+            case OperationStartResult::nothingToDo:
+                return;
+
+            case OperationStartResult::failure:
+                //failure
+                m_state = sFailed;
+                //cancelling all active operations
+                for( auto val: m_runningOperations )
+                    val.second->pleaseStop();
+
+                if( m_eventReceiver )
+                {
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, this, m_failedEntryPath, m_lastErrorText) ) );
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, false) ) );
+                }
+                return;
+
+            default:
+                assert( false );
+                break;
+        }
+    }
 }
 
-std::shared_ptr<detail::RDirSynchronizationOperation> RDirSyncher::startNextOperation()
+RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_ptr<detail::RDirSynchronizationOperation>* const newOperationRef )
 {
     assert( !m_syncTasks.empty() );
 
-    SynchronizationTask& taskToStart = *std::find_if( m_syncTasks.begin(), m_syncTasks.end(), [](const SynchronizationTask& task){ return !task.running; } );
+    auto taskToStartIter = std::find_if( m_syncTasks.begin(), m_syncTasks.end(), [](const SynchronizationTask& task){ return !task.running; } );
+    if( taskToStartIter == m_syncTasks.end() )
+    {
+        //all tasks are already started
+        return OperationStartResult::nothingToDo;
+    }
+
+    SynchronizationTask& taskToStart = *taskToStartIter;
     //will remove task only after its successfull completion
 
     std::shared_ptr<detail::RDirSynchronizationOperation> opCtx;
@@ -245,6 +267,7 @@ std::shared_ptr<detail::RDirSynchronizationOperation> RDirSyncher::startNextOper
                 operationID,
                 m_currentMirror,
                 taskToStart.entryPath,
+                m_localDirPath,
                 this ) );
             break;
 
@@ -252,27 +275,28 @@ std::shared_ptr<detail::RDirSynchronizationOperation> RDirSyncher::startNextOper
             opCtx.reset( new detail::GetFileOperation(
                 operationID,
                 m_currentMirror,
-                m_localDirPath,
                 taskToStart.entryPath,
+                m_localDirPath,
                 taskToStart.hashTypeName,
                 this ) );
             break;
 
         default:
             assert( false );
-            return nullptr;
+            return OperationStartResult::failure;
     }
 
     if( !opCtx->startAsync() )
     {
         //TODO/IMPL filling in m_failedEntryPath, m_lastErrorText
-        return nullptr;
+        return OperationStartResult::failure;
     }
 
     taskToStart.running = true;
 
     m_runningOperations.insert( std::make_pair( operationID, opCtx ) );
-    return opCtx;
+    *newOperationRef = opCtx;
+    return OperationStartResult::success;
 }
 
 bool RDirSyncher::useNextMirror( const QUrl& hintMirror )

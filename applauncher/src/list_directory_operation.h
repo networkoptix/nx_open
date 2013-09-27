@@ -61,10 +61,14 @@ namespace detail
         Q_OBJECT
 
     public:
+        /*!
+            \param localTargetDirPath Local directory to sync to
+        */
         ListDirectoryOperation(
             int _id,
             const QUrl& baseUrl,
             const QString& _dirPath,
+            const QString& localTargetDirPath,
             AbstractRDirSynchronizationEventHandler* _handler );
         ~ListDirectoryOperation();
 
@@ -77,7 +81,7 @@ namespace detail
         std::list<detail::RDirEntry> entries() const;
 
     private:
-        const QString m_dirPath;
+        const QString m_localTargetDirPath;
         nx_http::AsyncHttpClient* m_httpClient;
         std::list<detail::RDirEntry> m_entries;
         QUrl m_downloadUrl;
