@@ -7,6 +7,7 @@
 
 #include <QtMultimedia/QAudioDeviceInfo>
 
+#include <ui/dialogs/custom_file_dialog.h>
 #include <ui/widgets/dwm.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
@@ -14,6 +15,7 @@
 #ifdef Q_OS_WIN
 #   include "device_plugins/desktop_windows_specific/win_audio_helper.h"
 #endif
+
 
 namespace {
     const int ICON_SIZE = 32;
@@ -268,13 +270,13 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 }
 
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
-    QFileDialog fileDialog(this);
-    fileDialog.setDirectory(ui->recordingFolderLabel->text());
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
+    dialog->setDirectory(ui->recordingFolderLabel->text());
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    if (!dialog->exec())
         return;
 
-    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
     if (dir.isEmpty())
         return;
 

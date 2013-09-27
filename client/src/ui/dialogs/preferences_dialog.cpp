@@ -33,6 +33,8 @@
 #include <ui/widgets/settings/server_settings_widget.h>
 #include <ui/workbench/workbench_auto_starter.h>
 
+#include "custom_file_dialog.h"
+
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
     QDialog(parent),
@@ -286,13 +288,13 @@ void QnPreferencesDialog::openPopupSettingsPage() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
-    QFileDialog fileDialog(this);
-    fileDialog.setDirectory(ui->mainMediaFolderLabel->text());
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
+    dialog->setDirectory(ui->mainMediaFolderLabel->text());
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    if (!dialog->exec())
         return;
 
-    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
     if (dir.isEmpty())
         return;
 
@@ -300,13 +302,13 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 }
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
-    QFileDialog fileDialog(this);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
     //TODO: #Elric call setDirectory
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    if (!dialog->exec())
         return;
 
-    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
     if (dir.isEmpty())
         return;
 
