@@ -3938,10 +3938,6 @@ void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
     }
 }
 
-void QnWorkbenchActionHandler::at_toggleTourModeHotkeyAction_triggered() {
-    menu()->trigger(Qn::ToggleTourModeAction);
-}
-
 struct ItemPositionCmp {
     bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
         QRect lg = l->geometry();
