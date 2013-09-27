@@ -156,18 +156,17 @@ void QnRestConnectionProcessor::run()
         d->responseBody.append("</body>\n");
         d->responseBody.append("</html>\n");
         rez = CODE_NOT_FOUND;
-
-        QByteArray contentEncoding;
-#ifdef USE_NX_HTTP
-        if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
-#else
-        if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
-#endif
-            d->responseBody = compressData(d->responseBody);
-            contentEncoding = "gzip";
-        }
-        sendResponse("HTTP", rez, contentType, contentEncoding, false);
     }
+    QByteArray contentEncoding;
+#ifdef USE_NX_HTTP
+    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
+#else
+    if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
+#endif
+        d->responseBody = compressData(d->responseBody);
+        contentEncoding = "gzip";
+    }
+    sendResponse("HTTP", rez, contentType, contentEncoding, false);
 }
 
 void QnRestConnectionProcessor::registerHandler(const QString& path, QnRestRequestHandler* handler)
