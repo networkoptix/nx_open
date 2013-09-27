@@ -38,10 +38,7 @@ class QnCustomFileDialog : public QFileDialog
     typedef QFileDialog base_type;
 
 public:
-    explicit QnCustomFileDialog(QWidget *parent = 0,
-                         const QString &caption = QString(),
-                         const QString &directory = QString(),
-                         const QString &filter = QString());
+    explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
     ~QnCustomFileDialog();
 
     /**

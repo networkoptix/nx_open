@@ -1494,9 +1494,9 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFiles);
+    
     QStringList filters;
     //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
@@ -1511,9 +1511,9 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFiles);
+
     QStringList filters;
     filters << tr("All Supported (*.layout)");
     filters << tr("Layouts (*.layout)");
@@ -1525,9 +1525,9 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
     dialog->setFileMode(QFileDialog::Directory);
-    dialog->setOptions(QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog);
+    dialog->setOption(QFileDialog::ShowDirsOnly);
 
     if(dialog->exec())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
