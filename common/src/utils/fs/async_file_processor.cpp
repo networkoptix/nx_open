@@ -11,7 +11,8 @@
 
 AsyncFileProcessor::AsyncFileProcessor()
 {
-    //TODO/IMPL
+    setObjectName( QLatin1String( "AsyncFileProcessor" ) );
+    start();
 }
 
 AsyncFileProcessor::~AsyncFileProcessor()
@@ -56,26 +57,34 @@ void AsyncFileProcessor::run()
 
         std::unique_ptr<FileTask> task( taskPtr );
 
+        //const std::type_info& t1 = typeid(*task.get());
+        //const std::type_info& t2 = typeid(WriteFileTask);
+
         if( typeid(*task.get()) == typeid(OpenFileTask) )
-            doOpenFile( static_cast<const OpenFileTask&>(*task.get()) );
+            doOpenFile( static_cast<const OpenFileTask*>(task.get()) );
         else if( typeid(*task.get()) == typeid(WriteFileTask) )
-            doWriteFile( static_cast<const WriteFileTask&>(*task.get()) );
+            doWriteFile( static_cast<const WriteFileTask*>(task.get()) );
         else if( typeid(*task.get()) == typeid(CloseFileTask) )
-            doCloseFile( static_cast<const CloseFileTask&>(*task.get()) );
+            doCloseFile( static_cast<const CloseFileTask*>(task.get()) );
     }
 }
 
-void AsyncFileProcessor::doOpenFile( const OpenFileTask& task )
+void AsyncFileProcessor::doOpenFile( const OpenFileTask* task )
 {
     //TODO/IMPL
 }
 
-void AsyncFileProcessor::doWriteFile( const WriteFileTask& task )
+void AsyncFileProcessor::doWriteFile( const WriteFileTask* task )
 {
-    //TODO/IMPL
+    const qint64 bytesWritten = task->file->write( task->buffer.constData(), task->buffer.size() );
+    task->handler->onAsyncWriteFinished(
+        task->file,
+        bytesWritten,
+        bytesWritten == -1 ? SystemError::getLastOSErrorCode() : SystemError::noError );
 }
 
-void AsyncFileProcessor::doCloseFile( const CloseFileTask& task )
+void AsyncFileProcessor::doCloseFile( const CloseFileTask* task )
 {
-    //TODO/IMPL
+    task->file->close();
+    task->handler->onAsyncCloseFinished( task->file, SystemError::noError );
 }

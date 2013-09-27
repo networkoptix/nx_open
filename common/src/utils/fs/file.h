@@ -64,6 +64,9 @@ public:
     virtual void close();
     virtual qint64 read(char* buffer, qint64 count);
 
+    /*!
+        \return Bytes written or -1 in case of error (use \a SystemError::getLastOSErrorCode() to get error code)
+    */
     virtual qint64 write(const char* buffer, qint64 count);
     virtual void sync();
     virtual bool isOpen() const;

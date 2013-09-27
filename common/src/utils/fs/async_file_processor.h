@@ -35,7 +35,7 @@ public:
 
 protected:
     //!Implementation of QThread::run
-    virtual void run() override;
+    virtual void run() override final;
 
 private:
     class FileTask
@@ -48,6 +48,8 @@ private:
             file( _file )
         {
         }
+
+        virtual ~FileTask() {}
     };
 
     class OpenFileTask
@@ -67,7 +69,7 @@ private:
         public FileTask
     {
     public:
-        const QByteArray& buffer;
+        const QByteArray buffer;
         QnFile::AbstractWriteHandler* const handler;
 
         WriteFileTask(
@@ -101,9 +103,9 @@ private:
 
     CLThreadQueue<FileTask*> m_taskQueue;
 
-    void doOpenFile( const OpenFileTask& task );
-    void doWriteFile( const WriteFileTask& task );
-    void doCloseFile( const CloseFileTask& task );
+    void doOpenFile( const OpenFileTask* task );
+    void doWriteFile( const WriteFileTask* task );
+    void doCloseFile( const CloseFileTask* task );
 };
 
 #endif  //ASYNC_FILE_PROCESSOR_H
