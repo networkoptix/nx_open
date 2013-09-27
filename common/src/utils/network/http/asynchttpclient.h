@@ -105,6 +105,7 @@ namespace nx_http
             Emmitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
+            \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
         */
         void done( nx_http::AsyncHttpClient* );
         //!Connection to server has been restored after a sudden disconnect
