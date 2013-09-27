@@ -10,6 +10,7 @@
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
 #include "core/resource/storage_resource.h"
+#include "business/business_fwd.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -68,7 +69,7 @@ public:
     void stopAsyncTasks();
 signals:
     void noStoragesAvailable();
-    void storageFailure(QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr storageRes, QnBusiness::EventReason reason);
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -114,6 +115,7 @@ private:
     QTime m_lastTestTime;
     QTime m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
+    QMap<QnId, bool> m_diskFullWarned;
 };
 
 #define qnStorageMan QnStorageManager::instance()
