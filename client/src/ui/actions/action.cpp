@@ -129,7 +129,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
     if(!isVisible())
         return Qn::InvisibleAction; // TODO: #Elric cheat!
 
-    if(!(this->scope() & scope) && scope != this->scope())
+    if(!(this->scope() & scope) && this->scope() != scope)
         return Qn::InvisibleAction;
 
     if((m_flags & Qn::DevMode) && !qnSettings->isDevMode())
@@ -217,20 +217,25 @@ bool QnAction::event(QEvent *event) {
             }
         } 
 
+        Qn::ActionScope scope;
         QnActionParameters parameters;
         QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
         if(targetProvider != NULL) {
             if(flags() & Qn::ScopelessHotkey) {
-                parameters = targetProvider->currentParameters(static_cast<Qn::ActionScope>(static_cast<int>(scope())));
+                scope = static_cast<Qn::ActionScope>(static_cast<int>(this->scope()));
             } else {
-                Qn::ActionScope scope = targetProvider->currentScope();
-                if(this->scope() & scope)
-                    parameters = targetProvider->currentParameters(scope);
+                scope = targetProvider->currentScope();
+            }
+
+            if(flags() & Qn::TargetlessHotkey) {
+                /* Parameters are empty. */
+            } else {
+                parameters = targetProvider->currentParameters(scope);
             }
         }
 
-        if(checkCondition(scope(), parameters) == Qn::EnabledAction)
-            QnWorkbenchContextAware::menu()->trigger(m_id, parameters);
+        if(checkCondition(scope, parameters) == Qn::EnabledAction)
+            QnWorkbenchContextAware::menu()->trigger(id(), parameters);
         return true;
     }
     
