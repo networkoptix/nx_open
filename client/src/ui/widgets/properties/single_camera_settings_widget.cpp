@@ -486,6 +486,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
+    updateRecordingParamsAvailability();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
@@ -598,6 +599,14 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
         return;
     bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
+{
+    if (!m_camera)
+        return;
+    
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {

@@ -136,6 +136,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
+    m_recordingParamsAvailable(true),
     m_changesDisabled(false),
     m_readOnly(false),
     m_maxFps(0),
@@ -558,14 +559,30 @@ void QnCameraScheduleWidget::setMotionAvailable(bool available) {
     updateMotionButtons();
 }
 
-bool QnCameraScheduleWidget::isMotionAvailable() {
+void QnCameraScheduleWidget::setRecordingParamsAvailability(bool available)
+{
+    if(m_recordingParamsAvailable == available)
+        return;
+
+    m_recordingParamsAvailable = available;
+
+    updateGridEnabledState();
+}
+
+bool QnCameraScheduleWidget::isMotionAvailable() const
+{
     return m_motionAvailable;
+}
+
+bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
+{
+    return m_recordingParamsAvailable;
 }
 
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
-    bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
+    bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked && m_recordingParamsAvailable;
 
     ui->scheduleGridGroupBox->setEnabled(enabled);
     ui->settingsGroupBox->setEnabled(enabled);

@@ -139,6 +139,7 @@ private:
 
     void updateMotionWidgetNeedControlMaxRect();
     void updateMotionAvailability();
+    void updateRecordingParamsAvailability();
 
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
