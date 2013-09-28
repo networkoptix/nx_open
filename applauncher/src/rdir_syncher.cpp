@@ -11,6 +11,47 @@
 #include "get_file_operation.h"
 
 
+RDirSyncher::EventReceiver::~EventReceiver()
+{
+}
+
+void RDirSyncher::EventReceiver::started( RDirSyncher* const /*syncher*/ )
+{
+}
+
+void RDirSyncher::EventReceiver::fileStarted(
+    RDirSyncher* const /*syncher*/,
+    const QString& /*filePath*/ )
+{
+}
+
+void RDirSyncher::EventReceiver::fileProgress(
+    RDirSyncher* const /*syncher*/,
+    int64_t /*remoteFileSize*/,
+    int64_t /*bytesDownloaded*/ )
+{
+}
+
+void RDirSyncher::EventReceiver::fileDone(
+    RDirSyncher* const /*syncher*/,
+    const QString& /*filePath*/ )
+{
+}
+
+void RDirSyncher::EventReceiver::finished(
+    RDirSyncher* const /*syncher*/,
+    bool /*result*/ )
+{
+}
+
+void RDirSyncher::EventReceiver::failed(
+    RDirSyncher* const /*syncher*/,
+    const QString& /*failedFilePath*/,
+    const QString& /*errorText*/ )
+{
+}
+
+
 RDirSyncher::RDirSyncher(
     const std::forward_list<QUrl>& mirrors,
     const QString& localDirPath,
@@ -77,7 +118,7 @@ QString RDirSyncher::lastErrorText() const
 class RSyncEventTrigger
 {
 public:
-    virtual ~RSyncEventTrigger() {}
+    ~RSyncEventTrigger() {}
 
     virtual void doAction() = 0;
 };
@@ -108,11 +149,15 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 {
     std::list<RSyncEventTrigger*> eventsToTrigger;
     //creating auto guard which will trigger all events stored in eventsToTrigger
-    auto triggerEventFunc = [](std::list<RSyncEventTrigger*>* events)
+    auto scopedExitFunc = [&eventsToTrigger](RDirSyncher* /*pThis*/)
     {
-        for( RSyncEventTrigger* event: *events ) { event->doAction(); delete event; }
+        for( RSyncEventTrigger* event: eventsToTrigger )
+        {
+            event->doAction();
+            delete event;
+        }
     };
-    std::unique_ptr<std::list<RSyncEventTrigger*>, decltype(triggerEventFunc)> eventsToTriggerGuard( &eventsToTrigger, triggerEventFunc );
+    std::unique_ptr<RDirSyncher, decltype(scopedExitFunc)> eventsToTriggerGuard( this, scopedExitFunc );
 
     //events are triggered with m_mutex unlocked, so that no dead-lock can occur if m_eventReceiver calls some method of this class 
 

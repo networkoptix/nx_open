@@ -5,7 +5,8 @@
 
 #include "applauncher_process.h"
 
-#include <QProcess>
+#include <QtCore/QProcess>
+#include <QtCore/QDir>
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
@@ -13,12 +14,16 @@
 #include "version.h"
 
 
-ApplauncherProcess::ApplauncherProcess( bool quitMode )
+ApplauncherProcess::ApplauncherProcess(
+    QSettings* const settings,
+    const InstallationManager& installationManager,
+    bool quitMode )
 :
     m_terminated( false ),
+    m_installationManager( installationManager ),
     m_quitMode( quitMode ),
     m_taskServer( this ),
-    m_settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME ),
+    m_settings( settings ),
     m_bindTriesCount( 0 ),
     m_isLocalServerWasNotFound( false )
 {
@@ -42,22 +47,25 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::startApplication:
-        {
             *response = new applauncher::api::Response();
             startApplication(
                 std::static_pointer_cast<applauncher::api::StartApplicationTask>( request ),
                 *response );
             break;
-        }
 
         case applauncher::api::TaskType::install:
-        {
             *response = new applauncher::api::InstallResponse();
             startInstallation(
                 std::static_pointer_cast<applauncher::api::StartInstallationTask>( request ),
                 static_cast<applauncher::api::InstallResponse*>(*response) );
             break;
-        }
+
+        case applauncher::api::TaskType::getInstallationStatus:
+            *response = new applauncher::api::InstallationStatusResponse();
+            getInstallationStatus(
+                std::static_pointer_cast<applauncher::api::GetInstallationStatusRequest>( request ),
+                static_cast<applauncher::api::InstallationStatusResponse*>(*response) );
+            break;
 
         default:
             break;
@@ -90,6 +98,20 @@ int ApplauncherProcess::run()
 
     std::unique_lock<std::mutex> lk( m_mutex );
     m_cond.wait( lk, [this](){ return m_terminated; } );
+
+    //waiting for all running tasks to stop
+    m_taskServer.pleaseStop();
+    m_taskServer.wait();
+
+    //interrupting running installation tasks. With taskserver down noone can modify m_activeInstallations
+    for( auto installationIter: m_activeInstallations )
+        installationIter.second->pleaseStop();
+
+    for( auto installationIter: m_activeInstallations )
+        installationIter.second->wait();
+
+    m_activeInstallations.clear();
+
     return 0;
 }
 
@@ -122,10 +144,10 @@ static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunch
 
 bool ApplauncherProcess::getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs )
 {
-    if( m_settings.contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
+    if( m_settings->contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
     {
-        *versionToLaunch = m_settings.value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString();
-        *appArgs = m_settings.value( "previousUsedCmdParams" ).toString();
+        *versionToLaunch = m_settings->value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString();
+        *appArgs = m_settings->value( "previousUsedCmdParams" ).toString();
     }
     else if( m_installationManager.count() > 0 )
     {
@@ -235,7 +257,7 @@ bool ApplauncherProcess::startApplication(
     }
 
     if( task->version != m_installationManager.getMostRecentVersion() )
-        task->appArgs += QString::fromLatin1(" ") + m_settings.value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
+        task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
     //TODO/IMPL start process asynchronously ?
 
@@ -246,7 +268,7 @@ bool ApplauncherProcess::startApplication(
             task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
-        m_settings.setValue( QLatin1String("previousLaunchedVersion"), task->version );
+        m_settings->setValue( QLatin1String("previousLaunchedVersion"), task->version );
         response->result = applauncher::api::ResultType::ok;
         return true;
     }
@@ -262,24 +284,61 @@ bool ApplauncherProcess::startInstallation(
     const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
     applauncher::api::InstallResponse* const response )
 {
-    //TODO/IMPL detecting directory to download to 
-    QString targetDir;
-    //TODO/IMPL
-    std::forward_list<QUrl> mirrors;
-
-    int downloadingID = ++m_prevDownloadingID;
-
-    std::unique_ptr<RDirSyncher> syncher( new RDirSyncher( mirrors, targetDir, this ) );
-    //syncher->setFileProgressNotificationStep(  );
-
-    if( !syncher->startAsync() )
+    if( !InstallationManager::isValidVersionName(task->version) )
     {
-        //TODO/IMPL filling in response
-        return false;
+        response->result = applauncher::api::ResultType::invalidVersionFormat;
+        return true;
     }
 
-    //TODO/IMPL filling in response
+    if( m_installationManager.isVersionInstalled(task->version) )
+    {
+        response->result = applauncher::api::ResultType::alreadyInstalled;
+        return true;
+    }
 
-    //TODO/IMPL
+    //detecting directory to download to 
+    const QString& targetDir = m_installationManager.getInstallDirForVersion(task->version);
+    if( !QDir().mkpath(targetDir) )
+    {
+        response->result = applauncher::api::ResultType::ioError;
+        return true;
+    }
+    
+    std::shared_ptr<InstallationProcess> installationProcess( new InstallationProcess(
+        QN_PRODUCT_NAME_SHORT,
+        QN_CUSTOMIZATION_NAME,
+        task->version,
+        task->module,
+        targetDir ) );
+    if( !installationProcess->start( *m_settings ) )
+    {
+        response->result = applauncher::api::ResultType::ioError;
+        return true;
+    }
+
+    response->installationID = ++m_prevInstallationID;
+    m_activeInstallations.insert( std::make_pair( response->installationID, installationProcess ) );
+
+    response->result = applauncher::api::ResultType::ok;
+    return true;
+}
+
+bool ApplauncherProcess::getInstallationStatus(
+    const std::shared_ptr<applauncher::api::GetInstallationStatusRequest>& request,
+    applauncher::api::InstallationStatusResponse* const response )
+{
+    auto installationIter = m_activeInstallations.find( request->installationID );
+    if( installationIter == m_activeInstallations.end() )
+    {
+        response->result = applauncher::api::ResultType::notFound;
+        return true;
+    }
+
+    response->status = installationIter->second->getStatus();
+    response->progress = installationIter->second->getProgress();
+
+    if( response->status > applauncher::api::InstallationStatus::inProgress )
+        m_activeInstallations.erase( installationIter );
+
     return true;
 }

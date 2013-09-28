@@ -126,7 +126,7 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
         std::shared_ptr<applauncher::api::BaseTask>(task),
         &response );
 
-    const QByteArray& responseMsg = response != NULL ? "ok" : response->toString();
+    const QByteArray& responseMsg = response != NULL ? "ok\n\n" : response->serialize();
     unsigned int bytesWritten = 0;
     clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
     clientConnection->flush();

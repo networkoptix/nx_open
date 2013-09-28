@@ -48,23 +48,23 @@ public:
         \return false, if \a version not found. Otherwise, true and \a *appData filled
     */
     bool getInstalledVersionData( const QString& version, AppData* const appData ) const;
-    //!installs package \a packagePath
-    /*!
-        If error occured, false is returned and \a errorString() returns error description
-    */
-    bool install( const QString& packagePath );
+    //!Returns path to "{program files dir}/Network Optix" on windows and "/opt/Network Optix" on unix
+    QString getRootInstallDirectory() const;
+    //!Returns path to install \a version to
+    QString getInstallDirForVersion( const QString& version ) const;
     //!Returns previous error description
     QString errorString() const;
+
+    static bool isValidVersionName( const QString& version );
 
 private:
     QString m_errorString;
     //!map<version, AppData>. Most recent version first
     std::map<QString, AppData, std::greater<QString> > m_installedProductsByVersion;
+    QString m_rootInstallDirectory;
 
     void setErrorString( const QString& _errorString );
     void readInstalledVersions();
-    //!Returns path to "{program files dir}/Network Optix" on windows and "/opt/Network Optix" on unix
-    static QString getRootInstallDirectory();
 };
 
 #endif  //INSTALLATION_MANAGER_H

@@ -22,10 +22,12 @@ namespace applauncher
                 startApplication,
                 quit,
                 install,
+                getInstallationStatus,
                 invalidTaskType
             };
 
             Value fromString( const QnByteArrayConstRef& str );
+            QByteArray toString( Value val );
         }
 
         class BaseTask
@@ -37,7 +39,7 @@ namespace applauncher
             virtual ~BaseTask();
         
             virtual QByteArray serialize() const = 0;
-            virtual bool deserialize( const QByteArray& data ) = 0;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) = 0;
         };
 
         //!Parses \a serializedTask header, creates corresponding object (\a *ptr) and calls deserialize
@@ -49,7 +51,7 @@ namespace applauncher
             public BaseTask
         {
         public:
-            //!Version in serialized format (e.g., 1.4.3)
+            //!Version in format 1.4.3
             QString version;
             //!Command-line params to pass to application instance
             QString appArgs;
@@ -63,14 +65,25 @@ namespace applauncher
                 const QStringList& _appParams );
 
             virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QByteArray& data ) override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
 
         class StartInstallationTask
         :
             public BaseTask
         {
-            //TODO/IMPL
+        public:
+            //!Version in format 1.4.3
+            QString version;
+            //!Module name for install. By default, "client". For future use
+            QString module;
+
+            StartInstallationTask();
+
+            //!Implementation of \a BaseTask::serialize()
+            virtual QByteArray serialize() const override;
+            //!Implementation of \a BaseTask::deserialize()
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
 
         //!Applauncher process quits running on receiving this task
@@ -82,7 +95,7 @@ namespace applauncher
             QuitTask();
 
             virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QByteArray& data ) override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
 
         namespace ResultType
@@ -91,8 +104,14 @@ namespace applauncher
             {
                 ok,
                 versionNotInstalled,
-                ioError
+                alreadyInstalled,
+                invalidVersionFormat,
+                notFound,
+                ioError,
+                otherError
             };
+            Value fromString( const QnByteArrayConstRef& str );
+            QByteArray toString( Value val );
         }
 
         class Response
@@ -102,7 +121,8 @@ namespace applauncher
 
             Response();
 
-            virtual QByteArray toString() const;
+            virtual QByteArray serialize() const;
+            virtual bool deserialize( const QnByteArrayConstRef& data );
         };
 
         class InstallResponse
@@ -110,7 +130,56 @@ namespace applauncher
             public Response
         {
         public:
-            virtual QByteArray toString() const override;
+            //!Valid if \a result == \a ResultType::ok
+            unsigned int installationID;
+
+            InstallResponse();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class GetInstallationStatusRequest
+        :
+            public BaseTask
+        {
+        public:
+            unsigned int installationID;
+
+            GetInstallationStatusRequest();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        namespace InstallationStatus
+        {
+            enum Value
+            {
+                init,
+                inProgress,
+                success,
+                failed,
+                unknown
+            };
+
+            Value fromString( const QnByteArrayConstRef& str );
+            QByteArray toString( Value val );
+        }
+
+        class InstallationStatusResponse
+        :
+            public Response
+        {
+        public:
+            InstallationStatus::Value status;
+            //!Installation progress (percent)
+            float progress;
+
+            InstallationStatusResponse();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
     }
 }

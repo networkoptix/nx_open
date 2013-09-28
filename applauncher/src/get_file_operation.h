@@ -8,7 +8,6 @@
 
 #include <stdint.h>
 
-#include <atomic>
 #include <memory>
 #include <mutex>
 
@@ -78,7 +77,7 @@ namespace detail
         const QString m_localDirPath;
         const QString m_hashTypeName;
         std::shared_ptr<QnFile> m_outFile;
-        std::atomic<int> m_fileWritePending;
+        int m_fileWritePending;
         mutable std::mutex m_mutex;
 
         //!Implementation of QnFile::AbstractWriteHandler::onAsyncWriteFinished

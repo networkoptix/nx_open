@@ -22,6 +22,17 @@ TaskServer::TaskServer( AbstractRequestProcessor* const requestProcessor )
 {
 }
 
+void TaskServer::pleaseStop()
+{
+    disconnect( &m_server, SIGNAL(newConnection()), this, SLOT(onNewConnection()) );
+}
+
+void TaskServer::wait()
+{
+    //TODO/IMPL waiting for running TaskServer::onNewConnection() returns
+    m_server.close();
+}
+
 bool TaskServer::listen( const QString& pipeName )
 {
     //on windows multiple m_taskServer can listen single pipe, 
@@ -83,7 +94,7 @@ void TaskServer::onNewConnection()
         std::shared_ptr<applauncher::api::BaseTask>(task),
         &response );
 
-    const QByteArray& responseMsg = response != NULL ? "ok" : response->toString();
+    const QByteArray& responseMsg = response != NULL ? "ok\n\n" : response->serialize();
     conn->write( responseMsg );
     conn->flush();
 }

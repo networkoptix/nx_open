@@ -17,7 +17,7 @@
 
 #include "abstract_request_processor.h"
 #include "installation_manager.h"
-#include "rdir_syncher.h"
+#include "installation_process.h"
 #ifdef _WIN32
 #include "task_server_new.h"
 #else
@@ -28,11 +28,13 @@
 class ApplauncherProcess
 :
     public QnStoppable,
-    public AbstractRequestProcessor,
-    public RDirSyncher::EventReceiver
+    public AbstractRequestProcessor
 {
 public:
-    ApplauncherProcess( bool quitMode );
+    ApplauncherProcess(
+        QSettings* const settings,
+        const InstallationManager& installationManager,
+        bool quitMode );
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
     virtual void pleaseStop() override;
@@ -46,19 +48,20 @@ public:
 
 private:
     bool m_terminated;
+    const InstallationManager& m_installationManager;
     const bool m_quitMode;
-    InstallationManager m_installationManager;
 #ifdef _WIN32
     TaskServerNew m_taskServer;
 #else
     TaskServer m_taskServer;
 #endif
-    QSettings m_settings;
+    QSettings* const m_settings;
     int m_bindTriesCount;
     bool m_isLocalServerWasNotFound;
     mutable std::mutex m_mutex;
     std::condition_variable m_cond;
-    std::atomic<int> m_prevDownloadingID;
+    std::atomic<unsigned int> m_prevInstallationID;
+    std::map<unsigned int, std::shared_ptr<InstallationProcess>> m_activeInstallations;
 
     bool sendTaskToRunningLauncherInstance();
     bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );
@@ -69,6 +72,9 @@ private:
     bool startInstallation(
         const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
         applauncher::api::InstallResponse* const response );
+    bool getInstallationStatus(
+        const std::shared_ptr<applauncher::api::GetInstallationStatusRequest>& request,
+        applauncher::api::InstallationStatusResponse* const response );
 };
 
 #endif  //APPLAUNCHER_PROCESS_H

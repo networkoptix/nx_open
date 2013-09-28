@@ -73,40 +73,40 @@ public:
     class EventReceiver
     {
     public:
-        virtual ~EventReceiver() {}
+        virtual ~EventReceiver();
 
         //!Called just after downloading has been successfully started
-        virtual void started( RDirSyncher* const syncher ) {}
+        virtual void started( RDirSyncher* const syncher );
 
         virtual void fileStarted(
             RDirSyncher* const syncher,
-            const QString& filePath ) {}
+            const QString& filePath );
         /*!
             File download progress is not reported by default, but needs to be enabled by \a RDirSyncher::setFileProgressNotificationStep
         */
         virtual void fileProgress(
             RDirSyncher* const syncher,
             int64_t remoteFileSize,
-            int64_t bytesDownloaded ) {}
+            int64_t bytesDownloaded );
         /*!
             \param filePath Path relative to \a baseUrl
         */
         virtual void fileDone(
             RDirSyncher* const syncher,
-            const QString& filePath ) {}
+            const QString& filePath );
         /*!
             \param result \a true, if synchronization succeeded, \a false otherwise
         */
         virtual void finished(
             RDirSyncher* const syncher,
-            bool result ) {}
+            bool result );
         /*!
             \param failedFilePath path relative to \a baseUrl
         */
         virtual void failed(
             RDirSyncher* const syncher,
             const QString& failedFilePath,
-            const QString& errorText ) {}
+            const QString& errorText );
     };
 
     //!Initialization
