@@ -341,7 +341,7 @@ QnParamList QnResource::getResourceParamList() const
     }
     */
 
-    // 2. read AppServer params
+    // 2. read AppServer params 
     if (QnResourceTypePtr resType = qnResTypePool->getResourceType(resTypeId)) 
     {
         Q_ASSERT(resType);

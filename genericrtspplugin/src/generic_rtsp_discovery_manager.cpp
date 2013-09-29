@@ -27,6 +27,11 @@ void* GenericRTSPDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfac
         addRef();
         return this;
     }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
     return NULL;
 }
 
@@ -51,7 +56,7 @@ int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const 
 {
 #if 0
     strcpy( cameras[0].url, "rtsp://192.168.0.31:554/axis-media/media.amp" );
-    strcpy( cameras[0].uid, "HUY" );
+    strcpy( cameras[0].uid, "TESt_CAM" );
     strcpy( cameras[0].modelName, "rtsp://192.168.0.31:554/axis-media/media.amp" );
     return 1;
 #else

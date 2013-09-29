@@ -52,6 +52,9 @@ public:
     virtual qint64 endTime() = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     // If findIFrame=true, jump to position before time to a nearest IFrame.
+    /*!
+        \param time UTC, usec
+    */
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
     virtual QnResourceVideoLayout* getVideoLayout() = 0;
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
@@ -65,6 +68,9 @@ public:
     virtual void setSingleshotMode(bool value) { Q_UNUSED(value); }
 
     // MediaStreamQuality. By default, this function is not implemented. Return: true if need seek for change quality
+    /*!
+        \param fastSwitch Do not wait for next I-frame of new stream, but give data starting with previous I-frame
+    */
     virtual bool setQuality(MediaQuality quality, bool fastSwitch) { Q_UNUSED(quality); Q_UNUSED(fastSwitch); return false; }
 
     Flags getFlags() const { return m_flags; }

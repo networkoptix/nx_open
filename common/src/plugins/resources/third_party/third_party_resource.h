@@ -52,6 +52,19 @@ public:
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
+    //!Implementation of QnSecurityCamResource::createArchiveDataProvider
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
+    //!Implementation of QnSecurityCamResource::createArchiveDelegate
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    //!Implementation of QnSecurityCamResource::getDtsTimePeriodsByMotionRegion
+    virtual QnTimePeriodList getDtsTimePeriodsByMotionRegion(
+        const QList<QRegion>& regions,
+        qint64 msStartTime,
+        qint64 msEndTime,
+        int detailLevel ) override;
+
+    //!Implementation of QnNetworkResource::getDtsTimePeriods
+    virtual QnTimePeriodList getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel ) override;
 
     //!Implementation of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;

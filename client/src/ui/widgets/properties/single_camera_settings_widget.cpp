@@ -27,6 +27,7 @@
 #include <ui/style/warning_style.h>
 
 #include <utils/license_usage_helper.h>
+#include "core/resource/media_resource.h"
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
@@ -417,7 +418,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         Qn::PtzCapabilities ptzCaps = m_camera->getPtzCapabilities();
         ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")) &&
-                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled));
+                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled) &&
+                                          m_camera->getVideoLayout()->channelCount() == 1);
         
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
@@ -801,9 +803,16 @@ void QnSingleCameraSettingsWidget::updateIpAddressText() {
 void QnSingleCameraSettingsWidget::updateWebPageText() {
     if(m_camera) {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
+        
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80 && url.port() > 0)
-            webPageAddress += QLatin1Char(':') + QString::number(url.port());
+        if(url.isValid()) {
+            int port = url.queryItemValue(lit("http_port")).toInt();
+            if(port == 0)
+                port = url.port(80);
+            
+            if (port != 80 && port > 0)
+                webPageAddress += QLatin1Char(':') + QString::number(url.port());
+        }
 
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
 

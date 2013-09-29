@@ -4,9 +4,9 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
-#include <qglobal.h>
+#ifdef __linux__
 
-#ifdef Q_OS_LINUX
+#include <qglobal.h>
 
 #include "pollset.h"
 
@@ -28,6 +28,7 @@ class PollSetImpl
 public:
     struct SockData
     {
+        //!bit 'or' of listened events (EPOLLIN, EPOLLOUT, etc..)
         int eventsMask;
         bool markedForRemoval;
 
@@ -49,6 +50,7 @@ public:
 
         const void* userData( PollSet::EventType eventType ) const
         {
+            //TODO/IMPL #ak: get rid of m_userData map, since there can be only two(!) elements in it
             std::map<PollSet::EventType, void*>::const_iterator it = m_userData.find(eventType);
             return it != m_userData.end() ? it->second : NULL;
         }
@@ -100,53 +102,44 @@ class ConstIteratorImpl
 public:
     int currentIndex;
     PollSetImpl* pollSetImpl;
-    int currentTriggeredEvent;
+    PollSet::EventType triggeredEvent;
+    PollSet::EventType handlerToUse;
 
     ConstIteratorImpl()
     :
         currentIndex( 0 ),
         pollSetImpl( NULL ),
-        currentTriggeredEvent( -1 )
+        triggeredEvent( PollSet::etNone ),
+        handlerToUse( PollSet::etNone )
     {
-    }
-
-    ConstIteratorImpl( const ConstIteratorImpl& right )
-    :
-        currentIndex( right.currentIndex ),
-        pollSetImpl( right.pollSetImpl )
-    {
-    }
-
-    const ConstIteratorImpl& operator=( const ConstIteratorImpl& right )
-    {
-        currentIndex = right.currentIndex;
-        pollSetImpl = right.pollSetImpl;
-		return *this;
     }
 
     void selectNextSocket()
     {
         for( ; currentIndex < pollSetImpl->signalledSockCount; )
         {
-            //TODO/IMPL this method needs refactoring
-
             PollSetImpl::MonitoredEventMap::const_pointer socketData = NULL;
             if( currentIndex >= 0 )
             {
                 socketData = static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(pollSetImpl->epollEventsArray[currentIndex].data.ptr);
+                //reporting EPOLLIN and EPOLLOUT as different events to allow them to have different handlers:
                 if( socketData != NULL &&
                     !socketData->second.markedForRemoval &&
-                    currentTriggeredEvent == EPOLLIN &&
+                    handlerToUse == PollSet::etRead &&
                     (pollSetImpl->epollEventsArray[currentIndex].events & EPOLLOUT) )
                 {
-                    currentTriggeredEvent = EPOLLOUT;
+                    //if both EPOLLIN and EPOLLOUT have occured and EPOLLIN has already been reported then reporting EPOLLOUT
+                    handlerToUse = PollSet::etWrite;
+                    triggeredEvent = (pollSetImpl->epollEventsArray[currentIndex].events & EPOLLERR)
+                        ? PollSet::etError
+                        : PollSet::etWrite;
                     return;
                 }
             }
 
             ++currentIndex;
             if( currentIndex >= pollSetImpl->signalledSockCount ) 
-                return; //reached end
+                return; //reached end, iterator is invalid
 
             if( pollSetImpl->epollEventsArray[currentIndex].data.ptr == NULL )
             {
@@ -154,7 +147,7 @@ public:
                 uint64_t val = 0;
                 if( read( pollSetImpl->eventFD, &val, sizeof(val) ) == -1 )
                 {
-                    //TODO ???
+                    //TODO #ak: can this really occur???
                 }
                 continue;
             }
@@ -165,9 +158,29 @@ public:
 
             //processing all triggered events one by one
             if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLIN )
-                currentTriggeredEvent = EPOLLIN;
+            {
+                handlerToUse = PollSet::etRead;
+                triggeredEvent = PollSet::etRead;
+            }
             else if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLOUT )
-                currentTriggeredEvent = EPOLLOUT;
+            {
+                handlerToUse = PollSet::etWrite;
+                triggeredEvent = PollSet::etWrite;
+            }
+            else if( pollSetImpl->epollEventsArray[currentIndex].events & (EPOLLHUP | EPOLLRDHUP) )
+            {
+                //reporting events to every one who listens
+                pollSetImpl->epollEventsArray[currentIndex].events |= socketData->second.eventsMask & (EPOLLIN | EPOLLOUT);
+                handlerToUse = (socketData->second.eventsMask & EPOLLIN) ? PollSet::etRead : PollSet::etWrite;
+                triggeredEvent = handlerToUse;
+            }
+            else if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLERR )
+            {
+                //reporting PollSet::etError to every one who listens
+                pollSetImpl->epollEventsArray[currentIndex].events |= socketData->second.eventsMask & (EPOLLIN | EPOLLOUT);
+                handlerToUse = (socketData->second.eventsMask & EPOLLIN) ? PollSet::etRead : PollSet::etWrite;
+                triggeredEvent = PollSet::etError;
+            }
             return;
         }
     }
@@ -232,20 +245,12 @@ AbstractSocket* PollSet::const_iterator::socket()
 */
 PollSet::EventType PollSet::const_iterator::eventType() const
 {
-    //const uint32_t epollREvents = m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].events;
-    const uint32_t epollREvents = m_impl->currentTriggeredEvent;
-    unsigned int revents = 0;
-    if( epollREvents & EPOLLIN )
-        revents |= etRead;
-    if( epollREvents & EPOLLOUT )
-        revents |= etWrite;
-    return (PollSet::EventType)revents;
+    return m_impl->triggeredEvent;
 }
 
 void* PollSet::const_iterator::userData()
 {
-    //TODO: #AK gcc warning: invalid conversion from 'const void*' to 'void*' [-fpermissive]
-    return static_cast<PollSetImpl::MonitoredEventMap::pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( eventType() );
+    return static_cast<PollSetImpl::MonitoredEventMap::pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( m_impl->handlerToUse );
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -315,7 +320,7 @@ void PollSet::interrupt()
     uint64_t val = 1;
     if( write( m_impl->eventFD, &val, sizeof(val) ) != sizeof(val) )
     {
-        //TODO ???
+        //TODO #ak: can this really occur ???
     }
 }
 
@@ -374,7 +379,7 @@ void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
     if( (it == m_impl->monitoredEvents.end()) || !(it->second.eventsMask & epollEventType) )
         return NULL;
 
-    const int eventsBesidesRemovedOne = it->second.eventsMask & (~epollEventType);
+    const int eventsBesidesRemovedOne = (it->second.eventsMask & (EPOLLIN | EPOLLOUT)) & (~epollEventType);
     if( eventsBesidesRemovedOne )
     {
         //socket is being listened for multiple events, modifying event set
@@ -382,8 +387,8 @@ void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
         memset( &_event, 0, sizeof(_event) );
         _event.data.ptr = &*it;
         _event.events = eventsBesidesRemovedOne | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
-        if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event ) == 0 )
-            it->second.eventsMask = eventsBesidesRemovedOne;
+        epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event );
+        it->second.eventsMask &= ~epollEventType;   //resetting disabled event bit
         void* userData = it->second.userData(eventType);
         it->second.userData(eventType) = NULL;
         return userData;
@@ -410,7 +415,7 @@ void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
 
 size_t PollSet::size( EventType /*eventType*/ ) const
 {
-    //TODO/IMPL return only for events eventType
+    //TODO/IMPL #ak: return only for events eventType
     return m_impl->monitoredEvents.size();
 }
 
@@ -463,8 +468,10 @@ PollSet::const_iterator PollSet::end() const
 
 unsigned int PollSet::maxPollSetSize()
 {
-    //TODO/IMPL
-    return 128;
+    //TODO/IMPL #ak: choose proper limit:
+        //epoll can accept unlimited descriptors, but total number of available descriptors is limited by system
+    return 16*1024;
 }
 
-#endif
+#endif  //__linux__
+

@@ -37,6 +37,7 @@ static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
 static const double TIME_RESYNC_THRESHOLD = 10.0; // at seconds
 static const double LOCAL_TIME_RESYNC_THRESHOLD = 500; // at ms
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
+static const QString DEFAULT_REALM(lit("NetworkOptix"));
 
 
 QByteArray RTPSession::m_guid;
@@ -587,8 +588,12 @@ void RTPSession::updateResponseStatus(const QByteArray& response)
 }
 
 // in case of error return false
-bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
+bool RTPSession::isDigestAuthRequired(const QByteArray& response)
 {
+    updateResponseStatus(response);
+    if (m_responseCode != 401)
+        return false;
+
     QString wwwAuth = extractRTSPParam(QLatin1String(response), QLatin1String("WWW-Authenticate:"));
 
     if (wwwAuth.toLower().contains(QLatin1String("digest")))
@@ -611,20 +616,10 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
         m_realm.remove(QLatin1Char('"'));
         m_nonce.remove(QLatin1Char('"'));
 
-
-        if (m_realm.isEmpty() || m_nonce.isEmpty())
-            return false;
-
-
-        m_useDigestAuth = true;
-    }
-    else
-    {
-        m_useDigestAuth = false;
+        return true;
     }
 
-
-    return true;
+    return false;
 }
 
 CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
@@ -636,7 +631,6 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     mUrl = url;
     m_contentBase = mUrl.toString();
     m_responseBufferLen = 0;
-    m_useDigestAuth = false;
     m_rtpToTrack.clear();
 
 
@@ -685,17 +679,11 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
-    // check digest authentication here
-    if (!checkIfDigestAuthIsneeded(response))
-    {
-        m_tcpSock->close();
-        return CameraDiagnostics::CameraResponseParseErrorResult( url, QLatin1String("DESCRIBE") );
-    }
-        
 
-    // if digest authentication is nedded need to resend describe 
-    if (m_useDigestAuth)
+    // if digest authentication is needed need to resend describe 
+    if (isDigestAuthRequired(response))
     {
+        m_useDigestAuth = true;
         response.clear();
         if (!sendDescribe() || !readTextResponce(response)) 
         {
@@ -788,6 +776,11 @@ const QByteArray& RTPSession::getSdp() const
 
 //===================================================================
 
+QByteArray RTPSession::calcDefaultNonce() const
+{
+    return QByteArray::number(qnSyncTime->currentUSecsSinceEpoch() , 16);
+}
+
 void RTPSession::addAuth(QByteArray& request)
 {
     if (m_auth.isNull())
@@ -796,8 +789,12 @@ void RTPSession::addAuth(QByteArray& request)
     {
         QByteArray firstLine = request.left(request.indexOf('\n'));
         QList<QByteArray> methodAndUri = firstLine.split(' ');
-        if (methodAndUri.size() >= 2)
-            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]), QLatin1String(methodAndUri[1]) ));
+        if (methodAndUri.size() >= 2) {
+            QString uri = lit(methodAndUri[1]);
+            if (uri.startsWith(lit("rtsp://")))
+                uri = QUrl(uri).path();
+            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, lit(methodAndUri[0]), uri ));
+        }
     }
     else {
         request.append(CLSimpleHTTPClient::basicAuth(m_auth));
@@ -1149,12 +1146,9 @@ QByteArray RTPSession::getGuid()
     return m_guid;
 }
 
-bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
+bool RTPSession::sendPlayInternal(qint64 startPos, qint64 endPos)
 {
     QByteArray request;
-    QByteArray response;
-
-    m_scale = scale;
 
     request += "PLAY ";
     request += m_contentBase;
@@ -1168,7 +1162,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     request += "\r\n";
     request += USER_AGENT_STR;
     addRangeHeader(request, startPos, endPos);
-    request += QLatin1String("Scale: ") + QString::number(scale) + QLatin1String("\r\n");
+    request += QLatin1String("Scale: ") + QString::number(m_scale) + QLatin1String("\r\n");
     if (m_numOfPredefinedChannels) {
         request += "x-play-now: true\r\n";
         request += "x-guid: ";
@@ -1176,21 +1170,42 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
         request += "\r\n";
     }
     addAdditionAttrs(request);
-    
+
     request += QLatin1String("\r\n");
 
     if (m_tcpSock->send(request.data(), request.size()) <= 0)
         return false;
+    return true;
+}
 
+bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
+{
+    QByteArray response;
+
+    m_scale = scale;
+
+    if (!sendPlayInternal(startPos, endPos) || !readTextResponce(response))
+        return false;
+
+    // if digest authentication is nedded need to resend describe 
+    if (isDigestAuthRequired(response))
+    {
+        m_useDigestAuth = true;
+        response.clear();
+        if (!sendPlayInternal(startPos, endPos) || !readTextResponce(response) || isDigestAuthRequired(response))
+        {
+            m_tcpSock->close();
+            return false;
+        }
+    }
 
     while (1)
     {
-        if (!readTextResponce(response))
-            return false;
-
         QString cseq = extractRTSPParam(QLatin1String(response), QLatin1String("CSeq:"));
         if (cseq.toInt() == (int)m_csec-1)
             break;
+        else if (!readTextResponce(response))
+            return false; // try next response
     }    
 
 
@@ -1857,9 +1872,14 @@ void RTPSession::setTCPTimeout(int timeout)
     m_tcpTimeout = timeout;
 }
 
-void RTPSession::setAuth(const QAuthenticator& auth)
+void RTPSession::setAuth(const QAuthenticator& auth, DefaultAuthScheme defaultAuthScheme)
 {
     m_auth = auth;
+    if (defaultAuthScheme == authDigest) {
+        m_useDigestAuth = true;
+        m_realm = DEFAULT_REALM;
+        m_nonce = lit(calcDefaultNonce());
+    }
 }
 
 QAuthenticator RTPSession::getAuth() const

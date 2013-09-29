@@ -6,7 +6,7 @@
 #ifndef AXIS_CAMERA_PLUGIN_H
 #define AXIS_CAMERA_PLUGIN_H
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 #include <memory>
 
@@ -73,13 +73,13 @@ public:
     //!Implementaion of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
-    CommonRefManager* refManager();
+    nxpt::CommonRefManager* refManager();
     QNetworkAccessManager* networkAccessManager();
 
     static AxisCameraPlugin* instance();
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     std::auto_ptr<AxisCameraDiscoveryManager> m_discoveryManager;
     //!Used with QNetworkAccessManager
     QThread m_networkEventLoopThread;

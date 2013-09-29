@@ -143,7 +143,10 @@ bool VMaxStreamFetcher::vmaxConnect()
     vmaxDisconnect();
 
     QStringList args;
-    args << QString::number(QnVMax480Server::instance()->getPort());
+    int port = QnVMax480Server::instance()->getPort();
+    if (port == -1)
+        return false;
+    args << QString::number(port);
     m_tcpID = QnVMax480Server::instance()->registerProvider(this);
     args << m_tcpID;
     m_vMaxProxy = new QProcess();

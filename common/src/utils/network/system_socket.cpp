@@ -3,6 +3,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/stdext.h>
+#include "utils/network/ssl_socket.h"
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -29,6 +30,7 @@ typedef char raw_type;       // Type used for raw data on this platform
 #include <netinet/in.h>      // For sockaddr_in
 #include <netinet/tcp.h>      // For TCP_NODELAY
 #include <fcntl.h>
+#include "ssl_socket.h"
 typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
@@ -1014,6 +1016,36 @@ bool TCPServerSocket::setListen(int queueLen)
     return ::listen(sockDesc, queueLen) == 0;
 }
 
+// -------------------------- TCPSslServerSocket ----------------
+
+TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect): TCPServerSocket(), m_allowNonSecureConnect(allowNonSecureConnect)
+{
+
+}
+
+AbstractStreamSocket* TCPSslServerSocket::accept()
+{
+    AbstractStreamSocket* sock = TCPServerSocket::accept();
+    if (!sock)
+        return 0;
+
+    if (m_allowNonSecureConnect)
+        return new QnMixedSSLSocket(sock);
+
+    else
+        return new QnSSLSocket(sock, true);
+
+#if 0
+    // transparent accept required state machine here. doesn't implemented. Handshake implemented on first IO operations
+
+    QnSSLSocket* sslSock = new QnSSLSocket(sock);
+    if (sslSock->doServerHandshake())
+        return sslSock;
+    
+    delete sslSock;
+    return 0;
+#endif
+}
 
 //////////////////////////////////////////////////////////
 ///////// class UDPSocket

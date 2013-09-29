@@ -10,7 +10,8 @@
     - each interface has GUID (\a IID_{interface_name} const non-member of type \a nxpl::NX_GUID)
 
     \note Use in multithreaded environment:\n
-        - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef
+        - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef, 
+            so reference counting - related functionality MUST be thread-safe
 */
 namespace nxpl
 {

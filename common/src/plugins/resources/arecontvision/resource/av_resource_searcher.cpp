@@ -235,13 +235,8 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-    QString shortModel = model;
-    int dashPos = model.indexOf(lit('-'));
-    if (dashPos > 0)
-        shortModel = model.left(dashPos);
 
-
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), shortModel);
+    QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
     if (!rt.isValid())
         return QList<QnResourcePtr>();
 

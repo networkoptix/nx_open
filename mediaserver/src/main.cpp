@@ -1,3 +1,6 @@
+
+#include <cstdlib>
+
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -97,6 +100,8 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
+#include "utils/network/ssl_socket.h"
+#include "network/authenticate_helper.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -786,6 +791,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
+    m_universalTcpListener->enableSSLMode();
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
@@ -859,6 +865,16 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
 
+    QFile f(QLatin1String(":/cert.pem"));
+    if (!f.open(QIODevice::ReadOnly)) 
+    {
+        qWarning() << "No SSL sertificate for mediaServer!";
+    }
+    else {
+        QByteArray certData = f.readAll();
+        QnSSLSocket::initSSLEngine(certData);
+    }
+
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -867,6 +883,8 @@ void QnMain::run()
     QnSoapServer::instance()->start();
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
+
+    QnAuthHelper::initStaticInstance(new QnAuthHelper());
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1185,6 +1203,9 @@ void QnMain::run()
     // This method will set flag on message channel to threat next connection close as normal
     appServerConnection->disconnectSync();
     qSettings.setValue("lastRunningTime", 0);
+
+    QnSSLSocket::releaseSSLEngine();
+    QnAuthHelper::initStaticInstance(NULL);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
@@ -1257,6 +1278,8 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+    ::srand( ::time(NULL) );
+
     QnVideoService service(argc, argv);
 
     int result = service.exec();

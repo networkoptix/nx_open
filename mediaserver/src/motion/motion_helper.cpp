@@ -54,12 +54,7 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res,
 QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QVector<QnTimePeriodList> data;
-    for (int i = 0; i < regions.size(); ++i)
-    {
-        QnMotionArchive* archive = getArchive(res, i);
-        if (archive) 
-            data << archive->mathPeriod(regions[i], msStartTime, msEndTime, detailLevel);
-    }
+    mathImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
     return QnTimePeriod::mergeTimePeriods(data);
 }
 
@@ -67,14 +62,33 @@ QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnReso
 {
     QVector<QnTimePeriodList> data;
     foreach(QnResourcePtr res, resList)
+        mathImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
+    //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriod::mergeTimePeriods calls, which could worsen performance
+    return QnTimePeriod::mergeTimePeriods(data);
+}
+
+void QnMotionHelper::mathImage(
+    const QList<QRegion>& regions,
+    QnResourcePtr res,
+    qint64 msStartTime,
+    qint64 msEndTime,
+    int detailLevel,
+    QVector<QnTimePeriodList>* const timePeriods )
+{
+    for (int i = 0; i < regions.size(); ++i)
     {
-        for (int i = 0; i < regions.size(); ++i) {
+        QnSecurityCamResourcePtr securityCamRes = res.dynamicCast<QnSecurityCamResource>();
+        if( securityCamRes && securityCamRes->isDtsBased() )
+        {
+            *timePeriods << securityCamRes->getDtsTimePeriodsByMotionRegion( regions, msStartTime, msEndTime, detailLevel );
+        }
+        else
+        {
             QnMotionArchive* archive = getArchive(res, i);
             if (archive) 
-                data << archive->mathPeriod(regions[i], msStartTime, msEndTime, detailLevel);
+                *timePeriods << archive->mathPeriod(regions[i], msStartTime, msEndTime, detailLevel);
         }
     }
-    return QnTimePeriod::mergeTimePeriods(data);
 }
 
 //Q_GLOBAL_STATIC(QnMotionHelper, inst);
