@@ -176,11 +176,6 @@ void QnResourceDiscoveryManager::run()
     m_timer->start( 0 );    //immediate execution
     m_state = initialSearch;
 
-
-    int* x = NULL;
-    *x = 15;
-
-
     exec();
 
     m_timer.reset();
