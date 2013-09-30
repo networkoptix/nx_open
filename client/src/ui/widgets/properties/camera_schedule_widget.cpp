@@ -478,8 +478,8 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         qWarning() << "QnCameraScheduleWidget::No record type is selected!";
 
     bool enabled = !ui->noRecordButton->isChecked();
-    ui->fpsSpinBox->setEnabled(enabled);
-    ui->qualityComboBox->setEnabled(enabled);
+    ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
+    ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
 
@@ -567,6 +567,11 @@ void QnCameraScheduleWidget::setRecordingParamsAvailability(bool available)
     m_recordingParamsAvailable = available;
 
     updateGridEnabledState();
+
+    ui->gridWidget->setShowSecondParam(ui->displayQualityCheckBox->isChecked() && m_recordingParamsAvailable);
+    ui->gridWidget->setShowFirstParam(ui->displayFpsCheckBox->isChecked() && m_recordingParamsAvailable);
+    ui->fpsSpinBox->setEnabled(m_recordingParamsAvailable);
+    ui->qualityComboBox->setEnabled(m_recordingParamsAvailable);
 }
 
 bool QnCameraScheduleWidget::isMotionAvailable() const
@@ -582,11 +587,11 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
-    bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked && m_recordingParamsAvailable;
+    bool enabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
 
     ui->scheduleGridGroupBox->setEnabled(enabled);
     ui->settingsGroupBox->setEnabled(enabled);
-    ui->motionGroupBox->setEnabled(enabled);
+    ui->motionGroupBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
 }
 
@@ -770,12 +775,12 @@ void QnCameraScheduleWidget::at_enableRecordingCheckBox_clicked()
 
 void QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)
 {
-    ui->gridWidget->setShowSecondParam(state);
+    ui->gridWidget->setShowSecondParam(state && m_recordingParamsAvailable);
 }
 
 void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 {
-    ui->gridWidget->setShowFirstParam(state);
+    ui->gridWidget->setShowFirstParam(state && m_recordingParamsAvailable);
 }
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
