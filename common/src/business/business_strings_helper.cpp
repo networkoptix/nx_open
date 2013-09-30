@@ -294,8 +294,9 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
                 result = QString(tr("No video frame received during last %1 seconds")).arg(reasonText);
             break;
         case QnBusiness::NetworkIssueConnectionClosed:
-            if (eventType == BusinessEventType::Network_Issue)
-                result = QString(tr("Connection to camera was unexpectedly closed"));
+            if (eventType == BusinessEventType::Network_Issue) {
+                result = QString(tr("Connection to camera was unexpectedly closed %1").arg(reasonText));
+            }
             break;
         case QnBusiness::NetworkIssueRtpPacketLoss:
             if (eventType == BusinessEventType::Network_Issue) {

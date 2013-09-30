@@ -51,6 +51,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
+    m_rtpReader.setRole(getRole());
 
     //==== init if needed
     QnResource::ConnectionRole role = getRole();
