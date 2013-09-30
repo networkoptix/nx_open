@@ -29,6 +29,12 @@ QString authKey()
     return qSettings.value("authKey").toString();
 }
 
+static bool useAlternativeGuid = false;
+void setUseAlternativeGuid(bool value)
+{
+    useAlternativeGuid = value;
+}
+
 QString serverGuid()
 {
     static QString guid;
@@ -36,7 +42,9 @@ QString serverGuid()
     if (!guid.isEmpty())
         return guid;
 
-    guid = qSettings.value("serverGuid").toString();
+    QString name = useAlternativeGuid ? lit("serverGuid2") : lit("serverGuid");
+
+    guid = qSettings.value(name).toString();
     if (guid.isEmpty())
     {
         if (!qSettings.isWritable())
@@ -45,7 +53,7 @@ QString serverGuid()
         }
 
         guid = QUuid::createUuid().toString();
-        qSettings.setValue("serverGuid", guid);
+        qSettings.setValue(name, guid);
     }
 #ifdef _TEST_TWO_SERVERS
     return guid + "test";
