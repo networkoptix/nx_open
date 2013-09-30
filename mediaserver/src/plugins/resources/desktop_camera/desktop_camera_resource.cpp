@@ -1,5 +1,6 @@
 #include "desktop_camera_resource.h"
 #include "desktop_camera_reader.h"
+#include "serverutil.h"
 
 const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
 
@@ -37,12 +38,12 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 
 QString QnDesktopCameraResource::gePhysicalIdPrefix() const
 {
-    return lit(ID_PREFIX);
+    return lit(ID_PREFIX) + serverGuid() + lit("_");
 }
 
 QString QnDesktopCameraResource::getUserName() const 
 { 
-    return getPhysicalId().mid(ID_PREFIX.size());
+    return getPhysicalId().mid(gePhysicalIdPrefix().size());
 }
 
 const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
