@@ -31,7 +31,7 @@ private:
     QGLWidget* m_mainWidget;
     QnDesktopDataProvider* m_desktopDataProvider;
     QMutex m_dpMutex;
-    QMap<QnMediaServerResourcePtr, QnDesktopCameraConnectionPtr> m_connectionPool;
+    QMap<QString, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
 
 #endif // QN_DESKTOP_RESOURCE_H

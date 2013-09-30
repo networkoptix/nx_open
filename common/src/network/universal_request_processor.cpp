@@ -10,6 +10,7 @@
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
+static const int MAX_AUTH_RETRY_COUNT = 3;
 
 QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 {
@@ -39,7 +40,7 @@ QnTCPConnectionProcessor(priv, socket)
 bool QnUniversalRequestProcessor::authenticate()
 {
     Q_D(QnUniversalRequestProcessor);
-
+    int retryCount = 0;
     if (d->needAuth &&  d->protocol.toLower() == "http")
     {
         QUrl url = getDecodedUrl();
@@ -56,6 +57,8 @@ bool QnUniversalRequestProcessor::authenticate()
         {
             d->responseBody = STATIC_UNAUTHORIZED_HTML;
             sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
+            if (++retryCount > MAX_AUTH_RETRY_COUNT)
+                return false;
             while (t.elapsed() < AUTH_TIMEOUT) 
             {
                 if (readRequest()) {
