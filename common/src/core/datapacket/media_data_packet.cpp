@@ -78,6 +78,9 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
         return true;
     if( m_ctx == NULL || other->m_ctx == NULL )
         return false;
+    if (m_ctx->width != other->m_ctx->width || m_ctx->height != other->m_ctx->height)
+        return false;
+    
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
 }
 
