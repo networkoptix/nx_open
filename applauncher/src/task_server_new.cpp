@@ -113,10 +113,6 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
         return;
     }
 
-#ifdef AK_DEBUG
-    if( task->type == applauncher::api::TaskType::startApplication )
-        ((applauncher::api::StartApplicationTask*)task)->version = "debug";
-#endif
     if( task->type == applauncher::api::TaskType::quit )
         m_terminated = true;
 
@@ -126,7 +122,7 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
         std::shared_ptr<applauncher::api::BaseTask>(task),
         &response );
 
-    const QByteArray& responseMsg = response != NULL ? "ok\n\n" : response->serialize();
+    const QByteArray& responseMsg = response == NULL ? "ok\n\n" : response->serialize();
     unsigned int bytesWritten = 0;
     clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
     clientConnection->flush();

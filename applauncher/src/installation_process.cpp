@@ -11,6 +11,7 @@
 #include <QtXml/QXmlInputSource>
 #include <QtXml/QXmlSimpleReader>
 
+#include <plugins/videodecoders/stree/streesaxhandler.h>
 #include <utils/common/log.h>
 
 #include "mirror_list_xml_parse_handler.h"
@@ -31,9 +32,10 @@ InstallationProcess::InstallationProcess(
     m_installationDirectory( installationDirectory ),
     m_state( State::init ),
     m_httpClient( nullptr ),
-    m_status( applauncher::api::InstallationStatus::init )
+    m_status( applauncher::api::InstallationStatus::init ),
+    m_totalBytesDownloaded( 0 ),
+    m_totalBytesToDownload( 0 )
 {
-    //TODO/IMPL
 }
 
 InstallationProcess::~InstallationProcess()
@@ -86,8 +88,15 @@ applauncher::api::InstallationStatus::Value InstallationProcess::getStatus() con
 float InstallationProcess::getProgress() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    //TODO/IMPL
-    return m_state == State::finished ? 100 : 0;
+
+    if( m_totalBytesToDownload == 0 )
+        return -1;   //unknown
+
+    int64_t totalBytesDownloaded = m_totalBytesDownloaded;
+    for( auto fileBytesPair: m_unfinishedFilesBytesDownloaded )
+        totalBytesDownloaded += fileBytesPair.second;
+    const float percentCompleted = (float)totalBytesDownloaded / m_totalBytesToDownload * 100.0;
+    return percentCompleted > 100.0 ? 100.0 : percentCompleted;
 }
 
 QString InstallationProcess::errorText() const
@@ -96,19 +105,34 @@ QString InstallationProcess::errorText() const
     return m_errorText;
 }
 
+void InstallationProcess::overrallDownloadSizeKnown( int64_t totalBytesToDownload )
+{
+    m_totalBytesToDownload = totalBytesToDownload;
+}
+
 void InstallationProcess::fileProgress(
     RDirSyncher* const syncher,
+    const QString& filePath,
     int64_t remoteFileSize,
     int64_t bytesDownloaded )
 {
-    //TODO/IMPL
+    //NOTE multiple files can be downloaded simultaneously
+    std::unique_lock<std::mutex> lk( m_mutex );
+    m_unfinishedFilesBytesDownloaded[filePath] = bytesDownloaded;
 }
 
 void InstallationProcess::fileDone(
     RDirSyncher* const syncher,
     const QString& filePath )
 {
-    //TODO/IMPL
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    auto it = m_unfinishedFilesBytesDownloaded.find( filePath );
+    if( it == m_unfinishedFilesBytesDownloaded.end() )
+        return;
+
+    m_totalBytesDownloaded += it->second;
+    m_unfinishedFilesBytesDownloaded.erase( it );
 }
 
 void InstallationProcess::finished(
@@ -116,7 +140,15 @@ void InstallationProcess::finished(
     bool result )
 {
     m_state = State::finished;
-    m_status = result ? applauncher::api::InstallationStatus::success : applauncher::api::InstallationStatus::failed;
+    if( result )
+    {
+        m_status = applauncher::api::InstallationStatus::success;
+        emit installationSucceeded();
+    }
+    else
+    {
+        m_status = applauncher::api::InstallationStatus::failed;
+    }
 }
 
 void InstallationProcess::failed(
@@ -166,13 +198,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClient* httpClient )
     //reading message body and parsing mirror list
     nx_http::BufferType msgBody = m_httpClient->fetchMessageBodyBuffer();
 
-    std::forward_list<QUrl> mirrorList;
-    MirrorListXmlParseHandler xmlHandler(
-        m_productName,
-        m_customization,
-        m_version,
-        m_module,
-        &mirrorList );
+    stree::SaxHandler xmlHandler( m_rns );
 
     QXmlSimpleReader reader;
     reader.setContentHandler( &xmlHandler );
@@ -189,6 +215,23 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClient* httpClient )
         m_state = State::finished;
         m_status = applauncher::api::InstallationStatus::failed;
         return;
+    }
+    m_currentTree.reset( xmlHandler.releaseTree() );
+
+    stree::ResourceContainer inputData;
+    inputData.put( ProductParameters::product, m_productName );
+    inputData.put( ProductParameters::customization, m_customization );
+    inputData.put( ProductParameters::module, m_module );
+    inputData.put( ProductParameters::version, m_version );
+    stree::ResourceContainer result;
+    m_currentTree->get( inputData, &result );
+
+    std::forward_list<QUrl> mirrorList;
+    {
+        QString urlStr;
+        for( result.goToBeginning(); result.next(); )
+            if( result.resID() == ProductParameters::mirrorUrl )
+                mirrorList.push_front( QUrl(result.value().toString()) );
     }
 
     if( mirrorList.empty() )

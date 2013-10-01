@@ -1,6 +1,8 @@
 #ifndef QN_LOGIN_DIALOG_H
 #define QN_LOGIN_DIALOG_H
 
+#include <memory>
+
 #include <QtWidgets/QDialog>
 
 #include <client/client_settings.h>
@@ -10,6 +12,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "connectinfo.h"
+#include "compatibility_version_installation_dialog.h"
 
 class QStandardItemModel;
 class QStandardItem;
@@ -96,6 +99,7 @@ private:
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
     QMultiHash<QString, QUrl> m_foundEcs;
+    std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
 
     bool m_restartPending;
     bool m_autoConnectPending;

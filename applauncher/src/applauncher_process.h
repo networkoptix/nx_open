@@ -11,6 +11,7 @@
 #include <memory>
 #include <mutex>
 
+#include <QObject>
 #include <QSettings>
 
 #include <utils/common/stoppable.h>
@@ -27,13 +28,16 @@
 
 class ApplauncherProcess
 :
+    public QObject,
     public QnStoppable,
     public AbstractRequestProcessor
 {
+    Q_OBJECT
+
 public:
     ApplauncherProcess(
         QSettings* const settings,
-        const InstallationManager& installationManager,
+        InstallationManager* const installationManager,
         bool quitMode );
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
@@ -48,7 +52,7 @@ public:
 
 private:
     bool m_terminated;
-    const InstallationManager& m_installationManager;
+    InstallationManager* const m_installationManager;
     const bool m_quitMode;
 #ifdef _WIN32
     TaskServerNew m_taskServer;
@@ -71,10 +75,16 @@ private:
         applauncher::api::Response* const response );
     bool startInstallation(
         const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
-        applauncher::api::InstallResponse* const response );
+        applauncher::api::StartInstallationResponse* const response );
     bool getInstallationStatus(
         const std::shared_ptr<applauncher::api::GetInstallationStatusRequest>& request,
         applauncher::api::InstallationStatusResponse* const response );
+    bool isVersionInstalled(
+        const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
+        applauncher::api::IsVersionInstalledResponse* const response );
+
+private slots:
+    void onInstallationSucceeded();
 };
 
 #endif  //APPLAUNCHER_PROCESS_H

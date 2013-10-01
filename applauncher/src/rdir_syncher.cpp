@@ -15,6 +15,10 @@ RDirSyncher::EventReceiver::~EventReceiver()
 {
 }
 
+void RDirSyncher::EventReceiver::overrallDownloadSizeKnown( int64_t /*totalBytesToDownload*/ )
+{
+}
+
 void RDirSyncher::EventReceiver::started( RDirSyncher* const /*syncher*/ )
 {
 }
@@ -27,6 +31,7 @@ void RDirSyncher::EventReceiver::fileStarted(
 
 void RDirSyncher::EventReceiver::fileProgress(
     RDirSyncher* const /*syncher*/,
+    const QString& /*filePath*/,
     int64_t /*remoteFileSize*/,
     int64_t /*bytesDownloaded*/ )
 {

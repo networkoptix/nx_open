@@ -23,6 +23,8 @@ namespace applauncher
                     return install;
                 else if( str == "getInstallationStatus" )
                     return getInstallationStatus;
+                else if( str == "isVersionInstalled" )
+                    return isVersionInstalled;
                 else
                     return invalidTaskType;
             }
@@ -39,6 +41,8 @@ namespace applauncher
                         return "install";
                     case getInstallationStatus:
                         return "getInstallationStatus";
+                    case isVersionInstalled:
+                        return "isVersionInstalled";
                     default:
                         return "unknown";
                 }
@@ -79,6 +83,10 @@ namespace applauncher
 
                 case TaskType::getInstallationStatus:
                     *ptr = new GetInstallationStatusRequest();
+                    break;
+
+                case TaskType::isVersionInstalled:
+                    *ptr = new IsVersionInstalledRequest();
                     break;
 
                 case TaskType::invalidTaskType:
@@ -198,6 +206,33 @@ namespace applauncher
         }
 
 
+
+        ////////////////////////////////////////////////////////////
+        //// class Response
+        ////////////////////////////////////////////////////////////
+        IsVersionInstalledRequest::IsVersionInstalledRequest()
+        :
+            BaseTask( TaskType::isVersionInstalled )
+        {
+        }
+
+        QByteArray IsVersionInstalledRequest::serialize() const
+        {
+            return QString::fromLatin1("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).toLatin1();
+        }
+        
+        bool IsVersionInstalledRequest::deserialize( const QnByteArrayConstRef& data )
+        {
+            const QList<QnByteArrayConstRef>& lines = data.split('\n');
+            if( lines.size() < 2 )
+                return false;
+            if( lines[0] != TaskType::toString(type) )
+                return false;
+            version = QLatin1String(lines[1].toByteArrayWithRawData());
+            return true;
+        }
+
+
         ////////////////////////////////////////////////////////////
         //// class Response
         ////////////////////////////////////////////////////////////
@@ -266,20 +301,20 @@ namespace applauncher
 
 
         ////////////////////////////////////////////////////////////
-        //// class InstallResponse
+        //// class StartInstallationResponse
         ////////////////////////////////////////////////////////////
-        InstallResponse::InstallResponse()
+        StartInstallationResponse::StartInstallationResponse()
         :
             installationID( 0 )
         {
         }
 
-        QByteArray InstallResponse::serialize() const
+        QByteArray StartInstallationResponse::serialize() const
         {
             return Response::serialize() + QByteArray::number(installationID) + "\n";
         }
 
-        bool InstallResponse::deserialize( const QnByteArrayConstRef& data )
+        bool StartInstallationResponse::deserialize( const QnByteArrayConstRef& data )
         {
             if( !Response::deserialize(data) )
                 return false;
@@ -379,7 +414,35 @@ namespace applauncher
                 return false;
             //line 0 - is a error code
             status = InstallationStatus::fromString(lines[1]);
-            progress = lines[1].toFloat();
+            progress = lines[2].toFloat();
+            return true;
+        }
+
+
+        ////////////////////////////////////////////////////////////
+        //// class IsVersionInstalledResponse
+        ////////////////////////////////////////////////////////////
+        IsVersionInstalledResponse::IsVersionInstalledResponse()
+        :
+            installed( false )
+        {
+        }
+
+        QByteArray IsVersionInstalledResponse::serialize() const
+        {
+            return Response::serialize() + QByteArray::number(installed ? 1 : 0) + "\n\n";
+        }
+        
+        bool IsVersionInstalledResponse::deserialize( const QnByteArrayConstRef& data )
+        {
+            if( !Response::deserialize(data) )
+                return false;
+
+            const QList<QnByteArrayConstRef>& lines = data.split('\n');
+            if( lines.size() < 2 )
+                return false;
+            //line 0 - is a error code
+            installed = lines[1].toUInt() > 0;
             return true;
         }
     }

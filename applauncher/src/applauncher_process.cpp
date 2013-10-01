@@ -5,8 +5,8 @@
 
 #include "applauncher_process.h"
 
-#include <QtCore/QProcess>
 #include <QtCore/QDir>
+#include <QtCore/QProcess>
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
@@ -16,7 +16,7 @@
 
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
-    const InstallationManager& installationManager,
+    InstallationManager* const installationManager,
     bool quitMode )
 :
     m_terminated( false ),
@@ -54,10 +54,10 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::install:
-            *response = new applauncher::api::InstallResponse();
+            *response = new applauncher::api::StartInstallationResponse();
             startInstallation(
                 std::static_pointer_cast<applauncher::api::StartInstallationTask>( request ),
-                static_cast<applauncher::api::InstallResponse*>(*response) );
+                static_cast<applauncher::api::StartInstallationResponse*>(*response) );
             break;
 
         case applauncher::api::TaskType::getInstallationStatus:
@@ -65,6 +65,13 @@ void ApplauncherProcess::processRequest(
             getInstallationStatus(
                 std::static_pointer_cast<applauncher::api::GetInstallationStatusRequest>( request ),
                 static_cast<applauncher::api::InstallationStatusResponse*>(*response) );
+            break;
+
+        case applauncher::api::TaskType::isVersionInstalled:
+            *response = new applauncher::api::IsVersionInstalledResponse();
+            isVersionInstalled(
+                std::static_pointer_cast<applauncher::api::IsVersionInstalledRequest>( request ),
+                static_cast<applauncher::api::IsVersionInstalledResponse*>(*response) );
             break;
 
         default:
@@ -149,9 +156,9 @@ bool ApplauncherProcess::getVersionToLaunch( QString* const versionToLaunch, QSt
         *versionToLaunch = m_settings->value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString();
         *appArgs = m_settings->value( "previousUsedCmdParams" ).toString();
     }
-    else if( m_installationManager.count() > 0 )
+    else if( m_installationManager->count() > 0 )
     {
-        *versionToLaunch = m_installationManager.getMostRecentVersion();
+        *versionToLaunch = m_installationManager->getMostRecentVersion();
         //leaving default cmd params
     }
     else
@@ -236,15 +243,19 @@ bool ApplauncherProcess::startApplication(
 {
     NX_LOG( QString::fromLatin1("Entered LaunchingApplication"), cl_logDEBUG1 );
 
+#ifdef AK_DEBUG
+    std::const_pointer_cast<applauncher::api::StartApplicationTask>(task)->version = "debug";
+#endif
+
     InstallationManager::AppData appData;
     for( ;; )
     {
-        if( m_installationManager.getInstalledVersionData( task->version, &appData ) )
+        if( m_installationManager->getInstalledVersionData( task->version, &appData ) )
             break;
 
-        if( m_installationManager.count() > 0 )
+        if( m_installationManager->count() > 0 )
         {
-            const QString& theMostRecentVersion = m_installationManager.getMostRecentVersion();
+            const QString& theMostRecentVersion = m_installationManager->getMostRecentVersion();
             if( task->version != theMostRecentVersion )
             {
                 task->version = theMostRecentVersion;
@@ -256,7 +267,7 @@ bool ApplauncherProcess::startApplication(
         return false;
     }
 
-    if( task->version != m_installationManager.getMostRecentVersion() )
+    if( task->version != m_installationManager->getMostRecentVersion() )
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
     //TODO/IMPL start process asynchronously ?
@@ -274,6 +285,7 @@ bool ApplauncherProcess::startApplication(
     }
     else
     {
+        //TODO/IMPL should mark version as not installed or corrupted?
         NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
         response->result = applauncher::api::ResultType::ioError;
         return false;
@@ -282,7 +294,7 @@ bool ApplauncherProcess::startApplication(
 
 bool ApplauncherProcess::startInstallation(
     const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
-    applauncher::api::InstallResponse* const response )
+    applauncher::api::StartInstallationResponse* const response )
 {
     if( !InstallationManager::isValidVersionName(task->version) )
     {
@@ -290,14 +302,14 @@ bool ApplauncherProcess::startInstallation(
         return true;
     }
 
-    if( m_installationManager.isVersionInstalled(task->version) )
+    if( m_installationManager->isVersionInstalled(task->version) )
     {
         response->result = applauncher::api::ResultType::alreadyInstalled;
         return true;
     }
 
     //detecting directory to download to 
-    const QString& targetDir = m_installationManager.getInstallDirForVersion(task->version);
+    const QString& targetDir = m_installationManager->getInstallDirForVersion(task->version);
     if( !QDir().mkpath(targetDir) )
     {
         response->result = applauncher::api::ResultType::ioError;
@@ -318,6 +330,8 @@ bool ApplauncherProcess::startInstallation(
 
     response->installationID = ++m_prevInstallationID;
     m_activeInstallations.insert( std::make_pair( response->installationID, installationProcess ) );
+
+    connect( installationProcess.get(), SIGNAL(installationSucceeded()), this, SLOT(onInstallationSucceeded()), Qt::DirectConnection );
 
     response->result = applauncher::api::ResultType::ok;
     return true;
@@ -341,4 +355,17 @@ bool ApplauncherProcess::getInstallationStatus(
         m_activeInstallations.erase( installationIter );
 
     return true;
+}
+
+bool ApplauncherProcess::isVersionInstalled(
+    const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
+    applauncher::api::IsVersionInstalledResponse* const response )
+{
+    response->installed = m_installationManager->isVersionInstalled(request->version);
+    return true;
+}
+
+void ApplauncherProcess::onInstallationSucceeded()
+{
+    m_installationManager->updateInstalledVersionsInformation();
 }

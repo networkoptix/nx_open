@@ -2,6 +2,7 @@
 // 13 mar 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
+#include <iomanip>
 #include <iostream>
 
 #include <QtSingleApplication>
@@ -65,8 +66,14 @@ int doInstallation(
     const QString& module,
     const QString& installationPath );
 
+int testHttpClient();
+
 int main( int argc, char* argv[] )
 {
+    return testHttpClient();
+
+
+
     QString logLevel = "WARN";
     QString logFilePath;
     bool quitMode = false;
@@ -135,7 +142,7 @@ int main( int argc, char* argv[] )
 
     ApplauncherProcess applauncherProcess(
         &settings,
-        installationManager,
+        &installationManager,
         quitMode );
     applauncherProcessInstance = &applauncherProcess;
 
@@ -229,7 +236,7 @@ int doInstallation(
     {
         static const unsigned int INSTALLATION_STATUS_CHECK_TIMEOUT_MS = 1000;
         QThread::msleep( INSTALLATION_STATUS_CHECK_TIMEOUT_MS );
-        //TODO/IMPL printing progress
+        std::cout<<"Current progress: "<<std::fixed<<std::setprecision(2)<<installationProcess.getProgress()<<"%"<<std::endl;
     }
 
     switch( installationProcess.getStatus() )
@@ -239,11 +246,52 @@ int doInstallation(
             break;
 
         case applauncher::api::InstallationStatus::failed:
-            std::cerr<<"FAILURE"<<installationProcess.errorText().toStdString()<<std::endl;
+            std::cerr<<"FAILURE. "<<installationProcess.errorText().toStdString()<<std::endl;
             break;
 
         default:
             assert( false );
+    }
+
+    return 0;
+}
+
+
+#include <fstream>
+
+#include <utils/network/http/httpclient.h>
+
+int testHttpClient()
+{
+    const char* SOURCE_URL = "http://10.0.2.222/hdw.tar";
+    const char* DEST_FILE = "c:\\tmp\\hdw.tar";
+
+    nx_http::HttpClient httpClient;
+    if( !httpClient.doGet( QUrl(SOURCE_URL) ) )
+    {
+        std::cerr<<"Failed to get "<<SOURCE_URL<<std::endl;
+        return 1;
+    }
+
+    if( (httpClient.response()->statusLine.statusCode / 200 * 200) != nx_http::StatusCode::ok )
+    {
+        std::cerr<<"Failed to get "<<SOURCE_URL<<". "<<httpClient.response()->statusLine.reasonPhrase.constData()<<std::endl;
+        return 1;
+    }
+
+    std::ofstream f;
+    f.open( DEST_FILE, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary );
+    if( !f.is_open() )
+    {
+        std::cerr<<"Failed to open "<<DEST_FILE<<std::endl;
+        return 1;
+    }
+
+    httpClient.startReadMessageBody();
+    while( !httpClient.eof() )
+    {
+        const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
+        f.write( buf.constData(), buf.size() );
     }
 
     return 0;

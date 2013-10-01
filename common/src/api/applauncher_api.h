@@ -23,6 +23,7 @@ namespace applauncher
                 quit,
                 install,
                 getInstallationStatus,
+                isVersionInstalled,
                 invalidTaskType
             };
 
@@ -73,7 +74,7 @@ namespace applauncher
             public BaseTask
         {
         public:
-            //!Version in format 1.4.3
+            //!Version in format 1.4
             QString version;
             //!Module name for install. By default, "client". For future use
             QString module;
@@ -98,6 +99,20 @@ namespace applauncher
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
 
+        class IsVersionInstalledRequest
+        :
+            public BaseTask
+        {
+        public:
+            //!Version in format 1.4
+            QString version;
+
+            IsVersionInstalledRequest();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
         namespace ResultType
         {
             enum Value
@@ -107,6 +122,7 @@ namespace applauncher
                 alreadyInstalled,
                 invalidVersionFormat,
                 notFound,
+                badResponse,
                 ioError,
                 otherError
             };
@@ -125,7 +141,7 @@ namespace applauncher
             virtual bool deserialize( const QnByteArrayConstRef& data );
         };
 
-        class InstallResponse
+        class StartInstallationResponse
         :
             public Response
         {
@@ -133,7 +149,7 @@ namespace applauncher
             //!Valid if \a result == \a ResultType::ok
             unsigned int installationID;
 
-            InstallResponse();
+            StartInstallationResponse();
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
@@ -158,8 +174,11 @@ namespace applauncher
             {
                 init,
                 inProgress,
+                //!installation is being cancelled (removing already installed files)
+                cancelInProgress,
                 success,
                 failed,
+                cancelled,
                 unknown
             };
 
@@ -177,6 +196,19 @@ namespace applauncher
             float progress;
 
             InstallationStatusResponse();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class IsVersionInstalledResponse
+        :
+            public Response
+        {
+        public:
+            bool installed;
+
+            IsVersionInstalledResponse();
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;

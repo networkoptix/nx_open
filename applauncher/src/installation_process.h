@@ -16,8 +16,11 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/joinable.h>
 #include <utils/network/http/asynchttpclient.h>
+#include <plugins/videodecoders/stree/node.h>
+#include <plugins/videodecoders/stree/resourcenameset.h>
 
 #include "rdir_syncher.h"
+#include "rns_product_parameters.h"
 
 
 class QSettings;
@@ -57,6 +60,9 @@ public:
 
     QString errorText() const;
 
+signals:
+    void installationSucceeded();
+
 private:
     enum class State
     {
@@ -66,6 +72,7 @@ private:
         finished
     };
 
+    const ProductResourcesNameset m_rns;
     const QString m_productName;
     const QString m_customization;
     const QString m_version;
@@ -77,10 +84,17 @@ private:
     std::unique_ptr<RDirSyncher> m_syncher;
     QString m_errorText;
     mutable std::mutex m_mutex;
+    std::unique_ptr<stree::AbstractNode> m_currentTree;
+    int64_t m_totalBytesDownloaded;
+    std::map<QString, int64_t> m_unfinishedFilesBytesDownloaded;
+    int64_t m_totalBytesToDownload;
 
+    //!Implementation of RDirSyncher::EventReceiver::overrallDownloadSizeKnown
+    virtual void overrallDownloadSizeKnown( int64_t totalBytesToDownload );
     //!Implementation of RDirSyncher::EventReceiver::fileProgress
     virtual void fileProgress(
         RDirSyncher* const syncher,
+        const QString& filePath,
         int64_t remoteFileSize,
         int64_t bytesDownloaded ) override;
     //!Implementation of RDirSyncher::EventReceiver::fileProgress

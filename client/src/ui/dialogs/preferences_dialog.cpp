@@ -174,7 +174,7 @@ void QnPreferencesDialog::accept() {
                     QMessageBox::Ok
         );
         if (button == QMessageBox::Ok) {
-            m_restartPending = restartClient();
+            m_restartPending = applauncher::restartClient() == applauncher::api::ResultType::ok;
             if (!m_restartPending) {
                 QMessageBox::critical(
                             this,

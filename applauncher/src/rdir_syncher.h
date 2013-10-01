@@ -78,6 +78,7 @@ public:
         //!Called just after downloading has been successfully started
         virtual void started( RDirSyncher* const syncher );
 
+        virtual void overrallDownloadSizeKnown( int64_t totalBytesToDownload );
         virtual void fileStarted(
             RDirSyncher* const syncher,
             const QString& filePath );
@@ -86,6 +87,7 @@ public:
         */
         virtual void fileProgress(
             RDirSyncher* const syncher,
+            const QString& filePath,
             int64_t remoteFileSize,
             int64_t bytesDownloaded );
         /*!
