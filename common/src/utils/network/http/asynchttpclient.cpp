@@ -32,14 +32,14 @@ namespace nx_http
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
 
-        AsyncHttpClient_instanceCount.ref();
+        //AsyncHttpClient_instanceCount.ref();
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
         terminate();
 
-        AsyncHttpClient_instanceCount.deref();
+        //AsyncHttpClient_instanceCount.deref();
     }
 
     void AsyncHttpClient::terminate()
@@ -471,6 +471,7 @@ namespace nx_http
             //closing connection is a valid HTTP way to signal message end
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
             //TODO/IMPL check if whole message body is received (if message body size is known)
+            m_httpStreamReader.flush();
             m_state = sDone;
             return 0;
         }
@@ -502,7 +503,8 @@ namespace nx_http
         if( useHttp11 )
         {
             m_request.headers["Accept"] = "*/*";
-            m_request.headers["Accept-Encoding"] = "identity";
+            m_request.headers["Accept-Encoding"] = "gzip;q=1.0, identity;q=0.5, *;q=0";
+            //m_request.headers["Accept-Encoding"] = "identity";
             m_request.headers["Host"] = m_url.host().toLatin1();
         }
         //adding user credentials

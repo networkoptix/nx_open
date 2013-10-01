@@ -11,6 +11,8 @@
 #include "httptypes.h"
 #include "linesplitter.h"
 
+#include "utils/media/abstract_byte_stream_filter.h"
+
 
 namespace nx_http
 {
@@ -59,6 +61,8 @@ namespace nx_http
         QString errorText() const;
         //!Makes reader ready to parse new message
         void resetState();
+        //!Flush all internal buffers (if any), so that all data is available through public API
+        void flush();
 
     private:
         enum ChunkStreamParseState
@@ -85,16 +89,40 @@ namespace nx_http
         size_t m_currentChunkSize;
         size_t m_currentChunkBytesRead;
         BufferType::value_type m_prevChar;
+        BufferType m_codedMessageBodyBuffer;
+        std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
 
         LineSplitter m_lineSplitter;
         mutable std::mutex m_mutex;
 
         bool parseLine( const ConstBufferRefType& data );
-        //!Determines, whether Message-Body is available and fills \a m_contentLength and \a m_isChunkedTransfer
-        bool isMessageBodyFollows();
-        size_t readChunkStream( const BufferType& data, size_t offset = 0, size_t count = BufferNpos );
-        size_t readIdentityStream( const BufferType& data, size_t offset = 0, size_t count = BufferNpos );
+        //!Reads message body parameters from message headers and initializes required data
+        /*!
+            Sets members \a m_contentLength, \a m_isChunkedTransfer, \a m_contentDecoder
+            \return true If message body could be read or no message body is delared in message. false if cannot read message body (e.g., unsupported content encoding)
+        */
+        bool prepareToReadMessageBody();
+        /*!
+            \return bytes copied to \a outBuf or -1 in case of error
+        */
+        size_t readMessageBody(
+            const BufferType& data,
+            size_t offset,
+            size_t count,
+            BufferType* const outBuf );
+        size_t readChunkStream(
+            const BufferType& data,
+            size_t offset,
+            size_t count,
+            BufferType* const outBuf );
+        size_t readIdentityStream(
+            const BufferType& data,
+            size_t offset,
+            size_t count,
+            BufferType* const outBuf );
         unsigned int hexCharToInt( BufferType::value_type ch );
+        //!Returns nullptr if \a encodingName is unknown
+        AbstractByteStreamConverter* createContentDecoder( const nx_http::StringType& encodingName );
     };
 }
 
