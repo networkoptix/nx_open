@@ -255,6 +255,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
+    connect(ui->rebuildButton,          SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+
+    connect(&m_timer,                   SIGNAL(timeout()),              this,   SLOT(at_timer()));
+    m_timer.start(2000);
 
     updateFromResources();
 }
@@ -367,7 +371,10 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     return result;
 }
 
-void QnServerSettingsDialog::updateFromResources() {
+void QnServerSettingsDialog::updateFromResources() 
+{
+    at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
@@ -512,6 +519,39 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
     if(action == m_removeAction) {
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
+    }
+}
+
+void QnServerSettingsDialog::at_rebuildButton_clicked()
+{
+    RebuildAction action;
+    if (m_lastRebuildReply.state() == QnRebuildArchiveReply::Started)
+        action = RebuildAction_Cancel;
+    else
+        action = RebuildAction_Start;
+    m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+}
+
+void QnServerSettingsDialog::at_timer()
+{
+    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+}
+
+void QnServerSettingsDialog::at_archiveRebuildReply(int, const QnRebuildArchiveReply& reply, int)
+{
+    m_lastRebuildReply = reply;
+    ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
+    bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
+    ui->rebuildLabel->setEnabled(inProgress);
+    ui->rebuildProgressBar->setEnabled(inProgress);
+    if (inProgress)
+    {
+        ui->rebuildProgressBar->setValue(reply.progress());
+        ui->rebuildButton->setText(tr("Cancel"));
+    }
+    else {
+        ui->rebuildProgressBar->setValue(0);
+        ui->rebuildButton->setText(tr("Start"));
     }
 }
 

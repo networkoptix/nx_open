@@ -51,22 +51,76 @@ QnStorageManager::QnStorageManager():
     m_storagesStatisticsReady(false),
     m_catalogLoaded(false),
     m_warnSended(false),
-    m_isWritableStorageAvail(false)
-
+    m_isWritableStorageAvail(false),
+    m_rebuildState(RebuildState_None),
+    m_rebuildProgress(0)
 {
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
 }
 
-void QnStorageManager::loadFullFileCatalog()
+void QnStorageManager::loadFullFileCatalog(bool isRebuild)
 {
-    loadFullFileCatalogInternal(QnResource::Role_LiveVideo);
-    loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo);
+    loadFullFileCatalogInternal(QnResource::Role_LiveVideo, isRebuild);
+    loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo, isRebuild);
     m_catalogLoaded = true;
 }
 
-void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role)
+double QnStorageManager::rebuildProgress() const
+{
+    return m_rebuildProgress;
+}
+
+void QnStorageManager::rebuildCatalogIndex()
+{
+    QMutexLocker lock(&m_mutexCatalog);
+    m_rebuildProgress = 0;
+    m_catalogLoaded = false;
+    m_devFileCatalogHi.clear();
+    m_devFileCatalogLow.clear();
+    DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
+    loadFullFileCatalog(true);
+}
+
+void QnStorageManager::rebuildCatalogAsync()
+{
+    if (m_rebuildState == RebuildState_None)
+        setRebuildState(QnStorageManager::RebuildState_WaitForRecordersStopped);
+}
+
+void QnStorageManager::cancelRebuildCatalogAsync()
+{
+    if (m_rebuildState != RebuildState_None) 
+    {
+        cl_log.log("Catalog rebuild operation is canceled", cl_logINFO);
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_None);
+        setRebuildState(RebuildState_None);
+    }
+}
+
+
+void QnStorageManager::setRebuildState(RebuildState state)
+{
+    m_rebuildState = state;
+    if( m_rebuildState == RebuildState_Started) {
+        rebuildCatalogIndex();
+        m_rebuildState = RebuildState_None;
+    }
+}
+
+QnStorageManager::RebuildState QnStorageManager::rebuildState() const
+{
+    return m_rebuildState;        
+}
+
+
+bool QnStorageManager::isCatalogLoaded() const
+{
+    return m_catalogLoaded;
+}
+
+void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role, bool rebuildMode)
 {
 #ifdef _TEST_TWO_SERVERS
     QDir dir(closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
@@ -76,7 +130,10 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list)
     {
-        getFileCatalog(fi.fileName(), role);
+        if (rebuildMode && m_rebuildState != RebuildState_Started)
+            return; // cancel rebuild
+        getFileCatalogInternal(fi.fileName(), role);
+        m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
     }
 }
 
@@ -621,10 +678,19 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, const QString& qualityPrefix)
 {
-    return getFileCatalog(mac, DeviceFileCatalog::roleForPrefix(qualityPrefix));
+    if (!m_catalogLoaded)
+        return DeviceFileCatalogPtr();
+    return getFileCatalogInternal(mac, DeviceFileCatalog::roleForPrefix(qualityPrefix));
 }
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnResource::ConnectionRole role)
+{
+    if (!m_catalogLoaded)
+        return DeviceFileCatalogPtr();
+    return getFileCatalogInternal(mac, role);
+}
+
+DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_mutexCatalog);
     bool hiQuality = role == QnResource::Role_LiveVideo;

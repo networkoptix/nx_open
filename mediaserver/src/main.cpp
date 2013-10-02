@@ -102,6 +102,7 @@
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
 #include "utils/network/ssl_socket.h"
 #include "network/authenticate_helper.h"
+#include "rest/handlers/rebuild_archive_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -464,6 +465,11 @@ int serverMain(int argc, char *argv[])
     commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
     commandLineParser.parse(argc, argv, stderr);
 
+    if (rebuildArchive.isEmpty()) {
+        rebuildArchive = qSettingsRunTime.value("rebuild").toString();
+    }
+    qSettingsRunTime.remove("rebuild");
+
     if( logLevel != QString::fromLatin1("none") )
     {
         const QString& logDir = qSettings.value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
@@ -595,7 +601,9 @@ void QnMain::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
+    QnStorageManager::instance()->cancelRebuildCatalogAsync();
     qnFileDeletor->pleaseStop();
+
 
     if (m_restServer)
         m_restServer->pleaseStop();
@@ -799,6 +807,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
+    QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRestRebuildArchiveHandler());
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
@@ -1219,7 +1228,7 @@ void QnMain::run()
     disconnect(eventManager);
 
     // This method will set flag on message channel to threat next connection close as normal
-    appServerConnection->disconnectSync();
+    //appServerConnection->disconnectSync();
     qSettingsRunTime.setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();

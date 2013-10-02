@@ -85,14 +85,15 @@ public:
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
     static void setRebuildArchive(RebuildMethod value);
+    static void cancelRebuildArchive();
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
     void rewriteCatalog();
-
     void doRebuildArchive();
+
     void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks);
     void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
