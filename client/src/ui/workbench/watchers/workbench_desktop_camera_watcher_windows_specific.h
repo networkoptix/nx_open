@@ -27,6 +27,7 @@ private slots:
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+    void at_recordingSettingsChanged();
 private:
     void processServer(QnMediaServerResourcePtr server);
 private:

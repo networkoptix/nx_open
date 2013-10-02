@@ -40,10 +40,12 @@ public:
 
     QnAudioDeviceInfo primaryAudioDevice() const;
 
+    QString primaryAudioDeviceName() const;
     void setPrimaryAudioDeviceByName(const QString &name);
 
     QnAudioDeviceInfo secondaryAudioDevice() const;
 
+    QString secondaryAudioDeviceName() const;
     void setSecondaryAudioDeviceByName(const QString &name);
 
     bool captureCursor() const;

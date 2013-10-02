@@ -34,6 +34,7 @@
 #include <ui/workbench/workbench_auto_starter.h>
 
 #include "custom_file_dialog.h"
+#include "ui/workbench/watchers/workbench_desktop_camera_watcher_windows_specific.h"
 
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
@@ -59,6 +60,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
+#ifdef Q_OS_WIN32
+        connect(m_recordingSettingsWidget,  SIGNAL(recordingSettingsChanged()), context->instance<QnWorkbenchDesktopCameraWatcher>(), SLOT(at_recordingSettingsChanged()));
+#endif
     }
 
     if(!context->instance<QnWorkbenchAutoStarter>()->isSupported()) {
