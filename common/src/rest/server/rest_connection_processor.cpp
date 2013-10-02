@@ -135,12 +135,6 @@ void QnRestConnectionProcessor::run()
         for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
         {
             QString str = itr.key();
-            d->responseBody.append("<TR><TD>");
-            d->responseBody.append(str.toLatin1());
-            d->responseBody.append("<TD>");
-            d->responseBody.append(itr.value()->description());
-            d->responseBody.append("</TD>");
-            d->responseBody.append("</TD></TR>\n");
             if (str.startsWith(QLatin1String("api/")))
             {
                 d->responseBody.append("<TR><TD>");
