@@ -97,15 +97,52 @@ void QnRecordingSettingsWidget::updateFromSettings() {
     ui->recordingFolderLabel->setText(m_settings->recordingFolder());
 }
 
-void QnRecordingSettingsWidget::submitToSettings() {
-    m_settings->setCaptureMode(captureMode());
-    m_settings->setDecoderQuality(decoderQuality());
-    m_settings->setResolution(resolution());
-    m_settings->setScreen(screen());
-    m_settings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
-    m_settings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
-    m_settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
-    m_settings->setRecordingFolder(ui->recordingFolderLabel->text());
+void QnRecordingSettingsWidget::submitToSettings() 
+{
+    bool isChanged = false;
+    
+    if (m_settings->captureMode() != captureMode()) {
+        m_settings->setCaptureMode(captureMode());
+        isChanged = true;
+    }
+
+    if (m_settings->decoderQuality() != decoderQuality()) {
+        m_settings->setDecoderQuality(decoderQuality());
+        isChanged = true;
+    }
+
+    if (m_settings->resolution() != resolution()) {
+        m_settings->setResolution(resolution());
+        isChanged = true;
+    }
+
+    if (m_settings->screen() != screen()) {
+        m_settings->setScreen(screen());
+        isChanged = true;
+    }
+
+    if (m_settings->primaryAudioDeviceName() != primaryAudioDeviceName()) {
+        m_settings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
+        isChanged = true;
+    }
+
+    if (m_settings->secondaryAudioDeviceName() != secondaryAudioDeviceName()) {
+        m_settings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
+        isChanged = true;
+    }
+
+    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked()) {
+        m_settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
+        isChanged = true;
+    }
+
+    if (m_settings->recordingFolder() != ui->recordingFolderLabel->text()) {
+        m_settings->setRecordingFolder(ui->recordingFolderLabel->text());
+        isChanged = true;
+    }
+
+    if (isChanged)
+        emit recordingSettingsChanged();
 }
 
 Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const

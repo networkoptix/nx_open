@@ -108,3 +108,14 @@ void QnWorkbenchDesktopCameraWatcher::processServer(QnMediaServerResourcePtr ser
     }
 }
 
+void QnWorkbenchDesktopCameraWatcher::at_recordingSettingsChanged()
+{
+    QnDesktopResourcePtr desktop = qnResPool->getResourceByGuid(QnDesktopResource().getGuid()).dynamicCast<QnDesktopResource>();
+    if (!desktop)
+        return;
+
+    foreach (QnMediaServerResourcePtr mserver, m_serverList)
+        desktop->removeConnection(mserver);
+    foreach (QnMediaServerResourcePtr mserver, m_serverList)
+        desktop->addConnection(mserver);
+}

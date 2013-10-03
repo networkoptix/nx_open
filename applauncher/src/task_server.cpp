@@ -13,11 +13,24 @@
 
 #include <utils/common/log.h>
 
+#include "abstract_request_processor.h"
 
-TaskServer::TaskServer( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
+
+TaskServer::TaskServer( AbstractRequestProcessor* const requestProcessor )
 :
-    m_taskQueue( taskQueue )
+    m_requestProcessor( requestProcessor )
 {
+}
+
+void TaskServer::pleaseStop()
+{
+    disconnect( &m_server, SIGNAL(newConnection()), this, SLOT(onNewConnection()) );
+}
+
+void TaskServer::wait()
+{
+    //TODO/IMPL waiting for running TaskServer::onNewConnection() returns
+    m_server.close();
 }
 
 bool TaskServer::listen( const QString& pipeName )
@@ -62,8 +75,6 @@ void TaskServer::onNewConnection()
         return;
     }
     QByteArray data = conn->readAll();
-    conn->write( QByteArray("ok") );
-    conn->flush();
 
     applauncher::api::BaseTask* task = NULL;
     if( !applauncher::api::deserializeTask( data, &task ) )
@@ -77,5 +88,13 @@ void TaskServer::onNewConnection()
         ((applauncher::api::StartApplicationTask*)task)->version = "debug";
 #endif
 
-    m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
+    //m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
+    applauncher::api::Response* response = NULL;
+    m_requestProcessor->processRequest(
+        std::shared_ptr<applauncher::api::BaseTask>(task),
+        &response );
+
+    const QByteArray& responseMsg = response != NULL ? "ok\n\n" : response->serialize();
+    conn->write( responseMsg );
+    conn->flush();
 }

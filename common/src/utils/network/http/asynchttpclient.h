@@ -32,6 +32,7 @@ namespace nx_http
         \note It is strongly recommended to call terminate before scheduleForRemoval!
         \todo pipelining support
         \todo keep-alive connection support
+        \todo entity-body compression support
     */
     class AsyncHttpClient
     :
@@ -62,6 +63,8 @@ namespace nx_http
         virtual void terminate();
 
         State state() const;
+        //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
+        bool failed() const;
         //!Start request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
@@ -79,9 +82,9 @@ namespace nx_http
             \return false if failed to start reading message body
         */
         bool startReadMessageBody();
-        //!Returns current mesasge body buffer, clearing it
+        //!Returns current message body buffer, clearing it
         /*!
-            \note This method can be called only from slot directly connected to \a someMessageBodyAvailable()
+            \note This method is thread-safe and can be called in any thread
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
@@ -102,6 +105,7 @@ namespace nx_http
             Emmitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
+            \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
         */
         void done( nx_http::AsyncHttpClient* );
         //!Connection to server has been restored after a sudden disconnect

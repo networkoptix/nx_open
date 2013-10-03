@@ -42,7 +42,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 #ifdef Q_OS_WIN
-    m_desktopCameraWatcher = instance<QnWorkbenchDesktopCameraWatcher>();
+    instance<QnWorkbenchDesktopCameraWatcher>();
 #endif
 
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));

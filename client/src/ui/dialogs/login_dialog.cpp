@@ -38,6 +38,7 @@
 #include "connection_testing_dialog.h"
 
 #include "connectinfo.h"
+#include "compatibility_version_installation_dialog.h"
 #include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
@@ -366,44 +367,75 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         }
 
         if(m_restartPending) {
-            if(canRestart(connectInfo->version)) {
-                int button = QnMessageBox::warning(
-                    this,
-                    Qn::VersionMismatch_Help,
-                    tr("Could not connect to Enterprise Controller"),
-                    tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                        " - Client version: %1.\n"
-                        " - EC version: %2.\n"
-                        "Would you like to restart client in compatibility mode?"
-                    ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
-                    QMessageBox::Ok, 
-                    QMessageBox::Cancel
-                );
-                if(button == QMessageBox::Ok) {
-                    if (!restartClient(connectInfo->version, currentUrl().toEncoded())) {
-                        QMessageBox::critical(
-                                    this,
-                                    tr("Launcher process is not found"),
-                                    tr("Cannot restart the client in compatibility mode.\n"
-                                       "Please close the application and start it again using the shortcut in the start menu.")
-                                    );
-                    }
-                } else {
+            for( ;; )
+            {
+                bool isInstalled = false;
+                if( applauncher::isVersionInstalled(connectInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
+                {
+                    QnMessageBox::warning(
+                        this,
+                        Qn::VersionMismatch_Help,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                            " - Client version: %1.\n"
+                            " - EC version: %2.\n"
+                            "Unable to connect to applauncher to enable client compatibility mode"
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
+                        QMessageBox::Ok
+                    );
                     m_restartPending = false;
                 }
-            } else {
-                m_restartPending = false;
-                QnMessageBox::warning(
-                    this,
-                    Qn::VersionMismatch_Help,
-                    tr("Could not connect to Enterprise Controller"),
-                    tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                        " - Client version: %1.\n"
-                        " - EC version: %2.\n"
-                        "Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system."
-                    ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
-                    QMessageBox::Ok
-                );
+                else if(isInstalled) {
+                    int button = QnMessageBox::warning(
+                        this,
+                        Qn::VersionMismatch_Help,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                            " - Client version: %1.\n"
+                            " - EC version: %2.\n"
+                            "Would you like to restart client in compatibility mode?"
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
+                        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
+                        QMessageBox::Cancel
+                    );
+                    if(button == QMessageBox::Ok) {
+                        if (applauncher::restartClient(connectInfo->version, currentUrl().toEncoded()) != applauncher::api::ResultType::ok) {
+                            QMessageBox::critical(
+                                        this,
+                                        tr("Launcher process is not found"),
+                                        tr("Cannot restart the client in compatibility mode.\n"
+                                           "Please close the application and start it again using the shortcut in the start menu.")
+                                        );
+                        }
+                    } else {
+                        m_restartPending = false;
+                    }
+                } else {    //not installed
+                    int selectedButton = QnMessageBox::warning(
+                        this,
+                        Qn::VersionMismatch_Help,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                            " - Client version: %1.\n"
+                            " - EC version: %2.\n"
+                            "Client Version %3 is required to connect to this Enterprise Controller.\n"
+                            "Download version %3?"
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()).arg(connectInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+                        QMessageBox::Cancel
+                    );
+                    if( selectedButton == QMessageBox::Ok ) {
+                        //starting installation
+                        if( !m_installationDialog.get() )
+                            m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
+                        m_installationDialog->setVersionToInstall( connectInfo->version );
+                        m_installationDialog->exec();
+                        if( m_installationDialog->installationSucceeded() )
+                            continue;   //offering to start newly-installed compatibility version
+                    }
+                    m_restartPending = false;
+                }
+                break;
             }
         }
         

@@ -3,12 +3,14 @@
 
 
 #include <QtWidgets/QDialog>
+#include <QTimer>
 
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "button_box_dialog.h"
+#include "api/model/rebuild_archive_reply.h"
 
 class QLabel;
 
@@ -50,9 +52,12 @@ private slots:
     void at_storagesTable_cellChanged(int row, int column);
     void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
     void at_pingButton_clicked();
+    void at_rebuildButton_clicked();
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
-
+    void at_archiveRebuildReply(int, const QnRebuildArchiveReply& reply, int);
+    void sendNextArchiveRequest();
+    void at_updateRebuildInfo();
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
@@ -61,6 +66,8 @@ private:
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
+    QnRebuildArchiveReply m_lastRebuildReply;
+    QTimer m_timer;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H
