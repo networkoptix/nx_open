@@ -78,7 +78,7 @@ public:
     {
         pollSetImpl = right.pollSetImpl;
         currentIndex = right.currentIndex;
-		return *this;
+        return *this;
     }
 };
 

@@ -36,8 +36,11 @@ public:
     size_type size() const;
     QnByteArrayConstRef mid( size_type offset, size_type count = npos ) const;
     bool isEmpty() const;
+    int indexOf(char sep) const;
     bool startsWith( const_pointer str, size_type len = npos ) const;
     uint toUInt() const;
+    float toFloat() const;
+    QList<QnByteArrayConstRef> split( char sep ) const;
 
     const value_type& operator[]( size_type index ) const;
     //!Constructs new \a QByteArray object by calling \a QByteArray::mid

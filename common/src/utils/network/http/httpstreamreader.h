@@ -6,8 +6,12 @@
 #ifndef HTTPSTREAMREADER_H
 #define HTTPSTREAMREADER_H
 
+#include <mutex>
+
 #include "httptypes.h"
 #include "linesplitter.h"
+
+#include "utils/media/abstract_byte_stream_filter.h"
 
 
 namespace nx_http
@@ -16,7 +20,7 @@ namespace nx_http
     /*!
         Can handle multiple subsequent messages
         \note Supports chunked stream
-        \note Class methods are not thread-safe
+        \note Thread safety: only message body buffer - related functionality is thread-safe (required by \a AsyncHttpClient class). All other methods are NOT thread-safe
         \note Assumes that any message is followed by message body
         \note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes 
             infinite content-length (even when identity encoding is used)
@@ -57,6 +61,8 @@ namespace nx_http
         QString errorText() const;
         //!Makes reader ready to parse new message
         void resetState();
+        //!Flush all internal buffers (if any), so that all data is available through public API
+        void flush();
 
     private:
         enum ChunkStreamParseState
@@ -64,11 +70,11 @@ namespace nx_http
             waitingChunkStart,
             readingChunkSize,
             readingChunkExtension,
-            skippingCRLFBeforeChunkData,
+            skippingCRLF,
             readingChunkData,
-            skippingCRLFAfterChunkData,
             readingTrailer,
-            reachedChunkStreamEnd
+            reachedChunkStreamEnd,
+            undefined
         };
 
         ReadState m_state;
@@ -80,18 +86,42 @@ namespace nx_http
 
         //!HTTP/1.1 chunk stream parsing
         ChunkStreamParseState m_chunkStreamParseState;
+        ChunkStreamParseState m_nextState;
         size_t m_currentChunkSize;
         size_t m_currentChunkBytesRead;
         BufferType::value_type m_prevChar;
+        BufferType m_codedMessageBodyBuffer;
+        std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
+        int m_lineEndingOffset;
 
         LineSplitter m_lineSplitter;
+        mutable std::mutex m_mutex;
 
         bool parseLine( const ConstBufferRefType& data );
-        //!Determines, whether Message-Body is available and fills \a m_contentLength and \a m_isChunkedTransfer
-        bool isMessageBodyFollows();
-        size_t readChunkStream( const BufferType& data, size_t offset = 0, size_t count = BufferNpos );
-        size_t readIdentityStream( const BufferType& data, size_t offset = 0, size_t count = BufferNpos );
+        //!Reads message body parameters from message headers and initializes required data
+        /*!
+            Sets members \a m_contentLength, \a m_isChunkedTransfer, \a m_contentDecoder
+            \return true If message body could be read or no message body is delared in message. false if cannot read message body (e.g., unsupported content encoding)
+        */
+        bool prepareToReadMessageBody();
+        /*!
+            \return bytes read from \a data or -1 in case of error
+        */
+        template<class Func>
+        size_t readMessageBody(
+            const QnByteArrayConstRef& data,
+            Func func );
+        template<class Func>
+        size_t readChunkStream(
+            const QnByteArrayConstRef& data,
+            Func func );
+        template<class Func>
+        size_t readIdentityStream(
+            const QnByteArrayConstRef& data,
+            Func func );
         unsigned int hexCharToInt( BufferType::value_type ch );
+        //!Returns nullptr if \a encodingName is unknown
+        AbstractByteStreamConverter* createContentDecoder( const nx_http::StringType& encodingName );
     };
 }
 
