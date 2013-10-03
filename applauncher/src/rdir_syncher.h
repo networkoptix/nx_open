@@ -52,13 +52,14 @@ class RSyncEventTrigger;
     \note Can download multiple files simultaneously
     \note At the moment every file is downloaded by single connection
     \note Error in downloading any file result in synchronization interrupt
+    \note \a RDirSyncher instance MUST be used by std::shared_ptr
 */
 class RDirSyncher
 :
     public QnStoppable,
-    public detail::AbstractRDirSynchronizationEventHandler
+    public detail::AbstractRDirSynchronizationEventHandler,
+    public std::enable_shared_from_this<RDirSyncher>
 {
-
 public:
     enum State
     {
@@ -76,17 +77,20 @@ public:
         virtual ~EventReceiver();
 
         //!Called just after downloading has been successfully started
-        virtual void started( RDirSyncher* const syncher );
+        virtual void started( const std::shared_ptr<RDirSyncher>& syncher );
 
-        virtual void overrallDownloadSizeKnown( int64_t totalBytesToDownload );
+        virtual void overrallDownloadSizeKnown(
+            const std::shared_ptr<RDirSyncher>& syncher,
+            int64_t totalBytesToDownload );
         virtual void fileStarted(
-            RDirSyncher* const syncher,
+            const std::shared_ptr<RDirSyncher>& syncher,
             const QString& filePath );
         /*!
             File download progress is not reported by default, but needs to be enabled by \a RDirSyncher::setFileProgressNotificationStep
+            \param remoteFileSize -1 if file size if unknown (not reported by http server)
         */
         virtual void fileProgress(
-            RDirSyncher* const syncher,
+            const std::shared_ptr<RDirSyncher>& syncher,
             const QString& filePath,
             int64_t remoteFileSize,
             int64_t bytesDownloaded );
@@ -94,19 +98,19 @@ public:
             \param filePath Path relative to \a baseUrl
         */
         virtual void fileDone(
-            RDirSyncher* const syncher,
+            const std::shared_ptr<RDirSyncher>& syncher,
             const QString& filePath );
         /*!
             \param result \a true, if synchronization succeeded, \a false otherwise
         */
         virtual void finished(
-            RDirSyncher* const syncher,
+            const std::shared_ptr<RDirSyncher>& syncher,
             bool result );
         /*!
             \param failedFilePath path relative to \a baseUrl
         */
         virtual void failed(
-            RDirSyncher* const syncher,
+            const std::shared_ptr<RDirSyncher>& syncher,
             const QString& failedFilePath,
             const QString& errorText );
     };
@@ -142,6 +146,11 @@ public:
     //!Returns description of last error
     QString lastErrorText() const;
 
+    //!Implementation of AbstractRDirSynchronizationEventHandler::downloadProgress
+    virtual void downloadProgress(
+        const std::shared_ptr<detail::RDirSynchronizationOperation>& operation,
+        int64_t remoteFileSize,
+        int64_t bytesDownloaded ) override;
     //!Implementation of AbstractRDirSynchronizationEventHandler::operationDone
     virtual void operationDone( const std::shared_ptr<detail::RDirSynchronizationOperation>& operation ) override;
 

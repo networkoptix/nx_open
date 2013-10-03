@@ -74,6 +74,13 @@ void ApplauncherProcess::processRequest(
                 static_cast<applauncher::api::IsVersionInstalledResponse*>(*response) );
             break;
 
+        case applauncher::api::TaskType::cancelInstallation:
+            *response = new applauncher::api::CancelInstallationResponse();
+            cancelInstallation(
+                std::static_pointer_cast<applauncher::api::CancelInstallationRequest>( request ),
+                static_cast<applauncher::api::CancelInstallationResponse*>(*response) );
+            break;
+
         default:
             break;
     }
@@ -362,6 +369,15 @@ bool ApplauncherProcess::isVersionInstalled(
     applauncher::api::IsVersionInstalledResponse* const response )
 {
     response->installed = m_installationManager->isVersionInstalled(request->version);
+    return true;
+}
+
+bool ApplauncherProcess::cancelInstallation(
+    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
+    applauncher::api::CancelInstallationResponse* const response )
+{
+    //TODO/IMPL cancelling by id request->installationID
+    response->result = applauncher::api::ResultType::otherError;
     return true;
 }
 

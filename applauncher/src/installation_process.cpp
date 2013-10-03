@@ -105,15 +105,17 @@ QString InstallationProcess::errorText() const
     return m_errorText;
 }
 
-void InstallationProcess::overrallDownloadSizeKnown( int64_t totalBytesToDownload )
+void InstallationProcess::overrallDownloadSizeKnown(
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    int64_t totalBytesToDownload )
 {
     m_totalBytesToDownload = totalBytesToDownload;
 }
 
 void InstallationProcess::fileProgress(
-    RDirSyncher* const syncher,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     const QString& filePath,
-    int64_t remoteFileSize,
+    int64_t /*remoteFileSize*/,
     int64_t bytesDownloaded )
 {
     //NOTE multiple files can be downloaded simultaneously
@@ -122,7 +124,7 @@ void InstallationProcess::fileProgress(
 }
 
 void InstallationProcess::fileDone(
-    RDirSyncher* const syncher,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     const QString& filePath )
 {
     std::unique_lock<std::mutex> lk( m_mutex );
@@ -136,7 +138,7 @@ void InstallationProcess::fileDone(
 }
 
 void InstallationProcess::finished(
-    RDirSyncher* const syncher,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     bool result )
 {
     m_state = State::finished;
@@ -152,7 +154,7 @@ void InstallationProcess::finished(
 }
 
 void InstallationProcess::failed(
-    RDirSyncher* const syncher,
+    const std::shared_ptr<RDirSyncher>& syncher,
     const QString& failedFilePath,
     const QString& errorText )
 {

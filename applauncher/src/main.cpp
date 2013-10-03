@@ -70,7 +70,7 @@ int testHttpClient();
 
 int main( int argc, char* argv[] )
 {
-    return testHttpClient();
+    //return testHttpClient();
 
 
 
@@ -263,8 +263,8 @@ int doInstallation(
 
 int testHttpClient()
 {
-    const char* SOURCE_URL = "http://10.0.2.222/hdw.tar";
-    const char* DEST_FILE = "c:\\tmp\\hdw.tar";
+    const char* SOURCE_URL = "http://10.0.2.222/client-2.0/mediaserver";
+    const char* DEST_FILE = "c:\\tmp\\mediaserver";
 
     nx_http::HttpClient httpClient;
     if( !httpClient.doGet( QUrl(SOURCE_URL) ) )
@@ -293,6 +293,7 @@ int testHttpClient()
         const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
         f.write( buf.constData(), buf.size() );
     }
+    f.close();
 
     return 0;
 }

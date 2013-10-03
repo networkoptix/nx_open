@@ -76,13 +76,13 @@ bool QnByteArrayConstRef::startsWith( const_pointer str, size_type len ) const
 uint QnByteArrayConstRef::toUInt() const
 {
     //TODO/IMPL effective implementation
-    return ((QByteArray)*this).toUInt();
+    return toByteArrayWithRawData().toUInt();
 }
 
 float QnByteArrayConstRef::toFloat() const
 {
     //TODO/IMPL effective implementation
-    return ((QByteArray)*this).toFloat();
+    return toByteArrayWithRawData().toFloat();
 }
 
 QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const

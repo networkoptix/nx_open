@@ -24,6 +24,7 @@ namespace applauncher
                 install,
                 getInstallationStatus,
                 isVersionInstalled,
+                cancelInstallation,
                 invalidTaskType
             };
 
@@ -213,6 +214,21 @@ namespace applauncher
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
+
+        class CancelInstallationRequest
+        :
+            public BaseTask
+        {
+        public:
+            unsigned int installationID;
+
+            CancelInstallationRequest();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class CancelInstallationResponse : public Response {};
     }
 }
 

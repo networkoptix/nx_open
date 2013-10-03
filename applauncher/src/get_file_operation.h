@@ -79,6 +79,8 @@ namespace detail
         std::shared_ptr<QnFile> m_outFile;
         int m_fileWritePending;
         mutable std::mutex m_mutex;
+        uint64_t m_totalBytesDownloaded;
+        uint64_t m_totalBytesWritten;
 
         //!Implementation of QnFile::AbstractWriteHandler::onAsyncWriteFinished
         virtual void onAsyncWriteFinished(

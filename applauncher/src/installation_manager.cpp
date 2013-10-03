@@ -36,7 +36,7 @@ InstallationManager::InstallationManager( QObject* const parent )
     m_defaultDirectoryForNewInstallations = QStandardPaths::writableLocation( QStandardPaths::HomeLocation );
     if( !m_defaultDirectoryForNewInstallations.isEmpty() )
     {
-        m_defaultDirectoryForNewInstallations += QString::fromLatin1("/AppData/Local/%1/%2/compatibility/").arg(QN_ORGANIZATION_NAME).arg(QN_CUSTOMIZATION_NAME);
+        m_defaultDirectoryForNewInstallations += QString::fromLatin1("/AppData/Local/%1/compatibility/%2/").arg(QN_ORGANIZATION_NAME).arg(QN_CUSTOMIZATION_NAME);
         m_rootInstallDirectoryList.push_back( m_defaultDirectoryForNewInstallations );
     }
 
@@ -83,7 +83,23 @@ QString InstallationManager::getMostRecentVersion() const
 bool InstallationManager::isVersionInstalled( const QString& version ) const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    return m_installedProductsByVersion.find(version) != m_installedProductsByVersion.end();
+
+    auto iter = m_installedProductsByVersion.find(version);
+    if( iter == m_installedProductsByVersion.end() )
+        return false;
+
+    const QString installationDirectory = iter->second.installationDirectory;
+
+    lk.unlock();
+
+    //checking that directory exists
+    if( !QDir(installationDirectory).exists() )
+    {
+        m_installedProductsByVersion.erase( version );
+        return false;
+    }
+
+    return true;
 }
 
 bool InstallationManager::getInstalledVersionData(

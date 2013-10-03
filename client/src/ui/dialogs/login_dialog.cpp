@@ -411,7 +411,6 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         m_restartPending = false;
                     }
                 } else {    //not installed
-                    m_restartPending = false;
                     int selectedButton = QnMessageBox::warning(
                         this,
                         Qn::VersionMismatch_Help,
@@ -434,9 +433,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         if( m_installationDialog->installationSucceeded() )
                             continue;   //offering to start newly-installed compatibility version
                     }
-                    else {
-                        m_restartPending = false;
-                    }
+                    m_restartPending = false;
                 }
                 break;
             }

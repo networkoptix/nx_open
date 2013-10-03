@@ -27,6 +27,13 @@ namespace detail
     public:
         virtual ~AbstractRDirSynchronizationEventHandler() {}
 
+        /*!
+            \param remoteFileSize -1 if file size if unknown (not reported by http server)
+        */
+        virtual void downloadProgress(
+            const std::shared_ptr<RDirSynchronizationOperation>& /*operation*/,
+            int64_t /*remoteFileSize*/,
+            int64_t /*bytesDownloaded*/ ) {};
         //!Called in some unknown aio thread
         /*!
             \note MUST NOT block!

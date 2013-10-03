@@ -114,7 +114,12 @@ namespace applauncher
 
     api::ResultType::Value cancelInstallation( unsigned int installationID )
     {
-        //TODO/IMPL
-        return api::ResultType::otherError;
+        api::CancelInstallationRequest request;
+        request.installationID = installationID;
+        api::CancelInstallationResponse response;
+        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        if( result != api::ResultType::ok )
+            return result;
+        return response.result;
     }
 }

@@ -6,11 +6,14 @@
 #ifndef COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
 #define COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
 
+#include <mutex>
+
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QWidget>
 
 #include <utils/common/software_version.h>
+#include <utils/common/stoppable.h>
 #include <utils/common/timermanager.h>
 #include <api/applauncher_api.h>
 
@@ -22,7 +25,8 @@ namespace Ui {
 class CompatibilityVersionInstallationDialog
 :
     public QDialog,
-    public TimerEventHandler
+    public TimerEventHandler,
+    public QnStoppable
 {
     Q_OBJECT
 
@@ -32,6 +36,8 @@ public:
 
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop() override;
 
     void setVersionToInstall( const QnSoftwareVersion& version );
 
@@ -61,11 +67,14 @@ private:
     unsigned int m_installationID;
     State m_state;
     quint64 m_timerID;
+    mutable std::mutex m_mutex;
+    bool m_terminated;
 
     void launchInstallation();
 
 private slots:
     void onInstallationFailed( int resultInt );
+    void onCancelFailed( int resultInt );
     void onInstallationSucceeded();
     void updateInstallationProgress( float progress );
     void onCancelDone();

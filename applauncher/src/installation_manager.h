@@ -67,7 +67,7 @@ public:
 private:
     QString m_errorString;
     //!map<version, AppData>. Most recent version first
-    std::map<QString, AppData, std::greater<QString> > m_installedProductsByVersion;
+    mutable std::map<QString, AppData, std::greater<QString> > m_installedProductsByVersion;
     std::list<QString> m_rootInstallDirectoryList;
     //QString m_rootInstallDirectory;
     QString m_defaultDirectoryForNewInstallations;

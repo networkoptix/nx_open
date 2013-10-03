@@ -17,20 +17,31 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog( 
     ui( new Ui::CompatibilityVersionInstallationDialog() ),
     m_installationID( 0 ),
     m_state( State::init ),
-    m_timerID( 0 )
+    m_timerID( 0 ),
+    m_terminated( false )
 {
     ui->setupUi(this);
 }
 
 CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog()
 {
+    pleaseStop();
+    //after calling pleaseStop we can be sure that no new timer can be added
+    if( m_timerID )
+        TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 }
 
 static const int INSTALLATION_STATUS_CHECK_PERIOD_MS = 500;
 
 void CompatibilityVersionInstallationDialog::onTimer( const quint64& /*timerID*/ )
 {
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    if( m_terminated )
+        return;
+
     //NOTE this method is called from TimerManager thread (it's never GUI thread)
+        //performing all requests to applauncher in non-GUI thread
     m_timerID = 0;
 
     switch( m_state )
@@ -96,6 +107,11 @@ void CompatibilityVersionInstallationDialog::onTimer( const quint64& /*timerID*/
                 m_state = State::cancelling;
                 m_timerID = TimerManager::instance()->addTimer(this, INSTALLATION_STATUS_CHECK_PERIOD_MS);
             }
+            else
+            {
+                m_state = State::failed;
+                QMetaObject::invokeMethod( this, "onCancelFailed", Qt::QueuedConnection, Q_ARG(int, result) );
+            }
             break;
         }
 
@@ -140,6 +156,12 @@ void CompatibilityVersionInstallationDialog::onTimer( const quint64& /*timerID*/
     }
 }
 
+void CompatibilityVersionInstallationDialog::pleaseStop()
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+    m_terminated = true;
+}
+
 void CompatibilityVersionInstallationDialog::setVersionToInstall( const QnSoftwareVersion& version )
 {
     m_versionToInstall = version;
@@ -147,12 +169,14 @@ void CompatibilityVersionInstallationDialog::setVersionToInstall( const QnSoftwa
 
 bool CompatibilityVersionInstallationDialog::installationSucceeded() const
 {
+    std::unique_lock<std::mutex> lk( m_mutex );
     return m_state == State::succeeded;
 }
 
 void CompatibilityVersionInstallationDialog::reject()
 {
-    //TODO/IMPL synchronization with onTimer
+    std::unique_lock<std::mutex> lk( m_mutex );
+
     switch( m_state )
     {
         case State::installing:
@@ -188,16 +212,21 @@ void CompatibilityVersionInstallationDialog::showEvent(QShowEvent* event)
 void CompatibilityVersionInstallationDialog::hideEvent(QHideEvent* event)
 {
     //TODO/IMPL cancelling as soon as possible
+    //if( m_timerID )
+    //    TimerManager::instance()->deleteTimer( m_timerID );
     QDialog::hideEvent(event);
 }
 
 void CompatibilityVersionInstallationDialog::launchInstallation()
 {
+    std::unique_lock<std::mutex> lk( m_mutex );
+
     m_state = State::init;
     m_timerID = TimerManager::instance()->addTimer( this, 0 );  //calling applauncher from non-GUI thread
     ui->progressBar->setValue( 0 );
     setWindowTitle( tr("Installing version %1").arg(m_versionToInstall.toString(QnSoftwareVersion::MinorFormat)) );
     ui->buttonBox->setStandardButtons( QDialogButtonBox::Cancel );
+    ui->buttonBox->button( QDialogButtonBox::Cancel )->setFocus(Qt::OtherFocusReason);
 }
 
 void CompatibilityVersionInstallationDialog::onInstallationFailed( int resultInt )
@@ -209,18 +238,32 @@ void CompatibilityVersionInstallationDialog::onInstallationFailed( int resultInt
     setWindowTitle( tr("Installation failed") );
     
     ui->buttonBox->button( QDialogButtonBox::Cancel )->setDisabled(false);
+    ui->buttonBox->button( QDialogButtonBox::Cancel )->setFocus(Qt::OtherFocusReason);
+}
+
+void CompatibilityVersionInstallationDialog::onCancelFailed( int resultInt )
+{
+    const api::ResultType::Value result = static_cast<api::ResultType::Value>(resultInt);
+
+    //TODO/IMPL
+        //setting error message
+    setWindowTitle( tr("Could not cancel installation") );
+    
+    ui->buttonBox->button( QDialogButtonBox::Cancel )->setDisabled(false);
+    ui->buttonBox->button( QDialogButtonBox::Cancel )->setFocus(Qt::OtherFocusReason);
 }
 
 void CompatibilityVersionInstallationDialog::onInstallationSucceeded()
 {
-    //TODO/IMPL changing "changing Cancel button to OK"
+    //changing Cancel button to OK
     setWindowTitle( tr("Installation completed") );
     ui->buttonBox->setStandardButtons( QDialogButtonBox::Ok );
+    ui->buttonBox->button( QDialogButtonBox::Ok )->setFocus(Qt::OtherFocusReason);
 }
 
 void CompatibilityVersionInstallationDialog::updateInstallationProgress( float progress )
 {
-    //TODO/IMPL updating progress bar
+    //updating progress bar
     if( progress < 0.0 )
         ;//TODO/IMPL unknown progress
     else
@@ -233,7 +276,8 @@ void CompatibilityVersionInstallationDialog::onCancelDone()
         //setting error message
     setWindowTitle( tr("Installation has been cancelled") );
 
-    ui->buttonBox->button( QDialogButtonBox::Cancel )->setDisabled(false);
+    //closing dialog onm successfull installation cancelled
+    QDialog::reject();
 
     //QDialog::reject();
 }

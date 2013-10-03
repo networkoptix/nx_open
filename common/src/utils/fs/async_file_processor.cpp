@@ -17,7 +17,8 @@ AsyncFileProcessor::AsyncFileProcessor()
 
 AsyncFileProcessor::~AsyncFileProcessor()
 {
-    //TODO/IMPL
+    pleaseStop();
+    wait();
 }
 
 void AsyncFileProcessor::pleaseStop()
@@ -53,12 +54,9 @@ void AsyncFileProcessor::run()
         FileTask* taskPtr = nullptr;
         m_taskQueue.pop( taskPtr );
         if( !taskPtr )
-            continue;
+            break;
 
         std::unique_ptr<FileTask> task( taskPtr );
-
-        //const std::type_info& t1 = typeid(*task.get());
-        //const std::type_info& t2 = typeid(WriteFileTask);
 
         if( typeid(*task.get()) == typeid(OpenFileTask) )
             doOpenFile( static_cast<const OpenFileTask*>(task.get()) );

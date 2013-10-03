@@ -81,7 +81,7 @@ private:
     State m_state;
     nx_http::AsyncHttpClient* m_httpClient;
     applauncher::api::InstallationStatus::Value m_status;
-    std::unique_ptr<RDirSyncher> m_syncher;
+    std::shared_ptr<RDirSyncher> m_syncher;
     QString m_errorText;
     mutable std::mutex m_mutex;
     std::unique_ptr<stree::AbstractNode> m_currentTree;
@@ -90,24 +90,26 @@ private:
     int64_t m_totalBytesToDownload;
 
     //!Implementation of RDirSyncher::EventReceiver::overrallDownloadSizeKnown
-    virtual void overrallDownloadSizeKnown( int64_t totalBytesToDownload );
+    virtual void overrallDownloadSizeKnown(
+        const std::shared_ptr<RDirSyncher>& syncher,
+        int64_t totalBytesToDownload );
     //!Implementation of RDirSyncher::EventReceiver::fileProgress
     virtual void fileProgress(
-        RDirSyncher* const syncher,
+        const std::shared_ptr<RDirSyncher>& syncher,
         const QString& filePath,
         int64_t remoteFileSize,
         int64_t bytesDownloaded ) override;
     //!Implementation of RDirSyncher::EventReceiver::fileProgress
     virtual void fileDone(
-        RDirSyncher* const syncher,
+        const std::shared_ptr<RDirSyncher>& syncher,
         const QString& filePath ) override;
     //!Implementation of RDirSyncher::EventReceiver::fileProgress
     virtual void finished(
-        RDirSyncher* const syncher,
+        const std::shared_ptr<RDirSyncher>& syncher,
         bool result ) override;
     //!Implementation of RDirSyncher::EventReceiver::fileProgress
     virtual void failed(
-        RDirSyncher* const syncher,
+        const std::shared_ptr<RDirSyncher>& syncher,
         const QString& failedFilePath,
         const QString& errorText ) override;
 

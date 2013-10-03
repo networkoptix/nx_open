@@ -5,6 +5,7 @@
 
 #include "get_file_operation.h"
 
+#include <utils/common/log.h>
 #include <utils/network/http/asynchttpclient.h>
 
 
@@ -28,7 +29,9 @@ namespace detail
         m_hashTypeName( hashTypeName ),
         m_fileWritePending( 0 ),
         m_httpClient( nullptr ),
-        m_state( State::sInit )
+        m_state( State::sInit ),
+        m_totalBytesWritten( 0 ),
+        m_totalBytesDownloaded( 0 )
     {
         m_httpClient = new nx_http::AsyncHttpClient();
         connect(
@@ -47,12 +50,12 @@ namespace detail
 
     GetFileOperation::~GetFileOperation()
     {
-        if( m_httpClient )
-        {
-            m_httpClient->terminate();
-            m_httpClient->scheduleForRemoval();
-            m_httpClient = nullptr;
-        }
+        if( !m_httpClient )
+            return;
+
+        m_httpClient->terminate();
+        m_httpClient->scheduleForRemoval();
+        m_httpClient = nullptr;
     }
 
     void GetFileOperation::pleaseStop()
@@ -89,6 +92,12 @@ namespace detail
         uint64_t bytesWritten,
         SystemError::ErrorCode errorCode )
     {
+        m_totalBytesWritten += bytesWritten;
+        m_handler->downloadProgress(
+            shared_from_this(),
+            -1,
+            m_totalBytesWritten );
+
         std::unique_lock<std::mutex> lk( m_mutex );
 
         m_fileWritePending = 0;
@@ -110,6 +119,7 @@ namespace detail
         const nx_http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
         if( !partialMsgBody.isEmpty() )
         {
+            m_totalBytesDownloaded += partialMsgBody.size();
             m_outFile->writeAsync( partialMsgBody, this );
             m_fileWritePending = 1;
         }
@@ -128,6 +138,7 @@ namespace detail
             std::unique_lock<std::mutex> lk( m_mutex );
             m_state = State::sFinished;
         }
+        NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1,  bytes written %2").arg(entryPath).arg(m_totalBytesWritten), cl_logDEBUG2 );
         m_handler->operationDone( shared_from_this() );
     }
 
@@ -143,6 +154,8 @@ namespace detail
                 const nx_http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
                 if( partialMsgBody.isEmpty() )
                     return;
+
+                m_totalBytesDownloaded += partialMsgBody.size();
 
                 m_outFile->writeAsync( partialMsgBody, this );
                 m_fileWritePending = 1;

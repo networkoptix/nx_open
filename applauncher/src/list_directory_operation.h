@@ -79,10 +79,12 @@ namespace detail
         virtual bool startAsync() override;
 
         std::list<detail::RDirEntry> entries() const;
+        int64_t totalDirSize() const;
 
     private:
         const QString m_localTargetDirPath;
         nx_http::AsyncHttpClient* m_httpClient;
+        int64_t m_totalSize;
         std::list<detail::RDirEntry> m_entries;
         QUrl m_downloadUrl;
 

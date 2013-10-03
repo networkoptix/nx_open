@@ -8,6 +8,8 @@
 #include <cassert>
 #include <memory>
 
+#include <utils/common/log.h>
+
 #include "get_file_operation.h"
 
 
@@ -15,22 +17,24 @@ RDirSyncher::EventReceiver::~EventReceiver()
 {
 }
 
-void RDirSyncher::EventReceiver::overrallDownloadSizeKnown( int64_t /*totalBytesToDownload*/ )
+void RDirSyncher::EventReceiver::overrallDownloadSizeKnown(
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    int64_t /*totalBytesToDownload*/ )
 {
 }
 
-void RDirSyncher::EventReceiver::started( RDirSyncher* const /*syncher*/ )
+void RDirSyncher::EventReceiver::started( const std::shared_ptr<RDirSyncher>& /*syncher*/ )
 {
 }
 
 void RDirSyncher::EventReceiver::fileStarted(
-    RDirSyncher* const /*syncher*/,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     const QString& /*filePath*/ )
 {
 }
 
 void RDirSyncher::EventReceiver::fileProgress(
-    RDirSyncher* const /*syncher*/,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     const QString& /*filePath*/,
     int64_t /*remoteFileSize*/,
     int64_t /*bytesDownloaded*/ )
@@ -38,19 +42,19 @@ void RDirSyncher::EventReceiver::fileProgress(
 }
 
 void RDirSyncher::EventReceiver::fileDone(
-    RDirSyncher* const /*syncher*/,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     const QString& /*filePath*/ )
 {
 }
 
 void RDirSyncher::EventReceiver::finished(
-    RDirSyncher* const /*syncher*/,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     bool /*result*/ )
 {
 }
 
 void RDirSyncher::EventReceiver::failed(
-    RDirSyncher* const /*syncher*/,
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
     const QString& /*failedFilePath*/,
     const QString& /*errorText*/ )
 {
@@ -102,6 +106,8 @@ bool RDirSyncher::startAsync()
 {
     std::lock_guard<std::mutex> lk( m_mutex );
 
+    NX_LOG( QString::fromLatin1("RDirSyncher. Starting synchronization from %1 to %2").arg(m_mirrors.front().toString()).arg(m_localDirPath), cl_logDEBUG1 );
+
     m_syncTasks.push_back( SynchronizationTask("/", detail::RSyncOperationType::listDirectory) );
     std::shared_ptr<detail::RDirSynchronizationOperation> operation;
     if( startNextOperation(&operation) != OperationStartResult::success )
@@ -118,6 +124,26 @@ RDirSyncher::State RDirSyncher::state() const
 QString RDirSyncher::lastErrorText() const
 {
     return m_lastErrorText;
+}
+
+void RDirSyncher::downloadProgress(
+    const std::shared_ptr<detail::RDirSynchronizationOperation>& operation,
+    int64_t remoteFileSize,
+    int64_t bytesDownloaded )
+{
+    if( !m_eventReceiver )
+        return;
+
+    //TODO/IMPL report progress not very often
+
+    //NX_LOG( QString::fromLatin1("File %1 download progress: %2 bytes of %3 have been downloaded").
+    //    arg(operation->entryPath).arg(bytesDownloaded).arg(remoteFileSize), cl_logDEBUG2 );
+
+    m_eventReceiver->fileProgress(
+        shared_from_this(),
+        operation->entryPath,
+        remoteFileSize,
+        bytesDownloaded );
 }
 
 class RSyncEventTrigger
@@ -152,6 +178,9 @@ RSyncEventTriggerImpl<_Func>* allocEventTrigger( const _Func& f )
 
 void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizationOperation>& operation )
 {
+    NX_LOG( QString::fromLatin1("RDirSyncher. Operation %1 %2").arg((int)operation->type).
+        arg(operation->success() ? QLatin1String("completed successfully") : QLatin1String("failed")), cl_logDEBUG2 );
+
     std::list<RSyncEventTrigger*> eventsToTrigger;
     //creating auto guard which will trigger all events stored in eventsToTrigger
     auto scopedExitFunc = [&eventsToTrigger](RDirSyncher* /*pThis*/)
@@ -193,7 +222,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
         {
             case detail::RSyncOperationType::getFile:
                 if( m_eventReceiver )
-                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileDone, m_eventReceiver, this, operation->entryPath) ) );
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileDone, m_eventReceiver, shared_from_this(), operation->entryPath) ) );
                 break;
 
             case detail::RSyncOperationType::listDirectory:
@@ -201,11 +230,11 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
                 std::shared_ptr<detail::ListDirectoryOperation> listDirOperation = std::static_pointer_cast<detail::ListDirectoryOperation>(operation);
                 const std::list<detail::RDirEntry>& entries = listDirOperation->entries();
                 //adding dir entries to download queue
-                std::transform(
-                    entries.begin(),
-                    entries.end(),
-                    std::back_inserter(m_syncTasks),
-                    []( const detail::RDirEntry& _entry ){ return SynchronizationTask(_entry); } );
+                for( const detail::RDirEntry& entry: entries )
+                    m_syncTasks.push_back( SynchronizationTask(entry) );
+                if( listDirOperation->entryPath == "/" && listDirOperation->totalDirSize() > 0 )   //root directory
+                    eventsToTrigger.push_back( allocEventTrigger(
+                        std::bind(&EventReceiver::overrallDownloadSizeKnown, m_eventReceiver, shared_from_this(), listDirOperation->totalDirSize()) ) );
                 break;
             }
 
@@ -219,7 +248,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
             assert( m_runningOperations.empty() );
             m_state = sSucceeded;
             if( m_eventReceiver )
-                eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, true) ) );
+                eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, shared_from_this(), true) ) );
             return;
         }
 
@@ -243,8 +272,8 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 
         if( m_eventReceiver )
         {
-            eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, this, m_failedEntryPath, m_lastErrorText) ) );
-            eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, false) ) );
+            eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, shared_from_this(), m_failedEntryPath, m_lastErrorText) ) );
+            eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, shared_from_this(), false) ) );
         }
         return;
     }
@@ -266,7 +295,7 @@ void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigge
         {
             case OperationStartResult::success:
                 if( newOperation->type == detail::RSyncOperationType::getFile && m_eventReceiver )
-                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileStarted, m_eventReceiver, this, newOperation->entryPath) ) );
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::fileStarted, m_eventReceiver, shared_from_this(), newOperation->entryPath) ) );
                 break;
 
             case OperationStartResult::nothingToDo:
@@ -281,8 +310,8 @@ void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigge
 
                 if( m_eventReceiver )
                 {
-                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, this, m_failedEntryPath, m_lastErrorText) ) );
-                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, this, false) ) );
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::failed, m_eventReceiver, shared_from_this(), m_failedEntryPath, m_lastErrorText) ) );
+                    eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, shared_from_this(), false) ) );
                 }
                 return;
 

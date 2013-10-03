@@ -38,10 +38,13 @@ namespace detail
         public QXmlDefaultHandler
     {
     public:
+        int64_t totalSize;
+
         ContentsXmlSaxHandler( std::list<detail::RDirEntry>* const entries )
         :
             m_readingContents( false ),
-            m_entries( entries )
+            m_entries( entries ),
+            totalSize( -1 )
         {
         }
 
@@ -54,6 +57,9 @@ namespace detail
             {
                 if( m_readingContents )
                     return false;
+                int totalSizeArgPos = atts.index(QString::fromLatin1("totalSize"));
+                if( totalSizeArgPos >= 0 )
+                    totalSize = atts.value(totalSizeArgPos).toLongLong();
                 m_readingContents = true;
                 return true;
             }
@@ -159,7 +165,8 @@ namespace detail
             _dirPath,
             _handler ),
         m_localTargetDirPath( localTargetDirPath ),
-        m_httpClient( new nx_http::AsyncHttpClient() )
+        m_httpClient( new nx_http::AsyncHttpClient() ),
+        m_totalSize( -1 )
     {
         connect( m_httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection );
         connect( m_httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onHttpDone(nx_http::AsyncHttpClient*)), Qt::DirectConnection );
@@ -199,6 +206,11 @@ namespace detail
     std::list<detail::RDirEntry> ListDirectoryOperation::entries() const
     {
         return m_entries;
+    }
+
+    int64_t ListDirectoryOperation::totalDirSize() const
+    {
+        return m_totalSize;
     }
 
     void ListDirectoryOperation::onResponseReceived( nx_http::AsyncHttpClient* httpClient )
@@ -258,6 +270,8 @@ namespace detail
             m_handler->operationDone( shared_from_this() );
             return;
         }
+
+        m_totalSize = xmlHandler.totalSize;
 
         //TODO/IMPL asynchronously creating directory
         QDir(m_localTargetDirPath).mkdir( entryPath );

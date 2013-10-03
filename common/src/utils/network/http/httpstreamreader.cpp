@@ -6,9 +6,10 @@
 #include "httpstreamreader.h"
 
 #include <algorithm>
+#include <fstream>
 
 #include "utils/gzip/gzip_uncompressor.h"
-#include "utils/media/buffer_output_stream.h"
+#include "utils/media/custom_output_stream.h"
 
 
 namespace nx_http
@@ -16,21 +17,21 @@ namespace nx_http
     HttpStreamReader::HttpStreamReader()
     :
         m_state( waitingMessageStart ),
+        m_nextState( undefined ),
         m_contentLength( 0 ),
         m_isChunkedTransfer( false ),
         m_messageBodyBytesRead( 0 ),
         m_chunkStreamParseState( waitingChunkStart ),
         m_currentChunkSize( 0 ),
         m_currentChunkBytesRead( 0 ),
-        m_prevChar( 0 )
+        m_prevChar( 0 ),
+        m_lineEndingOffset( 0 )
     {
     }
 
     HttpStreamReader::~HttpStreamReader()
     {
     }
-
-    static int totalMsgBytesRead = 0;
 
     /*!
         \return false on parse error
@@ -52,24 +53,29 @@ namespace nx_http
                     size_t msgBodyBytesRead = 0;
                     if( m_contentDecoder )
                     {
-                        msgBodyBytesRead = readMessageBody( data, currentDataPos, count-currentDataPos, &m_codedMessageBodyBuffer );
+                        msgBodyBytesRead = readMessageBody(
+                            QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
                         //decoding content
                         if( (msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0) )
                         {
-                            totalMsgBytesRead += msgBodyBytesRead;
-                            //msgBodyBytesRead = m_contentDecoder->decode( &m_codedMessageBodyBuffer, &m_msgBodyBuffer );
-                            const size_t msgBodyBufferSizeBak = m_msgBodyBuffer.size();
                             if( !m_codedMessageBodyBuffer.isEmpty() )
                             {
                                 m_contentDecoder->processData( m_codedMessageBodyBuffer );  //result of processing is appended to m_msgBodyBuffer
                                 m_codedMessageBodyBuffer.clear();
                             }
-                            msgBodyBytesRead = m_msgBodyBuffer.size() - msgBodyBufferSizeBak;
                         }
                     }
                     else
                     {
-                        msgBodyBytesRead = readMessageBody( data, currentDataPos, count-currentDataPos, &m_msgBodyBuffer );
+                        msgBodyBytesRead = readMessageBody(
+                            QnByteArrayConstRef(data, currentDataPos, count-currentDataPos),
+                            [this]( const QnByteArrayConstRef& data )
+                                {
+                                    std::unique_lock<std::mutex> lk( m_mutex );
+                                    m_msgBodyBuffer.append( data.constData(), data.size() );
+                                }
+                        );
                     }
 
                     if( msgBodyBytesRead == (size_t)-1 )
@@ -260,15 +266,17 @@ namespace nx_http
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
         if( contentEncodingIter != m_httpMessage.headers().end() )
         {
-#if 0
-            m_contentDecoder.reset( new BufferOutputStream(&m_msgBodyBuffer) );
-#else
             AbstractByteStreamConverter* contentDecoder = createContentDecoder( contentEncodingIter->second );
             if( contentDecoder == nullptr )
                 return false;   //cannot decode message body
-            contentDecoder->setNextFilter( std::make_shared<BufferOutputStream>( &m_msgBodyBuffer ) );
+            //all operations with m_msgBodyBuffer MUST be done with m_mutex locked
+            auto safeAppendToBufferLambda = [this]( const QnByteArrayConstRef& data )
+            {
+                std::unique_lock<std::mutex> lk( m_mutex );
+                m_msgBodyBuffer.append( data.constData(), data.size() );
+            };
+            contentDecoder->setNextFilter( std::make_shared<CustomOutputStream<decltype(safeAppendToBufferLambda)>>( safeAppendToBufferLambda ) );
             m_contentDecoder.reset( contentDecoder );
-#endif
         }
         
         //analyzing message headers to find out if there should be message body
@@ -294,30 +302,26 @@ namespace nx_http
         return true;
     }
 
+    template<class Func>
     size_t HttpStreamReader::readMessageBody(
-        const BufferType& data,
-        size_t offset,
-        size_t count,
-        BufferType* const outBuf )
+        const QnByteArrayConstRef& data,
+        Func func )
     {
         return m_isChunkedTransfer
-            ? readChunkStream( data, offset, count, outBuf )
-            : readIdentityStream( data, offset, count, outBuf );
+            ? readChunkStream( data, func )
+            : readIdentityStream( data, func );
     }
 
+    template<class Func>
     size_t HttpStreamReader::readChunkStream(
-        const BufferType& data,
-        const size_t offset,
-        size_t count,
-        BufferType* const outBuf )
+        const QnByteArrayConstRef& data,
+        Func func )
     {
-        if( count == BufferNpos )
-            count = data.size() - offset;
-        const size_t maxOffset = offset + count;
-
-        size_t currentOffset = offset;
-        for( ; currentOffset < maxOffset; )
+        size_t currentOffset = 0;
+        for( ; currentOffset < data.size(); )
         {
+            const size_t currentOffsetBak = currentOffset;
+
             const BufferType::value_type currentChar = data[(unsigned int)currentOffset];
             switch( m_chunkStreamParseState )
             {
@@ -346,7 +350,9 @@ namespace nx_http
                     else if( currentChar == '\r' || currentChar == '\n' )
                     {
                         //no extension?
-                        m_chunkStreamParseState = skippingCRLFBeforeChunkData;
+                        m_chunkStreamParseState = skippingCRLF;
+                        m_nextState = readingChunkData;
+                        break;
                     }
                     else
                     {
@@ -359,15 +365,30 @@ namespace nx_http
                 case readingChunkExtension:
                     //TODO/IMPL reading extension
                     if( currentChar == '\r' || currentChar == '\n' )
-                        m_chunkStreamParseState = skippingCRLFBeforeChunkData;
+                    {
+                        m_chunkStreamParseState = skippingCRLF;
+                        m_nextState = readingChunkData;
+                        break;
+                    }
                     ++currentOffset;
                     break;
 
-                case skippingCRLFBeforeChunkData:
-                    if( m_prevChar == '\r' && currentChar == '\n' ) //supporting CR, LF and CRLF as line-ending, since some buggy rtsp-implementation can do that
+                case skippingCRLF:
+                    //supporting CR, LF and CRLF as line-ending, since some buggy rtsp-implementation can do that
+                    if( (m_lineEndingOffset < 2) &&
+                        ((currentChar == '\r' && m_lineEndingOffset == 0) ||
+                         (currentChar == '\n' && (m_lineEndingOffset == 0 || m_prevChar == '\r'))) )
+                    {
+                        ++m_lineEndingOffset;
                         ++currentOffset;    //skipping
+                        break;
+                    }
                     else
-                        m_chunkStreamParseState = readingChunkData;
+                    {
+                        m_lineEndingOffset = 0;
+                    }
+
+                    m_chunkStreamParseState = m_nextState;
                     break;
 
                 case readingChunkData:
@@ -375,37 +396,20 @@ namespace nx_http
                     if( !m_currentChunkSize )
                     {
                         //last chunk
-                        m_chunkStreamParseState = skippingCRLFAfterChunkData;
+                        m_chunkStreamParseState = readingTrailer;   //last chunk
                         break;
                     }
 
-                    const size_t bytesToCopy = std::min<>( m_currentChunkSize - m_currentChunkBytesRead, maxOffset - currentOffset );
-                    {
-                        std::unique_lock<std::mutex> lk( m_mutex ); //TODO/IMPL no need to lock if writing to temp buffer (if content encoding is enabled)
-                        outBuf->append( data.data()+currentOffset, (int)bytesToCopy );
-                    }
+                    const size_t bytesToCopy = std::min<>( m_currentChunkSize - m_currentChunkBytesRead, data.size() - currentOffset );
+                    func( data.mid(currentOffset, bytesToCopy) );
                     m_messageBodyBytesRead += bytesToCopy;
                     m_currentChunkBytesRead += bytesToCopy;
                     currentOffset += bytesToCopy;
                     if( m_currentChunkBytesRead == m_currentChunkSize )
-                        m_chunkStreamParseState = skippingCRLFAfterChunkData;
-                    break;
-                }
-
-                case skippingCRLFAfterChunkData:
-                {
-                    //supporting CR, LF and CRLF as line-ending, since some buggy rtsp-implementation can do that
-                    //if( m_prevChar == '\r' && currentChar == '\n' )
-                    if( (currentChar == '\n') || (currentChar == '\r') )
                     {
-                        ++currentOffset;    //skipping
-                        break;
+                        m_chunkStreamParseState = skippingCRLF;
+                        m_nextState = waitingChunkStart;
                     }
-
-                    if( !m_currentChunkSize )  //last chunk
-                        m_chunkStreamParseState = readingTrailer;
-                    else
-                        m_chunkStreamParseState = waitingChunkStart;
                     break;
                 }
 
@@ -414,7 +418,7 @@ namespace nx_http
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
                     const bool lineFound = m_lineSplitter.parseByLines(
-                        ConstBufferRefType(data, currentOffset, maxOffset-currentOffset),
+                        data.mid( currentOffset ),
                         &lineBuffer,
                         &bytesRead );
                     currentOffset += bytesRead;
@@ -424,7 +428,7 @@ namespace nx_http
                     {
                         //reached end of HTTP/1.1 chunk stream
                         m_chunkStreamParseState = reachedChunkStreamEnd;
-                        return currentOffset - offset;
+                        return currentOffset;
                     }
                     //TODO/IMPL parsing entity-header
                     break;
@@ -435,29 +439,22 @@ namespace nx_http
                     break;
             }
 
-            m_prevChar = currentChar;
+            if( currentOffset != currentOffsetBak ) //moved cursor
+                m_prevChar = currentChar;
         }
 
-        return currentOffset - offset;
+        return currentOffset;
     }
 
+    template<class Func>
     size_t HttpStreamReader::readIdentityStream(
-        const BufferType& data,
-        size_t offset,
-        size_t count,
-        BufferType* const outBuf )
+        const QnByteArrayConstRef& data,
+        Func func )
     {
-        Q_ASSERT( (int)offset < data.size() );
-
-        if( count == BufferNpos )
-            count = data.size() - offset;
         const size_t bytesToCopy = m_contentLength > 0
-            ? std::min<size_t>( count, m_contentLength-m_messageBodyBytesRead )
-            : count;    //Content-Length is unknown
-        {
-            std::unique_lock<std::mutex> lk( m_mutex );
-            outBuf->append( data.data() + offset, (int) bytesToCopy );
-        }
+            ? std::min<size_t>( data.size(), m_contentLength-m_messageBodyBytesRead )
+            : data.size();    //Content-Length is unknown
+        func( data.mid(0, bytesToCopy) );
         m_messageBodyBytesRead += bytesToCopy;
         return bytesToCopy;
     }

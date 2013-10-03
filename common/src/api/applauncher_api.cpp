@@ -25,6 +25,8 @@ namespace applauncher
                     return getInstallationStatus;
                 else if( str == "isVersionInstalled" )
                     return isVersionInstalled;
+                else if( str == "cancelInstallation" )
+                    return cancelInstallation;
                 else
                     return invalidTaskType;
             }
@@ -87,6 +89,10 @@ namespace applauncher
 
                 case TaskType::isVersionInstalled:
                     *ptr = new IsVersionInstalledRequest();
+                    break;
+                    
+                case TaskType::cancelInstallation:
+                    *ptr = new CancelInstallationRequest();
                     break;
 
                 case TaskType::invalidTaskType:
@@ -443,6 +449,34 @@ namespace applauncher
                 return false;
             //line 0 - is a error code
             installed = lines[1].toUInt() > 0;
+            return true;
+        }
+
+
+
+        ////////////////////////////////////////////////////////////
+        //// class CancelInstallationRequest
+        ////////////////////////////////////////////////////////////
+        CancelInstallationRequest::CancelInstallationRequest()
+        :
+            BaseTask( TaskType::getInstallationStatus ),
+            installationID( 0 )
+        {
+        }
+
+        QByteArray CancelInstallationRequest::serialize() const
+        {
+            return QString::fromLatin1("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(installationID).toLatin1();
+        }
+
+        bool CancelInstallationRequest::deserialize( const QnByteArrayConstRef& data )
+        {
+            const QList<QnByteArrayConstRef>& lines = data.split('\n');
+            if( lines.size() < 2 )
+                return false;
+            if( lines[0] != TaskType::toString(type) )
+                return false;
+            installationID = lines[1].toByteArrayWithRawData().toUInt();
             return true;
         }
     }

@@ -70,11 +70,11 @@ namespace nx_http
             waitingChunkStart,
             readingChunkSize,
             readingChunkExtension,
-            skippingCRLFBeforeChunkData,
+            skippingCRLF,
             readingChunkData,
-            skippingCRLFAfterChunkData,
             readingTrailer,
-            reachedChunkStreamEnd
+            reachedChunkStreamEnd,
+            undefined
         };
 
         ReadState m_state;
@@ -86,11 +86,13 @@ namespace nx_http
 
         //!HTTP/1.1 chunk stream parsing
         ChunkStreamParseState m_chunkStreamParseState;
+        ChunkStreamParseState m_nextState;
         size_t m_currentChunkSize;
         size_t m_currentChunkBytesRead;
         BufferType::value_type m_prevChar;
         BufferType m_codedMessageBodyBuffer;
         std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
+        int m_lineEndingOffset;
 
         LineSplitter m_lineSplitter;
         mutable std::mutex m_mutex;
@@ -103,23 +105,20 @@ namespace nx_http
         */
         bool prepareToReadMessageBody();
         /*!
-            \return bytes copied to \a outBuf or -1 in case of error
+            \return bytes read from \a data or -1 in case of error
         */
+        template<class Func>
         size_t readMessageBody(
-            const BufferType& data,
-            size_t offset,
-            size_t count,
-            BufferType* const outBuf );
+            const QnByteArrayConstRef& data,
+            Func func );
+        template<class Func>
         size_t readChunkStream(
-            const BufferType& data,
-            size_t offset,
-            size_t count,
-            BufferType* const outBuf );
+            const QnByteArrayConstRef& data,
+            Func func );
+        template<class Func>
         size_t readIdentityStream(
-            const BufferType& data,
-            size_t offset,
-            size_t count,
-            BufferType* const outBuf );
+            const QnByteArrayConstRef& data,
+            Func func );
         unsigned int hexCharToInt( BufferType::value_type ch );
         //!Returns nullptr if \a encodingName is unknown
         AbstractByteStreamConverter* createContentDecoder( const nx_http::StringType& encodingName );
