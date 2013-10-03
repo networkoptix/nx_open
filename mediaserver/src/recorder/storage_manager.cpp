@@ -105,8 +105,10 @@ void QnStorageManager::rebuildCatalogIndexInternal()
 
 void QnStorageManager::rebuildCatalogAsync()
 {
-    if (m_rebuildState == RebuildState_None)
+    if (m_rebuildState == RebuildState_None) {
+        m_rebuildProgress = 0.0;
         setRebuildState(QnStorageManager::RebuildState_WaitForRecordersStopped);
+    }
 }
 
 void QnStorageManager::cancelRebuildCatalogAsync()

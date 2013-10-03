@@ -245,6 +245,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
+    connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString )), this, SLOT(at_updateRebuildInfo()));
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -372,7 +374,8 @@ void QnServerSettingsDialog::updateFromResources()
 {
     at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
-    sendNextArchiveRequest();
+    if (m_server->getStatus() == QnResource::Online)
+        sendNextArchiveRequest();
 
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
@@ -545,12 +548,20 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
     m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
 
+void QnServerSettingsDialog::at_updateRebuildInfo()
+{
+    if (m_server->getStatus() == QnResource::Online)
+        sendNextArchiveRequest();
+    else
+        at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+}
+
 void QnServerSettingsDialog::sendNextArchiveRequest()
 {
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
 
-void QnServerSettingsDialog::at_archiveRebuildReply(int, const QnRebuildArchiveReply& reply, int)
+void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int)
 {
     m_lastRebuildReply = reply;
     ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
