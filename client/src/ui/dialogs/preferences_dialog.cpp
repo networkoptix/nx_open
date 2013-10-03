@@ -34,7 +34,7 @@
 #include <ui/workbench/workbench_auto_starter.h>
 
 #include "custom_file_dialog.h"
-#include "ui/workbench/watchers/workbench_desktop_camera_watcher_windows_specific.h"
+#include "ui/workbench/watchers/workbench_desktop_camera_watcher_win.h"
 
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):

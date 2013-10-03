@@ -2,7 +2,7 @@
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
-#include "../desktop_windows_specific/device/desktop_resource.h"
+#include "../desktop_win/device/desktop_resource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 
 

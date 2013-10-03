@@ -10,8 +10,8 @@
 #include "ui/style/skin.h"
 #include "video_recorder_settings.h"
 #include "utils/common/log.h"
-#include "device_plugins/desktop_windows_specific/desktop_file_encoder.h"
-#include "device_plugins/desktop_windows_specific/device/desktop_resource.h"
+#include "device_plugins/desktop_win/desktop_file_encoder.h"
+#include "device_plugins/desktop_win/device/desktop_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/resource_managment/resource_pool.h"
 

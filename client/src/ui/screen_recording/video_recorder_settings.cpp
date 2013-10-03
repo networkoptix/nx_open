@@ -7,13 +7,13 @@
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #ifdef Q_OS_WIN32
-#   include "device_plugins/desktop_windows_specific/win_audio_helper.h"
+#   include "device_plugins/desktop_win/win_audio_helper.h"
 #endif
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
-#   include <device_plugins/desktop_windows_specific/screen_grabber.h>
-#   include <device_plugins/desktop_windows_specific/desktop_file_encoder.h>
+#   include <device_plugins/desktop_win/screen_grabber.h>
+#   include <device_plugins/desktop_win/desktop_file_encoder.h>
 #endif
 
 #include <utils/common/warnings.h>

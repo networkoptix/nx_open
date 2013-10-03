@@ -79,7 +79,7 @@
 #include "rest/handlers/time_handler.h"
 #include "rest/handlers/ping_handler.h"
 #include "rest/handlers/events_handler.h"
-#include "platform/platform_abstraction.h"
+#include "platform/core_platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
 #include <business/business_event_connector.h>
@@ -455,7 +455,7 @@ int serverMain(int argc, char *argv[])
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
-    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+    QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
 
     QString logLevel;
     QString rebuildArchive;
@@ -1250,7 +1250,7 @@ public:
 protected:
     virtual int executeApplication() override { 
 
-        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+        QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();

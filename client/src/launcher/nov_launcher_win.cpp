@@ -1,4 +1,4 @@
-#include "nov_launcher.h"
+#include "nov_launcher_win.h"
 #include "utils/common/util.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 

@@ -23,7 +23,7 @@
 
 
 #ifdef Q_OS_WIN
-    #include <utils/qt5port_windows_specific.h>
+    #include <utils/qt5port_win.h>
 #endif
 
 

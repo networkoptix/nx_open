@@ -22,7 +22,7 @@
 #include "workbench_license_notifier.h"
 
 #ifdef Q_OS_WIN
-#include "watchers/workbench_desktop_camera_watcher_windows_specific.h"
+#include "watchers/workbench_desktop_camera_watcher_win.h"
 #endif
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):

@@ -12,7 +12,7 @@
 #ifdef QN_HAS_DWM
 #include <QtWidgets/5.1.1/QtWidgets/private/qwidget_p.h>
 #include <qt_windows.h>
-#include <utils/qt5port_windows_specific.h>
+#include <utils/qt5port_win.h>
 
 #define NOMINMAX
 #include <Windows.h>

@@ -1,4 +1,4 @@
-#include "notifier_windows_specific.h"
+#include "notifier_win.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
