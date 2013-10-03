@@ -95,6 +95,10 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         QMutexLocker lock(&m_mutexCatalog);
         m_rebuildProgress = 0;
         m_catalogLoaded = false;
+        foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogHi)
+            catalog->beforeRebuildArchive();
+        foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogLow)
+            catalog->beforeRebuildArchive();
         m_devFileCatalogHi.clear();
         m_devFileCatalogLow.clear();
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);

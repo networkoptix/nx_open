@@ -738,6 +738,12 @@ void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
     m_rebuildArchive = value;
 }
 
+void DeviceFileCatalog::beforeRebuildArchive()
+{
+    QMutexLocker lock(&m_mutex);
+    m_file.close();
+}
+
 QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
     //qDebug() << "find period from " << QDateTime::fromMSecsSinceEpoch(startTime).toString("hh:mm:ss.zzz") << "to" << QDateTime::fromMSecsSinceEpoch(endTime).toString("hh:mm:ss.zzz");

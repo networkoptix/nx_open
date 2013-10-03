@@ -86,6 +86,7 @@ public:
 
     static void setRebuildArchive(RebuildMethod value);
     static void cancelRebuildArchive();
+    void beforeRebuildArchive();
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
