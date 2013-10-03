@@ -65,6 +65,7 @@ void QnStorageManager::loadFullFileCatalog(bool isRebuild)
     loadFullFileCatalogInternal(QnResource::Role_LiveVideo, isRebuild);
     loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo, isRebuild);
     m_catalogLoaded = true;
+    m_rebuildProgress = 1.0;
 }
 
 double QnStorageManager::rebuildProgress() const

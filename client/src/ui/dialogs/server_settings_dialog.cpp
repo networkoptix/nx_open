@@ -257,9 +257,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
     connect(ui->rebuildButton,          SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
 
-    connect(&m_timer,                   SIGNAL(timeout()),              this,   SLOT(at_timer()));
-    m_timer.start(2000);
-
     updateFromResources();
 }
 
@@ -374,8 +371,9 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 void QnServerSettingsDialog::updateFromResources() 
 {
     at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
-
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    sendNextArchiveRequest();
+
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
@@ -529,10 +527,25 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
         action = RebuildAction_Cancel;
     else
         action = RebuildAction_Start;
+
+    if (action == RebuildAction_Start)
+    {
+        int button = QMessageBox::warning(
+            mainWindow(),
+            tr("Warning"),
+            tr("You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. "
+            "Depending on the total size of archive it can take several hours. "
+            "This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
+            QMessageBox::Yes | QMessageBox::No
+            );
+        if(button == QMessageBox::No)
+            return;
+    }
+
     m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
 
-void QnServerSettingsDialog::at_timer()
+void QnServerSettingsDialog::sendNextArchiveRequest()
 {
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
@@ -542,17 +555,13 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int, const QnRebuildArchiveR
     m_lastRebuildReply = reply;
     ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
     bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
+
     ui->rebuildLabel->setEnabled(inProgress);
     ui->rebuildProgressBar->setEnabled(inProgress);
+    ui->rebuildButton->setText(inProgress ? tr("Cancel") : tr("Start"));
+    ui->rebuildProgressBar->setValue(reply.progress());
     if (inProgress)
-    {
-        ui->rebuildProgressBar->setValue(reply.progress());
-        ui->rebuildButton->setText(tr("Cancel"));
-    }
-    else {
-        ui->rebuildProgressBar->setValue(0);
-        ui->rebuildButton->setText(tr("Start"));
-    }
+        m_timer.singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
 
 void QnServerSettingsDialog::at_pingButton_clicked() {

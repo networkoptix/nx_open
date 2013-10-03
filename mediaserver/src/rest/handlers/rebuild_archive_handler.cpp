@@ -27,6 +27,9 @@ int QnRestRebuildArchiveHandler::executeGet(const QString& path, const QnRequest
     
     int progress = -1;
     QString messageStr;
+    QString stateStr(lit("unknown"));
+
+
     if (method == "start") {
         if (QnStorageManager::instance()->rebuildState() == QnStorageManager::RebuildState_None) {
             QnStorageManager::instance()->rebuildCatalogAsync();
@@ -39,6 +42,7 @@ int QnRestRebuildArchiveHandler::executeGet(const QString& path, const QnRequest
         }
     }
     else if (method == "stop") {
+        progress = 100;
         if (QnStorageManager::instance()->rebuildState() != QnStorageManager::RebuildState_None)
             messageStr = lit("Rebuild archive canceled");
         else
@@ -46,8 +50,8 @@ int QnRestRebuildArchiveHandler::executeGet(const QString& path, const QnRequest
         QnStorageManager::instance()->cancelRebuildCatalogAsync();
     }
     else {
+        progress = QnStorageManager::instance()->rebuildProgress()*100 + 0.5;
         if (QnStorageManager::instance()->rebuildState() != QnStorageManager::RebuildState_None) {
-            progress = QnStorageManager::instance()->rebuildProgress()*100 + 0.5;
             messageStr = lit("Rebuild progress: %1%").arg(progress);
         }
         else {
@@ -55,7 +59,21 @@ int QnRestRebuildArchiveHandler::executeGet(const QString& path, const QnRequest
         }
     }
 
-    result.append(QString("<root><message>%1</message><progress>%2</progress></root>\n").arg(messageStr).arg(progress).toUtf8());
+    QnStorageManager::RebuildState state = QnStorageManager::instance()->rebuildState();
+    switch(state)
+    {
+    case QnStorageManager::RebuildState_None:
+        stateStr = "none";
+        break;
+    case QnStorageManager::RebuildState_WaitForRecordersStopped:
+        stateStr = "stop recorders";
+        break;
+    case QnStorageManager::RebuildState_Started:
+        stateStr = "started";
+        break;
+    }
+
+    result.append(QString("<root><message>%1</message><progress>%2</progress><state>%3</state></root>\n").arg(messageStr).arg(progress).arg(stateStr).toUtf8());
 
     return CODE_OK;
 }
