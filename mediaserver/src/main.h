@@ -32,7 +32,7 @@ private slots:
     void at_serverSaved(int, const QnResourceList&, int);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
     void at_noStorages();
-    void at_storageFailure(QnResourcePtr storage);
+    void at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);
     void at_timer();
     void at_connectionOpened();
 private:

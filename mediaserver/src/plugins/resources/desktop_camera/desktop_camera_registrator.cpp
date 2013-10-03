@@ -8,7 +8,7 @@ class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(AbstractStreamSocket* socket, QnTcpListener* _owner):
+QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket)
 {
 
@@ -22,5 +22,5 @@ void QnDesktopCameraRegistrator::run()
     sendResponse("HTTP", 200, QByteArray());
     QByteArray userName = d->request.headers["user-name"];
     QnDesktopCameraResourceSearcher::instance().registerCamera(d->socket, userName);
-        d->socket = 0; // remove ownership from socket
+    d->socket.clear();
 }

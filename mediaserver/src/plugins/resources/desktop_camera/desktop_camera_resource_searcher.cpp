@@ -19,11 +19,11 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(AbstractStreamSocket* connection, const QString& userName)
+void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName)
 {
     connection->setSendTimeout(1);
     QMutexLocker lock(&m_mutex);
-    m_connections << ClientConnectionInfo(TCPSocketPtr(connection), userName);
+    m_connections << ClientConnectionInfo(connection, userName);
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)

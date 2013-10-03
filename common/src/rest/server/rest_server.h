@@ -16,7 +16,7 @@ public:
     explicit QnRestServer(const QHostAddress& address, int port = DEFAULT_REST_PORT);
     virtual ~QnRestServer();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
 };
 
 #endif // __REST_SERVER_H__

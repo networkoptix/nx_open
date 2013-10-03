@@ -9,7 +9,7 @@ public:
     QnDroidControlPortListener(const QHostAddress& address, int port);
     virtual ~QnDroidControlPortListener();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner) override;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
 };
 
 class QnDroidControlPortProcessorPrivate;
@@ -17,7 +17,7 @@ class QnDroidControlPortProcessorPrivate;
 class QnDroidControlPortProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnDroidControlPortProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnDroidControlPortProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnDroidControlPortProcessor();
 protected:
     virtual void run() override;

@@ -55,8 +55,8 @@ void QnSignInfo::paintEvent(QPaintEvent *)
 
     {
         QMutexLocker lock(&m_mutex);
-        if (m_sign.isEmpty())
-            return;
+        //if (m_sign.isEmpty())
+        //    return;
         m_signHelper.setSign(m_sign);
     }
     QPixmap pixmap(m_textureWidth, m_textureHeight);

@@ -766,9 +766,9 @@ void QnMain::at_noStorages()
     qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
-void QnMain::at_storageFailure(QnResourcePtr storage)
+void QnMain::at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason)
 {
-    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError, storage);
+    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
 void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
@@ -923,7 +923,7 @@ void QnMain::run()
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
-    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr)), this, SLOT(at_storageFailure(QnResourcePtr)));
+    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
@@ -1253,6 +1253,21 @@ protected:
     virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
+
+        // check if local or remote EC. MServer changes guid depend of this fact
+        bool primaryGuidAbsent = qSettings.value(lit("serverGuid")).isNull();
+        if (primaryGuidAbsent)
+            qSettings.setValue("separateGuidForRemoteEC", 1);
+
+        QString ECHost = resolveHost(qSettings.value("appserverHost").toString()).toString();
+        bool isLocalAddr = (ECHost == lit("127.0.0.1") || ECHost == lit("localhost"));
+        foreach(const QHostAddress& addr, allLocalAddresses())
+        {
+            if (addr.toString() == ECHost)
+                isLocalAddr = true;
+        }
+        if (!isLocalAddr && qSettings.value("separateGuidForRemoteEC").toBool())
+            setUseAlternativeGuid(true);
 
         QString guid = serverGuid();
         if (guid.isEmpty())

@@ -266,7 +266,7 @@ void QnTcpListener::run()
                 }
                 d->ddosWarned = false;
                 NX_LOG( QString::fromLatin1("New client connection from %1").arg(clientSocket->getForeignAddress().address.toString()), cl_logDEBUG1 );
-                QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
+                QnTCPConnectionProcessor* processor = createRequestProcessor(QSharedPointer<AbstractStreamSocket>(clientSocket), this);
                 clientSocket->setRecvTimeout(processor->getSocketTimeout());
                 clientSocket->setSendTimeout(processor->getSocketTimeout());
                 

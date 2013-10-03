@@ -47,6 +47,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     const int encoderNumber = role == QnResource::Role_LiveVideo ? 0 : 1;
 
     nxcip::CameraMediaEncoder* intf = NULL;

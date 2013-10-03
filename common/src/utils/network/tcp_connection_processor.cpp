@@ -15,7 +15,7 @@
 static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -23,7 +23,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(AbstractStreamSocket* socket)
     d->chunkedMode = false;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, AbstractStreamSocket* socket):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, QSharedPointer<AbstractStreamSocket> socket):
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -325,7 +325,7 @@ void QnTCPConnectionProcessor::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-AbstractStreamSocket* QnTCPConnectionProcessor::socket() const
+QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket;
@@ -383,6 +383,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
 {
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
+    other.d_ptr->protocol = d->protocol;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
@@ -403,4 +404,10 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
     mutex.unlock();
     run();
     mutex.lock();
+}
+
+void QnTCPConnectionProcessor::releaseSocket()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->socket.clear();    
 }

@@ -13,7 +13,7 @@ QnDroidControlPortListener::~QnDroidControlPortListener()
     stop();
 }
 
-QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     return new QnDroidControlPortProcessor(clientSocket, owner);
 }
@@ -25,7 +25,7 @@ class QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 
-QnDroidControlPortProcessor::QnDroidControlPortProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
+QnDroidControlPortProcessor::QnDroidControlPortProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(socket)
 {
 

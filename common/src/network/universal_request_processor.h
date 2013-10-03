@@ -8,14 +8,15 @@ class QnUniversalRequestProcessorPrivate;
 class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnUniversalRequestProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
-    QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnUniversalRequestProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth);
+    QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth);
     virtual ~QnUniversalRequestProcessor();
 
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
     void processRequest();
+    bool authenticate();
 private:
     Q_DECLARE_PRIVATE(QnUniversalRequestProcessor);
 };

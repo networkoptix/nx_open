@@ -40,7 +40,7 @@ typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;
 class QnDesktopCameraConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnDesktopCameraConnectionProcessor(AbstractStreamSocket* socket, void* sslContext, QnDesktopResource* desktop);
+    QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop);
     virtual ~QnDesktopCameraConnectionProcessor();
     void processRequest();
     void sendData(const QnByteArray& data);

@@ -61,7 +61,10 @@ public:
     void setReadOnly(bool readOnly);
 
     void setMotionAvailable(bool available);
-    bool isMotionAvailable();
+    bool isMotionAvailable() const;
+
+    void setRecordingParamsAvailability(bool available);
+    bool isRecordingParamsAvailable() const;
 
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
@@ -119,6 +122,7 @@ private:
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams;
     bool m_motionAvailable;
+    bool m_recordingParamsAvailable;
     bool m_changesDisabled;
     bool m_readOnly;
 

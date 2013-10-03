@@ -23,7 +23,6 @@
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
-static const int AUTH_TIMEOUT = 60 * 1000;
 
 QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
     QnTcpListener(address, port)
@@ -36,7 +35,7 @@ QnProgressiveDownloadingServer::~QnProgressiveDownloadingServer()
 
 }
 
-QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     return new QnProgressiveDownloadingConsumer(clientSocket, owner);
 }
@@ -324,7 +323,7 @@ static const int MS_PER_SEC = 1000;
 
 extern QSettings qSettings;
 
-QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(AbstractStreamSocket* socket, QnTcpListener* _owner):
+QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
     Q_D(QnProgressiveDownloadingConsumer);
@@ -421,24 +420,6 @@ void QnProgressiveDownloadingConsumer::run()
     if (ready)
     {
         parseRequest();
-
-        QTime t;
-        t.restart();
-        while (!qnAuthHelper->authenticate(d->request, d->response))
-        {
-            if (t.elapsed() >= AUTH_TIMEOUT)
-                return; // close connection
-
-            d->responseBody = STATIC_UNAUTHORIZED_HTML;
-            sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
-            while (t.elapsed() < AUTH_TIMEOUT) {
-                ready = readRequest();
-                if (ready) {
-                    parseRequest();
-                    break;
-                }
-            }
-        }
 
         d->responseBody.clear();
 
@@ -580,6 +561,7 @@ void QnProgressiveDownloadingConsumer::run()
                 timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch(); // try ISO format
             timeMs *= 1000;
 
+
             if (isUTCRequest)
             {
                 QnAbstractArchiveDelegate* archive = 0;
@@ -686,7 +668,7 @@ void QnProgressiveDownloadingConsumer::run()
             camera->notInUse(this);
     }
 
-    d->socket->close();
+    //d->socket->close();
 }
 
 void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )
