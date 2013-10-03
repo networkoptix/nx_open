@@ -40,7 +40,7 @@ extern "C"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #ifdef Q_OS_WIN
-    #include "device_plugins/desktop_windows_specific/device/desktop_resource_searcher.h"
+    #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -90,6 +90,7 @@ extern "C"
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
+    #include "ui/workaround/size_move_workaround_win.h"
     #include "common/systemexcept_win32.h"
 #endif
 
@@ -101,7 +102,6 @@ extern "C"
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
-#include "ui/workaround/size_move_workaround_windows_specific.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)

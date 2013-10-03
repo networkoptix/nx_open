@@ -1,6 +1,10 @@
 #ifndef QN_DESKTOP_RESOURCE_H
 #define QN_DESKTOP_RESOURCE_H
 
+#include <QtCore/QtGlobal>
+
+#ifdef Q_OS_WIN
+
 #include "core/resource/resource.h"
 #include "plugins/resources/archive/abstract_archive_resource.h"
 #include "../desktop_data_provider_wrapper.h"
@@ -33,5 +37,7 @@ private:
     QMutex m_dpMutex;
     QMap<QString, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
+
+#endif
 
 #endif // QN_DESKTOP_RESOURCE_H

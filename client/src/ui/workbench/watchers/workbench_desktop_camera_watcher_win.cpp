@@ -1,4 +1,4 @@
-#include "workbench_desktop_camera_watcher_windows_specific.h"
+#include "workbench_desktop_camera_watcher_win.h"
 
 #include <utils/common/checked_cast.h>
 
@@ -8,7 +8,7 @@
 
 #include <api/media_server_connection.h>
 #include "core/resource/resource_fwd.h"
-#include "device_plugins/desktop_windows_specific/device/desktop_resource.h"
+#include "device_plugins/desktop_win/device/desktop_resource.h"
 
 enum {
     ServerTimeUpdatePeriod = 1000 * 60 * 2, /* 2 minutes. */

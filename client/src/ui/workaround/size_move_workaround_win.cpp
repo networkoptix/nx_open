@@ -1,4 +1,4 @@
-#include "size_move_workaround_windows_specific.h"
+#include "size_move_workaround_win.h"
 
 #include <Windows.h>
 

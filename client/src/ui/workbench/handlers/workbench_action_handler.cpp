@@ -124,7 +124,7 @@
 #include "../extensions/workbench_stream_synchronizer.h"
 
 #ifdef Q_OS_WIN
-#include "launcher_windows_specific/nov_launcher.h"
+#include "launcher/nov_launcher_win.h"
 #endif
 #include "core/resource/layout_item_data.h"
 #include "ui/dialogs/adjust_video_dialog.h"
