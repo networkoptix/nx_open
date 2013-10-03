@@ -9,7 +9,7 @@
  * This class hides launcher when application activates and
  * resores launcher when application loses focus.
  */
-class QnX11LauncherWorkaround: public QObject{
+class QnX11LauncherWorkaround: public QObject {
     Q_OBJECT
 
 public:

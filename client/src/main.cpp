@@ -102,6 +102,7 @@ extern "C"
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
+#include "ui/workaround/size_move_workaround_windows_specific.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -332,9 +333,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
 #ifdef Q_OS_WIN
-    QnIexploreUrlHandler iexploreUrlHanderWorkaround;
-    // all effects are placed in the constructor
-    Q_UNUSED(iexploreUrlHanderWorkaround)
+    new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
+    new QnSizeMoveWorkaround(application);
 #endif
 
     if(!noSingleApplication) {
