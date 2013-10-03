@@ -355,16 +355,17 @@ namespace nxcip
         //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability
         { 
-            hardwareMotionCapability    = 0x0001,     //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a BaseCameraManager::nativeMediaStreamCapability also
-            relayInputCapability        = 0x0002,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
-            relayOutputCapability       = 0x0004,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
-            ptzCapability               = 0x0008,     //!< if this flag is enabled, \a CameraPTZManager MUST be implemented
-            audioCapability             = 0x0010,     //!< if set, camera supports audio
-            shareFpsCapability          = 0x0020,     //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-            sharePixelsCapability       = 0x0040,     //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-            shareIpCapability           = 0x0080,     //!< allow multiple instances on a same IP address
-            dtsArchiveCapability        = 0x0100,     //!< camera has archive storage and provides access to its archive
-            nativeMediaStreamCapability = 0x0200      //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
+            hardwareMotionCapability            = 0x0001,     //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a BaseCameraManager::nativeMediaStreamCapability also
+            relayInputCapability                = 0x0002,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            relayOutputCapability               = 0x0004,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            ptzCapability                       = 0x0008,     //!< if this flag is enabled, \a CameraPTZManager MUST be implemented
+            audioCapability                     = 0x0010,     //!< if set, camera supports audio
+            shareFpsCapability                  = 0x0020,     //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
+            sharePixelsCapability               = 0x0040,     //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+            shareIpCapability                   = 0x0080,     //!< allow multiple instances on a same IP address
+            dtsArchiveCapability                = 0x0100,     //!< camera has archive storage and provides access to its archive
+            nativeMediaStreamCapability         = 0x0200,     //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
+            primaryStreamSoftMotionCapability   = 0x0400      //!< it is allowed to detect motion by primary stream (if no dual streaming on camera)
         };
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!

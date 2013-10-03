@@ -138,6 +138,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     if( !archiveDelegate )
         return QnSecurityCamResource::createArchiveDataProvider();
+        return QnPhysicalCameraResource::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
     if (hasFlags(still_image) || hasFlags(utc))
@@ -319,6 +320,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
+    setParam( lit("hasDualStreaming"), encoderCount > 1, QnDomainDatabase );
+
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
     result = m_camManager.getCameraCapabilities( &cameraCapabilities );
@@ -336,6 +339,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
         setCameraCapability( Qn::shareIpCapability, true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
+        setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         setPtzCapability( Qn::AbsolutePtzCapability, true );

@@ -61,7 +61,7 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
-    m_hwIdStr = QLatin1String(qnLicensePool->hardwareId2());
+    m_hwIdStr = QLatin1String(qnLicensePool->currentHardwareId());
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
@@ -706,7 +706,7 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = QLatin1String(qnLicensePool->hardwareId2());
+    QString hid = QLatin1String(qnLicensePool->currentHardwareId());
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);

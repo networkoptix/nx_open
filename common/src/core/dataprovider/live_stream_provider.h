@@ -10,6 +10,7 @@
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
+static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 //#define DESIRED_SECOND_STREAM_FPS (7)
 //#define MIN_SECOND_STREAM_FPS (2)
 
@@ -38,7 +39,7 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
-    void onGotVideoFrame(QnCompressedVideoDataPtr videoData);
+    virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData);
 
     void setUseSoftwareMotion(bool value);
 
@@ -55,7 +56,12 @@ protected:
 
     QnMetaDataV1Ptr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
-    QnResource::ConnectionRole roleForMotionEstimation();
+    virtual QnResource::ConnectionRole roleForMotionEstimation();
+    /*!
+        \param picSize video size in pixels
+    */
+    virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
+
 protected:
     mutable QMutex m_livemutex;
 
@@ -71,6 +77,7 @@ private:
 
     QnResource::ConnectionRole m_softMotionRole;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+    QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     const QnResourceVideoLayout* m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;

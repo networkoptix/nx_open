@@ -209,13 +209,15 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
+    const int effectiveWidth = frame->width & (~0x07);
+
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     const simd128i* curLinePtrPrev = (const simd128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
-    int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
+    int xSteps = qPower2Ceil((unsigned)effectiveWidth,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
     int ySteps = MD_HEIGHT;
 
@@ -263,7 +265,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         dst++;
     }
 
-    //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
+    //saveFrame(frame->data[0], effectiveWidth, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 }
 
 void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
@@ -911,12 +913,12 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     }
 }
 
-void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
+bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 {
     QMutexLocker lock(&m_mutex);
 
     if (m_decoder == 0 && !(videoData->flags & AV_PKT_FLAG_KEY))
-        return;
+        return false;
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
@@ -928,7 +930,9 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
 
     if (!m_decoder->decode(videoData, &m_frames[idx]))
-        return;
+        return false;
+    m_videoResolution.setWidth( m_frames[idx]->width );
+    m_videoResolution.setHeight( m_frames[idx]->height );
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
     m_lastFrameTime = m_frames[idx]->pkt_dts;
@@ -1018,6 +1022,8 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 #endif
     if (m_totalFrames == 0)
         m_totalFrames++;
+
+    return true;
 }
 
 void QnMotionEstimation::postFiltering()
@@ -1098,6 +1104,11 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
 bool QnMotionEstimation::existsMetadata() const
 {
     return m_lastFrameTime - m_firstFrameTime >= MOTION_AGGREGATION_PERIOD; // 30 ms agg period
+}
+
+QSize QnMotionEstimation::videoResolution() const
+{
+    return m_videoResolution;
 }
 
 void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
