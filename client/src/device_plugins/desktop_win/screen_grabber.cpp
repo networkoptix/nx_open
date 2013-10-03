@@ -587,12 +587,12 @@ bool QnScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     //pFrame->pts = m_timer.elapsed();
     pFrame->best_effort_timestamp = pFrame->pts;
 
-    bool rez = dataToFrame((unsigned char*)lockedRect.pBits, m_ddm.Width, m_ddm.Height, pFrame);
+    bool rez = dataToFrame((unsigned char*)lockedRect.pBits, lockedRect.Pitch, m_ddm.Width, m_ddm.Height, pFrame);
     pSurface->UnlockRect();
     return rez;
 }
 
-bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
+bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int height, AVFrame* pFrame)
 {
     drawLogo((quint8*) data, width, height);
     int roundWidth = width & ~7;
@@ -624,7 +624,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
 #else
         if (useSSE3())
         {
-            bgra_to_yv12_sse2_intr(data, width * 4,
+            bgra_to_yv12_sse2_intr(data, dataStride,
                 m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
                 m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
@@ -641,7 +641,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
     {
         if (useSSE3())
         {
-            bgra_to_yv12_sse2_intr(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
+            bgra_to_yv12_sse2_intr(data, dataStride, pFrame->data[0], pFrame->data[1], pFrame->data[2],
                              pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
         else {
@@ -655,7 +655,7 @@ bool QnScreenGrabber::capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* p
 {
     bool rez = false;
     if (m_mode == Qn::WindowMode)
-        rez = dataToFrame((quint8*) captureInfo->opaque, captureInfo->width, captureInfo->height, pFrame);
+        rez = dataToFrame((quint8*) captureInfo->opaque, captureInfo->width, captureInfo->width, captureInfo->height, pFrame);
     else
         rez = direct3DDataToFrame(captureInfo->opaque, pFrame);
     pFrame->pts = captureInfo->pts;
