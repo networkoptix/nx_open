@@ -95,6 +95,9 @@ public:
         /** Last used path for the layout backgrounds */
         BACKGROUNDS_FOLDER,
 
+        /** Allow double buffering for openGL context */
+        GL_DOUBLE_BUFFER,
+
         VARIABLE_COUNT
     };
 
@@ -173,6 +176,8 @@ private:
         QN_DECLARE_R_PROPERTY (int,                         statisticsNetworkFilter,                            STATISTICS_NETWORK_FILTER,  1)
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
+        QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
+
     QN_END_PROPERTY_STORAGE()
 
 private:
