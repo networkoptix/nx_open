@@ -307,6 +307,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
+    connect(action(Qn::SetCurrentItemAspectRatioAutoAction),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatioAutoAction_triggered()));
+    connect(action(Qn::SetCurrentItemAspectRatio4x3Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio4x3Action_triggered()));
+    connect(action(Qn::SetCurrentItemAspectRatio16x9Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -873,7 +876,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             if(snapshotManager()->isLocal(layout)) {
                 if(layout->getItems().empty()) {
                     resourcePool()->removeResource(layout);
-                } else {
+                } else if(!snapshotManager()->isFile(layout)) {
                     layout->setParentId(user->getId());
                 }
             }
@@ -1599,8 +1602,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
         if (wlayout)
             wlayout->centralizeItems();
     }
-
-    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -3170,10 +3171,19 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         if (m_exportStorage && (m_exportedMediaRes->toResource()->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         QnLayoutItemData itemData = m_exportLayout->getItem(uniqId);
+
+        QnMediaResourcePtr mediaRes = m_exportedMediaRes.dynamicCast<QnMediaResource>();
+        int timeOffset = 0;
+        if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+            // time difference between client and server
+            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0);
+        }
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll,
                                                       (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage,
                                                        role,
-                                                       0, 0,
+                                                       timeOffset, serverTimeZone,
                                                        itemData.zoomRect,
                                                        itemData.contrastParams,
                                                        itemData.dewarpingParams);
@@ -3498,6 +3508,39 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
     QMessageBox::warning(mainWindow(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
 }
 
+void QnWorkbenchActionHandler::at_setCurrentItemAspectRatioAutoAction_triggered() {
+
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(0.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio4x3Action_triggered() {
+
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(4.0 / 3.0);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio16x9Action_triggered() {
+
+    QnActionParameters params = menu()->currentParameters(sender());
+
+    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    if(!mediaWidget)
+        return;
+    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
+}
+
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
     action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -3747,8 +3790,6 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         }
     }
     layout->setBackgroundSize(QSize(w, h));
-
-    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {

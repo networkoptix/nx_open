@@ -5,6 +5,7 @@
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_criterion.h>
 #include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_resource.h>
 #include <recording/time_period_list.h>
 #include <camera/resource_display.h>
 
@@ -341,9 +342,14 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {
-    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourcePtr media = parameters.resource().dynamicCast<QnMediaResource>();
+    if(!media)
         return Qn::InvisibleAction;
+
+    bool isImage = media->toResource()->flags() & QnResource::still_image;
+    if (isImage)
+        return Qn::InvisibleAction;
+
 #if 0
     if(camera->isGroupPlayOnly())
         return Qn::InvisibleAction;

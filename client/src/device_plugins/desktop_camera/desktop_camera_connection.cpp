@@ -14,8 +14,8 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
         QnAbstractDataConsumer(20), 
-        m_owner(owner),
-        m_sequence(0)
+        m_sequence(0),
+        m_owner(owner)
     {
         for (int i = 0; i < 2; ++i) {
             m_serializers[i].setAdditionFlags(0);
@@ -81,7 +81,7 @@ public:
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(AbstractStreamSocket* socket, void* sslContext, QnDesktopResource* desktop):
-  QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket, sslContext)
+  QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
     d->desktop = desktop;
@@ -204,11 +204,13 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
 
 void QnDesktopCameraConnection::pleaseStop()
 {
-    if (processor)
-        processor->pleaseStop();
-
-    if (connection)
-        connection->getSocket()->close();
+    {
+        QMutexLocker lock(&m_mutex);
+        if (processor)
+            processor->pleaseStop();
+        if (connection)
+            connection->getSocket()->close();
+    }
 
     QnLongRunnable::pleaseStop();
 }
@@ -231,7 +233,7 @@ void QnDesktopCameraConnection::run()
             connection->addHeader("user-name", auth.user().toUtf8());
         }
 
-        CLHttpStatus status = connection->doGET("desktop_camera");
+        CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));
         if (status != CL_HTTP_SUCCESS) {
             terminatedSleep(1000 * 10);
             continue;
@@ -260,5 +262,6 @@ void QnDesktopCameraConnection::run()
     delete processor;
     delete connection;
 
+    processor = 0;
     connection = 0;
 }

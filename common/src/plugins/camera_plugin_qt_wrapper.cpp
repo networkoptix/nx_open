@@ -244,13 +244,6 @@ namespace nxcip_qt
         return m_intf->getPTZManager();
     }
 
-    //!See nxcip::BaseCameraManager::getCameraMotionDataProvider
-    nxcip::CameraMotionDataProvider* BaseCameraManager::getCameraMotionDataProvider() const
-    {
-        QMutexLocker lk( &m_mutex );
-        return m_intf->getCameraMotionDataProvider();
-    }
-
     //!See nxcip::BaseCameraManager::getCameraRelayIOManager
     nxcip::CameraRelayIOManager* BaseCameraManager::getCameraRelayIOManager() const
     {

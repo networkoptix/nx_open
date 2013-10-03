@@ -18,6 +18,9 @@ public:
     QString getPassword() const;
     void setPassword(const QString &password);
 
+    QString getDigest() const;
+    void setDigest(const QString& digest);
+
     quint64 getPermissions() const;
     void setPermissions(quint64 permissions);
 
@@ -35,6 +38,7 @@ protected:
 
 private:
     QString m_password;
+    QString m_digest;
     quint64 m_permissions;
     bool m_isAdmin;
     QString m_email;

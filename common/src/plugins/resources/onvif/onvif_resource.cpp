@@ -53,9 +53,6 @@ static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
 
 //Forth times greater than default = 320 x 240
 
-static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
-
-
 /* Some cameras declare invalid max resolution */
 struct StrictResolution {
     const char* model;
@@ -2882,14 +2879,14 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
+            //return CameraDiagnostics::RequestFailedResult(QLatin1String("getNetworkInterfaces"), soapWrapper.getLastError());
         }
+        else {
+            const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
 
-        const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
-
-        if (!mac.isEmpty()) 
-            setMAC(mac);
-
+            if (!mac.isEmpty()) 
+                setMAC(mac);
+        }
         if (getPhysicalId().isEmpty())
         {
             setPhysicalId(hardwareId);

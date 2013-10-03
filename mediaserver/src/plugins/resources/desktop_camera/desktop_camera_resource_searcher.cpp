@@ -119,7 +119,7 @@ TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userN
     for (int i = 0; i < m_connections.size(); ++i)
     {
         ClientConnectionInfo& conn = m_connections[i];
-        if (conn.useCount == 0) {
+        if (conn.useCount == 0 && conn.userName == userName) {
             conn.useCount++;
             return conn.socket;
         }

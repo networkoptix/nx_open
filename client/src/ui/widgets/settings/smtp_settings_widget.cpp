@@ -190,6 +190,9 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 }
 
 void QnSmtpSettingsWidget::at_simpleEmail_textChanged(const QString &value) {
+    if (!m_settingsReceived)
+        return;
+
     ui->detectErrorLabel->setText(QString());
 
     if (value.isEmpty())
@@ -228,11 +231,15 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
         ui->simpleSignatureLineEdit->setText(ui->signatureLineEdit->text());
+        at_simpleEmail_textChanged(ui->userLineEdit->text()); //force error checking
     }
     ui->stackedWidget->setCurrentIndex(toggled ? AdvancedPage : SimplePage);
 }
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
+    if (!m_settingsReceived)
+        return;
+
     QnEmail::Settings result = settings();
     if (result.isNull()) {
         QMessageBox::warning(this, tr("Invalid data"), tr("Cannot test such parameters"));
@@ -305,12 +312,12 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
         return;
 
     m_requestHandle = -1;
-    m_settingsReceived = true;
     context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(status, values, handle);
 
     bool success = (status == 0);
     if(!success) {
         QMessageBox::critical(this, tr("Error"), tr("Error while receiving settings"));
+        m_settingsReceived = true;
         return;
     }
 
@@ -326,4 +333,5 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
                                        ? AdvancedPage
                                        : SimplePage);
+    m_settingsReceived = true;
 }

@@ -96,6 +96,8 @@ message InitialMessage {
     optional string hardwareId2                = 7;
     optional string publicIp                   = 8;
     optional string systemName                 = 9;
+    optional string sessionKey                 = 10;
+    optional string hardwareId3                = 11;
 }
 
 message FileAddMessage {
@@ -129,6 +131,7 @@ message RuntimeInfoChangeMessage {
 
     optional string publicIp = 1;
     optional string systemName = 2;
+    optional string sessionKey = 3;
 }
 
 message BusinessRuleResetMessage {

@@ -17,9 +17,11 @@
 #include "utils/common/util.h"
 #include "core/resource/camera_resource.h"
 #include "cached_output_stream.h"
+#include "network/authenticate_helper.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
+static const int AUTH_TIMEOUT = 60 * 1000;
 
 QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
     QnTcpListener(address, port)
@@ -321,7 +323,7 @@ static const int MS_PER_SEC = 1000;
 extern QSettings qSettings;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(AbstractStreamSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
@@ -417,6 +419,25 @@ void QnProgressiveDownloadingConsumer::run()
     if (ready)
     {
         parseRequest();
+
+        QTime t;
+        t.restart();
+        while (!qnAuthHelper->authenticate(d->requestHeaders, d->responseHeaders))
+        {
+            if (t.elapsed() >= AUTH_TIMEOUT)
+                return; // close connection
+
+            d->responseBody = STATIC_UNAUTHORIZED_HTML;
+            sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
+            while (t.elapsed() < AUTH_TIMEOUT) {
+                ready = readRequest();
+                if (ready) {
+                    parseRequest();
+                    break;
+                }
+            }
+        }
+
         d->responseBody.clear();
 
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain

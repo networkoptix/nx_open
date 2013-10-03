@@ -37,7 +37,7 @@ public:
     void setEndTime(qint64 valueUsec);
     qint64 endTime() const;
 
-    void setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec);
+    void setArchiveRange(qint64 startTimeUsec, qint64 endTimeUsec, bool recursive = true);
 
     virtual void setStatus(Status newStatus, bool silenceMode = false);
 

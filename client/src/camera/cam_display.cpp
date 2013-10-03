@@ -114,20 +114,20 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
+    m_forceMtDecoding(false),
     m_timeMutex(QMutex::Recursive),
     m_resource(resource),
-	m_firstAfterJumpTime(AV_NOPTS_VALUE),
-	m_receivedInterval(0),
+    m_firstAfterJumpTime(AV_NOPTS_VALUE),
+    m_receivedInterval(0),
     m_archiveReader(reader),
     m_fullScreen(false),
     m_prevLQ(-1),
     m_doNotChangeDisplayTime(false),
     m_firstLivePacket(true),
-    m_multiView(false),
-    m_forceMtDecoding(false)
+    m_multiView(false)
 {
 
-    if (resource->toResource()->hasFlags(QnResource::live_cam))
+    if (resource && resource->toResource()->hasFlags(QnResource::live_cam))
         m_isRealTimeSource = true;
     else
         m_isRealTimeSource = false;
@@ -369,7 +369,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     m_totalFrames++;
     if (vd->flags & AV_PKT_FLAG_KEY)
         m_iFrames++;
-    if (vd->flags & QnAbstractMediaData::MediaFlags_FCZ)
+    bool isPrebuffering = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
+    if (isPrebuffering)
         m_fczFrames++; // fast channel zapping
 
     // in ideal world data comes to queue at the same speed as it goes out
@@ -377,11 +378,16 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
-    if (vd->flags & QnAbstractMediaData::MediaFlags_BOF)
+    if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || isPrebuffering)
         m_lastSleepInterval = needToSleep = 0;
-    
+
     if (vd->flags & AV_REVERSE_BLOCK_START)
-        needToSleep = m_lastSleepInterval;
+    {
+        const long frameTimeDiff = abs((long)(currentTime - m_previousVideoTime));
+        needToSleep = (m_lastSleepInterval == 0) && (frameTimeDiff < MAX_FRAME_DURATION * 1000)
+            ? frameTimeDiff
+            : m_lastSleepInterval;
+    }
     else {
         needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
@@ -1075,6 +1081,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         //    afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
 
+
     if (emptyData && !flushCurrentBuffer)
     {
         if (speed == 0)
@@ -1665,6 +1672,12 @@ bool QnCamDisplay::isBuffering() const
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
     return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
+}
+
+void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        m_display[i]->setOverridenAspectRatio(aspectRatio);
+    }
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

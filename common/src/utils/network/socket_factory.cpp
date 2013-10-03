@@ -6,6 +6,7 @@
 #include "socket_factory.h"
 
 #include "system_socket.h"
+#include "ssl_socket.h"
 
 
 AbstractDatagramSocket* SocketFactory::createDatagramSocket()
@@ -13,12 +14,19 @@ AbstractDatagramSocket* SocketFactory::createDatagramSocket()
     return new UDPSocket();
 }
 
-AbstractStreamSocket* SocketFactory::createStreamSocket( bool /*sslRequired*/, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
+AbstractStreamSocket* SocketFactory::createStreamSocket( bool sslRequired, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
 {
-    return new TCPSocket();
+    AbstractStreamSocket* result = new TCPSocket();
+    if (sslRequired)
+        result = new QnSSLSocket(result, false);
+    
+    return result;
 }
 
-AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool /*sslRequired*/, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
+AbstractStreamServerSocket* SocketFactory::createStreamServerSocket( bool sslRequired, SocketFactory::NatTraversalType /*natTraversalRequired*/ )
 {
-    return new TCPServerSocket();
+    if (sslRequired)
+        return new TCPSslServerSocket();
+    else
+        return new TCPServerSocket();
 }

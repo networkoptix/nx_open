@@ -11,7 +11,10 @@
 #include <QStringList>
 
 #include "api/app_server_connection.h"
+#include "motion_data_picture.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 #include "third_party_stream_reader.h"
+#include "third_party_archive_delegate.h"
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
@@ -130,6 +133,110 @@ bool QnThirdPartyResource::setRelayOutputState(
         autoResetTimeoutMS ) == nxcip::NX_NO_ERROR;
 }
 
+QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
+{
+    QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+    if( !archiveDelegate )
+        return QnPhysicalCameraResource::createArchiveDataProvider();
+    QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    if (hasFlags(still_image) || hasFlags(utc))
+        archiveReader->setCycleMode(false);
+    return archiveReader;
+}
+
+QnAbstractArchiveDelegate* QnThirdPartyResource::createArchiveDelegate()
+{
+    unsigned int camCapabilities = 0;
+    if( m_camManager.getCameraCapabilities( &camCapabilities ) != nxcip::NX_NO_ERROR ||
+        (camCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability) == 0 )
+    {
+        return NULL;
+    }
+
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    if( !camManager2 )
+        return NULL;
+
+    nxcip::DtsArchiveReader* archiveReader = NULL;
+    if( camManager2->createDtsArchiveReader( &archiveReader ) != nxcip::NX_NO_ERROR ||
+        archiveReader == NULL )
+    {
+        return NULL;
+    }
+    camManager2->releaseRef();
+
+    return new ThirdPartyArchiveDelegate( toResourcePtr(), archiveReader );
+}
+
+static const unsigned int USEC_IN_MS = 1000;
+
+QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
+    const QList<QRegion>& regions,
+    qint64 startTimeMs,
+    qint64 endTimeMs,
+    int detailLevel )
+{
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    Q_ASSERT( camManager2 );
+
+    QnTimePeriodList resultTimePeriods;
+
+    nxcip::ArchiveSearchOptions searchOptions;
+    if( !regions.isEmpty() )
+    {
+        //filling in motion mask
+        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture() );
+
+        QRegion unitedRegion;
+        for( QList<QRegion>::const_iterator
+            it = regions.begin();
+            it != regions.end();
+            ++it )
+        {
+            unitedRegion = unitedRegion.united( *it );
+        }
+
+        const QVector<QRect>& rects = unitedRegion.rects();
+        foreach( QRect r, rects )
+        {
+            for( int y = r.top(); y < std::min<int>(motionDataPicture->height(), r.bottom()); ++y )
+                for( int x = r.left(); x < std::min<int>(motionDataPicture->width(), r.right()); ++x )
+                    motionDataPicture->setPixel( x, y, 1 ); //TODO: some optimization would be appropriate
+        }
+
+        searchOptions.motionMask = motionDataPicture.release();
+    }
+    searchOptions.startTime = startTimeMs * USEC_IN_MS;
+    searchOptions.endTime = endTimeMs * USEC_IN_MS;
+    searchOptions.periodDetailLevel = detailLevel;
+    nxcip::TimePeriods* timePeriods = NULL;
+    if( camManager2->find( &searchOptions, &timePeriods ) != nxcip::NX_NO_ERROR || !timePeriods )
+        return resultTimePeriods;
+    camManager2->releaseRef();
+
+    for( timePeriods->goToBeginning(); !timePeriods->atEnd(); timePeriods->next() )
+    {
+        nxcip::UsecUTCTimestamp periodStart = nxcip::INVALID_TIMESTAMP_VALUE;
+        nxcip::UsecUTCTimestamp periodEnd = nxcip::INVALID_TIMESTAMP_VALUE;
+        timePeriods->get( &periodStart, &periodEnd );
+
+        resultTimePeriods << QnTimePeriod( periodStart / USEC_IN_MS, (periodEnd-periodStart) / USEC_IN_MS );
+    }
+    timePeriods->releaseRef();
+
+    return resultTimePeriods;
+}
+
+QnTimePeriodList QnThirdPartyResource::getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel )
+{
+    return getDtsTimePeriodsByMotionRegion(
+        QList<QRegion>(),
+        startTimeMs,
+        endTimeMs,
+        detailLevel );
+}
+
 //!Implementation of nxpl::NXPluginInterface::queryInterface
 void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
@@ -137,6 +244,11 @@ void* QnThirdPartyResource::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         addRef();
         return static_cast<nxcip::CameraInputEventHandler *>(this);
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
     }
     return NULL;
 }
@@ -206,6 +318,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
+    setParam( lit("hasDualStreaming"), encoderCount > 1, QnDomainDatabase );
+
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
     result = m_camManager.getCameraCapabilities( &cameraCapabilities );
@@ -223,6 +337,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
         setCameraCapability( Qn::shareIpCapability, true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
+        setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         setPtzCapability( Qn::AbsolutePtzCapability, true );
@@ -230,6 +346,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
+        setParam( lit("dts"), 1, QnDomainMemory );
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )

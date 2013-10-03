@@ -12,7 +12,7 @@ QString QnDesktopCameraResource::getDriverName() const
 
 QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource()
 {
-
+    setFlags(flags() | no_last_gop);
 }
 
 QnDesktopCameraResource::~QnDesktopCameraResource()
@@ -43,4 +43,13 @@ QString QnDesktopCameraResource::gePhysicalIdPrefix() const
 QString QnDesktopCameraResource::getUserName() const 
 { 
     return getPhysicalId().mid(ID_PREFIX.size());
+}
+
+const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+{
+    const QnDesktopCameraStreamReader* deskopReader = dynamic_cast<const QnDesktopCameraStreamReader*>(dataProvider);
+    if (deskopReader && deskopReader->getDPAudioLayout())
+        return deskopReader->getDPAudioLayout();
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }

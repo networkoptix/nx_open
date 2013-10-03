@@ -26,7 +26,7 @@ public:
                             const QSize& captureResolution = QSize(0, 0),
                             QWidget* widget = 0);
     virtual ~QnBufferedScreenGrabber();
-    QnScreenGrabber::CaptureInfo getNextFrame();
+    CaptureInfoPtr getNextFrame();
     bool dataExist();
 
     AVRational getFrameRate();
@@ -37,16 +37,16 @@ public:
     int screenHeight() const         { return m_grabber.screenHeight(); }
     qint64 currentTime() const { return m_grabber.currentTime(); }
 
-    bool capturedDataToFrame(QnScreenGrabber::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
+    bool capturedDataToFrame(CaptureInfoPtr data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
     void setLogo(const QPixmap& logo) { m_grabber.setLogo(logo); }
-
+    virtual void pleaseStop() override;
 protected:
     virtual void run();
 
 private:
     QnScreenGrabber m_grabber;
     int m_frameRate;
-    CLThreadQueue<QnScreenGrabber::CaptureInfo> m_queue;
+    CLThreadQueue<CaptureInfoPtr> m_queue;
     QVector<AVFrame*> m_frames;
     int m_frameIndex;
     //QTime m_timer;

@@ -90,6 +90,8 @@ private:
     QUrl createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
 
 private slots:
+    void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
+    void at_proxyAuthenticationRequired ( const QNetworkProxy & proxy, QAuthenticator * authenticator);
     void at_aboutToBeStopped();
     void at_aboutToBeStarted();
     void at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);

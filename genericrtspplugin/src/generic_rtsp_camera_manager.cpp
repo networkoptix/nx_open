@@ -25,7 +25,7 @@ GenericRTSPCameraManager::GenericRTSPCameraManager( const nxcip::CameraInfo& inf
     const QStringList& valList = auxiliaryData.split( QLatin1Char('='), QString::SkipEmptyParts );
     if( !valList.isEmpty() && valList[0] == QLatin1String("audio") )
         m_capabilities |= nxcip::BaseCameraManager::audioCapability;
-    m_capabilities |= nxcip::BaseCameraManager::shareIpCapability;
+    m_capabilities |= nxcip::BaseCameraManager::shareIpCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
 }
 
 GenericRTSPCameraManager::~GenericRTSPCameraManager()
@@ -38,6 +38,11 @@ void* GenericRTSPCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID
     {
         addRef();
         return this;
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
     }
     return NULL;
 }
@@ -106,7 +111,6 @@ nxcip::CameraPTZManager* GenericRTSPCameraManager::getPTZManager() const
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
 nxcip::CameraMotionDataProvider* GenericRTSPCameraManager::getCameraMotionDataProvider() const
 {
     return NULL;
@@ -130,7 +134,7 @@ const nxcip::CameraInfo& GenericRTSPCameraManager::info() const
     return m_info;
 }
 
-CommonRefManager* GenericRTSPCameraManager::refManager()
+nxpt::CommonRefManager* GenericRTSPCameraManager::refManager()
 {
     return &m_refManager;
 }

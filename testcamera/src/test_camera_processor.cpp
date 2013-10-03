@@ -16,7 +16,7 @@ public:
 };
 
 QnTestCameraProcessor::QnTestCameraProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(socket)
 {
 }
 

@@ -8,7 +8,7 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "common_ref_manager.h"
+#include <plugins/plugin_tools.h>
 
 
 class GenericRTSPCameraManager;
@@ -45,7 +45,7 @@ public:
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
 private:
-    CommonRefManager m_refManager;
+    nxpt::CommonRefManager m_refManager;
     GenericRTSPCameraManager* m_cameraManager;
 };
 

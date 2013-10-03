@@ -20,6 +20,7 @@ extern "C"
 #include "core/resource/media_server_resource.h"
 #include "redass/redass_controller.h"
 #include "device_plugins/server_camera/server_camera.h"
+#include "api/app_server_connection.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -45,10 +46,10 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
     m_audioLayout(0),
-    m_customVideoLayout(0),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_customVideoLayout(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -809,6 +810,14 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
             numOfVideoChannels = videoLayout->channelCount();
     }
     m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
+    
+    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
+    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+    
+    m_rtspSession.setAuth(auth, RTPSession::authDigest);
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

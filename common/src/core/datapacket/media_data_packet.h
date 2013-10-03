@@ -9,6 +9,7 @@ extern "C"
     #include "libavcodec/avcodec.h"
 }
 #include "abstract_data_packet.h"
+#include <plugins/camera_plugin.h>
 #include "utils/common/byte_array.h"
 #include "utils/media/sse_helper.h"
 
@@ -150,8 +151,12 @@ Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
-    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
-        : QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
+    QnCompressedVideoData(
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    :
+        QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
     {
         dataType = VIDEO;
         //useTwice = false;
@@ -257,6 +262,9 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     /** returns true if no motion detected */
     bool isEmpty() const;
 
+    //!Copies \a motionPicture data
+    void assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration );
+
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
@@ -357,8 +365,12 @@ public:
 
 struct QnCompressedAudioData : public QnAbstractMediaData
 {
-    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
-        : QnAbstractMediaData(alignment, capacity)
+    QnCompressedAudioData (
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    :
+        QnAbstractMediaData(alignment, capacity)
     {
         dataType = AUDIO;
         duration = 0;

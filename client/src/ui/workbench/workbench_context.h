@@ -23,7 +23,9 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
+#ifdef Q_OS_WIN
 class QnWorkbenchDesktopCameraWatcher;
+#endif
 class QnActionManager;
 
 /**
@@ -114,7 +116,9 @@ private:
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;
+#ifdef Q_OS_WIN
     QnWorkbenchDesktopCameraWatcher* m_desktopCameraWatcher;
+#endif
 };
 
 

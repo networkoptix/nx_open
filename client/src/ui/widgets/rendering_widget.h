@@ -15,7 +15,7 @@ class QnResourceWidgetRenderer;
 class QnRenderingWidget: public QGLWidget {
     Q_OBJECT;
 public:
-    QnRenderingWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    QnRenderingWidget(const QGLFormat &format, QWidget *parent = 0, QGLWidget *shareWidget = NULL, Qt::WindowFlags f = 0);
     virtual ~QnRenderingWidget();
 
     QnMediaResourcePtr resource() const;
