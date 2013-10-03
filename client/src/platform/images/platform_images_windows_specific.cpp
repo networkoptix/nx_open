@@ -1,9 +1,6 @@
-
-#ifdef _WIN32
-
 #include "platform_images.h"
 
-#include <Windows.h>
+
 
 
 namespace {
@@ -128,19 +125,55 @@ namespace {
         return QPixmap::fromImage(image);
     }
 
+    LPCWSTR standardCursorName(Qt::CursorShape shape) {
+        switch (shape) {
+        case Qt::ArrowCursor:           return IDC_ARROW;
+        case Qt::UpArrowCursor:         return IDC_UPARROW;
+        case Qt::CrossCursor:           return IDC_CROSS;
+        case Qt::WaitCursor:            return IDC_WAIT;
+        case Qt::IBeamCursor:           return IDC_IBEAM;
+        case Qt::SizeVerCursor:         return IDC_SIZENS;
+        case Qt::SizeHorCursor:         return IDC_SIZEWE;
+        case Qt::SizeBDiagCursor:       return IDC_SIZENESW;
+        case Qt::SizeFDiagCursor:       return IDC_SIZENWSE;
+        case Qt::SizeAllCursor:         return IDC_SIZEALL;
+        case Qt::PointingHandCursor:    return IDC_HAND;
+        case Qt::ForbiddenCursor:       return IDC_NO;
+        case Qt::WhatsThisCursor:       return IDC_HELP;
+        case Qt::BusyCursor:            return IDC_APPSTARTING;
+
+        case Qt::BlankCursor:       
+        case Qt::SplitVCursor:
+        case Qt::SplitHCursor:
+        case Qt::OpenHandCursor:
+        case Qt::ClosedHandCursor:
+        case Qt::BitmapCursor:
+            return NULL; /* These are hardcoded as pixmaps in Qt. */
+            
+        case Qt::DragCopyCursor:
+        case Qt::DragMoveCursor:
+        case Qt::DragLinkCursor:
+            return NULL; /* These should be provided by QApplicationPrivate::getPixmapCursor, but are not... */
+
+        default:
+            return NULL;
+        }
+    }
+
 } // anonymous namespace
 
-
 QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
-    QCursor cursor(shape);
-    //HCURSOR handle = cursor.handle();
-    HCURSOR handle = NULL;
-    // TODO: There is a bug in Qt 4.7.4 that results in drag cursors returning NULL handle. We don't care.
+    LPCWSTR cursorName = standardCursorName(shape);
+    if(cursorName) {
+        HCURSOR handle = LoadCursorW(0, cursorName);
+        
+        QPoint hotSpot;
+        QPixmap pixmap = QPixmap_fromWinHICON(handle, &hotSpot);
 
-    QPoint hotSpot;
-    QPixmap pixmap = QPixmap_fromWinHICON(handle, &hotSpot);
-
-    return QCursor(pixmap, hotSpot.x(), hotSpot.y());
+        return QCursor(pixmap, hotSpot.x(), hotSpot.y());
+    } else {
+        return QCursor(shape); // TODO
+    }
 }
 
-#endif  //_WIN32
+

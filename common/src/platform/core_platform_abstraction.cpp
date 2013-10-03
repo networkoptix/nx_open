@@ -1,35 +1,26 @@
-#include "platform_abstraction.h"
+#include "core_platform_abstraction.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QProcess>
 
 #include <utils/common/warnings.h>
 
-QnPlatformAbstraction *QnPlatformAbstraction::s_instance = NULL;
-
-QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
+QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
     QObject(parent) 
 {
     if(!qApp)
-        qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
+        qnWarning("QApplication instance must be created before a QnCorePlatformAbstraction.");
 
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
     m_notifier = QnPlatformNotifier::newInstance(this);
     m_process = QnPlatformProcess::newInstance(NULL, this);
-
-    if(s_instance) {
-        qnWarning("QnPlatformAbstraction instance already exists.");
-    } else {
-        s_instance = this;
-    }
 }
 
-QnPlatformAbstraction::~QnPlatformAbstraction() {
-    if(s_instance == this)
-        s_instance = NULL;
+QnCorePlatformAbstraction::~QnCorePlatformAbstraction() {
+    return;
 }
 
-QnPlatformProcess *QnPlatformAbstraction::process(QProcess *source) const {
+QnPlatformProcess *QnCorePlatformAbstraction::process(QProcess *source) const {
     if(source == NULL)
         return m_process;
 

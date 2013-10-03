@@ -97,7 +97,6 @@ extern "C"
 #include "client/client_module.h"
 #include <client/client_connection_data.h>
 #include "platform/platform_abstraction.h"
-#include <platform/client_platform_abstraction.h>
 #include "utils/common/long_runnable.h"
 
 #include "text_to_wav.h"
@@ -324,7 +323,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setStartDragDistance(20);
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnClientPlatformAbstraction> clientPlatform(new QnClientPlatformAbstraction());
+    QScopedPointer<QnPlatformAbstraction> clientPlatform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
 
 #ifdef Q_WS_X11
