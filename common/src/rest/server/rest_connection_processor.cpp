@@ -47,7 +47,7 @@ QByteArray compressData(const QByteArray& data)
     static int GZIP_HEADER_SIZE = 10;
     const quint8 GZIP_HEADER[] = {
         0x1f, 0x8b      // gzip magic number
-        , 8             // compress method "defalte"
+        , 8             // compress method "deflate"
         , 1             // text data
         , 0, 0, 0, 0    // timestamp is not set
         , 2             // maximum compression flag
