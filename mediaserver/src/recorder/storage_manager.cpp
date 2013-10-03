@@ -11,11 +11,26 @@
 #include "serverutil.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/resource/camera_resource.h"
+#include "utils/common/sleep.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 
 Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
+
+
+class RebuildAsyncTask: public QnLongRunnable
+{
+public:
+    RebuildAsyncTask(QnStorageManager* owner) : m_storageManager(owner){}
+    virtual void run() override
+    {
+        m_storageManager->rebuildCatalogIndexInternal();
+    }
+private:
+    QnStorageManager* m_storageManager;
+};
+
 
 class TestStorageThread: public QnLongRunnable
 {
@@ -53,7 +68,8 @@ QnStorageManager::QnStorageManager():
     m_warnSended(false),
     m_isWritableStorageAvail(false),
     m_rebuildState(RebuildState_None),
-    m_rebuildProgress(0)
+    m_rebuildProgress(0),
+    m_asyncRebuildTask(0)
 {
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
@@ -73,15 +89,18 @@ double QnStorageManager::rebuildProgress() const
     return m_rebuildProgress;
 }
 
-void QnStorageManager::rebuildCatalogIndex()
+void QnStorageManager::rebuildCatalogIndexInternal()
 {
-    QMutexLocker lock(&m_mutexCatalog);
-    m_rebuildProgress = 0;
-    m_catalogLoaded = false;
-    m_devFileCatalogHi.clear();
-    m_devFileCatalogLow.clear();
-    DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
+    {
+        QMutexLocker lock(&m_mutexCatalog);
+        m_rebuildProgress = 0;
+        m_catalogLoaded = false;
+        m_devFileCatalogHi.clear();
+        m_devFileCatalogLow.clear();
+        DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
+    }
     loadFullFileCatalog(true);
+    m_rebuildState = RebuildState_None;
 }
 
 void QnStorageManager::rebuildCatalogAsync()
@@ -100,13 +119,15 @@ void QnStorageManager::cancelRebuildCatalogAsync()
     }
 }
 
-
 void QnStorageManager::setRebuildState(RebuildState state)
 {
     m_rebuildState = state;
-    if( m_rebuildState == RebuildState_Started) {
-        rebuildCatalogIndex();
-        m_rebuildState = RebuildState_None;
+    if(m_rebuildState == RebuildState_Started) 
+    {
+        if (m_asyncRebuildTask == 0)
+            m_asyncRebuildTask = new RebuildAsyncTask(this);
+        if (!m_asyncRebuildTask->isRunning())
+            m_asyncRebuildTask->start();
     }
 }
 
@@ -536,6 +557,12 @@ void QnStorageManager::stopAsyncTasks()
         m_testStorageThread->stop();
         delete m_testStorageThread;
         m_testStorageThread = 0;
+    }
+    m_rebuildState = RebuildState_None;
+    if (m_asyncRebuildTask) {
+        m_asyncRebuildTask->stop();
+        delete m_asyncRebuildTask;
+        m_asyncRebuildTask = 0;
     }
 }
 

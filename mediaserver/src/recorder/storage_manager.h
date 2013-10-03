@@ -14,6 +14,7 @@
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
+class RebuildAsyncTask;
 
 class QnStorageManager: public QObject
 {
@@ -100,7 +101,7 @@ private:
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
     void updateStorageStatistics();
     void testOfflineStorages();
-    void rebuildCatalogIndex();
+    void rebuildCatalogIndexInternal();
     bool isCatalogLoaded() const;
 
 
@@ -136,6 +137,9 @@ private:
     QMap<QnId, bool> m_diskFullWarned;
     RebuildState m_rebuildState;
     double m_rebuildProgress;
+
+    friend class RebuildAsyncTask;
+    RebuildAsyncTask* m_asyncRebuildTask;
 };
 
 #define qnStorageMan QnStorageManager::instance()
