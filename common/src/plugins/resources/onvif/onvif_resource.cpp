@@ -53,9 +53,6 @@ static const unsigned int PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC = 1;
 
 //Forth times greater than default = 320 x 240
 
-static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
-
-
 /* Some cameras declare invalid max resolution */
 struct StrictResolution {
     const char* model;

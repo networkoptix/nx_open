@@ -130,6 +130,10 @@ QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
     return m_softMotionRole;
 }
 
+void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, const QSize& /*picSize*/ )
+{
+}
+
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
@@ -235,7 +239,15 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
     m_framesSinceLastMetaData++;
 
     if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
-        m_motionEstimation[videoData->channelNumber].analizeFrame(videoData);
+        if( m_motionEstimation[videoData->channelNumber].analizeFrame(videoData) )
+        {
+            const QSize& newResolution = m_motionEstimation[videoData->channelNumber].videoResolution();
+            if( newResolution != m_videoResolutionByChannelNumber[videoData->channelNumber] )
+            {
+                m_videoResolutionByChannelNumber[videoData->channelNumber] = newResolution;
+                onStreamResolutionChanged( videoData->channelNumber, newResolution );
+            }
+        }
 }
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)

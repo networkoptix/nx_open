@@ -17,6 +17,8 @@ class ThirdPartyStreamReader
 :
     public CLServerPushStreamReader
 {
+    typedef CLServerPushStreamReader parent_type;
+
 public:
     ThirdPartyStreamReader(
         QnResourcePtr res,
@@ -27,6 +29,9 @@ public:
 
     static CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader );
+
+    //!Overrides QnLiveStreamProvider::onGotVideoFrame()
+    virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData) override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -40,6 +45,11 @@ protected:
 
     virtual void pleaseStop() override;
 
+    //!Overrides QnLiveStreamProvider::roleForMotionEstimation()
+    virtual QnResource::ConnectionRole roleForMotionEstimation() override;
+    //!Overrides QnLiveStreamProvider::onStreamResolutionChanged()
+    virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
+
 private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
@@ -50,6 +60,7 @@ private:
     nxcip_qt::BaseCameraManager m_camManager;
     nxcip::StreamReader* m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
+    QSize m_videoResolution;
 
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
