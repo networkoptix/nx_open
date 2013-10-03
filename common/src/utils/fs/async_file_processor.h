@@ -35,7 +35,7 @@ public:
 
 protected:
     //!Implementation of QThread::run
-    virtual void run() override final;
+    virtual void run() override;
 
 private:
     class FileTask
