@@ -41,7 +41,6 @@ private:
 private:
     int m_argc;
     char** m_argv;
-    bool m_waitExtIpFinished;
     qint64 m_firstRunningTime;
 
     QnRtspListener* m_rtspListener;

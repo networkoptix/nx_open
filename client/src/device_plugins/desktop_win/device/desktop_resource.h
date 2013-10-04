@@ -3,13 +3,13 @@
 
 #include <QtCore/QtGlobal>
 
-#ifdef Q_OS_WIN
-
 #include "core/resource/resource.h"
 #include "plugins/resources/archive/abstract_archive_resource.h"
 #include "../desktop_data_provider_wrapper.h"
 #include "core/resource/resource_fwd.h"
 #include "device_plugins/desktop_camera/desktop_camera_connection.h"
+
+#ifdef _WIN32
 
 class QnDesktopDataProvider;
 
@@ -36,6 +36,17 @@ private:
     QnDesktopDataProvider* m_desktopDataProvider;
     QMutex m_dpMutex;
     QMap<QString, QnDesktopCameraConnectionPtr> m_connectionPool;
+};
+
+#else
+
+/*!
+    This declaration is used on non-win32 platforms.
+    TODO do this with platform-dependent implementation files
+*/
+class QnDesktopResource: public QnAbstractArchiveResource {
+public:
+    QnDesktopResource(QGLWidget* mainWindow = 0);
 };
 
 #endif

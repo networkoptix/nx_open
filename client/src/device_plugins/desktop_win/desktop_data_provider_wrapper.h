@@ -3,8 +3,6 @@
 
 #include <QtCore/QtGlobal>
 
-#ifdef Q_OS_WIN
-
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 
@@ -34,5 +32,3 @@ private:
 };
 
 #endif
-
-#endif // __DESKTOP_DATA_PROVIDER_WRAPPER_H
