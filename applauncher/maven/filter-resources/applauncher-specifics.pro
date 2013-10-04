@@ -1,5 +1,4 @@
 TEMPLATE = app
-QT += core gui network xml widgets
 
 QMAKE_RPATHDIR = ""
 

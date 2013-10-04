@@ -59,11 +59,7 @@ void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
     QnAppServerConnectionFactory::setPublicIp(message.publicIp);
     QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
 
-    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
-    if (lastRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
-                                                   lastRunningTime*1000,
-                                                   QnBusiness::MServerIssueStarted);
+    emit connectionOpened();
 }
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage message)
@@ -78,6 +74,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 
         if (!message.systemName.isNull())
             QnAppServerConnectionFactory::setSystemName(message.systemName);
+
+        if (!message.sessionKey.isNull())
+            QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
     }
     else if (message.messageType == Qn::Message_Type_License)
     {

@@ -1,10 +1,9 @@
+#include "gl_renderer.h"
 
-#ifndef __APPLE__
+#ifndef Q_OS_MACX
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glext.h>
 #endif
-
-#include "gl_renderer.h"
 
 #include <cassert>
 
@@ -160,8 +159,10 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 }
 
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
-{
+{    
     NX_LOG( QString::fromLatin1("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
+
+    QOpenGLFunctions::initializeOpenGLFunctions();
 
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )

@@ -10,9 +10,9 @@
 #include <utils/common/invocation_event.h>
 
 #ifdef QN_HAS_DWM
-#include <QtWidgets/private/qwidget_p.h>
+#include <QtWidgets/5.1.1/QtWidgets/private/qwidget_p.h>
 #include <qt_windows.h>
-#include <utils/qt5port_windows_specific.h>
+#include <utils/qt5port_win.h>
 
 #define NOMINMAX
 #include <Windows.h>
@@ -88,6 +88,7 @@ public:
 
 #ifdef QN_HAS_DWM
     void updateFrameStrut();
+    bool winEvent(MSG *message, long *result);
     bool calcSizeEvent(MSG *message, long *result);
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
@@ -427,15 +428,23 @@ bool QnDwm::widgetEvent(QEvent *event) {
     return false;
 }
 
-#ifdef Q_OS_WIN
-bool QnDwm::widgetWinEvent(MSG *message, long *result) {
+
+bool QnDwm::widgetNativeEvent(const QByteArray &eventType, void *message, long *result) {
 #ifdef QN_HAS_DWM
     if(d->widget == NULL)
         return false;
 
-    if(d->hasDwm) {
+    return d->winEvent(static_cast<MSG *>(message), result);
+#else
+    return false;
+#endif // QN_HAS_DWM
+}
+
+#ifdef QN_HAS_DWM
+bool QnDwmPrivate::winEvent(MSG *message, long *result) {
+    if(hasDwm) {
         RESULT localResult;
-        BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
+        BOOL handled = dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
         if (handled) {
             *result = localResult;
             return true;
@@ -443,20 +452,15 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     }
 
     switch(message->message) {
-    case WM_NCCALCSIZE:             return d->calcSizeEvent(message, result);
-    case WM_DWMCOMPOSITIONCHANGED:  return d->compositionChangedEvent(message, result);
-    case WM_NCACTIVATE:             return d->activateEvent(message, result);
-    case WM_NCPAINT:                return d->ncPaintEvent(message, result);
-    case WM_GETMINMAXINFO:          return d->getMinMaxInfoEvent(message, result);
+    case WM_NCCALCSIZE:             return calcSizeEvent(message, result);
+    case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
+    case WM_NCACTIVATE:             return activateEvent(message, result);
+    case WM_NCPAINT:                return ncPaintEvent(message, result);
+    case WM_GETMINMAXINFO:          return getMinMaxInfoEvent(message, result);
     default:                        return false;
     }
-#else
-    return false;
-#endif // QN_HAS_DWM
 }
-#endif // Q_OS_WIN
 
-#ifdef QN_HAS_DWM
 bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     if(!overrideFrameMargins)
         return false;

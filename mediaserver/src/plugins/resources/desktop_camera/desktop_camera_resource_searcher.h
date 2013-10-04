@@ -22,11 +22,12 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    void registerCamera(AbstractStreamSocket* connection, const QString& userName);
+    void registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName);
 
     TCPSocketPtr getConnection(const QString& userName);
     quint32 incCSeq(const TCPSocketPtr socket);
     void releaseConnection(TCPSocketPtr socket);
+
 private:
     struct ClientConnectionInfo
     {

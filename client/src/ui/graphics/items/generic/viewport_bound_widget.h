@@ -38,7 +38,7 @@ protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-private slots:
+public slots:
     void updateScale(QGraphicsView *view = NULL);
 
 private:

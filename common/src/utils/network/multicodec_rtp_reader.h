@@ -46,7 +46,7 @@ public:
     void pleaseStop();
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
-
+    void setRole(QnResource::ConnectionRole role);
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 private:
@@ -79,6 +79,7 @@ private:
     bool m_pleaseStop;
     QTime m_rtcpReportTimer;
     bool m_gotSomeFrame;
+    QnResource::ConnectionRole m_role;
 };
 
 #endif //__MULTI_CODEC_RTP_READER__

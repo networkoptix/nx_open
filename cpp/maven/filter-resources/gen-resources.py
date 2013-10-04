@@ -56,25 +56,37 @@ def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
   
     qrcfile.close()
 
+def rreplace(s, old, new):
+    li = s.rsplit(old, 1)
+    return new.join(li)
+    
 def gentext(file, path, extensions, text): 
     os.path = posixpath
    
     for root, dirs, files in os.walk(path):
         parent = root[len(path) + 1:]
         
-        for dir in dirs:
-            if dir.endswith('_specific') and not dir.endswith('${platform}_specific'):
-                if not dir.endswith('${common.platform}_specific'):
-                    dirs.remove(dir)              
-        
         for f in files:
-            f_short = os.path.splitext(f)[0]
+            n = os.path.splitext(f)[0]
+            p = os.path.join(parent, f)
             for extension in extensions:
-                if f.endswith(extension) and not f_short.endswith('_specific') and not f_short == 'StdAfx':
-                #and not parent.endswith('_specific'):
-                    print >> file, '\n%s%s/%s' % (text, path, os.path.join(parent, f))
-                if f.endswith(extension) and (f_short.endswith('${platform}_specific') or f_short.endswith('${common.platform}_specific')):
-                    print >> file, '\n%s%s/%s' % (text, path, os.path.join(parent, f))
+                if not f.endswith(extension):
+                    continue
+                if n == 'StdAfx':
+                    continue
+                
+                cond = ''
+                if n.endswith('_win'):
+                    cond = 'win*:'
+                elif n.endswith('_mac'):
+                    cond = 'mac'
+                elif n.endswith('_unix'):
+                    if(os.path.exists(rreplace(p, '_unix', '_mac'))):
+                        cond = 'unix:!mac:'
+                    else:
+                        cond = 'unix:'
+                
+                print >> file, '\n%s%s%s/%s' % (cond, text, path, os.path.join(parent, f))
 
 def replace(file,searchExp,replaceExp):
     for line in fileinput.input(file, inplace=1):

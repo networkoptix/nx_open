@@ -311,14 +311,12 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     if(INVOKE(sigar_net_interface_list_get(d->sigar, &networkInterfaces)) != SIGAR_OK)
         return result;
 
-    QStringList interfaceNames;
+    QSet<QString> interfaceNames;
+	QSet<QnMacAddress> interfaceMacs;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
-        
-        // remove duplicating entries
         if (interfaceNames.contains(interfaceName))
-            continue;
-        interfaceNames.append(interfaceName);
+            continue; /* Skip duplicate interface entries. */ 
 
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
@@ -331,19 +329,25 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
             load.type = LoopbackInterface;
         } else if(config.hwaddr.family == sigar_net_address_t::SIGAR_AF_LINK) {
             load.macAddress = QnMacAddress(config.hwaddr.addr.mac);
+            if(interfaceMacs.contains(load.macAddress))
+                continue; /* Skip entries with duplicate macs. */
 
+			/* Detect virtual interfaces. */ 
             for(int i = 0; i < arraysize(virtualMacs); i++) {
                 if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
                     load.type = VirtualInterface;
                     break;
                 }
             }
+
             if(load.type != VirtualInterface)
                 load.type = PhysicalInterface;
         } else {
             load.type = PhysicalInterface;
         }
 
+        interfaceMacs.insert(load.macAddress);
+        interfaceNames.insert(interfaceName);
         result.push_back(load);
     }
 

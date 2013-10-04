@@ -4,17 +4,12 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 
-QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
-                                       const QString &caption,
-                                       const QString &directory,
-                                       const QString &filter) :
+QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter)
 {
     setOption(QFileDialog::DontUseNativeDialog);
     connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
-
 }
-
 
 QnCustomFileDialog::~QnCustomFileDialog() {
 }

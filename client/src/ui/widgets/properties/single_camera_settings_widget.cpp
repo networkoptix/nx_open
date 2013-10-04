@@ -4,6 +4,7 @@
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
@@ -27,6 +28,7 @@
 #include <ui/style/warning_style.h>
 
 #include <utils/license_usage_helper.h>
+#include "core/resource/media_resource.h"
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
@@ -417,7 +419,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         Qn::PtzCapabilities ptzCaps = m_camera->getPtzCapabilities();
         ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")) &&
-                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled));
+                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled) &&
+                                          m_camera->getVideoLayout()->channelCount() == 1);
         
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
@@ -483,6 +486,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
+    updateRecordingParamsAvailability();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
@@ -595,6 +599,14 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
         return;
     bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
+{
+    if (!m_camera)
+        return;
+    
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
@@ -801,9 +813,17 @@ void QnSingleCameraSettingsWidget::updateIpAddressText() {
 void QnSingleCameraSettingsWidget::updateWebPageText() {
     if(m_camera) {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
+        
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
-        if (url.isValid() && url.port() != 80 && url.port() > 0)
-            webPageAddress += QLatin1Char(':') + QString::number(url.port());
+        if(url.isValid()) {
+            QUrlQuery query(url);
+            int port = query.queryItemValue(lit("http_port")).toInt();
+            if(port == 0)
+                port = url.port(80);
+            
+            if (port != 80 && port > 0)
+                webPageAddress += QLatin1Char(':') + QString::number(url.port());
+        }
 
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
 

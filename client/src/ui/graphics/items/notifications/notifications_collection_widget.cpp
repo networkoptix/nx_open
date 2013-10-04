@@ -463,7 +463,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
 
-    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)));
+    /* We use Qt::QueuedConnection as our handler may start the event loop. */
+    connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)), Qt::QueuedConnection);
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
     m_itemsByMessageType.insert(message, item);

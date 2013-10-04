@@ -9,12 +9,15 @@ TRANSLATIONS += ${basedir}/translations/client_en.ts \
 				${basedir}/translations/client_ko.ts \
 				${basedir}/translations/client_pt-BR.ts \
 
+INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
+                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/
+				
 include(${environment.dir}/qt5/qt-custom/qtsingleapplication/src/qtsingleapplication.pri)
 
 mac {
-  INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ /usr/X11/include/
+    INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/
 }
 
 unix: !mac {
-  QT += x11extras  
+    QT += x11extras  
 }

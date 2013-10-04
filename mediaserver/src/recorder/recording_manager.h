@@ -57,7 +57,7 @@ private:
     void updateCamera(QnSecurityCamResourcePtr camera);
 
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
-    void startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(QnResourcePtr res) const;
 
     void beforeDeleteRecorder(const Recorders& recorders);

@@ -245,6 +245,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
+    connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString )), this, SLOT(at_updateRebuildInfo()));
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -255,6 +257,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
+    connect(ui->rebuildButton,          SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
 
     updateFromResources();
 }
@@ -367,8 +370,13 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     return result;
 }
 
-void QnServerSettingsDialog::updateFromResources() {
+void QnServerSettingsDialog::updateFromResources() 
+{
+    at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    if (m_server->getStatus() == QnResource::Online)
+        sendNextArchiveRequest();
+
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
@@ -513,6 +521,58 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
     }
+}
+
+void QnServerSettingsDialog::at_rebuildButton_clicked()
+{
+    RebuildAction action;
+    if (m_lastRebuildReply.state() == QnRebuildArchiveReply::Started)
+        action = RebuildAction_Cancel;
+    else
+        action = RebuildAction_Start;
+
+    if (action == RebuildAction_Start)
+    {
+        int button = QMessageBox::warning(
+            mainWindow(),
+            tr("Warning"),
+            tr("You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. "
+            "Depending on the total size of archive it can take several hours. "
+            "This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
+            QMessageBox::Yes | QMessageBox::No
+            );
+        if(button == QMessageBox::No)
+            return;
+    }
+
+    m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+}
+
+void QnServerSettingsDialog::at_updateRebuildInfo()
+{
+    if (m_server->getStatus() == QnResource::Online)
+        sendNextArchiveRequest();
+    else
+        at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+}
+
+void QnServerSettingsDialog::sendNextArchiveRequest()
+{
+    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+}
+
+void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int)
+{
+    m_lastRebuildReply = reply;
+    ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
+    bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
+
+    ui->rebuildLabel->setEnabled(inProgress);
+    ui->rebuildProgressBar->setEnabled(inProgress);
+    ui->rebuildButton->setText(inProgress ? tr("Cancel") : tr("Start"));
+    ui->rebuildProgressBar->setValue(reply.progress());
+    if (inProgress)
+        m_timer.singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
 
 void QnServerSettingsDialog::at_pingButton_clicked() {

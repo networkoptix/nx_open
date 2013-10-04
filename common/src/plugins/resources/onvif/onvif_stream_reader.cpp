@@ -86,7 +86,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
     }
     */  
 
-
+    m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
     result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())

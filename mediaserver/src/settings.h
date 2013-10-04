@@ -4,5 +4,6 @@
 #include <QtCore/QSettings>
 
 extern QSettings qSettings;
+extern QSettings qSettingsRunTime;
 
 #endif

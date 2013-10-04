@@ -13,7 +13,7 @@
 #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
-#include "device_plugins/desktop_windows_specific/device/desktop_resource.h"
+#include "device_plugins/desktop_win/device/desktop_resource.h"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -369,7 +369,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     m_totalFrames++;
     if (vd->flags & AV_PKT_FLAG_KEY)
         m_iFrames++;
-    if (vd->flags & QnAbstractMediaData::MediaFlags_FCZ)
+    bool isPrebuffering = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
+    if (isPrebuffering)
         m_fczFrames++; // fast channel zapping
 
     // in ideal world data comes to queue at the same speed as it goes out
@@ -377,7 +378,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
-    if (vd->flags & QnAbstractMediaData::MediaFlags_BOF)
+    if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || isPrebuffering)
         m_lastSleepInterval = needToSleep = 0;
 
     if (vd->flags & AV_REVERSE_BLOCK_START)
@@ -1080,8 +1081,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         //    afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
 
-
-    qDebug() << "process packet time=" << QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString();
 
     if (emptyData && !flushCurrentBuffer)
     {

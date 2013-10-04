@@ -40,7 +40,8 @@ public:
 
     void updateFromSettings();
     void submitToSettings();
-
+signals:
+    void recordingSettingsChanged();
 private:
     void additionalAdjustSize();
 

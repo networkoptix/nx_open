@@ -108,3 +108,9 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
 void QnResourceTreeItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const {
     base_type::initStyleOption(option, index);
 }
+
+void QnResourceTreeItemDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) const {
+    // TODO: #QTBUG If focus is not cleared, we get crashes. Should be fixed in QWidget.
+    editor->clearFocus();
+    base_type::destroyEditor(editor, index);
+}

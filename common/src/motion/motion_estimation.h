@@ -19,9 +19,15 @@ public:
     */
     void setMotionMask(const QnMotionRegion& region);
     //void analizeFrame(const CLVideoDecoderOutput* frame);
-    void analizeFrame(QnCompressedVideoDataPtr frame);
+    /*!
+        \return true if successfully decoded and analyzed \a frame
+    */
+    bool analizeFrame(QnCompressedVideoDataPtr frame);
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;
+
+    //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analizeFrame call)
+    QSize videoResolution() const;
 
     static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 
@@ -55,6 +61,8 @@ private:
     int* m_linkedNums;
     int m_linkedSquare[MD_WIDTH*MD_HEIGHT];
     //quint8 m_sadTransformMatrix[10][256];
+
+    QSize m_videoResolution;
 };
 
 #endif // __MOTION_ESTIMATION_H__

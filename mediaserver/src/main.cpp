@@ -79,7 +79,7 @@
 #include "rest/handlers/time_handler.h"
 #include "rest/handlers/ping_handler.h"
 #include "rest/handlers/events_handler.h"
-#include "platform/platform_abstraction.h"
+#include "platform/core_platform_abstraction.h"
 #include "recorder/file_deletor.h"
 #include "rest/handlers/ext_bevent_handler.h"
 #include <business/business_event_connector.h>
@@ -102,6 +102,7 @@
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
 #include "utils/network/ssl_socket.h"
 #include "network/authenticate_helper.h"
+#include "rest/handlers/rebuild_archive_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -454,7 +455,7 @@ int serverMain(int argc, char *argv[])
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
-    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+    QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
 
     QString logLevel;
     QString rebuildArchive;
@@ -463,6 +464,11 @@ int serverMain(int argc, char *argv[])
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
     commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
     commandLineParser.parse(argc, argv, stderr);
+
+    if (rebuildArchive.isEmpty()) {
+        rebuildArchive = qSettingsRunTime.value("rebuild").toString();
+    }
+    qSettingsRunTime.remove("rebuild");
 
     if( logLevel != QString::fromLatin1("none") )
     {
@@ -558,6 +564,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -594,7 +601,9 @@ void QnMain::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
+    QnStorageManager::instance()->cancelRebuildCatalogAsync();
     qnFileDeletor->pleaseStop();
+
 
     if (m_restServer)
         m_restServer->pleaseStop();
@@ -739,9 +748,18 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
         qWarning() << "Error saving server.";
 }
 
+void QnMain::at_connectionOpened()
+{
+    if (m_firstRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
+        m_firstRunningTime*1000,
+        QnBusiness::MServerIssueStarted);
+    m_firstRunningTime = 0;
+}
+
 void QnMain::at_timer()
 {
-    qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qSettingsRunTime.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -756,9 +774,9 @@ void QnMain::at_noStorages()
     qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
-void QnMain::at_storageFailure(QnResourcePtr storage)
+void QnMain::at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason)
 {
-    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError, storage);
+    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
 void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
@@ -789,6 +807,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
+    QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRestRebuildArchiveHandler());
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
@@ -913,7 +932,7 @@ void QnMain::run()
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
-    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr)), this, SLOT(at_storageFailure(QnResourcePtr)));
+    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
 
     QnConnectInfoPtr connectInfo(new QnConnectInfo());
     while (!needToStop())
@@ -1137,9 +1156,12 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
+    m_firstRunningTime = qSettingsRunTime.value("lastRunningTime").toLongLong();
+
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
     timer.start(60 * 1000);
 
 
@@ -1206,8 +1228,8 @@ void QnMain::run()
     disconnect(eventManager);
 
     // This method will set flag on message channel to threat next connection close as normal
-    appServerConnection->disconnectSync();
-    qSettings.setValue("lastRunningTime", 0);
+    //appServerConnection->disconnectSync();
+    qSettingsRunTime.setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
@@ -1228,7 +1250,7 @@ public:
 protected:
     virtual int executeApplication() override { 
 
-        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+        QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
@@ -1240,6 +1262,21 @@ protected:
     virtual void start() override
     {
         QtSingleCoreApplication *application = this->application();
+
+        // check if local or remote EC. MServer changes guid depend of this fact
+        bool primaryGuidAbsent = qSettings.value(lit("serverGuid")).isNull();
+        if (primaryGuidAbsent)
+            qSettings.setValue("separateGuidForRemoteEC", 1);
+
+        QString ECHost = resolveHost(qSettings.value("appserverHost").toString()).toString();
+        bool isLocalAddr = (ECHost == lit("127.0.0.1") || ECHost == lit("localhost"));
+        foreach(const QHostAddress& addr, allLocalAddresses())
+        {
+            if (addr.toString() == ECHost)
+                isLocalAddr = true;
+        }
+        if (!isLocalAddr && qSettings.value("separateGuidForRemoteEC").toBool())
+            setUseAlternativeGuid(true);
 
         QString guid = serverGuid();
         if (guid.isEmpty())

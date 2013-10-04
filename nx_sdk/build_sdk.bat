@@ -15,6 +15,7 @@ copy /Y readme.txt %TARGET_DIR%\
 copy /Y ..\common\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
 copy /Y ..\common\src\plugins\plugin_tools.h %TARGET_DIR%\include\plugins\
 copy /Y ..\common\src\plugins\camera_plugin.h %TARGET_DIR%\include\plugins\
+copy /Y ..\common\src\plugins\camera_plugin_types.h %TARGET_DIR%\include\plugins\
 
 @rem Copying AXIS plugin
 set PLUGIN_NAME=axiscamplugin
@@ -45,8 +46,10 @@ set PLUGIN_NAME=image_library_plugin
 
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\win\
 xcopy /Y ..\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
 xcopy /Y ..\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y ..\%PLUGIN_NAME%\win\* %TARGET_DIR%\sample\%PLUGIN_NAME%\win\
 copy /Y ..\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
 
 @rem Removing unnecessary source files

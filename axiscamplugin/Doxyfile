@@ -669,7 +669,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 # Have to add paths for generating from develop/axiscamplugin folder and from nx_sdk folder, since I do not know how to sed on mswin (AK)
-INPUT                  = src/ ../common/src/plugins/plugin_api.h ../common/src/plugins/camera_plugin.h ../../include/plugins/plugin_api.h ../../include/plugins/camera_plugin.h
+INPUT                  = src/ ../common/src/plugins/plugin_api.h ../common/src/plugins/plugin_tools.h ../common/src/plugins/camera_plugin.h ../common/src/plugins/camera_plugin_types.h ../../include/plugins/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

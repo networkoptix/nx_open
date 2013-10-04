@@ -56,7 +56,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
-
+    m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)

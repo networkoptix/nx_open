@@ -53,6 +53,7 @@ appserver/setup/stage-env
 appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
+appserver/version.py
 
 applauncher/bin
 applauncher/build

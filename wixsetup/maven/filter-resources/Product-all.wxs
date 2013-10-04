@@ -12,6 +12,8 @@
         <Property Id="REINSTALLMODE" Value="amus"/>
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
+        <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
+
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
@@ -507,11 +509,15 @@
             <Custom Action="CertGenAction" After="CertGenAction_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion_Cmd" After="CertGenAction">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SaveLastDatabaseVersion" After="SaveLastDatabaseVersion_Cmd">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="BackupDatabaseFile_Cmd" After="SaveLastDatabaseVersion">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd">
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="SyncDatabaseAction_Cmd" After="BackupDatabaseFile">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
@@ -527,8 +533,10 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-            <Custom Action="RestoreDatabaseFile_Cmd" After="StopServices"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
-            <Custom Action="RestoreDatabaseFile" After="RestoreDatabaseFile_Cmd"><![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
+            <Custom Action="RestoreDatabaseFile_Cmd" After="StopServices">
+                <![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
+            <Custom Action="RestoreDatabaseFile" After="RestoreDatabaseFile_Cmd">
+                <![CDATA[ REMOVE_DATABASE=0 AND VERSION_TO_RESTORE <> "Current" ]]></Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
                 <![CDATA[ (!AppServerFeature=3 OR INSTALL_ECS OR !ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
@@ -613,8 +621,10 @@
                         </Directory>
 
                         <Directory Id="${installer.customization}TrayToolDir" Name="TrayTool">
-                            <Component Id="traytool.exe">
-                                <File Id="traytool.exe" Name="traytool.exe" Source="${libdir}/bin/${build.configuration}/traytool.exe" KeyPath="yes">
+                            <Directory Id="TraytoolPlatforms" Name="platforms">                                   
+                            </Directory>     
+                            <Component Id="traytool.exe">   
+                                <File Id="traytool.exe" Name="traytool.exe" Source="$(var.SourceDir)/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallException${installer.customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
 
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
@@ -625,15 +635,11 @@
                                               WorkingDirectory='${installer.customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
-                            </Component>
-                            <Component Id="TrayToolQjson">
-                                <File Id="TrayToolQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
-                            </Component>                                                    
+                            </Component>                                  
                         </Directory>
-
                         <Directory Id="${installer.customization}ProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable">
-                                <File Id="ProxyExe" Name="mediaproxy.exe" Source="${libdir}/bin/${build.configuration}/mediaproxy.exe" KeyPath="yes">
+                                <File Id="ProxyExe" Name="mediaproxy.exe" Source="$(var.SourceDir)/mediaproxy.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionProxyServer" Name="${mediaproxy.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
 
@@ -649,11 +655,7 @@
 
                                 <ServiceControl Id="Start${installer.customization}ProxyService" Name="${installer.customization}MediaProxy" Start="install" Wait="no" />
                                 <ServiceControl Id="Stop${installer.customization}ProxyService" Name="${installer.customization}MediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
-                            </Component>
-
-                            <Component Id="ProxyQjson">
-                                <File Id="ProxyQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
-                            </Component>                        
+                            </Component>                   
                         </Directory>
 
                         <Directory Id="${installer.customization}MediaServerDir" Name="MediaServer">
@@ -661,7 +663,7 @@
                             </Directory>
 
                             <Component Id="ServerExecutable">
-                                <File Id="ServerExe" Name="mediaserver.exe" Source="${libdir}/bin/${build.configuration}/mediaserver.exe" KeyPath="yes">
+                                <File Id="ServerExe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
 
@@ -697,33 +699,23 @@
                                 </RegistryKey>
                             </Component>
 
-                            <Directory Id="ServerSqlDrivers" Name="sqldrivers">
-                                <Component Id="ServerSqlDrivers">
-                                    <File Id="qsqlite$(var.suffix)4.dll" Name="qsqlite4.dll" Source="${libdir}/bin/${build.configuration}\sqldrivers\qsqlite$(var.suffix)4.dll" />
-                                </Component>
-                            </Directory>
-
                             <Component Id="ServerRtspPlugin">
-                                <File Id="ServerRtspPluginDll" Name="genericrtspplugin1.dll" Source="${libdir}/bin/${build.configuration}\genericrtspplugin1.dll" />
-                            </Component>
-
-                            <Component Id="ServerQjson">
-                                <File Id="ServerQjson.dll" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
-                            </Component>                        
+                                <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.SourceDir)\genericrtspplugin.dll" />
+                            </Component>                    
 
                             <Component Id="ServerSigar">
-                                <File Id="ServerSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
+                                <File Id="ServerSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
                             </Component>
 
                             <Directory Id="${installer.customization}VmaxDir" Name="VmaxProxy">
                                 <Component Id="vmaxproxy.exe">
-                                    <File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="${libdir}/bin/${build.configuration}/vmaxproxy/vmaxproxy.exe" KeyPath="yes">
+                                    <File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="$(var.SourceDir)/vmaxproxy/vmaxproxy.exe" KeyPath="yes">
                                         <fire:FirewallException Id="FirewallException${installer.customization}VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
                                     </File>
                                 </Component>
 
                                 <Component Id="VmaxProxyQTLibraries">
-                                    <File Id="VmaxProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/QtCore$(var.suffix)4.dll"  />
+                                    <File Id="VmaxProxyQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)/Qt5Core$(var.suffix).dll"  />
                                 </Component>
                             </Directory>
 
@@ -746,135 +738,158 @@
         </Directory>
 
         <!-- Component groups -->
+        <ComponentGroup Id="TraytoolPlatforms" Directory="TraytoolPlatforms">
+            <Component>
+                <File Id="Traytoolqminimal$(var.suffix).dll" Name="Traytoolqminimal4.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Traytoolqoffscreen$(var.suffix).dll" Name="Traytoolqoffscreen4.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Traytoolqwindows$(var.suffix).dll" Name="Traytoolqwindows4.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
+            </Component>      
+        </ComponentGroup>         
         <ComponentGroup Id="TrayToolQTLibraries" Directory="${installer.customization}TrayToolDir">
             <Component>
-                <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll"  />
+                <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />       
             </Component>
             <Component>
-                <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll"  />
+                <File Id="TrayToolQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll"  />
             </Component>
             <Component>
-                <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll"  />
+                <File Id="TrayToolQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>            
+            <Component>
+                <File Id="TrayToolQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll"  />
+            </Component>
+            <Component>
+                <File Id="TrayToolQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Network$(var.suffix).dll"  />
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="TrayToolOpenSSL" Directory="${installer.customization}TrayToolDir">
             <Component>
-                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
             <Component>
-                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll"/>
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ProxyQTLibraries" Directory="${installer.customization}ProxyServerDir">
             <Component>
-                <File Id="ProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                <File Id="ProxyQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ProxyQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                <File Id="ProxyQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ProxyQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                <File Id="ProxyQt5Multimedia$(var.suffix).dll" Name="Qt5Multimedia$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Multimedia$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                <File Id="ProxyQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Network$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
+                <File Id="ProxyQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
+            <Component>
+                <File Id="ProxyQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>             
         </ComponentGroup>
 
         <ComponentGroup Id="ServerFFmpegLibraries" Directory="${installer.customization}MediaServerDir">
             <Component>
-                <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
+                <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
             <Component>
-                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
+                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="$(var.SourceDir)/avdevice-53.dll"/>
             </Component>
             <Component>
-                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
+                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll"/>
             </Component>
             <Component>
-                <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
+                <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="$(var.SourceDir)/avformat-54.dll"/>
             </Component>
             <Component>
-                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
+                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="$(var.SourceDir)/avutil-51.dll"/>
             </Component>
             <Component>
-                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
+                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="$(var.SourceDir)/swscale-2.dll"/>
             </Component>
             <Component>
-                <File Id="ServerOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
+                <File Id="ServerOggDll" Name="libogg-0.dll" Source="$(var.SourceDir)/libogg-0.dll"/>
             </Component>
             <Component>
-                <File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                <File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="$(var.SourceDir)/libvorbis-0.dll"/>
             </Component>
             <Component>
-                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="$(var.SourceDir)/libmp3lame-0.dll"/>
             </Component>
             <Component>
-                <File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                <File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll"/>
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ServerQTLibraries" Directory="${installer.customization}MediaServerDir">
             <Component>
-                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                <File Id="ServerQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                <File Id="ServerQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                <File Id="ServerQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
+            </Component>              
+            <Component>
+                <File Id="ServerQt5Multimedia$(var.suffix).dll" Name="Qt5Multimedia$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Multimedia$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                <File Id="ServerQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Network$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
+                <File Id="ServerQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ServerQtSql$(var.suffix)4.dll" Name="QtSql$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtSql$(var.suffix)4.dll" />
+                <File Id="ServerQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" />
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ServerImageFormats" Directory="ServerImageFormats">
             <Component>
-                <File Id="Serverqgif$(var.suffix)4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+                <File Id="Serverqgif$(var.suffix).dll" Name="qgif4.dll" Source="$(var.SourceDir)\imageformats\qgif$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="Serverqjpeg$(var.suffix)4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+                <File Id="Serverqjpeg$(var.suffix).dll" Name="qjpeg4.dll" Source="$(var.SourceDir)\imageformats\qjpeg$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="Serverqtiff$(var.suffix)4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
+                <File Id="Serverqtiff$(var.suffix).dll" Name="qtiff4.dll" Source="$(var.SourceDir)\imageformats\qtiff$(var.suffix).dll" />
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ServerOpenSSL" Directory="${installer.customization}MediaServerDir">
             <Component>
-                <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
             <Component>
-                <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+                <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll"/>
             </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ProxyOpenSSL" Directory="${installer.customization}ProxyServerDir">
             <Component>
-                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
             <Component> 
-                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll"/>
             </Component>
         </ComponentGroup>                            
 
         <ComponentGroup Id="VmaxProxySDK" Directory="${installer.customization}VmaxDir">
             <Component>
-                <File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="${libdir}/bin/${build.configuration}/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
+                <File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
             </Component>
             <Component>
-                <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="${libdir}/bin/${build.configuration}/vmaxproxy/pid.dat"/>
+                <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="$(var.SourceDir)/vmaxproxy/pid.dat"/>
             </Component>
         </ComponentGroup>                            
 
@@ -907,8 +922,7 @@
             <ComponentRef Id="AppServerConfigurationGuid"/>
 
             <ComponentRef Id="ProxyExecutable" />
-            <ComponentGroupRef Id="ProxyQTLibraries" />
-            <ComponentRef Id="ProxyQjson" />            
+            <ComponentGroupRef Id="ProxyQTLibraries" />       
             <ComponentGroupRef Id="ProxyOpenSSL" />
         </Feature>
 
@@ -924,7 +938,7 @@
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
             <ComponentGroupRef Id="TrayToolOpenSSL"/>
-            <ComponentRef Id="TrayToolQjson"/>
+            <ComponentGroupRef Id="TraytoolPlatforms" />            
         </Feature>
 
         <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
@@ -936,13 +950,11 @@
 
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
-            <ComponentRef Id="ServerSqlDrivers"/>
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
             <ComponentGroupRef Id="ServerImageFormats"/>
             <ComponentRef Id="ServerSigar"/>
-            <ComponentRef Id="ServerQjson"/>
             <ComponentRef Id="sysfomediaservercomponent"/>
 
             <?if $(var.vmax) = true?>   

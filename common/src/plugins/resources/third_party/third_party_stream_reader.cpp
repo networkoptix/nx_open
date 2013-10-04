@@ -41,12 +41,19 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
 
 static const nxcip::Resolution DEFAULT_SECOND_STREAM_RESOLUTION = nxcip::Resolution(480, 316);
 
+void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData )
+{
+    //TODO/IMPL
+    parent_type::onGotVideoFrame( videoData );
+}
+
 CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 {
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     const int encoderNumber = role == QnResource::Role_LiveVideo ? 0 : 1;
 
     nxcip::CameraMediaEncoder* intf = NULL;
@@ -139,6 +146,24 @@ void ThirdPartyStreamReader::pleaseStop()
         m_liveStreamReader->interrupt();
     else
         m_rtpStreamParser.pleaseStop();
+}
+
+QnResource::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
+{
+    const QnResource::ConnectionRole softMotionRole = CLServerPushStreamReader::roleForMotionEstimation();
+    if( softMotionRole != QnResource::Role_LiveVideo)  //primary stream
+        return softMotionRole;
+
+    //checking stream resolution
+    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION )
+        return QnResource::Role_SecondaryLiveVideo;
+
+    return softMotionRole;
+}
+
+void ThirdPartyStreamReader::onStreamResolutionChanged( int /*channelNumber*/, const QSize& picSize )
+{
+    m_videoResolution = picSize;
 }
 
 QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()

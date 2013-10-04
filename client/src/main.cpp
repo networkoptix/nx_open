@@ -40,7 +40,7 @@ extern "C"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #ifdef Q_OS_WIN
-    #include "device_plugins/desktop_windows_specific/device/desktop_resource_searcher.h"
+    #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -90,6 +90,7 @@ extern "C"
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
+    #include "ui/workaround/size_move_workaround_win.h"
     #include "common/systemexcept_win32.h"
 #endif
 
@@ -266,6 +267,295 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 #ifndef API_TEST_MAIN
 
+int runApplication(QtSingleApplication* application, int argc, char **argv) {
+    int result = 0;
+    //(refactoring to QnResourcePool instanciation was required to make mediaserver exit without segfault)
+
+    QTextStream out(stdout);
+    QThread::currentThread()->setPriority(QThread::HighestPriority);
+
+    /* Parse command line. */
+    QnAutoTester autoTester(argc, argv);
+
+    qnSettings->updateFromCommandLine(argc, argv, stderr);
+
+    QString devModeKey;
+    bool noSingleApplication = false;
+    int screen = -1;
+    QString authenticationString, delayedDrop, instantDrop, logLevel;
+    QString translationPath;
+    bool devBackgroundEditable = false;
+    bool skipMediaFolderScan = false;
+    bool noFullScreen = false;
+    bool noVersionMismatchCheck = false;
+
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
+    commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
+    commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
+    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
+    commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+    commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
+    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
+    commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
+    commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
+    commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
+    commandLineParser.parse(argc, argv, stderr);
+
+    /* Dev mode. */
+    if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
+        qnSettings->setDevMode(true);
+    }
+
+    /* Set authentication parameters from command line. */
+    QUrl authentication = QUrl::fromUserInput(authenticationString);
+    if(authentication.isValid()) {
+        // do not print password in plaintext
+        //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
+        qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
+    }
+
+    /* Initialize application instance. */
+    application->setQuitOnLastWindowClosed(true);
+    application->setWindowIcon(qnSkin->icon("window_icon.png"));
+    application->setStartDragDistance(20);
+
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+    QScopedPointer<QnPlatformAbstraction> clientPlatform(new QnPlatformAbstraction());
+    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+
+#ifdef Q_WS_X11
+    //   QnX11LauncherWorkaround x11LauncherWorkaround;
+    //   application->installEventFilter(&x11LauncherWorkaround);
+#endif
+
+#ifdef Q_OS_WIN
+    new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
+    new QnSizeMoveWorkaround(application);
+#endif
+
+    if(!noSingleApplication) {
+        QString argsMessage;
+        for (int i = 1; i < argc; ++i)
+            argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
+
+        while (application->isRunning()) {
+            if (application->sendMessage(argsMessage))
+                return 0;
+        }
+    }
+
+    /* Initialize connections. */
+    initAppServerConnection();
+    qnSettings->save();
+    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
+
+    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
+
+
+    /* Initialize sound. */
+    QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
+
+
+    /* Initialize log. */
+    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
+        return 0;
+    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
+        return 0;
+
+
+    QnHelpHandler helpHandler;
+    qApp->installEventFilter(&helpHandler);
+
+    QnLog::initLog(logLevel);
+    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
+
+    defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
+
+
+    // Create and start SessionManager
+    QnSessionManager::instance()->start();
+
+    QnResourcePool::instance(); // to initialize net state;
+    ffmpegInit();
+
+    //===========================================================================
+
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
+
+    QnLocalFileProcessor localFileProcessor;
+    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
+
+    //============================
+    //QnResourceDirectoryBrowser
+    if(!skipMediaFolderScan) {
+        QnResourceDirectoryBrowser::instance().setLocal(true);
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
+        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    }
+
+#ifdef STANDALONE_MODE
+    QnPlArecontResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
+
+    QnPlAxisResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
+
+    QnPlDlinkResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+
+    QnPlDroidResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
+
+    QnPlIqResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+
+    //QnPlIpWebCamResourceSearcher::instance().setLocal(true);
+    //QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
+
+    QnPlISDResourceSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
+
+    QnPlOnvifWsSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlOnvifWsSearcher::instance());
+
+    QnPlPulseSearcher::instance().setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
+#endif
+
+#ifdef Q_OS_WIN
+    //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
+#endif // Q_OS_WIN
+    QnResourceDiscoveryManager::instance()->start();
+
+    // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    qApp->setStyle(qnSkin->style());
+
+    /* Load translation. */
+    QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
+    QnTranslation translation;
+    if(!translationPath.isEmpty()) /* From command line. */
+        translation = translationManager->loadTranslation(translationPath);
+
+    if(translation.isEmpty()) /* By path. */
+        translation = translationManager->loadTranslation(qnSettings->translationPath());
+
+    translationManager->installTranslation(translation);
+
+    /* Create workbench context. */
+    QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+    context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    /* Create main window. */
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
+    context->setMainWindow(mainWindow.data());
+    mainWindow->setAttribute(Qt::WA_QuitOnClose);
+
+    if(screen != -1) {
+        QDesktopWidget *desktop = qApp->desktop();
+        if(screen >= 0 && screen < desktop->screenCount()) {
+            QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
+
+            mainWindow->move(desktop->screenGeometry(screen).topLeft() + screenDelta);
+        }
+    }
+
+    mainWindow->show();
+    if (!noFullScreen)
+        context->action(Qn::EffectiveMaximizeAction)->trigger();
+    if(noVersionMismatchCheck)
+        context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
+
+    /* Initialize desctop camera searcher. */
+#ifdef Q_OS_WIN
+    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
+    QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
+    desktopSearcher.setLocal(true);
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
+#endif
+
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
+
+    /* Process input files. */
+    for (int i = 1; i < argc; ++i)
+        mainWindow->handleMessage(QFile::decodeName(argv[i]));
+    if(!noSingleApplication)
+        QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
+
+#ifdef TEST_RTSP_SERVER
+    addTestData();
+#endif
+
+    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
+        QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
+        autoTester.start();
+    }
+
+    /* Process pending events before executing actions. */
+    qApp->processEvents();
+
+    if (argc <= 1) {
+        /* If no input files were supplied --- open connection settings dialog. */
+        if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
+            context->menu()->trigger(Qn::ConnectToServerAction,
+                                     QnActionParameters().withArgument(Qn::AutoConnectRole, true));
+        } else {
+            context->menu()->trigger(Qn::ReconnectAction);
+        }
+    }
+
+    /* Drop resources if needed. */
+    if(!delayedDrop.isEmpty()) {
+        qnSettings->setLayoutsOpenedOnLogin(false);
+
+        QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
+        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+    }
+
+    if (!instantDrop.isEmpty()){
+        qnSettings->setLayoutsOpenedOnLogin(false);
+
+        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+    }
+
+#ifdef _DEBUG
+    /* Show FPS in debug. */
+    context->menu()->trigger(Qn::ShowFpsAction);
+#endif
+
+    result = application->exec();
+
+    if(autoTester.state() == QnAutoTester::FINISHED) {
+        if(!autoTester.succeeded())
+            result = 1;
+
+        out << autoTester.message();
+    }
+
+    QnClientMessageProcessor::instance()->stop();
+    QnSessionManager::instance()->stop();
+
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance()->stop();
+
+    /* Write out settings. */
+    qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
+    av_lockmgr_register(NULL);
+
+    return result;
+}
+
 int main(int argc, char **argv)
 {
 #ifdef Q_WS_X11
@@ -283,7 +573,7 @@ int main(int argc, char **argv)
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
-    
+
     QnClientModule client(argc, argv);
 
     QnSessionManager::instance();
@@ -292,292 +582,7 @@ int main(int argc, char **argv)
     TextToWaveServer::initStaticInstance( new TextToWaveServer() );
     TextToWaveServer::instance()->start();
 
-    int result = 0;
-    {   //do not remove! needed to make QnResourcePool life time controlled
-            //(refactoring to QnResourcePool instanciation was required to make mediaserver exit without segfault)
-
-        QTextStream out(stdout);
-        QThread::currentThread()->setPriority(QThread::HighestPriority);
-
-        /* Parse command line. */
-        QnAutoTester autoTester(argc, argv);
-
-        qnSettings->updateFromCommandLine(argc, argv, stderr);
-
-        QString devModeKey;
-        bool noSingleApplication = false;
-        int screen = -1;
-        QString authenticationString, delayedDrop, instantDrop, logLevel;
-        QString translationPath;
-        bool devBackgroundEditable = false;
-        bool skipMediaFolderScan = false;
-        bool noFullScreen = false;
-        bool noVersionMismatchCheck = false;
-
-        QnCommandLineParser commandLineParser;
-        commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
-        commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
-        commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
-        commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
-        commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
-        commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
-        commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
-        commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
-        commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
-        commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
-        commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
-        commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
-        commandLineParser.parse(argc, argv, stderr);
-
-        /* Dev mode. */
-        if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
-            qnSettings->setDevMode(true);
-        }
-
-        /* Set authentication parameters from command line. */
-        QUrl authentication = QUrl::fromUserInput(authenticationString);
-        if(authentication.isValid()) {
-            // do not print password in plaintext
-            //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
-            qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
-        }
-
-        /* Initialize application instance. */
-        application->setQuitOnLastWindowClosed(true);
-        application->setWindowIcon(qnSkin->icon("window_icon.png"));
-        application->setStartDragDistance(20);
-
-        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-
-#ifdef Q_WS_X11
-     //   QnX11LauncherWorkaround x11LauncherWorkaround;
-     //   application->installEventFilter(&x11LauncherWorkaround);
-#endif
-
-#ifdef Q_OS_WIN
-        QnIexploreUrlHandler iexploreUrlHanderWorkaround;
-        // all effects are placed in the constructor
-        Q_UNUSED(iexploreUrlHanderWorkaround)
-#endif
-
-        if(!noSingleApplication) {
-            QString argsMessage;
-            for (int i = 1; i < argc; ++i)
-                argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
-
-            while (application->isRunning()) {
-                if (application->sendMessage(argsMessage))
-                    return 0;
-            }
-        }
-
-        /* Initialize connections. */
-        initAppServerConnection();
-        qnSettings->save();
-        cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
-
-        QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
-
-
-        /* Initialize sound. */
-        QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
-
-
-        /* Initialize log. */
-        const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-        if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
-            return 0;
-        if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
-            return 0;
-
-
-        QnHelpHandler helpHandler;
-        qApp->installEventFilter(&helpHandler);
-
-        QnLog::initLog(logLevel);
-        cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-        cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
-        cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
-
-        defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
-
-
-        // Create and start SessionManager
-        QnSessionManager::instance()->start();
-
-        QnResourcePool::instance(); // to initialize net state;
-        ffmpegInit();
-
-        //===========================================================================
-
-        CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
-
-        QnLocalFileProcessor localFileProcessor;
-        QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-        QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
-
-        //============================
-        //QnResourceDirectoryBrowser
-        if(!skipMediaFolderScan) {
-            QnResourceDirectoryBrowser::instance().setLocal(true);
-            QStringList dirs;
-            dirs << qnSettings->mediaFolder();
-            dirs << qnSettings->extraMediaFolders();
-            QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-            QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
-        }
-
-#ifdef STANDALONE_MODE
-        QnPlArecontResourceSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
-
-        QnPlAxisResourceSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
-
-        QnPlDlinkResourceSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
-
-        QnPlDroidResourceSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
-
-        QnPlIqResourceSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
-
-        //QnPlIpWebCamResourceSearcher::instance().setLocal(true);
-        //QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
-
-        QnPlISDResourceSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
-
-        QnPlOnvifWsSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlOnvifWsSearcher::instance());
-
-        QnPlPulseSearcher::instance().setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
-#endif
-
-#ifdef Q_OS_WIN
-    //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
-#endif // Q_OS_WIN
-        QnResourceDiscoveryManager::instance()->start();
-
-        // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
-        qApp->setStyle(qnSkin->style());
-
-        /* Load translation. */
-        QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
-        QnTranslation translation;
-        if(!translationPath.isEmpty()) /* From command line. */
-            translation = translationManager->loadTranslation(translationPath);
-
-        if(translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(qnSettings->translationPath());
-
-        translationManager->installTranslation(translation);
-
-        /* Create workbench context. */
-        QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
-        context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
-
-        /* Create main window. */
-        QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
-        context->setMainWindow(mainWindow.data());
-        mainWindow->setAttribute(Qt::WA_QuitOnClose);
-
-        if(screen != -1) {
-            QDesktopWidget *desktop = qApp->desktop();
-            if(screen >= 0 && screen < desktop->screenCount()) {
-                QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
-
-                mainWindow->move(desktop->screenGeometry(screen).topLeft() + screenDelta);
-            }
-        }
-
-        mainWindow->show();
-        if (!noFullScreen)
-            context->action(Qn::EffectiveMaximizeAction)->trigger();
-        if(noVersionMismatchCheck)
-            context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
-
-        /* Initialize desctop camera searcher. */
-#ifdef Q_OS_WIN
-        QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
-        QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
-        desktopSearcher.setLocal(true);
-        QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
-#endif
-
-        //initializing plugin manager. TODO supply plugin dir (from settings)
-        PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
-
-        /* Process input files. */
-        for (int i = 1; i < argc; ++i)
-            mainWindow->handleMessage(QFile::decodeName(argv[i]));
-        if(!noSingleApplication)
-            QObject::connect(application.data(), SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
-
-#ifdef TEST_RTSP_SERVER
-        addTestData();
-#endif
-
-        if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
-            QObject::connect(&autoTester, SIGNAL(finished()), application.data(), SLOT(quit()));
-            autoTester.start();
-        }
-
-        /* Process pending events before executing actions. */
-        qApp->processEvents();
-
-        if (argc <= 1) {
-            /* If no input files were supplied --- open connection settings dialog. */
-            if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
-                context->menu()->trigger(Qn::ConnectToServerAction,
-                                         QnActionParameters().withArgument(Qn::AutoConnectRole, true));
-            } else {
-                context->menu()->trigger(Qn::ReconnectAction);
-            }
-        }
-
-        /* Drop resources if needed. */
-        if(!delayedDrop.isEmpty()) {
-            qnSettings->setLayoutsOpenedOnLogin(false);
-
-            QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
-        }
-
-        if (!instantDrop.isEmpty()){
-            qnSettings->setLayoutsOpenedOnLogin(false);
-
-            QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
-        }
-
-#ifdef _DEBUG
-        /* Show FPS in debug. */
-        context->menu()->trigger(Qn::ShowFpsAction);
-#endif
-
-        result = application->exec();
-
-        if(autoTester.state() == QnAutoTester::FINISHED) {
-            if(!autoTester.succeeded())
-                result = 1;
-
-            out << autoTester.message();
-        }
-
-        QnClientMessageProcessor::instance()->stop();
-        QnSessionManager::instance()->stop();
-
-        QnResource::stopCommandProc();
-        QnResourceDiscoveryManager::instance()->stop();
-
-        /* Write out settings. */
-        qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
-        av_lockmgr_register(NULL);
-    }
+    int result = runApplication(application.data(), argc, argv);
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );

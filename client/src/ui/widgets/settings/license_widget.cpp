@@ -13,6 +13,7 @@
 
 #include <common/customization.h>
 
+#include "ui/dialogs/custom_file_dialog.h"
 #include "licensing/license.h"
 #include "version.h"
 
@@ -139,9 +140,8 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
 }
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open License File")));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open License File")));
     dialog->setNameFilters(QStringList() << tr("All files (*.*)"));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFile);
     if (dialog->exec() && !dialog->selectedFiles().isEmpty()) {
         QFile file(dialog->selectedFiles().first());

@@ -6,7 +6,7 @@
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
 
-#include <platform/client_platform_abstraction.h>
+#include <platform/platform_abstraction.h>
 
 #include <ui/common/geometry.h>
 
@@ -32,12 +32,12 @@ public:
 
 private:
     bool renderCursor(Qt::CursorShape shape, int rotation, QCursor *result) {
-        if(!qnClientPlatform) {
+        if(!qnPlatform) {
             qnWarning("Platform instance does not exist, cannot render cursor.");
             return false;
         }
 
-        QnPlatformImages *images = qnClientPlatform->images();
+        QnPlatformImages *images = qnPlatform->images();
 
         QCursor cursor = images->bitmapCursor(shape);
         QPixmap normalPixmap = cursor.pixmap();

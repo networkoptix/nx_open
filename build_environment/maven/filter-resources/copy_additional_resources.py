@@ -33,6 +33,7 @@ if get_environment_variable('platform') == 'windows':
     for arch in ('x86', 'x64'):
         plugin_source_dir = '${environment.dir}/qt5/qtbase-%s/plugins' % arch
         lib_source_dir = '${environment.dir}/qt5/qtbase-%s/bin' % arch
+        pdb_source_dir = '${environment.dir}/qt5/qtbase-%s/lib' % arch
         target_dir = join('${project.build.directory}', arch, 'bin')
         help_dir = join('${project.build.directory}', arch, 'bin/help')
             
@@ -47,7 +48,12 @@ if get_environment_variable('platform') == 'windows':
         
         for qtlib in qtlibs:
             if qtlib != '':
-                
+
+                for file in os.listdir(pdb_source_dir):
+                    if fnmatch.fnmatch(file, 'qt5%sd.pdb' % qtlib):
+                        print (join(pdb_source_dir, file))
+                        shutil.copy2(join(pdb_source_dir, file), join(target_dir, 'debug'))
+            
                 for file in os.listdir(lib_source_dir):
                     if fnmatch.fnmatch(file, 'qt5%sd.dll' % qtlib):
                         print (join(lib_source_dir, file))
@@ -64,7 +70,7 @@ if get_environment_variable('platform') == 'windows':
             if qtplugin != '':
                 print join(plugin_source_dir, qtplugin)
                 for file in os.listdir(join(plugin_source_dir, qtplugin)):
-                    if fnmatch.fnmatch(file, 'q*d.dll'):
+                    if fnmatch.fnmatch(file, 'q*d.*'):
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
                     else:
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))

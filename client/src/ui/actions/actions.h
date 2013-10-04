@@ -709,11 +709,6 @@ namespace Qn {
          */
         ToggleTourModeAction,
 
-        /**
-         * Toggles tour mode. Used only as hotkey.
-         */
-        ToggleTourModeHotkeyAction,
-
         /* Slider actions. */
 
         /**
@@ -892,6 +887,9 @@ namespace Qn {
          * Action can be executed from any scope, and its target will be taken from its scope. */
         ScopelessHotkey         = 0x00200000,
 
+        /** When the action is activated via hotkey, it will be executed with an empty target. */
+        TargetlessHotkey        = 0x04000000,
+
         /** Action can be pulled into enclosing menu if it is the only one in
          * its submenu. It may have different text in this case. */
         Pullable                = 0x00400000,
@@ -905,23 +903,25 @@ namespace Qn {
         /** Action can be executed only in dev-mode. */
         DevMode                 = 0x02000000,
 
+        GlobalHotkey            = NoTarget | ScopelessHotkey | TargetlessHotkey,
+
 
         /** Action can appear in main menu. */
-        Main                    = Qn::MainScope | NoTarget,
+        Main                    = MainScope | NoTarget,
 
         /** Action can appear in scene context menu. */
-        Scene                   = Qn::SceneScope | WidgetTarget,
+        Scene                   = SceneScope | WidgetTarget,
 
         /** Action can appear in tree context menu. */
-        Tree                    = Qn::TreeScope,
+        Tree                    = TreeScope,
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | WidgetTarget,
+        Slider                  = SliderScope | WidgetTarget,
 
         /** Action can appear in title bar context menu. */
-        TitleBar                = Qn::TitleBarScope | LayoutTarget,
+        TitleBar                = TitleBarScope | LayoutTarget,
 
-        Notifications           = Qn::NotificationsScope | WidgetTarget
+        Notifications           = NotificationsScope | WidgetTarget
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag)

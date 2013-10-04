@@ -133,8 +133,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QByteArray layoutData = layoutFile->readAll();
     delete layoutFile;
     QnApiPbSerializer serializer;
+    QList<QnLayoutItemDataList> orderedItems;
     try {
-        serializer.deserializeLayout(layout, layoutData);
+        serializer.deserializeLayout(layout, layoutData, &orderedItems);
         if (layout == 0)
             return layout;
     } catch(...) {
@@ -197,7 +198,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
 
-    QnLayoutItemDataMap items = layout->getItems();
+    //QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
     QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
@@ -206,8 +207,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
-    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr) {
-        QnLayoutItemData& item = itr.value();
+    //for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr) 
+    QnLayoutItemDataList& items = orderedItems[0];
+    for (int i = 0; i < items.size(); ++i)
+    {
+        //QnLayoutItemData& item = itr.value();
+        QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
         //item.resource.id = QnId::generateSpecialId();

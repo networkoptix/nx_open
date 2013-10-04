@@ -97,6 +97,7 @@ message InitialMessage {
     optional string publicIp                   = 8;
     optional string systemName                 = 9;
     optional string sessionKey                 = 10;
+    optional string hardwareId3                = 11;
 }
 
 message FileAddMessage {

@@ -27,6 +27,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 

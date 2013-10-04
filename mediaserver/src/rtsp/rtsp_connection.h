@@ -47,7 +47,7 @@ class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
-    QnRtspConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);

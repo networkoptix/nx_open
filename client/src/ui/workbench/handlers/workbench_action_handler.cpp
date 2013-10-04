@@ -124,7 +124,7 @@
 #include "../extensions/workbench_stream_synchronizer.h"
 
 #ifdef Q_OS_WIN
-#include "launcher_windows_specific/nov_launcher.h"
+#include "launcher/nov_launcher_win.h"
 #endif
 #include "core/resource/layout_item_data.h"
 #include "ui/dialogs/adjust_video_dialog.h"
@@ -337,7 +337,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
-    connect(action(Qn::ToggleTourModeHotkeyAction),             SIGNAL(triggered()),    this,   SLOT(at_toggleTourModeHotkeyAction_triggered()));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
@@ -672,6 +671,9 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
         arguments << QString::number(screen);
     }
 
+    if (qnSettings->isDevMode())
+        arguments << QLatin1String("--dev-mode-key=razrazraz");
+
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
@@ -900,7 +902,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             if(snapshotManager()->isLocal(layout)) {
                 if(layout->getItems().empty()) {
                     resourcePool()->removeResource(layout);
-                } else {
+                } else if(!snapshotManager()->isFile(layout)) {
                     layout->setParentId(user->getId());
                 }
             }
@@ -980,12 +982,12 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             // if file is not exists then it is already deleted or just not downloaded yet
             // I think it should not be played when downloaded
             AudioPlayer::playFileAsync(filePath);
-            qDebug() << "play sound action received" << filename << filePath;
+//            qDebug() << "play sound action received" << filename << filePath;
             break;
         }
     case BusinessActionType::SayText: {
             AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
-            qDebug() << "speech action received" << businessAction->getParams().getSayText();
+//            qDebug() << "speech action received" << businessAction->getParams().getSayText();
             break;
         }
     default:
@@ -1492,9 +1494,9 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFiles);
+    
     QStringList filters;
     //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
@@ -1509,9 +1511,9 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
     dialog->setFileMode(QFileDialog::ExistingFiles);
+
     QStringList filters;
     filters << tr("All Supported (*.layout)");
     filters << tr("Layouts (*.layout)");
@@ -1523,10 +1525,9 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(mainWindow(), tr("Open file")));
-    dialog->setOption(QFileDialog::DontUseNativeDialog, true);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
     dialog->setFileMode(QFileDialog::Directory);
-    dialog->setOptions(QFileDialog::ShowDirsOnly);
+    dialog->setOption(QFileDialog::ShowDirsOnly);
 
     if(dialog->exec())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
@@ -2039,15 +2040,15 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
 
             if(step < dayMSecs) {
-                QTime base;
+                QTime base = QDateTime::fromMSecsSinceEpoch(0).time();
 
                 int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
                 int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime.setTime(QTime());
+                startDateTime.setTime(base);
                 startDateTime = startDateTime.addMSecs(startMSecs);
 
-                endDateTime.setTime(QTime());
+                endDateTime.setTime(base);
                 endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
@@ -2066,7 +2067,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             period = QnTimePeriod(startTime, endTime - startTime);
         }
 
-        itemCount = period.durationMs / step;
+        itemCount = qMin(period.durationMs / step, maxItems);
     }
 
     /* Adjust for chunks. */
@@ -3204,10 +3205,19 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         if (m_exportStorage && (m_exportedMediaRes->toResource()->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         QnLayoutItemData itemData = m_exportLayout->getItem(uniqId);
+
+        QnMediaResourcePtr mediaRes = m_exportedMediaRes.dynamicCast<QnMediaResource>();
+        int timeOffset = 0;
+        if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+            // time difference between client and server
+            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0);
+        }
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll,
                                                       (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage,
                                                        role,
-                                                       0, 0,
+                                                       timeOffset, serverTimeZone,
                                                        itemData.zoomRect,
                                                        itemData.contrastParams,
                                                        itemData.dewarpingParams);
@@ -3926,10 +3936,6 @@ void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
         m_tourTimer->start(qnSettings->tourCycleTime());
         at_tourTimer_timeout();
     }
-}
-
-void QnWorkbenchActionHandler::at_toggleTourModeHotkeyAction_triggered() {
-    menu()->trigger(Qn::ToggleTourModeAction);
 }
 
 struct ItemPositionCmp {

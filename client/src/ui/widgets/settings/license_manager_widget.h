@@ -22,25 +22,24 @@ public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);
     virtual ~QnLicenseManagerWidget();
 
-signals:
-    void showMessageLater(const QString &title, const QString &message, bool warning);
-
 private slots:
     void updateLicenses();
+    void updateDetailsButtonEnabled();
 
     void at_downloadError();
     void at_downloadFinished();
     void at_licensesReceived(int status, QnLicenseList licenses, int handle);
-
     void at_licenseDetailsButton_clicked();
-    void at_gridLicenses_currentChanged();
     void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
 
     void showMessage(const QString &title, const QString &message, bool warning);
 
+signals:
+    void showMessageLater(const QString &title, const QString &message, bool warning);
+
 private:
-    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId, const QString &hardwareId2);
+    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId, const QString &hardwareId2, const QString &hardwareId3);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 

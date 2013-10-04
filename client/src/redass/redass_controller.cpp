@@ -24,6 +24,7 @@ QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive), m_mode(Qn:
 {
     QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_timer.start(TIMER_TICK_INTERVAL);
+    m_lastSwitchTimer.start();
     m_hiQualityRetryCounter = 0;
     m_timerTicks = 0;
     m_lastLqTime = 0;

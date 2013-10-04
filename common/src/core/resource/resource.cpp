@@ -40,6 +40,7 @@ QnResource::QnResource():
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult())
 {
+    m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
 
 QnResource::~QnResource()

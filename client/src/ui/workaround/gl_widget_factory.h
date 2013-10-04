@@ -3,6 +3,7 @@
 
 #include <QGLFormat>
 #include <QGLWidget>
+#include "client/client_settings.h"
 
 class QnGlWidgetFactory {
 public:
@@ -23,6 +24,7 @@ public:
 #else
         localFormat.setSwapInterval(1); /* Turn vsync on. */
 #endif
+        localFormat.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
 
         Widget *result = new Widget(localFormat, parent, /* shareWidget = */ NULL, windowFlags);
 

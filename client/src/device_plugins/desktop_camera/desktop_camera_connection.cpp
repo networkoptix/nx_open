@@ -2,7 +2,7 @@
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
-#include "../desktop_windows_specific/device/desktop_resource.h"
+#include "../desktop_win/device/desktop_resource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 
 
@@ -80,7 +80,7 @@ public:
     QMutex sendMutex;
 };
 
-QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(AbstractStreamSocket* socket, void* sslContext, QnDesktopResource* desktop):
+QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
@@ -96,7 +96,7 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
     stop();
     disconnectInternal();
 
-    d->socket = 0; // we have not ownership for socket in this class
+    d->socket.clear(); // we have not ownership for socket in this class
 }
 
 void QnDesktopCameraConnectionProcessor::processRequest()
@@ -239,7 +239,7 @@ void QnDesktopCameraConnection::run()
             continue;
         }
 
-        processor = new QnDesktopCameraConnectionProcessor(connection->getSocket().data(), 0, m_owner);
+        processor = new QnDesktopCameraConnectionProcessor(connection->getSocket(), 0, m_owner);
 
         QTime timeout;
         timeout.restart();

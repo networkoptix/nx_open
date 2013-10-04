@@ -266,6 +266,7 @@ void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
     qnLicensePool->setOldHardwareId(message.oldHardwareId);
     qnLicensePool->setHardwareId1(message.hardwareId1);
     qnLicensePool->setHardwareId2(message.hardwareId2);
+    qnLicensePool->setHardwareId3(message.hardwareId3);
 }
 
 void QnClientMessageProcessor::at_connectionOpened(QnMessage message)

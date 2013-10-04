@@ -405,7 +405,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
     qint64 testPos = 0;
     Q_ASSERT_X(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
 
-    m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qHash(fileName));
+    m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qt4Hash(fileName));
 
     if (!file.open(QIODevice::ReadWrite))
         return false;
@@ -432,7 +432,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
     if (!file.open(QIODevice::ReadOnly))
         return -1;
 
-    quint32 hash = qHash(fileName);
+    quint32 hash = qt4Hash(fileName);
     QByteArray utf8FileName = fileName.toUtf8();
     for (uint i = 0; i < m_index.entryCount; ++i)
     {

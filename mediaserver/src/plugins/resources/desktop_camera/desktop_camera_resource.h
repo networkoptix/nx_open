@@ -26,7 +26,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems) {}
 
-    bool isInitialized() const;
+    virtual CameraDiagnostics::Result initInternal() override;
 
     virtual bool shoudResolveConflicts() const override { return false; }
 
@@ -39,6 +39,7 @@ public:
 
     QString gePhysicalIdPrefix() const;
     QString getUserName() const;
+    const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 };
 typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 
