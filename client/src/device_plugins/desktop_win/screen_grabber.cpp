@@ -653,9 +653,11 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
 
 bool QnScreenGrabber::capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* pFrame)
 {
+    static const int RGBA32_BYTES_PER_PIXEL = 4;
+
     bool rez = false;
     if (m_mode == Qn::WindowMode)
-        rez = dataToFrame((quint8*) captureInfo->opaque, captureInfo->width, captureInfo->width, captureInfo->height, pFrame);
+        rez = dataToFrame((quint8*) captureInfo->opaque, captureInfo->width*RGBA32_BYTES_PER_PIXEL, captureInfo->width, captureInfo->height, pFrame);
     else
         rez = direct3DDataToFrame(captureInfo->opaque, pFrame);
     pFrame->pts = captureInfo->pts;
