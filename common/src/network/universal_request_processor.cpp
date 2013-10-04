@@ -59,7 +59,7 @@ bool QnUniversalRequestProcessor::authenticate()
             sendResponse("HTTP", CODE_AUTH_REQUIRED, "text/html");
             if (++retryCount > MAX_AUTH_RETRY_COUNT)
                 return false;
-            while (t.elapsed() < AUTH_TIMEOUT) 
+            while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected()) 
             {
                 if (readRequest()) {
                     parseRequest();
