@@ -1,3 +1,6 @@
+
+#ifdef _WIN32
+
 #include <QGLWidget>
 
 #include "desktop_resource_searcher.h"
@@ -85,4 +88,4 @@ QnResourcePtr QnDesktopResourceSearcher::createResource(QnId resourceTypeId, con
     return QnResourcePtr(0);
 }
 
-
+#endif
