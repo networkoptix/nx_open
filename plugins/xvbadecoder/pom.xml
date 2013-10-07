@@ -7,10 +7,10 @@
     and have a parent pom to deletegate the build.
   -->
 	<parent>
-		<artifactId>cpp</artifactId>
+		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
 		<version>2.0.1-SNAPSHOT</version>
-		<relativePath>../cpp</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>

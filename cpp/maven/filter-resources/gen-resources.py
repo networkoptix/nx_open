@@ -2,7 +2,7 @@ import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
 from os.path import dirname, join, exists, isfile
 from os import listdir
 
-sys.path.insert(0, '${basedir}/../common')
+sys.path.insert(0, '${root.dir}/common')
 from gencomp import gencomp_cpp
 
 template_file='template.pro'
