@@ -212,7 +212,8 @@
                 <module>genericrtspplugin</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
-                <module>wixsetup</module>
+                <module>wixsetup/wixsetup-full</module>
+                <module>wixsetup/wixsetup-client-only</module>
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
