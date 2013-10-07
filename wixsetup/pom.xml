@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -95,43 +88,6 @@
             </activation>           
             <build>
                 <plugins>
-                 <!--   <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>2.5</version>
-
-                        <executions>
-                            <execution>
-                                <id>prepare-resources</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.sourceDirectory}/maven-bin-resources/common</directory>
-                                            <filtering>false</filtering>
-                                        </resource>     
-                                        <resource>
-                                            <directory>${project.build.sourceDirectory}/maven-bin-resources/custom/${installer.customization}</directory>
-                                            <filtering>false</filtering>
-                                        </resource>     
-                                        <resource>
-                                            <directory>${project.build.sourceDirectory}</directory>
-                                            <filtering>false</filtering>
-                                            <includes>
-                                                <include>CustomActions/**</include>
-                                            </includes>
-                                        </resource>                                         
-                                    </resources>            
-                                    <encoding>UTF-8</encoding>
-                                </configuration>            
-                            </execution>
-                        </executions>
-                    </plugin>      --> 
-
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <version>1.7</version>
