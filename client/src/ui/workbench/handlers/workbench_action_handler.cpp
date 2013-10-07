@@ -1102,7 +1102,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         AddToLayoutParams addParams;
         addParams.usePosition = !position.isNull();
         addParams.position = position;
-        addParams.time = parameters.argument(Qn::ItemTimeRole, -1);
+        addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
         addToLayout(layout, resources, addParams);
         return;
     }
