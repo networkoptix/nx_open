@@ -121,7 +121,7 @@ else:
     else: print '+++++++++++++++++++++++ Could not recognize platform +++++++++++++++++++++++'
                               
     for config in ('debug', 'release'):
-        shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))  
+        shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))  
 
         for qtplugin in qtplugins:
             if qtplugin != '':

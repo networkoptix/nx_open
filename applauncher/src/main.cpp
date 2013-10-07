@@ -7,6 +7,7 @@
 
 #include <QtSingleApplication>
 #include <QDir>
+#include <QThread>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
@@ -144,9 +145,9 @@ int main( int argc, char* argv[] )
         &settings,
         &installationManager,
         quitMode );
-    applauncherProcessInstance = &applauncherProcess;
 
 #ifdef _WIN32
+    applauncherProcessInstance = &applauncherProcess;
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
 
@@ -174,7 +175,7 @@ int syncDir( const QString& localDir, const QString& remoteUrl )
     }
 
     while( syncher.state() == RDirSyncher::sInProgress )
-        ::Sleep( 1000 );
+        QThread::msleep( 1000 );
 
     switch( syncher.state() )
     {
