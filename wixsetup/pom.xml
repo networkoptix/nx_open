@@ -79,11 +79,11 @@
                                     <filtering>false</filtering>
                                 </resource>           
                                 <resource>
-                                    <directory>${customization.dir}/${project.artifactId}/${customization}/wixsetup</directory>
+                                    <directory>${customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
                                 </resource>		                
                                 <resource>
-                                    <directory>${child.customization.dir}/${project.artifactId}/wixsetup</directory>
+                                    <directory>${child.customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
                                 </resource>                             
                             </resources>              
