@@ -333,7 +333,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 #ifdef Q_OS_WIN
     new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
-    new QnSizeMoveWorkaround(application);
+    new QnQt5Workaround(application);
 #endif
 
     if(!noSingleApplication) {
