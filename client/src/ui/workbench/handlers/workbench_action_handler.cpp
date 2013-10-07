@@ -2040,23 +2040,21 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
 
             if(step < dayMSecs) {
-                QTime base = QDateTime::fromMSecsSinceEpoch(0).time();
-
                 int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
                 int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime.setTime(base);
+                startDateTime.setTime(QTime(0, 0, 0, 0));
                 startDateTime = startDateTime.addMSecs(startMSecs);
 
-                endDateTime.setTime(base);
+                endDateTime.setTime(QTime(0, 0, 0, 0));
                 endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
-                startDateTime.setTime(QTime());
+                startDateTime.setTime(QTime(0, 0, 0, 0));
                 startDateTime.setDate(QDate::fromJulianDay(qFloor(startDateTime.date().toJulianDay(), stepDays)));
 
-                endDateTime.setTime(QTime());
+                endDateTime.setTime(QTime(0, 0, 0, 0));
                 endDateTime.setDate(QDate::fromJulianDay(qCeil(endDateTime.date().toJulianDay(), stepDays)));
             }
 
