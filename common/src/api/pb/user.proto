@@ -15,4 +15,5 @@ message User {
     optional uint64 rights   = 3;
     optional string email    = 4;
     optional string digest   = 5;
+    optional string hash     = 6;
 }
