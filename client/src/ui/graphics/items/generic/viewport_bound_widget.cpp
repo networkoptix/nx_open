@@ -113,8 +113,16 @@ QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVar
     return base_type::itemChange(change, value);
 }
 
-void QnViewportBoundWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    base_type::resizeEvent(event);
-    if(!m_inUpdateScale)
-        updateScale();
+void QnViewportBoundWidget::setGeometry(const QRectF &geometry) {
+    if(m_inUpdateScale) {
+        base_type::setGeometry(geometry);
+    } else {
+        QSizeF oldSize = size();
+
+        base_type::setGeometry(geometry);
+
+        if(!qFuzzyCompare(size(), oldSize))
+            updateScale();
+    }
 }
+
