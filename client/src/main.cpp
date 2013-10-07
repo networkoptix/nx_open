@@ -90,7 +90,7 @@ extern "C"
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
-    #include "ui/workaround/size_move_workaround_win.h"
+    #include "ui/workaround/qt5_workaround_win.h"
     #include "common/systemexcept_win32.h"
 #endif
 
@@ -333,7 +333,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 #ifdef Q_OS_WIN
     new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
-    new QnSizeMoveWorkaround(application);
+    new QnQt5Workaround(application);
 #endif
 
     if(!noSingleApplication) {

@@ -5,18 +5,18 @@
 #include <QtCore/QAbstractNativeEventFilter>
 
 /**
- * Workaround for a strange Qt bug that causes system freeze when resizing any 
- * window.
+ * Workaround for some Qt5-related bugs.
  * 
- * Related Qt bug:
+ * Bugs:
  * https://bugreports.qt-project.org/browse/QTBUG-28513
+ * https://bugreports.qt-project.org/browse/QTBUG-32835 (Fixed in #Qt5.2.0) 
  */
-class QnSizeMoveWorkaround: public QObject, public QAbstractNativeEventFilter {
+class QnQt5Workaround: public QObject, public QAbstractNativeEventFilter {
     Q_OBJECT
 
 public:
-    QnSizeMoveWorkaround(QObject *parent = NULL);
-    virtual ~QnSizeMoveWorkaround();
+    QnQt5Workaround(QObject *parent = NULL);
+    virtual ~QnQt5Workaround();
 
     virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 

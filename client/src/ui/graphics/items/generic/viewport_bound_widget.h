@@ -34,8 +34,9 @@ public:
      */
     void setFixedSize(const QSizeF &fixedSize);
 
+    virtual void setGeometry(const QRectF &geometry) override;
+
 protected:
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 public slots:

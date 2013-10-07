@@ -1,4 +1,4 @@
-#include "size_move_workaround_win.h"
+#include "qt5_workaround_win.h"
 
 #include <Windows.h>
 
@@ -6,7 +6,7 @@ enum {
     WM_QT_SENDPOSTEDEVENTS = WM_USER + 1 /* Copied from qeventdispatcher_win.cpp. */
 };
 
-QnSizeMoveWorkaround::QnSizeMoveWorkaround(QObject *parent): 
+QnQt5Workaround::QnQt5Workaround(QObject *parent): 
     QObject(parent),
     m_inSizeMove(false),
     m_ignoreNextPostedEventsMessage(false)
@@ -14,13 +14,23 @@ QnSizeMoveWorkaround::QnSizeMoveWorkaround(QObject *parent):
     qApp->installNativeEventFilter(this);
 }
 
-QnSizeMoveWorkaround::~QnSizeMoveWorkaround() {
+QnQt5Workaround::~QnQt5Workaround() {
     return;
 }
 
-bool QnSizeMoveWorkaround::nativeEventFilter(const QByteArray &eventType, void *message, long *result) {
+bool QnQt5Workaround::nativeEventFilter(const QByteArray &eventType, void *message, long *result) {
     MSG *msg = static_cast<MSG *>(message);
     switch(msg->message) {
+    /* Workaround #1: Qt does not react to system help query. */
+    case WM_SYSCOMMAND: 
+        if((msg->wParam & 0xfff0) == SC_CONTEXTHELP) {
+            *result = 0; /* An application should return zero if it processes this message. */
+            QWhatsThis::enterWhatsThisMode();
+            return true;
+        }
+        return false;
+
+    /* Workaround #2: event loop starvation if event dispatching is done by the system. */
     case WM_ENTERSIZEMOVE:
         m_inSizeMove = true;
         return false;

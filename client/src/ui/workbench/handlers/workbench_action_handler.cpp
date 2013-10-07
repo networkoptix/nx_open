@@ -607,8 +607,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
                 method.constData(),
                 Qt::QueuedConnection,
                 Q_ARG(int, 0),
-                Q_ARG(QByteArray, QByteArray()),
-                Q_ARG(QnResourceList, QnResourceList()),
+                Q_ARG(QVariant, QVariant()),
                 Q_ARG(int, 0)
             );
         }
@@ -1103,7 +1102,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         AddToLayoutParams addParams;
         addParams.usePosition = !position.isNull();
         addParams.position = position;
-        addParams.time = parameters.argument(Qn::ItemTimeRole, -1);
+        addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
         addToLayout(layout, resources, addParams);
         return;
     }
@@ -2040,23 +2039,21 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
 
             if(step < dayMSecs) {
-                QTime base = QDateTime::fromMSecsSinceEpoch(0).time();
-
                 int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
                 int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime.setTime(base);
+                startDateTime.setTime(QTime(0, 0, 0, 0));
                 startDateTime = startDateTime.addMSecs(startMSecs);
 
-                endDateTime.setTime(base);
+                endDateTime.setTime(QTime(0, 0, 0, 0));
                 endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
-                startDateTime.setTime(QTime());
+                startDateTime.setTime(QTime(0, 0, 0, 0));
                 startDateTime.setDate(QDate::fromJulianDay(qFloor(startDateTime.date().toJulianDay(), stepDays)));
 
-                endDateTime.setTime(QTime());
+                endDateTime.setTime(QTime(0, 0, 0, 0));
                 endDateTime.setDate(QDate::fromJulianDay(qCeil(endDateTime.date().toJulianDay(), stepDays)));
             }
 
