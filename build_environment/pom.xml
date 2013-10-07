@@ -107,6 +107,8 @@
                                 <argument>configure.py</argument>
                                 <argument>--cst</argument>
                                 <argument>${customization}</argument>
+                                <argument>--chld</argument>
+                                <argument>${child.customization}</argument>                                
                                 <argument>--cfg</argument>
                                 <argument>${build.configuration}</argument>                                
                             </arguments>

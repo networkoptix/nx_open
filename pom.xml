@@ -33,14 +33,15 @@
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
-
+        <build.configuration>release</build.configuration>
+        <buildNumber>0</buildNumber>
+        
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
-        <customization.dir>${basedir}/customization</customization.dir>
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
@@ -51,10 +52,13 @@
         <boost.version>1.54-SNAPSHOT</boost.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
 
-        <build.configuration>release</build.configuration>
-        <buildNumber>0</buildNumber>
+        <!-- Set parent (customization) and child (child.customization) customizations here -->         
         <customization>default</customization>
-        <!--QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules)--> 
+        <customization.dir>${root.dir}/customization/${customization}</customization.dir>
+        <child.customization>${customization}</child.customization>
+        <child.customization.dir>${customization.dir}/child/${child.customization}</child.customization.dir>        
+
+        <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
         <qtlib2>Network</qtlib2>
         <qtlib3>Xml</qtlib3>
@@ -103,7 +107,7 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/rsa-key-${license.environment}.properties</file>
-                                <file>${root.dir}/build-${customization}.properties</file>
+                                <file>${child.customization.dir}/build.properties</file>
                                 <file>${root.dir}/appserver/appserver-${arch}.properties</file>
                             </files>
                         </configuration>
@@ -166,14 +170,23 @@
                                     <filtering>false</filtering>
                                 </resource>                                
                                 <resource>
-                                    <directory>${root.dir}/customization/${customization}/${project.artifactId}</directory>
+                                    <directory>${customization.dir}/${project.artifactId}</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>child/**</exclude>
+                                        <exclude>**/_unused/**</exclude>
+                                    </excludes>
+                                </resource>	        	                                
+                                <resource>
+                                    <directory>${child.customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
-                                </resource>		                                
+                                </resource>	                                
                             </resources>              
                             <encoding>UTF-8</encoding>
+                            <overwrite>true</overwrite>
                         </configuration>            
                     </execution>
                 </executions>

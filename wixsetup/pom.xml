@@ -79,12 +79,13 @@
                                     <filtering>false</filtering>
                                 </resource>           
                                 <resource>
-                                    <directory>${root.dir}/customization/${customization}/wixsetup</directory>
+                                    <directory>${customization.dir}/${project.artifactId}/${customization}/wixsetup</directory>
                                     <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/_unused/**</exclude>
-                                    </excludes>
-                                </resource>		                                
+                                </resource>		                
+                                <resource>
+                                    <directory>${child.customization.dir}/${project.artifactId}/wixsetup</directory>
+                                    <filtering>false</filtering>
+                                </resource>                             
                             </resources>              
                             <encoding>UTF-8</encoding>
                         </configuration>            
