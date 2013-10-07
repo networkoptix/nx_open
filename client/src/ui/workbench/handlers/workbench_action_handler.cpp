@@ -607,8 +607,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
                 method.constData(),
                 Qt::QueuedConnection,
                 Q_ARG(int, 0),
-                Q_ARG(QByteArray, QByteArray()),
-                Q_ARG(QnResourceList, QnResourceList()),
+                Q_ARG(QVariant, QVariant()),
                 Q_ARG(int, 0)
             );
         }
