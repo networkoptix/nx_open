@@ -257,7 +257,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
-    connect(ui->rebuildButton,          SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+    connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+    connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
 
     updateFromResources();
 }
@@ -566,11 +567,10 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
     m_lastRebuildReply = reply;
     ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
     bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
-
-    ui->rebuildLabel->setEnabled(inProgress);
-    ui->rebuildProgressBar->setEnabled(inProgress);
-    ui->rebuildButton->setText(inProgress ? tr("Cancel") : tr("Start"));
     ui->rebuildProgressBar->setValue(reply.progress());
+    ui->stackedWidget->setCurrentIndex(inProgress 
+        ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
+        : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
     if (inProgress)
         m_timer.singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
