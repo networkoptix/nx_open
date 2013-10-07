@@ -273,6 +273,8 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
+    glColor4f( 1, 1, 1, 1 );
+
     drawBindedTexture( v_array, tx_array );
 }
 
