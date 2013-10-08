@@ -24,7 +24,7 @@ D3DGraphicsAdapterDescription::D3DGraphicsAdapterDescription( IDirect3D9Ex* dire
         &m_adapterIdentifier );
     if( result != S_OK )
     {
-        cl_log.log( QString::fromAscii("Failed to read graphics adapter %1 info. %2").
+        cl_log.log( QString::fromLatin1("Failed to read graphics adapter %1 info. %2").
             arg(graphicsAdapterNumber).arg(QString::fromWCharArray(DXGetErrorDescription(result))), cl_logERROR );
         return;
     }
@@ -38,7 +38,7 @@ D3DGraphicsAdapterDescription::D3DGraphicsAdapterDescription( IDirect3D9Ex* dire
     //reading m_displayAdapterDeviceString
     const GLubyte* rendererStr = glGetString( GL_RENDERER );
     if( rendererStr )
-        m_displayAdapterDeviceString = QString::fromAscii( (const char*)rendererStr );
+        m_displayAdapterDeviceString = QString::fromLatin1( (const char*)rendererStr );
 }
 
 bool D3DGraphicsAdapterDescription::get( int resID, QVariant* const value ) const
@@ -54,7 +54,7 @@ bool D3DGraphicsAdapterDescription::get( int resID, QVariant* const value ) cons
             return true;
 
         case DecoderParameter::gpuDeviceString:
-            *value = QString::fromAscii( m_adapterIdentifier.Description );
+            *value = QString::fromLatin1( m_adapterIdentifier.Description );
             return true;
 
         case DecoderParameter::driverVersion:

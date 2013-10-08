@@ -111,6 +111,7 @@ QOpenGLFunctions_3_2_Core* GLFence::versionFunctions() {
     m_versionFunctions = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_2_Core>();
     if (!m_versionFunctions) {
         qWarning() << "Could not obtain required OpenGL context version";
+        return NULL;
     }
     if (!m_versionFunctions->initializeOpenGLFunctions())
         m_versionFunctions = NULL;

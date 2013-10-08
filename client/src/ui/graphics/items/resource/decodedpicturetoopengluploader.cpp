@@ -776,25 +776,6 @@ inline void streamLoadAndDeinterleaveNV12UVPlane(
 }
 #endif
 
-class ScopedAtomicLock
-{
-public:
-    ScopedAtomicLock( QAtomicInt* const refCounter )
-    :
-        m_refCounter( refCounter )
-    {
-        m_refCounter->ref();
-    }
-
-    ~ScopedAtomicLock()
-    {
-        m_refCounter->deref();
-    }
-
-private:
-    QAtomicInt* const m_refCounter;
-};
-
 /*!
     For now, it supports only DXVA textures with NV12 format
 */
@@ -945,7 +926,10 @@ private:
     {
 #ifdef _WIN32
         //checking, if m_picDataRef ref has not been marked for released
-        ScopedAtomicLock picUsageCounterLock( &m_picDataRef->syncCtx()->usageCounter );
+        auto decAtomicLambda = []( std::atomic<int>* pInt ){ --(*pInt); };
+        std::unique_ptr<std::atomic<int>, decltype(decAtomicLambda)> picUsageCounterLock(
+            &m_picDataRef->syncCtx()->usageCounter,
+            decAtomicLambda );
         if( !m_picDataRef->isValid() )
         {
             NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...").
@@ -1752,9 +1736,9 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
     cancelUploadingInGUIThread();
 #endif
 
-	for( std::deque<UploadedPicture*>::iterator
-		it = m_picturesWaitingRendering.begin();
-		it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
+    for( std::deque<UploadedPicture*>::iterator
+        it = m_picturesWaitingRendering.begin();
+        it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
          )
     {
         m_emptyBuffers.push_back( *it );
@@ -2472,10 +2456,10 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
         pic->data[3], pic->linesize[3],
         m_rgbaBuf );
 
-	QImage img(
-		m_rgbaBuf,
-		pic->width,
-		pic->height,
+    QImage img(
+        m_rgbaBuf,
+        pic->width,
+        pic->height,
         QImage::Format_ARGB32 );	//QImage::Format_ARGB4444_Premultiplied );
     const QString& fileName = QString::fromLatin1("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
     img.save(fileName, "png");
