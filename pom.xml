@@ -173,7 +173,6 @@
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
-                                        <exclude>child/**</exclude>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
                                 </resource>	        	                                
@@ -220,7 +219,7 @@
                 </os>
             </activation>
             <modules>
-                <!--                <module>plugins/quicksyncdecoder</module>	-->
+                <!-- <module>plugins/quicksyncdecoder</module>	-->
                 <module>client</module>		
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
