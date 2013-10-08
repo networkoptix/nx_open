@@ -19,7 +19,6 @@
         <root.dir>${basedir}/..</root.dir>
         <!-- Change it to true to skip buildenv synchronization (can save time)-->
         <rsync.skip>false</rsync.skip>
-        <buildLib/>
     </properties>
 
     <dependencies>
