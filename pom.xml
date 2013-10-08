@@ -35,7 +35,7 @@
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
-        
+
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
@@ -86,7 +86,6 @@
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
         <module>plugins/image_library_plugin</module>        
-        <module>plugins/quicksyncdecoder</module>        
         <module>mediaserver</module>
         <module>mediaproxy</module>
         <module>testcamera</module>
@@ -174,7 +173,6 @@
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
-                                        <exclude>child/**</exclude>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
                                 </resource>	        	                                
@@ -221,10 +219,10 @@
                 </os>
             </activation>
             <modules>
-                <!--                <module>plugins/quicksyncdecoder</module>	-->
-                <module>client</module>		
+                <module>plugins/quicksyncdecoder</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
+                <module>client</module>		                
                 <module>wixsetup/wixsetup-full</module>
                 <module>wixsetup/wixsetup-client-only</module>
             </modules>
