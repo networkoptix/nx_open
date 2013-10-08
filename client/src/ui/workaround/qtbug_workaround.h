@@ -8,7 +8,7 @@
 class QnQtbugWorkaroundPrivate;
 
 /**
- * Workaround for some Qt-related bugs.
+ * Workaround for some Qt bugs.
  * 
  * Windows bugs:
  * https://bugreports.qt-project.org/browse/QTBUG-28513

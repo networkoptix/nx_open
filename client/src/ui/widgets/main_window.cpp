@@ -3,11 +3,7 @@
 #include <QtCore/QFile>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QToolButton>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QFileOpenEvent>
 #include <QtNetwork/QNetworkReply>
 
@@ -18,7 +14,6 @@
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
 #include "ui/common/palette.h"
@@ -54,10 +49,6 @@
 #include "resource_browser_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
-#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-
-#include "openal/qtvaudiodevice.h"
-#include "ui/graphics/items/controls/volume_slider.h"
 
 namespace {
 

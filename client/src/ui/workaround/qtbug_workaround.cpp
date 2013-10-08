@@ -26,7 +26,7 @@ QnQtbugWorkaround::~QnQtbugWorkaround() {
     return;
 }
 
-bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &eventType, void *message, long *result) {
+bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &, void *message, long *result) {
     Q_D(QnQtbugWorkaround);
 
     MSG *msg = static_cast<MSG *>(message);
