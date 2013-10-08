@@ -72,6 +72,6 @@ void IntelCPUDescription::readCPUInfo()
     if( nExIds >= 0x80000004 )
     {
         //printf_s("\nCPU Brand String: %s\n", CPUBrandString);
-        m_cpuString = QString::fromAscii( CPUBrandString ).trimmed();
+        m_cpuString = QString::fromLatin1( CPUBrandString ).trimmed();
     }
 }

@@ -26,6 +26,8 @@ protected:
     
     virtual void destroyEditor(QWidget *editor, const QModelIndex &index) const override;
 
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 private:
     QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon, m_buggyIcon;

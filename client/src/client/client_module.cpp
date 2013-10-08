@@ -6,8 +6,6 @@
 
 #include <common/common_module.h>
 
-#include <ui/workaround/system_menu_event.h>
-
 #include "client_meta_types.h"
 #include "client_settings.h"
 
@@ -25,9 +23,6 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
-
-    /* We want to receive system menu event on Windows. */
-    QnSystemMenuEvent::initialize();
 
     /* Init singletons. */
     new QnCommonModule(argc, argv, this);

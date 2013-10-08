@@ -86,6 +86,7 @@
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
         <module>plugins/image_library_plugin</module>        
+        <module>plugins/quicksyncdecoder</module>        
         <module>mediaserver</module>
         <module>mediaproxy</module>
         <module>testcamera</module>

@@ -64,7 +64,7 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
-#include <ui/workaround/system_menu_event.h>
+#include <ui/workaround/qtbug_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/event_processors.h>
@@ -1695,7 +1695,7 @@ void QnWorkbenchUi::initGraphicsMessageBox() {
 bool QnWorkbenchUi::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+    if(event->type() == QnEvent::WinSystemMenu) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
 
@@ -2143,6 +2143,7 @@ void QnWorkbenchUi::at_sliderZoomInButton_pressed() {
 
 void QnWorkbenchUi::at_sliderZoomInButton_released() {
     m_sliderZoomingIn = false;
+    m_sliderItem->timeSlider()->hurryKineticAnimations();
 }
 
 void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
@@ -2151,6 +2152,7 @@ void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
 
 void QnWorkbenchUi::at_sliderZoomOutButton_released() {
     m_sliderZoomingOut = false;
+    m_sliderItem->timeSlider()->hurryKineticAnimations();
 }
 
 void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {

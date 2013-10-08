@@ -114,3 +114,11 @@ void QnResourceTreeItemDelegate::destroyEditor(QWidget *editor, const QModelInde
     editor->clearFocus();
     base_type::destroyEditor(editor, index);
 }
+
+bool QnResourceTreeItemDelegate::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::ContextMenu)
+        return true; /* Ignore context menu events as they don't work well with editors embedded into graphics scene. */
+
+    return base_type::eventFilter(object, event);
+}
+

@@ -32,6 +32,7 @@ class QuicksyncDecoderPlugin
     public QnAbstractVideoDecoderPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.networkoptix.plugin.videodecoder" FILE "quicksync_plugin.json")
     Q_INTERFACES(QnAbstractVideoDecoderPlugin)
 
 public:
