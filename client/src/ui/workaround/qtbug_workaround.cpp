@@ -81,6 +81,8 @@ bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &, void *message, lon
 
 #else
 
+class QnQtbugWorkaroundPrivate {};
+
 QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent = NULL): 
     QObject(parent) 
 {}
