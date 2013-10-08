@@ -2143,6 +2143,7 @@ void QnWorkbenchUi::at_sliderZoomInButton_pressed() {
 
 void QnWorkbenchUi::at_sliderZoomInButton_released() {
     m_sliderZoomingIn = false;
+    m_sliderItem->timeSlider()->hurryKineticAnimations();
 }
 
 void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
@@ -2151,6 +2152,7 @@ void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
 
 void QnWorkbenchUi::at_sliderZoomOutButton_released() {
     m_sliderZoomingOut = false;
+    m_sliderItem->timeSlider()->hurryKineticAnimations();
 }
 
 void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {

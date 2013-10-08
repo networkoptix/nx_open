@@ -79,7 +79,7 @@ def gentext(file, path, extensions, text):
                 if n.endswith('_win'):
                     cond = 'win*:'
                 elif n.endswith('_mac'):
-                    cond = 'mac'
+                    cond = 'mac:'
                 elif n.endswith('_unix'):
                     if(os.path.exists(rreplace(p, '_unix', '_mac'))):
                         cond = 'unix:!mac:'
