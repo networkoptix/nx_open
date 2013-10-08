@@ -18,6 +18,7 @@ public:
     void stop();
 
 signals:
+    void connectionOpened();
     void connectionReset();
     void businessRuleChanged(QnBusinessEventRulePtr bEvent);
     void businessRuleDeleted(int id);
