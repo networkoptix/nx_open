@@ -170,6 +170,28 @@ namespace {
         }
     };
 
+    class QnGeometryGraphicsProxyWidget: public QGraphicsProxyWidget {
+        typedef QGraphicsProxyWidget base_type;
+    public:
+        QnGeometryGraphicsProxyWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
+
+    protected:
+        virtual bool eventFilter(QObject *object, QEvent *event) override {
+            if(object == widget())
+                if(event->type() == QEvent::Move)
+                    return false; /* Don't propagate moves. */
+
+            return base_type::eventFilter(object, event);
+        }
+
+        virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override {
+            if(change == ItemPositionChange || change == ItemPositionHasChanged)
+                return value; /* Don't propagate moves. */
+
+            return base_type::itemChange(change, value);
+        }
+    };
+
     const qreal normalTreeOpacity = 0.85;
     const qreal hoverTreeOpacity = 0.95;
     const qreal normalTreeBackgroundOpacity = 0.5;
@@ -372,7 +394,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
     m_titleItem->installEventFilter(titleMenuSignalizer);
 
-    m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
+    /* Note: using QnGeometryGraphicsProxyWidget here fixes this bug:
+     * https://noptix.enk.me/redmine/issues/2330. */
+    m_tabBarItem = new QnGeometryGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     m_tabBarWidget = new QnLayoutTabBar(NULL, context());
