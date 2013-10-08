@@ -85,6 +85,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString
 
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body)
 {
+    if (m_sock->failed())
+        return CL_TRANSPORT_ERROR;
+
     try
     {
         if (!m_connected)
@@ -251,6 +254,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 
 CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
 {
+    if (m_sock->failed())
+        return CL_TRANSPORT_ERROR;
+
     try
     {
         if (!m_connected)

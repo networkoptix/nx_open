@@ -975,6 +975,7 @@ bool Socket::setReadTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
+        setStatusBit( Socket::sbFailed );
         qWarning()<<"handle("<<sockDesc<<"). setReadTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
@@ -999,6 +1000,7 @@ bool Socket::setWriteTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
+        setStatusBit( Socket::sbFailed );
         qWarning()<<"handle("<<sockDesc<<"). setWriteTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
