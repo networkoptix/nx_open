@@ -132,7 +132,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
 #elif defined(USE_SINGLE_DEVICE_PER_DECODER)
     if( !openD3D9Device() )
     {
-        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to create D3D device. %1").
+        NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin. Failed to create D3D device. %1").
             arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))), cl_logERROR );
         return NULL;
     }
@@ -141,7 +141,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     d3d9Ctx = m_d3dDevices[0];
 #endif
 
-    NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Creating decoder..."), cl_logINFO );
+    NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin. Creating decoder..."), cl_logINFO );
 
     std::auto_ptr<VideoDecoderSwitcher> videoDecoderSwitcher( new VideoDecoderSwitcher( NULL, data, *this ) );
 
@@ -203,7 +203,7 @@ bool QuicksyncDecoderPlugin::isStreamSupported( const stree::AbstractResourceRea
 
 bool QuicksyncDecoderPlugin::initialize() const
 {
-    m_usageWatcher.reset( new PluginUsageWatcher( QString::fromAscii( QUICKSYNC_PLUGIN_ID ) ) );
+    m_usageWatcher.reset( new PluginUsageWatcher( QString::fromLatin1( QUICKSYNC_PLUGIN_ID ) ) );
     m_usageCalculator.reset( new PredefinedUsageCalculator(
         m_resNameset,
         QString("%1/%2").arg(QApplication::instance()->applicationDirPath()).arg(quicksyncXmlFileName),
@@ -217,7 +217,7 @@ bool QuicksyncDecoderPlugin::initialize() const
     mfxStatus status = m_mfxSession->Init( MFX_IMPL_AUTO_ANY, &version );
     if( status != MFX_ERR_NONE )
     {
-        NX_LOG( QString::fromAscii("Failed to create Intel media SDK parent session. Status %1").arg(status), cl_logERROR );
+        NX_LOG( QString::fromLatin1("Failed to create Intel media SDK parent session. Status %1").arg(status), cl_logERROR );
         m_mfxSession.reset();
         return false;
     }
@@ -225,7 +225,7 @@ bool QuicksyncDecoderPlugin::initialize() const
     status = m_mfxSession->QueryVersion( &version );
     if( status != MFX_ERR_NONE )
     {
-        NX_LOG( QString::fromAscii("Failed to read Intel media SDK version. Status %1").arg(status), cl_logERROR );
+        NX_LOG( QString::fromLatin1("Failed to read Intel media SDK version. Status %1").arg(status), cl_logERROR );
         m_mfxSession.reset();
         return false;
     }
@@ -252,7 +252,7 @@ bool QuicksyncDecoderPlugin::initialize() const
         m_prevD3DOperationResult = Direct3DCreate9Ex( D3D_SDK_VERSION, &m_direct3D9 );
         if( m_prevD3DOperationResult != S_OK )
         {
-            NX_LOG( QString::fromAscii("Failed to initialize IDirect3D9Ex. %1").arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))), cl_logERROR );
+            NX_LOG( QString::fromLatin1("Failed to initialize IDirect3D9Ex. %1").arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))), cl_logERROR );
             return false;
         }
     }
@@ -260,7 +260,7 @@ bool QuicksyncDecoderPlugin::initialize() const
     //creating D3D device & D3D device manager
     if( !openD3D9Device() )
     {
-        NX_LOG( QString::fromAscii("Failed to initialize IDirect3DDevice9Ex. %1").arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))), cl_logERROR );
+        NX_LOG( QString::fromLatin1("Failed to initialize IDirect3DDevice9Ex. %1").arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))), cl_logERROR );
         return false;
     }
 
@@ -269,7 +269,7 @@ bool QuicksyncDecoderPlugin::initialize() const
     m_graphicsDesc.reset( new D3DGraphicsAdapterDescription( m_direct3D9, m_adapterNumber ) );
     m_cpuDesc.reset( new IntelCPUDescription() );
 
-    NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin has been successfully initialized"), cl_logINFO );
+    NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin has been successfully initialized"), cl_logINFO );
 
     return true;
 }
@@ -457,13 +457,13 @@ bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractReso
     PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
     if( !usageLock.locked() )
     {
-        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to lock shared usage watcher. Cannot create decoder"), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin. Failed to lock shared usage watcher. Cannot create decoder"), cl_logWARNING );
         return false;
     }
 
     if( !m_usageWatcher->readExternalUsage() )
     {
-        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to read total usage. Cannot create decoder"), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin. Failed to read total usage. Cannot create decoder"), cl_logWARNING );
         return false;
     }
 
@@ -485,4 +485,4 @@ bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const stree::AbstractReso
     return m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( mediaStreamParams, curUsageParams );
 }
 
-Q_EXPORT_PLUGIN2( quicksyncdecoderplugin, QuicksyncDecoderPlugin );
+//Q_EXPORT_PLUGIN2( quicksyncdecoderplugin, QuicksyncDecoderPlugin );
