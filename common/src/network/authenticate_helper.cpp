@@ -126,7 +126,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         QByteArray value = data.mid(pos+1);
         value = value.mid(1, value.length()-2);
         if (key == "username")
-            userName = value;
+            userName = value.toLower();
         else if (key == "response")
             response = value;
         else if (key == "nonce")
@@ -148,7 +148,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         QMutexLocker lock(&m_mutex);
         foreach(QnUserResourcePtr user, m_users)
         {
-            if (user->getName().toUtf8() == userName)
+            if (user->getName().toUtf8().toLower() == userName)
             {
                 QByteArray dbHash = user->getDigest().toUtf8();
 
@@ -176,14 +176,14 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse
     int pos = digest.indexOf(':');
     if (pos == -1)
         return false;
-    QByteArray userName = digest.left(pos);
+    QByteArray userName = digest.left(pos).toLower();
     QByteArray password = digest.mid(pos+1);
 
     foreach(QnUserResourcePtr user, m_users)
     {
-        if (user->getName().toUtf8() == userName)
+        if (user->getName().toUtf8().toLower() == userName)
         {
-            QList<QByteArray> pswdData = user->getPassword().toUtf8().split('$');
+            QList<QByteArray> pswdData = user->getHash().toUtf8().split('$');
             if (pswdData.size() == 3)
             {
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
