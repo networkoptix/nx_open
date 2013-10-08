@@ -25,13 +25,13 @@ namespace detail
             baseUrl,
             filePath,
             _handler ),
+        m_httpClient( nullptr ),
+        m_state( State::sInit ),
         m_localDirPath( localDirPath ),
         m_hashTypeName( hashTypeName ),
         m_fileWritePending( 0 ),
-        m_httpClient( nullptr ),
-        m_state( State::sInit ),
-        m_totalBytesWritten( 0 ),
-        m_totalBytesDownloaded( 0 )
+        m_totalBytesDownloaded( 0 ),
+        m_totalBytesWritten( 0 )
     {
         m_httpClient = new nx_http::AsyncHttpClient();
         connect(
@@ -88,7 +88,7 @@ namespace detail
     }
 
     void GetFileOperation::onAsyncWriteFinished(
-        const std::shared_ptr<QnFile>& file,
+        const std::shared_ptr<QnFile>& /*file*/,
         uint64_t bytesWritten,
         SystemError::ErrorCode errorCode )
     {
@@ -131,7 +131,7 @@ namespace detail
     }
 
     void GetFileOperation::onAsyncCloseFinished(
-        const std::shared_ptr<QnFile>& file,
+        const std::shared_ptr<QnFile>& /*file*/,
         SystemError::ErrorCode /*errorCode*/ )
     {
         {
