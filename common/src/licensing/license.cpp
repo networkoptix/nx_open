@@ -332,8 +332,8 @@ QnLicenseList QnLicensePool::getLicenses() const
 bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
     const QString brand(QLatin1String(QN_PRODUCT_NAME_SHORT));
 
-    // >= v1.5, shoud have hwid1 or hwid2, and have brand
-    if (license->isValid(m_hardwareId1, brand) || license->isValid(m_hardwareId2, brand))
+    // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
+    if (license->isValid(m_hardwareId1, brand) || license->isValid(m_hardwareId2, brand) || license->isValid(m_hardwareId3, brand))
         return true;
 
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
@@ -438,4 +438,29 @@ QByteArray QnLicensePool::hardwareId2() const
     return m_hardwareId2;
 }
 
+void QnLicensePool::setHardwareId3(const QByteArray &hardwareId3)
+{
+    m_hardwareId3 = hardwareId3;
+}
 
+QByteArray QnLicensePool::hardwareId3() const
+{
+    return m_hardwareId3;
+}
+
+QByteArray QnLicensePool::currentHardwareId() const
+{
+    if (!m_hardwareId3.isEmpty())
+        return m_hardwareId3;
+
+    if (!m_hardwareId2.isEmpty())
+        return m_hardwareId2;
+
+    if (!m_hardwareId1.isEmpty())
+        return m_hardwareId1;
+
+    if (!m_oldHardwareId.isEmpty())
+        return m_oldHardwareId;
+
+    return QByteArray();
+}
