@@ -76,7 +76,7 @@ void DragInstrument::startDrag(DragInfo *info) {
     QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), mimeData);
     drag->setMimeData(mimeData);
 
-    Qt::DropAction dropAction = drag->exec();
+    Qt::DropAction dropAction = drag->exec(Qt::CopyAction, Qt::CopyAction);
     Q_UNUSED(dropAction);
 
     emit dragFinished(info->view());
