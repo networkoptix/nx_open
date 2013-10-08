@@ -29,7 +29,7 @@
         <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 
         <windows.oslibs.debug></windows.oslibs.debug>        
-        <linux.oslibs>-lssleay32 -leay32</linux.oslibs>
+        <linux.oslibs></linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>

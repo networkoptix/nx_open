@@ -14,8 +14,6 @@
 #include <windows.h>
 #include <sys/stat.h>
 
-#include "../async_file_processor.h"
-
 
 QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE)
 {
@@ -159,20 +157,6 @@ bool QnFile::truncate( qint64 newFileSize)
         return false;
     }
     return SetEndOfFile( m_impl ) > 0;
-}
-
-bool QnFile::writeAsync( const QByteArray& buffer, AbstractWriteHandler* handler )
-{
-    const std::shared_ptr<QnFile>& sharedThis = shared_from_this();
-    assert( sharedThis );
-    return AsyncFileProcessor::instance()->fileWrite( sharedThis, buffer, handler );
-}
-
-bool QnFile::closeAsync( AbstractCloseHandler* handler )
-{
-    const std::shared_ptr<QnFile>& sharedThis = shared_from_this();
-    assert( sharedThis );
-    return AsyncFileProcessor::instance()->fileClose( sharedThis, handler );
 }
 
 bool QnFile::fileExists( const QString& fileName )
