@@ -16,27 +16,14 @@
 #include <ui/workbench/workbench_layout.h>
 
 
-namespace {
-    struct LayoutNameCmp {
-        bool operator()(const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-            return naturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
-        }
-    };
-
-    struct PtzPresetNameCmp {
-        bool operator()(const QnPtzPreset &l, const QnPtzPreset &r) {
-            return naturalStringCaseInsensitiveLessThan(l.name, r.name);
-        }
-    };
-
-} // anonymous namespace
-
-
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
     QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
-    qSort(layouts.begin(), layouts.end(), LayoutNameCmp());
+    
+    qSort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+        return naturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
+    });
 
     QList<QAction *> result;
     foreach(const QnLayoutResourcePtr &layout, layouts) {
@@ -75,7 +62,9 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         return result;
 
     QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera);
-    qSort(presets.begin(), presets.end(), PtzPresetNameCmp());
+    qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+    });
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
