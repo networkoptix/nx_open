@@ -1,25 +1,20 @@
-#include <QtGlobal>
-
-#if defined(Q_OS_LINUX) && !defined(__arm__)
-
-#include "platform_images.h"
+#include "images_unix.h"
 
 #include <QtGui/QCursor>
 #include <QtGui/QPixmap>
+#include <QtGui/QGuiApplication>
 #include <QtX11Extras/QX11Info>
-#include <QtWidgets/QApplication>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xfixes.h>
 
-
 /* X.h defines CursorShape, which conflicts with Qt::CursorShape. */
 #undef CursorShape
 
-QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
-    QApplication::setOverrideCursor(shape);
+QCursor QnUnixImages::bitmapCursor(Qt::CursorShape shape) const {
+    QGuiApplication::setOverrideCursor(shape);
     XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
-    QApplication::restoreOverrideCursor();
+    QGuiApplication::restoreOverrideCursor();
     if(!xImage)
         return QCursor(QPixmap());
 
@@ -31,9 +26,7 @@ QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
     if (sizeof(long) == 4) {
         cursorData = reinterpret_cast<uchar *>(xImage->pixels);
         freeCursorData = false;
-    }
-    else
-    {
+    } else {
         int i, j;
         quint32 *cursorWords;
         ulong *p;
@@ -64,4 +57,3 @@ QCursor QnPlatformImages::bitmapCursor(Qt::CursorShape shape) const {
     return result;
 }
 
-#endif  //Q_OS_LINUX

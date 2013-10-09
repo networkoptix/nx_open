@@ -1,17 +1,17 @@
-#ifndef QN_LINUX_PROCESS_H
-#define QN_LINUX_PROCESS_H
+#ifndef QN_UNIX_PROCESS_H
+#define QN_UNIX_PROCESS_H
 
 #include "platform_process.h"
 
-class QnLinuxProcessPrivate;
+class QnUnixProcessPrivate;
 
-class QnLinuxProcess: public QnPlatformProcess {
+class QnUnixProcess: public QnPlatformProcess {
     Q_OBJECT;
     typedef QnPlatformProcess base_type;
 
 public:
-    QnLinuxProcess(QProcess *process, QObject *parent = NULL);
-    virtual ~QnLinuxProcess();
+    QnUnixProcess(QProcess *process, QObject *parent = NULL);
+    virtual ~QnUnixProcess();
 
     virtual qint64 pid() const override;
     virtual Priority priority() const override;
@@ -21,8 +21,8 @@ private slots:
     void at_process_stateChanged();
 
 protected:
-    Q_DECLARE_PRIVATE(QnLinuxProcess);
-    QScopedPointer<QnLinuxProcessPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(QnUnixProcess);
+    QScopedPointer<QnUnixProcessPrivate> d_ptr;
 };
 
-#endif // QN_LINUX_PROCESS_H
+#endif // QN_UNIX_PROCESS_H

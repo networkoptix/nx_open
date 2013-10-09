@@ -5,6 +5,24 @@
 
 #include <utils/common/warnings.h>
 
+#if defined(Q_OS_WIN)
+#   include "process/process_win.h"
+#else
+#   include "process/process_unix.h"
+#endif
+
+namespace {
+    QnPlatformProcess *newPlatformProcess(QProcess *process, QObject *parent) {
+#if defined(Q_OS_WIN)
+        return new QnWindowsProcess(process, parent);
+#else
+        return new QnUnixProcess(process, parent);
+#endif
+    }
+
+} // anonymous namespace
+
+
 QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
     QObject(parent) 
 {
@@ -13,7 +31,7 @@ QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
 
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
     m_notifier = QnPlatformNotifier::newInstance(this);
-    m_process = QnPlatformProcess::newInstance(NULL, this);
+    m_process = newPlatformProcess(NULL, this);
 }
 
 QnCorePlatformAbstraction::~QnCorePlatformAbstraction() {
@@ -27,8 +45,8 @@ QnPlatformProcess *QnCorePlatformAbstraction::process(QProcess *source) const {
     static const char *qn_platformProcessPropertyName = "_qn_platformProcess";
     QnPlatformProcess *result = source->property(qn_platformProcessPropertyName).value<QnPlatformProcess *>();
     if(!result) {
-        result = QnPlatformProcess::newInstance(source, source);
-        result->setProperty(qn_platformProcessPropertyName, QVariant::fromValue<QnPlatformProcess *>(result));
+        result = newPlatformProcess(source, source);
+        source->setProperty(qn_platformProcessPropertyName, QVariant::fromValue<QnPlatformProcess *>(result));
     }
 
     return result;

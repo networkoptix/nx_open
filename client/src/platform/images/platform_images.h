@@ -10,10 +10,8 @@
 class QnPlatformImages: public QObject {
     Q_OBJECT
 public:
-    QnPlatformImages(QObject *parent = NULL);
-    virtual ~QnPlatformImages();
-
-    static QnPlatformImages *newInstance(QObject *parent = NULL);
+    QnPlatformImages(QObject *parent = NULL): QObject(parent) {}
+    virtual ~QnPlatformImages() {}
 
     /**
      * This function creates a bitmap cursor for the given cursor shape.
@@ -25,7 +23,7 @@ public:
      *                                  cursor shape, or bitmap cursor with a 
      *                                  null pixmap in case of an error.
      */
-    QCursor bitmapCursor(Qt::CursorShape shape) const;
+    virtual QCursor bitmapCursor(Qt::CursorShape shape) const = 0;
 
 private:
     Q_DISABLE_COPY(QnPlatformImages)
