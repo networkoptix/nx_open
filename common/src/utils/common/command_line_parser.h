@@ -108,8 +108,8 @@ public:
 
     void clear();
 
-    bool parse(int &argc, char **argv, FILE *errorFile);
-    bool parse(int &argc, char **argv, QTextStream *errorStream);
+    bool parse(const QStringList& args, FILE *errorFile);
+    bool parse(const QStringList& args, QTextStream *errorStream);
 
 private:
     void addName(int index, const QString &name);
