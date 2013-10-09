@@ -752,8 +752,10 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
         ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
         ctx->soapWsddProxy.soap->fopen = NULL;
-        ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
-        ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+        //ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
+        //ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+        ctx->soapWsddProxy.soap->socket = -1;
+        ctx->soapWsddProxy.soap->master = -1;
     }
 
     fillWsddStructs( ctx->wsddProbe, ctx->replyTo );
