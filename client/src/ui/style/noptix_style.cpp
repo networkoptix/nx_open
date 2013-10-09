@@ -229,7 +229,6 @@ void QnNoptixStyle::polish(QApplication *application) {
     application->setFont(font);
 
     QFont menuFont;
-    menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
     application->setFont(menuFont, "QMenu");
 }
