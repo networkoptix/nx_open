@@ -12,6 +12,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_preset_manager.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_layout.h>
 
 
 namespace {
@@ -31,12 +33,17 @@ namespace {
 
 
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
-    QnId userId = context()->user() ? context()->user()->getId() : QnId();
-    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(userId).filtered<QnLayoutResource>();
+    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
+    if(context()->user())
+        layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
     qSort(layouts.begin(), layouts.end(), LayoutNameCmp());
 
     QList<QAction *> result;
     foreach(const QnLayoutResourcePtr &layout, layouts) {
+        if(snapshotManager()->isFile(layout))
+            if(!QnWorkbenchLayout::instance(layout))
+                continue; /* Not opened. */
+
         QAction *action = new QAction(parent);
         action->setText(layout->getName());
         action->setData(QVariant::fromValue<QnLayoutResourcePtr>(layout));
