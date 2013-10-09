@@ -895,18 +895,10 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         workbench()->update(state);
     }
 
-    /* Delete empty orphaned layouts, move non-empty to the new user. */
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout)) {
-                if(layout->getItems().empty()) {
-                    resourcePool()->removeResource(layout);
-                } else if(!snapshotManager()->isFile(layout)) {
-                    layout->setParentId(user->getId());
-                }
-            }
-        }
-    }
+    /* Delete orphaned layouts. */
+    foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>())
+        if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            resourcePool()->removeResource(layout);
 
     /* Close all other layouts. */
     foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
@@ -1818,10 +1810,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     // remove previous "Last used connection"
     connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
 
-    QUrl clean_url(connectionData.url);
-    clean_url.setPassword(QString());
+    QUrl cleanUrl(connectionData.url);
+    cleanUrl.setPassword(QString());
     QnConnectionData selected = connections.getByName(loginDialog()->currentName());
-    if (selected.url == clean_url){
+    if (selected.url == cleanUrl){
         connections.removeOne(selected.name);
         connections.prepend(selected);
     } else {
