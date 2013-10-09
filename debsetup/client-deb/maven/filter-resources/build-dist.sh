@@ -71,15 +71,6 @@ find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 
 chmod 755 $BINSTAGE/$MINORVERSION/*
 
-# Must use system libraries due to compatibility issues
-# cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
-# cp -P ${qt.dir}/libXi.so* $LIBSTAGE
-# cp -P ${qt.dir}/libXt.so* $LIBSTAGE
-# cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
-# cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
-# cp -P ${qt.dir}/libICE.so* $LIBSTAGE
-# cp -P ${qt.dir}/libSM.so* $LIBSTAGE
-
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
 
