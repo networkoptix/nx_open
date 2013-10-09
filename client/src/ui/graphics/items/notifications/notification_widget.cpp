@@ -321,7 +321,7 @@ void QnNotificationWidget::updateToolTipPosition() {
     if(m_inToolTipPositionUpdate)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inToolTipPositionUpdate, true); /* Prevent stack overflow. */
+    QN_SCOPED_VALUE_ROLLBACK(&m_inToolTipPositionUpdate, true); /* Prevent stack overflow. */
 
     m_tooltipWidget->updateTailPos();
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));

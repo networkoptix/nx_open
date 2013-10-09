@@ -816,9 +816,8 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(Qn::ToggleTreeAction)->setChecked(opened);
-    Q_UNUSED(rollback)
 
     qreal newX = opened ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
     if (animate) {
@@ -835,9 +834,8 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(Qn::ToggleSliderAction)->setChecked(opened);
-    Q_UNUSED(rollback)
 
     qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
     if (animate) {
@@ -856,9 +854,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(Qn::ToggleTitleBarAction)->setChecked(opened);
-    Q_UNUSED(rollback)
 
     if (save)
         qnSettings->setTitleOpened(opened);
@@ -891,7 +888,7 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate, bool save)
         m_notificationsItem->setX(newX);
     }
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     m_notificationsShowButton->setChecked(opened);
 
     if (save)
@@ -916,7 +913,7 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
     if(!opened)
         setDayTimeWidgetOpened(opened, animate);
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     m_calendarShowButton->setChecked(opened);
 }
 
@@ -1472,7 +1469,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.setHeight(16);
 
     if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerItem->geometry())) {
-        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges2, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreSliderResizerGeometryChanges2, true);
 
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
@@ -1910,7 +1907,7 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
         sliderGeometry.setHeight(targetHeight);
         sliderGeometry.moveTop(sliderTop);
 
-        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreSliderResizerGeometryChanges, true);
         m_sliderItem->setGeometry(sliderGeometry);
     }
 
@@ -2100,7 +2097,7 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
     if(m_inCalendarGeometryUpdate)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inCalendarGeometryUpdate, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_inCalendarGeometryUpdate, true);
 
     /*QRectF dayTimePaintRect = m_dayTimeItem->paintRect();
     dayTimePaintRect.setHeight(m_calendarItem->paintRect().height());
@@ -2127,7 +2124,7 @@ void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() {
     if(m_inDayTimeGeometryUpdate)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inDayTimeGeometryUpdate, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_inDayTimeGeometryUpdate, true);
 
     updateDayTimeWidgetGeometry();
     updateNotificationsGeometry();

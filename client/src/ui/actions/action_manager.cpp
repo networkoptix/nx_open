@@ -1459,8 +1459,8 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
         return;
     }
 
-    QnScopedValueRollback<QnActionParameters> paramsRollback(&m_parametersByMenu[NULL], parameters);
-    QnScopedValueRollback<QnAction *> actionRollback(&m_shortcutAction, action);
+    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[NULL], parameters);
+    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
     action->trigger();
 }
 

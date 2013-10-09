@@ -229,7 +229,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 }
 
 void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    QnScopedValueRollback<bool> guard(&m_loading, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }

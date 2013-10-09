@@ -90,11 +90,12 @@ QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
 void QnLayoutTabBar::submitCurrentLayout() {
     if(!m_submit)
         return;
-    
-    QnScopedValueRollback<bool> guard(&m_update, false);
-    workbench()->setCurrentLayout(currentIndex() == -1 ? NULL : m_layouts[currentIndex()]);
 
-    guard.rollback();
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_update, false)
+        workbench()->setCurrentLayout(currentIndex() == -1 ? NULL : m_layouts[currentIndex()]);
+    }
+
     checkInvariants();
 }
 
@@ -194,25 +195,26 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
     if(m_layouts == layouts)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
-    for(int i = 0; i < layouts.size(); i++) {
-        int index = m_layouts.indexOf(layouts[i]);
-        if(index == -1) {
-            m_layouts.insert(i, layouts[i]);
-            insertTab(i, layoutIcon(layouts[i]), layoutText(layouts[i]));
-        } else {
-            moveTab(index, i);
+        for(int i = 0; i < layouts.size(); i++) {
+            int index = m_layouts.indexOf(layouts[i]);
+            if(index == -1) {
+                m_layouts.insert(i, layouts[i]);
+                insertTab(i, layoutIcon(layouts[i]), layoutText(layouts[i]));
+            } else {
+                moveTab(index, i);
+            }
         }
+
+        while(count() > layouts.size())
+            removeTab(count() - 1);
+
+        /* Current layout may have changed. Sync. */
+        at_workbench_currentLayoutChanged();
     }
-
-    while(count() > layouts.size())
-        removeTab(count() - 1);
-
-    /* Current layout may have changed. Sync. */
-    at_workbench_currentLayoutChanged();
-
-    guard.rollback();
+    
     checkInvariants();
 }
 
@@ -226,10 +228,11 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged() {
     if(currentIndex() == newCurrentIndex)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
-    setCurrentIndex(newCurrentIndex);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+        setCurrentIndex(newCurrentIndex);
+    }
 
-    guard.rollback();
     checkInvariants();
 }
 
@@ -250,58 +253,61 @@ void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &
 }
 
 void QnLayoutTabBar::tabInserted(int index) {
-    QnScopedValueRollback<bool> guard(&m_update, false);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
-    QString name;
-    if(m_layouts.size() != count()) { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
-        QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-        m_layouts.insert(index, layout);
-        name = tabText(index);
+        QString name;
+        if(m_layouts.size() != count()) { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
+            QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+            m_layouts.insert(index, layout);
+            name = tabText(index);
+        }
+
+        QnWorkbenchLayout *layout = m_layouts[index];
+        connect(layout, SIGNAL(nameChanged()),          this, SLOT(at_layout_nameChanged()));
+        connect(layout, SIGNAL(lockedChanged()),        this, SLOT(at_layout_lockedChanged()));
+
+        if(!name.isNull())
+            layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */
+
+        if(m_submit)
+            workbench()->insertLayout(layout, index);
+        submitCurrentLayout();
     }
 
-    QnWorkbenchLayout *layout = m_layouts[index];
-    connect(layout, SIGNAL(nameChanged()),          this, SLOT(at_layout_nameChanged()));
-    connect(layout, SIGNAL(lockedChanged()),        this, SLOT(at_layout_lockedChanged()));
-
-    if(!name.isNull())
-        layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */
-
-    if(m_submit)
-        workbench()->insertLayout(layout, index);
-    submitCurrentLayout();
-
-    guard.rollback();
     checkInvariants();
     setMovable(count() > 1);
 }
 
 void QnLayoutTabBar::tabRemoved(int index) {
-    QnScopedValueRollback<bool> guard(&m_update, false);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
-    QnWorkbenchLayout *layout = m_layouts[index];
-    disconnect(layout, NULL, this, NULL);
+        QnWorkbenchLayout *layout = m_layouts[index];
+        disconnect(layout, NULL, this, NULL);
 
-    m_layouts.removeAt(index);
-    submitCurrentLayout();
+        m_layouts.removeAt(index);
+        submitCurrentLayout();
 
-    if(m_submit)
-        workbench()->removeLayout(layout);
+        if(m_submit)
+            workbench()->removeLayout(layout);
+    }
 
-    guard.rollback();
     checkInvariants();
     setMovable(count() > 1);
 }
 
 void QnLayoutTabBar::at_tabMoved(int from, int to) {
-    QnScopedValueRollback<bool> guard(&m_update, false);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
-    QnWorkbenchLayout *layout = m_layouts[from];
-    m_layouts.move(from, to);
+        QnWorkbenchLayout *layout = m_layouts[from];
+        m_layouts.move(from, to);
 
-    if(m_submit)
-        workbench()->moveLayout(layout, to);
+        if(m_submit)
+            workbench()->moveLayout(layout, to);
+    }
 
-    guard.rollback();
     checkInvariants();
 }
 
