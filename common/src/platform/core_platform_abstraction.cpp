@@ -7,21 +7,25 @@
 
 #if defined(Q_OS_WIN)
 #   include "process/process_win.h"
+#   include "notification/notifier_win.h"
+#   define QnProcessImpl QnWindowsProcess
+#   define QnNotifierImpl QnWindowsNotifier
+#elif defined(Q_OS_LINUX)
+#   include "process/process_unix.h"
+#   include "notification/generic_notifier.h"
+#   define QnProcessImpl QnUnixProcess
+#   define QnNotifierImpl QnGenericNotifier
+#elif defined(Q_OS_MACX)
+#   include "process/process_unix.h"
+#   include "notification/generic_notifier.h"
+#   define QnProcessImpl QnUnixProcess
+#   define QnNotifierImpl QnGenericNotifier
 #else
 #   include "process/process_unix.h"
+#   include "notification/generic_notifier.h"
+#   define QnProcessImpl QnUnixProcess
+#   define QnNotifierImpl QnGenericNotifier
 #endif
-
-namespace {
-    QnPlatformProcess *newPlatformProcess(QProcess *process, QObject *parent) {
-#if defined(Q_OS_WIN)
-        return new QnWindowsProcess(process, parent);
-#else
-        return new QnUnixProcess(process, parent);
-#endif
-    }
-
-} // anonymous namespace
-
 
 QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
     QObject(parent) 
@@ -30,8 +34,8 @@ QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
         qnWarning("QApplication instance must be created before a QnCorePlatformAbstraction.");
 
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
-    m_notifier = QnPlatformNotifier::newInstance(this);
-    m_process = newPlatformProcess(NULL, this);
+    m_notifier = new QnNotifierImpl(this);
+    m_process = new QnProcessImpl(NULL, this);
 }
 
 QnCorePlatformAbstraction::~QnCorePlatformAbstraction() {
@@ -45,7 +49,7 @@ QnPlatformProcess *QnCorePlatformAbstraction::process(QProcess *source) const {
     static const char *qn_platformProcessPropertyName = "_qn_platformProcess";
     QnPlatformProcess *result = source->property(qn_platformProcessPropertyName).value<QnPlatformProcess *>();
     if(!result) {
-        result = newPlatformProcess(source, source);
+        result = new QnProcessImpl(source, source);
         source->setProperty(qn_platformProcessPropertyName, QVariant::fromValue<QnPlatformProcess *>(result));
     }
 
