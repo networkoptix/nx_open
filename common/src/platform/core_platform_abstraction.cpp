@@ -5,26 +5,36 @@
 
 #include <utils/common/warnings.h>
 
+#include "monitoring/global_monitor.h"
+
 #if defined(Q_OS_WIN)
 #   include "process/process_win.h"
 #   include "notification/notifier_win.h"
+#   include "monitoring/sys_dependent_monitor.h"
 #   define QnProcessImpl QnWindowsProcess
 #   define QnNotifierImpl QnWindowsNotifier
+#   define QnMonitorImpl QnSysDependentMonitor
 #elif defined(Q_OS_LINUX)
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
+#   include "monitoring/sys_dependent_monitor.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
+#   define QnMonitorImpl QnSysDependentMonitor
 #elif defined(Q_OS_MACX)
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
+#   include "monitoring/sys_dependent_monitor.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
+#   define QnMonitorImpl QnSysDependentMonitor
 #else
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
+#   include "monitoring/sys_dependent_monitor.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
+#   define QnMonitorImpl QnSysDependentMonitor
 #endif
 
 QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
@@ -33,7 +43,7 @@ QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):
     if(!qApp)
         qnWarning("QApplication instance must be created before a QnCorePlatformAbstraction.");
 
-    m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(this), this);
+    m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this);
     m_notifier = new QnNotifierImpl(this);
     m_process = new QnProcessImpl(NULL, this);
 }

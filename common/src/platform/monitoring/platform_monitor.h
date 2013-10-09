@@ -126,13 +126,6 @@ public:
     virtual ~QnPlatformMonitor() {}
 
     /**
-     * \param parent                    Parent object for the platform monitor to be created.
-     * \returns                         A newly created platform monitor instance suitable for usage
-     *                                  on current platform.
-     */
-    static QnPlatformMonitor *newInstance(QObject *parent = NULL);
-
-    /**
      * \returns                         Percent of CPU time (both user and kernel) consumed 
      *                                  by all running processes since the last call to this function,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.

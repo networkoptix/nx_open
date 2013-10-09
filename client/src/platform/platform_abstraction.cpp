@@ -1,15 +1,18 @@
 #include "platform_abstraction.h"
 
-#include <QtWidgets/QApplication>
+#include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
 
 #if defined(Q_OS_WIN)
 #   include "images/images_win.h"
+#   define QnImagesImpl QnWindowsImages
 #elif defined(Q_OS_LINUX)
 #   include "images/images_unix.h"
+#   define QnImagesImpl QnUnixImages
 #else
 #   include "images/images_generic.h"
+#   define QnImagesImpl QnGenericImages
 #endif
 
 QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
@@ -18,13 +21,7 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     if(!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
-#if defined(Q_OS_WIN)
-    m_images = new QnWindowsImages(this);
-#elif defined(Q_OS_LINUX)
-    m_images = new QnUnixImages(this);
-#else
-    m_images = new QnGenericImages(this);
-#endif
+    m_images = new QnImagesImpl(this);
 }
 
 QnPlatformAbstraction::~QnPlatformAbstraction() {
