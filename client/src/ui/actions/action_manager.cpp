@@ -862,22 +862,26 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
+            requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetMenu).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Go to Position...")).
+            requiredPermissions(Qn::WritePtzPermission).
             childFactory(new QnPtzGoToPresetActionFactory(this)).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzManagePresetsAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage Saved Positions...")).
+            requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetAction).
             flags(Qn::SingleTarget | Qn::ResourceTarget).
             text(tr("Go To Saved Position")).
+            requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
     } factory.endSubMenu();
 
