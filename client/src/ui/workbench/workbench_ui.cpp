@@ -816,6 +816,10 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
+    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    action(Qn::ToggleTreeAction)->setChecked(opened);
+    Q_UNUSED(rollback)
+
     qreal newX = opened ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
     if (animate) {
         m_treeXAnimator->animateTo(newX);
@@ -824,16 +828,16 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
         m_treeItem->setX(newX);
     }
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
-    action(Qn::ToggleTreeAction)->setChecked(opened);
-    Q_UNUSED(rollback)
-
     if (save)
         qnSettings->setTreeOpened(opened);
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
+
+    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    action(Qn::ToggleSliderAction)->setChecked(opened);
+    Q_UNUSED(rollback)
 
     qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
     if (animate) {
@@ -844,10 +848,6 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
     }
 
     updateCalendarVisibility(animate);
-
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
-    action(Qn::ToggleSliderAction)->setChecked(opened);
-    Q_UNUSED(rollback)
 
     if (save)
         qnSettings->setSliderOpened(opened);
