@@ -42,6 +42,8 @@ static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 
 //TODO/IMPL set prevErrorCode to noError in case of success
 
+QMutex Socket::m_createSockMutex;
+
 int getSystemErrCode()
 {
 #ifdef WIN32
@@ -105,11 +107,13 @@ void Socket::close()
     if( sockDesc == -1 )
         return;
 
+    m_createSockMutex.lock();
 #ifdef WIN32
     ::closesocket(sockDesc);
 #else
     ::close(sockDesc);
 #endif
+    m_createSockMutex.unlock();
     sockDesc = -1;
 }
 
@@ -374,7 +378,10 @@ bool Socket::createSocket(int type, int protocol)
 #endif
 
     // Make a new socket
-    return (sockDesc = socket(PF_INET, type, protocol)) > 0;
+    m_createSockMutex.lock();
+    sockDesc = socket(PF_INET, type, protocol);
+    m_createSockMutex.unlock();
+    return  sockDesc > 0;
 }
 
 
