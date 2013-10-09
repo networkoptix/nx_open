@@ -542,14 +542,16 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
+
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_waitExtIpFinished(false),
+    m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
-    m_universalTcpListener(0),
-    m_firstRunningTime(0)
+    m_universalTcpListener(0)
 {
     serviceMainInstance = this;
 }
