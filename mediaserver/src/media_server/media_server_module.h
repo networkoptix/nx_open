@@ -12,7 +12,7 @@ class QnPtzMapperPool;
 class QnMediaServerModule: public QObject, public Singleton<QnMediaServerModule> {
     Q_OBJECT;
 public:
-    QnMediaServerModule(int &argc, char **argv, QObject *parent = NULL);
+    QnMediaServerModule(const QStringList& args, QObject *parent = NULL);
     virtual ~QnMediaServerModule();
 
 protected:

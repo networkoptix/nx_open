@@ -192,16 +192,16 @@ void QnPropertyStorage::submitToSettings(QSettings *settings) const {
     submitValuesToSettings(settings, m_nameById.keys());
 }
 
-bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, FILE *errorFile) {
+bool QnPropertyStorage::updateFromCommandLine(const QStringList& args, FILE *errorFile) {
     if(errorFile) {
         QTextStream errorStream(errorFile);
-        return updateFromCommandLine(argc, argv, &errorStream);
+        return updateFromCommandLine(args, &errorStream);
     } else {
-        return updateFromCommandLine(argc, argv, static_cast<QTextStream *>(NULL));
+        return updateFromCommandLine(args, static_cast<QTextStream *>(NULL));
     }
 }
 
-bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream) {
+bool QnPropertyStorage::updateFromCommandLine(const QStringList& args, QTextStream *errorStream) {
     QnPropertyStorageLocker locker(this);
 
     QList<int> ids = m_argumentNamesById.keys();
@@ -226,7 +226,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
         }
     }
 
-    if(!parser.parse(argc, argv, errorStream)) 
+    if(!parser.parse(args, errorStream)) 
         return false;
 
     bool result = true;

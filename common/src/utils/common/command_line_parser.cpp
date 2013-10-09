@@ -111,27 +111,27 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile) {
+bool QnCommandLineParser::parse(const QStringList& args, FILE *errorFile) {
     if(errorFile) {
         QTextStream errorStream(errorFile);
-        return parse(argc, argv, &errorStream);
+        return parse(args, &errorStream);
     } else {
-        return parse(argc, argv, static_cast<QTextStream *>(NULL));
+        return parse(args, static_cast<QTextStream *>(NULL));
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream) {
+bool QnCommandLineParser::parse(const QStringList& args, QTextStream *errorStream) {
     bool result = true;
     int pos = 0, skipped = 0;
-
-    while(pos < argc) {
+    while(pos < args.size()) 
+    {
         /* Extract name. */
-        QStringList paramInfo = QString(QLatin1String(argv[pos])).split(QLatin1Char('='));
+        QStringList paramInfo = args[pos].split(QLatin1Char('='));
         QString name = paramInfo[0];
 
         int index = m_indexByName.value(name, -1);
         if(index == -1) {
-            argv[skipped] = argv[pos];
+            //argv[skipped] = argv[pos];
 
             pos++;
             skipped++;
@@ -148,12 +148,12 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
             value = parameter.impliedValue();
         } else {
             pos++;
-            if(pos >= argc) {
+            if(pos >= args.size()) {
                 if(errorStream)
                     *errorStream << tr("No value provided for the '%1' argument.").arg(name) << endl;
                 result = false;
             } else {
-                value = QLatin1String(argv[pos]);
+                value = args[pos];
             }
         }
 
@@ -184,6 +184,6 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         pos++;
     }
 
-    argc = skipped;
+    //argc = skipped;
     return result;
 }
