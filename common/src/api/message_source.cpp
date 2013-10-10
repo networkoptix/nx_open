@@ -1,5 +1,5 @@
-#include <QtNetwork>
-#include <QtEndian>
+#include <QtNetwork/QtNetwork>
+#include <QtCore/QtEndian>
 #include "message_source.h"
 #include "api/app_server_connection.h"
 #include <utils/common/warnings.h>

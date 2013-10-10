@@ -4,6 +4,7 @@
 #include <boost/array.hpp>
 
 #include <QtGui/QPixmap>
+#include <QtGui/QOpenGLFunctions>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
@@ -17,12 +18,11 @@ class QGLWidget;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
-class QnGlFunctions;
 
 /**
  * A lightweight button widget that does not use styles for painting.
  */
-class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
+class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protected QOpenGLFunctions {
     Q_OBJECT
     Q_FLAGS(StateFlags StateFlag)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
@@ -141,7 +141,6 @@ private:
     bool m_actionIconOverridden;
 
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
-    QScopedPointer<QnGlFunctions> m_gl;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

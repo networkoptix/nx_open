@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "file_storage_resource.h"
 #include "utils/common/util.h"
@@ -251,7 +251,7 @@ bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* c
 
     while( !tabFile.atEnd() )
     {
-        QString line = QString::fromAscii(tabFile.readLine().trimmed());
+        QString line = QString::fromLatin1(tabFile.readLine().trimmed());
         if( line.isEmpty() || line.startsWith('#') )
             continue;
 

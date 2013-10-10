@@ -126,6 +126,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
+    qRegisterMetaType<QnRebuildArchiveReply>();
 
     qRegisterMetaType<DewarpingParams>();
 

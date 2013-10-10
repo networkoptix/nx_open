@@ -100,5 +100,10 @@ int random(int min, int max);
  */
 qreal frandom();
 
+/**
+ * \returns                             has of string. Added for compatibility with QT4 code
+ */
+uint qt4Hash(const QString& key);
+
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

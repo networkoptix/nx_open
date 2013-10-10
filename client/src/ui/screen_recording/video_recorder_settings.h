@@ -1,7 +1,7 @@
 #ifndef VIDEORECORDERSETTINGS_H
 #define VIDEORECORDERSETTINGS_H
 
-#include <QRegExp>
+#include <QtCore/QRegExp>
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
 #include <QtMultimedia/QAudioDeviceInfo>
@@ -40,10 +40,12 @@ public:
 
     QnAudioDeviceInfo primaryAudioDevice() const;
 
+    QString primaryAudioDeviceName() const;
     void setPrimaryAudioDeviceByName(const QString &name);
 
     QnAudioDeviceInfo secondaryAudioDevice() const;
 
+    QString secondaryAudioDeviceName() const;
     void setSecondaryAudioDeviceByName(const QString &name);
 
     bool captureCursor() const;

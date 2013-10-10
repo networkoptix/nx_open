@@ -1,10 +1,12 @@
 #ifndef frame_info_1730
 #define frame_info_1730
 
+#include <atomic>
+
 #ifdef _WIN32
 #include <D3D9.h>
 #endif
-#include <QAtomicInt>
+#include <QtCore/QAtomicInt>
 
 extern "C"
 {
@@ -33,15 +35,15 @@ public:
         /*!
             QnAbstractPictureDataRef implementation MUST increment this value at object instanciation and decrement at object destruction
         */
-        QAtomicInt externalRefCounter;
+        std::atomic<int> externalRefCounter;
         //!Sequence counter incremented by the decoder to invalidate references to the picture
         /*!
             QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved 
             value this one to check, whether its reference is still valid
         */
-        QAtomicInt sequence;
+        std::atomic<int> sequence;
         //!MUST be incremented for accessing picture data
-        QAtomicInt usageCounter;
+        std::atomic<int> usageCounter;
     };
 
     enum PicStorageType
@@ -57,7 +59,7 @@ public:
     QnAbstractPictureDataRef( SynchronizationContext* const syncCtx )
     :
         m_syncCtx( syncCtx ),
-        m_initialSequence( syncCtx->sequence )
+        m_initialSequence( syncCtx->sequence.load() )
     {
     }
     virtual ~QnAbstractPictureDataRef() {}
@@ -78,7 +80,7 @@ public:
     //!If return value is \a false, access to picture data can lead to undefined behavour
     bool isValid() const
     {
-        return m_syncCtx->sequence == m_initialSequence;
+        return m_syncCtx->sequence.load() == m_initialSequence;
     }
 
 private:

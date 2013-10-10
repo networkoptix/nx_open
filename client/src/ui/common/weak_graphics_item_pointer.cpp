@@ -3,7 +3,7 @@
 #include <iterator> /* For std::back_inserter. */
 #include <algorithm> /* For std::copy. */
 
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 
 namespace {
 

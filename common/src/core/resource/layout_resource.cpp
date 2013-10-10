@@ -298,7 +298,7 @@ qreal QnLayoutResource::backgroundOpacity() const {
 
 void QnLayoutResource::setBackgroundOpacity(qreal value) {
     {
-        qreal bound = qBound(0.0, value, 1.0);
+        qreal bound = qBound<qreal>(0.0, value, 1.0);
         QMutexLocker locker(&m_mutex);
         if (qFuzzyCompare(m_backgroundOpacity, bound))
             return;

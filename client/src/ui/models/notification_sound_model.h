@@ -1,7 +1,7 @@
 #ifndef NOTIFICATION_SOUND_MODEL_H
 #define NOTIFICATION_SOUND_MODEL_H
 
-#include <QStandardItemModel>
+#include <QtGui/QStandardItemModel>
 
 class QnNotificationSoundModel : public QStandardItemModel
 {

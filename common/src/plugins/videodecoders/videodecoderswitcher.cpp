@@ -4,7 +4,7 @@
 
 #include "videodecoderswitcher.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "decoders/abstractvideodecoderplugin.h"
 #include "decoders/video/ffmpeg.h"

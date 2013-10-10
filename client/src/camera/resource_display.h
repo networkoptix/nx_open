@@ -1,7 +1,7 @@
 #ifndef QN_UI_DISPLAY_H
 #define QN_UI_DISPLAY_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include <core/resource/resource_consumer.h>
 #include <core/resource/media_resource.h>
 

@@ -27,7 +27,9 @@ CameraDiagnostics::Result QnRtpStreamReader::openStream()
 {
     //m_rtpReader.setRequest("liveVideoTest");
     //m_rtpReader.setRequest("stream1");
+    m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
+
     return m_rtpReader.openStream();
 }
 

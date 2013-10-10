@@ -1,8 +1,8 @@
 #ifndef QN_CAMERA_MOTION_MASK_WIDGET_H
 #define QN_CAMERA_MOTION_MASK_WIDGET_H
 
-#include <QGraphicsScene>
-#include <QGraphicsView>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "ui/graphics/instruments/click_instrument.h"
@@ -10,6 +10,7 @@
 class MotionSelectionInstrument;
 
 class QnGraphicsView;
+class QnGraphicsScene;
 class QnWorkbench;
 class QnWorkbenchDisplay;
 class QnWorkbenchController;
@@ -65,7 +66,7 @@ private:
 
     QScopedPointer<QnWorkbenchContext> m_context;
 
-    QScopedPointer<QGraphicsScene> m_scene;
+    QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnGraphicsView> m_view;
 
     QScopedPointer<QnWorkbenchController> m_controller;

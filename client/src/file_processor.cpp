@@ -4,8 +4,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
-#include <QtGui/QApplication>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_managment/resource_pool.h>

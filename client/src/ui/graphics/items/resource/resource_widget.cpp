@@ -4,9 +4,9 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -281,6 +281,10 @@ QnResourcePtr QnResourceWidget::resource() const {
     return m_resource;
 }
 
+QnWorkbenchItem* QnResourceWidget::item() const {
+    return m_item.data();
+}
+
 const QRectF &QnResourceWidget::zoomRect() const {
     return m_zoomRect;
 }
@@ -419,6 +423,7 @@ void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
 
     m_footerLeftLabel->setText(leftText);
     m_footerRightLabel->setText(rightText);
+    m_footerOverlayWidget->updateScale();
 }
 
 QString QnResourceWidget::calculateInfoText() const {

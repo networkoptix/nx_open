@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 #include "utils/common/sleep.h"
@@ -46,6 +46,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
     QString SET_AUDIO(QLatin1String("CHANNEL=%1&V2_AUDIO_ENABLED=%2"));
 
+    m_multiCodec.setRole(m_role);
     int fps = m_actiRes->roundFps(getFps(), m_role);
     int ch = getActiChannelNum();
     QSize resolution = m_actiRes->getResolution(m_role);

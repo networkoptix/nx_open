@@ -1,5 +1,10 @@
 #include "splash_item.h"
 
+#include <QtGui/QGradient>
+#include <QtGui/QLinearGradient>
+#include <QtGui/QRadialGradient>
+#include <QtGui/QPainter>
+
 #include <utils/common/delete_later.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/fuzzy.h>

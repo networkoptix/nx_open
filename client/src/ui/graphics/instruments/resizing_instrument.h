@@ -1,7 +1,7 @@
 #ifndef QN_RESIZING_INSTRUMENT_H
 #define QN_RESIZING_INSTRUMENT_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtGui/QTransform>
 
 #include "drag_processing_instrument.h"
@@ -97,7 +97,7 @@ private:
     QTransform m_startTransform;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
-    QWeakPointer<QGraphicsWidget> m_widget;
+    QPointer<QGraphicsWidget> m_widget;
     ConstrainedGeometrically *m_constrained;
 };
 

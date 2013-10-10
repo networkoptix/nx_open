@@ -3,10 +3,10 @@
 
 #include <list>
 
-#include <QTime>
-#include <QList>
-#include <QMap>
-#include <QStringList>
+#include <QtCore/QTime>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QStringList>
 
 #include "utils/network/socket.h"
 

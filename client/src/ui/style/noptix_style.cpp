@@ -3,14 +3,14 @@
 #include <cmath> /* For std::fmod. */
 
 #include <QtCore/QSet>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QImage>
-#include <QtGui/QStyleOption>
-#include <QtGui/QMenu>
-#include <QtGui/QAction>
-#include <QtGui/QToolBar>
-#include <QtGui/QAbstractItemView>
+#include <QtWidgets/QStyleOption>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QAbstractItemView>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
@@ -229,7 +229,6 @@ void QnNoptixStyle::polish(QApplication *application) {
     application->setFont(font);
 
     QFont menuFont;
-    menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
     application->setFont(menuFont, "QMenu");
 }

@@ -1,7 +1,7 @@
 #ifndef QN_ADVANCED_SETTINGS_WIDGET_H
 #define QN_ADVANCED_SETTINGS_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 

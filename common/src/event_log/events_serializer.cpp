@@ -1,6 +1,6 @@
 #include "events_serializer.h"
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 
 inline int readInt(quint8* &curPtr)

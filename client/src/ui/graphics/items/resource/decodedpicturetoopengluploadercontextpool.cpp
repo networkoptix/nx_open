@@ -57,7 +57,7 @@ void DecodedPictureToOpenGLUploadThread::run()
     GLContext::ScopedContextUsage scu( m_glContext );
 #endif
 
-    NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread started"), cl_logDEBUG1 );
+    NX_LOG( QString::fromLatin1("DecodedPictureToOpenGLUploadThread started"), cl_logDEBUG1 );
 
     for( ;; )
     {
@@ -80,7 +80,7 @@ void DecodedPictureToOpenGLUploadThread::run()
         toRun->run();
     }
 
-    NX_LOG( QString::fromAscii("DecodedPictureToOpenGLUploadThread stopped"), cl_logDEBUG1 );
+    NX_LOG( QString::fromLatin1("DecodedPictureToOpenGLUploadThread stopped"), cl_logDEBUG1 );
 #endif
 }
 

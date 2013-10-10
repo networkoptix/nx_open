@@ -2,14 +2,15 @@
 
 #include <limits>
 
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QMessageBox>
 
 #include <QtOpenGL/QGLWidget>
 
 #include "utils/common/checked_cast.h"
 
 #include "ui/graphics/view/graphics_view.h"
+#include "ui/graphics/view/graphics_scene.h"
 #include "ui/graphics/instruments/signaling_instrument.h"
 #include "ui/graphics/instruments/instrument_manager.h"
 #include "ui/graphics/instruments/motion_selection_instrument.h"
@@ -42,7 +43,7 @@ void QnCameraMotionMaskWidget::init() {
     m_motionSensitivity = 0;
 
     /* Set up scene & view. */
-    m_scene.reset(new QGraphicsScene(this));
+    m_scene.reset(new QnGraphicsScene(this));
     m_view.reset(new QnGraphicsView(m_scene.data(), this));
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);

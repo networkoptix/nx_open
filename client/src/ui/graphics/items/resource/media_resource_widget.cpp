@@ -2,7 +2,8 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
@@ -612,23 +613,23 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->translate(rect.topLeft());
 
     QnScopedPainterPenRollback penRollback(painter);
-    painter->setPen(QPen(QColor(255, 255, 255, 16)));
+    painter->setPen(QPen(QColor(255, 255, 255, 16), 0.0));
     painter->drawLines(gridLines[0]);
 
-    painter->setPen(QPen(QColor(255, 0, 0, 128)));
+    painter->setPen(QPen(QColor(255, 0, 0, 128), 0.0));
     painter->drawLines(gridLines[1]);
 }
 
 void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor) {
     // 4-6 fps
 
-    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback)
-
-    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback)
+    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback);
+    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback);
+    QnScopedPainterPenRollback penRollback(painter); Q_UNUSED(penRollback);
 
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
-    painter->setPen(QPen(penColor));
+    painter->setPen(QPen(penColor, 0.0));
     painter->drawPath(path);
 }
 

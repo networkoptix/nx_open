@@ -1,8 +1,8 @@
 #ifndef __STARDOT_RESOURCE_H__
 #define __STARDOT_RESOURCE_H__
 
-#include <QMap>
-#include <QMutex>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -42,7 +42,7 @@ public:
 
     bool isAudioSupported() const;
 
-    __m128i* getMotionMaskBinData() const;
+    simd128i* getMotionMaskBinData() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -61,7 +61,7 @@ private:
     int m_maxFps;
     int m_rtspPort;
     QString m_rtspTransport;
-    __m128i *m_motionMaskBinData;
+    simd128i *m_motionMaskBinData;
 };
 
 #endif // __STARDOT_RESOURCE_H__

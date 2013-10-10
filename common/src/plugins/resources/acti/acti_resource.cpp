@@ -470,9 +470,9 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     url.setScheme(QLatin1String("rtsp"));
     url.setPort(m_rtspPort);
     if (isAudioSupported())
-        url.setPath(QString(QLatin1String("stream%1")).arg(actiChannelNum));
+        url.setPath(QString(QLatin1String("/stream%1/")).arg(actiChannelNum));
     else
-        url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
+        url.setPath(QString(QLatin1String("/track%1/")).arg(actiChannelNum));
     return url.toString();
 }
 

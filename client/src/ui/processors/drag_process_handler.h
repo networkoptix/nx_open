@@ -1,7 +1,7 @@
 #ifndef QN_DRAG_PROCESS_HANDLER_H
 #define QN_DRAG_PROCESS_HANDLER_H
 
-#include <QtGlobal> /* For Q_UNUSED. */
+#include <QtCore/QtGlobal> /* For Q_UNUSED. */
 
 class DragProcessor;
 class DragInfo;

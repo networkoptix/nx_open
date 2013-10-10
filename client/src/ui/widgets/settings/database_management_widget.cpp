@@ -1,8 +1,8 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
-#include <QMessageBox>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
 #include <QtCore/QFileInfo>
 
 #include "client/client_settings.h"
@@ -34,7 +34,7 @@ QnDatabaseManagementWidget::~QnDatabaseManagementWidget() {
 }
 
 void QnDatabaseManagementWidget::at_backupButton_clicked() {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QFileDialog::DontUseNativeDialog);
     if(fileName.isEmpty())
         return;
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
@@ -68,7 +68,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
 }
 
 void QnDatabaseManagementWidget::at_restoreButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QFileDialog::DontUseNativeDialog);
     if(fileName.isEmpty())
         return;
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());

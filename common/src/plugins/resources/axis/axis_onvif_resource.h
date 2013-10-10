@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"

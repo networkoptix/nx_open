@@ -2,7 +2,7 @@
 #define QN_ACTION_CONDITIONS_H
 
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
+
 
 #include <client/client_globals.h>
 

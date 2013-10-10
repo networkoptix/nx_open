@@ -1,7 +1,7 @@
 #ifndef QN_MASKED_PROXY_WIDGET_H
 #define QN_MASKED_PROXY_WIDGET_H
 
-#include <QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 /**
  * A proxy widget that can be forced to draw only part of the source widget.
@@ -36,6 +36,8 @@ public:
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
     bool isUpdatesEnabled() const;
+
+    virtual bool event( QEvent* e ) override;
 
 signals:
     void paintRectChanged();

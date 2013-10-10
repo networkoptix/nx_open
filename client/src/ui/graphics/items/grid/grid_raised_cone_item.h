@@ -1,8 +1,8 @@
 #ifndef GRID_RAISED_CONE_ITEM_H
 #define GRID_RAISED_CONE_ITEM_H
 
-#include <QObject>
-#include <QGraphicsWidget>
+#include <QtCore/QObject>
+#include <QtWidgets/QGraphicsWidget>
 
 class QnGridRaisedConeItem : public QGraphicsObject
 {

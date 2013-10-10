@@ -1,7 +1,7 @@
 #include "weektime_schedule_widget.h"
 #include "ui_weektime_schedule_widget.h"
 
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 #include <core/resource_managment/resource_pool.h>
 #include <utils/math/color_transformations.h>

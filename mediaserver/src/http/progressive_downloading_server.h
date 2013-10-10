@@ -14,7 +14,7 @@ public:
     explicit QnProgressiveDownloadingServer(const QHostAddress& address, int port);
     virtual ~QnProgressiveDownloadingServer();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner) override;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
 };
 
 class QnProgressiveDownloadingConsumerPrivate;
@@ -22,7 +22,7 @@ class QnProgressiveDownloadingConsumerPrivate;
 class QnProgressiveDownloadingConsumer: virtual public QnTCPConnectionProcessor, public TimerEventHandler
 {
 public:
-    QnProgressiveDownloadingConsumer(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();

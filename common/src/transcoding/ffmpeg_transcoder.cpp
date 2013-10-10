@@ -1,5 +1,5 @@
 #include "ffmpeg_transcoder.h"
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 

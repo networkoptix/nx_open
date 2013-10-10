@@ -1,7 +1,7 @@
 #ifndef CONNECTION_TESTING_DIALOG_H
 #define CONNECTION_TESTING_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 #include <QtCore/QTimer>
 
 #include "utils/common/request_param.h"

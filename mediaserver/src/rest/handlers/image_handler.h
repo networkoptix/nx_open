@@ -1,7 +1,7 @@
 #ifndef QN_REST_IMAGE_HANDLER_H
 #define QN_REST_IMAGE_HANDLER_H
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 #include "rest/server/request_handler.h"
 
 class QnImageHandler: public QnRestRequestHandler

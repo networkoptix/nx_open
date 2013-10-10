@@ -1,6 +1,6 @@
 #include "grid_raised_cone_item.h"
 
-#include <QPainter>
+#include <QtGui/QPainter>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/style/globals.h>

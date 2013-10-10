@@ -4,9 +4,9 @@
 #include "coldstore_api/sfs-client.h"
 
 #include <QHash>
-#include <QIODevice>
-#include <QTime>
-#include <QMutex>
+#include <QtCore/QIODevice>
+#include <QtCore/QTime>
+#include <QtCore/QMutex>
 
 
 #define CS_ACTUAL_DATA_CHANNEL 0

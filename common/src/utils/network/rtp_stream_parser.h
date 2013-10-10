@@ -1,7 +1,7 @@
 #ifndef __RTP_STREAM_PARSER_H
 #define __RTP_STREAM_PARSER_H
 
-#include <QIODevice>
+#include <QtCore/QIODevice>
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "rtpsession.h"

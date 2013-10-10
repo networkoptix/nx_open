@@ -1,6 +1,6 @@
 #include "avi_dvd_resource.h"
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "../archive_stream_reader.h"
 #include "avi_dvd_archive_delegate.h"

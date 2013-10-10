@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 
-#include <QString>
+#include <QtCore/QString>
 
 struct IMMDeviceEnumerator;
 struct IMMDevice;

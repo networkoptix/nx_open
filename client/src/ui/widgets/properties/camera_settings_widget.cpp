@@ -1,8 +1,8 @@
 #include "camera_settings_widget.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QStackedWidget>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_managment/resource_criterion.h>

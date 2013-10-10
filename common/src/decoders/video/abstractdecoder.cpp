@@ -50,11 +50,11 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
                 }
                 if( videoDecoderPlugin )
                 {
-                    std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext, swDecoderCount ) );
+                    std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext, swDecoderCount.load() ) );
                     if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
                         return decoder.release();
                 }
-                cl_log.log( QString::fromAscii("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
+                cl_log.log( QString::fromLatin1("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
             }
 		}
 

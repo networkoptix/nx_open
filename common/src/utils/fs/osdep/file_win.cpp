@@ -6,13 +6,14 @@
 
 #ifdef Q_OS_WIN
 
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "../file.h"
 
 #include <sstream>
 #include <io.h>
 #include <windows.h>
 #include <sys/stat.h>
+
 
 QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE)
 {
@@ -26,8 +27,8 @@ QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(INVALID_HANDLE_V
 
 QnFile::~QnFile()
 {
-	if( isOpen() )
-		close();
+    if( isOpen() )
+        close();
 }
 
 bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDependentFlags)
@@ -76,86 +77,86 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
 
 void QnFile::close()
 {
-	//sync();
-	CloseHandle( m_impl );
-	m_impl = INVALID_HANDLE_VALUE;
+    //sync();
+    CloseHandle( m_impl );
+    m_impl = INVALID_HANDLE_VALUE;
 }
 
 qint64 QnFile::read(char* buffer, qint64 count )
 {
-	if( !isOpen() )
-		return -1;
+    if( !isOpen() )
+        return -1;
 
-	DWORD bytesRead = 0;
-	BOOL res = ReadFile( m_impl, buffer, count, &bytesRead, NULL );
-	if( !res )
-		return -1;
-	return bytesRead;
+    DWORD bytesRead = 0;
+    BOOL res = ReadFile( m_impl, buffer, count, &bytesRead, NULL );
+    if( !res )
+        return -1;
+    return bytesRead;
 }
 
 qint64 QnFile::write( const char* buffer, qint64 count )
 {
-	if( !isOpen() )
-		return -1;
+    if( !isOpen() )
+        return -1;
 
-	DWORD bytesWritten = 0;
-	BOOL res = WriteFile( m_impl, buffer, count, &bytesWritten, NULL );
-	if( !res )
-		return -1;
-	return bytesWritten;
+    DWORD bytesWritten = 0;
+    BOOL res = WriteFile( m_impl, buffer, count, &bytesWritten, NULL );
+    if( !res )
+        return -1;
+    return bytesWritten;
 }
 
 void QnFile::sync()
 {
-	FlushFileBuffers( m_impl );
+    FlushFileBuffers( m_impl );
 }
 
 bool QnFile::isOpen() const
 {
-	return m_impl != INVALID_HANDLE_VALUE;
+    return m_impl != INVALID_HANDLE_VALUE;
 }
 
 qint64 QnFile::size() const
 {
     QnFile* nonConstThis = const_cast<QnFile*>(this);
     nonConstThis->sync();
-	DWORD highDw;
-	DWORD lowDw = GetFileSize( m_impl, &highDw );
-	if( (lowDw == INVALID_FILE_SIZE) && (GetLastError() != NO_ERROR) )
-		return -1;
-	return ((qint64)highDw << 32) + lowDw;
+    DWORD highDw;
+    DWORD lowDw = GetFileSize( m_impl, &highDw );
+    if( (lowDw == INVALID_FILE_SIZE) && (GetLastError() != NO_ERROR) )
+        return -1;
+    return ((qint64)highDw << 32) + lowDw;
 }
 
 bool QnFile::seek( qint64 offset)
 {
-	if( !isOpen() )
-		return false;
+    if( !isOpen() )
+        return false;
 
-	LONG distanceToMoveLow = (quint32)(offset & 0xffffffff);
-	LONG distanceToMoveHigh = (quint32)((offset & 0xffffffff00000000ull) >> 32);
+    LONG distanceToMoveLow = (quint32)(offset & 0xffffffff);
+    LONG distanceToMoveHigh = (quint32)((offset & 0xffffffff00000000ull) >> 32);
 
-	DWORD newPointerLow = SetFilePointer( m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN );
-	if( newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR )
-		return false;
-	return true;
+    DWORD newPointerLow = SetFilePointer( m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN );
+    if( newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR )
+        return false;
+    return true;
 }
 
 bool QnFile::truncate( qint64 newFileSize)
 {
-	LONG distanceToMoveLow = (quint32)(newFileSize & 0xffffffff);
-	LONG distanceToMoveHigh = (quint32)(newFileSize >> 32);
-	DWORD newPointerLow = SetFilePointer( 
-		m_impl,
-		distanceToMoveLow,
-		&distanceToMoveHigh,
-		FILE_BEGIN );
-	int errCode = GetLastError();
-	if( (newPointerLow == INVALID_SET_FILE_POINTER) && (errCode != NO_ERROR) )
+    LONG distanceToMoveLow = (quint32)(newFileSize & 0xffffffff);
+    LONG distanceToMoveHigh = (quint32)(newFileSize >> 32);
+    DWORD newPointerLow = SetFilePointer( 
+        m_impl,
+        distanceToMoveLow,
+        &distanceToMoveHigh,
+        FILE_BEGIN );
+    int errCode = GetLastError();
+    if( (newPointerLow == INVALID_SET_FILE_POINTER) && (errCode != NO_ERROR) )
     {
         qWarning() << "Can't truncate file " << m_fileName << "to size" << newFileSize;
-		return false;
+        return false;
     }
-	return SetEndOfFile( m_impl ) > 0;
+    return SetEndOfFile( m_impl ) > 0;
 }
 
 bool QnFile::fileExists( const QString& fileName )

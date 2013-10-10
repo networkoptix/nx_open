@@ -33,13 +33,11 @@ protected:
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
 
 private:
-    QnWorkbench *workbench() const {
-        return m_workbench.data();
-    }
+    QnWorkbench *workbench() const;
 
 private:
-    QWeakPointer<QWidget> m_currentViewport;
-    QWeakPointer<QnWorkbench> m_workbench;
+    QPointer<QWidget> m_currentViewport;
+    QPointer<QnWorkbench> m_workbench;
     QSizeF m_speed;
     QSizeF m_maxSpacing;
 };

@@ -5,27 +5,25 @@
 
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
-#include <QUuid>
+#include <QtCore/QUuid>
 
-#include <qjson/serializer.h>
-#include <qjson/parser.h>
+#include <QtCore/QJsonDocument>
 
 #include <utils/common/color.h>
 
 #include "warnings.h"
 
 void QJson_detail::serialize_json(const QVariant &value, QByteArray *target) {
-    QJson::Serializer serializer;
-    *target = serializer.serialize(value);
+    *target = QJsonDocument::fromVariant(value).toJson();
 }
 
 bool QJson_detail::deserialize_json(const QByteArray &value, QVariant *target) {
-    QJson::Parser deserializer;
-
-    bool ok = true;
-    QVariant result = deserializer.parse(value, &ok);
-    if(!ok)
+    QJsonParseError error;
+    QVariant result = QJsonDocument::fromJson(value, &error).toVariant();
+    if(error.error != QJsonParseError::NoError) {
+        qWarning() << error.errorString();
         return false;
+    }
 
     *target = result;
     return true;

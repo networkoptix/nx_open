@@ -3,15 +3,15 @@
 #include <cassert>
 #include <limits>
 
-#include <QGraphicsView>
-#include <QMouseEvent>
-#include <QApplication>
-#include <QGraphicsItem>
-#include <QStyleHintReturnMask>
-#include <QStyleOptionRubberBand>
-#include <QRubberBand>
-#include <QWidget>
-#include <QCursor>
+#include <QtWidgets/QGraphicsView>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QStyleHintReturnMask>
+#include <QtWidgets/QStyleOptionRubberBand>
+#include <QtWidgets/QRubberBand>
+#include <QtWidgets/QWidget>
+#include <QtGui/QCursor>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -361,4 +361,7 @@ QSet<QGraphicsItem *> RubberBandInstrument::toSet(QList<QGraphicsItem *> items) 
     return result;
 }
 
+RubberBandItem* RubberBandInstrument::rubberBand() const  {
+    return m_rubberBand.data();
+}
 

@@ -3,10 +3,10 @@
 
 #include <QtCore/QEvent>
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QItemEditorFactory>
+#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 
@@ -56,11 +56,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->tableView->resizeColumnsToContents();
 
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
 
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);

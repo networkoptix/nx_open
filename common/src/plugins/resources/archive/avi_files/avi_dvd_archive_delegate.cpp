@@ -1,6 +1,7 @@
-#include <QMutex>
-#include <QFileInfo>
-#include <QUrl>
+#include <QtCore/QMutex>
+#include <QtCore/QFileInfo>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 #include "avi_dvd_archive_delegate.h"
 #include "avi_dvd_resource.h"
@@ -289,7 +290,7 @@ QStringList QnAVIDvdArchiveDelegate::getPlaylist(const QString& url)
         if (pathAndParams.size() > 1)
         {
             //QUrl url = m_device->getUniqueId();
-            QString titleStr = QUrl(url).queryItemValue(QLatin1String("title"));
+            QString titleStr = QUrlQuery(QUrl(url).query()).queryItemValue(QLatin1String("title"));
             if (!titleStr.isEmpty())
                 titleNum = titleStr.toInt();
         }
@@ -724,7 +725,7 @@ void QnAVIDvdArchiveDelegate::fillAdditionalInfo(CLFileInfo* fi)
         {
             QString lang = findLangByCode(info->m_audioLang[avStream->id - 128]);
             if (!lang.isEmpty())
-            av_dict_set(&avStream->metadata, "language", lang.toAscii().constData(), 0);
+            av_dict_set(&avStream->metadata, "language", lang.toLatin1().constData(), 0);
         }
     }
 }

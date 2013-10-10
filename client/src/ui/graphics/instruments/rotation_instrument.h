@@ -2,7 +2,7 @@
 #define QN_ROTATION_INSTRUMENT_H
 
 #include "drag_processing_instrument.h"
-#include <QtCore/QWeakPointer>
+
 
 class QGraphicsWidget;
 
@@ -48,19 +48,14 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
-    RotationItem *rotationItem() const {
-        return m_rotationItem.data();
-    }
-
-    QGraphicsWidget *target() const {
-        return m_target.data();
-    }
+    RotationItem *rotationItem() const;
+    QGraphicsWidget *target() const;
 
     void startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart);
 
 private:
-    QWeakPointer<RotationItem> m_rotationItem;
-    QWeakPointer<QGraphicsWidget> m_target;
+    QPointer<RotationItem> m_rotationItem;
+    QPointer<QGraphicsWidget> m_target;
     bool m_rotationStartedEmitted;
     qreal m_originAngle;
     qreal m_lastRotation;

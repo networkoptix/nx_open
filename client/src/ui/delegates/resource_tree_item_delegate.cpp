@@ -1,5 +1,7 @@
 #include "resource_tree_item_delegate.h"
 
+#include <QtWidgets/QApplication>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
@@ -106,3 +108,17 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
 void QnResourceTreeItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const {
     base_type::initStyleOption(option, index);
 }
+
+void QnResourceTreeItemDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) const {
+    // TODO: #QTBUG If focus is not cleared, we get crashes. Should be fixed in QWidget.
+    editor->clearFocus();
+    base_type::destroyEditor(editor, index);
+}
+
+bool QnResourceTreeItemDelegate::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::ContextMenu)
+        return true; /* Ignore context menu events as they don't work well with editors embedded into graphics scene. */
+
+    return base_type::eventFilter(object, event);
+}
+

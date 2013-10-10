@@ -1,8 +1,8 @@
 #ifndef QN_RESOURCE_ICON_CACHE_H
 #define QN_RESOURCE_ICON_CACHE_H
 
-#include <QObject>
-#include <QIcon>
+#include <QtCore/QObject>
+#include <QtGui/QIcon>
 #include <core/resource/resource.h>
 
 /**

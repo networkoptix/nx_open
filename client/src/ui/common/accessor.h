@@ -2,7 +2,7 @@
 #define QN_ACCESSOR_H
 
 #include <QtCore/QObject>
-#include <QVariant>
+#include <QtCore/QVariant>
 
 /**
  * Abstract accessor class. 

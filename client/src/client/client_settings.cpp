@@ -7,6 +7,8 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include <QtCore/QJsonDocument>
+
 #include <client/config.h>
 
 #include <utils/common/util.h>
@@ -84,9 +86,11 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Load from internal resource. */
     QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QVariantMap json;
-        if(!QJson::deserialize(file.readAll(), &json)) {
-            qnWarning("Could not parse client settings file.");
+
+        QJsonParseError error;
+        QVariantMap json = QJsonDocument::fromJson(file.readAll(), &error).toVariant().toMap();
+        if (error.error != QJsonParseError::NoError) {
+            qWarning() << error.errorString();
         } else {
             updateFromJson(json.value(lit("settings")).toMap());
         }
@@ -225,7 +229,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 }
 
 void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    QnScopedValueRollback<bool> guard(&m_loading, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }

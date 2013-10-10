@@ -1,4 +1,4 @@
-#include <QDir>
+#include <QtCore/QDir>
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
@@ -9,7 +9,7 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "motion/motion_helper.h"
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "recording_manager.h"
 #include "serverutil.h"
 
@@ -84,22 +84,25 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
         return;
     }
 
-    if (m_file.size() == 0) 
-    {
-        QTextStream str(&m_file);
-        str << "timezone; start; storage; index; duration\n"; // write CSV header
-        str.flush();
-
-    }
-    else if (m_rebuildArchive == Rebuild_All || 
-             (m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo) ||
-             (m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
-            )
+    if (m_rebuildArchive == Rebuild_All || 
+        (m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo) ||
+        (m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
+        )
     {
         doRebuildArchive();
     }
-    else {
-        deserializeTitleFile();
+    else 
+    {
+        if (m_file.size() == 0) 
+        {
+            QTextStream str(&m_file);
+            str << "timezone; start; storage; index; duration\n"; // write CSV header
+            str.flush();
+
+        }
+        else {
+            deserializeTitleFile();
+        }
     }
 }
 
@@ -301,6 +304,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
     QDir dir(folder);
     foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
+        if (m_rebuildArchive == Rebuild_None)
+            return; // cancceled
+
         if (fi.isDir())
             scanMediaFiles(fi.absoluteFilePath(), storage, allChunks);
         else {
@@ -338,8 +344,14 @@ void DeviceFileCatalog::doRebuildArchive()
     qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
 
     QMap<qint64, Chunk> allChunks;
-    foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages())
+    foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages()) {
+        if (m_rebuildArchive == Rebuild_None)
+            break;
         readStorageData(storage, m_role, allChunks);
+    }
+
+    if (m_rebuildArchive == Rebuild_None)
+        return; // canceled
 
     foreach(const Chunk& chunk, allChunks)
         m_chunks << chunk;
@@ -724,6 +736,12 @@ qint64 DeviceFileCatalog::firstTime() const
 void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
 {
     m_rebuildArchive = value;
+}
+
+void DeviceFileCatalog::beforeRebuildArchive()
+{
+    QMutexLocker lock(&m_mutex);
+    m_file.close();
 }
 
 QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)

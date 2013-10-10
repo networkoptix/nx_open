@@ -12,7 +12,7 @@
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
-
+#include "api/model/rebuild_archive_reply.h"
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
@@ -42,6 +42,7 @@ public:
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
+    void finished(int status, const QnRebuildArchiveReply &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);
@@ -60,6 +61,13 @@ private:
     friend class QnAbstractReplyProcessor;
 };
 
+
+enum RebuildAction
+{
+    RebuildAction_ShowProgress,
+    RebuildAction_Start,
+    RebuildAction_Cancel
+};
 
 class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
@@ -179,6 +187,12 @@ public:
     int doCameraDiagnosticsStepAsync(
         const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
+
+    /**
+        \param slot Slot MUST have signature (int, QnRebuildArchiveReply, int)
+        \returns Request handle
+     */
+    int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

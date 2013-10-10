@@ -1,9 +1,9 @@
 #ifndef QN_RESOURCE_WIDGET_H
 #define QN_RESOURCE_WIDGET_H
 
-#include <QtCore/QWeakPointer>
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
+#include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
 
@@ -94,9 +94,7 @@ public:
     /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.
      */
-    QnWorkbenchItem *item() const {
-        return m_item.data();
-    }
+    QnWorkbenchItem *item() const;
 
     /**
      * \returns                         Layout of channels in this widget. Never returns NULL.
@@ -385,7 +383,7 @@ private:
     friend class QnWorkbenchDisplay;
 
     /** Layout item. */
-    QWeakPointer<QnWorkbenchItem> m_item;
+    QPointer<QnWorkbenchItem> m_item;
 
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;

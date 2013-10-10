@@ -1,12 +1,19 @@
 #ifndef __TCP_CONNECTION_PRIV_H__
 #define __TCP_CONNECTION_PRIV_H__
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
+
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
-#include <QHttpRequestHeader>
 #include "tcp_connection_processor.h"
+
+#ifdef USE_NX_HTTP
+#include "utils/network/http/httptypes.h"
+#else
+#include <QHttpRequestHeader>
+#endif
+
 #include "utils/common/byte_array.h"
 
 
@@ -37,8 +44,7 @@ class QnTCPConnectionProcessorPrivate
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
-    QnTCPConnectionProcessorPrivate():
-        socket(0)
+    QnTCPConnectionProcessorPrivate()
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -46,14 +52,18 @@ public:
 
     virtual ~QnTCPConnectionProcessorPrivate()
     {
-        delete socket;
         delete [] tcpReadBuffer;
     }
 
 public:
-    AbstractStreamSocket* socket;
+    QSharedPointer<AbstractStreamSocket> socket;
+#ifdef USE_NX_HTTP
+    nx_http::HttpRequest request;
+    nx_http::HttpResponse response;
+#else
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;
+#endif
 
     QByteArray protocol;
     QByteArray requestBody;

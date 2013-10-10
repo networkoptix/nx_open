@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "isd_resource.h"
 #include "isd_stream_reader.h"
 #include "utils/common/sleep.h"
@@ -27,6 +27,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 

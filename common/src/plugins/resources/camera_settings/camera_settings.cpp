@@ -2,9 +2,9 @@
 
 #include <cmath>
 
-#include <QDebug>
-#include <QFile>
-#include <QStringList>
+#include <QtCore/QDebug>
+#include <QtCore/QFile>
+#include <QtCore/QStringList>
 
 //
 // CameraSettingValue

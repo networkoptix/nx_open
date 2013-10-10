@@ -1,7 +1,7 @@
 #ifndef QN_GRAPHICS_VIEW_H
 #define QN_GRAPHICS_VIEW_H
 
-#include <QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 
 //#define QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 
@@ -99,6 +99,9 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
     virtual void drawForeground(QPainter *painter, const QRectF &rect) override;
+
+private:
+    bool isInRedirectedPaint() const;
 
 private:
     PaintFlags m_paintFlags;

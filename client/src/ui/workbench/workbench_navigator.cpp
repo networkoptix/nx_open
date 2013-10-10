@@ -4,10 +4,10 @@
 
 #include <QtCore/QTimer>
 
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
-#include <QtGui/QGraphicsSceneContextMenuEvent>
-#include <QtGui/QApplication>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QGraphicsSceneContextMenuEvent>
+#include <QtWidgets/QApplication>
 
 extern "C"
 {
@@ -781,7 +781,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     if (!reader)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
@@ -978,7 +978,7 @@ void QnWorkbenchNavigator::updateSliderFromScrollBar() {
     if(m_updatingScrollBarFromSlider)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updatingSliderFromScrollBar, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromScrollBar, true);
 
     m_timeSlider->setWindow(m_timeScrollBar->value(), m_timeScrollBar->value() + m_timeScrollBar->pageStep());
 }
@@ -988,7 +988,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
         return;
 
     {
-        QnScopedValueRollback<bool> guard(&m_updatingScrollBarFromSlider, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingScrollBarFromSlider, true);
 
         qint64 windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
 

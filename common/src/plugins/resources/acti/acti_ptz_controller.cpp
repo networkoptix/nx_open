@@ -243,7 +243,7 @@ int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     QMutexLocker lock(&m_mutex);
 
-    zoomPos = qMax(0.0, (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
+    zoomPos = qMax<double>(0.0, (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
 
     CLHttpStatus status;
 

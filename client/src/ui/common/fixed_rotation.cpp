@@ -1,7 +1,7 @@
 #include "fixed_rotation.h"
 
 #include <cmath>
-#include <QtGui/QGraphicsWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 #include <qmath.h>
 

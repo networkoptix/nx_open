@@ -17,6 +17,12 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http
 {
+    StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
+    {
+        HttpHeaders::const_iterator it = headers.find( headerName );
+        return it == headers.end() ? StringType() : it->second;
+    }
+    
     ////////////////////////////////////////////////////////////
     //// parse utils
     ////////////////////////////////////////////////////////////
@@ -220,6 +226,12 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     //// class StatusLine
     ////////////////////////////////////////////////////////////
+    static const int MAX_DIGITS_IN_STATUS_CODE = 5;
+    static size_t estimateSerializedDataSize( const StatusLine& sl )
+    {
+        return sl.version.size() + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
+    }
+
     StatusLine::StatusLine()
     :
         statusCode( StatusCode::undefined )
@@ -347,6 +359,31 @@ namespace nx_http
         dstBuffer->append( (const BufferType::value_type*)"\r\n" );
         dstBuffer->append( messageBody );
     }
+
+
+    ////////////////////////////////////////////////////////////
+    //// class HttpResponse
+    ////////////////////////////////////////////////////////////
+    void HttpResponse::serialize( BufferType* const dstBuffer ) const
+    {
+        //estimating required buffer size
+        dstBuffer->clear();
+        dstBuffer->reserve( estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+
+        //serializing
+        statusLine.serialize( dstBuffer );
+        serializeHeaders( headers, dstBuffer );
+        dstBuffer->append( (const BufferType::value_type*)"\r\n" );
+        dstBuffer->append( messageBody );
+    }
+
+    BufferType HttpResponse::toString() const
+    {
+        BufferType str;
+        serialize( &str );
+        return str;
+    }
+
 
 
     ////////////////////////////////////////////////////////////

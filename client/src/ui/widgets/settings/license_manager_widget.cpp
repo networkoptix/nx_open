@@ -3,13 +3,13 @@
 #include "version.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QUrl>
 #include <QtCore/QTextStream>
+#include <QtCore/QUrlQuery>
 
-#include <QtGui/QAbstractItemView>
-#include <QtGui/QTreeWidgetItem>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -35,19 +35,17 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
     ui->gridLicenses->setModel(m_model);
-
-    ui->detailsButton->setEnabled(false);
     ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
     connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
-    connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(at_gridLicenses_currentChanged()));
+    connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(updateDetailsButtonEnabled()));
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
     connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
 
     updateLicenses();
-    at_gridLicenses_currentChanged();
+    updateDetailsButtonEnabled();
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
@@ -71,7 +69,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(qnLicensePool->currentHardwareId());
-    ui->licenseWidget->setFreeLicenseAvailable(!licenseListHelper.haveLicenseKey(qnProductFeatures().freeLicenseKey.toAscii()) && (qnProductFeatures().freeLicenseCount > 0));
+    ui->licenseWidget->setFreeLicenseAvailable(!licenseListHelper.haveLicenseKey(qnProductFeatures().freeLicenseKey.toLatin1()) && (qnProductFeatures().freeLicenseCount > 0));
 
     /* Update grid. */
     m_model->setLicenses(m_licenses);
@@ -134,7 +132,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     QNetworkRequest request;
     request.setUrl(url);
 
-    QUrl params;
+    QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
 
     int n = 1;
@@ -151,7 +149,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
     params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
 
-    QNetworkReply *reply = m_httpClient->post(request, params.encodedQuery());  
+    QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
     m_replyKeyMap[reply] = licenseKey;
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
@@ -182,7 +180,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 
     if (!keyLicense) {
-        /* QNetworkReply slots should not start eventLoop */
+        /* QNetworkReply slots should not start event loop. */
         emit showMessageLater(tr("License Activation"),
                               tr("Invalid License. Contact our support team to get a valid License."),
                               true);
@@ -207,6 +205,11 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
         .arg(license->cameraCount());
     QMessageBox::information(this, tr("License Details"), details);
 }
+
+void QnLicenseManagerWidget::updateDetailsButtonEnabled() {
+    ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -284,16 +287,12 @@ void QnLicenseManagerWidget::at_downloadFinished() {
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
-    ui->detailsButton->setEnabled(ui->gridLicenses->selectionModel()->currentIndex().isValid());
-}
-
 void QnLicenseManagerWidget::at_gridLicenses_doubleClicked(const QModelIndex &index) {
     showLicenseDetails(m_model->license(index));
 }
 
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
-    QModelIndex index = ui->gridLicenses->selectionModel()->selectedRows().front();
+    QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
     showLicenseDetails(m_model->license(index));
 }
 

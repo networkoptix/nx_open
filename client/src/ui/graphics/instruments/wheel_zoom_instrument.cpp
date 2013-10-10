@@ -4,8 +4,8 @@
 
 #include <QtCore/QDateTime>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QGraphicsSceneWheelEvent>
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+#include <QtWidgets/QGraphicsView>
 #include <QtGui/QCursor>
 
 #include <ui/processors/kinetic_cutting_processor.h>

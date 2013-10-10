@@ -1,10 +1,10 @@
 
 #include "time_image_filter.h"
 
-#include <QDateTime>
-#include <QFontMetrics>
-#include <QImage>
-#include <QPainter>
+#include <QtCore/QDateTime>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 #include "utils/color_space/yuvconvert.h"
 
@@ -110,7 +110,7 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
 
     // copy and convert frame buffer to image
-    yuv420_argb32_sse2_intr(m_imageBuffer,
+    yuv420_argb32_simd_intr(m_imageBuffer,
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         m_timeImg->width(), m_timeImg->height(),
         m_timeImg->bytesPerLine(), 
@@ -125,7 +125,7 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     p.strokePath(path, QPen(QColor(32,32,32,80)));
 
     // copy and convert RGBA32 image back to frame buffer
-    bgra_to_yv12_sse2_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
+    bgra_to_yv12_simd_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);

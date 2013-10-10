@@ -2,12 +2,14 @@
 #include "caching_proxy_widget.h"
 
 #include <cassert>
-#ifdef __APPLE__
+#ifdef Q_OS_MACX
 #include <Glu.h>
+#else
+#include <GL/glu.h>
 #endif
 
-#include <QEvent>
-#include <QSysInfo>
+#include <QtCore/QEvent>
+#include <QtCore/QSysInfo>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/warnings.h>

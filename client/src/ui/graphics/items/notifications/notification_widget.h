@@ -1,6 +1,8 @@
 #ifndef NOTIFICATION_WIDGET_H
 #define NOTIFICATION_WIDGET_H
 
+#include <QtGui/QPainter>
+
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/image_button_widget.h>

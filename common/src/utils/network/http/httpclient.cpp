@@ -5,7 +5,7 @@
 
 #include "httpclient.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 
 namespace nx_http

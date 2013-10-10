@@ -134,10 +134,10 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
                 findMore = false;
                 for (int i = 0; i < rects.size(); ++i)
                 {
-                    if (!linkedRects.intersect(rects[i].translated(1,0)).isEmpty() ||
-                        !linkedRects.intersect(rects[i].translated(0,1)).isEmpty() ||
-                        !linkedRects.intersect(rects[i].translated(-1,0)).isEmpty() ||
-                        !linkedRects.intersect(rects[i].translated(0,-1)).isEmpty())
+                    if (!linkedRects.intersected(rects[i].translated(1,0)).isEmpty() ||
+                        !linkedRects.intersected(rects[i].translated(0,1)).isEmpty() ||
+                        !linkedRects.intersected(rects[i].translated(-1,0)).isEmpty() ||
+                        !linkedRects.intersected(rects[i].translated(0,-1)).isEmpty())
                     {
                         linkedRects += rects[i];
                         rects.remove(i);

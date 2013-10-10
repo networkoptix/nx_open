@@ -35,21 +35,16 @@ protected:
     virtual bool dragLeaveEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
     virtual bool dropEvent(QGraphicsItem *item, QGraphicsSceneDragDropEvent *event) override;
 
-    DestructionGuardItem *guard() const {
-        return m_guard.data();
-    }
-
-    SceneEventFilterItem *filterItem() const {
-        return m_filterItem.data();
-    }
+    DestructionGuardItem *guard() const;
+    SceneEventFilterItem *filterItem() const;
 
 private:
     QnResourceList m_resources;
     
-    QWeakPointer<QnWorkbenchContext> m_context;
+    QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;
-    QWeakPointer<DestructionGuardItem> m_guard;
-    QWeakPointer<QGraphicsObject> m_surface;
+    QPointer<DestructionGuardItem> m_guard;
+    QPointer<QGraphicsObject> m_surface;
     bool m_intoNewLayout;
 };
 

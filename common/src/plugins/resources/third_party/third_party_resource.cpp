@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 #include "api/app_server_connection.h"
 #include "motion_data_picture.h"
@@ -137,6 +137,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
 {
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
     if( !archiveDelegate )
+        return QnSecurityCamResource::createArchiveDataProvider();
         return QnPhysicalCameraResource::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
@@ -291,6 +292,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     int result = m_camManager.getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )
     {
+        if( false )
         NX_LOG( QString::fromLatin1("Error getting camera info from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );

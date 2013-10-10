@@ -2,11 +2,12 @@
 
 #include <cassert>
 
-#include <QMetaEnum>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QUrl>
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
@@ -31,7 +32,7 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();
     }
-    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toAscii()), m_handle);
+    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), m_handle);
 
     qnDeleteLater(reply);
     qnDeleteLater(this);
@@ -126,13 +127,15 @@ QByteArray QnSessionManager::formatNetworkError(int error) {
 QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const {
     QUrl url(baseUrl);
 
-    QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
+    QString path = QLatin1String("/api/") + objectName + QLatin1Char('/');
     url.setPath(path);
 
+    QUrlQuery urlQuery(url.query());
     for (int i = 0; i < params.count(); i++){
         QPair<QString, QString> param = params[i];
-        url.addQueryItem(param.first, param.second);
+        urlQuery.addQueryItem(param.first, param.second);
     }
+    url.setQuery( urlQuery );
     return url;
 }
 
@@ -282,7 +285,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
     foreach (QnRequestHeader header, headers) {
         if (header.first == QLatin1String("Content-Type"))
             skipContentType = true;
-        request.setRawHeader(header.first.toAscii(), header.second.toUtf8());
+        request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());
     }
 
     QString userInfo = url.userInfo();

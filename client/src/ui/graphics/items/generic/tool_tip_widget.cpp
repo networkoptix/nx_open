@@ -3,10 +3,10 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -200,6 +200,15 @@ QRectF QnToolTipWidget::boundingRect() const {
     return m_boundingRect;
 }
 
+void QnToolTipWidget::setGeometry(const QRectF &rect) {
+    QSizeF oldSize = size();
+
+    base_type::setGeometry(rect);
+
+    if(!qFuzzyCompare(size(), oldSize))
+        invalidateShape();
+}
+
 void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShape();
 
@@ -215,12 +224,6 @@ void QnToolTipWidget::updateGeometry() {
 
     if(m_autoSize)
         resize(effectiveSizeHint(Qt::PreferredSize));
-}
-
-void QnToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    base_type::resizeEvent(event);
-
-    invalidateShape();
 }
 
 void QnToolTipWidget::wheelEvent(QGraphicsSceneWheelEvent *event) {

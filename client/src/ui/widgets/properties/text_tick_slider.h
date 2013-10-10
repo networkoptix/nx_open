@@ -1,7 +1,7 @@
 #ifndef QN_TEXT_TICK_SLIDER_H
 #define QN_TEXT_TICK_SLIDER_H
 
-#include <QtGui/QSlider>
+#include <QtWidgets/QSlider>
 
 class QnTextTickSlider: public QSlider {
     Q_OBJECT;

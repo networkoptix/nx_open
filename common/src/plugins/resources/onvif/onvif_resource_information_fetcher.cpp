@@ -15,7 +15,7 @@ const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
-	{"vivo_ironman", "VS8801"},
+    {"vivo_ironman", "VS8801"},
     {"VIVOTEK", "VS8801"}
 };
 
@@ -89,8 +89,8 @@ bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, 
 {
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
-        QRegExp rxVendor(QLatin1String(IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
-        QRegExp rxName(QLatin1String(IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
+        QRegExp rxVendor(QLatin1String((const char*)IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
+        QRegExp rxName(QLatin1String((const char*)IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
 
         if (rxVendor.exactMatch(manufacturer) && rxName.exactMatch(name))
             return true;

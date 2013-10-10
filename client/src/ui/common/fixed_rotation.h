@@ -1,8 +1,8 @@
 #ifndef QN_FIXED_ROTATION_H
 #define QN_FIXED_ROTATION_H
 
-#include <QtCore/QWeakPointer>
-#include <QtGui/QGraphicsRotation>
+#include <QtCore/QPointer>
+#include <QtWidgets/QGraphicsRotation>
 
 class QGraphicsWidget;
 
@@ -36,7 +36,7 @@ private slots:
     void updateOrigin();
 
 private:
-    QWeakPointer<QGraphicsWidget> m_target;
+    QPointer<QGraphicsWidget> m_target;
 };
 
 

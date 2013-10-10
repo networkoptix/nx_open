@@ -1,16 +1,7 @@
 #ifndef QN_PLATFORM_MONITOR_H
 #define QN_PLATFORM_MONITOR_H
 
-#if defined(_MSC_VER) && _MSC_VER<1600 
-// TODO: msvc2008, remove this hell after transition to msvc2010
-#   ifdef _WIN64
-namespace std { typedef __int64 intptr_t; }
-#   else
-namespace std { typedef __int32 intptr_t; }
-#   endif
-#else
-#   include <cstdint> /* For std::intptr_t. */
-#endif
+#include <cstdint> /* For std::intptr_t. */
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -133,13 +124,6 @@ public:
 
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
-
-    /**
-     * \param parent                    Parent object for the platform monitor to be created.
-     * \returns                         A newly created platform monitor instance suitable for usage
-     *                                  on current platform.
-     */
-    static QnPlatformMonitor *newInstance(QObject *parent = NULL);
 
     /**
      * \returns                         Percent of CPU time (both user and kernel) consumed 

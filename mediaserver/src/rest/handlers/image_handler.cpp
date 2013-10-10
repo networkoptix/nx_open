@@ -1,5 +1,5 @@
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 
 extern "C"
 {

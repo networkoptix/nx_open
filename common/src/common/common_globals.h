@@ -232,8 +232,7 @@ public:
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
-        EventTypeRole,                            /**< Role for business event type. Used in BusinessEventsLogAction. */
-
+        EventTypeRole,                              /**< Role for business event type. Used in BusinessEventsLogAction. */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -241,7 +240,9 @@ public:
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
-        DisplayHtmlRole                             /**< Same as Display role, but use HTML format. */
+        DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
+
+        RoleCount
     };
 
 

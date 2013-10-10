@@ -8,8 +8,8 @@
 
 #include <queue>
 
-#include <QByteArray>
-#include <QMutex>
+#include <QtCore/QByteArray>
+#include <QtCore/QMutex>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>

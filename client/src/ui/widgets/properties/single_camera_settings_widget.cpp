@@ -4,10 +4,11 @@
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QSplitter>
+#include <QtWidgets/QSplitter>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -485,6 +486,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
+    updateRecordingParamsAvailability();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
@@ -597,6 +599,14 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
         return;
     bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
+{
+    if (!m_camera)
+        return;
+    
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
@@ -806,7 +816,8 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
         
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
         if(url.isValid()) {
-            int port = url.queryItemValue(lit("http_port")).toInt();
+            QUrlQuery query(url);
+            int port = query.queryItemValue(lit("http_port")).toInt();
             if(port == 0)
                 port = url.port(80);
             

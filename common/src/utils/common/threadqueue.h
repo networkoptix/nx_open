@@ -2,8 +2,8 @@
 #define cl_ThreadQueue_h_2236 
 
 #include <vector>
-#include <QQueue>
-#include <QVariant>
+#include <QtCore/QQueue>
+#include <QtCore/QVariant>
 
 #include "log.h"
 #include "semaphore.h"

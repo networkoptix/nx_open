@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include <QtCore/QDate>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
 

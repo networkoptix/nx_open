@@ -1,8 +1,8 @@
 #include "viewport_animator.h"
 #include <cmath> /* For std::log, std::exp. */
 #include <limits>
-#include <QGraphicsView>
-#include <QMargins>
+#include <QtWidgets/QGraphicsView>
+#include <QtCore/QMargins>
 #include <ui/common/geometry.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>

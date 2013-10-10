@@ -10,8 +10,9 @@ public:
     QnStyledTooltipWidget(QGraphicsItem *parent = 0);
     virtual ~QnStyledTooltipWidget();
 
+    virtual void setGeometry(const QRectF &rect) override;
+
 protected:
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual void updateTailPos();
 };
 

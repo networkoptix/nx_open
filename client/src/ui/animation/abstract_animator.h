@@ -1,8 +1,8 @@
 #ifndef QN_ABSTRACT_ANIMATOR_H
 #define QN_ABSTRACT_ANIMATOR_H
 
-#include <QObject>
-#include <QVariant>
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
 #include "animation_timer_listener.h"
 
 class AnimatorGroup;

@@ -1,8 +1,8 @@
 #ifndef QN_CAMERA_SETTINGS_DIALOG_H
 #define QN_CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/dewarping_params.h>
@@ -46,7 +46,7 @@ private slots:
     void acceptIfSafe();
 
 private:
-    QWeakPointer<QnWorkbenchContext> m_context;
+    QPointer<QnWorkbenchContext> m_context;
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;

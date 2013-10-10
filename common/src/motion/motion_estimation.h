@@ -1,7 +1,7 @@
 #ifndef __MOTION_ESTIMATION_H__
 #define __MOTION_ESTIMATION_H__
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "core/resource/motion_window.h"

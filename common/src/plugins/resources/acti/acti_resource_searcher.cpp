@@ -1,4 +1,4 @@
-#include <QNetworkReply>
+#include <QtNetwork/QNetworkReply>
 
 #include "acti_resource_searcher.h"
 #include "core/resource/camera_resource.h"

@@ -1,7 +1,7 @@
 #ifndef VC1_PARSER_H
 #define VC1_PARSER_H
 
-#include <QString>
+#include <QtCore/QString>
 
 extern "C"
 {

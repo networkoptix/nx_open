@@ -1,9 +1,9 @@
 #include "widget_animator.h"
 #include <cmath>
 #include <limits>
-#include <QGraphicsWidget>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
+#include <QtWidgets/QGraphicsWidget>
+#include <QtCore/QPropertyAnimation>
+#include <QtCore/QParallelAnimationGroup>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include "variant_animator.h"

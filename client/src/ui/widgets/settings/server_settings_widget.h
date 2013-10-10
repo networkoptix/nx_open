@@ -1,7 +1,7 @@
 #ifndef QN_SERVER_SETTINGS_WIDGET_H
 #define QN_SERVER_SETTINGS_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class ServerSettingsWidget;

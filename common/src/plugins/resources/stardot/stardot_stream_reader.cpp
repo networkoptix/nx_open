@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "stardot_resource.h"
 #include "stardot_stream_reader.h"
 #include "utils/common/sleep.h"
@@ -56,7 +56,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
-
+    m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
@@ -196,7 +196,7 @@ QnMetaDataV1Ptr QnStardotStreamReader::getCameraMetadata()
         quint32* dst = (quint32*) m_lastMetadata->data.data();
         for (int i = 0; i < MD_WIDTH; ++i)
             dst[i] = htonl(dst[i]);
-        const __m128i* mask = m_stardotRes->getMotionMaskBinData();
+        const simd128i* mask = m_stardotRes->getMotionMaskBinData();
         if (mask)
             m_lastMetadata->removeMotion(mask);
 

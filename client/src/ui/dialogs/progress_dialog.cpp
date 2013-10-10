@@ -53,7 +53,9 @@
 #include "qtimer.h"
 #include "qelapsedtimer.h"
 #include <limits.h>
-#include <QPointer>
+
+#include <QtCore/QPointer>
+#include <QtWidgets/QVBoxLayout>
 
 
 #if defined(QT_SOFTKEYS_ENABLED)

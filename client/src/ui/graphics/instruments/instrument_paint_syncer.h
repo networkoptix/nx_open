@@ -1,8 +1,9 @@
 #ifndef QN_INSTRUMENT_PAINT_SYNCER_H
 #define QN_INSTRUMENT_PAINT_SYNCER_H
 
-#include <QObject>
-#include <QWeakPointer>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
+
 #include <ui/animation/animation_timer.h>
 
 class InstrumentPaintSyncer: public QObject, public AnimationTimer, public AnimationTimerListener {
@@ -23,7 +24,7 @@ protected:
 
 private:
     QAnimationTimer *m_animationTimer;
-    QWeakPointer<QObject> m_currentWatched;
+    QPointer<QObject> m_currentWatched;
     QWidget *m_currentWidget;
 };
 

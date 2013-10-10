@@ -1,4 +1,4 @@
-#include <QDateTime>
+#include <QtCore/QDateTime>
 
 #include "vmax480_chunk_reader.h"
 #include "utils/common/synctime.h"

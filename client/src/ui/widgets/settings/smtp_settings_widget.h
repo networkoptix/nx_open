@@ -1,9 +1,9 @@
 #ifndef SMTP_SETTINGS_WIDGET_H
 #define SMTP_SETTINGS_WIDGET_H
 
-#include <QWidget>
-#include <QTimer>
-#include <QIntValidator>
+#include <QtWidgets/QWidget>
+#include <QtCore/QTimer>
+#include <QtGui/QIntValidator>
 
 #include <api/model/kvpair.h>
 

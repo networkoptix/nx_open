@@ -196,7 +196,7 @@ QString QnStardotResource::getRtspUrl() const
     url.setScheme(lit("rtsp"));
     url.setHost(getHostAddress());
     url.setPort(m_rtspPort);
-    url.setPath(lit("nph-h264.cgi"));
+    url.setPath(lit("/nph-h264.cgi/"));
     return url.toString();
 }
 
@@ -246,11 +246,11 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
         }
     }
     if (m_motionMaskBinData == 0)
-        m_motionMaskBinData = (__m128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+        m_motionMaskBinData = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
     QnMetaDataV1::createMask(getMotionMask(0), (char*)m_motionMaskBinData);
 }
 
-__m128i* QnStardotResource::getMotionMaskBinData() const
+simd128i* QnStardotResource::getMotionMaskBinData() const
 {
     return m_motionMaskBinData;
 }

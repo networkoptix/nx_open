@@ -1,7 +1,7 @@
 #include "abstract_animator.h"
 #include <cassert>
-#include <QMetaType>
-#include <QVariant>
+#include <QtCore/QMetaType>
+#include <QtCore/QVariant>
 #include <utils/common/warnings.h>
 
 namespace {

@@ -3,7 +3,7 @@
 
 #include "instrument.h"
 #include <QHash>
-#include <QTransform>
+#include <QtGui/QTransform>
 
 /**
  * This instrument listens to view transformation and size changes and notifies 

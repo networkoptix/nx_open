@@ -7,10 +7,10 @@
 
 #include <utils/common/warnings.h>
 
-void QnCommandLineParameter::init(void *target, QnMetaHandler *targetHandler, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
+void QnCommandLineParameter::init(void *target, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
     m_target = target;
-    m_targetHandler = QSharedPointer<QnMetaHandler>(targetHandler);
     m_type = type;
+    m_metaType.reset(new QMetaType(type));
     m_longName = longName;
     m_shortName = shortName;
     m_description = description;
@@ -175,10 +175,10 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         m_values[index] = value;
 
         /* Write value out if needed. */
-        if(parameter.target() && parameter.targetHandler() && result) {
+        if(parameter.target() && parameter.metaType() && result) {
             assert(value.userType() == parameter.type());
 
-            parameter.targetHandler()->copy(value.data(), parameter.target());
+            parameter.metaType()->construct(parameter.target(), value.data());
         }
 
         pos++;

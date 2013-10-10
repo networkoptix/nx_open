@@ -1,5 +1,5 @@
 #include "animator_group.h"
-#include <QEvent>
+#include <QtCore/QEvent>
 #include <utils/common/warnings.h>
 
 AnimatorGroup::AnimatorGroup(QObject *parent):

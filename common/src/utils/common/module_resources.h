@@ -14,10 +14,6 @@
 #define QN_INIT_MODULE_RESOURCES(MODULE_NAME)                                   \
     {                                                                           \
         Q_INIT_RESOURCE(MODULE_NAME);                                           \
-        Q_INIT_RESOURCE(MODULE_NAME ## _common);                                \
-        Q_INIT_RESOURCE(MODULE_NAME ## _custom);                                \
-        Q_INIT_RESOURCE(MODULE_NAME ## _generated);                             \
-        Q_INIT_RESOURCE(MODULE_NAME ## _translations);                          \
     }
 
 #endif // QN_MODULE_RESOURCES_H

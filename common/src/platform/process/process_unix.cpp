@@ -1,11 +1,13 @@
+
 #include "process_unix.h"
 
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <QProcess>
-#include <QWeakPointer>
+#include <QtCore/QProcess>
+#include <QtCore/QPointer>
+
 
 #include <utils/common/warnings.h>
 
@@ -16,11 +18,11 @@ namespace {
 }
 
 // -------------------------------------------------------------------------- //
-// QnLinuxProcessPrivate
+// QnUnixProcessPrivate
 // -------------------------------------------------------------------------- //
-class QnLinuxProcessPrivate {
+class QnUnixProcessPrivate {
 public:
-    QnLinuxProcessPrivate(): initialized(false), current(false), valid(false), pid(-1) {}
+    QnUnixProcessPrivate(): initialized(false), current(false), valid(false), pid(-1) {}
 
 private:
     void tryInitialize() {
@@ -96,24 +98,24 @@ private:
     }
 
 private:
-    friend class QnLinuxProcess;
+    friend class QnUnixProcess;
 
     bool initialized;
     bool current;
     bool valid;
     qint64 pid;
-    QWeakPointer<QProcess> process;
+    QPointer<QProcess>  process;
 };
 
 
 // -------------------------------------------------------------------------- //
-// QnLinuxProcess
+// QnUnixProcess
 // -------------------------------------------------------------------------- //
-QnLinuxProcess::QnLinuxProcess(QProcess *process, QObject *parent):
+QnUnixProcess::QnUnixProcess(QProcess *process, QObject *parent):
     base_type(parent),
-    d_ptr(new QnLinuxProcessPrivate())
+    d_ptr(new QnUnixProcessPrivate())
 {
-    Q_D(QnLinuxProcess);
+    Q_D(QnUnixProcess);
     d->process = process;
     d->current = process == NULL;
 
@@ -123,16 +125,16 @@ QnLinuxProcess::QnLinuxProcess(QProcess *process, QObject *parent):
     d->tryInitialize();
 }
 
-QnLinuxProcess::~QnLinuxProcess() {
+QnUnixProcess::~QnUnixProcess() {
     return;
 }
 
-qint64 QnLinuxProcess::pid() const {
+qint64 QnUnixProcess::pid() const {
     return d_func()->pid;
 }
 
-QnPlatformProcess::Priority QnLinuxProcess::priority() const {
-    Q_D(const QnLinuxProcess);
+QnPlatformProcess::Priority QnUnixProcess::priority() const {
+    Q_D(const QnUnixProcess);
     if(!d->valid)
         return InvalidPriority;
 
@@ -145,8 +147,8 @@ QnPlatformProcess::Priority QnLinuxProcess::priority() const {
     }
 }
 
-void QnLinuxProcess::setPriority(Priority priority) {
-    Q_D(QnLinuxProcess);
+void QnUnixProcess::setPriority(Priority priority) {
+    Q_D(QnUnixProcess);
     if(!d->valid) {
         qnWarning("Process is not valid, could not set priority.");
         return;
@@ -164,6 +166,6 @@ void QnLinuxProcess::setPriority(Priority priority) {
     }
 }
 
-void QnLinuxProcess::at_process_stateChanged() {
+void QnUnixProcess::at_process_stateChanged() {
     d_func()->tryInitialize();
 }

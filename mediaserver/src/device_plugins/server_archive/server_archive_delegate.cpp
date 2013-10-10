@@ -1,5 +1,5 @@
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "server_archive_delegate.h"
 #include "core/resource_managment/resource_pool.h"

@@ -59,7 +59,7 @@ QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
 
 void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
 {
-    QnScopedValueRollback<bool> guard(&m_updating, true); Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     bool sameQuality = true;
     bool sameControlState = true;

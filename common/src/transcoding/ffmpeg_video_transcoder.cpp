@@ -219,8 +219,8 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
                 dstRectF = QRectF(dstLeft, dstTop, dstWidth, dstHeight);
 
                 frameRectF.translate(-channelRect.left(), -channelRect.top());
-                dstRectF.setRight(qMin(channelRect.right(), 1.0)); // avoid epsilon factor
-                dstRectF.setBottom(qMin(channelRect.bottom(), 1.0));
+                dstRectF.setRight(qMin<double>(channelRect.right(), 1.0)); // avoid epsilon factor
+                dstRectF.setBottom(qMin<double>(channelRect.bottom(), 1.0));
                 frameRect = QRect(frameRectF.left() * decoder->getWidth() + 0.5, frameRectF.top() * decoder->getHeight() + 0.5, 
                     frameRectF.width() * decoder->getWidth() + 0.5, frameRectF.height() * decoder->getHeight() + 0.5);
                 frameRect = roundRect(frameRect);

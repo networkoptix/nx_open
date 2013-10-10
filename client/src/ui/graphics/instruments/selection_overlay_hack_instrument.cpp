@@ -70,3 +70,6 @@ void SelectionOverlayHackInstrument::showSelectedOverlay(QnResourceWidget *widge
     widget->setOption(QnResourceWidget::DisplaySelection, show);
 }
 
+QnResourceWidget *SelectionOverlayHackInstrument::singleSelectedWidget() {
+    return m_singleSelectedWidget.data();
+}

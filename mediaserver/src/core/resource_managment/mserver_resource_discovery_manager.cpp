@@ -1,6 +1,6 @@
 #include "mserver_resource_discovery_manager.h"
 
-#include <QtCore/QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "utils/common/sleep.h"
 #include "core/resource_managment/resource_searcher.h"
@@ -448,7 +448,8 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 
             if (m_resourceDiscoveryCounter[uniqId] >= 5)
             {
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)) {
+                QnVirtualCameraResourcePtr camRes = netRes.dynamicCast<QnVirtualCameraResource>();
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled())) {
                     if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)

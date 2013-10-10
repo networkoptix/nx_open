@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include "abstract_decoder_event_receiver.h"
 #include "../../decoders/video/abstractdecoder.h"

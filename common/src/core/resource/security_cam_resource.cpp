@@ -1,7 +1,6 @@
 
 #include "security_cam_resource.h"
-
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include <business/business_event_connector.h>
 
@@ -170,7 +169,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone()
 {
-    if( m_inputPortListenerCount > 0 )
+    if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoring();
 }
 
@@ -365,7 +364,7 @@ void QnSecurityCamResource::inputPortListenerDetached()
 {
     QMutexLocker lk( &m_initMutex );
  
-    if( m_inputPortListenerCount <= 0 )
+    if( m_inputPortListenerCount.load() <= 0 )
         return;
 
     int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );

@@ -1,6 +1,6 @@
 #include "opacity_animator.h"
 
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 
 #include <utils/common/warnings.h>
 

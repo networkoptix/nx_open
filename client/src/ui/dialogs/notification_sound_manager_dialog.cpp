@@ -2,9 +2,9 @@
 #include "ui_notification_sound_manager_dialog.h"
 
 #include <QtCore/QFileInfo>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
-#include <QtGui/QInputDialog>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
 
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/models/notification_sound_model.h>

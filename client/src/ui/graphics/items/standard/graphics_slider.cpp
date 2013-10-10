@@ -4,11 +4,11 @@
 #ifndef QT_NO_ACCESSIBILITY
 #include <QtGui/QAccessible>
 #endif
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsSceneEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOption>
 
 void GraphicsSliderPrivate::init()
 {

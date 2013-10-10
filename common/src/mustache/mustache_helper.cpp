@@ -1,5 +1,10 @@
 #include "mustache/mustache_helper.h"
 
+#include <QtCore/QFile>
+#include <QtCore/QIODevice>
+
+#include <common/common_globals.h>
+
 QString renderTemplateFromFile(const QString& path, const QString& filename, const QVariantHash& contextMap) {
     QFile templateFile(path + lit("/") + filename);
     templateFile.open(QIODevice::ReadOnly);

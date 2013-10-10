@@ -1,22 +1,22 @@
 #ifndef QN_WEAK_POINTER_H
 #define QN_WEAK_POINTER_H
 
-#include <QWeakPointer>
+#include <QtCore/QWeakPointer>
 #include "weak_graphics_item_pointer.h"
 
 /**
  * Weak pointer class that also supports <tt>QGraphicsItem</tt>s.
  */ 
 template<class T>
-class WeakPointer: public QWeakPointer<T> {
-    typedef QWeakPointer<T> base_type;
+class WeakPointer: public QPointer<T> {
+    typedef QPointer<T> base_type;
 
 public:
     WeakPointer(): base_type() {}
     WeakPointer(QWeakPointer<T> &other): base_type(other) {}
     WeakPointer(const QSharedPointer<T> &other): base_type(other) {}
 
-    WeakPointer<T> &operator=(const QWeakPointer<T> &other) {
+    WeakPointer<T> &operator=(const QPointer<T> &other) {
         base_type::operator=(other);
         return *this;
     }
@@ -57,6 +57,5 @@ public:
         return *this;
     }
 };
-
 
 #endif // QN_WEAK_POINTER_H

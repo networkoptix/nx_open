@@ -8,8 +8,8 @@
 
 #if defined(Q_OS_DARWIN) || defined(Q_OS_LINUX)
 
-#include <QDebug>
-#include <QFile>
+#include <QtCore/QDebug>
+#include <QtCore/QFile>
 #include "../file.h"
 
 #include <sstream>

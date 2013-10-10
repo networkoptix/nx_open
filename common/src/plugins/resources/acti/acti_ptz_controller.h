@@ -2,7 +2,7 @@
 #define QN_ACTI_PTZ_CONTROLLER_H
 
 #include <QtCore/QHash>
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include <core/resource/interface/abstract_ptz_controller.h>
 

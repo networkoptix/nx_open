@@ -141,6 +141,7 @@ public:
     void setToolTipFormat(const QString &format);
 
     Q_SLOT void finishAnimations();
+    Q_SLOT void hurryKineticAnimations();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -187,6 +188,7 @@ protected:
     virtual void tick(int deltaMSecs) override;
 
     virtual void kineticMove(const QVariant &degrees) override;
+    virtual void finishKinetic() override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
@@ -284,6 +286,7 @@ private:
     void updateThumbnailsPeriod();
     void updateThumbnailsStepSizeLater();
     void updateThumbnailsVisibility();
+    void updateKineticProcessor();
     Q_SLOT void updateThumbnailsStepSizeTimer();
     Q_SLOT void updateThumbnailsStepSizeForced();
 
@@ -322,6 +325,7 @@ private:
 
     qint64 m_zoomAnchor;
     bool m_animating;
+    bool m_kineticsHurried;
     qint64 m_animationStart, m_animationEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
@@ -339,7 +343,7 @@ private:
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
 
-    QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    QPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     qreal m_thumbnailsAspectRatio;
     QTimer *m_thumbnailsUpdateTimer;
     qint64 m_lastThumbnailsUpdateTime;

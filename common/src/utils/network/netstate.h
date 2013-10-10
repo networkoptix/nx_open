@@ -1,8 +1,8 @@
 #ifndef cl_net_state_439
 #define cl_net_state_439
 
-#include <QHostAddress>
-#include <QNetworkAddressEntry>
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QNetworkAddressEntry>
 
 struct CLSubNetState
 {

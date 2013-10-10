@@ -1,7 +1,7 @@
 #ifndef QnPlAreconVisionResource_h_1252
 #define QnPlAreconVisionResource_h_1252
 
-#include <QImage>
+#include <QtGui/QImage>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"

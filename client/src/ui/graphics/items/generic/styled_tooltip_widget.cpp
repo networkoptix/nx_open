@@ -3,7 +3,7 @@
 
 #include <limits>
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 
 #include <ui/common/palette.h>
 
@@ -29,9 +29,13 @@ QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem *parent):
 
 QnStyledTooltipWidget::~QnStyledTooltipWidget() {}
 
-void QnStyledTooltipWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    base_type::resizeEvent(event);
-    updateTailPos();
+void QnStyledTooltipWidget::setGeometry(const QRectF &rect) {
+    QSizeF oldSize = size();
+
+    base_type::setGeometry(rect);
+
+    if(size() != oldSize)
+        updateTailPos();
 }
 
 void QnStyledTooltipWidget::updateTailPos() {

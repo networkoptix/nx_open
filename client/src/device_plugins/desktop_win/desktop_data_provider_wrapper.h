@@ -1,6 +1,8 @@
 #ifndef __DESKTOP_DATA_PROVIDER_WRAPPER_H
 #define __DESKTOP_DATA_PROVIDER_WRAPPER_H
 
+#include <QtCore/QtGlobal>
+
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 
@@ -29,4 +31,4 @@ private:
     QnDesktopDataProvider* m_owner;
 };
 
-#endif // __DESKTOP_DATA_PROVIDER_WRAPPER_H
+#endif

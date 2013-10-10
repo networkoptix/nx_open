@@ -73,7 +73,6 @@ bool qBetween(const T &value, const T &min, const T &max) {
     return min <= value && value < max;
 }
 
-
 #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
 /**
  * Converts the given 64-bit number from host byte order to network byte order.
@@ -81,7 +80,7 @@ bool qBetween(const T &value, const T &min, const T &max) {
  * \param x                             Value to convert, in host byte order.
  * \returns                             Converted value, in network byte order.
  */
-inline quint64 htonll(quint64 x) {
+inline quint64 qn_htonll(quint64 x) {
     return
         ((((x) & 0xff00000000000000ULL) >> 56) | 
         (((x) & 0x00ff000000000000ULL) >> 40) | 
@@ -99,12 +98,15 @@ inline quint64 htonll(quint64 x) {
  * \param x                             Value to convert, in network byte order.
  * \returns                             Converted value, in host byte order.
  */
-inline quint64 ntohll(quint64 x) { return htonll(x); }
+inline quint64 qn_ntohll(quint64 x) { return qn_htonll(x); }
 
 #else
-inline quint64 htonll(quint64 x) { return x;}
-inline quint64 ntohll(quint64 x)  { return x;}
+inline quint64 qn_htonll(quint64 x) { return x;}
+inline quint64 qn_ntohll(quint64 x)  { return x;}
 #endif
+
+#define htonll qn_htonll 
+#define ntohll qn_ntohll
 
 
 /**

@@ -1,8 +1,8 @@
 #ifndef __CAMERA_POOL_H__
 #define __CAMERA_POOL_H__
 
-#include <QMap>
-#include <QMutex>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include "core/resource/resource.h"
 #include "camera/video_camera.h"
 

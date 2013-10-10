@@ -4,9 +4,8 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <QImage>
-#include <QNetworkProxy>
-#include <QNetworkReply>
+#include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QNetworkReply>
 #include <QSharedPointer>
 
 #include "utils/common/util.h"
@@ -22,6 +21,9 @@
 #include "serializer/pb_serializer.h"
 #include "event_log/events_serializer.h"
 
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
+#include <QtGui/QImage>
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
@@ -42,6 +44,7 @@ namespace {
         ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
         ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
+        ((rebuildArchiveObject,     "rebuildArchive"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -129,7 +132,7 @@ protected:
         QUrl url = query.url();
         url.setPath(QString());
         url.setUserInfo(QString());
-        url.setQueryItems(QList<QPair<QString, QString> >());
+        url.setQuery(QUrlQuery());
 
         QMutexLocker locker(&m_mutex);
         QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
@@ -153,7 +156,7 @@ private:
 
 Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
 
-QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
+QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
 
     /* Qt will take ownership of the supplied instance. */
@@ -162,11 +165,11 @@ QWeakPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     return result;
 }
 
-Q_GLOBAL_STATIC_WITH_ARGS(QWeakPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
+Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
 
 QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 {
-    QWeakPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
+    QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
     if(*result) {
         return result->data();
     } else {
@@ -370,6 +373,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
         break;
+    case rebuildArchiveObject: {
+        QnRebuildArchiveReply info;
+        if (response.status == 0)
+            info.deserialize(response.data);
+        emitFinished(this, response.status, info, handle);
+        break;
+    }
     default:
         assert(false); /* We should never get here. */
         break;
@@ -563,6 +573,16 @@ int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
     params << QnRequestParam("res_id",  cameraID);
     params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
     return sendAsyncGetRequest(CameraDiagnosticsObject, params, QN_REPLY_TYPE(QnCameraDiagnosticsReply), target, slot);
+}
+
+int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot)
+{
+    QnRequestParamList params;
+    if (action == RebuildAction_Start)
+        params << QnRequestParam("action",  lit("start"));
+    else if (action == RebuildAction_Cancel)
+        params << QnRequestParam("action",  lit("stop"));
+    return sendAsyncGetRequest(rebuildArchiveObject, params, QN_REPLY_TYPE(QnRebuildArchiveReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {

@@ -13,8 +13,8 @@ public:
 
     void deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) override;
-    void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) override;
-    void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) override;
+    void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) override;
+    void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) override;
     void deserializeUsers(QnUserResourceList& users, const QByteArray& data) override;
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) override;

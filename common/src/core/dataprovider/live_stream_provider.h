@@ -1,7 +1,7 @@
 #ifndef live_strem_provider_h_1508
 #define live_strem_provider_h_1508
 
-#include <QObject>
+#include <QtCore/QObject>
 #include "../resource/media_resource.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"

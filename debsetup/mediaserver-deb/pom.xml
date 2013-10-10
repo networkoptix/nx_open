@@ -20,10 +20,13 @@
 	<packaging>pom</packaging>
 	<name>Media Server Deb Package</name>
 
+    <properties>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/../..</root.dir>
+    </properties>
+	
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
-		<sourceDirectory>${basedir}/src</sourceDirectory> 	
-		<plugins></plugins>
 	</build>
 </project>

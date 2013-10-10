@@ -19,12 +19,12 @@ public:
     typedef const T & const_reference;
 
 public:
-    inline QnAlignedAllocator() noexcept {}
+    inline QnAlignedAllocator() throw() {}
 
     template <typename T2>
-    inline QnAlignedAllocator(const QnAlignedAllocator<T2, N> &) noexcept {}
+    inline QnAlignedAllocator(const QnAlignedAllocator<T2, N> &) throw() {}
 
-    inline ~QnAlignedAllocator() noexcept {}
+    inline ~QnAlignedAllocator() throw() {}
 
     inline pointer address(reference r) {
         return &r;
@@ -59,7 +59,7 @@ public:
         p->~value_type();
     }
 
-    inline size_type max_size() const noexcept {
+    inline size_type max_size() const throw() {
         return size_type(-1) / sizeof(value_type);
     }
 

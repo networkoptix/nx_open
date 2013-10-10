@@ -19,7 +19,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include <business/business_action_factory.h>
 
-#include <QSqlRecord>
+#include <QtSql/QSqlRecord>
 
 /* Prohibit the usage of std::string-QString conversion functions that do not 
  * explicitly state the encoding used for conversion. 
@@ -265,7 +265,7 @@ void parseServers(QnMediaServerResourceList &servers, const PbResourceList &pb_s
     }
 }
 
-void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResource)
+void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResource, QList<QnLayoutItemDataList>* orderedItems)
 {
     const pb::Layout& pb_layout = pb_layoutResource.GetExtension(pb::Layout::resource);
 
@@ -323,16 +323,18 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
         }
 
         layout->setItems(items);
+        if (orderedItems)
+            orderedItems->push_back(items);
     }
 }
 
-void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layouts)
+void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layouts, QList<QnLayoutItemDataList>* orderedItems)
 {
     for (PbResourceList::const_iterator ci = pb_layouts.begin(); ci != pb_layouts.end(); ++ci)
     {
         const pb::Resource& pb_layoutResource = *ci;
         QnLayoutResourcePtr layout;
-        parseLayout(layout, pb_layoutResource);
+        parseLayout(layout, pb_layoutResource, orderedItems);
         if (layout)
             layouts.append(layout);
         else
@@ -553,7 +555,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
     pb_layoutResource.set_parentid(layoutIn->getParentId().toInt());
     pb_layoutResource.set_name(layoutIn->getName().toUtf8().constData());
-    pb_layoutResource.set_guid(layoutIn->getGuid().toAscii().constData());
+    pb_layoutResource.set_guid(layoutIn->getGuid().toLatin1().constData());
 
     pb_layout.set_cellaspectratio(layoutIn->cellAspectRatio());
     pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
@@ -666,19 +668,19 @@ void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, c
     parseServers(servers, pb_servers.resource(), resourceFactory);
 }
 
-void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data)
+void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems)
 {
     pb::Resources pb_layouts;
     if (!pb_layouts.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized layouts."));
 
-    parseLayouts(layouts, pb_layouts.resource());
+    parseLayouts(layouts, pb_layouts.resource(), orderedItems);
 }
 
-void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data)
+void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems)
 {
     QnLayoutResourceList layouts;
-    deserializeLayouts(layouts, data);
+    deserializeLayouts(layouts, data, orderedItems);
 
     if (layouts.isEmpty())
         layout = QnLayoutResourcePtr();
@@ -852,7 +854,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
     pb_serverResource.set_id(serverPtr->getId().toInt());
     pb_serverResource.set_name(serverPtr->getName().toUtf8().constData());
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
-    pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
+    pb_serverResource.set_guid(serverPtr->getGuid().toLatin1().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
     pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
@@ -1104,7 +1106,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
         case pb::Resource_Type_Layout:
         {
             QnLayoutResourcePtr layout;
-            parseLayout(layout, pb_resource);
+            parseLayout(layout, pb_resource, 0);
             resource = layout;
             break;
         }

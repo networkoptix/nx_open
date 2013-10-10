@@ -1,5 +1,7 @@
 #include "ptz_preset_hotkey_item_delegate.h"
 
+#include <QtCore/QEvent>
+
 #include <ui/widgets/char_combo_box.h>
 
 

@@ -105,7 +105,7 @@ void QnResourceSearchSynchronizer::update() {
     }
 
     m_hasPendingUpdates = false;
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     /* Create a set of items that match the search criteria. */
     QSet<QnResourcePtr> searchResult = m_modelItemCountByResource.keys().toSet();
@@ -215,7 +215,7 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
     if(!m_update)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
@@ -231,7 +231,7 @@ void QnResourceSearchSynchronizer::at_model_rowsAboutToBeRemoved(const QModelInd
     if (!m_update)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
@@ -247,7 +247,7 @@ void QnResourceSearchSynchronizer::at_model_criteriaChanged() {
     if(!m_update)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     updateLater();
 }

@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-#include <QTextStream>
+#include <QtCore/QTextStream>
 
 #include "plugins/plugin_tools.h"
 #include "utils/common/sleep.h"
@@ -53,6 +53,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     const int encoderNumber = role == QnResource::Role_LiveVideo ? 0 : 1;
 
     nxcip::CameraMediaEncoder* intf = NULL;

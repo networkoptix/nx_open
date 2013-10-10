@@ -2,14 +2,16 @@
 #include "ui_layout_settings_dialog.h"
 
 #include <QtCore/qmath.h>
-#include <QUrl>
-#include <QResizeEvent>
+#include <QtCore/QUrl>
+#include <QtGui/QResizeEvent>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
 #include <QtGui/QPaintEvent>
-#include <QImageReader>
+#include <QtGui/QImageReader>
+
+#include <QtWidgets/QDesktopWidget>
 
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
@@ -263,8 +265,7 @@ void QnLayoutSettingsDialog::updateControls() {
     if (m_isUpdating)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     Q_D(const QnLayoutSettingsDialog);
 
@@ -380,8 +381,7 @@ void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
         return;
     if (m_isUpdating)
         return;
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     qreal targetAspectRatio = bestAspectRatioForCells();
     if (targetAspectRatio < 0)
@@ -395,8 +395,7 @@ void QnLayoutSettingsDialog::at_heightSpinBox_valueChanged(int value) {
         return;
     if (m_isUpdating)
         return;
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     qreal targetAspectRatio = bestAspectRatioForCells();
     if (targetAspectRatio < 0)

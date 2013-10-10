@@ -6,7 +6,7 @@
 #ifndef SELFREMOVABLE_H
 #define SELFREMOVABLE_H
 
-#include <QAtomicInt>
+#include <QtCore/QAtomicInt>
 
 
 //!Inherit this class to enable object to be freed by callback (usefull for aio handler)

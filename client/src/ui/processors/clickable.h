@@ -1,7 +1,7 @@
 #ifndef QN_CLICKABLE_H
 #define QN_CLICKABLE_H
 
-#include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/forward.h>

@@ -1,7 +1,7 @@
 #ifndef _REST_CONNECTION_PROCESSOR_H__
 #define _REST_CONNECTION_PROCESSOR_H__
 
-#include <QVariantList>
+#include <QtCore/QVariantList>
 #include "utils/network/tcp_connection_processor.h"
 #include "request_handler.h"
 
@@ -12,7 +12,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
 
-    QnRestConnectionProcessor(AbstractStreamSocket* socket, QnTcpListener* owner);
+    QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
 
     static void registerHandler(const QString& path, QnRestRequestHandler* handler);

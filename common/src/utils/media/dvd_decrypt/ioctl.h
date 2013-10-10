@@ -24,7 +24,7 @@
 #ifndef DVDCSS_IOCTL_H
 #define DVDCSS_IOCTL_H
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 
 int ioctl_ReadCopyright     ( int, int, int * );

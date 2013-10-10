@@ -1,6 +1,6 @@
 #include "forwarding_instrument.h"
-#include <QGraphicsScene>
-#include <QGraphicsItem>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsItem>
 
 namespace {
     template<class Base>

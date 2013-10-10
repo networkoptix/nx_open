@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <memory>
 
-#include <QMutexLocker>
-#include <QXmlDefaultHandler>
+#include <QtCore/QMutexLocker>
+#include <QtXml/QXmlDefaultHandler>
 
+#include <common/common_globals.h>
 #include <utils/network/aio/aioservice.h>
 #include <utils/network/system_socket.h>
-
 
 using namespace std;
 

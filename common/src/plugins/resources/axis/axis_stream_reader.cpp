@@ -1,4 +1,4 @@
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "axis_resource.h"
 #include "axis_stream_reader.h"
 #include "axis_resource.h"
@@ -55,6 +55,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     //==== init if needed
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
     int channels = 1;

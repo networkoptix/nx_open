@@ -3,7 +3,7 @@
 
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QStyleOptionSlider>
+#include <QtWidgets/QStyleOptionSlider>
 
 
 QnTextTickSlider::QnTextTickSlider(QWidget *parent): 

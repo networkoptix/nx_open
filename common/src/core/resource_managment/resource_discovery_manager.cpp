@@ -1,7 +1,7 @@
 
 #include <set>
 
-#include <QtCore/QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "resource_discovery_manager.h"
 #include "utils/common/sleep.h"
