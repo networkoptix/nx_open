@@ -75,8 +75,11 @@ void CLSimpleHTTPClient::initSocket()
 {
     m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );
 
-    m_sock->setRecvTimeout(m_timeout);
-    m_sock->setSendTimeout(m_timeout);
+    if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
+    {
+        m_sock.clear();
+        m_connected = false;
+    }
 }
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
@@ -85,7 +88,7 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 
 QHostAddress CLSimpleHTTPClient::getLocalHost() const
 {
-    return QHostAddress(m_sock->getLocalAddress().address.toString());
+    return !m_sock ? QHostAddress() : QHostAddress(m_sock->getLocalAddress().address.toString());
 }
 
 void CLSimpleHTTPClient::addHeader(const QByteArray& key, const QByteArray& value)
@@ -100,6 +103,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString
 
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body)
 {
+    if (!m_sock)
+        return CL_TRANSPORT_ERROR;
+
     try
     {
         if (!m_connected)
@@ -266,6 +272,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 
 CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
 {
+    if (!m_sock)
+        return CL_TRANSPORT_ERROR;
+
     try
     {
         if (!m_connected)
