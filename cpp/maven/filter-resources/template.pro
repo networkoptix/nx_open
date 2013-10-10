@@ -3,6 +3,8 @@ BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QT += ${qt.libs}
+ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
+
 
 ## GLOBAL CONFIGURATIONS
 QMAKE_INFO_PLIST = Info.plist
@@ -54,7 +56,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${root.dir}/common/src \
                 ${libdir}/include \
                 ${environment.dir}/include \
-                ${qt.dir}/../qt-custom \
+                $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/
 
