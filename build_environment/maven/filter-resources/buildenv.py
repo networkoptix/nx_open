@@ -11,7 +11,7 @@ basedir = join(dirname(os.path.abspath(__file__)))
 environment = get_environment_variable('environment')
 
 with cd(environment):
-        status = subprocess.call('hg pull -u', shell=True)
+        status = subprocess.call('hg pull -u --clean', shell=True)
         if status != 0:
             sys.exit(status) 
             
