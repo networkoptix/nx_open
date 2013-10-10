@@ -565,7 +565,7 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             QnConnectionRequestResult result;
             connect(&result, SIGNAL(replyProcessed()), dialog.data(), SLOT(accept()));
 
-            closeLayouts(resources, rollbackResources, saveableResources, &result, SLOT(processReply(int, const QVariant &, int))); // TODO: #Elric we have a QObject::connect failure here
+            closeLayouts(resources, rollbackResources, saveableResources, &result, SLOT(processReply(int, const QVariant &, int)));
             dialog->exec();
 
             QnWorkbenchLayoutList currentLayouts = workbench()->layouts();
@@ -595,7 +595,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             if (validateItemTypes(fileResource)) { // TODO: #Elric and if not?
                 bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
-                if( saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly) ) // overwrite layout file
+                if( saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly, false, false) ) // overwrite layout file
                     ++m_exportsToFinishBeforeClosure;
             }
         }
@@ -1184,7 +1184,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         if (!validateItemTypes(layout))
             return;
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
-        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
+        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly, true, true); // overwrite layout file
     } else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
@@ -2898,12 +2898,12 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     if (existingLayout)
         removeLayoutFromPool(existingLayout);
 
-    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, readOnly);
+    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, readOnly, true, true);
 
     return true;
 }
 
-bool QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly)
+bool QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly, bool cancellable, bool newWindowOpenable)
 {
     if (m_exportedCamera)
     {
@@ -2926,14 +2926,27 @@ bool QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     }
 
     QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
+    
+    if(!cancellable) {
+        exportProgressDialog->setCancelButton(NULL);
+
+        QnMultiEventEater *eventEater = new QnMultiEventEater(Qn::IgnoreEvent, exportProgressDialog);
+        eventEater->addEventType(QEvent::KeyPress);
+        eventEater->addEventType(QEvent::KeyRelease); /* So that ESC doesn't close the dialog. */
+        eventEater->addEventType(QEvent::Close);
+        exportProgressDialog->installEventFilter(eventEater);
+    }
+
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(true);
     exportProgressDialog->show();
 
-    QPushButton *openNewWindowButton = new QPushButton(tr("Open New Window"));
-    exportProgressDialog->addButton(openNewWindowButton, QDialogButtonBox::HelpRole);
-    connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+    if(newWindowOpenable) {
+        QPushButton *openNewWindowButton = new QPushButton(tr("Open New Window"));
+        exportProgressDialog->addButton(openNewWindowButton, QDialogButtonBox::HelpRole);
+        connect(openNewWindowButton, SIGNAL(clicked()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+    }
 
     m_exportProgressDialog = exportProgressDialog;
     action(Qn::PlayPauseAction)->setChecked(false);
@@ -3461,7 +3474,7 @@ Do you want to continue?"),
 
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
-        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false);
+        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false, true, true);
     }
     else
 #endif
