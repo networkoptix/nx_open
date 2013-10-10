@@ -181,7 +181,7 @@ void QnResourceDiscoveryManager::run()
     m_timer.reset();
 }
 
-static int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
+static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
