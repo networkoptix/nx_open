@@ -8,7 +8,7 @@
 
 #include "customization.h"
 
-QnCommonModule::QnCommonModule(const QStringList& , QObject *parent): QObject(parent) {
+QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
     QN_INIT_MODULE_RESOURCES(common);
 
     QnCommonMetaTypes::initilize();

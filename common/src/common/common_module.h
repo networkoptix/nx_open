@@ -16,7 +16,7 @@ class QnSessionManager;
 class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
     Q_OBJECT
 public:
-    QnCommonModule(const QStringList& args, QObject *parent = NULL);
+    QnCommonModule(int &argc, char **argv, QObject *parent = NULL);
     virtual ~QnCommonModule();
 
     QnSessionManager *sessionManager() const {

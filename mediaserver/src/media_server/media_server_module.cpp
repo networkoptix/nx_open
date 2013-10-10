@@ -8,12 +8,12 @@
 
 #include <common/common_module.h>
 
-QnMediaServerModule::QnMediaServerModule(const QStringList& args, QObject *parent):
+QnMediaServerModule::QnMediaServerModule(int &argc, char **argv, QObject *parent):
     QObject(parent) 
 {
     QN_INIT_MODULE_RESOURCES(mediaserver);
 
-    m_common = new QnCommonModule(args, this);
+    m_common = new QnCommonModule(argc, argv, this);
 
     QnPtzMapperPool *ptzMapperPool = m_common->instance<QnPtzMapperPool>();
     loadPtzMappers(ptzMapperPool, QLatin1String(":/ptz_mappers.json"));

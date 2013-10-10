@@ -437,7 +437,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-int serverMain()
+int serverMain(int argc, char *argv[])
 {
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
@@ -463,7 +463,7 @@ int serverMain()
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
     commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
-    commandLineParser.parse(qApp->arguments(), stderr);
+    commandLineParser.parse(argc, argv, stderr);
 
     if (rebuildArchive.isEmpty()) {
         rebuildArchive = qSettingsRunTime.value("rebuild").toString();
@@ -496,7 +496,7 @@ int serverMain()
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
-    cl_log.log("binary path: ", qApp->arguments().first(), cl_logALWAYS);
+    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     if( logLevel != QString::fromLatin1("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -562,7 +562,8 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 }
 
 QnMain::QnMain(int argc, char* argv[])
-    : 
+    : m_argc(argc),
+    m_argv(argv),
     m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
@@ -1239,7 +1240,9 @@ class QnVideoService : public QtService<QtSingleCoreApplication>
 public:
     QnVideoService(int argc, char **argv): 
         QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
-        m_main(argc, argv)
+        m_main(argc, argv),
+        m_argc(argc),
+        m_argv(argv)
     {
         setServiceDescription(SERVICE_NAME);
     }
@@ -1248,7 +1251,7 @@ protected:
     virtual int executeApplication() override { 
 
         QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(qApp->arguments()));
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
         //QnBusinessRuleProcessor::fini();
@@ -1290,7 +1293,7 @@ protected:
             return;
         }
 
-        serverMain();
+        serverMain(m_argc, m_argv);
         m_main.start();
     }
 
@@ -1302,6 +1305,8 @@ protected:
 
 private:
     QnMain m_main;
+    int m_argc;
+    char **m_argv;
 
 };
 
