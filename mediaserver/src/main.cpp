@@ -559,9 +559,11 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toLatin1(), EVENT_RECONNECT_TIMEOUT);
 }
 
+
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_waitExtIpFinished(false),
     m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
@@ -1154,7 +1156,7 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    m_firstRunningTime = qSettingsRunTime.value("lastRunningTime").toLongLong();
+    m_firstRunningTime = qSettings.value("lastRunningTime").toLongLong();
 
     at_timer();
     QTimer timer;
