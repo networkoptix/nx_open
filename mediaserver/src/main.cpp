@@ -455,8 +455,6 @@ int serverMain(int argc, char *argv[])
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
-    QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
-
     QString logLevel;
     QString rebuildArchive;
 
@@ -501,7 +499,7 @@ int serverMain(int argc, char *argv[])
     if( logLevel != QString::fromLatin1("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-    platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
+    QnCorePlatformAbstraction::instance()->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
     ffmpegInit();
 
@@ -1254,7 +1252,6 @@ protected:
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
-        //QnBusinessRuleProcessor::fini();
 
         return result;
     }
