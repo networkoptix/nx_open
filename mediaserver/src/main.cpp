@@ -499,7 +499,7 @@ int serverMain(int argc, char *argv[])
     if( logLevel != QString::fromLatin1("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-    QnCorePlatformAbstraction::instance()->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
+    qnPlatform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
     ffmpegInit();
 
