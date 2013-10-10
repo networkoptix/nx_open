@@ -1,4 +1,4 @@
-#include "images_unix.h"
+#include "images_linux.h"
 
 #include <QtGui/QCursor>
 #include <QtGui/QPixmap>
@@ -11,7 +11,7 @@
 /* X.h defines CursorShape, which conflicts with Qt::CursorShape. */
 #undef CursorShape
 
-QCursor QnUnixImages::bitmapCursor(Qt::CursorShape shape) const {
+QCursor QnLinuxImages::bitmapCursor(Qt::CursorShape shape) const {
     QGuiApplication::setOverrideCursor(shape);
     XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
     QGuiApplication::restoreOverrideCursor();

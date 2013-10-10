@@ -9,7 +9,7 @@
 #   define QnImagesImpl QnWindowsImages
 #elif defined(Q_OS_LINUX)
 #   include "images/images_linux.h"
-#   define QnImagesImpl QnUnixImages
+#   define QnImagesImpl QnLinuxImages
 #else
 #   include "images/images_generic.h"
 #   define QnImagesImpl QnGenericImages
