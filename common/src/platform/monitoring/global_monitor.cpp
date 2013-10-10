@@ -4,6 +4,7 @@
 #include <QtCore/QMutexLocker>
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
+#include <QElapsedTimer>
 
 #include <utils/common/warnings.h>
 #include <utils/common/delete_later.h>
@@ -36,7 +37,9 @@ public:
         requestCount(0),
         totalCpuUsage(0.0),
         totalRamUsage(0.0)
-    {}
+    {
+        upTimeTimer.start();
+    }
 
     virtual ~QnGlobalMonitorPrivate() {}
 
@@ -67,7 +70,7 @@ private:
 
     QBasicTimer updateTimer;
     QBasicTimer stopTimer;
-
+    QElapsedTimer upTimeTimer;
 private:
     Q_DECLARE_PUBLIC(QnGlobalMonitor)
     QnGlobalMonitor *q_ptr;
@@ -195,4 +198,10 @@ void QnGlobalMonitor::timerEvent(QTimerEvent *event) {
         locker.unlock();
         base_type::timerEvent(event);
     }
+}
+
+qint64 QnGlobalMonitor::upTimeMs() const
+{
+    Q_D(const QnGlobalMonitor);
+    return d->upTimeTimer.elapsed();
 }
