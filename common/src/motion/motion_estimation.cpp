@@ -261,7 +261,7 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
@@ -317,7 +317,7 @@ void fillRightEdge8(const CLVideoDecoderOutput* frame)
 
 void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
 {
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];
@@ -370,7 +370,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
 
 void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
     const __m128i* curLinePtr = (const __m128i*) frame->data[0];

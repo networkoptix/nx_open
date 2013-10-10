@@ -550,9 +550,12 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
+
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_waitExtIpFinished(false),
+    m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -732,6 +735,15 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 {
     if (status != 0)
         qWarning() << "Error saving server.";
+}
+
+void QnMain::at_connectionOpened()
+{
+    if (m_firstRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
+        m_firstRunningTime*1000,
+        QnBusiness::MServerIssueStarted);
+    m_firstRunningTime = 0;
 }
 
 void QnMain::at_timer()
@@ -1132,9 +1144,12 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
+    m_firstRunningTime = qSettings.value("lastRunningTime").toLongLong();
+
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
     timer.start(60 * 1000);
 
 

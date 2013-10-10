@@ -59,11 +59,7 @@ void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
     QnAppServerConnectionFactory::setPublicIp(message.publicIp);
     QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
 
-    qint64 lastRunningTime = qSettings.value("lastRunningTime").toLongLong();
-    if (lastRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
-                                                   lastRunningTime*1000,
-                                                   QnBusiness::MServerIssueStarted);
+    emit connectionOpened();
 }
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage message)
