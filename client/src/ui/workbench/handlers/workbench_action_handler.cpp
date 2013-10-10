@@ -206,7 +206,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_layoutExportCamera(0),
     m_exportedCamera(0),
     m_exportRetryCount(0),
-    m_tourTimer(new QTimer())
+    m_tourTimer(new QTimer()),
+    m_exportsToFinishBeforeClosure(0),
+    m_objectToSignalWhenDone(nullptr)
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
@@ -589,19 +591,27 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
         if(!normalResources.isEmpty())
             snapshotManager()->save(normalResources, object, slot);
 
+        m_exportsToFinishBeforeClosure = 0;
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             if (validateItemTypes(fileResource)) { // TODO: #Elric and if not?
                 bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
-                saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
+                if( saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly) ) // overwrite layout file
+                    ++m_exportsToFinishBeforeClosure;
             }
         }
 
-        if(normalResources.isEmpty()) {
-            QByteArray method(slot && *slot ? slot + 1 : slot);
-            int index = method.indexOf('(');
-            if(index != -1)
-                method.truncate(index);
+        QByteArray method(slot && *slot ? slot + 1 : slot);
+        int index = method.indexOf('(');
+        if(index != -1)
+            method.truncate(index);
 
+        if( m_exportsToFinishBeforeClosure > 0 )
+        {
+            m_objectToSignalWhenDone = object;
+            m_methodToInvokeWhenDone = method;
+        }
+        else
+        {
             QMetaObject::invokeMethod(
                 object,
                 method.constData(),
@@ -2893,7 +2903,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     return true;
 }
 
-void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly)
+bool QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly)
 {
     if (m_exportedCamera)
     {
@@ -2904,7 +2914,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             QMessageBox::Ok
         );
 
-        return;
+        return false;
     }
 
     m_layoutExportMode = mode;
@@ -2943,7 +2953,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
         {
             at_layoutCamera_exportFailed(tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()));
-            return;
+            return false;
         }
     }
     else
@@ -3001,7 +3011,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     if (!device)
     {
         at_layoutCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
-        return;
+        return false;
     }
 
     QnApiPbSerializer serializer;
@@ -3070,7 +3080,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     m_exportPeriod = exportPeriod;
     m_exportLayout = layout;
     m_exportRetryCount = 0;
-    at_layoutCamera_exportFinished(fileName);
+    return at_layoutCamera_exportFinished(fileName);
 }
 
 void QnWorkbenchActionHandler::at_layout_exportFinished()
@@ -3127,6 +3137,9 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
 
         QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
     }
+
+    //checking, if waiting export finish to close layout
+    checkForClosurePending();
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished2()
@@ -3134,7 +3147,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished2()
     at_layoutCamera_exportFinished(m_exportTmpFileName);
 }
 
-void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
+bool QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
     Q_UNUSED(fileName)
     if (m_exportedMediaRes)
@@ -3162,7 +3175,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                     else {
                         at_layoutCamera_exportFailed(fileName);
                     }
-                    return;
+                    return false;
                 }
 
                 device->write(m_motionFileBuffer[i]->buffer());
@@ -3176,6 +3189,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 
     if (m_layoutExportResources.isEmpty()) {
         at_layout_exportFinished();
+        return false;
     } else {
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         m_exportedMediaRes = m_layoutExportResources.dequeue();
@@ -3213,6 +3227,8 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->toResource()->getUrl()).arg(m_layoutFileName));
+
+        return true;
     }
 }
 
@@ -3222,6 +3238,9 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFailed(QString errorMessage
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
     QMessageBox::warning(mainWindow(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
+
+    //checking, if waiting export finish to close layout
+    checkForClosurePending();
 }
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
@@ -3520,6 +3539,9 @@ void QnWorkbenchActionHandler::at_cancelExport()
         QFile::remove(exportFileName);
     m_exportStorage.clear();
     m_exportedMediaRes.clear();
+
+
+    //TODO if waiting closure, decreasing counter and, if zero, invoking method
 }
 
 void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
@@ -4046,4 +4068,21 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
 void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
     menu()->trigger(Qn::VersionMismatchMessageAction);
+}
+
+void QnWorkbenchActionHandler::checkForClosurePending()
+{
+    if( m_exportsToFinishBeforeClosure == 0 )
+        return;
+    --m_exportsToFinishBeforeClosure;
+    if( m_exportsToFinishBeforeClosure > 0 )
+        return; //waiting futher...
+
+    QMetaObject::invokeMethod(
+        m_objectToSignalWhenDone,
+        m_methodToInvokeWhenDone.constData(),
+        Qt::QueuedConnection,
+        Q_ARG(int, 0),
+        Q_ARG(QVariant, QVariant()),
+        Q_ARG(int, 0) );
 }

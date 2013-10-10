@@ -326,7 +326,10 @@ protected slots:
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
-    void at_layoutCamera_exportFinished(QString fileName);
+    /*!
+        \return true, if export continues. false, if nothing more to export
+    */
+    bool at_layoutCamera_exportFinished(QString fileName);
     void at_layoutCamera_exportFinished2();
     void at_layout_exportFinished();
     void at_layoutCamera_exportFailed(QString errorMessage);
@@ -352,7 +355,10 @@ private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
+    /*!
+        \return true, if started saving process (that MUST be awaited for)
+    */
+    bool saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
 #ifdef Q_OS_WIN
     QString binaryFilterName() const;
@@ -385,6 +391,9 @@ private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
     QnAdjustVideoDialog* adjustVideoDialog();
+
+    //!Checks if need to close layout
+    void checkForClosurePending();
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -429,6 +438,10 @@ private:
     QString m_exportTmpFileName;
 
     QTimer *m_tourTimer;
+
+    int m_exportsToFinishBeforeClosure;
+    QObject* m_objectToSignalWhenDone;
+    QByteArray m_methodToInvokeWhenDone;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H
