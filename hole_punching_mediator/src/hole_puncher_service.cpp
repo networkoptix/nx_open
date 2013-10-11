@@ -108,9 +108,16 @@ bool HolePuncherProcess::initialize()
 
     //binding to address(-es) to listen
     for( const SocketAddress& addr : addrToListenList )
-        m_listeners.push_back( std::unique_ptr<StreamSocketServer>(new StreamSocketServer(addr)) );
+    {
+        m_listeners.push_back( std::unique_ptr<StreamSocketServer>(new StreamSocketServer()) );
+        if( !m_listeners.back()->bind( addr ) )
+        {
+            m_listeners.clear();
+            return false;
+        }
+    }
 
-    //TODO: process privilege reduction can occur here
+    //TODO: process privilege reduction can be made here
 
     //listening for incoming requests
     for( std::unique_ptr<StreamSocketServer>& server : m_listeners )

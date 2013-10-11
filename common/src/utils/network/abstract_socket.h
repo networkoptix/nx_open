@@ -219,6 +219,17 @@ class AbstractStreamServerSocket
     virtual public AbstractSocket
 {
 public:
+    class AsyncAcceptHandler
+    {
+    public:
+        virtual ~AsyncAcceptHandler() {}
+
+        /*!
+            \param newConnection Object ownership is passed to \a AbstractStreamServerSocket::AsyncAcceptHandler instance
+        */
+        virtual void newConnectionAccepted( AbstractStreamServerSocket* serverSocket, AbstractStreamSocket* newConnection ) = 0;
+    };
+
     virtual ~AbstractStreamServerSocket() {}
 
     //!Start listening for incoming connections

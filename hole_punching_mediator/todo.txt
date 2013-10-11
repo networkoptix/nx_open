@@ -1,0 +1,19 @@
+
+- use extended STUN for binding/connection requests?
+- automatic switch from tcp to udt (if we move client from 3rd party network to home network, MUST NOT use nat traversal technique, but connect directly to required host using tcp)
+- every host identified by some unique identifier
+    - TODO resolve host ip by identifier in home network
+
+
+- sockets implementation refactor
+    TODO
+
+
+- STUN server
+    - STUN "Binding" request support
+    - STUN extension:
+        - caching binded hosts info by proprietary host ID
+        - "connect" message to get address of binded host by ID
+        - OPTIONAL indication to binded host about connection attempt
+    - http API for monitoring (authentication required)
+    - 
