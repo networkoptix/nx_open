@@ -21,11 +21,11 @@
     <name>HD Witness Installer</name>
 
     <properties>
+        <root.dir>${basedir}/..</root.dir>
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <install.type>all</install.type>
-        <ClientBgSourceDir>${basedir}/../client/resource/common/backgrounds</ClientBgSourceDir>
+        <ClientBgSourceDir>${root.dir}/client/resource/common/backgrounds</ClientBgSourceDir>
     </properties>
 
     <dependencies>
@@ -61,7 +61,7 @@
 
     <build>
         <directory>${arch}</directory>
-        <sourceDirectory>${basedir}</sourceDirectory>
+        <sourceDirectory>${root.dir}/wixsetup</sourceDirectory>
         <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
@@ -76,9 +76,9 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>../build-${customization}.properties</file>
-                                <file>../build_environment/${arch}/libdir.properties</file>
-                                <file>../appserver/setup/build/appserver-${arch}.properties</file>
+                                <file>${root.dir}/build-${customization}.properties</file>
+                                <file>${root.dir}/build_environment/${arch}/libdir.properties</file>
+                                <file>${root.dir}/appserver/setup/build/appserver-${arch}.properties</file>
                             </files>
                         </configuration>
                     </execution>
@@ -103,13 +103,17 @@
                         <executions>
                             <execution>
                                 <id>prepare-resources</id>
-                                <phase>process-sources</phase>
+                                <phase>generate-sources</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                     <resources>
+                                        <resource>
+                                            <directory>${project.build.sourceDirectory}/maven</directory>
+                                            <filtering>true</filtering>
+                                        </resource>                                      
                                         <resource>
                                             <directory>${project.build.sourceDirectory}/maven-bin-resources/common</directory>
                                             <filtering>false</filtering>
