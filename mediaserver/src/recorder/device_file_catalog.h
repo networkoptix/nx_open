@@ -58,9 +58,10 @@ public:
     void updateDuration(int durationMs, qint64 fileSize);
 
     /** return deleted file size if calcFileSize is true and srcStorage matched with deleted file */
-    qint64 deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage); 
+    void deleteFirstRecord(); 
+    bool isEmpty() const;
     void clear();
-    qint64 deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage);
+    void deleteRecordsBefore(int idx);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);

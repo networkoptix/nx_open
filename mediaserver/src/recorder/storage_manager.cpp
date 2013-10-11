@@ -289,6 +289,11 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
     connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
 }
 
+QStringList QnStorageManager::getAllStoragePathes() const
+{
+    return m_storageIndexes.keys();
+}
+
 void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
 {
     QMutexLocker lock(&m_mutexStorages);
@@ -466,9 +471,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         }
         if (catalog != 0) 
         {
-            qint64 fileSize = catalog->deleteFirstRecord(true, storage);
-            if (fileSize > 0)
-                toDelete -= fileSize;
+            catalog->deleteFirstRecord();
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
             if (catalogLowRes != 0) 
             {
@@ -476,17 +479,27 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                 if (minTime != (qint64)AV_NOPTS_VALUE) {
                     int idx = catalogLowRes->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
                     if (idx != -1)
-                        toDelete -= catalogLowRes->deleteRecordsBefore(idx, storage);
+                        catalogLowRes->deleteRecordsBefore(idx);
                 }
                 else {
                     catalogLowRes->clear();
                 }
+
+                if (catalog->isEmpty() && catalogLowRes->isEmpty())
+                    break; // nothing to delete
             }
-            if (fileSize == -1)
-                break; // nothing to delete
+            else {
+                if (catalog->isEmpty())
+                    break; // nothing to delete
+            }
         }
         else
             break; // nothing to delete
+
+        qint64 freeSpace = storage->getFreeSpace();
+        if (freeSpace == -1)
+            return;
+        toDelete = storage->getSpaceLimit() - freeSpace;
     }
 
     if (toDelete > 0) {

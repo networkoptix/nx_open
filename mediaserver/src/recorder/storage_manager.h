@@ -71,7 +71,8 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+    static const qint64 BIG_STORAGE_THRESHOLD       = 1000000000ll * 100; // 100Gb
+    static const qint64 DEFAULT_SPACE_LIMIT = 1000000000ll * 5; // 5gb
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
     void stopAsyncTasks();
@@ -82,6 +83,11 @@ public:
 
     void setRebuildState(RebuildState state);
     RebuildState rebuildState() const;
+    
+    /*
+    * Return full path list from storage_index.csv (include absent in DB storages)
+    */
+    QStringList QnStorageManager::getAllStoragePathes() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(QnResourcePtr storageRes, QnBusiness::EventReason reason);

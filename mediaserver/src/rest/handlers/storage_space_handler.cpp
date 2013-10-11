@@ -46,6 +46,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
             }
         }
 
+        if (storage->hasFlags(QnResource::deprecated))
+            continue;
+
         QnStorageSpaceData data;
         data.path = storage->getUrl();
         data.storageId = storage->getId();

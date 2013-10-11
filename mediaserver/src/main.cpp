@@ -1051,13 +1051,35 @@ void QnMain::run()
     } while (status != 0);
 
 
+    QStringList usedPathList;
     foreach (QnAbstractStorageResourcePtr storage, m_mediaServer->getStorages())
     {
         qnResPool->addResource(storage);
+        usedPathList << closeDirPath(storage->getUrl());
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
         if (physicalStorage)
             qnStorageMan->addStorage(physicalStorage);
     }
+    
+    
+    // check old storages, absent in the DB
+    QStringList allStoragePathList = qnStorageMan->getAllStoragePathes();
+    foreach (const QString& path, allStoragePathList)
+    {
+        if (usedPathList.contains(path))
+            continue;
+        QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
+        newStorage->setId(QnId::generateSpecialId());
+        newStorage->setUrl(path);
+        newStorage->setSpaceLimit(QnStorageManager::DEFAULT_SPACE_LIMIT);
+        newStorage->setUsedForWriting(false);
+        newStorage->addFlags(QnResource::deprecated);
+
+        qnStorageMan->addStorage(newStorage);
+    }
+
+    
+
     qnStorageMan->loadFullFileCatalog();
 
     initAppServerEventConnection(qSettings, m_mediaServer);

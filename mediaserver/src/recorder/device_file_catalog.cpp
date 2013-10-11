@@ -326,6 +326,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
                     qWarning() << allChunks.size() << "media files processed...";
 
             }
+            else {
+                qnFileDeletor->deleteFile(fi.absoluteFilePath());
+            }
         }
 
     }
@@ -521,19 +524,18 @@ void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
     str.flush();
 }
 
-qint64 DeviceFileCatalog::deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage)
+void DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
     qint64 rez = 0;
     for (int i = 0; i < count; ++i)
-        rez += deleteFirstRecord(true, srcStorage);
-    return rez;
+        deleteFirstRecord();
 }
 
 void DeviceFileCatalog::clear()
 {
     while(m_firstDeleteCount < m_chunks.size())
-        deleteFirstRecord(false, QnStorageResourcePtr());
+        deleteFirstRecord();
 }
 
 void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
@@ -563,17 +565,21 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 
 }
 
+bool DeviceFileCatalog::isEmpty() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_chunks.isEmpty();
+}
 
-qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage)
+void DeviceFileCatalog::deleteFirstRecord()
 {
 	QnStorageResourcePtr storage;
 	QString delFileName;
 	QString motionDirName;
-    qint64 deletedSize = 0;
 	{
 		QMutexLocker lock(&m_mutex);
 		if (m_chunks.isEmpty())
-			return -1;
+			return;
 
 		static const int DELETE_COEFF = 1000;
 
@@ -581,8 +587,6 @@ qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResource
 		{
 			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
 			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
-            if (calcFileSize && storage && srcStorage && srcStorage->getId() == storage->getId())
-                deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
 
 			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
@@ -611,16 +615,12 @@ qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResource
     if (storage) {
 	    if (!delFileName.isEmpty())
 	    {
-            if (deletedSize == 0 && calcFileSize && srcStorage && srcStorage->getId() == storage->getId())
-                deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
 		    //storage->addWritedSpace(-deletedSize);
 		    storage->removeFile(delFileName);
 	    }
 	    if (!motionDirName.isEmpty())
 		    storage->removeDir(motionDirName);
     }
-
-    return calcFileSize ? deletedSize : 0;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
