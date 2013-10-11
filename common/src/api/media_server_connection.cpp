@@ -227,6 +227,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
                 RAM
             ));
 
+            QByteArray miscBlock = extractXmlBody(data, "misc");
+            reply.uptimeMs = extractXmlBody(miscBlock, "uptimeMs").toLongLong();
+
             QByteArray storagesBlock = extractXmlBody(data, "storages"), storageBlock; {
                 int from = 0;
                 do {

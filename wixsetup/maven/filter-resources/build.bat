@@ -1,3 +1,3 @@
-call "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" ${arch}
+call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat" ${arch}
 
-call msbuild CustomActions-${arch}.vcproj /t:Rebuild /p:Configuration=${build.configuration}
+call msbuild CustomActions-${arch}.vcxproj /t:Rebuild /p:Configuration=${build.configuration}

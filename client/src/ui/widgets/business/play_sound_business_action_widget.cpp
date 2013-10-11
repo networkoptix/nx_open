@@ -53,8 +53,7 @@ void QnPlaySoundBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *a
 }
 
 void QnPlaySoundBusinessActionWidget::updateCurrentIndex() {
-    QnScopedValueRollback<bool> guard(&m_updating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
@@ -64,8 +63,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
     if (!model)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField) {
         m_filename = model->actionParams().getSoundUrl();

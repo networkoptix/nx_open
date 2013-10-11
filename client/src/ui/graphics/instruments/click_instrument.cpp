@@ -62,7 +62,7 @@ void ClickInstrument::aboutToBeDisabledNotify() {
 }
 
 void ClickInstrument::timerEvent(QTimerEvent *) {
-    QnScopedValueRollback<bool> clickRollback(&m_isClick, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_isClick, true);
     if(m_isDoubleClick) {
         m_isDoubleClick = false;
     } else {

@@ -64,7 +64,7 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
-#include <ui/workaround/system_menu_event.h>
+#include <ui/workaround/qtbug_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <utils/common/event_processors.h>
@@ -167,6 +167,28 @@ namespace {
             setFlag(ItemHasNoContents, true);
             setFlag(ItemIsMovable, true);
             setHandlingFlag(ItemHandlesMovement, true);
+        }
+    };
+
+    class QnGeometryGraphicsProxyWidget: public QGraphicsProxyWidget {
+        typedef QGraphicsProxyWidget base_type;
+    public:
+        QnGeometryGraphicsProxyWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
+
+    protected:
+        virtual bool eventFilter(QObject *object, QEvent *event) override {
+            if(object == widget())
+                if(event->type() == QEvent::Move)
+                    return false; /* Don't propagate moves. */
+
+            return base_type::eventFilter(object, event);
+        }
+
+        virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override {
+            if(change == ItemPositionChange || change == ItemPositionHasChanged)
+                return value; /* Don't propagate moves. */
+
+            return base_type::itemChange(change, value);
         }
     };
 
@@ -372,7 +394,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
     m_titleItem->installEventFilter(titleMenuSignalizer);
 
-    m_tabBarItem = new QGraphicsProxyWidget(m_controlsWidget);
+    /* Note: using QnGeometryGraphicsProxyWidget here fixes this bug:
+     * https://noptix.enk.me/redmine/issues/2330. */
+    m_tabBarItem = new QnGeometryGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     m_tabBarWidget = new QnLayoutTabBar(NULL, context());
@@ -792,6 +816,9 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
+    action(Qn::ToggleTreeAction)->setChecked(opened);
+
     qreal newX = opened ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
     if (animate) {
         m_treeXAnimator->animateTo(newX);
@@ -800,16 +827,15 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
         m_treeItem->setX(newX);
     }
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
-    action(Qn::ToggleTreeAction)->setChecked(opened);
-    Q_UNUSED(rollback)
-
     if (save)
         qnSettings->setTreeOpened(opened);
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
+    action(Qn::ToggleSliderAction)->setChecked(opened);
 
     qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
     if (animate) {
@@ -821,10 +847,6 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
 
     updateCalendarVisibility(animate);
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
-    action(Qn::ToggleSliderAction)->setChecked(opened);
-    Q_UNUSED(rollback)
-
     if (save)
         qnSettings->setSliderOpened(opened);
 }
@@ -832,9 +854,8 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     action(Qn::ToggleTitleBarAction)->setChecked(opened);
-    Q_UNUSED(rollback)
 
     if (save)
         qnSettings->setTitleOpened(opened);
@@ -867,7 +888,7 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate, bool save)
         m_notificationsItem->setX(newX);
     }
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     m_notificationsShowButton->setChecked(opened);
 
     if (save)
@@ -892,7 +913,7 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
     if(!opened)
         setDayTimeWidgetOpened(opened, animate);
 
-    QnScopedValueRollback<bool> rollback(&m_ignoreClickEvent, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     m_calendarShowButton->setChecked(opened);
 }
 
@@ -1448,7 +1469,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.setHeight(16);
 
     if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerItem->geometry())) {
-        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges2, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreSliderResizerGeometryChanges2, true);
 
         m_sliderResizerItem->setGeometry(sliderResizerGeometry);
 
@@ -1671,7 +1692,7 @@ void QnWorkbenchUi::initGraphicsMessageBox() {
 bool QnWorkbenchUi::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+    if(event->type() == QnEvent::WinSystemMenu) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
 
@@ -1886,7 +1907,7 @@ void QnWorkbenchUi::at_sliderResizerItem_geometryChanged() {
         sliderGeometry.setHeight(targetHeight);
         sliderGeometry.moveTop(sliderTop);
 
-        QnScopedValueRollback<bool> guard(&m_ignoreSliderResizerGeometryChanges, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreSliderResizerGeometryChanges, true);
         m_sliderItem->setGeometry(sliderGeometry);
     }
 
@@ -2076,7 +2097,7 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
     if(m_inCalendarGeometryUpdate)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inCalendarGeometryUpdate, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_inCalendarGeometryUpdate, true);
 
     /*QRectF dayTimePaintRect = m_dayTimeItem->paintRect();
     dayTimePaintRect.setHeight(m_calendarItem->paintRect().height());
@@ -2103,7 +2124,7 @@ void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() {
     if(m_inDayTimeGeometryUpdate)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inDayTimeGeometryUpdate, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_inDayTimeGeometryUpdate, true);
 
     updateDayTimeWidgetGeometry();
     updateNotificationsGeometry();
@@ -2119,6 +2140,7 @@ void QnWorkbenchUi::at_sliderZoomInButton_pressed() {
 
 void QnWorkbenchUi::at_sliderZoomInButton_released() {
     m_sliderZoomingIn = false;
+    m_sliderItem->timeSlider()->hurryKineticAnimations();
 }
 
 void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
@@ -2127,6 +2149,7 @@ void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
 
 void QnWorkbenchUi::at_sliderZoomOutButton_released() {
     m_sliderZoomingOut = false;
+    m_sliderItem->timeSlider()->hurryKineticAnimations();
 }
 
 void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {

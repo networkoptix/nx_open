@@ -455,8 +455,6 @@ int serverMain(int argc, char *argv[])
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
-    QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
-
     QString logLevel;
     QString rebuildArchive;
 
@@ -501,7 +499,7 @@ int serverMain(int argc, char *argv[])
     if( logLevel != QString::fromLatin1("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-    platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
+    qnPlatform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
 
     ffmpegInit();
 
@@ -560,6 +558,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toLatin1(), EVENT_RECONNECT_TIMEOUT);
 }
+
 
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
@@ -1156,7 +1155,7 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    m_firstRunningTime = qSettingsRunTime.value("lastRunningTime").toLongLong();
+    m_firstRunningTime = qSettings.value("lastRunningTime").toLongLong();
 
     at_timer();
     QTimer timer;
@@ -1254,7 +1253,6 @@ protected:
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
         const int result = application()->exec();
-        //QnBusinessRuleProcessor::fini();
 
         return result;
     }

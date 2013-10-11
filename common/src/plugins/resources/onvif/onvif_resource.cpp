@@ -1711,6 +1711,19 @@ bool QnPlOnvifResource::detectVideoSourceCount()
         return false;
     }
     m_maxChannels = (int) response.VideoSources.size();
+
+    if (m_maxChannels > 1)
+    {
+        VideoConfigsReq confRequest;
+        VideoConfigsResp confResponse;
+        soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
+        if (soapRes != SOAP_OK)
+            return false;
+        if (confResponse.Configurations.size() < m_maxChannels) {
+            m_maxChannels = confResponse.Configurations.size() /2;
+        }
+    }
+
     return true;
 }
 
@@ -1750,13 +1763,24 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 
     onvifXsd__VideoSource* conf = response.VideoSources.at(getChannel());
 
-        if (conf) {
-            QMutexLocker lock(&m_mutex);
-        m_videoSourceToken = QString::fromStdString(conf->token);
-        //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
-        return CameraDiagnostics::NoErrorResult();
+    if (!conf)
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (2)"));
+
+    QMutexLocker lock(&m_mutex);
+    m_videoSourceToken = QString::fromStdString(conf->token);
+    //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
+
+    if (m_maxChannels > 1)
+    {
+        VideoConfigsReq confRequest;
+        VideoConfigsResp confResponse;
+        soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
+        if (soapRes != SOAP_OK)
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
+        m_maxChannels = confResponse.Configurations.size() /2;
     }
-    return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (2)"));
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)

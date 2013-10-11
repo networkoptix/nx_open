@@ -40,8 +40,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     if (!model)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionTypeField) {
         bool instant = (model->actionType() == BusinessActionType::CameraOutputInstant);

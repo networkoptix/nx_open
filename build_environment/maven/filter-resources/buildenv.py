@@ -11,9 +11,12 @@ basedir = join(dirname(os.path.abspath(__file__)))
 environment = get_environment_variable('environment')
 
 with cd(environment):
-        status = subprocess.call('hg pull -u', shell=True)
+        status = subprocess.call('hg pul', shell=True)
         if status != 0:
             sys.exit(status) 
+        status = subprocess.call('hg up --clean', shell=True)
+        if status != 0:
+            sys.exit(status) 			
             
 with cd(environment):
         status = subprocess.call('%s/get_buildenv.%s ${arch} ${toolchain.version}' % (environment, get_executable_extension()), shell=True)

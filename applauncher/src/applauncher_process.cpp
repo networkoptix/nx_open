@@ -7,6 +7,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
+#include <QtNetwork/QLocalSocket>
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
@@ -214,7 +215,6 @@ bool ApplauncherProcess::addTaskToThePipe( const QByteArray& serializedTask )
         m_isLocalServerWasNotFound = sock.error() == QLocalSocket::ServerNotFoundError ||
                                      sock.error() == QLocalSocket::ConnectionRefusedError ||
                                      sock.error() == QLocalSocket::PeerClosedError;
-        const QString& errStr = sock.errorString();
         NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(sock.errorString()), cl_logDEBUG1 );
         return false;
     }
@@ -373,7 +373,7 @@ bool ApplauncherProcess::isVersionInstalled(
 }
 
 bool ApplauncherProcess::cancelInstallation(
-    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
+    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& /*request*/,
     applauncher::api::CancelInstallationResponse* const response )
 {
     //TODO/IMPL cancelling by id request->installationID

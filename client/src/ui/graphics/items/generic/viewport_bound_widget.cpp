@@ -58,7 +58,7 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     if(!isVisible())
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inUpdateScale, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_inUpdateScale, true);
 
     /* Assume affine transform that does not change x/y scale separately. */
     QTransform sceneToViewport = view->viewportTransform();

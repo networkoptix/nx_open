@@ -265,8 +265,7 @@ void QnLayoutSettingsDialog::updateControls() {
     if (m_isUpdating)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     Q_D(const QnLayoutSettingsDialog);
 
@@ -382,8 +381,7 @@ void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
         return;
     if (m_isUpdating)
         return;
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     qreal targetAspectRatio = bestAspectRatioForCells();
     if (targetAspectRatio < 0)
@@ -397,8 +395,7 @@ void QnLayoutSettingsDialog::at_heightSpinBox_valueChanged(int value) {
         return;
     if (m_isUpdating)
         return;
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     qreal targetAspectRatio = bestAspectRatioForCells();
     if (targetAspectRatio < 0)

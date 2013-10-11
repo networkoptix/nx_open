@@ -19,7 +19,6 @@
         <root.dir>${basedir}/..</root.dir>
         <!-- Change it to true to skip buildenv synchronization (can save time)-->
         <rsync.skip>false</rsync.skip>
-        <buildLib/>
     </properties>
 
     <dependencies>
@@ -107,6 +106,8 @@
                                 <argument>configure.py</argument>
                                 <argument>--cst</argument>
                                 <argument>${customization}</argument>
+                                <argument>--chld</argument>
+                                <argument>${child.customization}</argument>                                
                                 <argument>--cfg</argument>
                                 <argument>${build.configuration}</argument>                                
                             </arguments>
@@ -216,7 +217,7 @@
                 </property>
             </activation>            
             <dependencies>
-<!--
+
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>help</artifactId>
@@ -224,7 +225,7 @@
                     <type>tar.gz</type>
                     <classifier>${customization}</classifier>
                 </dependency>
--->
+
                 <dependency>
                     <groupId>org</groupId>
                     <artifactId>festival</artifactId>

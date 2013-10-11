@@ -5,6 +5,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/preprocessor/cat.hpp>
+
 template<class T, class Object, class Setter, class Getter>
 class QnGenericScopedValueRollback {
 public:
@@ -107,6 +110,13 @@ public:
         base_type(object, sg_type(name), sg_type(name), newValue)
     {}
 };
+
+
+#define QN_SCOPED_VALUE_ROLLBACK_I(NAME, VARIABLE, ... /* VALUE */)             \
+    QnScopedValueRollback<boost::remove_reference<decltype(*(VARIABLE))>::type> NAME(VARIABLE, ##__VA_ARGS__); Q_UNUSED(NAME);
+
+#define QN_SCOPED_VALUE_ROLLBACK(VARIABLE, ... /* VALUE */)                     \
+    QN_SCOPED_VALUE_ROLLBACK_I(BOOST_PP_CAT(scoped_rollback_, __LINE__), VARIABLE, ##__VA_ARGS__)
 
 
 #endif // QN_SCOPED_VALUE_ROLLBACK_H

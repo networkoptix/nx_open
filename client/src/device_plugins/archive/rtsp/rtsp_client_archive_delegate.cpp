@@ -675,6 +675,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     QnFfmpegRtpParserPtr parser = itr.value();
     parser->processData(data, 0, dataSize, RtspStatistic(), result);
     m_position = parser->position();
+    if (result)
+        result->channelNumber = channelNum;
     return result;
 }
 

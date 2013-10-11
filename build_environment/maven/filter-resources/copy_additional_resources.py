@@ -80,7 +80,7 @@ if get_environment_variable('platform') == 'windows':
             if os.path.exists(target):
                 shutil.rmtree(target)            
             shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target)                        
-            shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))
+            shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))
 
 else:     
     lib_source_dir = '${qt.dir}/lib'
@@ -121,7 +121,7 @@ else:
     else: print '+++++++++++++++++++++++ Could not recognize platform +++++++++++++++++++++++'
                               
     for config in ('debug', 'release'):
-        shutil.copy2('${root.dir}/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))  
+        shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))  
 
         for qtplugin in qtplugins:
             if qtplugin != '':

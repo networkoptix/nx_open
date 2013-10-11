@@ -647,7 +647,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged() {
         synchronizer->disableUpdates();
     setLayoutFilter(layout, ui->filterLineEdit->text());
 
-    QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
     ui->searchTreeWidget->setModel(NULL);
     ui->filterLineEdit->setText(QString());
     killSearchTimer();
@@ -662,7 +662,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged() {
 
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
-    QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
     ui->filterLineEdit->setText(layoutFilter(layout));
 
     /* Bold state has changed. */

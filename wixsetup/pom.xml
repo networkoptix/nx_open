@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -25,7 +18,6 @@
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <install.type>all</install.type>
     </properties>
 
     <dependencies>
@@ -65,157 +57,123 @@
         <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
                 <executions>
                     <execution>
-                        <phase>validate</phase>
+                        <id>copy-project-resources</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>read-project-properties</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <files>
-                                <file>${root.dir}/build-${customization}.properties</file>
-                                <!-- <file>../build_environment/${arch}/libdir.properties</file>
-                                <file>../appserver/setup/build/appserver-${arch}.properties</file> -->
-                            </files>
-                        </configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>	
+                                <resource>
+                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>           
+                                <resource>
+                                    <directory>${customization.dir}/wixsetup</directory>
+                                    <filtering>false</filtering>
+                                </resource>		                
+                                <resource>
+                                    <directory>${child.customization.dir}/wixsetup</directory>
+                                    <filtering>false</filtering>
+                                </resource>                             
+                            </resources>              
+                            <encoding>UTF-8</encoding>
+                        </configuration>            
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>	
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>compress</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec dir="${libdir}/bin/${build.configuration}" executable="${project.build.directory}/pack.bat" failifexecutionfails="true" />
+                            </target>
+                            <skip>${skip.compress}</skip>
+                        </configuration>
+                    </execution>    
+                </executions>
+            </plugin>                       
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+
+                    <execution>
+                        <id>package-CustomActions-with-msbuild</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${project.build.directory}/build.bat</executable>
+                            <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>wix-gen</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>wix-gen.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>                    
+                    </execution>
+
+                    <execution>
+                        <id>wix-compile</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>wix-compile.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>                    
+                    </execution>                   
+
+                    <execution>
+                        <id>integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${project.build.directory}/test.bat</executable>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <skip>${skip.test}</skip>                        
+                        </configuration>    
+                    </execution>
+                </executions> 
+            </plugin>            
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>installer</id>
-            <activation>                
-                <activeByDefault>true</activeByDefault>
-            </activation>           
-            <build>
-                <plugins>
-                 <!--   <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>2.5</version>
-
-                        <executions>
-                            <execution>
-                                <id>prepare-resources</id>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.sourceDirectory}/maven-bin-resources/common</directory>
-                                            <filtering>false</filtering>
-                                        </resource>     
-                                        <resource>
-                                            <directory>${project.build.sourceDirectory}/maven-bin-resources/custom/${installer.customization}</directory>
-                                            <filtering>false</filtering>
-                                        </resource>     
-                                        <resource>
-                                            <directory>${project.build.sourceDirectory}</directory>
-                                            <filtering>false</filtering>
-                                            <includes>
-                                                <include>CustomActions/**</include>
-                                            </includes>
-                                        </resource>                                         
-                                    </resources>            
-                                    <encoding>UTF-8</encoding>
-                                </configuration>            
-                            </execution>
-                        </executions>
-                    </plugin>      --> 
-
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>compress</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <target>
-                                        <exec dir="${libdir}/bin/${build.configuration}" executable="${project.build.directory}/pack.bat" failifexecutionfails="true" />
-                                    </target>
-                                    <skip>${skip.compress}</skip>
-                                </configuration>
-                            </execution>    
-                        </executions>
-                    </plugin>                       
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-
-                            <execution>
-                                <id>package-CustomActions-with-msbuild</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/build.bat</executable>
-                                    <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>wix-gen</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${python.dir}/python</executable>
-                                    <arguments>
-                                        <argument>wix-gen.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>                    
-                            </execution>
-                            
-                            <execution>
-                                <id>wix-compile</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${python.dir}/python</executable>
-                                    <arguments>
-                                        <argument>wix-compile.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>                    
-                            </execution>                   
-
-                            <execution>
-                                <id>integration-test</id>
-                                <phase>integration-test</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${project.build.directory}/test.bat</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                    <skip>${skip.test}</skip>                        
-                                </configuration>    
-                            </execution>
-                        </executions> 
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

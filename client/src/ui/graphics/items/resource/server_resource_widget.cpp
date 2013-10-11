@@ -690,7 +690,15 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 }
 
 QString QnServerResourceWidget::calculateTitleText() const {
-    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
+    QString result =  tr("%1 %2 ").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
+    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
+    if (uptimeMs) {
+        int msInDay = 24*3600*1000;
+        QString timeStr = QTime(0,0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"));
+        result += tr("(up %1 days, %2)").arg(uptimeMs/msInDay).arg(timeStr);
+    }
+
+    return result;
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
@@ -739,6 +747,8 @@ void QnServerResourceWidget::at_statistics_received() {
 
     m_elapsedTimer.restart();
     m_counter++;
+
+    updateTitleText();
 }
 
 void QnServerResourceWidget::at_pingButton_clicked() {

@@ -51,10 +51,10 @@ namespace {
                     widget->setEnabled(enabled);
     }
 
-    QStandardItem* itemForConnection(QnConnectionData connection) {
+    QStandardItem *newConnectionItem(QnConnectionData connection) {
         if (connection == QnConnectionData())
             return NULL;
-        QStandardItem* result = new QStandardItem(connection.name);
+        QStandardItem *result = new QStandardItem(connection.name);
         result->setData(connection.url, Qn::UrlRole);
         return result;
     }
@@ -233,7 +233,7 @@ void QnLoginDialog::resetConnectionsModel() {
         m_connectionsModel->removeRow(0); //last-used-connection row
 
     QModelIndex selectedIndex;
-    m_lastUsedItem = itemForConnection(connections.getByName(QnConnectionDataList::defaultLastUsedNameKey()));
+    m_lastUsedItem = newConnectionItem(connections.getByName(QnConnectionDataList::defaultLastUsedNameKey()));
     if (m_lastUsedItem != NULL) {
         m_lastUsedItem->setText(tr("* Last used connection *"));
         m_connectionsModel->insertRow(0, m_lastUsedItem);
@@ -263,7 +263,7 @@ void QnLoginDialog::resetSavedSessionsModel() {
     foreach (const QnConnectionData &connection, connections) {
         if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
             continue;
-        m_savedSessionsItem->appendRow(itemForConnection(connection));
+        m_savedSessionsItem->appendRow(newConnectionItem(connection));
     }
 }
 

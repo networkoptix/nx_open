@@ -862,22 +862,26 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
+            requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetMenu).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Go to Position...")).
+            requiredPermissions(Qn::WritePtzPermission).
             childFactory(new QnPtzGoToPresetActionFactory(this)).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzManagePresetsAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage Saved Positions...")).
+            requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
 
         factory(Qn::PtzGoToPresetAction).
             flags(Qn::SingleTarget | Qn::ResourceTarget).
             text(tr("Go To Saved Position")).
+            requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
     } factory.endSubMenu();
 
@@ -1455,8 +1459,8 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
         return;
     }
 
-    QnScopedValueRollback<QnActionParameters> paramsRollback(&m_parametersByMenu[NULL], parameters);
-    QnScopedValueRollback<QnAction *> actionRollback(&m_shortcutAction, action);
+    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[NULL], parameters);
+    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
     action->trigger();
 }
 

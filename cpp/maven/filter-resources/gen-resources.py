@@ -2,7 +2,7 @@ import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
 from os.path import dirname, join, exists, isfile
 from os import listdir
 
-sys.path.insert(0, '${basedir}/../common')
+sys.path.insert(0, '${root.dir}/common')
 from gencomp import gencomp_cpp
 
 template_file='template.pro'
@@ -79,12 +79,15 @@ def gentext(file, path, extensions, text):
                 if n.endswith('_win'):
                     cond = 'win*:'
                 elif n.endswith('_mac'):
-                    cond = 'mac'
+                    cond = 'mac:'
+                elif n.endswith('_linux'):
+                    cond = 'linux*:'
                 elif n.endswith('_unix'):
+                    cond = 'unix:'
                     if(os.path.exists(rreplace(p, '_unix', '_mac'))):
-                        cond = 'unix:!mac:'
-                    else:
-                        cond = 'unix:'
+                        cond += '!mac:'
+                    if(os.path.exists(rreplace(p, '_unix', '_linux'))):
+                        cond += '!linux*:'
                 
                 print >> file, '\n%s%s%s/%s' % (cond, text, path, os.path.join(parent, f))
 

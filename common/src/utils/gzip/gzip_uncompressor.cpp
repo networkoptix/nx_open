@@ -50,9 +50,9 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
             case State::inProgress:
             {
                 //NOTE assuming that inflate always eat all input stream if output buffer is available
-                const z_uInt availInBak = m_zStream.avail_in;
+                const uInt availInBak = m_zStream.avail_in;
                 zResult = inflate(&m_zStream, zFlushMode);
-                const z_uInt inBytesConsumed = availInBak - m_zStream.avail_in;
+                const uInt inBytesConsumed = availInBak - m_zStream.avail_in;
                 switch( zResult )
                 {
                     case Z_OK:

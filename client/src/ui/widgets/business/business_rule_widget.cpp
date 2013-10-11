@@ -109,8 +109,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
     }
 
     {
-        QnScopedValueRollback<bool> guard(&m_updating, true);
-        Q_UNUSED(guard)
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
@@ -126,8 +125,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     if (!model || m_model != model || m_updating)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::EventTypeField) {
 
