@@ -435,7 +435,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef Q_OS_WIN
     //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
-    QnResourceDiscoveryManager::instance()->start();
 
     // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
     qApp->setStyle(qnSkin->style());
@@ -479,9 +478,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
-    desktopSearcher.setLocal(true);
+    QnDesktopResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
 #endif
+
+    QnResourceDiscoveryManager::instance()->start();
 
     //initializing plugin manager. TODO supply plugin dir (from settings)
     PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );

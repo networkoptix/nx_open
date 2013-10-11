@@ -199,7 +199,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
         case initialSearch:
             foreach (QnAbstractResourceSearcher *searcher, searchersList)
             {
-                if (searcher->shouldBeUsed() && dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
+                if (searcher->shouldBeUsed() && searcher->isLocal())
                 {
                     QnResourceList lst = searcher->search();
                     m_resourceProcessor->processResources(lst);
