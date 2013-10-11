@@ -42,6 +42,7 @@ public:
     void unregisterConsumer(const QnMediaServerResourcePtr &resource, QObject *target);
 
     QnStatisticsHistory history(const QnMediaServerResourcePtr &resource) const;
+    qint64 uptimeMs(const QnMediaServerResourcePtr &resource) const;
     qint64 historyId(const QnMediaServerResourcePtr &resource) const;
 
     /** Data update period in milliseconds. It is taken from the server's response. */

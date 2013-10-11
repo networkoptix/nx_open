@@ -46,6 +46,8 @@ public:
 
     /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
     void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
+
+    qint64 uptimeMs() const;
 signals:
     /**
      * Signal emitted when new data is received.
@@ -70,6 +72,7 @@ private:
     uint m_listeners;
     int m_pointsLimit;
     int m_updatePeriod;
+    qint64 m_uptimeMs;
 
     QnStatisticsHistory m_history;
     QnMediaServerConnectionPtr m_apiConnection;

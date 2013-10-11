@@ -691,14 +691,11 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 
 QString QnServerResourceWidget::calculateTitleText() const {
     QString result =  tr("%1 %2 ").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
-    if (m_history.contains(lit("UPTIME"))) {
-        QnStatisticsData data = m_history.value(lit("UPTIME"));
-        if (!data.values.isEmpty()) {
-            qint64 upTimeMs = (qint64) data.values.last();
-            int msInDay = 24*3600*1000;
-            QString timeStr = QTime(0,0).addMSecs(upTimeMs % msInDay).toString(lit("hh:mm"));
-            result += tr("(up %1 days, %2)").arg(upTimeMs/msInDay).arg(timeStr);
-        }
+    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
+    if (uptimeMs) {
+        int msInDay = 24*3600*1000;
+        QString timeStr = QTime(0,0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"));
+        result += tr("(up %1 days, %2)").arg(uptimeMs/msInDay).arg(timeStr);
     }
 
     return result;

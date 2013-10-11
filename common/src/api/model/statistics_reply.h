@@ -11,8 +11,7 @@ enum QnStatisticsDeviceType {
     CPU,                /**< CPU load in percents. */
     RAM,                /**< RAM load in percents. */
     HDD,                /**< HDD load in percents. */
-    NETWORK,            /**< Network load in percent. */
-    MISC                /**< misc params. */
+    NETWORK            /**< Network load in percent. */
 };
 
 struct QnStatisticsDataItem {
@@ -35,8 +34,10 @@ struct QnStatisticsDataItem {
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
 struct QnStatisticsReply {
+    QnStatisticsReply(): updatePeriod(0), uptimeMs(0) {}
     QnStatisticsDataList statistics;
     qint64 updatePeriod;
+    qint64 uptimeMs;
 };
 
 
