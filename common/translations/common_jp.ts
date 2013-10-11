@@ -4,7 +4,7 @@
 <context>
     <name>CommunicatingSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="489"/>
+        <location filename="../src/utils/network/system_socket.cpp" line="660"/>
         <source>Connect failed (connect()). %1</source>
         <translation>接続不良 (接続()). %1</translation>
     </message>
@@ -30,13 +30,13 @@
 <context>
     <name>Language</name>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="141"/>
+        <location filename="../src/translation/translation_manager.cpp" line="142"/>
         <source>Language Name</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>日本語</translation>
     </message>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="144"/>
+        <location filename="../src/translation/translation_manager.cpp" line="145"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>jp</translation>
@@ -45,37 +45,31 @@
 <context>
     <name>QDnsLookup</name>
     <message>
-        <location filename="../src/qt5/network/qdnslookup.cpp" line="449"/>
         <source>Operation cancelled</source>
-        <translation>操作・取り消し</translation>
+        <translation type="obsolete">操作・取り消し</translation>
     </message>
 </context>
 <context>
     <name>QDnsLookupRunnable</name>
     <message>
-        <location filename="../src/qt5/network/qdnslookup.cpp" line="968"/>
         <source>Invalid domain name</source>
-        <translation>無効なドメイン名</translation>
+        <translation type="obsolete">無効なドメイン名</translation>
     </message>
     <message>
-        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="67"/>
         <source>Server could not process query</source>
-        <translation>サーバーはクエリーを実行出来ませんでした</translation>
+        <translation type="obsolete">サーバーはクエリーを実行出来ませんでした</translation>
     </message>
     <message>
-        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="71"/>
         <source>Server failure</source>
-        <translation>サーバー不良</translation>
+        <translation type="obsolete">サーバー不良</translation>
     </message>
     <message>
-        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="75"/>
         <source>Non existent domain</source>
-        <translation>ドメインが存在しません</translation>
+        <translation type="obsolete">ドメインが存在しません</translation>
     </message>
     <message>
-        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="79"/>
         <source>Server refused to answer</source>
-        <translation>サーバーが返答を拒否しました</translation>
+        <translation type="obsolete">サーバーが返答を拒否しました</translation>
     </message>
 </context>
 <context>
@@ -162,72 +156,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="653"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="657"/>
         <source>Cannot parse serialized cameras.</source>
         <translation>シリアル化されたカメラを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="662"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="666"/>
         <source>Cannot parse serialized servers.</source>
         <translation>シリアル化されたサーバーを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="671"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="675"/>
         <source>Cannot parse serialized layouts.</source>
         <translation>シリアル化されたレイアウトを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="691"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="695"/>
         <source>Cannot parse serialized users.</source>
         <translation>シリアル化されたユーザーを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="700"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="704"/>
         <source>Cannot parse serialized resources.</source>
         <translation>シリアル化されたリソースを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="709"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="713"/>
         <source>Cannot parse serialized resource types.</source>
         <translation>シリアル化されたリソースタイプを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="718"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="722"/>
         <source>Cannot parse serialized licenses.</source>
         <translation>シリアル化されたライセンスを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="728"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="732"/>
         <source>Cannot parse serialized camera history.</source>
         <translation>シリアル化されたカメラ履歴を解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="738"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="742"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation>シリアル化されたキーと値のペアを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="748"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="752"/>
         <source>Cannot parse serialized settings.</source>
         <translation>シリアル化された設定を解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="758"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="762"/>
         <source>Cannot parse serialized connection information.</source>
         <translation>シリアル化された接続情報を解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="780"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="784"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>シリアル化されたイベント／アクション:ルールを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
         <source>Cannot parse serialized action.</source>
         <translation>シリアル化されたアクションを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="805"/>
         <source>Cannot parse serialized actions.</source>
         <translation>シリアル化されたアクションを解析できません.</translation>
     </message>
@@ -419,31 +413,40 @@
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="298"/>
-        <source>Connection to camera was unexpectedly closed</source>
-        <translation>カメラとの接続が予期しないで閉じられました</translation>
+        <source>Connection to camera was unexpectedly closed %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="305"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="327"/>
+        <source>HDD/SSD disk %1 is full! Disk contains too much data out of VMS storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to camera was unexpectedly closed</source>
+        <translation type="obsolete">カメラとの接続が予期しないで閉じられました</translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="306"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation>RTPパケットロスが直前のシーケンス=%1 から次のシーケンス=%2・迄で検知されました</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="310"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="311"/>
         <source>Server terminated</source>
         <translation>サーバーが停止しました</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="314"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="315"/>
         <source>Server started after crash</source>
         <translation>クラッシュ後にサーバーが再開されました</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="318"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="319"/>
         <source>I/O Error occured at %1</source>
         <translation>I/O エラーが発生しました %1</translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="322"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="323"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
         <translation>HDD/SSD・%1・への書き込み速度が不十分です</translation>
     </message>
@@ -451,131 +454,131 @@
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="25"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="27"/>
         <source>ok</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
         <source>Media server %1 is not available.
  Check that media server is up and running.</source>
         <translation>メディアサーバー %1 は使用出来ません.
  メディアサーバーが立上がって、稼働しているか確認して下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check if Media Server is up and has the proper version.</source>
         <translation>メディアサーバー %1: &quot;%2&quot;・から不良の返答を受信しました.
  メディアサーバーが立上がって居て、尚且つ適切なバージョンか確認して下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
         <source>Cannot connect to http port %1.
  Make sure the camera is plugged into the network.</source>
         <translation>http ポート %1・に接続出来ません.
  カメラがネットワークに接続されているか確認して下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
         <translation>メディア URL %1・を開けません. 又メディアポート %2・に接続出来ません .
  ポート %2 がアクセス可能か (フォワード等)確認して下さい. カメラのリブートを試し、その後カメラのWEBページから工場出荷時に戻して下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot camera.</source>
         <translation>メディアURL %1・開けません. Connection to ポート %2 との接続が予期しないで閉じられました.
  カメラがネットワークに接続されているか確認して下さい、カメラをリブートして下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="51"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>Error parsing camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation> URL・%1,・リクエスト名・%2,に対するカメラ応答エラー解析
  カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media track(s) at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation>URL・%1上のメディアトラックがサポート対象外です
 ・カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1</source>
         <translation>・URL・%1は、承認されていません</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
         <translation>・メディアURL・%1を開けませんでした。・メディアプロトコル・%2・はサポートされていません
 ・カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
         <translation>パラメータ・%1・を構成出来ません
 ・（記録が停止している場合は）始めに記録を開始してみて下さい。そしてカメラ設定画面からFPS（記録コマ数/秒）を減らして下さい。それでも駄目な場合は、カメラのウェブページ上から工場出荷時のデフォルト設定を復元してみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
         <translation>カメラは&quot;%1”・をリクエストしましたがエラー・&quot;%2&quot;・にて失敗しました
 カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Unknown Camera Issue.
  Please, contact support.</source>
         <translation>未知のカメラトラブル
 サポートにお問い合わせ下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="84"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
         <source>I/O error. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>I/Oエラー・OSメッセージ:・&quot;%1&quot;.
 カメラがネットワークに接続されているか確認して下さい、カメラを再起動してみてください.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
         <source>Server has been stopped.</source>
         <translation>サーガーが停止しました.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="91"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data received from camera: %1</source>
         <translation>カメラ:・%1・から無効なデータを受信しました</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Too many media errors. Please open camera issues dialog for more details</source>
         <translation>多数のメディアエラーが発生、詳細はカメラ問題ダイアログを開いて下さい</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
         <source>Media stream is opened but no media data was received</source>
         <translation>メディアストリームが開始されましたがメディアデータは何も受信されませんでした</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
         <source>Unknown error. Please contact support.</source>
         <translation>未知のエラー、・サポートにお問い合わせ下さい.</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="114"/>
         <source> Parameters: </source>
         <translation>・パラメーター:</translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="125"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="127"/>
         <source>(unknown)</source>
         <translation>（未知）</translation>
     </message>
@@ -596,12 +599,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <location filename="../src/utils/common/environment.cpp" line="51"/>
+        <location filename="../src/utils/common/environment.cpp" line="55"/>
         <source>Launching Windows Explorer failed</source>
         <translation>ウィンドウズエクスプローラーの軌道に失敗しました</translation>
     </message>
     <message>
-        <location filename="../src/utils/common/environment.cpp" line="52"/>
+        <location filename="../src/utils/common/environment.cpp" line="56"/>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>ウィンドウズエクスプローラを起動するパスにexplorer.exeを見つけることができませんでした.</translation>
     </message>
@@ -705,22 +708,22 @@
 <context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="233"/>
+        <location filename="../src/licensing/license.cpp" line="234"/>
         <source>Free</source>
         <translation>無料</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="234"/>
+        <location filename="../src/licensing/license.cpp" line="235"/>
         <source>Trial</source>
         <translation>試用</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="235"/>
+        <location filename="../src/licensing/license.cpp" line="236"/>
         <source>Analog</source>
         <translation>アナログ</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="236"/>
+        <location filename="../src/licensing/license.cpp" line="237"/>
         <source>Professional</source>
         <translation>プロフェッショナル</translation>
     </message>
@@ -734,6 +737,19 @@
     </message>
 </context>
 <context>
+    <name>QnMulticodecRtpReader</name>
+    <message>
+        <location filename="../src/utils/network/multicodec_rtp_reader.cpp" line="234"/>
+        <source>(primary video)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/network/multicodec_rtp_reader.cpp" line="236"/>
+        <source>(secondary video)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnPropertyStorage</name>
     <message>
         <location filename="../src/utils/common/property_storage.cpp" line="246"/>
@@ -744,29 +760,29 @@
 <context>
     <name>QnSignHelper</name>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="65"/>
-        <location filename="../src/export/sign_helper.cpp" line="710"/>
+        <location filename="../src/export/sign_helper.cpp" line="66"/>
+        <location filename="../src/export/sign_helper.cpp" line="711"/>
         <source>Unknown</source>
         <translation>未知の値</translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="68"/>
-        <location filename="../src/export/sign_helper.cpp" line="714"/>
+        <location filename="../src/export/sign_helper.cpp" line="69"/>
+        <location filename="../src/export/sign_helper.cpp" line="715"/>
         <source>FREE license</source>
         <translation>無償ライセンス</translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="260"/>
+        <location filename="../src/export/sign_helper.cpp" line="261"/>
         <source>Hardware ID: </source>
         <translation>ハードウェアID:</translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="261"/>
+        <location filename="../src/export/sign_helper.cpp" line="262"/>
         <source>Licensed to: </source>
         <translation>以下にライセンス:</translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="262"/>
+        <location filename="../src/export/sign_helper.cpp" line="263"/>
         <source>Watermark: </source>
         <translation>電子透かし:</translation>
     </message>
@@ -890,7 +906,7 @@
         <translation>ビデオ又はオーディオコーデックが・%1・のフォーマットと互換性がありません、別のフォーマットを試して下さい.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="756"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>ファイル &apos;%1&apos;用の電子透かしの作成中にエラーが発生しました.</translation>
     </message>
@@ -988,32 +1004,32 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="280"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="305"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="282"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="307"/>
         <source>Not Found</source>
         <translation>見つかりません</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="284"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="309"/>
         <source>Not Implemented</source>
         <translation>未実装</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="286"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="311"/>
         <source>Unsupported Transport</source>
         <translation>サポートされていない伝送</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="288"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="313"/>
         <source>Internal Server Error</source>
         <translation>内部サーバーエラー</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="290"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="315"/>
         <source>Invalid Parameter</source>
         <translation>無効なパラメータ</translation>
     </message>
@@ -1044,12 +1060,12 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTranslationListModel</name>
     <message>
-        <location filename="../src/translation/translation_list_model.cpp" line="63"/>
+        <location filename="../src/translation/translation_list_model.cpp" line="66"/>
         <source>%1 (built-in)</source>
         <translation>%1 (内蔵)</translation>
     </message>
     <message>
-        <location filename="../src/translation/translation_list_model.cpp" line="65"/>
+        <location filename="../src/translation/translation_list_model.cpp" line="68"/>
         <source>%1 (external)</source>
         <translation>%1 (外部)</translation>
     </message>
@@ -1057,12 +1073,11 @@ You cannot record video from cameras.</source>
 <context>
     <name>Socket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="198"/>
         <source>WSACleanup() failed.</source>
-        <translation>WSAクリーンナップ()不良.</translation>
+        <translation type="obsolete">WSAクリーンナップ()不良.</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="350"/>
+        <location filename="../src/utils/network/system_socket.cpp" line="521"/>
         <source>Couldn&apos;t resolve %1: %2.</source>
         <translation> %1: %2・を解決方法出来ません.</translation>
     </message>
@@ -1070,9 +1085,8 @@ You cannot record video from cameras.</source>
 <context>
     <name>UDPSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="889"/>
         <source>Disconnect failed (connect()).</source>
-        <translation>切断不良 (接続()).</translation>
+        <translation type="obsolete">切断不良 (接続()).</translation>
     </message>
 </context>
 </TS>

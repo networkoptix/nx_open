@@ -30,12 +30,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="39"/>
+        <location filename="../src/main.cpp" line="41"/>
         <source>System Tray</source>
         <translation>システムトレー</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="40"/>
+        <location filename="../src/main.cpp" line="42"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
         <translation>本システムにシステムトレーが有りません
@@ -58,12 +58,12 @@ Application will now quit.</source>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="587"/>
+        <location filename="../src/systraywindow.cpp" line="592"/>
         <source>Insufficient privileges to manage services</source>
         <translation>サービスを管理するための権限が不十分です</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="587"/>
+        <location filename="../src/systraywindow.cpp" line="592"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation>UAC・管理者以外のユーザーの権限を有効にする必要があります</translation>
     </message>
@@ -71,17 +71,17 @@ Application will now quit.</source>
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="86"/>
+        <location filename="../src/systraywindow.cpp" line="91"/>
         <source>Port</source>
         <translation>ポート</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="127"/>
+        <location filename="../src/systraywindow.cpp" line="132"/>
         <source>VMS settings</source>
         <translation>VMS設定</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="146"/>
+        <location filename="../src/systraywindow.cpp" line="151"/>
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
@@ -89,213 +89,213 @@ Built for %5-%6 with %7.&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="233"/>
+        <location filename="../src/systraywindow.cpp" line="238"/>
         <source>The requested access was denied</source>
         <translation>要求されたアクセスは拒否されました</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="236"/>
+        <location filename="../src/systraywindow.cpp" line="241"/>
         <source>The specified database does not exist.</source>
         <translation>指定されたデータベースは存在しません.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="239"/>
+        <location filename="../src/systraywindow.cpp" line="244"/>
         <source>A specified parameter is invalid.</source>
         <translation>指定されたパラメーターは無効です.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="243"/>
+        <location filename="../src/systraywindow.cpp" line="248"/>
         <source>Insufficient permissions to start/stop services</source>
         <translation>サービスを開始／停止するための権限が不十分です</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="261"/>
+        <location filename="../src/systraywindow.cpp" line="266"/>
         <source>No %1 services installed</source>
         <translation>・%1・番のサービスがインストールされました</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="396"/>
+        <location filename="../src/systraywindow.cpp" line="401"/>
         <source>Enterprise controller has been stopped</source>
         <translation>エンタープライズコントローラーが停止しました</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="403"/>
+        <location filename="../src/systraywindow.cpp" line="408"/>
         <source>Enterprise controller has been started</source>
         <translation>エンタープライズコントローラーが始動しました</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="422"/>
+        <location filename="../src/systraywindow.cpp" line="427"/>
         <source>Media server has been stopped</source>
         <translation>メディアサーバーが停止しました</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="429"/>
+        <location filename="../src/systraywindow.cpp" line="434"/>
         <source>Media server has been started</source>
         <translation>メディアサーバーが始動しました</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="455"/>
+        <location filename="../src/systraywindow.cpp" line="460"/>
         <source> (stopped)</source>
         <translation> (停止)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="463"/>
+        <location filename="../src/systraywindow.cpp" line="468"/>
         <source> (starting)</source>
         <translation> (始動)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="471"/>
+        <location filename="../src/systraywindow.cpp" line="476"/>
         <source> (stopping)</source>
         <translation> (停止中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="479"/>
+        <location filename="../src/systraywindow.cpp" line="484"/>
         <source> (started)</source>
         <translation> (始動済み)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="487"/>
+        <location filename="../src/systraywindow.cpp" line="492"/>
         <source> (resuming)</source>
         <translation>・(再開中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="495"/>
+        <location filename="../src/systraywindow.cpp" line="500"/>
         <source> (paused)</source>
         <translation>・(一時停止しました)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="503"/>
+        <location filename="../src/systraywindow.cpp" line="508"/>
         <source> (pausing)</source>
         <translation>・(一時停止中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="534"/>
-        <location filename="../src/systraywindow.cpp" line="556"/>
-        <location filename="../src/systraywindow.cpp" line="870"/>
-        <location filename="../src/systraywindow.cpp" line="903"/>
-        <location filename="../src/systraywindow.cpp" line="959"/>
-        <location filename="../src/systraywindow.cpp" line="969"/>
-        <location filename="../src/systraywindow.cpp" line="976"/>
+        <location filename="../src/systraywindow.cpp" line="539"/>
+        <location filename="../src/systraywindow.cpp" line="561"/>
+        <location filename="../src/systraywindow.cpp" line="875"/>
+        <location filename="../src/systraywindow.cpp" line="908"/>
+        <location filename="../src/systraywindow.cpp" line="964"/>
+        <location filename="../src/systraywindow.cpp" line="974"/>
+        <location filename="../src/systraywindow.cpp" line="981"/>
         <source>Systray</source>
         <translation>システムトレー</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="534"/>
+        <location filename="../src/systraywindow.cpp" line="539"/>
         <source>Media server is going to be stopped. Are you sure?</source>
         <translation>メディアサーバーが停止しますが、本当に停止して良いですか？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="556"/>
+        <location filename="../src/systraywindow.cpp" line="561"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
         <translation>エンタープライズコントローラーが停止しますが、本当に停止して良いですか？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="627"/>
+        <location filename="../src/systraywindow.cpp" line="632"/>
         <source>&amp;Settings</source>
         <translation>設定(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="633"/>
+        <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Media Server Log</source>
         <translation>メディアサーバーログ表示(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="638"/>
+        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Show Enterprise Controller Log</source>
         <translation>エンタープライズコントローラーロク表示(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="643"/>
+        <location filename="../src/systraywindow.cpp" line="648"/>
         <source>&amp;Quit</source>
         <translation>終了(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="646"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Start Media Server</source>
         <translation>メディアサーバー始動</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="651"/>
+        <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Stop Media Server</source>
         <translation>メディアサーバー停止</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="656"/>
+        <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Start Enterprise Controller</source>
         <translation>エンタープライズコントローラーを始動</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="661"/>
+        <location filename="../src/systraywindow.cpp" line="666"/>
         <source>Stop Enterprise Controller</source>
         <translation>エンタープライズコントローラーを停止</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="743"/>
+        <location filename="../src/systraywindow.cpp" line="748"/>
         <source>* Last used connection *</source>
         <translation>*:直近に使用された接続・*</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="863"/>
+        <location filename="../src/systraywindow.cpp" line="868"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>この変更は、エンタープライズコントローラー及びメディアサーバーの再起動が必要です、今再起動しても良いですか？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="865"/>
+        <location filename="../src/systraywindow.cpp" line="870"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>この変更は、エンタープライズコントローラーの再起動が必要です、今再起動しても良いですか？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="867"/>
+        <location filename="../src/systraywindow.cpp" line="872"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>この変更は、メディアサーバーの再起動が必要です、今再起動しても良いですか？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="903"/>
+        <location filename="../src/systraywindow.cpp" line="908"/>
         <source>Invalid %1 port specified.</source>
         <translation>無効な・%1・ポートが指定されました.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="936"/>
+        <location filename="../src/systraywindow.cpp" line="941"/>
         <source>enterprise controller</source>
         <translation>エンタープライズコントローラー</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="937"/>
+        <location filename="../src/systraywindow.cpp" line="942"/>
         <source>media proxy</source>
         <translation>メディアプロキシ</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="942"/>
+        <location filename="../src/systraywindow.cpp" line="947"/>
         <source>media server RTSP</source>
         <translation>メディアサーバーRTSP</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="944"/>
+        <location filename="../src/systraywindow.cpp" line="949"/>
         <source>media server API</source>
         <translation>メディアサーバーAPI</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="959"/>
+        <location filename="../src/systraywindow.cpp" line="964"/>
         <source>%1 port is same as %2 port</source>
         <translation>%1 ポートは %2 ポートと同一です</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="969"/>
+        <location filename="../src/systraywindow.cpp" line="974"/>
         <source>%1 port already used by another process</source>
         <translation>%1・ポートは既に別のプロセスで使用されています</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="976"/>
+        <location filename="../src/systraywindow.cpp" line="981"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>パブリックIPアドレスの為に設定されたIPアドレスが無効です</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1041"/>
+        <location filename="../src/systraywindow.cpp" line="1046"/>
         <source>Invalid parameters</source>
         <translation>無効なパラメーター</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1041"/>
+        <location filename="../src/systraywindow.cpp" line="1046"/>
         <source>You have entered invalid URL.</source>
         <translation>無効なURLが入力されました.</translation>
     </message>
