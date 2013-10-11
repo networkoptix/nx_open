@@ -36,6 +36,11 @@ public:
      */
     void setUpdatePeriod(qint64 updatePeriod);
 
+    /**
+     * Server up time in milliseconds.
+     */
+    qint64 upTimeMs() const;
+
     virtual qreal totalCpuUsage() override;
     virtual qreal totalRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;

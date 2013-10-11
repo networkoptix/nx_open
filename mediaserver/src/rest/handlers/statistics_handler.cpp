@@ -54,6 +54,10 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
     }
     result.append("</network>\n");
 
+    result.append("<misc>\n");
+    result.append(QString("<uptimeMs>%1</uptimeMs>\n").arg(m_monitor->upTimeMs()));
+    result.append("</misc>\n");
+
     result.append("<params>\n");
     result.append(QString("<updatePeriod>%1</updatePeriod>\n").arg(m_monitor->updatePeriod()));
     result.append("</params>\n");
