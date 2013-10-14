@@ -728,11 +728,16 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
         return;
 
-    QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
-    if (!helper.isValid()) {
-        QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
-        QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
-        cameraSettingsDialog()->widget()->setScheduleEnabled(false);
+    //checking if showing Licenses limit exceeded is appropriate
+    if( cameraSettingsDialog()->widget()->licensedParametersModified() )
+    {
+        QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
+        if (!helper.isValid())
+        {
+            QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
+            QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
+            cameraSettingsDialog()->widget()->setScheduleEnabled(false);
+        }
     }
 
     /* Submit and save it. */
