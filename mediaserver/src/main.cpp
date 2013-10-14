@@ -1249,7 +1249,7 @@ void QnMain::run()
     disconnect(eventManager);
 
     // This method will set flag on message channel to threat next connection close as normal
-    //appServerConnection->disconnectSync();
+    appServerConnection->disconnectSync();
     qSettingsRunTime.setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();
