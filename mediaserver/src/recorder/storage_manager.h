@@ -87,7 +87,7 @@ public:
     /*
     * Return full path list from storage_index.csv (include absent in DB storages)
     */
-    QStringList QnStorageManager::getAllStoragePathes() const;
+    QStringList getAllStoragePathes() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(QnResourcePtr storageRes, QnBusiness::EventReason reason);
