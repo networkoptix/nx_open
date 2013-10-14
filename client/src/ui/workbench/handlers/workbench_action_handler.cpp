@@ -588,10 +588,13 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             }
         }
 
-        if(!normalResources.isEmpty())
-            snapshotManager()->save(normalResources, object, slot);
-
         m_exportsToFinishBeforeClosure = 0;
+        if(!normalResources.isEmpty())
+        {
+            ++m_exportsToFinishBeforeClosure;
+            snapshotManager()->save(normalResources, this, SLOT(checkForClosurePending()));
+        }
+
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             if (validateItemTypes(fileResource)) { // TODO: #Elric and if not?
                 bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);

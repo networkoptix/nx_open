@@ -392,6 +392,7 @@ private:
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
+private slots:
     //!Checks if need to close layout
     void checkForClosurePending();
 
