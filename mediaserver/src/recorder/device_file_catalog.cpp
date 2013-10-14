@@ -347,14 +347,31 @@ void DeviceFileCatalog::doRebuildArchive()
     qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
 
     QMap<qint64, Chunk> allChunks;
+    bool canceled = false;
     foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages()) {
-        if (m_rebuildArchive == Rebuild_None)
+        if (m_rebuildArchive == Rebuild_None) {
+            canceled = true;
             break;
+        }
         readStorageData(storage, m_role, allChunks);
     }
 
-    if (m_rebuildArchive == Rebuild_None)
-        return; // canceled
+    if (canceled) {
+        // canceled, restore archive
+        m_file.close();
+        if (m_file.open(QFile::ReadWrite)) {
+            if (m_file.size() == 0) 
+            {
+                QTextStream str(&m_file);
+                str << "timezone; start; storage; index; duration\n"; // write CSV header
+                str.flush();
+            }
+            else {
+                deserializeTitleFile();
+            }
+        }
+        return; 
+    }
 
     foreach(const Chunk& chunk, allChunks)
         m_chunks << chunk;
