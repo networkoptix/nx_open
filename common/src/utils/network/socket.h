@@ -1,7 +1,6 @@
 #ifndef __PRACTICALSOCKET_INCLUDED__
 #define __PRACTICALSOCKET_INCLUDED__
 
-#include <QMutex>
 #include <string>
 #include <exception>
 
@@ -198,7 +197,6 @@ private:
     SystemError::ErrorCode m_prevErrorCode;
     unsigned int m_readTimeoutMS;
     unsigned int m_writeTimeoutMS;
-    static QMutex m_createSockMutex;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
