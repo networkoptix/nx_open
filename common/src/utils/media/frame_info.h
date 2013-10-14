@@ -126,8 +126,8 @@ class QnOpenGLPictureData
 public:
     QnOpenGLPictureData(
         SynchronizationContext* const syncCtx,
-//  		GLXContext _glContext,
-   		unsigned int _glTexture );
+        //GLXContext _glContext,
+        unsigned int _glTexture );
 
     virtual QnAbstractPictureDataRef::PicStorageType type() const { return QnAbstractPictureDataRef::pstOpenGL; }
 
@@ -144,8 +144,8 @@ private:
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
-	//!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
-	QSharedPointer<QnAbstractPictureDataRef> picData;
+    //!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
+    QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
