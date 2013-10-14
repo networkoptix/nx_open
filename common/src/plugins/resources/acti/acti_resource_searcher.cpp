@@ -87,7 +87,7 @@ void QnActiResourceSearcher::at_replyReceived(nx_http::AsyncHttpClient* reply)
     m_cachedXml[host].timer.restart();
     m_httpInProgress.remove(host);
 
-    reply->deleteLater();
+    reply->scheduleForRemoval();
 }
 
 QnActiResourceSearcher& QnActiResourceSearcher::instance()
