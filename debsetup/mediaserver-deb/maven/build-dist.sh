@@ -53,6 +53,9 @@ chmod -R 755 $BINSTAGE
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver* $BINSTAGE
 
+# We set rpath as settings capabilities makes LD_LIBRARY_PATH useless
+chrpath -r ../lib $BINSTAGE/mediaserver-bin
+
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
 
