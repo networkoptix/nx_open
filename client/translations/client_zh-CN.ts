@@ -576,27 +576,32 @@
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
         <source>Dialog</source>
-        <translation type="unfinished">对话框</translation>
+        <translation>对话框</translation>
     </message>
     <message>
         <source>Installing version %1</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>安装版本 %1</translatorcomment>
+        <translation>安装版本 %1</translation>
     </message>
     <message>
         <source>Installation failed</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>安装失败</translatorcomment>
+        <translation>安装失败</translation>
     </message>
     <message>
         <source>Could not cancel installation</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>无法取消安装</translatorcomment>
+        <translation>无法取消安装</translation>
     </message>
     <message>
         <source>Installation completed</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>安装完成</translatorcomment>
+        <translation>安装完成</translation>
     </message>
     <message>
         <source>Installation has been cancelled</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>安装已取消</translatorcomment>
+        <translation>安装已取消</translation>
     </message>
 </context>
 <context>
@@ -2715,7 +2720,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Change Camera Aspect Ratio...</source>
-        <translation type="unfinished"></translation>
+        <translation>改变摄像机宽高比</translation>
     </message>
 </context>
 <context>
@@ -4151,11 +4156,11 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished">音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
+        <translation>音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
     </message>
     <message>
         <source>Can&apos;t find video encoder </source>
-        <translation type="unfinished">无法找到视频编码器</translation>
+        <translation>无法找到视频编码器</translation>
     </message>
 </context>
 <context>
@@ -4851,14 +4856,17 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation type="unfinished">*最后使用的连接*</translation>
+        <translation>*最后使用的连接*</translation>
     </message>
     <message>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Unable to connect to applauncher to enable client compatibility mode</source>
-        <translation type="unfinished"></translation>
+        <translation>您正在连接到不同版本的系统控制器：
+ - 客户端版本：%1
+ - 系统控制器版本：%2
+无法连接到应用程序以启用客户端兼容性模式</translation>
     </message>
     <message>
         <source>You are about to connect to Enterprise Controller which has a different version:
@@ -4866,7 +4874,10 @@ Unable to connect to applauncher to enable client compatibility mode</source>
  - EC version: %2.
 Client Version %3 is required to connect to this Enterprise Controller.
 Download version %3?</source>
-        <translation type="unfinished"></translation>
+        <translation>您连接到了不同版本的系统控制器:
+  - 客户端版本n: %1。
+  -系统控制器版本: %2。
+必须使用客户端版本 %3 以连接到此系统控制器。下载版本 %3?</translation>
     </message>
 </context>
 <context>
@@ -5703,31 +5714,31 @@ Please close the application and start it again using the shortcut in the start 
     <name>QnRecordingStatusHelper</name>
     <message>
         <source>Not recording</source>
-        <translation type="unfinished">不录像</translation>
+        <translation>不录像</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation type="unfinished">录像全部</translation>
+        <translation>录像全部</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation type="unfinished">仅移动侦测录像</translation>
+        <translation>仅移动侦测录像</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation type="unfinished">移动侦测和低分辨率录像</translation>
+        <translation>移动侦测和低分辨率录像</translation>
     </message>
     <message>
         <source>Continuous</source>
-        <translation type="unfinished">连续</translation>
+        <translation>连续</translation>
     </message>
     <message>
         <source>Motion only</source>
-        <translation type="unfinished"></translation>
+        <translation>仅移动侦测录像</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished">移动+低分辨率</translation>
+        <translation>移动+低分辨率</translation>
     </message>
 </context>
 <context>
@@ -5865,7 +5876,7 @@ Please close the application and start it again using the shortcut in the start 
     <name>QnScreenRecorder</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try latter</source>
-        <translation type="unfinished"></translation>
+        <translation>屏幕捕捉子系统尚未初始化。请稍后再试</translation>
     </message>
 </context>
 <context>
@@ -5911,11 +5922,11 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>%1 %2 </source>
-        <translation type="unfinished">%1% {1 %2 ?}</translation>
+        <translation>%1% {1 %2 ?}</translation>
     </message>
     <message>
         <source>(up %1 days, %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>(在线 %1 天, %2)</translation>
     </message>
 </context>
 <context>
@@ -6004,11 +6015,11 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. Depending on the total size of archive it can take several hours. This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>您将启动存档重新同步例程。注意！在此过程中，将停止所有的记录。根据归档文件的总大小，它可能需要几个小时。如果您的存档文件夹已移动重命名或更换，这个过程是必要的。您可以在任何时候取消重建操作并保留原数据。要继续吗？</translation>
     </message>
 </context>
 <context>
@@ -7676,19 +7687,19 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
+        <translation>重建归档索引</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>开始</translation>
     </message>
     <message>
         <source>Rebuild progress</source>
-        <translation type="unfinished"></translation>
+        <translation>重建进度</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>

@@ -861,12 +861,12 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="298"/>
         <source>Connection to camera was unexpectedly closed %1</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机连接突然被中断 %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="327"/>
         <source>HDD/SSD disk %1 is full! Disk contains too much data out of VMS storage</source>
-        <translation type="unfinished"></translation>
+        <translation>硬盘 %1 空间已满！磁盘包含太多数据</translation>
     </message>
     <message>
         <source>Connection to camera was unexpectedly closed</source>
@@ -1298,12 +1298,12 @@ for recording to %1.</source>
     <message>
         <location filename="../src/utils/network/multicodec_rtp_reader.cpp" line="234"/>
         <source>(primary video)</source>
-        <translation type="unfinished"></translation>
+        <translation>(主要视频)</translation>
     </message>
     <message>
         <location filename="../src/utils/network/multicodec_rtp_reader.cpp" line="236"/>
         <source>(secondary video)</source>
-        <translation type="unfinished"></translation>
+        <translation>(次要视频)</translation>
     </message>
 </context>
 <context>
