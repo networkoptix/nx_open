@@ -40,6 +40,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_hasCameraChanges(false),
     m_anyCameraChanges(false),
     m_hasDbChanges(false),
+    m_scheduleEnabledChanged(false),
     m_hasScheduleChanges(false),
     m_hasScheduleControlsChanges(false),
     m_hasMotionControlsChanges(false),
@@ -382,6 +383,14 @@ void QnSingleCameraSettingsWidget::reject()
     updateFromResource();
 }
 
+bool QnSingleCameraSettingsWidget::licensedParametersModified() const
+{
+    if( !hasDbChanges() && !hasCameraChanges() && !hasAnyCameraChanges() )
+        return false;//nothing have been changed
+
+    return m_scheduleEnabledChanged || m_hasScheduleChanges;
+}
+
 void QnSingleCameraSettingsWidget::updateFromResource() {
     loadAdvancedSettings();
 
@@ -490,6 +499,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
+    m_scheduleEnabledChanged = false;
     m_hasScheduleControlsChanges = false;
     m_hasMotionControlsChanges = false;
 
@@ -554,7 +564,10 @@ void QnSingleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
 
     m_hasDbChanges = hasChanges;
     if(!m_hasDbChanges && !hasCameraChanges())
+    {
+        m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -565,7 +578,10 @@ void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
 
     m_hasCameraChanges = hasChanges;
     if(!m_hasCameraChanges && !hasDbChanges())
+    {
+        m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -576,7 +592,10 @@ void QnSingleCameraSettingsWidget::setAnyCameraChanges(bool hasChanges) {
 
     m_anyCameraChanges = hasChanges;
     if(!m_anyCameraChanges && !hasDbChanges())
+    {
+        m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -912,6 +931,8 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
     if (m_camera && m_camera->isAnalog())
         ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
+
+    m_scheduleEnabledChanged = true;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)

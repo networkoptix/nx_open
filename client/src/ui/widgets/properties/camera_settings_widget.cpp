@@ -234,6 +234,19 @@ void QnCameraSettingsWidget::setReadOnly(bool readOnly) const {
     m_multiWidget->setReadOnly(readOnly);
 }
 
+bool QnCameraSettingsWidget::licensedParametersModified() const
+{
+    switch( mode() )
+    {
+        case SingleMode:
+            return m_singleWidget->licensedParametersModified();
+        case MultiMode:
+            return m_multiWidget->licensedParametersModified();
+        default:
+            return true;
+    }
+}
+
 void QnCameraSettingsWidget::updateFromResources() {
     switch(mode()) {
     case SingleMode:

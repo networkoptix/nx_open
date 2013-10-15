@@ -17,4 +17,13 @@
         <root.dir>${basedir}/../..</root.dir>
         <install.type>full</install.type>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>installer</id>
+            <activation>                
+                <activeByDefault>true</activeByDefault>
+            </activation>           
+        </profile>
+    </profiles>    
 </project>

@@ -443,6 +443,11 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
                 int naluSize = 0;
                 for( int i = 0; i < m_nalLengthSize; ++i )
                     naluSize = (naluSize << 8) | p[i];
+                if( p + m_nalLengthSize + naluSize > inputStream.Data + inputStream.DataLength )
+                {
+                    //corrupted data?
+                    break;
+                }
 
 #ifdef ALLOW_INPLACE_CONVERSION_TO_ANNEXB
                 if( convertToAnnexBInPlace )
@@ -462,7 +467,6 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
                 }
 
                 p += m_nalLengthSize + naluSize;
-                Q_ASSERT( p <= inputStream.Data + inputStream.DataLength );
             }
 
             if( !convertToAnnexBInPlace )

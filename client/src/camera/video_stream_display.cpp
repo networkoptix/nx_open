@@ -899,6 +899,13 @@ qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 {
     if (m_renderList.isEmpty())
         return AV_NOPTS_VALUE;
+    foreach(QnAbstractRenderer* renderer, m_renderList)
+    {
+        QnResourceWidgetRenderer* r = dynamic_cast<QnResourceWidgetRenderer*>(renderer);
+        if (r && r->isEnabled(m_channelNumber)) 
+            return r->getTimestampOfNextFrameToRender(m_channelNumber);
+    }
+
     QnAbstractRenderer* renderer = *m_renderList.begin();
     return renderer->getTimestampOfNextFrameToRender(m_channelNumber);
 }

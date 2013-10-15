@@ -59,6 +59,9 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;
 
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
+
     void updateFromResources();
     void submitToResources();
     void reject();

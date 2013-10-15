@@ -79,6 +79,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
     void updateFromResource();
     void reject();
     void submitToResource();
@@ -161,6 +163,7 @@ private:
     bool m_anyCameraChanges;
     bool m_hasDbChanges;
 
+    bool m_scheduleEnabledChanged;
     /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
 

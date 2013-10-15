@@ -192,7 +192,11 @@ wixsetup/CustomActions/CustomActions.aps
 wixsetup/version.bat
 wixsetup/bin
 wixsetup/x86
+wixsetup/wixsetup-client-only/x86
+wixsetup/wixsetup-full/x86
 wixsetup/x64
+wixsetup/wixsetup-client-only/x64
+wixsetup/wixsetup-full/x64
 
 My Amplifier XE Results*
 My Inspector XE Results*
