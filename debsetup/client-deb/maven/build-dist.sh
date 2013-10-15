@@ -104,6 +104,4 @@ install -m 755 debian/prerm $STAGE/DEBIAN
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-beta)

@@ -66,12 +66,11 @@ mkdir -p $STAGE/DEBIAN
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
+install -m 755 debian/preinst $STAGE/DEBIAN
 install -m 755 debian/postinst $STAGE/DEBIAN
 install -m 755 debian/prerm $STAGE/DEBIAN
 install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)

@@ -12,8 +12,6 @@
 #cp -P `find ${qt.dir} -iname 'libqgenericbearer.so*'` ${libdir}/build/bin/debug
 #cp -P `find ${qt.dir} -iname 'libqgenericbearer.so*'` ${libdir}/build/bin/release
 
-sudo chown -R $USER:sudo ${project.build.directory}
-
 chmod 755 ./init.d/*
 chmod 755 ./debian/prerm 
 chmod 755 ./debian/postinst

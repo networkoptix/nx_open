@@ -13,7 +13,5 @@ for f in ${project.build.directory}/usr/share/icons/hicolor/*/*/vmsclient.png; d
 mv ${project.build.directory}/usr/share/applications/hdwitness.desktop ${project.build.directory}/usr/share/applications/vmsclient-${customization}.desktop
 
 
-sudo chown -R `whoami`:sudo ${project.build.directory}
-
 chmod 775 ./bin/client*
 chmod 775 ./build-dist.sh
