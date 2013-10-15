@@ -511,6 +511,10 @@ void QnMulticodecRtpReader::closeStream()
 {
     m_RtpSession.sendTeardown();
     m_RtpSession.stop();
+    for (int i = 0; i < m_demuxedData.size(); ++i) {
+        if (m_demuxedData[i])
+            m_demuxedData[i]->clear();
+    }
 }
 
 bool QnMulticodecRtpReader::isStreamOpened() const
