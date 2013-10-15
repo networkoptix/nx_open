@@ -263,9 +263,9 @@ void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , 
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
+    Q_UNUSED(reply)
     QString user = QnAppServerConnectionFactory::defaultUrl().userName();
     QString password = QnAppServerConnectionFactory::defaultUrl().password();
-    QAuthenticator auth;
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }
