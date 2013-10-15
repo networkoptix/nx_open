@@ -93,7 +93,7 @@ namespace nx_http
 
                         case PollSet::etTimedOut:
                         case PollSet::etError:
-                            NX_LOG( QString::fromLatin1("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logWARNING );
+                            NX_LOG( QString::fromLatin1("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
@@ -113,7 +113,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        NX_LOG( QString::fromLatin1("Error sending http request to %1").arg(m_url.toString()), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Error sending http request to %1").arg(m_url.toString()), cl_logDEBUG1 );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -123,7 +123,7 @@ namespace nx_http
 
                     if( !sendRequest() )
                     {
-                        NX_LOG( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         m_state = sFailed;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
                         lk.unlock();
@@ -133,7 +133,7 @@ namespace nx_http
                     }
                     if( (int)m_requestBytesSent == m_requestBuffer.size() )
                     {
-                        NX_LOG( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        NX_LOG( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
                         aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
@@ -147,7 +147,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        NX_LOG( QString::fromLatin1("Error reading http response from %1").arg(m_url.toString()), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Error reading http response from %1").arg(m_url.toString()), cl_logDEBUG1 );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -176,7 +176,7 @@ namespace nx_http
                     //response read
                     NX_LOG( QString::fromLatin1("Http response from %1 has been successfully read. Status line: %2(%3)").
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
-                        arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG1 );
+                        arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2 );
 
                     const HttpResponse* response = m_httpStreamReader.message().response;
                     if( response->statusLine.statusCode == StatusCode::unauthorized
@@ -247,7 +247,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        NX_LOG( QString::fromLatin1("Error reading http response message body from %1").arg(m_url.toString()), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -351,7 +351,7 @@ namespace nx_http
         if( m_state < sResponseReceived )
         {
             NX_LOG( QString::fromLatin1("HttpClient (%1). Message body cannot be read while in state %2").
-                arg(m_url.toString()).arg(QLatin1String(toString(m_state))), cl_logWARNING );
+                arg(m_url.toString()).arg(QLatin1String(toString(m_state))), cl_logDEBUG1 );
             return false;
         }
         else if( m_state > sResponseReceived )
@@ -364,7 +364,7 @@ namespace nx_http
         if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this ) )
         {
             NX_LOG( QString::fromLatin1("HttpClient (%1). Failed to start socket polling. %2").
-                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
             m_state = sResponseReceived;
             return false;
         }
@@ -479,7 +479,7 @@ namespace nx_http
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
             NX_LOG( QString::fromLatin1("Error parsing http response from %1. %2").
-                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
+                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1 );
             m_state = sFailed;
             return -1;
         }
