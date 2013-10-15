@@ -124,7 +124,15 @@ protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
     {
         QList<QNetworkProxy> rez;
-        if (query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
+
+        QString urlPath = query.url().path();
+        if (urlPath.startsWith(QLatin1String("/")))
+            urlPath.remove(0, 1);
+
+        if (urlPath.endsWith(QLatin1String("/")))
+            urlPath.chop(1);
+
+        if (urlPath.isEmpty() || urlPath == QLatin1String("api/ping")) {
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
             return rez;
         }
