@@ -76,11 +76,22 @@ set -e
 
 set +e
 chown $USER:$GROUP $VARDIR $ETCDIR
-cat <(echo $VARDIR) <(echo $ETCDIR) /opt/digitalwatchdog/mediaserver/etc/mediaserver.conf | grep \\path | sed 's/^.*=//g' | while read s
-do
-    echo Checking permissions on directory $s
-    find $s -follow -not -group $GROUP -o -not user $USER -print0 2>/dev/null \
+
+verify_permissions()
+{
+    DIR="$1"
+
+    echo Checking permissions on directory $DIR
+    find "$DIR" -follow -not -group $GROUP -o -not user $USER -print0 2>/dev/null \
       | xargs -0 --no-run-if-empty chown $USER:$GROUP
+}
+
+verify_permissions "$VARDIR"
+verify_permissions "$ETCDIR"
+
+cat /opt/digitalwatchdog/mediaserver/etc/mediaserver.conf | grep \\path | sed 's/^.*=//g' | while read s
+do
+    verify_permissions "$s"
 done
 
 find $VARDIR $ETCDIR -follow -not -group $GROUP -o -not user $USER -print0 2>/dev/null \
