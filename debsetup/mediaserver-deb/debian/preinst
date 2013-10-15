@@ -82,7 +82,7 @@ verify_permissions()
     DIR="$1"
 
     echo Checking permissions on directory $DIR
-    find "$DIR" -follow -not -group $GROUP -o -not user $USER -print0 2>/dev/null \
+    find "$DIR" -follow -not -group $GROUP -o -not -user $USER -print0 2>/dev/null \
       | xargs -0 --no-run-if-empty chown $USER:$GROUP
 }
 
