@@ -32,14 +32,14 @@ namespace nx_http
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
 
-        AsyncHttpClient_instanceCount.ref();
+        //AsyncHttpClient_instanceCount.ref();
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
         terminate();
 
-        AsyncHttpClient_instanceCount.deref();
+        //AsyncHttpClient_instanceCount.deref();
     }
 
     void AsyncHttpClient::terminate()
@@ -56,7 +56,7 @@ namespace nx_http
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
 
-            //AIOService guarantees that eventTriggered had return and will never be called with m_socket
+            //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
         }
     }
 
@@ -158,17 +158,9 @@ namespace nx_http
 
                     readAndParseHttp();
                     //TODO/IMPL reconnect in case of error
-                    if( m_state >= sFailed )
-                    {
-                        lk.unlock();
-                        emit done( this );
-                        lk.relock();
-                        if( m_terminated )
-                            break;
-                    }
 
                     if( m_httpStreamReader.state() == HttpStreamReader::readingMessageHeaders )
-                        break;
+                        break;  //response has not been read yet
 
                     //read http message headers
                     if( m_httpStreamReader.message().type != nx_http::MessageType::response )
@@ -181,14 +173,11 @@ namespace nx_http
                         lk.relock();
                         break;
                     }
+
                     //response read
                     cl_log.log( QString::fromLatin1("Http response from %1 has been successfully read. Status line: %2(%3)").
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                         arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG1 );
-                    //TODO/IMPL should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
-                    if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
-                        break; // wait more data
-                    aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
 
                     const HttpResponse* response = m_httpStreamReader.message().response;
                     if( response->statusLine.statusCode == StatusCode::unauthorized
@@ -199,6 +188,12 @@ namespace nx_http
                             return;
                     }
 
+                    //should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
+                    aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
+
+                    const bool messageHasMessageBody = 
+                        (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) || (m_httpStreamReader.messageBodyBufferSize() > 0);
+
                     m_state = sResponseReceived;
                     lk.unlock();
                     emit responseReceived( this );
@@ -206,24 +201,43 @@ namespace nx_http
                     if( m_terminated )
                         break;
 
-                    if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
+                    //is message body follows?
+                    if( !messageHasMessageBody )
                     {
-                        m_state = sDone;
+                        //no message body: done
+                        m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                         lk.unlock();
                         emit done( this );
                         lk.relock();
-                        if( m_terminated )
-                            break;
+                        break;
                     }
-                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later, we will not send someMessageBodyAvailable signal
-                    if( m_state == sReadingMessageBody &&
-                        m_httpStreamReader.state() == HttpStreamReader::readingMessageBody && 
-                        m_httpStreamReader.messageBodyBufferSize() > 0 )
+
+                    if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
+                        m_state == sReadingMessageBody )                    //client wants to read message body
                     {
                         lk.unlock();
                         emit someMessageBodyAvailable( this );
                         lk.relock();
                     }
+
+                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later, 
+                        //we will not send someMessageBodyAvailable signal for already read message body
+
+                    if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
+                        break; // wait for more data
+
+                    //message body has been received with request
+                    assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
+
+                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later 
+                        //and whole message body has been received with response, we MUST NOT emit done now, but wait or user to receive message body
+
+                    //TODO: #AK looks like startReadMessageBody() call was a bad idea...
+
+                    m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
+                    lk.unlock();
+                    emit done( this );
+                    lk.relock();
                     break;
                 }
 
@@ -331,11 +345,15 @@ namespace nx_http
     */
     bool AsyncHttpClient::startReadMessageBody()
     {
-        if( m_state != sResponseReceived )
+        if( m_state < sResponseReceived )
         {
             cl_log.log( QString::fromLatin1("HttpClient (%1). Message body cannot be read while in state %2").
                 arg(m_url.toString()).arg(QLatin1String(toString(m_state))), cl_logWARNING );
             return false;
+        }
+        else if( m_state > sResponseReceived )
+        {
+            return true;
         }
 
         m_state = sReadingMessageBody;
