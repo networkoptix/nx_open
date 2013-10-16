@@ -157,6 +157,8 @@ private:
             to another frame and not copy data to this object (TODO)
     */
     bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+
+    void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H
