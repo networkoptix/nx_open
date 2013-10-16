@@ -513,6 +513,16 @@ Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {
+    if  (!context()->user())
+        return Qn::InvisibleAction;
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (snapshotManager()->isFile(layout))
+        return Qn::InvisibleAction;
+    else
+        return Qn::EnabledAction;
+}
+
 Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {
     return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }

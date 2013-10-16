@@ -386,6 +386,12 @@ public:
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };
 
+class QnChangeResolutionActionCondition: public QnActionCondition {
+public:
+    QnChangeResolutionActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 /** Display action only if user is logged in. */
 class QnLoggedInCondition: public QnActionCondition {
 public:

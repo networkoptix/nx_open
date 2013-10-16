@@ -832,7 +832,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Resolution...")).
-        condition(new QnLoggedInCondition(this));
+        condition(new QnChangeResolutionActionCondition(this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
