@@ -89,6 +89,10 @@ protected slots:
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
+    void showFullScreen();
+    void showNormal();
+
+private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QScopedPointer<QnGraphicsView> m_view;
