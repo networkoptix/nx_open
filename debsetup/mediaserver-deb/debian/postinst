@@ -75,7 +75,7 @@ function write_config {
     [ -z "$PUBLIC_IP_ENABLED" ] || echo "publicIPEnabled=$PUBLIC_IP_ENABLED" >> $CONFIG_FILE
     [ -z "$STATIC_PUBLIC_IP" ] || echo "staticPublicIP=$STATIC_PUBLIC_IP" >> $CONFIG_FILE
 
-    chown ${product.name.short}:${product.name.short} $CONFIG_FILE
+    chown -R ${product.name.short}:${product.name.short} $CONFIG_FILE
 }
 
 function to_int {

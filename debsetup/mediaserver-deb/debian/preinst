@@ -72,10 +72,10 @@ fi
 # end of NIS tolerance zone
 set -e
 
-[ -d $VARDIR ] || mkdir $VARDIR
+[ -d $VARDIR ] || mkdir -p $VARDIR
 
 set +e
-chown $USER:$GROUP $VARDIR $ETCDIR
+chown -R $USER:$GROUP $VARDIR $ETCDIR
 
 verify_permissions()
 {
@@ -83,7 +83,7 @@ verify_permissions()
 
     echo Checking permissions on directory $DIR
     find "$DIR" -follow -not -group $GROUP -o -not -user $USER -print0 2>/dev/null \
-      | xargs -0 --no-run-if-empty chown $USER:$GROUP
+      | xargs -0 --no-run-if-empty chown -R $USER:$GROUP
 }
 
 verify_permissions "$VARDIR"
@@ -95,5 +95,5 @@ do
 done
 
 find $VARDIR $ETCDIR -follow -not -group $GROUP -o -not user $USER -print0 2>/dev/null \
-  | xargs -0 --no-run-if-empty chown $USER:$GROUP
+  | xargs -0 --no-run-if-empty chown -R $USER:$GROUP
 set -e
