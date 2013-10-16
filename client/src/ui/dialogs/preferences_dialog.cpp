@@ -119,7 +119,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
     connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
-    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
 
     initTranslations();
     updateFromSettings();
@@ -358,12 +357,21 @@ void QnPreferencesDialog::at_onDecoderPluginsListChanged()
         if( plugin->isHardwareAccelerated() )
         {
             ui->hardwareDecodingCheckBox->show();
+            if( ui->hardwareDecodingCheckBox->isChecked() )
+                ui->hwAccelerationWarningLabel->show();
+            connect( ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
+            //static_cast<QVBoxLayout*>(ui->miscGroupBox->layout())->insertItem( 2, ui->hardwareDecodingControlsLayout );
+            //ui->hardwareDecodingControlsLayout->setEnabled( true );
             return;
         }
     }
 
+    disconnect( ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
+    ui->miscGroupBox->layout()->removeItem( ui->hardwareDecodingControlsLayout );
+    //ui->hardwareDecodingControlsLayout->setEnabled( false );
     ui->hardwareDecodingCheckBox->hide();
     ui->hardwareDecodingLabel->hide();
+    ui->hwAccelerationWarningLabel->hide();
 }
 
 void QnPreferencesDialog::at_downmixAudioCheckBox_toggled(bool checked) {
