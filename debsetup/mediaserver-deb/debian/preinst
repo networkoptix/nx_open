@@ -9,7 +9,7 @@
 
 . /usr/share/debconf/confmodule
 
-BASEDIR=/opt/digitalwatchdog/mediaserver
+BASEDIR=/opt/$COMPANY_NAME/mediaserver
 VARDIR=$BASEDIR/var
 ETCDIR=$BASEDIR/etc
 
@@ -20,13 +20,13 @@ if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
 stop_server() {
-    if [ ! -x /etc/init.d/digitalwatchdog-mediaserver ]; then return; fi
+    if [ ! -x /etc/init.d/$COMPANY_NAME-mediaserver ]; then return; fi
 
     set +e
     if [ -x /usr/sbin/invoke-rc.d ]; then
-      cmd="invoke-rc.d digitalwatchdog-mediaserver stop"
+      cmd="invoke-rc.d $COMPANY_NAME-mediaserver stop"
     else
-      cmd="/etc/init.d/digitalwatchdog-mediaserver stop"
+      cmd="/etc/init.d/$COMPANY_NAME-mediaserver stop"
     fi
     $cmd
     errno=$?
@@ -72,14 +72,13 @@ fi
 # end of NIS tolerance zone
 set -e
 
-[ -d $VARDIR ] || mkdir $VARDIR
-
 set +e
-chown $USER:$GROUP $VARDIR $ETCDIR
 
 verify_permissions()
 {
     DIR="$1"
+
+    [ -d "$DIR" ] || return
 
     echo Checking permissions on directory $DIR
     find "$DIR" -follow -not -group $GROUP -o -not -user $USER -print0 2>/dev/null \
@@ -89,11 +88,9 @@ verify_permissions()
 verify_permissions "$VARDIR"
 verify_permissions "$ETCDIR"
 
-cat /opt/digitalwatchdog/mediaserver/etc/mediaserver.conf | grep \\path | sed 's/^.*=//g' | while read s
+[ -f $ETCDIR/mediaserver.conf ] && cat $ETCDIR/mediaserver.conf 2>/dev/null | grep \\path | sed 's/^.*=//g' | while read s
 do
     verify_permissions "$s"
 done
 
-find $VARDIR $ETCDIR -follow -not -group $GROUP -o -not user $USER -print0 2>/dev/null \
-  | xargs -0 --no-run-if-empty chown $USER:$GROUP
 set -e
