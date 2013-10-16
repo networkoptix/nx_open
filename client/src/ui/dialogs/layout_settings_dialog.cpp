@@ -66,7 +66,8 @@ class QnLayoutSettingsDialogPrivate
 public:
     QnLayoutSettingsDialogPrivate():
         state(NoImage),
-        cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio())
+        cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
+        skipNextReleaseEvent(false)
     {}
     
     virtual ~QnLayoutSettingsDialogPrivate(){}
@@ -116,6 +117,8 @@ public:
 
     /** Text of the last error if any occured. */
     QString errorText;
+
+    bool skipNextReleaseEvent;
 };
 
 
@@ -131,6 +134,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     setHelpTopic(ui->imageLabel,        Qn::LayoutSettings_EMapping_Help);
     setHelpTopic(ui->lockedCheckBox,    Qn::LayoutSettings_Locking_Help);
 
+    installEventFilter(this);
     ui->imageLabel->installEventFilter(this);
     ui->imageLabel->setFrameColor(qnGlobals->frameColor());
 
@@ -161,11 +165,18 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
     Q_D(QnLayoutSettingsDialog);
 
-    if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease) {
-        if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
-            selectFile();
-        else
-            viewFile();
+    if (event->type() == QEvent::LeaveWhatsThisMode)
+        d->skipNextReleaseEvent = true;
+    else if (event->type() == QEvent::MouseButtonRelease) 
+    {
+        if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease && !d->skipNextReleaseEvent)
+        {
+            if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
+                selectFile();
+            else
+                viewFile();
+        }
+        d->skipNextReleaseEvent = false;
     }
 
     return base_type::eventFilter(target, event);
