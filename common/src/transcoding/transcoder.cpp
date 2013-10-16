@@ -180,7 +180,7 @@ QnTranscoder::QnTranscoder():
     m_eofCounter(0),
     m_packetizedMode(false)
 {
-    QThread::currentThread()->setPriority(QThread::LowPriority); 
+    //QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
 
 QnTranscoder::~QnTranscoder()
