@@ -193,8 +193,6 @@ public:
             ++it )
         {
             netStat.push_back( it->second );
-  
-            std::cout<<"totalNetworkLoad. Returning "<<it->second.interfaceName.toLatin1().constData()<<" in: "<<it->second.bytesPerSecIn<<", out: "<<it->second.bytesPerSecOut<<"\n";
         }
 
         return netStat;
@@ -307,7 +305,7 @@ protected:
 
                 ctx.bytesPerSecMax = readFileContents( QString::fromLatin1("/sys/class/net/%1/speed").arg(interfaceName) ).toInt() * BYTES_PER_MB / CHAR_BIT;
                 if( !ctx.bytesPerSecMax )
-                    ctx.bytesPerSecMax = 100 * 1024 * 1024 / CHAR_BIT;
+                    ctx.bytesPerSecMax = 1000 * 1024 * 1024 / CHAR_BIT; //if unknown, assuming 1Gbps
                 const uint64_t rx_bytes = readFileContents( QString::fromLatin1("/sys/class/net/%1/statistics/rx_bytes").arg(interfaceName) ).toLongLong();
                 if( ctx.bytesReceived > 0 )
                     ctx.bytesPerSecIn = (rx_bytes - ctx.bytesReceived) * MS_PER_SEC / elapsed;
