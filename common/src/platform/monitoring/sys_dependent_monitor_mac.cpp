@@ -25,4 +25,9 @@ QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad()
     return QnSigarMonitor::totalHddLoad();
 }
 
+QList<NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
+{
+    return base_type::totalNetworkLoad();
+}
+
 #endif  //__APPLE__

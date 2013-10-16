@@ -4,14 +4,29 @@
 
 #include "sys_dependent_monitor.h"
 
+#include <map>
+
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QFile>
 #include <QtCore/QHash>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include <time.h>
 #include <signal.h>
 #include <errno.h>
 
+#include <utils/common/timermanager.h>
 
-class QnSysDependentMonitorPrivate {
+
+static const int BYTES_PER_MB = 1024*1024;
+static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
+static const int MS_PER_SEC = 1000;
+
+class QnSysDependentMonitorPrivate
+:
+    public TimerEventHandler
+{
 public:
     //!This structure is read from /proc/diskstat
     struct DiskStatSys {
@@ -67,10 +82,14 @@ public:
     static const size_t MAX_LINE_LENGTH = 256;
 
 
-    QnSysDependentMonitorPrivate():
+    QnSysDependentMonitorPrivate()
+    :
+        m_calculateNetstatTask(0),
         lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
+        
+        m_calculateNetstatTask = TimerManager::instance()->addTimer( this, NET_STAT_CALCULATION_PERIOD_SEC * MS_PER_SEC );
     }
 
     virtual ~QnSysDependentMonitorPrivate() {}
@@ -148,6 +167,22 @@ public:
         return result;
     }
 
+    QList<NetworkLoad> totalNetworkLoad()
+    {
+        QMutexLocker lk( &m_mutex );
+
+        QList<NetworkLoad> netStat;
+        for( std::map<QString, InterfaceStatisticsContext>::const_iterator
+            it = m_ifNameToStatistics.begin();
+            it != m_ifNameToStatistics.end();
+            ++it )
+        {
+            netStat.push_back( it->second );
+        }
+
+        return netStat;
+    }
+
     void updatePartitions() {
         const time_t time = ::time(NULL);
 
@@ -193,10 +228,112 @@ public:
         return result;
     }
 
+protected:
+    static QByteArray readFileContents( const QString& filePath )
+    {
+        QFile statFile( filePath );
+        if( !statFile.open( QIODevice::ReadOnly ) )
+            return QByteArray();
+        return statFile.readAll();
+    }
+
+    //!Implementation of TimerEventHandler::onTimer
+    virtual void onTimer( const quint64& timerID ) override
+    {
+        const qint64 elapsed = m_networkStatCalcTimer.elapsed();
+        if( m_networkStatCalcTimer.isValid() && elapsed > 0 )
+        {
+            //listing /sys/class/net/
+            QDir sysClassNet( "/sys/class/net/" );
+            if( !sysClassNet.exists() )
+            {
+                NX_LOG( QString::fromLatin1("No /sys/class/net/. Cannot read network statistics"), cl_logWARNING );
+                return;
+            }
+
+            QStringList intefaceList = sysClassNet.entryList( QStringList(), QDir::Dirs | QDir::NoDotAndDotDot );
+            foreach( const QString& interfaceName, intefaceList )
+            {
+                InterfaceStatisticsContext ctx;
+                {
+                    QMutexLocker lk( &m_mutex );
+                    std::map<QString, InterfaceStatisticsContext>::iterator it = m_ifNameToStatistics.find(interfaceName);
+                    if( it != m_ifNameToStatistics.end() )
+                        ctx = it->second;
+                }
+
+                if( ctx.interfaceName.isEmpty() )
+                {
+                    ctx.interfaceName = interfaceName;
+                    ctx.macAddress = QnMacAddress( QFile( QString::fromLatin1("/sys/class/net/%1/address").arg(interfaceName) ).readAll() );
+                    int sysType = QFile( ( QString::fromLatin1("/sys/class/net/%1/type").arg(interfaceName) ).readAll().toInt();
+                    switch( sysType )
+                    {
+                        case ARPHRD_LOOPBACK:
+                            ctx.type = QnPlatformMonitor::LoopbackInterface;
+                            break;
+
+                        case ARPHRD_TUNNEL:
+                        case ARPHRD_TUNNEL6:
+                        case ARPHRD_IPDDP:
+                        case ARPHRD_IPGRE:
+                            ctx.type = QnPlatformMonitor::VirtualInterface;
+                            break;
+
+                        default:
+                            ctx.type = QnPlatformMonitor::PhysicalInterface;
+                    }
+                }
+
+                ctx.bytesPerSecMax = readFileContents( QString::fromLatin1("/sys/class/net/%1/speed").arg(interfaceName) ).toInt() * BYTES_PER_MB / CHAR_BIT;
+                const uint64_t rx_bytes = readFileContents( QString::fromLatin1("/sys/class/net/%1/statistics/rx_bytes").arg(interfaceName) ).toLongLong();
+                if( ctx.bytesReceived > 0 )
+                    ctx.bytesPerSecIn = (rx_bytes - ctx.bytesReceived) * MS_PER_SEC / elapsed;
+                ctx.bytesReceived = rx_bytes;
+                const uint64_t tx_bytes = readFileContents( QString::fromLatin1("/sys/class/net/%1/statistics/tx_bytes").arg(interfaceName) ).toLongLong();
+                if( ctx.bytesSent > 0 )
+                    ctx.bytesPerSecOut = (tx_bytes - ctx.bytesSent) * MS_PER_SEC / elapsed;
+                ctx.bytesSent = tx_bytes;
+
+                NX_LOG( QString::fromLatin1("Interface %1 statistics: speed %2, rx_bytes %3, tx_bytes %4, bytesPerSecIn %5, bytesPerSecOut %6").
+                    arg(interfaceName).arg(ctx.bytesPerSecMax).arg(rx_bytes).arg(tx_bytes).arg(ctx.bytesPerSecIn).arg(ctx.bytesPerSecOut), cl_logWARNING );
+
+                {
+                    QMutexLocker lk( &m_mutex );
+                    m_ifNameToStatistics[ctx.interfaceName] = ctx;
+                }
+            }
+        }
+
+        m_networkStatCalcTimer.restart();
+
+        m_calculateNetstatTask = TimerManager::instance()->addTimer( this, NET_STAT_CALCULATION_PERIOD_SEC * MS_PER_SEC );
+    }
+
 private:
+    class InterfaceStatisticsContext
+    :
+        public NetworkLoad
+    {
+    public:
+        uint64_t bytesReceived;
+        uint64_t bytesSent;
+
+        InterfaceStatisticsContext()
+        :
+            bytesReceived( 0 ),
+            bytesSent( 0 )
+        {
+        }
+    };
+
+    mutable QMutex m_mutex;
     QHash<int, Hdd> diskById;
     QHash<int, unsigned int> lastDiskTimeById;
-    
+    std::map<QString, InterfaceStatisticsContext> m_ifNameToStatistics;
+    QElapsedTimer m_networkStatCalcTimer;
+    qint64 m_calculateNetstatTask;
+
     time_t lastPartitionsUpdateTime;
     struct timespec lastDiskUsageUpdateTime;
 
@@ -218,6 +355,11 @@ QnSysDependentMonitor::~QnSysDependentMonitor() {
 
 QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
     return d_func()->totalHddLoad();
+}
+
+QList<NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
+{
+    return d_func()->totalNetworkLoad();
 }
 
 #endif
