@@ -273,9 +273,12 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
 void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {
     assert(QThread::currentThread() == this->thread());
 
-    if (!m_accessManager) {
-        qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
-        return;
+    {
+        QMutexLocker lock(&m_accessManagerMutex);
+        if (!m_accessManager) {
+            qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
+            return;
+        }
     }
 
     QNetworkRequest request;
