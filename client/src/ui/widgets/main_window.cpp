@@ -187,6 +187,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
+    addAction(action(Qn::CheckFileSignatureAction));
     addAction(action(Qn::TakeScreenshotAction));
     addAction(action(Qn::AdjustVideoAction));
     addAction(action(Qn::TogglePanicModeAction));
