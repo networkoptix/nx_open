@@ -9,6 +9,8 @@
 
 . /usr/share/debconf/confmodule
 
+COMPANY_NAME=${deb.customization.company.name}
+
 BASEDIR=/opt/$COMPANY_NAME/mediaserver
 VARDIR=$BASEDIR/var
 ETCDIR=$BASEDIR/etc
@@ -35,7 +37,7 @@ stop_server() {
     # 0=ok, 100=no init script (fresh install)
     if [ "$errno" != 0 -a "$errno" != 100 ]; then
       echo "${cmd/ */} returned $errno" 1>&2
-      echo "There is a DW Spectrum media server running, but we failed in our attempts to stop it." 1>&2
+      echo "There is a $COMPANY_NAME media server running, but we failed in our attempts to stop it." 1>&2
       echo "Stop it yourself and try again!" 1>&2
       db_stop
       exit 1
@@ -64,7 +66,7 @@ if ! getent passwd $USER >/dev/null; then
       --ingroup $GROUP \
       --no-create-home \
       --home /nonexistent \
-      --gecos "DW Spectrum Server" \
+      --gecos "$COMPANY_NAME media server" \
       --shell /bin/false \
       $USER  >/dev/null
 fi
@@ -81,7 +83,7 @@ verify_permissions()
     [ -d "$DIR" ] || return
 
     echo Checking permissions on directory $DIR
-    find "$DIR" -follow -not -group $GROUP -o -not -user $USER -print0 2>/dev/null \
+    find "$DIR" -follow -print0 -not -group $GROUP -o -not -user $USER 2>/dev/null \
       | xargs -0 --no-run-if-empty chown $USER:$GROUP
 }
 
