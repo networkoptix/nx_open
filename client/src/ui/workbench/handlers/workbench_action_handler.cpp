@@ -889,7 +889,14 @@ void QnWorkbenchActionHandler::submitInstantDrop(QnMimeData &data) {
     data.toMimeData(&mimeData);
 
     QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-    menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+
+    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
+    if (!layouts.isEmpty()){
+        workbench()->clear();
+        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+    } else {
+        menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+    }
 }
 
 

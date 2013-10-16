@@ -453,7 +453,7 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
 
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
-    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
