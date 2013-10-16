@@ -1,5 +1,9 @@
 #include "main_window.h"
 
+#ifdef Q_OS_MAC
+#include "mac_utils.h"
+#endif
+
 #include <QtCore/QFile>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -329,6 +333,22 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         showNormal();
         setGeometry(m_storedGeometry);
     }
+}
+
+void QnMainWindow::showFullScreen() {
+#if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+    mac_showFullScreen(winId(), true);
+#else
+    QnEmulatedFrameWidget::showFullScreen();
+#endif
+}
+
+void QnMainWindow::showNormal() {
+#if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+    mac_showFullScreen(winId(), false);
+#else
+    QnEmulatedFrameWidget::showNormal();
+#endif
 }
 
 void QnMainWindow::minimize() {
