@@ -510,7 +510,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ConnectToServerAction,
                                      QnActionParameters().withArgument(Qn::AutoConnectRole, true));
-        } else {
+        } else if (instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ReconnectAction);
         }
     }
