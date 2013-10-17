@@ -25,6 +25,8 @@
 static const int BYTES_PER_MB = 1024*1024;
 static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
 static const int MS_PER_SEC = 1000;
+//!used, if interface speed cannot be read (noticed on vmware)
+static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
 
 class QnSysDependentMonitorPrivate
 :
@@ -307,7 +309,7 @@ protected:
 
                 ctx.bytesPerSecMax = readFileContents( QString::fromLatin1("/sys/class/net/%1/speed").arg(interfaceName) ).toInt() * BYTES_PER_MB / CHAR_BIT;
                 if( !ctx.bytesPerSecMax )
-                    ctx.bytesPerSecMax = 1000 * 1024 * 1024 / CHAR_BIT; //if unknown, assuming 1Gbps
+                    ctx.bytesPerSecMax = DEFAULT_INTERFACE_SPEED_MBPS * 1024 * 1024 / CHAR_BIT; //if unknown, assuming 1Gbps
                 const uint64_t rx_bytes = readFileContents( QString::fromLatin1("/sys/class/net/%1/statistics/rx_bytes").arg(interfaceName) ).toLongLong();
                 if( ctx.bytesReceived > 0 )
                     ctx.bytesPerSecIn = ctx.bytesPerSecIn * (1-NEW_VALUE_WEIGHT) + ((rx_bytes - ctx.bytesReceived) * MS_PER_SEC / elapsed) * NEW_VALUE_WEIGHT;
