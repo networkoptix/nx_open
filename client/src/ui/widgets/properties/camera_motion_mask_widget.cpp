@@ -156,6 +156,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
         m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
+        m_resourceWidget->setOption(QnResourceWidget::WindowRotationForbidden, true);
     }
     m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
 
