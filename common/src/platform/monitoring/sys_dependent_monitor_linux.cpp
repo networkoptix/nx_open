@@ -303,16 +303,18 @@ protected:
                     }
                 }
 
+                static const double NEW_VALUE_WEIGHT=0.7;
+
                 ctx.bytesPerSecMax = readFileContents( QString::fromLatin1("/sys/class/net/%1/speed").arg(interfaceName) ).toInt() * BYTES_PER_MB / CHAR_BIT;
                 if( !ctx.bytesPerSecMax )
                     ctx.bytesPerSecMax = 1000 * 1024 * 1024 / CHAR_BIT; //if unknown, assuming 1Gbps
                 const uint64_t rx_bytes = readFileContents( QString::fromLatin1("/sys/class/net/%1/statistics/rx_bytes").arg(interfaceName) ).toLongLong();
                 if( ctx.bytesReceived > 0 )
-                    ctx.bytesPerSecIn = (rx_bytes - ctx.bytesReceived) * MS_PER_SEC / elapsed;
+                    ctx.bytesPerSecIn = ctx.bytesPerSecIn * (1-NEW_VALUE_WEIGHT) + ((rx_bytes - ctx.bytesReceived) * MS_PER_SEC / elapsed) * NEW_VALUE_WEIGHT;
                 ctx.bytesReceived = rx_bytes;
                 const uint64_t tx_bytes = readFileContents( QString::fromLatin1("/sys/class/net/%1/statistics/tx_bytes").arg(interfaceName) ).toLongLong();
                 if( ctx.bytesSent > 0 )
-                    ctx.bytesPerSecOut = (tx_bytes - ctx.bytesSent) * MS_PER_SEC / elapsed;
+                    ctx.bytesPerSecOut = ctx.bytesPerSecOut * (1-NEW_VALUE_WEIGHT) + ((tx_bytes - ctx.bytesSent) * MS_PER_SEC / elapsed) * NEW_VALUE_WEIGHT;
                 ctx.bytesSent = tx_bytes;
 
                 //std::cout<<"Interface "<<interfaceName.toLatin1().constData()<<" (mac "<<ctx.macAddress.toString().toLatin1().constData()<<") statistics: "
