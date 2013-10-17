@@ -21,3 +21,7 @@ mac {
 unix: !mac {
     QT += x11extras  
 }
+
+mac {
+    OBJECTIVE_SOURCES += ${basedir}/src/mac_utils.mm
+}

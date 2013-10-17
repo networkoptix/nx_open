@@ -177,9 +177,9 @@
         </ComponentGroup>
 
         <ComponentGroup Id="ClientQuickSync" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
-            <!-- <Component>
-                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder1.dll" Source="$(var.SourceDir)/quicksyncdecoder2.dll"/>
-            </Component> -->
+            <Component>
+                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.SourceDir)/quicksyncdecoder.dll"/>
+            </Component>
             <Component>
                 <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.SourceDir)/hw_decoding_conf.xml"/>                               
             </Component>

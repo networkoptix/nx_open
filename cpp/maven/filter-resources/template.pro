@@ -1,3 +1,5 @@
+cache()
+
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 TARGET = ${project.artifactId}
