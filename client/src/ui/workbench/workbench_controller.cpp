@@ -143,6 +143,34 @@ namespace {
 
 } // anonymous namespace
 
+
+/*!
+    Returns true if widget has checked option not set
+*/
+class ResourceWidgetHasNoOptionCondition
+:
+    public InstrumentItemCondition
+{
+public:
+    ResourceWidgetHasNoOptionCondition( QnResourceWidget::Option optionToCheck )
+    :
+        m_optionToCheck( optionToCheck )
+    {
+    }
+
+    //!Implementation of InstrumentItemCondition::oeprator()
+    virtual bool operator()(QGraphicsItem *item, Instrument* /*instrument*/) const
+    {
+        QnResourceWidget* resourceWidget = dynamic_cast<QnResourceWidget*>(item);
+        if( !resourceWidget )
+            return true;
+        return (resourceWidget->options() & m_optionToCheck) == 0;
+    }
+
+private:
+    QnResourceWidget::Option m_optionToCheck;
+};
+
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -213,6 +241,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_resizingInstrument->setEffectRadius(8);
 
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_rotationInstrument->addItemCondition(new ResourceWidgetHasNoOptionCondition( QnResourceWidget::WindowRotationForbidden ));
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
