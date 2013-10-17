@@ -176,7 +176,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-    void submitInstantDrop(QnMimeData &data);
+    void submitInstantDrop();
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
@@ -422,6 +422,7 @@ private:
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
+    QList<QnMimeData> m_instantDrops;
 
     QnVideoCamera* m_layoutExportCamera;
     QnVideoCamera* m_exportedCamera;
