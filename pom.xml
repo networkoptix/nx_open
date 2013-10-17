@@ -85,7 +85,6 @@
         <module>common</module>
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
-        <module>plugins/image_library_plugin</module>        
         <module>mediaserver</module>
         <module>mediaproxy</module>
         <module>testcamera</module>
@@ -220,6 +219,7 @@
             </activation>
             <modules>
                 <module>plugins/quicksyncdecoder</module>
+                <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
                 <module>client</module>		                
@@ -267,6 +267,7 @@
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
+                <module>plugins/image_library_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
