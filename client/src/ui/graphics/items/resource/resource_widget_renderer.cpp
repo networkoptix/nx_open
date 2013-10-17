@@ -239,7 +239,7 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         if( !ctx.uploader )
             return;
 
-    ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
+        ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
         ++ctx.framesSinceJump;
     }
 
