@@ -884,19 +884,29 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     m_delayedDrops.clear();
 }
 
-void QnWorkbenchActionHandler::submitInstantDrop(QnMimeData &data) {
-    QMimeData mimeData;
-    data.toMimeData(&mimeData);
+void QnWorkbenchActionHandler::submitInstantDrop() {
 
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-
-    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-    if (!layouts.isEmpty()){
-        workbench()->clear();
-        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-    } else {
-        menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+    if (QnResourceDiscoveryManager::instance()->state() == QnResourceDiscoveryManager::initialSearch) {
+        // local resources is not ready yet
+        QTimer::singleShot(100, this, SLOT(submitInstantDrop()));
+        return;
     }
+
+    foreach(const QnMimeData &data, m_instantDrops) {
+        QMimeData mimeData;
+        data.toMimeData(&mimeData);
+
+        QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
+
+        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
+        if (!layouts.isEmpty()){
+            workbench()->clear();
+            menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+        } else {
+            menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+        }
+    }
+    m_instantDrops.clear();
 }
 
 
@@ -1499,14 +1509,17 @@ void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
     submitDelayedDrops();
 }
 
-void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
+void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered()
+{
     QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
     QnMimeData mimeData;
     stream >> mimeData;
     if(stream.status() != QDataStream::Ok || mimeData.formats().empty())
         return;
-    submitInstantDrop(mimeData);
+    m_instantDrops.push_back(mimeData);
+
+    submitInstantDrop();
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {

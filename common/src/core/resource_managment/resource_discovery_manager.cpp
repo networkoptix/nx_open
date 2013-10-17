@@ -205,6 +205,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
                     m_resourceProcessor->processResources(lst);
                 }
             }
+            emit localSearchDone();
             m_state = periodicSearch;
             break;
 
@@ -579,3 +580,7 @@ void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
     m_disabledVendorsForAutoSearch = vendors.toSet();
 }
 
+QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
+{ 
+    return m_state; 
+}
