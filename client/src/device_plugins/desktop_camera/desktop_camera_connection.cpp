@@ -83,6 +83,7 @@ public:
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
+    Q_UNUSED(sslContext)
     Q_D(QnDesktopCameraConnectionProcessor);
     d->desktop = desktop;
     d->dataProvider = 0;
@@ -166,7 +167,7 @@ void QnDesktopCameraConnectionProcessor::sendData(const QnByteArray& data)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
     int sended = d->socket->send(data);
-    if (sended < data.size())
+    if (sended < (int)data.size())
         d->socket->close();
 }
 
