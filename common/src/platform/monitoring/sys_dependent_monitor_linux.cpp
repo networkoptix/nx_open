@@ -28,8 +28,6 @@ static const int MS_PER_SEC = 1000;
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
 
 class QnSysDependentMonitorPrivate
-:
-    public TimerEventHandler
 {
 public:
     //!This structure is read from /proc/diskstat
