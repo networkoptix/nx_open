@@ -87,7 +87,7 @@
         <module>plugins/genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
-        <module>testcamera</module>
+        <!-- <module>testcamera</module> -->
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>
