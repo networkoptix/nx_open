@@ -17,7 +17,7 @@ bool QnClientPullMediaStreamProvider::canChangeStatus() const
 void QnClientPullMediaStreamProvider::run()
 {
     saveSysThreadID();
-    //setPriority(QThread::HighPriority);
+    setPriority(QThread::HighPriority);
     NX_LOG("stream reader started", cl_logDEBUG1);
 
     int numberOfChnnels = 1;
