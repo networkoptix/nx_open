@@ -596,16 +596,16 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
 void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
 {
-	// We can't remove it by now, as it's required in .proto
+    // We can't remove it by now, as it's required in .proto
     // Will remove it ocasionally.
     pb_license.set_name("");
     pb_license.set_hwid(""); 
     pb_license.set_signature("");
-	/////////
+    /////////
 
-	pb_license.set_key(license->key().constData());
-	pb_license.set_cameracount(license->cameraCount());
-	pb_license.set_rawlicense(license->rawLicense().constData());
+    pb_license.set_key(license->key().constData());
+    pb_license.set_cameracount(license->cameraCount());
+    pb_license.set_rawlicense(license->rawLicense().constData());
 }
 
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
@@ -1116,39 +1116,39 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 // TODO: #Ivan. Temporary code
 QByteArray combineV1LicenseBlock(const QString& name, const QString& serial, const QString& hwid, int count, const QString& signature)
 {
-	return (QString() +
-		QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
-		QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
-		QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
+    return (QString() +
+        QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
+        QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
+        QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
         QLatin1String("COUNT=") + QString::number(count) + QLatin1String("\n") +
-		QLatin1String("SIGNATURE=") + signature).toUtf8();
+        QLatin1String("SIGNATURE=") + signature).toUtf8();
 }
 
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId)
 {
-	if (!pb_license.rawlicense().empty()) {
-		license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
-		return;
-	}
+    if (!pb_license.rawlicense().empty()) {
+        license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
+        return;
+    }
 
-	// TODO: #Ivan. Temporary code
-	QByteArray block;
+    // TODO: #Ivan. Temporary code
+    QByteArray block;
 
     // Seems like this block can be removed as if license was activated in >=1.5, then it's stored as license block
     // otherwise it should have oldhwid.
     // TODO: #Ivan. Commented out by now. Will remove it later.
     //
-	//block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
-	//if (QnLicense(block).isValid(hardwareId)) {
-	//	license = QnLicensePtr(new QnLicense(block));
-	//	return;
-	//}
+    //block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+    //if (QnLicense(block).isValid(hardwareId)) {
+    //	license = QnLicensePtr(new QnLicense(block));
+    //	return;
+    //}
 
-	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+    block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
     if (QnLicense(block).isValid(oldHardwareId, QLatin1String(QN_PRODUCT_NAME_SHORT))) {
-		license = QnLicensePtr(new QnLicense(block));
-		return;
-	}
+        license = QnLicensePtr(new QnLicense(block));
+        return;
+    }
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
@@ -1292,8 +1292,8 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 
         QnLicensePtr license;
         // Parse license and validate its signature
-		if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
-			parseLicense(license, pb_license, qnLicensePool->oldHardwareId());
+        if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
+            parseLicense(license, pb_license, qnLicensePool->oldHardwareId());
 
         // Verify that license is valid and for our hardwareid
         if (license)
