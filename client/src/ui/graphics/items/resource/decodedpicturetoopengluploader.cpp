@@ -168,10 +168,10 @@ public:
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
         QOpenGLFunctions(context->contextHandle()),
         supportsNonPower2Textures(false),
-        functions(new QnGlFunctions(context)),
         forceSoftYUV(false),
         yv12SharedUsed(false),
-        nv12SharedUsed(false)
+        nv12SharedUsed(false),
+        functions(new QnGlFunctions(context))
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
