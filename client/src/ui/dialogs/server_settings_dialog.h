@@ -55,7 +55,7 @@ private slots:
 #ifndef Q_OS_MACX
     void at_rebuildButton_clicked();
 
-    void at_archiveRebuildReply(int, const QnRebuildArchiveReply& reply, int);
+    void at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int);
     void sendNextArchiveRequest();
     void at_updateRebuildInfo();
 #endif
@@ -72,6 +72,7 @@ private:
 #ifndef Q_OS_MACX
     QnRebuildArchiveReply m_lastRebuildReply;
 #endif
+	QTimer m_timer;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H
