@@ -226,12 +226,23 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
-    quint8* bufferEnd = rtpBuffer + readed;
+    if (rtpHeader->extension)
+    {
+        if (readed < RtpHeader::RTP_HEADER_SIZE + 4)
+            return clearInternalBuffer();
+
+        int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
+        curPtr += extWords*4 + 4;
+    }
+
+    const quint8* bufferEnd = rtpBuffer + readed;
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
 
     if (rtpHeader->payloadType != m_rtpChannel)
         return true; // skip data
 
+    if (curPtr >= bufferEnd)
+        return clearInternalBuffer();
 
     bool isPacketLost = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
     
