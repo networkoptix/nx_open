@@ -19,7 +19,6 @@
 #include <net/if_arp.h>
 
 #include <utils/common/log.h>
-#include <utils/common/timermanager.h>
 
 
 static const int BYTES_PER_MB = 1024*1024;
@@ -89,26 +88,13 @@ public:
 
     QnSysDependentMonitorPrivate()
     :
-        m_calculateNetstatTaskID(0),
-        lastPartitionsUpdateTime(0),
-        m_terminated(false)
+        lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
-        
-        m_calculateNetstatTaskID = TimerManager::instance()->addTimer( this, NET_STAT_CALCULATION_PERIOD_SEC * MS_PER_SEC );
     }
 
     virtual ~QnSysDependentMonitorPrivate()
     {
-        {
-            QMutexLocker lk( &m_mutex );
-            m_terminated = true;
-        }
-        if( m_calculateNetstatTaskID )
-        {
-            TimerManager::instance()->joinAndDeleteTimer( m_calculateNetstatTaskID );
-            m_calculateNetstatTaskID = 0;
-        }
     }
 
     QList<HddLoad> totalHddLoad() {
@@ -186,7 +172,7 @@ public:
 
     QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad()
     {
-        QMutexLocker lk( &m_mutex );
+        calcNetworkStat();
 
         QList<QnPlatformMonitor::NetworkLoad> netStat;
         for( std::map<QString, InterfaceStatisticsContext>::const_iterator
@@ -254,8 +240,7 @@ protected:
         return statFile.readAll().trimmed();
     }
 
-    //!Implementation of TimerEventHandler::onTimer
-    virtual void onTimer( const quint64& /*timerID*/ ) override
+    void calcNetworkStat()
     {
         const qint64 elapsed = m_networkStatCalcTimer.elapsed();
         if( m_networkStatCalcTimer.isValid() && elapsed > 0 )
@@ -265,9 +250,6 @@ protected:
             if( !sysClassNet.exists() )
             {
                 NX_LOG( QString::fromLatin1("No /sys/class/net/. Cannot read network statistics"), cl_logWARNING );
-                QMutexLocker lk( &m_mutex );
-                if( !m_terminated )
-                    m_calculateNetstatTaskID = 0;
                 return;
             }
 
@@ -276,7 +258,6 @@ protected:
             {
                 InterfaceStatisticsContext ctx;
                 {
-                    QMutexLocker lk( &m_mutex );
                     std::map<QString, InterfaceStatisticsContext>::iterator it = m_ifNameToStatistics.find(interfaceName);
                     if( it != m_ifNameToStatistics.end() )
                         ctx = it->second;
@@ -323,18 +304,11 @@ protected:
                 //    "speed "<<ctx.bytesPerSecMax<<", rx_bytes "<<rx_bytes<<", tx_bytes "<<tx_bytes<<", "
                 //    "bytesPerSecIn "<<ctx.bytesPerSecIn<<", bytesPerSecOut "<<ctx.bytesPerSecOut<<"\n";
                     
-                {
-                    QMutexLocker lk( &m_mutex );
-                    m_ifNameToStatistics[interfaceName] = ctx;
-                }
+                m_ifNameToStatistics[interfaceName] = ctx;
             }
         }
 
         m_networkStatCalcTimer.restart();
-
-        QMutexLocker lk( &m_mutex );
-        if( !m_terminated )
-            m_calculateNetstatTaskID = TimerManager::instance()->addTimer( this, NET_STAT_CALCULATION_PERIOD_SEC * MS_PER_SEC );
     }
 
 private:
@@ -354,17 +328,13 @@ private:
         }
     };
 
-    mutable QMutex m_mutex;
     QHash<int, Hdd> diskById;
     QHash<int, unsigned int> lastDiskTimeById;
     std::map<QString, InterfaceStatisticsContext> m_ifNameToStatistics;
     QElapsedTimer m_networkStatCalcTimer;
-    qint64 m_calculateNetstatTaskID;
 
     time_t lastPartitionsUpdateTime;
     struct timespec lastDiskUsageUpdateTime;
-
-    bool m_terminated;
 
 private:
     Q_DECLARE_PUBLIC(QnSysDependentMonitor);
