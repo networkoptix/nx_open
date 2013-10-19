@@ -337,6 +337,22 @@ const QList<Instrument *> &InstrumentManager::instruments() const {
     return d_func()->instruments;
 }
 
+bool InstrumentManager::isAnimationEnabled() const
+{
+    return d_func()->timer()->isActive();
+}
+
+void InstrumentManager::setAnimationsEnabled(bool enabled)
+{
+    if (isAnimationEnabled() == enabled)
+        return;
+
+    if (enabled)
+        d_func()->timer()->activate();
+    else
+        d_func()->timer()->deactivate();
+}
+
 bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
     Q_D(InstrumentManager);
 
