@@ -518,7 +518,8 @@ bool QnMainWindow::event(QEvent *event) {
 
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
-    Q_UNUSED(event)
+    event->ignore();
+    action(Qn::ExitAction)->trigger();
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {

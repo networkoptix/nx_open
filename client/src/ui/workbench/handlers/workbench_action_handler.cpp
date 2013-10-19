@@ -2173,6 +2173,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(mainWindow());
+        m_cameraSettingsDialog->setModal(true);
         newlyCreated = true;
 
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),        this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
@@ -2636,8 +2637,10 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     }
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(closeAllLayouts(true))
-        qApp->closeAllWindows();
+    if(closeAllLayouts(true)) {
+        qApp->exit(0);
+    }
+
 }
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
