@@ -26,6 +26,7 @@
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/graphics_scene.h"
 #include "ui/graphics/view/gradient_background_painter.h"
+#include "ui/graphics/instruments/instrument_manager.h"
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include "ui/workbench/handlers/workbench_action_handler.h"
@@ -101,6 +102,17 @@ namespace {
 
 } // anonymous namespace
 
+extern "C" {
+    void disable_animations(void *qnmainwindow) {
+        QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
+        mainwindow->setAnimationsEnabled(false);
+    }
+
+    void enable_animations(void *qnmainwindow) {
+        QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
+        mainwindow->setAnimationsEnabled(true);
+    }
+}
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
@@ -110,6 +122,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm(NULL),
     m_drawCustomFrame(false)
 {
+    mac_initFullScreen(winId(), this);
+
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
     /* And file open events on Mac. */
@@ -335,8 +349,14 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
     }
 }
 
+void QnMainWindow::setAnimationsEnabled(bool enabled) {
+    InstrumentManager *manager = InstrumentManager::instance(m_scene.data());
+    manager->setAnimationsEnabled(enabled);
+}
+
 void QnMainWindow::showFullScreen() {
 #if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+//    setAnimationsEnabled(false);
     mac_showFullScreen(winId(), true);
 #else
     QnEmulatedFrameWidget::showFullScreen();
@@ -345,6 +365,7 @@ void QnMainWindow::showFullScreen() {
 
 void QnMainWindow::showNormal() {
 #if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+//    setAnimationsEnabled(false);
     mac_showFullScreen(winId(), false);
 #else
     QnEmulatedFrameWidget::showNormal();
@@ -590,6 +611,12 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
         return;
     menu()->trigger(Qn::ToggleTourModeAction);
+}
+
+void QnMainWindow::resizeEvent(QResizeEvent *event) {
+    base_type::resizeEvent(event);
+
+    qDebug() << "Resize";
 }
 
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
