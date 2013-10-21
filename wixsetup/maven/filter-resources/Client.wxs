@@ -382,25 +382,25 @@
         
         <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
             <Component>
-                <File Id="qgif$(var.suffix).dll" Name="qgif4.dll" Source="$(var.SourceDir)\imageformats\qgif$(var.suffix).dll" />
+                <File Id="qgif$(var.suffix).dll" Name="qgif.dll" Source="$(var.SourceDir)\imageformats\qgif$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="qjpeg$(var.suffix).dll" Name="qjpeg4.dll" Source="$(var.SourceDir)\imageformats\qjpeg$(var.suffix).dll" />
+                <File Id="qjpeg$(var.suffix).dll" Name="qjpeg.dll" Source="$(var.SourceDir)\imageformats\qjpeg$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="qtiff$(var.suffix).dll" Name="qtiff4.dll" Source="$(var.SourceDir)\imageformats\qtiff$(var.suffix).dll" />
+                <File Id="qtiff$(var.suffix).dll" Name="qtiff.dll" Source="$(var.SourceDir)\imageformats\qtiff$(var.suffix).dll" />
             </Component>
         </ComponentGroup>
         
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
-                <File Id="qminimal$(var.suffix).dll" Name="qminimal4.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
+                <File Id="qminimal$(var.suffix).dll" Name="qminimal.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="qoffscreen$(var.suffix).dll" Name="qoffscreen4.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
+                <File Id="qoffscreen$(var.suffix).dll" Name="qoffscreen.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="qwindows$(var.suffix).dll" Name="qwindows4.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
+                <File Id="qwindows$(var.suffix).dll" Name="qwindows.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
             </Component>
         </ComponentGroup>        
 
