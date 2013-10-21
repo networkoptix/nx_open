@@ -33,6 +33,8 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
         errorString = errorString.mid(n + 1).trimmed();
     }
     emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), m_handle);
+    disconnect(reply, NULL, this, NULL);
+    disconnect(reply, NULL, reply, NULL);
 
     qnDeleteLater(reply);
     qnDeleteLater(this);
@@ -310,7 +312,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
         break;
     default:
         qnWarning("Unknown HTTP operation '%1'.", static_cast<int>(operation));
-        break;
+        return;
     }
 
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
