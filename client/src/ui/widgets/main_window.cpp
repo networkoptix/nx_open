@@ -1,6 +1,6 @@
 #include "main_window.h"
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACX
 #include "mac_utils.h"
 #endif
 
@@ -122,7 +122,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm(NULL),
     m_drawCustomFrame(false)
 {
+#ifdef Q_OS_MACX
     mac_initFullScreen(winId(), this);
+#endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
