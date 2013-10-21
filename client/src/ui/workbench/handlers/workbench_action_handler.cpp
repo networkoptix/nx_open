@@ -1314,12 +1314,15 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
     newLayout->setItems(items);
 
-    bool isCurrent = (layout == workbench()->currentLayout()->resource());
+    const bool isCurrent = (layout == workbench()->currentLayout()->resource());
     bool shouldDelete = snapshotManager()->isLocal(layout) &&
             (name == layout->getName() || isCurrent);
 
     /* If it is current layout, close it and open the new one instead. */
-    if(isCurrent) {
+    const QnResourcePtr layoutOwnerUser = layout->getParentResource();
+    if( isCurrent && 
+        user == layoutOwnerUser )   //making current only new layout of current user
+    {
         int index = workbench()->currentLayoutIndex();
         workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
         workbench()->setCurrentLayoutIndex(index);
@@ -1327,7 +1330,11 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
         // If current layout should not be deleted then roll it back
         if (!shouldDelete)
+        {
+            //(user == layoutOwnerUser) condition prevents clearing layout of another user (e.g., if copying layout from one user to another)
+                //user - is an owner of newLayout. It is not required to be owner of layout
             snapshotManager()->restore(layout);
+        }
     }
 
     snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
@@ -2166,6 +2173,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(mainWindow());
+        m_cameraSettingsDialog->setModal(true);
         newlyCreated = true;
 
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),        this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
@@ -2629,8 +2637,10 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     }
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(closeAllLayouts(true))
-        qApp->closeAllWindows();
+    if(closeAllLayouts(true)) {
+        qApp->exit(0);
+    }
+
 }
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()

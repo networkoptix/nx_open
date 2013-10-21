@@ -125,9 +125,9 @@ int main( int argc, char* argv[] )
         QnLog::initLog( logLevel );
     }
 
-    NX_LOG( QN_APPLICATION_NAME" started", cl_logALWAYS );
-    NX_LOG( "Software version: "QN_APPLICATION_VERSION, cl_logALWAYS );
-    NX_LOG( "Software revision: "QN_APPLICATION_REVISION, cl_logALWAYS );
+    NX_LOG( QN_APPLICATION_NAME " started", cl_logALWAYS );
+    NX_LOG( "Software version: " QN_APPLICATION_VERSION, cl_logALWAYS );
+    NX_LOG( "Software revision: " QN_APPLICATION_REVISION, cl_logALWAYS );
 
     if( syncMode )
         return syncDir( localDir, remoteUrl );

@@ -87,7 +87,7 @@
         <module>plugins/genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
-        <module>testcamera</module>
+        <!-- <module>testcamera</module> -->
     </modules>
     <build>
         <defaultGoal>install</defaultGoal>
@@ -280,9 +280,6 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <modules>
-                <module>ios-client</module>
-            </modules>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
                 <python.dir>${env.environment}/python/bin/</python.dir>				
@@ -355,6 +352,15 @@
                 <module>android-client/protobuf-classes</module>
                 <module>android-client/android-main</module>
             </modules>
-        </profile>		
+        </profile>	
+        <profile>
+            <id>ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>ios-client</module>
+            </modules>
+        </profile>	        
     </profiles>	
 </project>

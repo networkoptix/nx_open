@@ -285,4 +285,9 @@ QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
     return result;
 }
 
+QList<QnPlatformMonitor::NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
+{
+    return base_type::totalNetworkLoad();
+}
+
 #endif

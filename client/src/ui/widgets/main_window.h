@@ -51,6 +51,8 @@ public:
     Options options() const;
     void setOptions(Options options);
 
+    void setAnimationsEnabled(bool enabled = true);
+
     QWidget *viewport() const;
 
 public slots:
@@ -68,6 +70,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 

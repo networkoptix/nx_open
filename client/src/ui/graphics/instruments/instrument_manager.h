@@ -150,6 +150,9 @@ public:
         return NULL;
     }
 
+    bool isAnimationEnabled() const;
+    void setAnimationsEnabled(bool enabled = true);
+
     AnimationTimer *animationTimer() const;
 
     /**
