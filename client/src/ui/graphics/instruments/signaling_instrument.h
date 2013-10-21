@@ -1,17 +1,20 @@
 #ifndef QN_SIGNALING_INSTRUMENT_H
 #define QN_SIGNALING_INSTRUMENT_H
 
+#include "utils/common/util.h"
 #include "instrument.h"
 
 class SignalingInstrument: public Instrument {
     Q_OBJECT;
 public:
     SignalingInstrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-        Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent)
+        Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent),
+        m_previousTime(0)
     {}
 
     SignalingInstrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent = NULL):
-        Instrument(type, eventTypes, parent)
+        Instrument(type, eventTypes, parent),
+        m_previousTime(0)
     {}
 
 signals:
@@ -32,6 +35,18 @@ protected:
     }
 
     virtual bool event(QWidget *viewport, QEvent *event) override {
+        // TODO: Sasha, AAAAAAAA, refactor ASAP!!!!!!!!
+#ifdef Q_OS_MAC
+        if (event->type() == QEvent::Paint) {
+            quint64 now = getUsecTimer();
+            if (now - m_previousTime < 15000) {
+                return false;
+            }
+
+            m_previousTime = now;
+        }
+#endif
+
         emit activated(viewport, event);
         return false;
     }
@@ -40,6 +55,8 @@ protected:
         emit activated(item, event);
         return false;
     }
+private:
+    quint64 m_previousTime;
 };
 
 #endif // QN_SIGNALING_INSTRUMENT_H
