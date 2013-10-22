@@ -189,7 +189,7 @@ protected slots:
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
-
+    QTime m_updateSliderTimer;
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
