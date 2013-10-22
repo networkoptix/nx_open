@@ -216,6 +216,7 @@ ios-client/HDWitness/HDWitness-Info.plist
 ios-client/HDWitness/HDWCompatibilityItems.m
 ios-client/HDWitness/version.h
 ios-client/Podfile
+ios-client/Pods
 
 launcher/x86
 launcher/x64
@@ -248,3 +249,7 @@ libonvif/.build/
 
 .vagrant
 **/Makefile
+
+macsetup/client/dmg-folder/DW Spectrum.app/Contents/Resources/mac_client/
+
+.qmake.cache
