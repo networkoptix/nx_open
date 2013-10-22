@@ -5,29 +5,29 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>DW Spectrum</string>
+	<string>${product.name}/string>
 	<key>CFBundleExecutable</key>
-	<string>DW Spectrum</string>
+	<string>${product.name}/string>
 	<key>CFBundleIconFile</key>
 	<string>appIcon.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.digitalwatchdog.DWSpectrum</string>
+	<string>${namespace.major}.${namespace.minor}.${namespace.additional}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>DW Spectrum</string>
+	<string>${product.name}/string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1</string>
+	<string>${release.version}</string>
 	<key>CFBundleVersion</key>
-	<string>2.1</string>
+	<string>${release.version}</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.5.0</string>
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2013 Digital Watchdog</string>
+	<string>© 2013 ${company.name}</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

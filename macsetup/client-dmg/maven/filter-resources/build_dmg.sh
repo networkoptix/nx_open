@@ -5,6 +5,8 @@ DMG_FILE="${product.name} ${release.version}.dmg"
 
 ln -s /Applications $SRC/Applications
 mv $SRC/client.app "$SRC/${product.name}.app"
+mv "$SRC/${product.name}.app/Contents/MacOS/client" "$SRC/${product.name}.app/Contents/MacOS/${product.name}"
+
 mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/bin"
 mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
 cp -Rf ${libdir}/lib/${build.configuration}/** "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
