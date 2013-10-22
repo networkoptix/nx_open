@@ -36,16 +36,6 @@ protected:
 
     virtual bool event(QWidget *viewport, QEvent *event) override {
         // TODO: Sasha, AAAAAAAA, refactor ASAP!!!!!!!!
-#ifdef Q_OS_MAC
-        if (event->type() == QEvent::Paint) {
-            quint64 now = getUsecTimer();
-            if (now - m_previousTime < 15000) {
-                return false;
-            }
-
-            m_previousTime = now;
-        }
-#endif
 
         emit activated(viewport, event);
         return false;

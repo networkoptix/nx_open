@@ -86,6 +86,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
+    m_updateSliderTimer.restart();
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -780,6 +781,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
+#ifdef Q_OS_MAC
+    // todo: MAC  got stuck in full screen mode if update slider to often! #elric: refactor it!
+    if (m_updateSliderTimer.elapsed() < 33)
+        return;
+    m_updateSliderTimer.restart();
+#endif
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
 
