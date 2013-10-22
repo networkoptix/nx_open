@@ -65,7 +65,7 @@
         <qtlib4>Concurrent</qtlib4>
         <qtlib5>Sql</qtlib5>
         <qtlib6>Multimedia</qtlib6>
-        <qtlib7>Opengl</qtlib7>
+        <qtlib7>OpenGL</qtlib7>
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>                    
