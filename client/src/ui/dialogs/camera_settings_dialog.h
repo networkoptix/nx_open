@@ -17,7 +17,7 @@ class QnWorkbenchContext;
 class QnCameraSettingsDialog: public QDialog {
     Q_OBJECT
 public:
-    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags =  Qt::Tool);
     virtual ~QnCameraSettingsDialog();
 
     QnCameraSettingsWidget *widget() const {
