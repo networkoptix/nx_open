@@ -40,9 +40,10 @@
                         <configuration>
                             <failOnError>false</failOnError>
                             <target>							
-                                <exec dir="${project.build.directory}" executable="mv ${project.build.directory}/build_dmg.sh" failifexecutionfails="true">
+<!--                                <exec dir="${project.build.directory}" executable="mv ${project.build.directory}/build_dmg.sh" failifexecutionfails="true">
                                     <arg line="${project.build.directory}/dmg-folder/client.app ${project.build.directory}/dmg-folder/${product.name}.app" /> 
-                                </exec>
+                                </exec>-->
+				<chmod file="${project.build.directory}/*.sh" perm="755"/>				
                                 <exec dir="${project.build.directory}" executable="${project.build.directory}/build_dmg.sh" failifexecutionfails="true" />
                             </target>
                         </configuration>

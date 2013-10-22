@@ -1,7 +1,14 @@
-SRC=dmg-folder
+SRC=./dmg-folder
 TMP=tmp
-VOLUME_NAME="DW Spectrum 2.1"
-DMG_FILE="DW Spectrum 2.1.dmg"
+VOLUME_NAME="${product.name} ${release.version}"
+DMG_FILE="${product.name} ${release.version}.dmg"
+
+ln -s /Applications $SRC/Applications
+mv $SRC/client.app "$SRC/${product.name}.app"
+mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/bin"
+mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
+cp -Rf ${libdir}/lib/${build.configuration}/** "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
+cp -Rf ${libdir}/bin/${build.configuration}/** "$SRC/${product.name}.app/Contents/Resources/mac_client/bin"
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"
