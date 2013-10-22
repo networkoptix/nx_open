@@ -897,7 +897,10 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 
 #ifdef Q_OS_MAC
     // todo: #sasha fix it! If change tab from recording to motion at first time, UI stucks, This code fix it somehow
+    ui->tabWidget->setCurrentIndex(Qn::ExpertCameraSettingsTab);
+    ui->tabWidget->setCurrentIndex(Qn::AdvancedCameraSettingsTab);
     ui->tabWidget->setCurrentIndex(Qn::RecordingSettingsTab);
+    ui->tabWidget->setCurrentIndex(Qn::GeneralSettingsTab);
     ui->tabWidget->setCurrentIndex(Qn::MotionSettingsTab);
 #endif
 
