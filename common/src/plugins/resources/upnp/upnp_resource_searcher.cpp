@@ -111,7 +111,8 @@ UDPSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndAddr& iface)
         UDPSocket* sock = new UDPSocket();
         QString localAddress = iface.address.toString();
 
-        if (!sock->bindToInterface(iface))
+        //if (!sock->bindToInterface(iface))
+        if (!sock->setLocalAddressAndPort(iface.address.toString()))
         {
             delete sock;
             return 0;

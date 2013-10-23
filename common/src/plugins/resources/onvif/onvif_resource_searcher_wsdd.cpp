@@ -736,13 +736,15 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     {
         ctx = new ProbeContext();
         ctx->sock.reset( new UDPSocket() );
-        if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        if( !ctx->sock->setLocalAddressAndPort(iface.address.toString()) || !ctx->sock->setNonBlockingMode( true ) )
         {
             ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
         }
+        ctx->sock->setMulticastIF(iface.address.toString());
 
         ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
         ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
