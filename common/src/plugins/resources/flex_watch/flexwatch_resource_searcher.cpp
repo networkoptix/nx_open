@@ -39,7 +39,8 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
         foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
         {
             QUdpSocket* sock = new QUdpSocket();
-            if (!bindToInterface(*sock, iface, 51001)) {
+            //if (!bindToInterface(*sock, iface, 51001)) {
+            if (!sock->bind(iface.address, 51001)) {
                 delete sock;
                 continue;
             }

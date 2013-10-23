@@ -36,7 +36,9 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
         QUdpSocket sock;
 
-        if (!bindToInterface(sock, iface))
+        //if (!bindToInterface(sock, iface))
+        //    continue;
+        if (!sock.bind(iface.address, 0))
             continue;
 
         // sending broadcast

@@ -55,7 +55,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
     {
         QUdpSocket socket;
 
-        if (!bindToInterface(socket, iface))
+        if (!socket.bind(iface.address, 0))
             continue;
 
         QHostAddress groupAddress(QLatin1String("224.111.111.1"));

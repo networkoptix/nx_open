@@ -20,6 +20,7 @@
 #include <unistd.h>
 #endif
 
+/*
 bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
 {
     int res;
@@ -41,6 +42,7 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 
     return true;
 }
+*/
 
 QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {

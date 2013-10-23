@@ -231,9 +231,9 @@ QnResourceList QnPlIqResourceSearcher::findResources()
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
         QUdpSocket sendSock, receiveSock;
-        if (!bindToInterface(sendSock, iface, NATIVE_DISCOVERY_REQUEST_PORT)) 
+        if (!sendSock.bind(iface.address, NATIVE_DISCOVERY_REQUEST_PORT))
             continue;
-        if (!bindToInterface(receiveSock, iface, NATIVE_DISCOVERY_RESPONSE_PORT))
+        if (!receiveSock.bind(iface.address, NATIVE_DISCOVERY_RESPONSE_PORT))
             continue;
 
         for (uint i = 0; i < sizeof(requests)/sizeof(char*); ++i)
