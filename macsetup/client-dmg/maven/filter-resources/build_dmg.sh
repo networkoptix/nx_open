@@ -1,4 +1,7 @@
+BINARIES=${libdir}/bin/${build.configuration}
+LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
+TARGET="$SRC/${product.name}.app/Contents/Resources/mac_client"
 TMP=tmp
 VOLUME_NAME="${product.name} ${release.version}"
 DMG_FILE="${product.name} ${release.version}.dmg"
@@ -10,10 +13,15 @@ mv "$SRC/${product.name}.app/Contents/MacOS/client" "$SRC/${product.name}.app/Co
 chmod 777 "$SRC/${product.name}.app/Contents/MacOS/${product.name}"
 chmod 777 "$SRC/${product.name}.app/Contents/Resources/script"
 
-mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/bin"
-mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
-cp -Rf ${libdir}/lib/${build.configuration}/** "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
-cp -Rf ${libdir}/bin/${build.configuration}/** "$SRC/${product.name}.app/Contents/Resources/mac_client/bin"
+mkdir -p "$TARGET/bin"
+mkdir -p "$TARGET/lib"
+cp -Rf $LIBRARIES/** "$TARGET/lib"
+cp -Rf $BINARIES/** "$TARGET/bin"
+find "$TARGET/bin" -type f -maxdepth 1 -exec rm -f {} \;
+find "$TARGET/bin" -lname '*.*' -maxdepth 1 -exec rm -f {} \;
+cp -f $BINARIES/client "$TARGET/bin"
+cp -f $BINARIES/applauncher "$TARGET/bin"
+cp -f $BINARIES/x264 "$TARGET/bin"
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"

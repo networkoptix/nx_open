@@ -2,4 +2,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/../Resources/mac_client
 
 export DYLD_LIBRARY_PATH="$DIR/lib"
 export DYLD_FRAMEWORK_PATH="$DIR/lib"
-"$DIR/bin/client"
+"$DIR/bin/applauncher"
