@@ -5,7 +5,10 @@ DMG_FILE="${product.name} ${release.version}.dmg"
 
 ln -s /Applications $SRC/Applications
 mv $SRC/client.app "$SRC/${product.name}.app"
+mv "$SRC/DS_Store" "$SRC/.DS_Store"
 mv "$SRC/${product.name}.app/Contents/MacOS/client" "$SRC/${product.name}.app/Contents/MacOS/${product.name}"
+chmod 777 "$SRC/${product.name}.app/Contents/MacOS/${product.name}"
+chmod 777 "$SRC/${product.name}.app/Contents/Resources/script"
 
 mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/bin"
 mkdir -p "$SRC/${product.name}.app/Contents/Resources/mac_client/lib"
