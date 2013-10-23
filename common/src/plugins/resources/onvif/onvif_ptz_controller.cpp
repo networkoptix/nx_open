@@ -111,7 +111,7 @@ int QnOnvifPtzController::stopMove()
 {
     // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
     QString model = m_resource->getModel();
-    if(model == lit("SD8362") || model == lit("SD83X3") || model == lit("SD8111"))
+    if(model == lit("SD8362") || model == lit("SD83X3") || model == lit("SD81X1"))
         return startMove(0, 0, 0);
 
     QAuthenticator auth(m_resource->getAuth());

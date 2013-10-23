@@ -7,9 +7,16 @@ COMPANY_NAME=${deb.customization.company.name}
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
+USER=${product.name.short}
+GROUP=${product.name.short}
+
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
-CONFIG_FILE="/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf"
+BASEDIR="/opt/$COMPANY_NAME/mediaserver"
+ETCDIR="$BASEDIR/etc"
+VARDIR="$BASEDIR/var"
+CONFIG_FILE="$ETCDIR/mediaserver.conf"
+
 ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
 
 # This is necessary because changed configuration options should take effect 
@@ -74,6 +81,8 @@ function write_config {
     [ -z "$TRANSPORT" ] || echo "rtspTransport=$TRANSPORT" >> $CONFIG_FILE
     [ -z "$PUBLIC_IP_ENABLED" ] || echo "publicIPEnabled=$PUBLIC_IP_ENABLED" >> $CONFIG_FILE
     [ -z "$STATIC_PUBLIC_IP" ] || echo "staticPublicIP=$STATIC_PUBLIC_IP" >> $CONFIG_FILE
+
+    chown $USER:$GROUP $CONFIG_FILE
 }
 
 function to_int {
@@ -186,6 +195,9 @@ case "$1" in
     exit 1
   ;;
 esac
+
+[ -d $VARDIR ] || mkdir $VARDIR
+chown $USER:$GROUP $VARDIR
 
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?

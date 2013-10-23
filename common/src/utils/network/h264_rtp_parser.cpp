@@ -360,7 +360,11 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if (rtpHeader->marker && m_frameExists)
+    if (rtpHeader->marker) 
+    {
+        if (!m_frameExists)
+            return clearInternalBuffer();
         result = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
+    }
     return true;
 }
