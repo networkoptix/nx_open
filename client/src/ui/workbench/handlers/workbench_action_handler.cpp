@@ -2173,7 +2173,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(mainWindow());
-        m_cameraSettingsDialog->setModal(true);
         newlyCreated = true;
 
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),        this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));

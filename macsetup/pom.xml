@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.0.2-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.0.2-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>macsetup</artifactId>
+    <packaging>pom</packaging>
+    <name>Common POM for debs projects</name>	
+
+    <properties>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/..</root.dir>
+    </properties>
+
+    <build>
+        <plugins>	
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>pack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <target>							
+<!--                                <exec dir="${project.build.directory}" executable="mv ${project.build.directory}/build_dmg.sh" failifexecutionfails="true">
+                                    <arg line="${project.build.directory}/dmg-folder/client.app ${project.build.directory}/dmg-folder/${product.name}.app" /> 
+                                </exec>-->
+				<chmod file="${project.build.directory}/*.sh" perm="755"/>				
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build_dmg.sh" failifexecutionfails="true" />
+                            </target>
+                        </configuration>
+                    </execution>					
+                </executions>
+            </plugin>	
+        </plugins>	        
+    </build>				
+</project>
