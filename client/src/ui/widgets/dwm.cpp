@@ -436,6 +436,9 @@ bool QnDwm::widgetNativeEvent(const QByteArray &eventType, void *message, long *
 
     return d->winEvent(static_cast<MSG *>(message), result);
 #else
+    Q_UNUSED(eventType)
+    Q_UNUSED(message)
+    Q_UNUSED(result)
     return false;
 #endif // QN_HAS_DWM
 }
