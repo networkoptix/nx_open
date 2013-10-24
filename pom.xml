@@ -81,8 +81,8 @@
 
     <modules>
         <module>build_environment</module>
-        <module>appserver</module>
         <module>common</module>
+        <module>appserver</module>
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
         <module>mediaserver</module>
