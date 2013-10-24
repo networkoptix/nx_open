@@ -82,10 +82,10 @@ bool QnPlAxisResource::startInputPortMonitoring()
         ++it )
     {
         QMutexLocker lk( &m_inputPortMutex );
-        pair<map<unsigned int, nx_http::AsyncHttpClient*>::iterator, bool>
-            p = m_inputPortHttpMonitor.insert( make_pair( it->second, (nx_http::AsyncHttpClient*)NULL ) );
-        if( !p.second )
-            continue;   //port already monitored
+
+        if (m_inputPortHttpMonitor.find(it->second) != m_inputPortHttpMonitor.end())
+            continue; //port already monitored
+
         lk.unlock();
 
         //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
@@ -99,9 +99,15 @@ bool QnPlAxisResource::startInputPortMonitoring()
         httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
         httpClient->setUserName( auth.user() );
         httpClient->setUserPassword( auth.password() );
-        httpClient->doGet( requestUrl );
-
-        p.first->second = httpClient;
+        
+        if (httpClient->doGet( requestUrl ))
+        {
+            QMutexLocker lk( &m_inputPortMutex );
+            m_inputPortHttpMonitor.insert( make_pair( it->second, httpClient ));
+        }
+        else {
+            httpClient->scheduleForRemoval();
+        }
     }
 
     return true;
