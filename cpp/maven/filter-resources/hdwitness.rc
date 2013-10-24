@@ -1,4 +1,4 @@
-IDI_ICON1               ICON    DISCARDABLE     "${root.dir}/build_environment/target/icons/hdw_logo.ico"
+IDI_ICON1               ICON    DISCARDABLE     "${customization.dir}/icons/hdw_logo.ico"
 
 #include <windows.h>
 #include "${project.build.directory}/version.h"
