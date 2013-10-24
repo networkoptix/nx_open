@@ -418,7 +418,7 @@ namespace nx_http
         m_httpStreamReader.resetState();
 
         m_socket = QSharedPointer<TCPSocket>( new TCPSocket() );
-        if( !m_socket->setNonBlockingMode( true ) )
+        if( !m_socket->setNonBlockingMode( true ) || !m_socket->setWriteTimeOut(CommunicatingSocket::DEFAULT_TIMEOUT_MILLIS) )
         {
             cl_log.log( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
