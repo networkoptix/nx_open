@@ -426,6 +426,14 @@ namespace nx_http
             return false;
         }
 
+        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )
+        {
+            cl_log.log( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
+                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            m_socket.clear();
+            return false;
+        }
+
         //starting async connect
         if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT) ) )
         {
@@ -434,18 +442,10 @@ namespace nx_http
             m_socket.clear();
             return false;
         }
+        //connect is done if socket is available for write
 
         m_url = url;
         m_state = sWaitingConnectToHost;
-
-        //connect is done if socket is available for write
-        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )
-        {
-            cl_log.log( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
-                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
-            return false;
-        }
 
         return true;
     }
