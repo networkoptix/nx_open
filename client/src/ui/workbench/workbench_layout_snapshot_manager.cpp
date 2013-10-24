@@ -167,6 +167,9 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
     }
     connectTo(resource);
 
+    if(QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
+        synchronizer->reset();
+
     setFlags(resource, flags(resource) & ~Qn::ResourceIsChanged);
 }
 
