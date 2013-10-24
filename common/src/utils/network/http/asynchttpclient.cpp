@@ -434,18 +434,20 @@ namespace nx_http
             return false;
         }
 
+        m_url = url;
+        m_state = sWaitingConnectToHost;
+
         //starting async connect
         if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT) ) )
         {
             cl_log.log( QString::fromLatin1("Failed to perform async connect to %1:%2. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
+            m_state = sInit;
+            m_url = QUrl();
             return false;
         }
         //connect is done if socket is available for write
-
-        m_url = url;
-        m_state = sWaitingConnectToHost;
 
         return true;
     }
