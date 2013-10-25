@@ -1,5 +1,5 @@
 syntax: glob
-
+*.cache
 .qmake.cache
 *-build*
 *.idb
