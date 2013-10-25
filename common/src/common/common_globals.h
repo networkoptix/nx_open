@@ -160,6 +160,8 @@ public:
         MediaServerComponent,
         ClientComponent,
         MediaProxyComponent,
+
+        AnyComponent
     };
 
 
