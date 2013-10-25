@@ -7,6 +7,7 @@
 #define ASYNCHTTPCLIENT_H
 
 #include <map>
+#include <memory>
 
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
@@ -15,7 +16,6 @@
 
 #include "httpstreamreader.h"
 #include "../aio/aioeventhandler.h"
-#include "../aio/selfremovable.h"
 
 
 namespace nx_http
@@ -23,13 +23,13 @@ namespace nx_http
     //!Http client. All operations are done asynchronously using aio::AIOService
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
-        Object can be freed from signal handler by calling SelfRemovable::scheduleForRemoval
+        
+        \warning Instance of \a AsyncHttpClient MUST be used as shared pointer (std::shared_ptr)
 
         \note On receiving reply, client will not start downloading message body until \a readMessageBody() call
         \note This class methods are not thread-safe
-        \note All signals are emitted from aio::AIOService threads
+        \note All signals are emitted from io::AIOService threads
         \note State is changed just before emitting signal
-        \note It is strongly recommended to call terminate before scheduleForRemoval!
         \todo pipelining support
         \todo keep-alive connection support
         \todo entity-body compression support
@@ -38,7 +38,7 @@ namespace nx_http
     :
         public QObject,
         public aio::AIOEventHandler,
-        public SelfRemovable
+        public std::enable_shared_from_this<AsyncHttpClient>
     {
         Q_OBJECT
 
@@ -58,6 +58,7 @@ namespace nx_http
         static const int UNLIMITED_RECONNECT_TRIES = -1;
 
         AsyncHttpClient();
+        virtual ~AsyncHttpClient();
 
         //!Stops socket event processing. If some event handler is running, method blocks until event handler has been stopped
         virtual void terminate();
@@ -112,8 +113,6 @@ namespace nx_http
         void reconnected( nx_http::AsyncHttpClient* );
 
     protected:
-        virtual ~AsyncHttpClient();
-
         //!Implementation of aio::AIOEventHandler::eventTriggered
         virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
 

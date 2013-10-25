@@ -115,6 +115,8 @@ private:
         QByteArray xmlDevInfo;
     };
 
+    typedef std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo> HttpClientsDict;
+
     class UPNPDescriptionCacheItem
     {
     public:
@@ -136,7 +138,7 @@ private:
     //map<local interface ip, socket>
     std::map<QString, QSharedPointer<AbstractDatagramSocket> > m_socketList;
     char* m_readBuf;
-    std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo> m_httpClients;
+    HttpClientsDict m_httpClients;
     std::list<DiscoveredDeviceInfo> m_discoveredDevices;
     std::list<DiscoveredDeviceInfo> m_discoveredDevicesToProcess;
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;

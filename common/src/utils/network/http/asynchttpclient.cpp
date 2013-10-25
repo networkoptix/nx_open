@@ -65,7 +65,8 @@ namespace nx_http
     {
         //TODO/IMPL #AK need to refactore this method: possibly split to multiple methods
 
-        ScopedDestructionProhibition undestructable( this );    //~ScopedDestructionProhibition can call delete *this, which will lock m_mutex
+        //ScopedDestructionProhibition undestructable( this );    //~ScopedDestructionProhibition can call delete *this, which will lock m_mutex
+        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QMutexLocker lk( &m_mutex );
 

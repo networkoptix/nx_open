@@ -12,18 +12,17 @@ namespace nx_http
 {
     HttpClient::HttpClient()
     :
-        m_asyncHttpClient( new AsyncHttpClient() ),
+        m_asyncHttpClient( std::make_shared<AsyncHttpClient>() ),
         m_done( false )
     {
-        connect( m_asyncHttpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
-        connect( m_asyncHttpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
-        connect( m_asyncHttpClient, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onDone()), Qt::DirectConnection );
+        connect( m_asyncHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
+        connect( m_asyncHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
+        connect( m_asyncHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onDone()), Qt::DirectConnection );
     }
 
     HttpClient::~HttpClient()
     {
         m_asyncHttpClient->terminate();
-        m_asyncHttpClient->scheduleForRemoval();
     }
 
     bool HttpClient::doGet( const QUrl& url )

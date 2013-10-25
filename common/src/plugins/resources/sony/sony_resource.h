@@ -38,7 +38,7 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    nx_http::AsyncHttpClient* m_inputMonitorHttpClient;
+    std::shared_ptr<nx_http::AsyncHttpClient> m_inputMonitorHttpClient;
     mutable QMutex m_inputPortMutex;
     nx_http::LineSplitter m_lineSplitter;
     std::map<int, bool> m_relayInputStates;
