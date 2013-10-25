@@ -248,3 +248,4 @@ libonvif/.build/
 
 .vagrant
 **/Makefile
+.qmake.cache
