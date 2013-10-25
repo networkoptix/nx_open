@@ -349,6 +349,9 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         showNormal();
         setGeometry(m_storedGeometry);
     }
+#ifdef Q_OS_MACX
+    display()->fitInView(true);
+#endif
 }
 
 void QnMainWindow::setAnimationsEnabled(bool enabled) {
@@ -622,8 +625,6 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 
 void QnMainWindow::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
-
-    qDebug() << "Resize";
 }
 
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
