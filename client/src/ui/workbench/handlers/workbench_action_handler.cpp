@@ -3953,6 +3953,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         return;
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
+    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::MediaServerComponent);
+
+    // if some component is newer than the newest mediaserver, focus on its version
+    if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
+        latestMsVersion = latestVersion;
 
     QString components;
     foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
@@ -3976,11 +3981,15 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             break;
         }
 
-        if(!isCompatible(data.version, latestVersion))
+        bool updateRequested = data.component == Qn::MediaServerComponent
+                ? QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true)
+                : QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestVersion);
+        if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
         components += component;
     }
+
 
     QString message = tr(
         "Some components of the system are not upgraded:<br/>"
@@ -3988,7 +3997,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "%1"
         "<br/>"
         "Please upgrade all components to the latest version %2."
-    ).arg(components).arg(watcher->latestVersion().toString());
+    ).arg(components).arg(latestMsVersion.toString());
 
     QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
 }
