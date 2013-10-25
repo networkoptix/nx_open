@@ -1040,7 +1040,15 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+    QString disabledVendors = qSettings.value("disabledVendors").toString();
+    QStringList disabledVendorList;
+    if (disabledVendors.contains(";"))
+        disabledVendorList = disabledVendors.split(";");
+    else
+        disabledVendorList = disabledVendors.split(",");
+    for (int i = 0; i < disabledVendorList.size(); ++i)
+        disabledVendorList[i] = disabledVendorList[i].trimmed();
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(disabledVendorList);
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
