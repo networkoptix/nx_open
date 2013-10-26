@@ -134,8 +134,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             return CL_TRANSPORT_ERROR;
         }
 
-        if (CL_TRANSPORT_ERROR==readHeaders())
-            return CL_TRANSPORT_ERROR;
+        const int res = readHeaders();
+        if ( res < 0 )
+            return (CLHttpStatus)res;
 
         QList<QByteArray> strings = m_responseLine.split(' ');
         if (strings.size() < 2)
@@ -195,6 +196,8 @@ int CLSimpleHTTPClient::readHeaders()
     while (eofPos == 0)
     {
         int readed = m_sock->recv(curPtr, left);
+        if( readed == 0 )
+            return CL_NOT_HTTP; //connection closed before we could read some http header(s)
         if (readed < 1)
             return CL_TRANSPORT_ERROR;
         curPtr += readed;
@@ -300,8 +303,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             return CL_TRANSPORT_ERROR;
         }
 
-        if (CL_TRANSPORT_ERROR==readHeaders())
-            return CL_TRANSPORT_ERROR;
+        const int res = readHeaders();
+        if ( res < 0 )
+            return (CLHttpStatus)res;
 
         m_responseLine = m_responseLine.toLower();
 
