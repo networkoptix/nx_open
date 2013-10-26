@@ -349,6 +349,9 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         showNormal();
         setGeometry(m_storedGeometry);
     }
+#ifdef Q_OS_MACX
+    display()->fitInView(true);
+#endif
 }
 
 void QnMainWindow::setAnimationsEnabled(bool enabled) {
@@ -359,6 +362,7 @@ void QnMainWindow::setAnimationsEnabled(bool enabled) {
 void QnMainWindow::showFullScreen() {
 #if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 //    setAnimationsEnabled(false);
+    setOptions(options() &~ TitleBarDraggable);
     mac_showFullScreen(winId(), true);
 #else
     QnEmulatedFrameWidget::showFullScreen();
@@ -369,6 +373,7 @@ void QnMainWindow::showNormal() {
 #if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 //    setAnimationsEnabled(false);
     mac_showFullScreen(winId(), false);
+    setOptions(options() | TitleBarDraggable);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
@@ -537,10 +542,12 @@ void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
 void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
+#ifndef Q_OS_MACX
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
         action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
+#endif
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {
@@ -618,8 +625,6 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 
 void QnMainWindow::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
-
-    qDebug() << "Resize";
 }
 
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {

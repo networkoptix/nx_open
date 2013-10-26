@@ -218,6 +218,10 @@ void QnLoginDialog::showEvent(QShowEvent *event) {
         accept();
     else
         resetConnectionsModel();
+#ifdef Q_OS_MAC
+    if (focusWidget())
+        focusWidget()->activateWindow();
+#endif
 }
 
 void QnLoginDialog::hideEvent(QHideEvent *event)

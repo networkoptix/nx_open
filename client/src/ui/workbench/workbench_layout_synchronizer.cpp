@@ -154,6 +154,11 @@ void QnWorkbenchLayoutSynchronizer::update() {
     m_layout->update(m_resource);
 }
 
+void QnWorkbenchLayoutSynchronizer::reset() {
+    update();
+    m_pendingItems.clear();
+}
+
 void QnWorkbenchLayoutSynchronizer::submit() {
     if(!m_submit)
         return;
