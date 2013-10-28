@@ -210,6 +210,7 @@ android-client/android-main/libs/protobuf-classes*.jar
 ios-client/build
 ios-client/dist
 ios-client/target
+ios-client/ihdwitness.xcworkspace/xcuserdata
 
 ios-client/Settings.bundle/Root.plist
 ios-client/HDWitness/HDWitness-Info.plist
