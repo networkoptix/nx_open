@@ -285,6 +285,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
+
+#ifdef Q_OS_MACX
+    //initialize system-wide menu
+    menu()->newMenu(Qn::MainScope);
+#endif
 }
 
 QnMainWindow::~QnMainWindow() {
