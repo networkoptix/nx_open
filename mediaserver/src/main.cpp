@@ -1045,10 +1045,15 @@ void QnMain::run()
     if (disabledVendors.contains(";"))
         disabledVendorList = disabledVendors.split(";");
     else
-        disabledVendorList = disabledVendors.split(",");
-    for (int i = 0; i < disabledVendorList.size(); ++i)
-        disabledVendorList[i] = disabledVendorList[i].trimmed();
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(disabledVendorList);
+        disabledVendorList = disabledVendors.split(" ");
+    QStringList updatedVendorList;        
+    for (int i = 0; i < disabledVendorList.size(); ++i) {
+	if (!disabledVendorList[i].trimmed().isEmpty())
+    	    updatedVendorList << disabledVendorList[i].trimmed();
+    }
+    qWarning() << "disabled vendors amount" << updatedVendorList.size();
+    qWarning() << disabledVendorList;        
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(updatedVendorList);
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
