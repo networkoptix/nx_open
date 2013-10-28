@@ -16,7 +16,7 @@ namespace BusinessActionType {
         case CameraRecording:       return QObject::tr("Camera recording");
         case PanicRecording:        return QObject::tr("Panic recording");
         case SendMail:              return QObject::tr("Send mail");
-        case Diagnostics:           return QObject::tr("Diagnostics");
+        case Diagnostics:           return QObject::tr("Write to log");
         case ShowPopup:             return QObject::tr("Show notification");
         case PlaySound:             return QObject::tr("Play sound");
         case SayText:               return QObject::tr("Say");
