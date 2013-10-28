@@ -836,9 +836,9 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
             }
             soap_destroy(ctx.soapWsddProxy.soap);
             soap_end(ctx.soapWsddProxy.soap);
-            ctx.sock.reset();
-            delete it->second;
-            m_ifaceToSock.erase( it );
+            //ctx.sock.reset();
+            //delete it->second;
+            //m_ifaceToSock.erase( it );
             return true;
         }
 
