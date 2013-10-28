@@ -304,6 +304,16 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 {
     const QList<QnInterfaceAndAddr>& intfList = getAllIPv4Interfaces();
 
+    if( !m_isFirstSearch )
+    {
+        foreach(QnInterfaceAndAddr iface, intfList)
+        {
+            if (m_shouldStop)
+                return;
+            readProbeMatches( iface, result );
+        }
+    }
+
     // if interface list is changed, remove old sockets
     std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
     for(; itr != m_ifaceToSock.end() ; ++itr) {
