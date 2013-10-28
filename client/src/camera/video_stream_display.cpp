@@ -1031,9 +1031,9 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
 
     srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
 
-    if (frameCopySize == srcSize)
+    if (frameCopySize == srcSize) {
         av_picture_copy((AVPicture*) srcFrame.data(), (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
-    else {
+    } else {
         // resize frame
         SwsContext* convertor = sws_getContext(
             lastFrame->width,       lastFrame->height,  (PixelFormat) lastFrame->format,
@@ -1061,13 +1061,16 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
         return QImage();
 
     int numBytes = avpicture_get_size(PIX_FMT_RGBA, srcFrame->width, srcFrame->height);
+
     AVPicture outPicture; 
     avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, srcFrame->width, srcFrame->height);
+    outPicture.data[4] = outPicture.data[5] = outPicture.data[6] = outPicture.data[7] = 0;
 
     sws_scale(convertor, srcFrame->data, srcFrame->linesize, 
               0, srcFrame->height, 
               outPicture.data, outPicture.linesize);
     sws_freeContext(convertor);
+
     // convert to QImage
     QImage tmp(outPicture.data[0], srcFrame->width, srcFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
     QImage rez( srcFrame->width, srcFrame->height, QImage::Format_ARGB32);
