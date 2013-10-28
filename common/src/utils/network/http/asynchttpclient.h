@@ -89,6 +89,8 @@ namespace nx_http
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
+        //!Number of total bytes read (including http request line and headers)
+        quint64 totalBytesRead() const;
 
         void setSubsequentReconnectTries( int reconnectTries );
         void setTotalReconnectTries( int reconnectTries );
@@ -132,6 +134,7 @@ namespace nx_http
         std::map<BufferType, BufferType> m_customHeaders;
         bool m_terminated;
         mutable QMutex m_mutex;
+        quint64 m_totalBytesRead;
 
         bool doGetPrivate( const QUrl& url );
         /*!

@@ -13,6 +13,7 @@
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
+#include "utils/network/ip_range_checker_async.h"
 #include "plugins/resources/upnp/upnp_device_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 #include "core/resource/abstract_storage_resource.h"
@@ -419,7 +420,8 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     }
 
     //=======================================
-    QnIprangeChecker ip_cheker;
+    //QnIprangeChecker ip_checker;   
+    QnIprangeCheckerAsync ip_checker;
 
     cl_log.log("Checking for online addresses....", cl_logINFO);
 
@@ -427,7 +429,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     if (endAddr.isNull())
         online << startAddr;
     else
-        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
+        online = ip_checker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
