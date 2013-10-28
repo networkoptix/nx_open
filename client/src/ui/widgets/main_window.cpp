@@ -419,7 +419,11 @@ void QnMainWindow::updateDecorationsState() {
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
 
+#ifdef Q_OS_MACX
+    bool uiTitleUsed = true;
+#else
     bool uiTitleUsed = fullScreen || maximized;
+#endif
 
     setTitleVisible(!uiTitleUsed);
     m_ui->setTitleUsed(uiTitleUsed);
