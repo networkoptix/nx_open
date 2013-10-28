@@ -3,6 +3,8 @@
 #include <QtCore/QCryptographicHash>
 
 #include <sstream>
+
+#include "http/httptypes.h"
 #include "../common/util.h"
 
 
@@ -307,13 +309,20 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         if ( res < 0 )
             return (CLHttpStatus)res;
 
-        m_responseLine = m_responseLine.toLower();
+        //m_responseLine = m_responseLine.toLower();
 
-        if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
+        //got following status line: http/1.1 401 n/a, and this method returned CL_TRANSPORT_ERROR
+        nx_http::StatusLine statusLine;
+        if( !statusLine.parse( m_responseLine ) )
+            return CL_NOT_HTTP;
+
+        //if (!m_responseLine.contains("200 ok") && !m_responseLine.contains("204 no content"))// not ok
+        if( statusLine.statusCode != nx_http::StatusCode::ok && statusLine.statusCode != nx_http::StatusCode::noContent )
         {
             close();
 
-            if (m_responseLine.contains("401 unauthorized"))
+            //if (m_responseLine.contains("401 unauthorized"))
+            if( statusLine.statusCode == nx_http::StatusCode::unauthorized )
             {
                 getAuthInfo();
 
@@ -322,15 +331,16 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
-            else if (m_responseLine.contains("not found"))
+            //else if (m_responseLine.contains("not found"))
+            else if( statusLine.statusCode == nx_http::StatusCode::notFound )
             {
                 return CL_HTTP_NOT_FOUND;
             }
-            else if (m_responseLine.contains("302 moved"))
+            //else if (m_responseLine.contains("302 moved"))
+            else if( statusLine.statusCode == nx_http::StatusCode::moved )
             {
                 return CL_HTTP_REDIRECT;
             }
-
 
             return CL_TRANSPORT_ERROR;
         }
