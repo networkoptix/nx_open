@@ -2078,6 +2078,7 @@ struct SOAP_STD_API soap
   soap(const struct soap&);
   virtual ~soap();
 #else
+  #error "This file MUST be compiled as c++"
   void (*dummy)(void);
 #endif
 };
