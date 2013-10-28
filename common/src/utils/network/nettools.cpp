@@ -61,6 +61,9 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
     {
+        if (!(iface.flags() & QNetworkInterface::IsUp))
+            continue;
+
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         foreach (const QNetworkAddressEntry& address, addresses)
         {
