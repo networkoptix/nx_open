@@ -347,9 +347,6 @@ QString QnPlOnvifResource::getVendorName() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
-    if (secondaryStreamQuality() == Qn::SSQualityDontUse)
-        return false;
-
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
@@ -480,7 +477,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         ptzCaps = m_ptzController->getCapabilities();
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
-    else if (!hasDualStreaming())
+    else if (!hasDualStreaming2())
         setMotionType(Qn::MT_NoMotion);
 
     

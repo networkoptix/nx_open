@@ -526,9 +526,6 @@ bool QnActiResource::isAudioSupported() const
 
 bool QnActiResource::hasDualStreaming() const
 {
-    if (secondaryStreamQuality() == Qn::SSQualityDontUse)
-        return false;
-
     QVariant mediaVariant;
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
