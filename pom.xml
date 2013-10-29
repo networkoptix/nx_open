@@ -81,8 +81,8 @@
 
     <modules>
         <module>build_environment</module>
-        <module>appserver</module>
         <module>common</module>
+        <module>appserver</module>
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
         <module>mediaserver</module>
@@ -160,6 +160,13 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
+                                <resource>
+                                    <directory>${root.dir}/customization</directory>
+                                    <includes>
+                                        <include>version.h</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>	
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>

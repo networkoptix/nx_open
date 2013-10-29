@@ -13,4 +13,4 @@ echo ARCH=%INPUT_ARCH%
 
 @echo on
 call mvn compile -T 4 --projects build_environment %CUSTOMIZATION%  %ARCH%
-call mvn compile -T 4 -rf appserver -P!installer %CUSTOMIZATION% %ARCH%
+call mvn compile -T 4 -rf common %CUSTOMIZATION% %ARCH%
