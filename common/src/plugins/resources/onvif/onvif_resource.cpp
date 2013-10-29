@@ -347,6 +347,9 @@ QString QnPlOnvifResource::getVendorName() const
 
 bool QnPlOnvifResource::hasDualStreaming() const
 {
+    if (secondaryStreamQuality() == Qn::SSQualityDontUse)
+        return false;
+
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);

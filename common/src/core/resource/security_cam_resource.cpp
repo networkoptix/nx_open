@@ -277,6 +277,9 @@ const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
+    if (secondaryStreamQuality() == Qn::SSQualityDontUse)
+        return false;
+
     if (!hasParam(lit("hasDualStreaming")))
     {
         //Q_ASSERT(false);
