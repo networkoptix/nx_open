@@ -17,6 +17,8 @@ namespace {
 
 }
 
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
+
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
      * so we don't need heavyweight synchronization here. */
@@ -43,6 +45,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnServerStorageStateHash>();
     qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
+    qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<Qn::ActionId>();
