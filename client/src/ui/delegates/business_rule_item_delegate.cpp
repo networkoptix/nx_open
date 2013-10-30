@@ -27,7 +27,7 @@
 QnSelectResourcesDialogButton::QnSelectResourcesDialogButton(QWidget *parent):
     base_type(parent),
     m_dialogDelegate(NULL),
-    m_nodeType(Qn::ServersNode)
+    m_target(QnResourceSelectionDialog::CameraResourceTarget)
 {
     connect(this, SIGNAL(clicked()), this, SLOT(at_clicked()));
 }
@@ -48,16 +48,16 @@ void QnSelectResourcesDialogButton::setDialogDelegate(QnResourceSelectionDialogD
     m_dialogDelegate = delegate;
 }
 
-Qn::NodeType QnSelectResourcesDialogButton::nodeType() const {
-    return m_nodeType;
+QnResourceSelectionDialog::SelectionTarget  QnSelectResourcesDialogButton::selectionTarget() const {
+    return m_target;
 }
 
-void QnSelectResourcesDialogButton::setNodeType(Qn::NodeType nodeType) {
-    m_nodeType = nodeType;
+void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog::SelectionTarget target) {
+    m_target = target;
 }
 
 void QnSelectResourcesDialogButton::at_clicked() {
-    QnResourceSelectionDialog dialog(m_nodeType, this); //TODO: #GDM servers dialog?
+    QnResourceSelectionDialog dialog(m_target, this);
     dialog.setSelectedResources(m_resources);
     dialog.setDelegate(m_dialogDelegate);
     int result = dialog.exec();
@@ -153,7 +153,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 }
                 else if (actionType == BusinessActionType::SendMail) {
                     btn->setDialogDelegate(new QnEmailValidDelegate(btn));
-                    btn->setNodeType(Qn::UsersNode);
+                    btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
                 }
                 return btn;
             }

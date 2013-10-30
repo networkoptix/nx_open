@@ -123,7 +123,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_drawCustomFrame(false)
 {
 #ifdef Q_OS_MACX
-    mac_initFullScreen(winId(), this);
+    mac_initFullScreen((void*)winId(), (void*)this);
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -368,7 +368,7 @@ void QnMainWindow::showFullScreen() {
 #if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 //    setAnimationsEnabled(false);
     setOptions(options() &~ TitleBarDraggable);
-    mac_showFullScreen(winId(), true);
+    mac_showFullScreen((void*)winId(), true);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
@@ -377,7 +377,7 @@ void QnMainWindow::showFullScreen() {
 void QnMainWindow::showNormal() {
 #if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 //    setAnimationsEnabled(false);
-    mac_showFullScreen(winId(), false);
+    mac_showFullScreen((void*)winId(), false);
     setOptions(options() | TitleBarDraggable);
 #else
     QnEmulatedFrameWidget::showNormal();

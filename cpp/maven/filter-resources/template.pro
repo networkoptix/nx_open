@@ -98,11 +98,11 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
 }
 
 ## LINUX
 unix:!mac {
+  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
   LIBS += ${linux.oslibs}
   ${arch}:!arm {
     QMAKE_CXXFLAGS += -msse2
@@ -114,7 +114,7 @@ unix:!mac {
 
 ## MAC OS
 mac {
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -std=c++11 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}

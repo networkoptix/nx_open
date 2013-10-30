@@ -1,15 +1,15 @@
+#include "text_to_wav.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
+#ifndef Q_OS_MACX
 #include <memory>
 
 #include <festival.h>
 
 #include <version.h>
 #include <EST_wave_aux.h>
-
-#include "text_to_wav.h"
 
 
 static char festivalVoxPath[256];
@@ -277,7 +277,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
     return result;
 }
 
-
+#endif
 
 
 
@@ -295,22 +295,32 @@ TextToWaveServer::~TextToWaveServer()
 void TextToWaveServer::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
+#ifndef Q_O_MACX
     m_textQueue.push( QSharedPointer<SynthetiseSpeechTask>(new SynthetiseSpeechTask()) );
+#endif
 }
 
 int TextToWaveServer::generateSoundAsync( const QString& text, QIODevice* const dest )
 {
+#ifndef Q_OS_MACX
     QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
     return task ? task->id : 0;
+#else
+    return 0;
+#endif
 }
 
 bool TextToWaveServer::generateSoundSync( const QString& text, QIODevice* const dest )
 {
+    #ifndef Q_OS_MACX
     QMutexLocker lk( &m_mutex );
     QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
     while( !task->done )
         m_cond.wait( lk.mutex() );
     return task->result;
+#else
+    return false;
+#endif
 }
 
 static TextToWaveServer* _staticInstance = NULL;
@@ -327,6 +337,7 @@ TextToWaveServer* TextToWaveServer::instance()
 
 void TextToWaveServer::run()
 {
+#ifndef Q_OS_MACX
     saveSysThreadID();
 
     FestivalInitializer festivalInitializer;
@@ -348,10 +359,12 @@ void TextToWaveServer::run()
         }
         emit done( task->id, task->result );
     }
+#endif
 }
 
 QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTaskToQueue( const QString& text, QIODevice* const dest )
 {
+#ifndef Q_OS_MACX
     QSharedPointer<SynthetiseSpeechTask> task( new SynthetiseSpeechTask() );
     int taskID = m_prevTaskID.fetchAndAddAcquire(1);
     if( taskID == 0 )
@@ -360,4 +373,5 @@ QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTask
     task->text = text;
     task->dest = dest;
     return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
+#endif
 }
