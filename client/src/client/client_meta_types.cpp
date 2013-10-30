@@ -15,7 +15,6 @@ namespace {
 
     volatile bool qn_clientMetaTypes_initialized = false;
 
-    QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode);
 }
 
 void QnClientMetaTypes::initialize() {
@@ -44,7 +43,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnServerStorageStateHash>();
     qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
-    qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<Qn::ActionId>();
