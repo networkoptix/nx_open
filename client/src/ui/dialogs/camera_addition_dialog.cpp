@@ -136,7 +136,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),                          this,   SLOT(at_subnetCheckbox_toggled(bool)));
     connect(ui->closeButton,        SIGNAL(clicked()),                              this,   SLOT(accept()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
-    connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          ui->portSpinBox, SLOT(setDisabled(bool)));
+    connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          this,   SLOT(at_portAutoCheckBox_toggled(bool)));
     connect(qnResPool,              SIGNAL(resourceChanged(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceChanged(const QnResourcePtr &)));
     connect(qnResPool,              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
 
@@ -595,6 +595,10 @@ void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled) {
 
     m_subnetMode = toggled;
     updateSubnetMode();
+}
+
+void QnCameraAdditionDialog::at_portAutoCheckBox_toggled(bool toggled) {
+    ui->portSpinBox->setDisabled(toggled);
 }
 
 void QnCameraAdditionDialog::at_resPool_resourceChanged(const QnResourcePtr &resource) {
