@@ -1,6 +1,6 @@
 syntax: glob
 *.cache
-.qmake.cache
+*make.cache
 *-build*
 *.idb
 *.log

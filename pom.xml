@@ -40,6 +40,7 @@
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
+        <help.language>english</help.language>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
