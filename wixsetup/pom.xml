@@ -59,7 +59,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
@@ -71,13 +71,17 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
                                 <resource>
-                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
-                                    <filtering>true</filtering>
-                                </resource>	
+                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>
                                 <resource>
                                     <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
                                     <filtering>false</filtering>
-                                </resource>           
+                                </resource>                                  
+                                <resource>
+                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>	                                
                                 <resource>
                                     <directory>${customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>

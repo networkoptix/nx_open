@@ -40,6 +40,7 @@
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
+        <help.language>english</help.language>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -81,8 +82,8 @@
 
     <modules>
         <module>build_environment</module>
-        <module>appserver</module>
         <module>common</module>
+        <module>appserver</module>
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
         <module>mediaserver</module>
@@ -160,6 +161,13 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
+                                <resource>
+                                    <directory>${root.dir}/customization</directory>
+                                    <includes>
+                                        <include>version.h</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>	
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
