@@ -365,20 +365,24 @@ void QnMainWindow::setAnimationsEnabled(bool enabled) {
 }
 
 void QnMainWindow::showFullScreen() {
-#if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+#if defined Q_OS_MACX
 //    setAnimationsEnabled(false);
     setOptions(options() &~ TitleBarDraggable);
     mac_showFullScreen((void*)winId(), true);
+    updateDecorationsState();
+    display()->fitInView(true);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
 }
 
 void QnMainWindow::showNormal() {
-#if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+#if defined Q_OS_MACX
 //    setAnimationsEnabled(false);
     mac_showFullScreen((void*)winId(), false);
     setOptions(options() | TitleBarDraggable);
+    updateDecorationsState();
+    display()->fitInView(true);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
@@ -413,14 +417,18 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
+#ifdef Q_OS_MACX
+    bool fullScreen = mac_isFullscreen((void*)winId());
+#else
     bool fullScreen = isFullScreen();
+#endif
     bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
 
 #ifdef Q_OS_MACX
-    bool uiTitleUsed = true;
+    bool uiTitleUsed = fullScreen;
 #else
     bool uiTitleUsed = fullScreen || maximized;
 #endif
