@@ -17,15 +17,26 @@ def mkdir_p(path):
             pass
         else: raise
 
+def extract(tar_url, extract_path='.'):
+    print tar_url
+    tar = tarfile.open(tar_url, 'r')
+    for item in tar:
+        #print (item.name)
+        if(os.path.isfile(os.path.join(extract_path,item.name))):
+            print (os.path.join(extract_path,item.name))
+            os.unlink(os.path.join(extract_path,item.name));
+        tar.extract(item, extract_path)
+        if item.name.find(".tar.gz") != -1:
+            extract(item.name, "./" + item.name[:item.name.rfind('/')])        
+    tar.close() 
+    os.unlink(file)
+        
 print '+++++++++++++++++++++ EXPANDING LIBS +++++++++++++++++++++'
         
 for file in os.listdir('.'):
     if file.endswith('tar.gz'):
         print(file)
-        tar = tarfile.open(file)
-        tar.extractall()
-        tar.close() 
-        os.unlink(file)
+        extract(file)
 
 print '+++++++++++++++++++++ COPYING QT LIBS +++++++++++++++++++++'
         
