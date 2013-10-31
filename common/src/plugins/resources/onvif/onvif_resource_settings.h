@@ -27,8 +27,8 @@ class OnvifCameraSettingsResp
 
 public:
 
-    OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl, const std::string& login,
-        const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift);
+    OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl, const QString &login,
+        const QString &passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift);
 
     ~OnvifCameraSettingsResp();
 
