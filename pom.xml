@@ -272,6 +272,7 @@
             <properties>			
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+                <additional.compiler>gcc</additional.compiler>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -293,8 +294,9 @@
                 <python.dir>${env.environment}/python/bin/</python.dir>				
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>
+                <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
-                <qt.spec>macx-g++47</qt.spec>
+                <qt.spec>macx-clang-libc++</qt.spec>
                 <qtlib11>PrintSupport</qtlib11>
             </properties>
             <modules>
