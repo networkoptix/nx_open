@@ -95,6 +95,8 @@ public slots:
         If there is opened file, it's being closed first
     */
     bool open( const QString& filePath );
+
+#ifndef Q_OS_MACX
     //!Prepares to play \a text
     /*!
         Subsequent \a AudioPlayer::playAsync call will synthesize speech and play it.
@@ -108,6 +110,7 @@ public slots:
         \return false, if no opened file. true, if started playback
         \note If file is being already played, nothing is done and \a true is returned
     */
+#endif
     bool playAsync();
     //!Closes opened file. If file not opened, does nothing
     void close();

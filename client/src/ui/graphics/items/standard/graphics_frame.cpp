@@ -225,7 +225,7 @@ void GraphicsFrame::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::StyleChange)
         d_func()->updateFrameWidth();
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     else if (event->type() == QEvent::MacSizeChange)
         d_func()->updateFrameWidth();
 #endif
