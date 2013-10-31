@@ -7,16 +7,9 @@ COMPANY_NAME=${deb.customization.company.name}
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
-USER=${product.name.short}
-GROUP=${product.name.short}
-
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
-BASEDIR="/opt/$COMPANY_NAME/mediaserver"
-ETCDIR="$BASEDIR/etc"
-VARDIR="$BASEDIR/var"
-CONFIG_FILE="$ETCDIR/mediaserver.conf"
-
+CONFIG_FILE="/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf"
 ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
 
 # This is necessary because changed configuration options should take effect 

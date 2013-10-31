@@ -68,7 +68,6 @@ mkdir -p $STAGE/DEBIAN
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
-cp debian/preinst $STAGE/DEBIAN
 cp debian/postinst $STAGE/DEBIAN
 cp debian/prerm $STAGE/DEBIAN
 cp debian/templates $STAGE/DEBIAN
