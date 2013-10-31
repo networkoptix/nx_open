@@ -223,7 +223,7 @@
                     <artifactId>help</artifactId>
                     <version>${project.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${help.customization}-${help.language}</classifier>
+                    <classifier>${child.customization}-${help.language}</classifier>
                 </dependency>
 
                 <dependency>

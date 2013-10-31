@@ -205,6 +205,18 @@
             <id>noarm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>!mac</family>
+                </os> 
+            </activation>
+            <properties>
+                <additional.compiler>${compiler}</additional.compiler>         
+            </properties>
+        </profile>  
+        <profile>        
+            <id>nomac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
                 <property>
                     <name>arch</name>
                     <value>!arm</value>
@@ -217,7 +229,7 @@
             <properties>
                 <toolchain.version>none</toolchain.version>            
             </properties>
-        </profile>  
+        </profile>         
         <profile>
             <id>windows</id>
             <activation>
@@ -272,7 +284,6 @@
             <properties>			
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <additional.compiler>gcc</additional.compiler>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
