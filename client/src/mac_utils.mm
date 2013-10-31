@@ -74,3 +74,11 @@ void mac_showFullScreen(void *winId, bool fullScreen) {
 //        [nswindow setCollectionBehavior:NSWindowCollectionBehaviorDefault];
     }
 }
+
+bool mac_isFullscreen(void *winId) {
+    NSView *nsview = (NSView *) winId;
+    NSWindow *nswindow = [nsview window];
+
+    bool isFullScreen = [nswindow styleMask] & NSFullScreenWindowMask;
+    return isFullScreen;
+}

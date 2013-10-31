@@ -403,6 +403,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBarItem->setWidget(m_tabBarWidget);
     m_tabBarWidget->installEventFilter(m_tabBarItem);
+    connect(m_tabBarWidget, SIGNAL(tabTextChanged()), this, SLOT(at_tabBar_tabTextChanged()));
 
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
 
@@ -2161,3 +2162,6 @@ void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {
         setDayTimeWidgetOpened(true, true);
 }
 
+void QnWorkbenchUi::at_tabBar_tabTextChanged() {
+    m_titleItem->layout()->updateGeometry();
+}

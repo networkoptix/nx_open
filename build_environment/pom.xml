@@ -28,7 +28,7 @@
             <artifactId>protobuf</artifactId>
             <version>${protobuf.version}</version>
             <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${additional.compiler}</classifier>
         </dependency>                           
         <dependency>
             <groupId>org.openssl</groupId>
@@ -49,7 +49,7 @@
             <artifactId>onvif</artifactId>
             <version>${onvif.version}</version>
             <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${additional.compiler}</classifier>
         </dependency>		                        
         <dependency>
             <groupId>org.hyperic</groupId>
@@ -245,7 +245,7 @@
                     <artifactId>bespin</artifactId>
                     <version>1.2-SNAPSHOT</version>
                     <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>                   
             </dependencies>	            
         </profile>      
