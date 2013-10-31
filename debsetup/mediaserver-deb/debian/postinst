@@ -74,8 +74,6 @@ function write_config {
     [ -z "$TRANSPORT" ] || echo "rtspTransport=$TRANSPORT" >> $CONFIG_FILE
     [ -z "$PUBLIC_IP_ENABLED" ] || echo "publicIPEnabled=$PUBLIC_IP_ENABLED" >> $CONFIG_FILE
     [ -z "$STATIC_PUBLIC_IP" ] || echo "staticPublicIP=$STATIC_PUBLIC_IP" >> $CONFIG_FILE
-
-    chown $USER:$GROUP $CONFIG_FILE
 }
 
 function to_int {
@@ -190,7 +188,6 @@ case "$1" in
 esac
 
 [ -d $VARDIR ] || mkdir $VARDIR
-chown $USER:$GROUP $VARDIR
 
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
