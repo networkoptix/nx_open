@@ -106,7 +106,6 @@ bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const
 
 bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char *slot)
 {
-#ifndef Q_OS_MACX
 #if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
 #else
@@ -122,9 +121,6 @@ bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char
         return false;
     audioPlayer.release();
     return true;
-#else
-    return false;
-#endif
 }
 
 QString AudioPlayer::getTagValue( const QString& filePath, const QString& tagName )
@@ -167,7 +163,6 @@ bool AudioPlayer::open( const QString& filePath )
     return open( srcFile.release() );
 }
 
-#ifndef Q_OS_MACX
 bool AudioPlayer::prepareTextPlayback( const QString& text )
 {
     QMutexLocker lk( &m_mutex );
@@ -185,7 +180,6 @@ bool AudioPlayer::prepareTextPlayback( const QString& text )
 
     return true;
 }
-#endif
 
 bool AudioPlayer::playAsync()
 {
