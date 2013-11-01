@@ -98,6 +98,4 @@ private:
     bool initializeIOPorts();
 };
 
-typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
-
 #endif  //THIRD_PARTY_RESOURCE_H
