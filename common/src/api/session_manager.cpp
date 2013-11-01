@@ -268,6 +268,9 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
     Q_UNUSED(reply)
     QString user = QnAppServerConnectionFactory::defaultUrl().userName();
     QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    if (user.isEmpty() || password.isEmpty())
+        return;
+
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }
