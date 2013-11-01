@@ -12,7 +12,7 @@
 #include "decodedpicturetoopengluploadercontextpool.h"
 
 
-QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLContext* context )
+QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* context )
 :
     QnAbstractRenderer( parent ),
     m_glContext( context ),
@@ -45,6 +45,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         return;
 
     Q_ASSERT( m_glContext != NULL );
+    m_glContext->makeCurrent();
 
     for (int i = channelCount; (uint)i < m_channelRenderers.size(); ++i)
     {
