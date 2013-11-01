@@ -68,7 +68,7 @@
         <module>appserver</module>
         <module>common</module>
         <module>applauncher</module>
-        <module>axiscamplugin</module>
+        <!-- <module>axiscamplugin</module> -->
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
@@ -166,7 +166,7 @@
             </activation>
             <modules>
                 <module>quicksyncdecoder</module>	
-                <module>axiscamplugin</module>
+                <!-- <module>axiscamplugin</module> -->
                 <module>genericrtspplugin</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
