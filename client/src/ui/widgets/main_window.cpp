@@ -283,7 +283,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Post-initialize. */
     updateDwmState();
+#ifdef Q_OS_MACX
+    setOptions(WindowButtonsVisible);
+#else
     setOptions(TitleBarDraggable | WindowButtonsVisible);
+#endif
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
@@ -368,8 +372,6 @@ void QnMainWindow::setAnimationsEnabled(bool enabled) {
 
 void QnMainWindow::showFullScreen() {
 #if defined Q_OS_MACX
-//    setAnimationsEnabled(false);
-    setOptions(options() &~ TitleBarDraggable);
     mac_showFullScreen((void*)winId(), true);
     updateDecorationsState();
     display()->fitInView(true);
@@ -380,9 +382,7 @@ void QnMainWindow::showFullScreen() {
 
 void QnMainWindow::showNormal() {
 #if defined Q_OS_MACX
-//    setAnimationsEnabled(false);
     mac_showFullScreen((void*)winId(), false);
-    setOptions(options() | TitleBarDraggable);
     updateDecorationsState();
     display()->fitInView(true);
 #else
