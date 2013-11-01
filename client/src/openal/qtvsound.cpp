@@ -1,8 +1,8 @@
 #include "qtvsound.h"
 
-#ifdef __APPLE__
-#include <al.h>
-#include <alc.h>
+#ifdef Q_OS_MACX
+#include <openal/al.h>
+#include <openal/alc.h>
 #else
 #include <AL/al.h>
 #include <AL/alc.h>
