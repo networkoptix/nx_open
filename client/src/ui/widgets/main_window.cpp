@@ -102,6 +102,7 @@ namespace {
 
 } // anonymous namespace
 
+#ifdef Q_OS_MACX
 extern "C" {
     void disable_animations(void *qnmainwindow) {
         QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
@@ -113,6 +114,7 @@ extern "C" {
         mainwindow->setAnimationsEnabled(true);
     }
 }
+#endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),

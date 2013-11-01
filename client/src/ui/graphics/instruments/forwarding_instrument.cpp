@@ -1,6 +1,9 @@
 #include "forwarding_instrument.h"
+
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsItem>
+
+#include <ui/graphics/instruments/instrument_manager.h>
 
 namespace {
     template<class Base>
@@ -69,7 +72,14 @@ bool ForwardingInstrument::event(QWidget *viewport, QEvent *event) {
     case QEvent::DragEnter:
     case QEvent::DragMove:
     case QEvent::DragLeave:
+#ifdef Q_OS_MACX
+        if (InstrumentManager::instance(view->scene())->isAnimationEnabled())
+            filtered = open(static_cast<QFrame *>(view))->staticProcessEvent(event);
+        else
+            filtered = true;
+#else
         filtered = open(static_cast<QFrame *>(view))->staticProcessEvent(event);
+#endif
         break;
     case QEvent::LayoutRequest:
     case QEvent::Gesture:
