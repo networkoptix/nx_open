@@ -484,7 +484,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    platform->process(NULL)->setPriority(QnPlatformProcess::HighestPriority);
+    platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
 
