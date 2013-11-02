@@ -119,7 +119,14 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
 }
 
 void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
-    setTabText(m_layouts.indexOf(layout), layoutText(layout));
+    int idx = m_layouts.indexOf(layout);
+    QString oldText = tabText(idx);
+    QString newText = layoutText(layout);
+    if (oldText == newText)
+        return;
+
+    setTabText(idx, newText);
+    emit tabTextChanged();
 }
 
 void QnLayoutTabBar::updateTabIcon(QnWorkbenchLayout *layout) {

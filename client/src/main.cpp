@@ -321,6 +321,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
+#ifdef Q_OS_MACX
+    application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+#endif
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnPlatformAbstraction> clientPlatform(new QnPlatformAbstraction());

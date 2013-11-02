@@ -28,7 +28,7 @@ public:
     /*!
         \param context MUST not be NULL
     */
-    QnResourceWidgetRenderer(QObject* parent, const QGLContext* context );
+    QnResourceWidgetRenderer(QObject* parent, QGLContext* context );
     void setChannelCount(int channelCount);
 
 
@@ -132,7 +132,7 @@ private:
     /** Current screen size of a single channel, in pixels. */
     QSize m_channelScreenSize;
 
-    const QGLContext* m_glContext;
+    QGLContext* m_glContext;
     
     QRectF m_displayRect[CL_MAX_CHANNELS];
 

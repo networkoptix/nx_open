@@ -72,7 +72,7 @@ QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${libdir}/icons/hdw_logo.ico	
+  ICON = ${customization.dir}/icons/hdw_logo.ico	
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
@@ -98,11 +98,11 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
 }
 
 ## LINUX
 unix:!mac {
+  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
   LIBS += ${linux.oslibs}
   ${arch}:!arm {
     QMAKE_CXXFLAGS += -msse2
@@ -114,7 +114,7 @@ unix:!mac {
 
 ## MAC OS
 mac {
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -std=c++11 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}

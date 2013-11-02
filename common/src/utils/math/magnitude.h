@@ -59,7 +59,7 @@ public:
      */
     template<class T>
     static TypedMagnitudeCalculator<T> *forType() {
-        return forType(qMetaTypeId<T>())->typed<T>();
+        return forType(qMetaTypeId<T>())->template typed<T>();
     }
 
     /**

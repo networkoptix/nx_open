@@ -338,27 +338,32 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
 
     std::shared_ptr<detail::RDirSynchronizationOperation> opCtx;
     const int operationID = ++m_prevOperationID;
+//    detail::RDirSynchronizationOperation * op;
     switch( taskToStart.type )
     {
-        case detail::RSyncOperationType::listDirectory:
+        case detail::RSyncOperationType::listDirectory: {
             //requesting file {taskToStart.entryPath}/contents.xml
-            opCtx.reset( new detail::ListDirectoryOperation(
-                operationID,
-                m_currentMirror,
-                taskToStart.entryPath,
-                m_localDirPath,
-                this ) );
+            detail::RDirSynchronizationOperation *op = new detail::ListDirectoryOperation(
+                        operationID,
+                        m_currentMirror,
+                        taskToStart.entryPath,
+                        m_localDirPath,
+                        this );
+            opCtx.reset( op );
             break;
+        }
 
-        case detail::RSyncOperationType::getFile:
-            opCtx.reset( new detail::GetFileOperation(
-                operationID,
-                m_currentMirror,
-                taskToStart.entryPath,
-                m_localDirPath,
-                taskToStart.hashTypeName,
-                this ) );
+        case detail::RSyncOperationType::getFile: {
+            detail::RDirSynchronizationOperation *op = new detail::GetFileOperation(
+                        operationID,
+                        m_currentMirror,
+                        taskToStart.entryPath,
+                        m_localDirPath,
+                        taskToStart.hashTypeName,
+                        this );
+            opCtx.reset( op );
             break;
+        }
 
         default:
             assert( false );

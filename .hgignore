@@ -1,5 +1,6 @@
 syntax: glob
-
+*.cache
+*make.cache
 *-build*
 *.idb
 *.log

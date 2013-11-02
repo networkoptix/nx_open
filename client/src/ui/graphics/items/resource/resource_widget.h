@@ -4,6 +4,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtCore/QPointer>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
 
@@ -459,6 +460,7 @@ private:
 
     qint64 m_lastNewFrameTimeMSec;
 
+    QElapsedTimer m_limitTextRescaleTimer;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

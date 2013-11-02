@@ -28,6 +28,7 @@ void mac_initFullScreen(void *winId, void *qnmainwindow) {
                                       object:nswindow
                                       queue:nil
                                       usingBlock:^(NSNotification *) {
+                                           [nswindow setCollectionBehavior:NSWindowCollectionBehaviorDefault];
                                            disable_animations(qnmainwindow);
                                       }];
     [defaultCenter addObserverForName:NSWindowDidEnterFullScreenNotification
@@ -67,10 +68,17 @@ void mac_showFullScreen(void *winId, bool fullScreen) {
         return;
 
     if (fullScreen) {
-//        [nswindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+        [nswindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
         [nswindow toggleFullScreen:nil];
     } else {
         [nswindow toggleFullScreen:nil];
-//        [nswindow setCollectionBehavior:NSWindowCollectionBehaviorDefault];
     }
+}
+
+bool mac_isFullscreen(void *winId) {
+    NSView *nsview = (NSView *) winId;
+    NSWindow *nswindow = [nsview window];
+
+    bool isFullScreen = [nswindow styleMask] & NSFullScreenWindowMask;
+    return isFullScreen;
 }

@@ -102,6 +102,7 @@ namespace {
 
 } // anonymous namespace
 
+#ifdef Q_OS_MACX
 extern "C" {
     void disable_animations(void *qnmainwindow) {
         QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
@@ -113,6 +114,7 @@ extern "C" {
         mainwindow->setAnimationsEnabled(true);
     }
 }
+#endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
@@ -123,7 +125,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_drawCustomFrame(false)
 {
 #ifdef Q_OS_MACX
-    mac_initFullScreen(winId(), this);
+    mac_initFullScreen((void*)winId(), (void*)this);
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -281,10 +283,19 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Post-initialize. */
     updateDwmState();
+#ifdef Q_OS_MACX
+    setOptions(WindowButtonsVisible);
+#else
     setOptions(TitleBarDraggable | WindowButtonsVisible);
+#endif
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
+
+#ifdef Q_OS_MACX
+    //initialize system-wide menu
+    menu()->newMenu(Qn::MainScope);
+#endif
 }
 
 QnMainWindow::~QnMainWindow() {
@@ -360,20 +371,20 @@ void QnMainWindow::setAnimationsEnabled(bool enabled) {
 }
 
 void QnMainWindow::showFullScreen() {
-#if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
-//    setAnimationsEnabled(false);
-    setOptions(options() &~ TitleBarDraggable);
-    mac_showFullScreen(winId(), true);
+#if defined Q_OS_MACX
+    mac_showFullScreen((void*)winId(), true);
+    updateDecorationsState();
+    display()->fitInView(true);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
 }
 
 void QnMainWindow::showNormal() {
-#if defined Q_OS_MAC && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
-//    setAnimationsEnabled(false);
-    mac_showFullScreen(winId(), false);
-    setOptions(options() | TitleBarDraggable);
+#if defined Q_OS_MACX
+    mac_showFullScreen((void*)winId(), false);
+    updateDecorationsState();
+    display()->fitInView(true);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
@@ -408,14 +419,18 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
+#ifdef Q_OS_MACX
+    bool fullScreen = mac_isFullscreen((void*)winId());
+#else
     bool fullScreen = isFullScreen();
+#endif
     bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
 
 #ifdef Q_OS_MACX
-    bool uiTitleUsed = false;
+    bool uiTitleUsed = fullScreen;
 #else
     bool uiTitleUsed = fullScreen || maximized;
 #endif

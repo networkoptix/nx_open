@@ -186,6 +186,7 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     int roundWidth = qPower2Ceil((unsigned) width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
+        numBytes += FF_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
         avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
         fillRightEdge();
     }

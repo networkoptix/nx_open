@@ -34,8 +34,8 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     }
 
     QAuthenticator auth(getAuth());
-    std::string login = auth.user().toStdString();
-    std::string password = auth.password().toStdString();
+    QString login = auth.user();
+    QString password = auth.password();
     std::string endpoint = getMediaUrl().toStdString();
 
     MediaSoapWrapper soapWrapperGet(endpoint.c_str(), login, password, getTimeDrift());

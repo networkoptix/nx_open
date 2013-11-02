@@ -15,8 +15,9 @@ namespace {
 
     volatile bool qn_clientMetaTypes_initialized = false;
 
-    QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode);
 }
+
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 

@@ -4104,9 +4104,21 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             break;
         }
 
-        bool updateRequested = data.component == Qn::MediaServerComponent
-                ? QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true)
-                : QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestVersion);
+        bool updateRequested = false;
+        switch (data.component) {
+        case Qn::MediaServerComponent:
+            updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
+            break;
+        case Qn::EnterpriseControllerComponent:
+            updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestVersion);
+            break;
+        case Qn::ClientComponent:
+            updateRequested = false;
+            break;
+        default:
+            break;
+        }
+
         if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
