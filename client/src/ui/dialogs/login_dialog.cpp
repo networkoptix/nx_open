@@ -132,6 +132,12 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
             this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
     m_entCtrlFinder->start();
+
+    if (QLatin1String(QN_BETA) == QLatin1String("true"))
+        QMessageBox::warning(this->context()->mainWindow(),
+                             QObject::tr("Beta version"),
+                             QObject::tr("You are running beta version of %1")
+                             .arg(QLatin1String(QN_APPLICATION_NAME)));
 }
 
 QnLoginDialog::~QnLoginDialog() {
