@@ -35,7 +35,7 @@
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
-        <beta>false</beta>
+        <beta>true</beta>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
