@@ -54,7 +54,6 @@
     <build>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
-        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -180,4 +179,29 @@
             </plugin>            
         </plugins>
     </build>
+
+        <profile>
+            <id>beta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
+            </properties>
+        </profile>	      
+        <profile>
+            <id>beta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
+            </properties>
+        </profile>	          
 </project>
