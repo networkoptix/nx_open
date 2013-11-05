@@ -27,7 +27,7 @@
         <global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lonvif</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lcrypto -lsigar</linux.oslibs>
+        <linux.oslibs>-lssl -lcrypto -lsigar -lfaac</linux.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>                
         <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
