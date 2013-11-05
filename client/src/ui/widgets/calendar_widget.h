@@ -25,19 +25,12 @@ public:
     void setSyncedTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &periods);
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
-    // TODO: #GDM please do something about this setter. The naming is terribly wrong
-    // even in the context of our application (see call site in workbench_navigator).
-  
-    // TODO: #GDM function/accessor name should convey what it does/modifies,
-    // not where it should be used in some other class. 
-    // 
-    // Calendar knows nothing about central / non-central widgets, resources,
-    // and other our stuff, and it really shouldn't. If it is used outside of
-    // the context of our application, its method names should still make sense.
+    bool currentTimePeriodsVisible() const;
+
     /**
-     * If current widget is not central, calendar should not draw current periods.
+     * Set flag that enable or disable drawing of current periods.
      */
-    void setCurrentWidgetIsCentral(bool currentWidgetIsCentral);
+    void setCurrentTimePeriodsVisible(bool value);
 
     /**
      * \return true is all loaded periods of all roles are empty
@@ -77,7 +70,7 @@ private:
     QnTimePeriodStorage m_emptyPeriodStorage;
     QnTimePeriod m_selectedPeriod, m_selectedDaysPeriod, m_enabledPeriod;
     bool m_empty;
-    bool m_currentWidgetIsCentral;
+    bool m_currentTimePeriodsVisible;
 
     /** Current server time in msecs since epoch. */
     qint64 m_currentTime;

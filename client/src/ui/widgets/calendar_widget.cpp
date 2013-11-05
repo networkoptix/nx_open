@@ -28,7 +28,7 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent):
     base_type(parent),
     m_delegate(new QnCalendarItemDelegate(this)),
     m_empty(true),
-    m_currentWidgetIsCentral(false),
+    m_currentTimePeriodsVisible(false),
     m_currentTime(0),
     m_localOffset(0)
 {
@@ -96,11 +96,15 @@ void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
     update();
 }
 
-void QnCalendarWidget::setCurrentWidgetIsCentral(bool currentWidgetIsCentral){
-    if (m_currentWidgetIsCentral == currentWidgetIsCentral)
+bool QnCalendarWidget::currentTimePeriodsVisible() const {
+    return m_currentTimePeriodsVisible;
+}
+
+void QnCalendarWidget::setCurrentTimePeriodsVisible(bool value){
+    if (m_currentTimePeriodsVisible == value)
         return;
 
-    m_currentWidgetIsCentral = currentWidgetIsCentral;
+    m_currentTimePeriodsVisible = value;
     update();
 }
 
@@ -121,7 +125,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         m_localOffset,
         m_enabledPeriod, 
         m_selectedPeriod, 
-        m_currentWidgetIsCentral ? m_currentPeriodStorage : m_emptyPeriodStorage, 
+        m_currentTimePeriodsVisible ? m_currentPeriodStorage : m_emptyPeriodStorage,
         m_syncedPeriodStorage, 
         QString::number(date.day())
     );

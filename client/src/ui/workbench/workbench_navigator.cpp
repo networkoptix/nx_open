@@ -976,9 +976,9 @@ void QnWorkbenchNavigator::updateCalendar() {
     if(!m_calendar)
         return;
     if(m_currentWidgetFlags & WidgetSupportsPeriods)
-        m_calendar->setCurrentWidgetIsCentral(true);
+        m_calendar->setCurrentTimePeriodsVisible(true);
     else
-        m_calendar->setCurrentWidgetIsCentral(false);
+        m_calendar->setCurrentTimePeriodsVisible(false);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
