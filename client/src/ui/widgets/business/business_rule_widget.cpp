@@ -18,6 +18,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topic_accessor.h>
@@ -25,7 +26,6 @@
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
-#include <ui/widgets/properties/weektime_schedule_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
@@ -376,9 +376,8 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked() {
     if (!m_model)
         return;
 
-    QScopedPointer<QnWeekTimeScheduleWidget> dialog(new QnWeekTimeScheduleWidget(this));
+    QScopedPointer<QnWeekTimeScheduleDialog> dialog(new QnWeekTimeScheduleDialog(this));
     dialog->setScheduleTasks(m_model->schedule());
-    setHelpTopic(dialog.data(), Qn::EventsActions_Schedule_Help);
     if (dialog->exec() != QDialog::Accepted)
         return;
     m_model->setSchedule(dialog->scheduleTasks());

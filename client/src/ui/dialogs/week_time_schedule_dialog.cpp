@@ -1,20 +1,24 @@
-#include "weektime_schedule_widget.h"
-#include "ui_weektime_schedule_widget.h"
+#include "week_time_schedule_dialog.h"
+#include "ui_week_time_schedule_dialog.h"
 
 #include <QtWidgets/QMessageBox>
 
-#include <core/resource_managment/resource_pool.h>
-#include <utils/math/color_transformations.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
+
+#include <utils/math/color_transformations.h>
 #include "utils/media/bitStream.h"
 
-QnWeekTimeScheduleWidget::QnWeekTimeScheduleWidget(QWidget *parent):
-    QDialog(parent),
-    ui(new Ui::WeekTimeScheduleWidget),
+QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
+    base_type(parent),
+    ui(new Ui::QnWeekTimeScheduleDialog),
     m_disableUpdateGridParams(false),
     m_inUpdate(0)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::EventsActions_Schedule_Help);
 
     // init buttons
     ui->valueOnButton->setColor(qnGlobals->recordAlwaysColor());
@@ -31,32 +35,32 @@ QnWeekTimeScheduleWidget::QnWeekTimeScheduleWidget(QWidget *parent):
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     connectToGridWidget();
-    
+
     ui->gridWidget->setShowSecondParam(false);
     ui->gridWidget->setShowFirstParam(false);
 }
 
-QnWeekTimeScheduleWidget::~QnWeekTimeScheduleWidget() {
-    return;
+QnWeekTimeScheduleDialog::~QnWeekTimeScheduleDialog()
+{
 }
 
-void QnWeekTimeScheduleWidget::connectToGridWidget() 
+void QnWeekTimeScheduleDialog::connectToGridWidget()
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
 }
 
-void QnWeekTimeScheduleWidget::disconnectFromGridWidget() 
+void QnWeekTimeScheduleDialog::disconnectFromGridWidget()
 {
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
 }
 
-QString QnWeekTimeScheduleWidget::scheduleTasks() const
+QString QnWeekTimeScheduleDialog::scheduleTasks() const
 {
     quint8 buffer[24]; // qPower2Floor(24*7/8, 4)
     BitStreamWriter writer;
     writer.setBuffer(buffer, sizeof(buffer));
     try {
-        for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
+        for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
         {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                 const QPoint cell(col, row);
@@ -74,12 +78,12 @@ QString QnWeekTimeScheduleWidget::scheduleTasks() const
     return QString::fromUtf8(result.toHex());
 }
 
-void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
+void QnWeekTimeScheduleDialog::setScheduleTasks(const QString& value)
 {
     disconnectFromGridWidget(); /* We don't want to get 100500 notifications. */
 
     if (value.isEmpty()) {
-        for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
+        for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
         {
             for (int col = 0; col < ui->gridWidget->columnCount(); ++col)
                 ui->gridWidget->setCellRecordingType(QPoint(col, row), Qn::RecordingType_Run);
@@ -89,7 +93,7 @@ void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
         QByteArray schedule = QByteArray::fromHex(value.toUtf8());
         try {
             BitStreamReader reader((quint8*) schedule.data(), schedule.size());
-            for (int row = 0; row < ui->gridWidget->rowCount(); ++row) 
+            for (int row = 0; row < ui->gridWidget->rowCount(); ++row)
             {
                 for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
                     const QPoint cell(col, row);
@@ -107,7 +111,7 @@ void QnWeekTimeScheduleWidget::setScheduleTasks(const QString& value)
     emit scheduleTasksChanged();
 }
 
-void QnWeekTimeScheduleWidget::updateGridParams(bool fromUserInput)
+void QnWeekTimeScheduleDialog::updateGridParams(bool fromUserInput)
 {
     if (m_inUpdate > 0)
         return;
@@ -121,7 +125,7 @@ void QnWeekTimeScheduleWidget::updateGridParams(bool fromUserInput)
     else if (ui->valueOffButton->isChecked())
         recordType = Qn::RecordingType_Never;
     else
-        qWarning() << "QnWeekTimeScheduleWidget::No record type is selected!";
+        qWarning() << "QnWeekTimeScheduleDialog::No record type is selected!";
 
     if(!fromUserInput)
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::RecordTypeParam, recordType);
@@ -133,7 +137,7 @@ void QnWeekTimeScheduleWidget::updateGridParams(bool fromUserInput)
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWeekTimeScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
+void QnWeekTimeScheduleDialog::at_gridWidget_cellActivated(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
 
