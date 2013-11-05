@@ -88,7 +88,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                 change_dep_path(binary, full_name, join(folder, name))
 
 
-def main(app_path, bindir, libdir):
+def main(app_path, bindir, libdir, helpdir):
     qlibdir = '{env}/qt5/qtbase-x64/lib'.format(env=os.getenv('environment'))
 
     appdir = os.path.basename(app_path)
