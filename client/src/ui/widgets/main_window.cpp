@@ -227,7 +227,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
+#ifdef Q_OS_WIN
+    // tabs are drawn in the window header on windows 7 //TODO: #Elric check on windows XP
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
+#endif
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
