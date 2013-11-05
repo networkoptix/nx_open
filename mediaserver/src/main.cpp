@@ -1086,7 +1086,8 @@ void QnMain::run()
 
     
 
-    QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
+    // Roman asked Ivan to comment it for Brian
+    // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 
     //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
