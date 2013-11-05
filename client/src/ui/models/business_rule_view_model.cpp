@@ -12,6 +12,7 @@
 #include <business/events/motion_business_event.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
+#include <business/actions/camera_output_business_action.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>
@@ -710,6 +711,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     return any;
                 } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
+                } else if (m_actionType == BusinessActionType::CameraOutput || m_actionType == BusinessActionType::CameraOutputInstant) {
+                    return QnCameraOutputBusinessAction::isResourcesListValid(m_actionResources);
                 } else if (m_actionType == BusinessActionType::PlaySound) {
                     return !m_actionParams.getSoundUrl().isEmpty();
                 }  else if (m_actionType == BusinessActionType::SayText) {
@@ -821,6 +824,20 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         int invalid = QnRecordingBusinessAction::invalidResourcesCount(m_actionResources);
         if (detailed && invalid > 0)
             return tr("Recording is disabled for %1")
+                    .arg((cameras.size() == 1)
+                         ? getResourceName(cameras.first())
+                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
+        if (cameras.size() == 1)
+            return getResourceName(cameras.first());
+        return tr("%n Camera(s)", "", cameras.size());
+    } else if (m_actionType == BusinessActionType::CameraOutput || m_actionType == BusinessActionType::CameraOutputInstant) {
+        QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
+        if (cameras.isEmpty())
+            return tr("Select at least one camera");
+
+        int invalid = QnCameraOutputBusinessAction::invalidResourcesCount(m_actionResources);
+        if (detailed && invalid > 0)
+            return tr("%1 have not output relays", "", cameras.size())
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
                          : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
