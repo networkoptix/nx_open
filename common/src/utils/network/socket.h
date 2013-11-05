@@ -23,7 +23,7 @@
 #define MAX_ERROR_MSG_LENGTH 1024
 
 static const int MAX_DATAGRAM_SIZE = 1024 * 16;
-static const QString BROADCAST_ADDRESS(lit("255.255.255.255"));
+static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
 
 /**
  *   Signals a problem with the execution of a socket call.
