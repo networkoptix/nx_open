@@ -510,7 +510,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qApp->processEvents();
 
     // show bet version warning message for the main instance only
-    if (!noSingleApplication && QLatin1String(QN_BETA) == QLatin1String("true"))
+    if (!noSingleApplication &&
+            !qnSettings->isDevMode() &&
+            QLatin1String(QN_BETA) == QLatin1String("true"))
         context->action(Qn::BetaVersionMessageAction)->trigger();
 
     if (argc <= 1) {
