@@ -273,6 +273,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
         m_streamingUrl = localOther->getStreamingUrl();
+        m_version = localOther->getVersion();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
