@@ -179,7 +179,7 @@
             </plugin>            
         </plugins>
     </build>
-
+    <profiles>
         <profile>
             <id>beta</id>
             <activation>
@@ -193,7 +193,7 @@
             </properties>
         </profile>	      
         <profile>
-            <id>beta</id>
+            <id>nobeta</id>
             <activation>
                 <property>
                     <name>beta</name>
@@ -204,4 +204,5 @@
                 <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
             </properties>
         </profile>	          
+    </profiles>
 </project>
