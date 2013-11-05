@@ -242,7 +242,7 @@ image_library_plugin/x64
 image_library_plugin/arm
 
 
-nx_sdk/nx_sdk 
+nx_sdk/nx_sdk
 
 
 libonvif/.build/
@@ -250,3 +250,4 @@ libonvif/.build/
 .vagrant
 **/Makefile
 .qmake.cache
+target/version.h
