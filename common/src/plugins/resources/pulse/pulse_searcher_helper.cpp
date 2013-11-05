@@ -4,39 +4,6 @@
 #include "utils/network/mac_address.h"
 #include "../pulse/pulse_resource.h"
 
-// These functions added temporary as in Qt 4.8 they are already in QUdpSocket
-bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
-{
-    struct ip_mreq imr;
-
-    memset(&imr, 0, sizeof(imr));
-
-    imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
-    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address());
-
-    int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
-    if (res == -1)
-        return false;
-
-    return true;
-}
-
-bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
-{
-    struct ip_mreq imr;
-
-    imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
-    imr.imr_interface.s_addr = INADDR_ANY;
-
-    int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
-    if (res == -1)
-        return false;
-
-    return true;
-}
-
-
-
 QnPlPulseSearcherHelper::QnPlPulseSearcherHelper()
 {
 
@@ -53,13 +20,14 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        QUdpSocket socket;
+        UDPSocket socket;
 
-        if (!socket.bind(iface.address, 0))
+        if (!socket.setLocalAddressAndPort(iface.address.toString(), 0))
             continue;
 
-        QHostAddress groupAddress(QLatin1String("224.111.111.1"));
-        if (!multicastJoinGroup(socket, groupAddress, iface.address)) continue;
+        QString groupAddress(QLatin1String("224.111.111.1"));
+        if (!socket.joinGroup(groupAddress, iface.address.toString())) 
+            continue;
 
         QByteArray requestDatagram;
         requestDatagram.resize(43);
@@ -69,28 +37,30 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         requestDatagram.insert(13, QByteArray("127.0.0.1"));
          requestDatagram.resize(43);
 
-        socket.writeDatagram(requestDatagram.data(), requestDatagram.size(), groupAddress, 6789);
+        socket.sendTo(requestDatagram.data(), requestDatagram.size(), groupAddress, 6789);
 
         QnSleep::msleep(150);
-        while(socket.hasPendingDatagrams())
+        while(socket.hasData())
         {
             QByteArray reply;
-            reply.resize(socket.pendingDatagramSize());
+            reply.resize(MAX_DATAGRAM_SIZE);
 
-            QHostAddress sender;
+            QString sender;
             quint16 senderPort;
-            socket.readDatagram(reply.data(), reply.size(),    &sender, &senderPort);
+            int readed = socket.recvFrom(reply.data(), reply.size(), sender, senderPort);
+            if (readed < 1)
+                continue;
                         
-            WSResult res = parseReply(reply);
+            WSResult res = parseReply(reply.left(readed));
             if (!res.mac.isEmpty())
             {
-                res.ip = sender.toString();
+                res.ip = sender;
                 res.disc_ip = iface.address.toString();
                 result[res.mac] = res;
             }
 
         }
-        multicastLeaveGroup(socket, groupAddress);
+        socket.leaveGroup(groupAddress);
     }
 
     

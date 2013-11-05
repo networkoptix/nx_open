@@ -23,7 +23,7 @@ protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
 private:
-    QList<QSharedPointer<QUdpSocket> > m_socketList;
+    QList<QSharedPointer<UDPSocket> > m_socketList;
     qint64 m_lastReadSocketTime;
 };
 

@@ -230,35 +230,35 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        QUdpSocket sendSock, receiveSock;
-        if (!sendSock.bind(iface.address, NATIVE_DISCOVERY_REQUEST_PORT))
+        UDPSocket sendSock, receiveSock;
+        if (!sendSock.setLocalAddressAndPort(iface.address.toString(), NATIVE_DISCOVERY_REQUEST_PORT))
             continue;
-        if (!receiveSock.bind(iface.address, NATIVE_DISCOVERY_RESPONSE_PORT))
+        if (!receiveSock.setLocalAddressAndPort(iface.address.toString(), NATIVE_DISCOVERY_RESPONSE_PORT))
             continue;
 
         for (uint i = 0; i < sizeof(requests)/sizeof(char*); ++i)
         {
             // sending broadcast
             QByteArray datagram(requests[i], REQUEST_SIZE);
-            sendSock.writeDatagram(datagram.data(), datagram.size(),QHostAddress::Broadcast, NATIVE_DISCOVERY_REQUEST_PORT);
+            sendSock.sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, NATIVE_DISCOVERY_REQUEST_PORT);
         }
 
         QTime time;
         time.start();
         QnSleep::msleep(300);
 
-        while (receiveSock.hasPendingDatagrams())
+        while (receiveSock.hasData())
         {
             QByteArray datagram;
-            datagram.resize(receiveSock.pendingDatagramSize());
+            datagram.resize(MAX_DATAGRAM_SIZE);
 
-            QHostAddress sender;
+            QString sender;
             quint16 senderPort;
 
-            receiveSock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+            int readed = receiveSock.recvFrom(datagram.data(), datagram.size(),	sender, senderPort);
 
-            if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && datagram.size() > 128) // minimum response size
-                processNativePacket(result, datagram, iface.address);
+            if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
+                processNativePacket(result, datagram.left(readed), iface.address);
         }
         //processNativePacket(result, QByteArray(), iface.address);
     }

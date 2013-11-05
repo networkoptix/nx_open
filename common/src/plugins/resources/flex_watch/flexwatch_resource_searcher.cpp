@@ -19,7 +19,7 @@ QnFlexWatchResourceSearcher::~QnFlexWatchResourceSearcher()
 
 void QnFlexWatchResourceSearcher::clearSocketList()
 {
-    foreach(QUdpSocket* sock, m_sockList)
+    foreach(UDPSocket* sock, m_sockList)
         delete sock;
     m_sockList.clear();
 }
@@ -38,9 +38,9 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
         clearSocketList();
         foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
         {
-            QUdpSocket* sock = new QUdpSocket();
+            UDPSocket* sock = new UDPSocket();
             //if (!bindToInterface(*sock, iface, 51001)) {
-            if (!sock->bind(iface.address, 51001)) {
+            if (!sock->setLocalAddressAndPort(iface.address.toString(), 51001)) {
                 delete sock;
                 continue;
             }
@@ -55,7 +55,7 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
 void QnFlexWatchResourceSearcher::sendBroadcast()
 {
     QByteArray requestPattertn("53464a001c0000000000000000000000____f850000101000000d976");
-    foreach (QUdpSocket* sock, m_sockList)
+    foreach (UDPSocket* sock, m_sockList)
     {
         if (shouldStop())
             break;
@@ -66,7 +66,7 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
         QByteArray pattern = requestPattertn.replace("____", rndPattern);
         QByteArray request = QByteArray::fromHex(pattern);
         // sending broadcast
-        sock->writeDatagram(request.data(), request.size(),QHostAddress::Broadcast, 51000);
+		sock->sendTo(request.data(), request.size(), BROADCAST_ADDRESS, 51000);
     }
 }
 
@@ -81,21 +81,21 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
 
     QSet<QString> processedMac;
 
-    foreach (QUdpSocket* sock, m_sockList)
+    foreach (UDPSocket* sock, m_sockList)
     {
         if (shouldStop())
             return QnResourceList();
 
-        while (sock->hasPendingDatagrams())
+        while (sock->hasData())
         {
             QByteArray datagram;
-            datagram.resize(sock->pendingDatagramSize());
+            datagram.resize(MAX_DATAGRAM_SIZE);
 
-            QHostAddress sender;
+            QString sender;
             quint16 senderPort;
-            sock->readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
+            int readed = sock->recvFrom(datagram.data(), datagram.size(),  sender, senderPort);
 
-            if (!datagram.startsWith("SFJ"))
+            if (readed < 4 || !datagram.startsWith("SFJ"))
                 continue;
             if (datagram.size() < 64)
                 continue;
@@ -113,7 +113,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             processedMac << info.mac;
 
             info.uniqId = info.mac;
-            info.discoveryIp = sender.toString();
+            info.discoveryIp = sender;
 
             OnvifResourceInformationFetcher onfivFetcher;
             onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result);

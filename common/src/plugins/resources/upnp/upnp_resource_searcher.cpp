@@ -9,10 +9,6 @@
 #include "utils/network/nettools.h"
 
 
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
-
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 
