@@ -4,6 +4,7 @@
 #   include <icmpapi.h>
 #   include <stdio.h>
 #else
+#   include <stdlib.h>
 #   include <sys/types.h>
 #   include <sys/socket.h>
 #   include <arpa/inet.h>
@@ -24,11 +25,14 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 {
 #ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -n %2 -l %3");
-#else
-    QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");
-#endif //TODO: #ivan MacOS ping?
     QProcess process;
     process.start(cmd.arg(ip).arg(retry).arg(packetSize));
     process.waitForFinished();
     return process.exitCode() == 0;
+#else
+    QString cmd = QLatin1String("/bin/ping %1 -c %2 -s %3");
+    int rez = system(cmd.arg(ip).arg(retry).arg(packetSize).toLocal8Bit().data());
+    return WEXITSTATUS(rez) == 0;
+#endif 
+    //TODO: #ivan MacOS ping?
 }
