@@ -116,7 +116,7 @@ public:
     bool setLocalAddressAndPort(const QString &localAddress,
                                 unsigned short localPort = 0) ;
 
-    bool bindToInterface(const QnInterfaceAndAddr& iface);
+    //bool bindToInterface(const QnInterfaceAndAddr& iface);
     /*!
         \param ms. New timeout value (in millis). 0 - no timeout
         \return true. if timeout has been changed

@@ -27,7 +27,7 @@ FFMPEG_FILES="libavcodec.so.[0-9][0-9] libavdevice.so.[0-9][0-9] libavfilter.so.
 
 
 # Prepare stage dir
-sudo rm -rf $STAGEBASE
+rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $ETCSTAGE
@@ -74,6 +74,4 @@ cp debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-
-(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-mediaserver_${VERSION}_${ARCHITECTURE})
+(cd $STAGEBASE; fakeroot dpkg-deb -b networkoptix-mediaserver_${VERSION}_${ARCHITECTURE})

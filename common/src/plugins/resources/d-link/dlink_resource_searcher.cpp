@@ -64,7 +64,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
         QUdpSocket sock;
 
-        if (!bindToInterface(sock, iface))
+        if (!sock.bind(iface.address, 0))
             continue;
 
         // sending broadcast

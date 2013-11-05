@@ -418,7 +418,7 @@ namespace nx_http
         m_httpStreamReader.resetState();
 
         m_socket = QSharedPointer<TCPSocket>( new TCPSocket() );
-        if( !m_socket->setNonBlockingMode( true ) )
+        if( !m_socket->setNonBlockingMode( true ) || !m_socket->setWriteTimeOut(CommunicatingSocket::DEFAULT_TIMEOUT_MILLIS) )
         {
             cl_log.log( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
@@ -426,10 +426,9 @@ namespace nx_http
             return false;
         }
 
-        //starting async connect
-        if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT) ) )
+        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )
         {
-            cl_log.log( QString::fromLatin1("Failed to perform async connect to %1:%2. %3").
+            cl_log.log( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
             return false;
@@ -438,14 +437,17 @@ namespace nx_http
         m_url = url;
         m_state = sWaitingConnectToHost;
 
-        //connect is done if socket is available for write
-        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )
+        //starting async connect
+        if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT) ) )
         {
-            cl_log.log( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
+            cl_log.log( QString::fromLatin1("Failed to perform async connect to %1:%2. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
+            m_state = sInit;
+            m_url = QUrl();
             return false;
         }
+        //connect is done if socket is available for write
 
         return true;
     }

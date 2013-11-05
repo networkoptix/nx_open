@@ -35,7 +35,7 @@ function build_ecs {
 build_ecs
 
 # Prepare stage dir
-sudo rm -rf $STAGEBASE
+rm -rf $STAGEBASE
 mkdir -p $PKGSTAGE
 rmdir $PKGSTAGE
 
@@ -86,5 +86,4 @@ cp debian/conffiles $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b networkoptix-entcontroller_${VERSION}_${ARCHITECTURE})
+(cd $STAGEBASE; fakeroot dpkg-deb -b networkoptix-entcontroller_${VERSION}_${ARCHITECTURE})

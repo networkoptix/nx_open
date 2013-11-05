@@ -96,8 +96,8 @@
 								</goals>
 								<configuration>
 									<target>
-										<exec dir="${basedir}" executable="sudo" failifexecutionfails="false">
-											<arg line="rm -Rf ${project.build.directory}"/>
+										<exec dir="${basedir}" executable="rm" failifexecutionfails="false">
+											<arg line="-Rf ${project.build.directory}"/>
 										</exec>
 									</target>
 									<target>
