@@ -18,6 +18,7 @@
 #include <ui/help/business_help.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -175,8 +176,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 break;
 
             if (!isValid(column))
-                return QBrush(QColor(204, 0, 0));   //TODO: #GDM skin colors
-            return QBrush(QColor(150, 0, 0));       //TODO: #GDM skin colors
+                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+            return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
 
         case Qn::ModifiedRole:
             return m_modified;

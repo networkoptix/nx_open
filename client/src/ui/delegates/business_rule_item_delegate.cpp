@@ -15,6 +15,7 @@
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/style/globals.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -100,12 +101,11 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
     if (index.data(Qn::DisabledRole).toBool()) {
         if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
             vopt->state &= ~QStyle::State_Enabled;
-         //   vopt->features |= QStyleOptionViewItemV2::Alternate;
         }
-        option->palette.setColor(QPalette::Highlight, QColor(64, 64, 64)); //TODO: #GDM skin colors
+        option->palette.setColor(QPalette::Highlight, qnGlobals->businessRuleDisabledHighlightColor());
     } else if (!index.data(Qn::ValidRole).toBool()) {
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
-        option->palette.setColor(QPalette::Highlight, clr.lighter()); //TODO: #GDM skin colors
+        option->palette.setColor(QPalette::Highlight, clr.lighter());
     }
 }
 
