@@ -49,6 +49,7 @@ private:
     // TODO: #Elric share these.
     QStaticText m_noDataStaticText;
     QStaticText m_offlineStaticText;
+    QStaticText m_serverOfflineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticSubText;
     QStaticText m_loadingStaticText;
