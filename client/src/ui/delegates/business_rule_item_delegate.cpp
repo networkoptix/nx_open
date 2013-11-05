@@ -97,13 +97,13 @@ QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, c
 
 void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
     base_type::initStyleOption(option, index);
-    if (index.data(QnBusiness::DisabledRole).toBool()) {
+    if (index.data(Qn::DisabledRole).toBool()) {
         if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
             vopt->state &= ~QStyle::State_Enabled;
          //   vopt->features |= QStyleOptionViewItemV2::Alternate;
         }
         option->palette.setColor(QPalette::Highlight, QColor(64, 64, 64)); //TODO: #GDM skin colors
-    } else if (!index.data(QnBusiness::ValidRole).toBool()) {
+    } else if (!index.data(Qn::ValidRole).toBool()) {
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
         option->palette.setColor(QPalette::Highlight, clr.lighter()); //TODO: #GDM skin colors
     }
@@ -117,7 +117,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 //TODO: #GDM server selection dialog?
                 connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-                BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(QnBusiness::EventTypeRole).toInt();
+                BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(Qn::EventTypeRole).toInt();
                 if (eventType == BusinessEventType::Camera_Motion)
                     btn->setDialogDelegate(new QnMotionEnabledDelegate(btn));
                 else if (eventType == BusinessEventType::Camera_Input)
@@ -127,7 +127,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             }
         case QnBusiness::TargetColumn:
             {
-                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qn::ActionTypeRole).toInt();
 
                 if (actionType == BusinessActionType::ShowPopup) {
                     QComboBox* comboBox = new QComboBox(parent);
@@ -168,7 +168,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             }
         case QnBusiness::ActionColumn:
             {
-                bool instant = index.data(QnBusiness::InstantActionRole).toBool();
+                bool instant = index.data(Qn::ActionIsInstantRole).toBool();
                 QComboBox* comboBox = new QComboBox(parent);
                 for (int i = 0; i < BusinessActionType::Count; i++) {
                     BusinessActionType::Value val = (BusinessActionType::Value)i;
@@ -198,15 +198,15 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
         case QnBusiness::SourceColumn:
             {
                 if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-                    btn->setResources(index.data(QnBusiness::EventResourcesRole).value<QnResourceList>());
-                    btn->setText(index.data(QnBusiness::ShortTextRole).toString());
+                    btn->setResources(index.data(Qn::EventResourcesRole).value<QnResourceList>());
+                    btn->setText(index.data(Qn::ShortTextRole).toString());
                     return;
                 }
                 break;
             }
         case QnBusiness::TargetColumn:
             {
-                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qn::ActionTypeRole).toInt();
 
                 if (actionType == BusinessActionType::ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
@@ -231,21 +231,21 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
 
 
                 if(QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor)){
-                    btn->setResources(index.data(QnBusiness::ActionResourcesRole).value<QnResourceList>());
-                    btn->setText(index.data(QnBusiness::ShortTextRole).toString());
+                    btn->setResources(index.data(Qn::ActionResourcesRole).value<QnResourceList>());
+                    btn->setText(index.data(Qn::ShortTextRole).toString());
                     return;
                 }
                 break;
             }
         case QnBusiness::EventColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::EventTypeRole)));
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole)));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
         case QnBusiness::ActionColumn:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(QnBusiness::ActionTypeRole)));
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole)));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
@@ -275,7 +275,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
             }
         case QnBusiness::TargetColumn:
             {
-                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(QnBusiness::ActionTypeRole).toInt();
+                BusinessActionType::Value actionType = (BusinessActionType::Value)index.data(Qn::ActionTypeRole).toInt();
 
                 if (actionType == BusinessActionType::ShowPopup) {
                     if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {

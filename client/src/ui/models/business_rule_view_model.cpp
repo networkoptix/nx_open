@@ -178,24 +178,24 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return QBrush(QColor(204, 0, 0));   //TODO: #GDM skin colors
             return QBrush(QColor(150, 0, 0));       //TODO: #GDM skin colors
 
-        case QnBusiness::ModifiedRole:
+        case Qn::ModifiedRole:
             return m_modified;
-        case QnBusiness::DisabledRole:
+        case Qn::DisabledRole:
             return m_disabled;
-        case QnBusiness::ValidRole:
+        case Qn::ValidRole:
             return isValid();
-        case QnBusiness::InstantActionRole:
+        case Qn::ActionIsInstantRole:
             return !BusinessEventType::hasToggleState(m_eventType);
-        case QnBusiness::ShortTextRole:
+        case Qn::ShortTextRole:
             return getText(column, false);
 
-        case QnBusiness::EventTypeRole:
+        case Qn::EventTypeRole:
             return m_eventType;
-        case QnBusiness::EventResourcesRole:
+        case Qn::EventResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_eventResources);
-        case QnBusiness::ActionTypeRole:
+        case Qn::ActionTypeRole:
             return m_actionType;
-        case QnBusiness::ActionResourcesRole:
+        case Qn::ActionResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_actionResources);
 
         case Qn::HelpTopicIdRole:
