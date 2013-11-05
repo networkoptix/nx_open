@@ -71,7 +71,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 
 
 //=========================================================================
-QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(QByteArray& datagram)
+QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(const QByteArray& datagram)
 {
 
     WSResult result;
