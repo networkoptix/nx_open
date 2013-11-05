@@ -32,10 +32,6 @@
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
-// TODO: #GDM
-// Why are you using QFrame as container for subwidgets of QnBusinessRuleWidget?
-// Why don't just use QWidget?
-
 namespace {
     QString toggleStateToString(Qn::ToggleState value, bool prolonged) {
         switch( value )
@@ -134,7 +130,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
         bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
-        ui->eventResourcesFrame->setVisible(isResourceRequired);
+        ui->eventResourcesWidget->setVisible(isResourceRequired);
 
         initEventParameters();
     }
@@ -156,7 +152,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
-        ui->actionResourcesFrame->setVisible(isResourceRequired);
+        ui->actionResourcesWidget->setVisible(isResourceRequired);
 
         ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
