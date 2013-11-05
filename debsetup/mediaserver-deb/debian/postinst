@@ -187,6 +187,8 @@ case "$1" in
   ;;
 esac
 
+[ -d $VARDIR ] || mkdir $VARDIR
+
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
 fi

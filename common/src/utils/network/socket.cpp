@@ -944,6 +944,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     return rtn;
 }
 
+/*
 bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
 {
 #ifdef Q_OS_LINUX
@@ -963,6 +964,7 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
     //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
     return res;
 }
+*/
 
 bool Socket::setReadTimeOut( unsigned int ms )
 {

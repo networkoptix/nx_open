@@ -484,7 +484,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
+    platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
 
@@ -1040,7 +1040,20 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+    QString disabledVendors = qSettings.value("disabledVendors").toString();
+    QStringList disabledVendorList;
+    if (disabledVendors.contains(";"))
+        disabledVendorList = disabledVendors.split(";");
+    else
+        disabledVendorList = disabledVendors.split(" ");
+    QStringList updatedVendorList;        
+    for (int i = 0; i < disabledVendorList.size(); ++i) {
+	if (!disabledVendorList[i].trimmed().isEmpty())
+    	    updatedVendorList << disabledVendorList[i].trimmed();
+    }
+    qWarning() << "disabled vendors amount" << updatedVendorList.size();
+    qWarning() << disabledVendorList;        
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(updatedVendorList);
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );

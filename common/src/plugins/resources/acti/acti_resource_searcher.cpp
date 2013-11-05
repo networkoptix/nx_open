@@ -62,7 +62,7 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 
     QString host = url.host();
     CasheInfo info = m_cachedXml.value(host);
-    if (info.xml.isEmpty() || info.timer.elapsed() > CACHE_UPDATE_TIME)
+    if (!m_cachedXml.contains(host) || info.timer.elapsed() > CACHE_UPDATE_TIME)
     {
         if (!m_httpInProgress.contains(url.host())) 
         {
@@ -70,8 +70,10 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 
             nx_http::AsyncHttpClient* request = new nx_http::AsyncHttpClient();
             connect(request, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(at_replyReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
-            request->doGet(url);
-            m_httpInProgress << url.host();
+            if (request->doGet(url))
+                m_httpInProgress << url.host();
+            else
+                request->scheduleForRemoval();
         }
     }
 
