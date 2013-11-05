@@ -73,7 +73,7 @@ bool ForwardingInstrument::event(QWidget *viewport, QEvent *event) {
     case QEvent::DragMove:
     case QEvent::DragLeave:
         // All animations and paint events should be disabled while in fullscreen-transition process on MacOSX
-        if (!m_manager->isAnimationEnabled())
+        if (!manager()->isAnimationEnabled())
             return false;
         filtered = open(static_cast<QFrame *>(view))->staticProcessEvent(event);
         break;
