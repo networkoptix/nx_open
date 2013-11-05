@@ -54,6 +54,7 @@
     <build>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
+        <finalName>${finalName}</finalName>    
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -183,10 +184,11 @@
         <profile>
             <id>beta</id>
             <activation>
+                <activeByDefault>true</activeByDefault>
                 <property>
                     <name>beta</name>
                     <value>true</value>
-                </property>
+                </property>                
             </activation>
             <properties>
                 <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
