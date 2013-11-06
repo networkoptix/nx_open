@@ -245,8 +245,12 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
+#ifdef Q_OS_MACX
+    ui->rebuildGroupBox->setVisible(false);
+#else
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
     connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString )), this, SLOT(at_updateRebuildInfo()));
+#endif
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -257,8 +261,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
+
+#ifndef Q_OS_MACX
     connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
     connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+#endif
 
     updateFromResources();
 }
@@ -373,10 +380,13 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 
 void QnServerSettingsDialog::updateFromResources() 
 {
+      m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+#ifndef Q_OS_MACX
     at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
-    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+
     if (m_server->getStatus() == QnResource::Online)
         sendNextArchiveRequest();
+#endif
 
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
@@ -524,6 +534,7 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
     }
 }
 
+#ifndef Q_OS_MACX
 void QnServerSettingsDialog::at_rebuildButton_clicked()
 {
     RebuildAction action;
@@ -572,8 +583,9 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
         ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
         : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
     if (inProgress)
-        m_timer.singleShot(500, this, SLOT(sendNextArchiveRequest()));
+        QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
+#endif
 
 void QnServerSettingsDialog::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_server));

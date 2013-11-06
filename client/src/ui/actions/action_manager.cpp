@@ -430,7 +430,9 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MainMenuAction).
         flags(Qn::GlobalHotkey).
         text(tr("Main Menu")).
+#ifndef Q_OS_MACX
         shortcut(tr("Alt+Space")).
+#endif
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
@@ -601,6 +603,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
         text(tr("Show Version Mismatch Message"));
+
+    factory(Qn::BetaVersionMessageAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Beta Version Warning Message"));
 
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).

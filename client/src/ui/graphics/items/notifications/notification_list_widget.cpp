@@ -291,6 +291,8 @@ void QnNotificationListWidget::addItem(QnNotificationWidget *item, bool locked) 
     m_itemDataByItem.insert(item, data);
     m_items.append(item);
 
+    emit itemAdded(item);
+
     m_collapsedItemCountChanged = true;
     emit itemCountChanged();
 

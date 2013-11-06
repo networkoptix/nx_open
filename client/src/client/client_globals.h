@@ -221,7 +221,10 @@ namespace Qn {
         NoDataOverlay,
         UnauthorizedOverlay,
         OfflineOverlay,
-        AnalogWithoutLicenseOverlay
+        AnalogWithoutLicenseOverlay,
+        ServerOfflineOverlay,
+
+        OverlayCount
     };
 
     /**

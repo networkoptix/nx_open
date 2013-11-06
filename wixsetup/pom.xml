@@ -2,12 +2,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>2.0.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.3-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup</artifactId>
     <packaging>pom</packaging>
@@ -54,12 +54,12 @@
     <build>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
-        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+        <finalName>${finalName}</finalName>    
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
@@ -71,13 +71,17 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
                                 <resource>
-                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
-                                    <filtering>true</filtering>
-                                </resource>	
+                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>
                                 <resource>
                                     <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
                                     <filtering>false</filtering>
-                                </resource>           
+                                </resource>                                  
+                                <resource>
+                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>	                                
                                 <resource>
                                     <directory>${customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
@@ -176,4 +180,31 @@
             </plugin>            
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>beta</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>beta</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
+            </properties>
+        </profile>	      
+        <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
+            </properties>
+        </profile>	          
+    </profiles>
 </project>

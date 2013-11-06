@@ -1063,6 +1063,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
+    data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;

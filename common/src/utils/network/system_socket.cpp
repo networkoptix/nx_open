@@ -985,7 +985,7 @@ AbstractStreamSocket* TCPServerSocket::accept()
 {
     unsigned int recvTimeoutMs = 0;
     if( !getRecvTimeout( &recvTimeoutMs ) )
-        return false;
+        return NULL;
     int newConnSD = acceptWithTimeout( sockDesc, recvTimeoutMs );
     if( newConnSD >= 0 )
     {

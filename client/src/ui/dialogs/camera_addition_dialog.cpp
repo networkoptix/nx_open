@@ -136,7 +136,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),                          this,   SLOT(at_subnetCheckbox_toggled(bool)));
     connect(ui->closeButton,        SIGNAL(clicked()),                              this,   SLOT(accept()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
-    connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          ui->portSpinBox, SLOT(setDisabled(bool)));
+    connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          this,   SLOT(at_portAutoCheckBox_toggled(bool)));
     connect(qnResPool,              SIGNAL(resourceChanged(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceChanged(const QnResourcePtr &)));
     connect(qnResPool,              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
 
@@ -254,13 +254,9 @@ void QnCameraAdditionDialog::removeAddedCameras() {
 }
 
 void QnCameraAdditionDialog::updateSubnetMode() {
-    ui->startIPLabel->setVisible(m_subnetMode);
-    ui->startIPLineEdit->setVisible(m_subnetMode);
-    ui->endIPLabel->setVisible(m_subnetMode);
-    ui->endIPLineEdit->setVisible(m_subnetMode);
-
-    ui->cameraIpLabel->setVisible(!m_subnetMode);
-    ui->cameraIpLineEdit->setVisible(!m_subnetMode);
+    ui->addressStackedWidget->setCurrentWidget(m_subnetMode
+                                               ? ui->pageSubnet
+                                               : ui->pageSingleCamera);
 
     if (m_subnetMode) {
         ui->startIPLineEdit->setText(ui->cameraIpLineEdit->text());
@@ -491,7 +487,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     ui->cameraIpLineEdit->setEnabled(true);
     ui->endIPLineEdit->setEnabled(true);
     ui->portAutoCheckBox->setEnabled(true);
-    ui->portSpinBox->setEnabled(!ui->portAutoCheckBox->isChecked());
+    ui->portSpinBox->setEnabled(true);
     ui->subnetCheckbox->setEnabled(true);
     ui->loginLineEdit->setEnabled(true);
     ui->passwordLineEdit->setEnabled(true);
@@ -595,6 +591,10 @@ void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled) {
 
     m_subnetMode = toggled;
     updateSubnetMode();
+}
+
+void QnCameraAdditionDialog::at_portAutoCheckBox_toggled(bool toggled) {
+    ui->portStackedWidget->setCurrentWidget(toggled ? ui->pageAuto : ui->pagePort);
 }
 
 void QnCameraAdditionDialog::at_resPool_resourceChanged(const QnResourcePtr &resource) {

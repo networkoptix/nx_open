@@ -265,9 +265,15 @@ void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , 
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
-    Q_UNUSED(reply)
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QString user = reply->url().userName();
+    QString password = reply->url().password();
+
+    // if current values are already present in authenticator, do not send them again -
+    // it will cause an infinite loop until a timeout
+    if (user.isEmpty() || password.isEmpty() ||
+            (authenticator->user() == user && authenticator->password() == password))
+        return;
+
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }

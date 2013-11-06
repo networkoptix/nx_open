@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.3-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -35,11 +35,13 @@
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
+        <beta>true</beta>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
+        <help.language>english</help.language>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -81,8 +83,8 @@
 
     <modules>
         <module>build_environment</module>
-        <module>appserver</module>
         <module>common</module>
+        <module>appserver</module>
         <!--<module>plugins/axiscamplugin</module>-->
         <module>plugins/genericrtspplugin</module>
         <module>mediaserver</module>
@@ -149,7 +151,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
@@ -160,6 +162,13 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>          
+                                <resource>
+                                    <directory>${root.dir}/customization</directory>
+                                    <includes>
+                                        <include>version.h</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>	
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
@@ -197,6 +206,18 @@
             <id>noarm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>!mac</family>
+                </os> 
+            </activation>
+            <properties>
+                <additional.compiler>${compiler}</additional.compiler>         
+            </properties>
+        </profile>  
+        <profile>        
+            <id>nomac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
                 <property>
                     <name>arch</name>
                     <value>!arm</value>
@@ -209,7 +230,7 @@
             <properties>
                 <toolchain.version>none</toolchain.version>            
             </properties>
-        </profile>  
+        </profile>         
         <profile>
             <id>windows</id>
             <activation>
@@ -285,8 +306,9 @@
                 <python.dir>${env.environment}/python/bin/</python.dir>				
                 <platform>macosx</platform>
                 <compiler>gcc</compiler>
+                <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
-                <qt.spec>macx-g++47</qt.spec>
+                <qt.spec>macx-clang-libc++</qt.spec>
                 <qtlib11>PrintSupport</qtlib11>
             </properties>
             <modules>
@@ -346,6 +368,23 @@
                 <arch>x86</arch>
             </properties>
         </profile>	
+        <profile>
+            <id>linux-x86-on-x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.spec>linux-g++-32</qt.spec>
+            </properties>
+        </profile>	        
         <profile>
             <id>android</id>
             <activation>
