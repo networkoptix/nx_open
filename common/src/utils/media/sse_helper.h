@@ -117,11 +117,12 @@ _mm_hadd_epi16 (__m128i __X, __m128i __Y)
 //TODO: #ak give up following Q_OS_MAC check
 //TODO/ARM: sse analog
 
+#ifdef __arm__
+#else
+
 static inline bool useSSE2()
 {
-#ifdef __arm__
-    return false;
-#elif defined(Q_OS_MAC)
+#ifdef Q_OS_MAC
     return true;
 #else
     return qCpuHasFeature(SSE2);
@@ -130,9 +131,7 @@ static inline bool useSSE2()
 
 static inline bool useSSE3()
 {
-#ifdef __arm__
-    return false;
-#elif defined(Q_OS_MAC)
+#ifdef Q_OS_MAC
     return true;
 #else
     return qCpuHasFeature(SSE3);
@@ -141,9 +140,7 @@ static inline bool useSSE3()
 
 static inline bool useSSSE3()
 {
-#ifdef __arm__
-    return false;
-#elif defined(Q_OS_MAC)
+#ifdef Q_OS_MAC
     return true;
 #else
     return qCpuHasFeature(SSSE3);
@@ -152,9 +149,7 @@ static inline bool useSSSE3()
 
 static inline bool useSSE41()
 {
-#ifdef __arm__
-    return false;
-#elif defined(Q_OS_MAC)
+#ifdef Q_OS_MAC
     return false;
 #else
     return qCpuHasFeature(SSE4_1);
@@ -163,14 +158,14 @@ static inline bool useSSE41()
 
 static inline bool useSSE42()
 {
-#ifdef __arm__
-    return false;
-#elif defined(Q_OS_MAC)
+#ifdef Q_OS_MAC
     return false;
 #else
     return qCpuHasFeature(SSE4_2);
 #endif
 }
+
+#endif  // not arm
 
 // TODO: #vasilenko function too large for inlining. Move to cpp file.
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
