@@ -459,8 +459,6 @@ private:
     Qn::RenderStatus m_renderStatus;
 
     qint64 m_lastNewFrameTimeMSec;
-
-    QElapsedTimer m_limitTextRescaleTimer;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

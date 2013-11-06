@@ -426,12 +426,6 @@ void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
 
     m_footerLeftLabel->setText(leftText);
     m_footerRightLabel->setText(rightText);
-
-    // update text scale no often than once per second - it can be very slow while resizing an item
-    if (m_limitTextRescaleTimer.elapsed() < minTextRescaleDelay)
-        return; // it will be called on next paint event
-    m_footerOverlayWidget->updateScale();
-    m_limitTextRescaleTimer.restart();
 }
 
 QString QnResourceWidget::calculateInfoText() const {
