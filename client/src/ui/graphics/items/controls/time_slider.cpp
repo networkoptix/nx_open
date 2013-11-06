@@ -515,8 +515,8 @@ QVector<QnTimeStep> QnTimeSlider::createAbsoluteSteps() {
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     tr("m"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     tr("m"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     tr("h"),        ampm ? lit("dd MMMM yyyy h ap") : lit("dd MMMM yyyy hh:mm"), false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   3,      24,     tr("h"),        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   12,     24,     tr("h"),        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     tr("h"),        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     tr("h"),        QString(),          false) <<
         QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     lit("dd MMM"),  lit("dd MMMM yyyy"), false) <<
         QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     lit("MMMM"),    lit("MMMM yyyy"),   false) <<
         QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  lit("yyyy"),    lit("yyyy"),        false) <<
