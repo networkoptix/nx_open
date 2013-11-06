@@ -11,7 +11,8 @@ export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 ECS_PORT_DEFAULT=7001
 ECS_PROXY_PORT_DEFAULT=7004
 
-CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
+ETC_DIR="/opt/$COMPANY_NAME/entcontroller/etc"
+CONFIG_FILE="$ETC_DIR/entcontroller.conf"
 SSL_DIR="/opt/$COMPANY_NAME/entcontroller/var/ssl"
 SSL_CERT="$SSL_DIR/cert.pem"
 BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
@@ -25,14 +26,29 @@ if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-entcontroller
 fi
     
+function replace_var {
+    file=$1; shift
+    name=$1; shift
+    value=$1; shift
+
+    if grep "$name=" $file > /dev/null 2>&1
+        tmpfile=$(mktemp)
+        while read line
+        do
+              echo ${line/$name=*/$name=$value}
+        done < "$file" > "$tmpfile" && mv "$tmpfile" "$file"
+    then
+        sed -i "/\[General\]/a \
+$name=$value" $file
+    fi   
+}
+
 function read_config {
     ECS_PORT=$ECS_PORT_DEFAULT
     ECS_PROXY_PORT=$ECS_PROXY_PORT_DEFAULT
 
     [ -f $CONFIG_FILE ] || { true; return; }
 
-    ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid\s*=\s*\(.*\)/\1/g')
-    LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile\s*=\s*\(.*\)/\1/g')
     ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port\s*=\s*\(.*\)/\1/g')
     ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
     ECS_PROXY_AUTH_KEY=$(cat $CONFIG_FILE | grep proxyAuthKey | head -1 | sed 's/proxyAuthKey\s*=\s*\(.*\)/\1/g')
@@ -42,12 +58,12 @@ function read_config {
 }
 
 function write_config {
-    echo "[General]" > $CONFIG_FILE
-    [ -z "$ECS_GUID" ] || echo "ecsGuid=$ECS_GUID" >> $CONFIG_FILE
-    [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
-    [ -z "$ECS_PORT" ] || echo "port=$ECS_PORT" >> $CONFIG_FILE
-    [ -z "$ECS_PROXY_PORT" ] || echo "proxyPort=$ECS_PROXY_PORT" >> $CONFIG_FILE
-    [ -z "$ECS_PROXY_AUTH_KEY" ] || echo "proxyAuthKey=$ECS_PROXY_AUTH_KEY" >> $CONFIG_FILE
+    [ -d $ETC_DIR ] || mkdir $ETC_DIR
+    [ -f $CONFIG_FILE ] || echo "[General]" > $CONFIG_FILE
+
+    replace_var $CONFIG_FILE port $ECS_PORT
+    replace_var $CONFIG_FILE proxyPort $ECS_PROXY_PORT
+    replace_var $CONFIG_FILE proxyAuthKey $ECS_PROXY_AUTH_KEY
 }
 
 function to_int {

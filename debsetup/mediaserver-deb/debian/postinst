@@ -9,7 +9,8 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
-CONFIG_FILE="/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf"
+ETC_DIR="/opt/$COMPANY_NAME/mediaserver/etc"
+CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
 
 # This is necessary because changed configuration options should take effect 
@@ -32,6 +33,23 @@ PORT_DEFAULT="7002"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
 
+function replace_var {
+    file=$1; shift
+    name=$1; shift
+    value=$1; shift
+
+    if grep "$name=" $file > /dev/null 2>&1
+        tmpfile=$(mktemp)
+        while read line
+        do
+              echo ${line/$name=*/$name=$value}
+        done < "$file" > "$tmpfile" && mv "$tmpfile" "$file"
+    then
+        sed -i "/\[General\]/a \
+$name=$value" $file
+    fi   
+}
+
 function read_config {
     ECS_HOST=$ECS_HOST_DEFAULT
     ECS_PORT=$ECS_PORT_DEFAULT
@@ -42,8 +60,6 @@ function read_config {
 
     [ -f $CONFIG_FILE ] || { true; return; }
 
-    SERVER_GUID=$(cat $CONFIG_FILE | grep "^serverGuid=" | head -1 | sed 's/serverGuid=\(.*\)/\1/g')
-    LOG_FILE=$(cat $CONFIG_FILE | grep "^logFile=" | head -1 | sed 's/logFile=\(.*\)/\1/g')
     ECS_HOST=$(cat $CONFIG_FILE | grep "^appserverHost=" | head -1 | sed 's/appserverHost=\(.*\)/\1/g')
     ECS_PORT=$(cat $CONFIG_FILE | grep "^appserverPort=" | head -1 | sed 's/appserverPort=\(.*\)/\1/g')
     ECS_LOGIN=$(cat $CONFIG_FILE | grep "^appserverLogin=" | head -1 | sed 's/appserverLogin=\(.*\)/\1/g')
@@ -63,17 +79,17 @@ function read_config {
 }
 
 function write_config {
-    echo "[General]" > $CONFIG_FILE
-    [ -z "$SERVER_GUID" ] || echo "serverGuid=$SERVER_GUID" >> $CONFIG_FILE
-    [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
-    [ -z "$ECS_HOST" ] || echo "appserverHost=$ECS_HOST" >> $CONFIG_FILE
-    [ -z "$ECS_PORT" ] || echo "appserverPort=$ECS_PORT" >> $CONFIG_FILE
-    [ -z "$ECS_LOGIN" ] || echo "appserverLogin=$ECS_LOGIN" >> $CONFIG_FILE
-    [ -z "$ECS_PASSWORD" ] || echo "appserverPassword=$ECS_PASSWORD" >> $CONFIG_FILE
-    [ -z "$PORT" ] || echo "rtspPort=$PORT" >> $CONFIG_FILE
-    [ -z "$TRANSPORT" ] || echo "rtspTransport=$TRANSPORT" >> $CONFIG_FILE
-    [ -z "$PUBLIC_IP_ENABLED" ] || echo "publicIPEnabled=$PUBLIC_IP_ENABLED" >> $CONFIG_FILE
-    [ -z "$STATIC_PUBLIC_IP" ] || echo "staticPublicIP=$STATIC_PUBLIC_IP" >> $CONFIG_FILE
+    [ -d $ETC_DIR ] || mkdir $ETC_DIR
+    [ -f $CONFIG_FILE ] || echo "[General]" > $CONFIG_FILE
+
+    replace_var $CONFIG_FILE appserverHost "$ECS_HOST"
+    replace_var $CONFIG_FILE appserverPort "$ECS_PORT"
+    replace_var $CONFIG_FILE appserverLogin "$ECS_LOGIN"
+    replace_var $CONFIG_FILE appserverPassword "$ECS_PASSWORD"
+    replace_var $CONFIG_FILE rtspPort "$PORT"
+    replace_var $CONFIG_FILE rtspTransport "$TRANSPORT"
+    replace_var $CONFIG_FILE publicIPEnabled "$PUBLIC_IP_ENABLED"
+    replace_var $CONFIG_FILE staticPublicIP "$STATIC_PUBLIC_IP"
 }
 
 function to_int {
