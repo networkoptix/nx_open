@@ -7,7 +7,7 @@ namespace {
     int asciisum(const QString &value) {
         int result = 0;
         foreach (QChar c, value)
-            result += c.toAscii();
+            result += c.toLatin1();
         return result;
     }
 
@@ -43,7 +43,7 @@ QColor QnStatisticsColors::hddByKey(const QString &key) const {
     int id = 0;
     if (key.contains(QLatin1Char(':'))) {
         // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
-        id = key.at(0).toAscii() - 'C';
+        id = key.at(0).toLatin1() - 'C';
     }
     else if (key.startsWith(QLatin1String("sd")))
         id = asciisum(key) - sda;

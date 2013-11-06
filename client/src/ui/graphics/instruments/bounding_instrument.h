@@ -1,9 +1,9 @@
 #ifndef QN_BOUNDING_INSTRUMENT_H
 #define QN_BOUNDING_INSTRUMENT_H
 
-#include <QRect>
-#include <QSet>
-#include <QTransform>
+#include <QtCore/QRect>
+#include <QtCore/QSet>
+#include <QtGui/QTransform>
 #include <ui/animation/animation_timer.h>
 #include <ui/common/margins.h>
 #include "instrument.h"

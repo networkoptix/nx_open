@@ -1,8 +1,8 @@
 #ifndef QN_PTZ_HANDLER_H
 #define QN_PTZ_HANDLER_H
 
-#include <QElapsedTimer>
-#include <QMutex>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include <rest/server/json_rest_handler.h>
 

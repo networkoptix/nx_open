@@ -72,17 +72,11 @@ private:
     ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
     ZoomWindowWidget *windowWidget(QnMediaResourceWidget *widget) const;
 
-    QnMediaResourceWidget *target() const {
-        return m_target.data();
-    }
+    QnMediaResourceWidget *target() const;
 
-    ZoomWindowWidget *windowTarget() const {
-        return m_windowTarget.data();
-    }
+    ZoomWindowWidget *windowTarget() const;
 
-    FixedArSelectionItem *selectionItem() const {
-        return m_selectionItem.data();
-    }
+    FixedArSelectionItem *selectionItem() const;
     void ensureSelectionItem();
 
     void registerWidget(QnMediaResourceWidget *widget);
@@ -104,15 +98,15 @@ private:
 
     bool m_zoomWindowStartedEmitted;
     QVector<QColor> m_zoomWindowColors;
-    QWeakPointer<FixedArSelectionItem> m_selectionItem;
-    QWeakPointer<QWidget> m_viewport;
+    QPointer<FixedArSelectionItem> m_selectionItem;
+    QPointer<QWidget> m_viewport;
     QColor m_zoomWindowColor;
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<QnMediaResourceWidget> m_target;
     QHash<QObject *, ZoomData> m_dataByWidget;
     QSet<QObject *> m_processingWidgets;
-    QWeakPointer<QnMediaResourceWidget> m_zoomedWidget;
-    QWeakPointer<ZoomWindowWidget> m_windowTarget;
-    QWeakPointer<ZoomWindowWidget> m_storedWindowWidget;
+    QPointer<QnMediaResourceWidget> m_zoomedWidget;
+    QPointer<ZoomWindowWidget> m_windowTarget;
+    QPointer<ZoomWindowWidget> m_storedWindowWidget;
 };
 
 #endif // QN_ZOOM_WINDOW_INSTRUMENT_H

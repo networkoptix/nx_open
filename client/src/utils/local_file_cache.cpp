@@ -2,7 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <QtGui/QDesktopServices>
+#include <QtCore/QStandardPaths>
 
 QnLocalFileCache::QnLocalFileCache(QObject *parent) :
     base_type(parent)
@@ -14,7 +14,7 @@ QnLocalFileCache::~QnLocalFileCache() {
 }
 
 QString QnLocalFileCache::getFullPath(const QString &filename) const {
-    QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/local/%2/%3"))
                                     .arg(path)
                                     .arg(folderName())

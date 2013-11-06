@@ -3,10 +3,10 @@
 
 #include <QtCore/QEvent>
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QItemEditorFactory>
+#include <QtWidgets/QComboBox>
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 
@@ -29,7 +29,7 @@
 #include <client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint | Qt::Tool),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -56,11 +56,11 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->tableView->resizeColumnsToContents();
 
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
 
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);
@@ -127,7 +127,7 @@ void QnBusinessRulesDialog::reject() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
+                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 ); //TODO: #GDM calculate once and use anywhere
     if (!hasChanges) {
@@ -330,8 +330,8 @@ void QnBusinessRulesDialog::createActions() {
 }
 
 bool QnBusinessRulesDialog::saveAll() {
-    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, -1, Qt::MatchExactly);
-    QModelIndexList invalid = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ValidRole, false, -1, Qt::MatchExactly);
+    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, -1, Qt::MatchExactly);
+    QModelIndexList invalid = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ValidRole, false, -1, Qt::MatchExactly);
     QSet<QModelIndex> invalid_modified = invalid.toSet().intersect(modified.toSet());
 
     if (!invalid_modified.isEmpty()) {
@@ -378,7 +378,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
+                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 );
     bool canDelete = hasRights && loaded && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();

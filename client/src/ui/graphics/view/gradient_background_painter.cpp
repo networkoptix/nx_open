@@ -12,7 +12,6 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
@@ -103,11 +102,6 @@ void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
 }
 
 void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect) {
-    if(!m_gl)
-        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
-    if(!(m_gl->features() & QnGlFunctions::ArbPrograms))
-        return; /* Don't draw anything on old OpenGL versions. */
-
     qreal pos = position();
 
     QColor color = linearCombine(1.0 + 0.5 * pos, backgroundColor());

@@ -1,11 +1,11 @@
 #ifndef TEXT_TO_WAV_H
 #define TEXT_TO_WAV_H
 
-#include <QIODevice>
-#include <QMutex>
-#include <QSharedPointer>
-#include <QString>
-#include <QWaitCondition>
+#include <QtCore/QIODevice>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QString>
+#include <QtCore/QWaitCondition>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>

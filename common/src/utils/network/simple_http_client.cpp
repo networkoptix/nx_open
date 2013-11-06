@@ -1,6 +1,7 @@
 #include "simple_http_client.h"
 
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QUrl>
 
 #include <sstream>
 #include "../common/util.h"
@@ -74,8 +75,11 @@ void CLSimpleHTTPClient::initSocket()
 {
     m_sock = TCPSocketPtr( SocketFactory::createStreamSocket() );
 
-    m_sock->setRecvTimeout(m_timeout);
-    m_sock->setSendTimeout(m_timeout);
+    if( !m_sock->setRecvTimeout(m_timeout) || !m_sock->setSendTimeout(m_timeout) )
+    {
+        m_sock.clear();
+        m_connected = false;
+    }
 }
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
@@ -84,7 +88,7 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 
 QHostAddress CLSimpleHTTPClient::getLocalHost() const
 {
-    return QHostAddress(m_sock->getLocalAddress().address.toString());
+    return !m_sock ? QHostAddress() : QHostAddress(m_sock->getLocalAddress().address.toString());
 }
 
 void CLSimpleHTTPClient::addHeader(const QByteArray& key, const QByteArray& value)
@@ -99,6 +103,9 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString
 
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body)
 {
+    if (!m_sock)
+        return CL_TRANSPORT_ERROR;
+
     try
     {
         if (!m_connected)
@@ -265,6 +272,9 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 
 CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
 {
+    if (!m_sock)
+        return CL_TRANSPORT_ERROR;
+
     try
     {
         if (!m_connected)
@@ -461,14 +471,14 @@ QByteArray CLSimpleHTTPClient::basicAuth() const
 QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url)
 {
     QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
-    HA1 = QString::fromAscii(QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    HA1 = QString::fromLatin1(QCryptographicHash::hash(HA1.toLatin1(), QCryptographicHash::Md5).toHex().constData());
 
     QString HA2 = method + QLatin1Char(':') + url;
-    HA2 = QString::fromAscii(QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    HA2 = QString::fromLatin1(QCryptographicHash::hash(HA2.toLatin1(), QCryptographicHash::Md5).toHex().constData());
 
     QString response = HA1 + QLatin1Char(':') + nonce + QLatin1Char(':') + HA2;
 
-    response = QString::fromAscii(QCryptographicHash::hash(response.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    response = QString::fromLatin1(QCryptographicHash::hash(response.toLatin1(), QCryptographicHash::Md5).toHex().constData());
 
 
     QString result;

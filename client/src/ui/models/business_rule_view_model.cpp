@@ -12,11 +12,13 @@
 #include <business/events/motion_business_event.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/recording_business_action.h>
+#include <business/actions/camera_output_business_action.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/notification_sound_model.h>
+#include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
@@ -174,27 +176,27 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 break;
 
             if (!isValid(column))
-                return QBrush(QColor(204, 0, 0));   //TODO: #GDM skin colors
-            return QBrush(QColor(150, 0, 0));       //TODO: #GDM skin colors
+                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+            return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
 
-        case QnBusiness::ModifiedRole:
+        case Qn::ModifiedRole:
             return m_modified;
-        case QnBusiness::DisabledRole:
+        case Qn::DisabledRole:
             return m_disabled;
-        case QnBusiness::ValidRole:
+        case Qn::ValidRole:
             return isValid();
-        case QnBusiness::InstantActionRole:
+        case Qn::ActionIsInstantRole:
             return !BusinessEventType::hasToggleState(m_eventType);
-        case QnBusiness::ShortTextRole:
+        case Qn::ShortTextRole:
             return getText(column, false);
 
-        case QnBusiness::EventTypeRole:
+        case Qn::EventTypeRole:
             return m_eventType;
-        case QnBusiness::EventResourcesRole:
+        case Qn::EventResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_eventResources);
-        case QnBusiness::ActionTypeRole:
+        case Qn::ActionTypeRole:
             return m_actionType;
-        case QnBusiness::ActionResourcesRole:
+        case Qn::ActionResourcesRole:
             return QVariant::fromValue<QnResourceList>(m_actionResources);
 
         case Qn::HelpTopicIdRole:
@@ -710,6 +712,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     return any;
                 } else if (m_actionType == BusinessActionType::CameraRecording) {
                     return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
+                } else if (m_actionType == BusinessActionType::CameraOutput || m_actionType == BusinessActionType::CameraOutputInstant) {
+                    return QnCameraOutputBusinessAction::isResourcesListValid(m_actionResources);
                 } else if (m_actionType == BusinessActionType::PlaySound) {
                     return !m_actionParams.getSoundUrl().isEmpty();
                 }  else if (m_actionType == BusinessActionType::SayText) {
@@ -821,6 +825,20 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         int invalid = QnRecordingBusinessAction::invalidResourcesCount(m_actionResources);
         if (detailed && invalid > 0)
             return tr("Recording is disabled for %1")
+                    .arg((cameras.size() == 1)
+                         ? getResourceName(cameras.first())
+                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
+        if (cameras.size() == 1)
+            return getResourceName(cameras.first());
+        return tr("%n Camera(s)", "", cameras.size());
+    } else if (m_actionType == BusinessActionType::CameraOutput || m_actionType == BusinessActionType::CameraOutputInstant) {
+        QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
+        if (cameras.isEmpty())
+            return tr("Select at least one camera");
+
+        int invalid = QnCameraOutputBusinessAction::invalidResourcesCount(m_actionResources);
+        if (detailed && invalid > 0)
+            return tr("%1 have not output relays", "", cameras.size())
                     .arg((cameras.size() == 1)
                          ? getResourceName(cameras.first())
                          : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));

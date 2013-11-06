@@ -1,7 +1,7 @@
 #ifndef NOTIFICATIONS_COLLECTION_WIDGET_H
 #define NOTIFICATIONS_COLLECTION_WIDGET_H
 
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsItem>
 
 #include <utils/common/connective.h>
 
@@ -120,7 +120,7 @@ private:
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
-    QWeakPointer<QnBlinkingImageButtonWidget> m_blinker;
+    QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

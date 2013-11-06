@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>679</width>
-    <height>303</height>
+    <width>662</width>
+    <height>296</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,127 +31,153 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QFormLayout" name="singleCameraLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="cameraIpLabel">
-           <property name="minimumSize">
-            <size>
-             <width>112</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>&amp;Camera Address:</string>
-           </property>
-           <property name="buddy">
-            <cstring>cameraIpLineEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="cameraIpLineEdit">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string notr="true"/>
-           </property>
-           <property name="placeholderText">
-            <string>IP, hostname, RTSP link...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QFormLayout" name="subnetLayout">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        <widget class="QStackedWidget" name="addressStackedWidget">
+         <property name="currentIndex">
+          <number>1</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="startIPLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+         <widget class="QWidget" name="pageSingleCamera">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>112</width>
-             <height>0</height>
-            </size>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-           <property name="text">
-            <string>S&amp;tart IP:</string>
+           <property name="rightMargin">
+            <number>0</number>
            </property>
-           <property name="buddy">
-            <cstring>startIPLineEdit</cstring>
+           <property name="bottomMargin">
+            <number>0</number>
            </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QnIpLineEdit" name="startIPLineEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <item>
+            <layout class="QFormLayout" name="singleCameraLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="cameraIpLabel">
+               <property name="minimumSize">
+                <size>
+                 <width>112</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>&amp;Camera Address:</string>
+               </property>
+               <property name="buddy">
+                <cstring>cameraIpLineEdit</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="cameraIpLineEdit">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string notr="true"/>
+               </property>
+               <property name="placeholderText">
+                <string>IP, hostname, RTSP link...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageSubnet">
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-           <property name="inputMethodHints">
-            <set>Qt::ImhDigitsOnly</set>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="endIPLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <property name="rightMargin">
+            <number>0</number>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>112</width>
-             <height>0</height>
-            </size>
+           <property name="bottomMargin">
+            <number>0</number>
            </property>
-           <property name="text">
-            <string>&amp;End IP:</string>
-           </property>
-           <property name="buddy">
-            <cstring>endIPLineEdit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QnIpLineEdit" name="endIPLineEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="inputMethodHints">
-            <set>Qt::ImhDigitsOnly</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
+           <item>
+            <layout class="QFormLayout" name="subnetLayout">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="startIPLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>112</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>S&amp;tart IP:</string>
+               </property>
+               <property name="buddy">
+                <cstring>startIPLineEdit</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QnIpLineEdit" name="startIPLineEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMethodHints">
+                <set>Qt::ImhDigitsOnly</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="endIPLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>112</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>&amp;End IP:</string>
+               </property>
+               <property name="buddy">
+                <cstring>endIPLineEdit</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QnIpLineEdit" name="endIPLineEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="inputMethodHints">
+                <set>Qt::ImhDigitsOnly</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="subnetCheckbox">
@@ -240,31 +266,83 @@
        <item row="2" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QSpinBox" name="portSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>72</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="minimum">
+          <widget class="QStackedWidget" name="portStackedWidget">
+           <property name="currentIndex">
             <number>1</number>
            </property>
-           <property name="maximum">
-            <number>65535</number>
-           </property>
-           <property name="value">
-            <number>80</number>
-           </property>
+           <widget class="QWidget" name="pagePort">
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QSpinBox" name="portSpinBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>72</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>65535</number>
+               </property>
+               <property name="value">
+                <number>80</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="pageAuto">
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="text">
+                <string>auto</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
          <item>
@@ -534,7 +612,6 @@
   <tabstop>subnetCheckbox</tabstop>
   <tabstop>loginLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
-  <tabstop>portSpinBox</tabstop>
   <tabstop>portAutoCheckBox</tabstop>
   <tabstop>scanButton</tabstop>
   <tabstop>stopScanButton</tabstop>

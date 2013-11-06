@@ -3,8 +3,9 @@
 
 #include <inttypes.h>
 
-#include <QSet>
-#include <QVector>
+#include <QtCore/QMap>
+#include <QtCore/QSet>
+#include <QtCore/QVector>
 #include <memory.h>
 #include <map>
 

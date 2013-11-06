@@ -20,7 +20,16 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -59,7 +68,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QComboBox" name="connectionsComboBox">
+           <widget class="QnTreeComboBox" name="connectionsComboBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -115,7 +124,16 @@
           <item row="0" column="1">
            <widget class="QWidget" name="hostWidget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -206,7 +224,16 @@
           <item row="2" column="1">
            <widget class="QWidget" name="widget" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -279,6 +306,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnTreeComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">ui/widgets/tree_combo_box.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>connectionsComboBox</tabstop>
   <tabstop>saveButton</tabstop>

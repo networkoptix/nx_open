@@ -1,6 +1,6 @@
 #include "graphics_view.h"
 
-#include <QtOpenGL>
+#include <QtOpenGL/QtOpenGL>
 
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
@@ -8,6 +8,21 @@
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 #   include <QtCore/QDateTime>
 #endif
+
+namespace {
+    class PaintDevice: public QPaintDevice {
+    public:
+        QPaintDevice *invokeRedirected(QPoint *offset) const {
+            return redirected(offset);
+        }
+    };
+
+    PaintDevice *open(QPaintDevice *paintDevice) {
+        return static_cast<PaintDevice *>(paintDevice);
+    }
+
+} // anonymous namespace
+
 
 QnLayerPainter::QnLayerPainter(): m_view(NULL), m_layer(static_cast<QGraphicsScene::SceneLayer>(0)) {}
 
@@ -25,7 +40,10 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene *scene, QWidget * parent):
     QGraphicsView(scene, parent),
     m_paintFlags(0),
     m_behaviorFlags(0)
-{}
+{
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+}
 
 QnGraphicsView::~QnGraphicsView() {
     while(!m_backgroundPainters.empty())
@@ -83,8 +101,13 @@ void QnGraphicsView::showEvent(QShowEvent *event) {
     }
 }
 
+bool QnGraphicsView::isInRedirectedPaint() const {
+    QPoint offset;
+    return open(viewport())->invokeRedirected(&offset) != viewport();
+}
+
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
-    if(!(m_paintFlags & PaintOnExternalSurfaces) && QPainter::redirected(viewport(), NULL) != viewport())
+    if(isInRedirectedPaint())
         return;
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE

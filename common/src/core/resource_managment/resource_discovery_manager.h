@@ -4,7 +4,7 @@
 #include <memory> // for auto_ptr
 #include <QtCore/QThread>
 #include <QAuthenticator>
-#include <QTimer>
+#include <QtCore/QTimer>
 #include "utils/common/long_runnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
@@ -59,6 +59,12 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
     Q_OBJECT;
 
 public:
+    enum State
+    {
+        initialSearch,
+        periodicSearch
+    };
+
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
@@ -89,7 +95,7 @@ public:
     void doResourceDiscoverIteration();
 
     static void init(QnResourceDiscoveryManager* instance);
-
+    State state() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -101,6 +107,7 @@ protected:
     virtual bool processDiscoveredResources(QnResourceList& resources);
 
 signals:
+    void localSearchDone();
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
@@ -109,12 +116,6 @@ private slots:
     void at_resourceDeleted(const QnResourcePtr& resource);
 
 private:
-    enum State
-    {
-        initialSearch,
-        periodicSearch
-    };
-
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool

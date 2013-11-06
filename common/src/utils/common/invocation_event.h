@@ -1,8 +1,8 @@
 #ifndef QN_INVOCATION_EVENT_H
 #define QN_INVOCATION_EVENT_H
 
-#include <QEvent>
-#include <QVariant>
+#include <QtCore/QEvent>
+#include <QtCore/QVariant>
 
 /**
  * Universal custom event.

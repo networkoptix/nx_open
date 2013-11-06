@@ -46,13 +46,22 @@
    <item>
     <widget class="QWidget" name="periodWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
        <widget class="QLabel" name="everyLabel">
         <property name="text">
-         <string>Once per</string>
+         <string>No more than once per</string>
         </property>
        </widget>
       </item>

@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
+#include <common/common_globals.h>
 
 QnTranslationManager::QnTranslationManager(QObject *parent):
     QObject(parent),

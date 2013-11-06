@@ -7,7 +7,7 @@
 
 #include <api/model/storage_space_reply.h>
 
-#include <platform/platform_abstraction.h>
+#include <platform/core_platform_abstraction.h>
 
 #include <recorder/storage_manager.h>
 
@@ -45,6 +45,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, 
                 break;
             }
         }
+
+        if (storage->hasFlags(QnResource::deprecated))
+            continue;
 
         QnStorageSpaceData data;
         data.path = storage->getUrl();

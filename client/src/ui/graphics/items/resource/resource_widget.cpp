@@ -4,9 +4,9 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -75,6 +75,9 @@ namespace {
     const QColor overlayBackgroundColor = QColor(0, 0, 0, 96);
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160);
+
+    /** Static text should be rescaled no more often than once in this period */
+    const qint64 minTextRescaleDelay = 1000;
 
     Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
@@ -279,6 +282,10 @@ QnResourceWidget::~QnResourceWidget() {
 
 QnResourcePtr QnResourceWidget::resource() const {
     return m_resource;
+}
+
+QnWorkbenchItem* QnResourceWidget::item() const {
+    return m_item.data();
 }
 
 const QRectF &QnResourceWidget::zoomRect() const {

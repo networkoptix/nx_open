@@ -2,6 +2,7 @@
 #define BUSINESS_RULES_VIEW_MODEL_H
 
 #include <QtCore/QAbstractItemModel>
+#include <QtGui/QStandardItemModel>
 #include <QtCore/QModelIndex>
 #include <QtCore/QVariant>
 #include <QtCore/QList>

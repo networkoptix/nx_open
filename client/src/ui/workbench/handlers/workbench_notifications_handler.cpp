@@ -64,7 +64,6 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        qDebug() << "popup for admins received, we are not admin";
         return;
     }
 
@@ -83,15 +82,9 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     }
 
     if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
-        qDebug() << "popup received, ignoring" << QnBusinessStringsHelper::eventName(eventType);
         return;
     }
 
-    int id = businessAction->getRuntimeParams().getEventResourceId();
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
-    QString resource = res ? res->getName() : QString();
-
-    qDebug() << "popup received" << eventType << QnBusinessStringsHelper::eventName(eventType) << "from" << resource << "(" << id << ")";
     emit businessActionAdded(businessAction);
 }
 

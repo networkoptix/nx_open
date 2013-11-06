@@ -13,6 +13,18 @@ QString QnUserResource::getUniqueId() const
     return getGuid();
 }
 
+QString QnUserResource::getHash() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_hash;
+}
+
+void QnUserResource::setHash(const QString& hash)
+{
+    QMutexLocker locker(&m_mutex);
+    m_hash = hash;
+}
+
 QString QnUserResource::getPassword() const
 {
     QMutexLocker locker(&m_mutex);
@@ -84,6 +96,7 @@ void QnUserResource::updateInner(QnResourcePtr other)
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
         setPassword(localOther->getPassword());
+        setHash(localOther->getHash());
         setDigest(localOther->getDigest());
         setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());

@@ -1,5 +1,5 @@
 #include "hover_processor.h"
-#include <QTimerEvent>
+#include <QtCore/QTimerEvent>
 #include <utils/common/warnings.h>
 
 HoverFocusProcessor::HoverFocusProcessor(QGraphicsItem *parent):

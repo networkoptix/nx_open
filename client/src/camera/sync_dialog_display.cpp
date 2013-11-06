@@ -51,6 +51,9 @@ void QnSignDialogDisplay::finilizeSign()
                     emit gotSignatureDescription(QString::fromUtf8(patternParams[1]), QString::fromUtf8(patternParams[2]), QString::fromUtf8(patternParams[3]));
                 }
             }
+            else {
+                calculatedSign = m_mdctx.result();
+            }
         }
     }
 #endif

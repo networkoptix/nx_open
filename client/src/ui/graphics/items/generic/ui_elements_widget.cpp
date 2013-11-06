@@ -1,6 +1,6 @@
 #include "ui_elements_widget.h"
 
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 
 #include <utils/common/warnings.h>
 

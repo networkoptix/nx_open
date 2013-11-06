@@ -1,9 +1,9 @@
 
 #include "workbench_screenshot_handler.h"
 
-#include <QAction>
-#include <QImageWriter>
-#include <QMessageBox>
+#include <QtWidgets/QAction>
+#include <QtGui/QImageWriter>
+#include <QtWidgets/QMessageBox>
 
 #include <utils/common/string.h>
 #include <utils/common/warnings.h>

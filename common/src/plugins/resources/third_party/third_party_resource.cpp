@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 #include "api/app_server_connection.h"
 #include "motion_data_picture.h"
@@ -136,6 +136,9 @@ bool QnThirdPartyResource::setRelayOutputState(
 QnAbstractStreamDataProvider* QnThirdPartyResource::createArchiveDataProvider()
 {
     QnAbstractArchiveDelegate* archiveDelegate = createArchiveDelegate();
+    if( !archiveDelegate )
+        return QnSecurityCamResource::createArchiveDataProvider();
+        return QnPhysicalCameraResource::createArchiveDataProvider();
     QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(toSharedPointer());
     archiveReader->setArchiveDelegate(archiveDelegate);
     if (hasFlags(still_image) || hasFlags(utc))
@@ -289,6 +292,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     int result = m_camManager.getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )
     {
+        if( false )
         NX_LOG( QString::fromLatin1("Error getting camera info from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
@@ -316,6 +320,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
+    setParam( lit("hasDualStreaming"), encoderCount > 1, QnDomainDatabase );
+
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
     result = m_camManager.getCameraCapabilities( &cameraCapabilities );
@@ -333,6 +339,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
         setCameraCapability( Qn::shareIpCapability, true );
+    if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
+        setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         //setPtzCapability( Qn::AbsolutePtzCapability, true );

@@ -14,7 +14,7 @@
 #ifndef Q_OS_WIN
 #include "utils/media/audioformat.h"
 #else
-#include <QAudioFormat>
+#include <QtMultimedia/QAudioFormat>
 #define QnAudioFormat QAudioFormat
 #endif
 

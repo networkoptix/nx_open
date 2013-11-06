@@ -1,4 +1,4 @@
-#include <QDir>
+#include <QtCore/QDir>
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
@@ -9,7 +9,7 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "motion/motion_helper.h"
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "recording_manager.h"
 #include "serverutil.h"
 
@@ -84,22 +84,25 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
         return;
     }
 
-    if (m_file.size() == 0) 
-    {
-        QTextStream str(&m_file);
-        str << "timezone; start; storage; index; duration\n"; // write CSV header
-        str.flush();
-
-    }
-    else if (m_rebuildArchive == Rebuild_All || 
-             (m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo) ||
-             (m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
-            )
+    if (m_rebuildArchive == Rebuild_All || 
+        (m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo) ||
+        (m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
+        )
     {
         doRebuildArchive();
     }
-    else {
-        deserializeTitleFile();
+    else 
+    {
+        if (m_file.size() == 0) 
+        {
+            QTextStream str(&m_file);
+            str << "timezone; start; storage; index; duration\n"; // write CSV header
+            str.flush();
+
+        }
+        else {
+            deserializeTitleFile();
+        }
     }
 }
 
@@ -301,6 +304,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
     QDir dir(folder);
     foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
+        if (m_rebuildArchive == Rebuild_None)
+            return; // cancceled
+
         if (fi.isDir())
             scanMediaFiles(fi.absoluteFilePath(), storage, allChunks);
         else {
@@ -320,6 +326,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
                     qWarning() << allChunks.size() << "media files processed...";
 
             }
+            else {
+                qnFileDeletor->deleteFile(fi.absoluteFilePath());
+            }
         }
 
     }
@@ -338,8 +347,31 @@ void DeviceFileCatalog::doRebuildArchive()
     qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
 
     QMap<qint64, Chunk> allChunks;
-    foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages())
+    bool canceled = false;
+    foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages()) {
+        if (m_rebuildArchive == Rebuild_None) {
+            canceled = true;
+            break;
+        }
         readStorageData(storage, m_role, allChunks);
+    }
+
+    if (canceled) {
+        // canceled, restore archive
+        m_file.close();
+        if (m_file.open(QFile::ReadWrite)) {
+            if (m_file.size() == 0) 
+            {
+                QTextStream str(&m_file);
+                str << "timezone; start; storage; index; duration\n"; // write CSV header
+                str.flush();
+            }
+            else {
+                deserializeTitleFile();
+            }
+        }
+        return; 
+    }
 
     foreach(const Chunk& chunk, allChunks)
         m_chunks << chunk;
@@ -509,19 +541,18 @@ void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
     str.flush();
 }
 
-qint64 DeviceFileCatalog::deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage)
+void DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
     qint64 rez = 0;
     for (int i = 0; i < count; ++i)
-        rez += deleteFirstRecord(true, srcStorage);
-    return rez;
+        deleteFirstRecord();
 }
 
 void DeviceFileCatalog::clear()
 {
     while(m_firstDeleteCount < m_chunks.size())
-        deleteFirstRecord(false, QnStorageResourcePtr());
+        deleteFirstRecord();
 }
 
 void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
@@ -551,17 +582,21 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 
 }
 
+bool DeviceFileCatalog::isEmpty() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_chunks.isEmpty();
+}
 
-qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage)
+void DeviceFileCatalog::deleteFirstRecord()
 {
 	QnStorageResourcePtr storage;
 	QString delFileName;
 	QString motionDirName;
-    qint64 deletedSize = 0;
 	{
 		QMutexLocker lock(&m_mutex);
 		if (m_chunks.isEmpty())
-			return -1;
+			return;
 
 		static const int DELETE_COEFF = 1000;
 
@@ -569,8 +604,6 @@ qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResource
 		{
 			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
 			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
-            if (calcFileSize && storage && srcStorage && srcStorage->getId() == storage->getId())
-                deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
 
 			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
@@ -599,16 +632,12 @@ qint64 DeviceFileCatalog::deleteFirstRecord(bool calcFileSize, QnStorageResource
     if (storage) {
 	    if (!delFileName.isEmpty())
 	    {
-            if (deletedSize == 0 && calcFileSize && srcStorage && srcStorage->getId() == storage->getId())
-                deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
 		    //storage->addWritedSpace(-deletedSize);
 		    storage->removeFile(delFileName);
 	    }
 	    if (!motionDirName.isEmpty())
 		    storage->removeDir(motionDirName);
     }
-
-    return calcFileSize ? deletedSize : 0;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
@@ -724,6 +753,12 @@ qint64 DeviceFileCatalog::firstTime() const
 void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
 {
     m_rebuildArchive = value;
+}
+
+void DeviceFileCatalog::beforeRebuildArchive()
+{
+    QMutexLocker lock(&m_mutex);
+    m_file.close();
 }
 
 QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)

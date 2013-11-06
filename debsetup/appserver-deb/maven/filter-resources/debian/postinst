@@ -1,0 +1,182 @@
+#!/bin/bash -e
+
+. /usr/share/debconf/confmodule
+
+COMPANY_NAME="${deb.customization.company.name}"
+
+if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
+${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
+ 
+export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
+ECS_PORT_DEFAULT=7001
+ECS_PROXY_PORT_DEFAULT=7004
+
+CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
+SSL_DIR="/opt/$COMPANY_NAME/entcontroller/var/ssl"
+SSL_CERT="$SSL_DIR/cert.pem"
+BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
+
+ECS_PORT_DEFAULT=7001
+ECS_PROXY_PORT_DEFAULT=7004
+
+# This is necessary because changed configuration options should take effect 
+# immediately.
+if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
+  stop $COMPANY_NAME-entcontroller
+fi
+    
+function replace_var {
+    file=$1; shift
+    name=$1; shift
+    value=$1; shift
+
+    [ -z $value ] && return
+
+    tmpfile=$(mktemp)
+    while read line
+    do
+          echo ${line/^$name=.*$/$name=$replace}
+    done < "$file" > "$tmpfile" && mv "$tmpfile" "$file"
+}
+
+function read_config {
+    ECS_PORT=$ECS_PORT_DEFAULT
+    ECS_PROXY_PORT=$ECS_PROXY_PORT_DEFAULT
+
+    [ -f $CONFIG_FILE ] || { true; return; }
+
+    ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port\s*=\s*\(.*\)/\1/g')
+    ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
+    ECS_PROXY_AUTH_KEY=$(cat $CONFIG_FILE | grep proxyAuthKey | head -1 | sed 's/proxyAuthKey\s*=\s*\(.*\)/\1/g')
+
+    [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT || true
+    [ -z "$ECS_PROXY_PORT" ] && ECS_PORT=$ECS_PROXY_PORT_DEFAULT || true
+}
+
+function write_config {
+    replace_var $CONFIG_FILE port $ECS_PORT
+    replace_var $CONFIG_FILE proxyPort $ECS_PROXY_PORT
+    replace_var $CONFIG_FILE proxyAuthKey $ECS_PROXY_AUTH_KEY
+}
+
+function to_int {
+    local -i num="10#${1}"
+    echo "${num}"
+}
+ 
+function port_is_ok {
+    local port="$1"
+    local -i port_num=$(to_int "${port}" 2>/dev/null)
+ 
+    if (( $port_num < 1 || $port_num > 65535 )) ; then
+        return 1
+    fi
+ 
+    return 0
+}
+
+function create_dir {
+    local dir="$1";
+
+    mkdir -p "$dir"
+}
+
+function validate_ecsPassword {
+    [ "$IS_ADMIN_PW_SET" = "true" -o -n "$1" ]
+}
+
+function validate_ecsPort {
+    port_is_ok $1
+}
+
+function valide_ecsProxyPort {
+    port_is_ok $1
+}
+
+function ask_for_value {
+    local varname="$1"
+    local default="$2"
+    local full_name="$COMPANY_NAME-entcontroller/$varname"
+    local error_message="${full_name}_invalid"
+
+    # Support unattened install
+    db_get $full_name
+    if [ "$RET" = "" ]; then
+        [ -n "$default" ] && db_set $full_name $default 
+    fi
+
+    db_input high $full_name || true
+    db_go
+
+    while :
+    do
+        db_get $full_name
+        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true        
+        [ $STATUS -eq 0 ] && break # validation passes
+        [ $STATUS -ne 1 ] && break # no validation function or invalid
+
+        db_input high $error_message
+        db_go
+
+        { db_input high $full_name; STATUS=$?; } || true
+        [ $STATUS -eq 30 ] && break
+        db_go
+    done
+
+    RESULT="$RET"
+    db_unregister $full_name
+    echo $RESULT
+}
+
+case "$1" in
+  configure)
+      read_config
+
+      IS_ADMIN_PW_SET="false"
+      [ -f /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db ] && $BINDIR/dbconfig isadminpw && IS_ADMIN_PW_SET="true"
+
+      ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
+      ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
+      ECS_PASSWORD=$(ask_for_value ecsPassword "")
+
+      write_config
+
+      dbversion=$("$BINDIR/dbconfig" swversion)
+      if [ $dbversion != "0" ]
+      then
+          cp -p /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db{,.$dbversion}
+      fi
+
+      "$BINDIR/dbsync"
+
+      if [ -n "$ECS_PASSWORD" ]
+      then
+          "$BINDIR/dbconfig" setpw admin "$ECS_PASSWORD"
+      fi
+
+      "$BINDIR/certgen" -i
+
+      chmod 600 /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db
+      chmod 600 "$SSL_CERT"
+  ;;
+
+  abort-upgrade|abort-remove|abort-configure)
+  ;;
+
+  *)
+    echo "postinst called with unknown argument '$1'" 1>&2
+    exit 1
+  ;;
+esac
+
+if [ -e "/etc/init/$COMPANY_NAME-entcontroller.conf" ]; then
+    invoke-rc.d $COMPANY_NAME-entcontroller start || exit $?
+fi
+update-rc.d -f $COMPANY_NAME-entcontroller remove >/dev/null || exit $?
+
+if [ -e "/etc/init/$COMPANY_NAME-mediaproxy.conf" ]; then
+    invoke-rc.d $COMPANY_NAME-mediaproxy start || exit $?
+fi
+update-rc.d -f $COMPANY_NAME-mediaproxy remove >/dev/null || exit $?
+
+exit 0

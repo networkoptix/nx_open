@@ -1,8 +1,8 @@
 #ifndef __MOTION_WRITER_H__
 #define __MOTION_WRITER_H__
 
-#include <QRegion>
-#include <QFile>
+#include <QtGui/QRegion>
+#include <QtCore/QFile>
 #include <QSharedPointer>
 #include "core/resource/network_resource.h"
 #include "core/datapacket/media_data_packet.h"

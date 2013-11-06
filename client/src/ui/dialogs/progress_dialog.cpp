@@ -53,7 +53,9 @@
 #include "qtimer.h"
 #include "qelapsedtimer.h"
 #include <limits.h>
-#include <QPointer>
+
+#include <QtCore/QPointer>
+#include <QtWidgets/QVBoxLayout>
 
 
 #if defined(QT_SOFTKEYS_ENABLED)
@@ -686,7 +688,7 @@ void QnProgressDialog::setValue(int progress)
                 d->shown_once = true;
             }
         }
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         QApplication::flush();
 #endif
     }

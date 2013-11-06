@@ -1,8 +1,8 @@
 #ifndef BUSINESS_RULE_ITEM_DELEGATE_H
 #define BUSINESS_RULE_ITEM_DELEGATE_H
 
-#include <QStyledItemDelegate>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QPushButton>
 
 #include <core/resource/resource_fwd.h>
 
@@ -23,8 +23,8 @@ public:
     QnResourceSelectionDialogDelegate* dialogDelegate() const;
     void setDialogDelegate(QnResourceSelectionDialogDelegate* delegate);
 
-    Qn::NodeType nodeType() const;
-    void setNodeType(Qn::NodeType nodeType);
+    QnResourceSelectionDialog::SelectionTarget selectionTarget() const;
+    void setSelectionTarget(QnResourceSelectionDialog::SelectionTarget target);
 signals:
     void commit();
 
@@ -37,7 +37,7 @@ private slots:
 private:
     QnResourceList m_resources;
     QnResourceSelectionDialogDelegate* m_dialogDelegate;
-    Qn::NodeType m_nodeType;
+    QnResourceSelectionDialog::SelectionTarget m_target;
 };
 
 class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware {
@@ -54,6 +54,7 @@ protected:
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
 private slots:
     void at_editor_commit();
 };

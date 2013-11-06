@@ -1,8 +1,8 @@
 #ifndef QN_RECT_SET_H
 #define QN_RECT_SET_H
 
-#include <QRect>
-#include <QPoint>
+#include <QtCore/QRect>
+#include <QtCore/QPoint>
 #include <set>
 #include "warnings.h"
 

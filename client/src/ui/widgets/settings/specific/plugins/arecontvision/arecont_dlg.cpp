@@ -1,10 +1,10 @@
 
 #include "arecont_dlg.h"
 
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QGroupBox>
-#include <QtGui/QMessageBox>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
 
 
 AreconVisionDlgManufacture::AreconVisionDlgManufacture()

@@ -1,20 +1,15 @@
 #include "custom_file_dialog.h"
 
-#include <QtGui/QGridLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 
-QnCustomFileDialog::QnCustomFileDialog(QWidget *parent,
-                                       const QString &caption,
-                                       const QString &directory,
-                                       const QString &filter) :
+QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter)
 {
     setOption(QFileDialog::DontUseNativeDialog);
     connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
-
 }
-
 
 QnCustomFileDialog::~QnCustomFileDialog() {
 }

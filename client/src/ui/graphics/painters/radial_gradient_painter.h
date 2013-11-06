@@ -3,14 +3,13 @@
 
 #include <QtCore/QSharedPointer>
 #include <QtGui/QColor>
-
-#include <ui/graphics/opengl/gl_functions.h>
+#include <QtGui/QOpenGLFunctions>
 
 class QGLContext;
 
 class QnColorShaderProgram;
 
-class QnRadialGradientPainter: public QnGlFunctions {
+class QnRadialGradientPainter: protected QOpenGLFunctions {
 public:
     QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context);
     ~QnRadialGradientPainter();

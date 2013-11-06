@@ -3,10 +3,10 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
 
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QMessageBox>
+
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
@@ -49,7 +49,7 @@ namespace detail {
         void at_replyReceived(int status, const QnResourceList &resources, int handle);
 
     private:
-        QWeakPointer<QnWorkbenchActionHandler> m_handler;
+        QPointer<QnWorkbenchActionHandler> m_handler;
         QnVirtualCameraResourceList m_resources;
         QList<int> m_oldDisabledFlags;
     };
@@ -158,29 +158,17 @@ protected:
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
 
-    QnCameraSettingsDialog *cameraSettingsDialog() const {
-        return m_cameraSettingsDialog.data();
-    }
+    QnCameraSettingsDialog *cameraSettingsDialog() const;
 
-    QnBusinessRulesDialog *businessRulesDialog() const {
-        return m_businessRulesDialog.data();
-    }
+    QnBusinessRulesDialog *businessRulesDialog() const;
 
-    QnEventLogDialog *businessEventsLogDialog() const {
-        return m_businessEventsLogDialog.data();
-    }
+    QnEventLogDialog *businessEventsLogDialog() const;
 
-    QnCameraListDialog *cameraListDialog() const {
-        return m_cameraListDialog.data();
-    }
+    QnCameraListDialog *cameraListDialog() const;
 
-    QnCameraAdditionDialog *cameraAdditionDialog() const {
-        return m_cameraAdditionDialog.data();
-    }
+    QnCameraAdditionDialog *cameraAdditionDialog() const;
 
-    QnLoginDialog *loginDialog() const {
-        return m_loginDialog.data();
-    }
+    QnLoginDialog *loginDialog() const;
 
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
@@ -188,7 +176,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-    void submitInstantDrop(QnMimeData &data);
+    void submitInstantDrop();
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
@@ -335,11 +323,13 @@ protected slots:
     void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
-    void at_toggleTourModeHotkeyAction_triggered();
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
-    void at_layoutCamera_exportFinished(QString fileName);
+    /*!
+        \return true, if export continues. false, if nothing more to export
+    */
+    bool at_layoutCamera_exportFinished(QString fileName);
     void at_layoutCamera_exportFinished2();
     void at_layout_exportFinished();
     void at_layoutCamera_exportFailed(QString errorMessage);
@@ -361,11 +351,16 @@ protected slots:
     void at_versionMismatchMessageAction_triggered();
     void at_versionMismatchWatcher_mismatchDataChanged();
 
+    void at_betaVersionMessageAction_triggered();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
+    /*!
+        \return true, if started saving process (that MUST be awaited for)
+    */
+    bool saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly, bool cancellable, bool newWindowOpenable);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
 #ifdef Q_OS_WIN
     QString binaryFilterName() const;
@@ -399,20 +394,24 @@ private:
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
+private slots:
+    //!Checks if need to close layout
+    void checkForClosurePending();
+
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
-    QWeakPointer<QWidget> m_widget;
-    QWeakPointer<QMenu> m_mainMenu;
-    QWeakPointer<QMenu> m_currentUserLayoutsMenu;
+    QPointer<QWidget> m_widget;
+    QPointer<QMenu> m_mainMenu;
+    QPointer<QMenu> m_currentUserLayoutsMenu;
 
-    QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
-    QWeakPointer<QnBusinessRulesDialog> m_businessRulesDialog;
-    QWeakPointer<QnEventLogDialog> m_businessEventsLogDialog;
-    QWeakPointer<QnCameraListDialog> m_cameraListDialog;
-    QWeakPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
-    QWeakPointer<QnLoginDialog> m_loginDialog;
-    QWeakPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
+    QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
+    QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
+    QPointer<QnEventLogDialog> m_businessEventsLogDialog;
+    QPointer<QnCameraListDialog> m_cameraListDialog;
+    QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
+    QPointer<QnLoginDialog> m_loginDialog;
+    QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
 
 
     /** Whether the set of selected resources was changed and settings
@@ -425,13 +424,14 @@ private:
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
+    QList<QnMimeData> m_instantDrops;
 
     QnVideoCamera* m_layoutExportCamera;
     QnVideoCamera* m_exportedCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QWeakPointer<QnProgressDialog> m_exportProgressDialog;
+    QPointer<QnProgressDialog> m_exportProgressDialog;
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
@@ -442,6 +442,10 @@ private:
     QString m_exportTmpFileName;
 
     QTimer *m_tourTimer;
+
+    int m_exportsToFinishBeforeClosure;
+    QObject* m_objectToSignalWhenDone;
+    QByteArray m_methodToInvokeWhenDone;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

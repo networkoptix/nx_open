@@ -1,8 +1,8 @@
 #ifndef __ACTI_RESOURCE_H__
 #define __ACTI_RESOURCE_H__
 
-#include <QMap>
-#include <QMutex>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"

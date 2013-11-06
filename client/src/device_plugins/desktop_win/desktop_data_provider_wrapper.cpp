@@ -1,4 +1,7 @@
 #include "desktop_data_provider_wrapper.h"
+
+#ifdef Q_OS_WIN
+
 #include "device/desktop_resource.h"
 #include "desktop_data_provider.h"
 
@@ -60,3 +63,5 @@ QString QnDesktopDataProviderWrapper::lastErrorStr() const
 {
     return m_owner->lastErrorStr();
 }
+
+#endif

@@ -1,7 +1,7 @@
 #ifndef QN_ABSOLUTE_PTZ_INSTRUMENT_H
 #define QN_ABSOLUTE_PTZ_INSTRUMENT_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtCore/QBasicTimer>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
@@ -84,24 +84,16 @@ private slots:
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:
-    QnMediaResourceWidget *target() const {
-        return m_target.data();
-    }
+    QnMediaResourceWidget *target() const;
 
-    PtzManipulatorWidget *manipulator() const {
-        return m_manipulator.data();
-    }
+    PtzManipulatorWidget *manipulator() const;
 
     QnSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
-    FixedArSelectionItem *selectionItem() const {
-        return m_selectionItem.data();
-    }
+    FixedArSelectionItem *selectionItem() const;
     void ensureSelectionItem();
 
-    PtzElementsWidget *elementsWidget() const {
-        return m_elementsWidget.data();
-    }
+    PtzElementsWidget *elementsWidget() const;
     void ensureElementsWidget();
 
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
@@ -137,11 +129,11 @@ private:
     int m_clickDelayMSec;
     qreal m_expansionSpeed;
 
-    QWeakPointer<FixedArSelectionItem> m_selectionItem;
-    QWeakPointer<PtzElementsWidget> m_elementsWidget;
-    QWeakPointer<QWidget> m_viewport;
-    QWeakPointer<QnMediaResourceWidget> m_target;
-    QWeakPointer<PtzManipulatorWidget> m_manipulator;
+    QPointer<FixedArSelectionItem> m_selectionItem;
+    QPointer<PtzElementsWidget> m_elementsWidget;
+    QPointer<QWidget> m_viewport;
+    QPointer<QnMediaResourceWidget> m_target;
+    QPointer<PtzManipulatorWidget> m_manipulator;
     QHash<QObject *, PtzData> m_dataByWidget;
     QBasicTimer m_movementTimer;
 

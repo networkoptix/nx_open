@@ -26,6 +26,7 @@ public:
             m_cache.insert(key, result);
             return result;
         } else {
+            m_cache.insert(key, shape);
             return shape;
         }
     }
@@ -37,9 +38,10 @@ private:
             return false;
         }
 
-        QnPlatformImages *images = qnPlatform->images();
+        QCursor cursor = qnPlatform->images()->bitmapCursor(shape);
+        if(cursor.shape() != Qt::BitmapCursor)
+            return false; /* Not supported by the platform images implementation. */
 
-        QCursor cursor = images->bitmapCursor(shape);
         QPixmap normalPixmap = cursor.pixmap();
         
         QPixmap rotatedPixmap(normalPixmap.size() * 1.5);

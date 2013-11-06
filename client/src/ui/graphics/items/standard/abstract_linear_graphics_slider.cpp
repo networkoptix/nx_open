@@ -1,7 +1,7 @@
 #include "abstract_linear_graphics_slider.h"
 #include "abstract_linear_graphics_slider_p.h"
 
-#include <QtGui/QStyleOptionSlider>
+#include <QtWidgets/QStyleOptionSlider>
 
 void AbstractLinearGraphicsSliderPrivate::init()
 {

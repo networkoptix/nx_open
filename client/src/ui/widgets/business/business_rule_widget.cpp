@@ -8,7 +8,7 @@
 
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
 
@@ -18,6 +18,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/dialogs/week_time_schedule_dialog.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topic_accessor.h>
@@ -25,16 +26,11 @@
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
-#include <ui/widgets/properties/weektime_schedule_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
-
-// TODO: #GDM
-// Why are you using QFrame as container for subwidgets of QnBusinessRuleWidget?
-// Why don't just use QWidget?
 
 namespace {
     QString toggleStateToString(Qn::ToggleState value, bool prolonged) {
@@ -109,8 +105,7 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
     }
 
     {
-        QnScopedValueRollback<bool> guard(&m_updating, true);
-        Q_UNUSED(guard)
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
@@ -126,8 +121,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     if (!model || m_model != model || m_updating)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::EventTypeField) {
 
@@ -136,7 +130,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
         bool isResourceRequired = BusinessEventType::isResourceRequired(m_model->eventType());
-        ui->eventResourcesFrame->setVisible(isResourceRequired);
+        ui->eventResourcesWidget->setVisible(isResourceRequired);
 
         initEventParameters();
     }
@@ -158,7 +152,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
         bool isResourceRequired = BusinessActionType::requiresCameraResource(m_model->actionType())
                 || BusinessActionType::requiresUserResource(m_model->actionType());
-        ui->actionResourcesFrame->setVisible(isResourceRequired);
+        ui->actionResourcesWidget->setVisible(isResourceRequired);
 
         ui->actionAtLabel->setText(m_model->actionType() == BusinessActionType::SendMail ? tr("to") : tr("at"));
 
@@ -174,7 +168,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
-        ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, QnBusiness::ShortTextRole).toString());
+        ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }
 
@@ -354,15 +348,15 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    Qn::NodeType node = BusinessActionType::requiresCameraResource(m_model->actionType())
-            ? Qn::ServersNode
-            : BusinessActionType::requiresUserResource(m_model->actionType())
-              ? Qn::UsersNode
-              : Qn::BastardNode;
-    if (node == Qn::BastardNode)
+    QnResourceSelectionDialog::SelectionTarget target;
+    if (BusinessActionType::requiresCameraResource(m_model->actionType()))
+        target = QnResourceSelectionDialog::CameraResourceTarget;
+    else if (BusinessActionType::requiresUserResource(m_model->actionType()))
+        target = QnResourceSelectionDialog::UserResourceTarget;
+    else
         return;
 
-    QnResourceSelectionDialog dialog(node, this);
+    QnResourceSelectionDialog dialog(target, this);
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
@@ -382,9 +376,8 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked() {
     if (!m_model)
         return;
 
-    QScopedPointer<QnWeekTimeScheduleWidget> dialog(new QnWeekTimeScheduleWidget(this));
+    QScopedPointer<QnWeekTimeScheduleDialog> dialog(new QnWeekTimeScheduleDialog(this));
     dialog->setScheduleTasks(m_model->schedule());
-    setHelpTopic(dialog.data(), Qn::EventsActions_Schedule_Help);
     if (dialog->exec() != QDialog::Accepted)
         return;
     m_model->setSchedule(dialog->scheduleTasks());

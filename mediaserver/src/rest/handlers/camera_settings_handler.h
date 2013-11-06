@@ -9,8 +9,8 @@
 #include <map>
 #include <set>
 
-#include <QMutex>
-#include <QWaitCondition>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include <core/resource/resource_fwd.h>
 

@@ -6,12 +6,12 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <functional>
 #include <map>
 
-#include <QByteArray>
-#include <QMap>
-#include <QUrl>
-#include <functional>
+#include <QtCore/QByteArray>
+#include <QtCore/QMap>
+#include <QtCore/QUrl>
 
 #include "qnbytearrayref.h"
 
@@ -55,6 +55,12 @@ namespace nx_http
 
     typedef std::map<StringType, StringType, ci_less> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
+
+    /*!
+        This is convinient method for simplify transition from QHttp
+        \return Value of header \a headerName (if found), empty string otherwise
+    */
+    StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
 
     static const size_t BufferNpos = size_t(-1);
 
@@ -201,7 +207,10 @@ namespace nx_http
     public:
         StatusLine statusLine;
         HttpHeaders headers;
-        //BufferType messageBody; // not filled anywhere.
+        BufferType messageBody;
+
+        void serialize( BufferType* const dstBuffer ) const;
+        BufferType toString() const;
     };
 
     namespace MessageType
@@ -238,76 +247,76 @@ namespace nx_http
     //!Contains http header structures
     namespace Header
     {
-		//!Http authentication scheme enumeration
-		namespace AuthScheme
-		{
-			enum Value
-			{
-				none,
-				basic,
-				digest
-			};
+        //!Http authentication scheme enumeration
+        namespace AuthScheme
+        {
+            enum Value
+            {
+                none,
+                basic,
+                digest
+            };
 
-			const char* toString( Value val );
-			Value fromString( const char* str );
-			Value fromString( const ConstBufferRefType& str );
-		}
+            const char* toString( Value val );
+            Value fromString( const char* str );
+            Value fromString( const ConstBufferRefType& str );
+        }
 
         //!Login/password to use in http authorization
-		class UserCredentials
+        class UserCredentials
         {
         public:
-			StringType userid;
-			StringType password;
+            StringType userid;
+            StringType password;
         };
 
-		//!rfc2617, section 2
-		class BasicCredentials
+        //!rfc2617, section 2
+        class BasicCredentials
         :
             public UserCredentials
-		{
-		public:
-			bool parse( const BufferType& str );
-			void serialize( BufferType* const dstBuffer ) const;
-		};
+        {
+        public:
+            bool parse( const BufferType& str );
+            void serialize( BufferType* const dstBuffer ) const;
+        };
 
-		//!rfc2617, section 3.2.2
-		class DigestCredentials
+        //!rfc2617, section 3.2.2
+        class DigestCredentials
         :
             public UserCredentials
-		{
-		public:
-			QMap<BufferType, BufferType> params;
+        {
+        public:
+            QMap<BufferType, BufferType> params;
 
-			bool parse( const BufferType& str );
-			void serialize( BufferType* const dstBuffer ) const;
-		};
+            bool parse( const BufferType& str );
+            void serialize( BufferType* const dstBuffer ) const;
+        };
 
-		//!Authorization header (rfc2616, rfc2617)
-		class Authorization
-		{
-		public:
+        //!Authorization header (rfc2616, rfc2617)
+        class Authorization
+        {
+        public:
             static const StringType NAME;
 
-			AuthScheme::Value authScheme;
-			union
-			{
-				BasicCredentials* basic;
-				DigestCredentials* digest;
-			};
+            AuthScheme::Value authScheme;
+            union
+            {
+                BasicCredentials* basic;
+                DigestCredentials* digest;
+            };
 
-			Authorization();
-			Authorization( const AuthScheme::Value& authSchemeVal );
-			~Authorization();
+            Authorization();
+            Authorization( const AuthScheme::Value& authSchemeVal );
+            ~Authorization();
 
-			bool parse( const BufferType& str );
-			void serialize( BufferType* const dstBuffer ) const;
+            bool parse( const BufferType& str );
+            void serialize( BufferType* const dstBuffer ) const;
             StringType toString() const;
 
-		private:
-			Authorization( const Authorization& );
-			const Authorization& operator=( const Authorization& );
-		};
+        private:
+            Authorization( const Authorization& );
+            const Authorization& operator=( const Authorization& );
+        };
 
         //!Convient class for generating Authorization header with Basic authentication method
         class BasicAuthorization
@@ -336,7 +345,7 @@ namespace nx_http
 
             WWWAuthenticate();
 
-			bool parse( const BufferType& str );
+            bool parse( const BufferType& str );
         };
     }
 }

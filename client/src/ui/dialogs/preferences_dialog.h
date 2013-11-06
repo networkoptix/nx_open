@@ -2,7 +2,7 @@
 #define QN_PREFERENCES_DIALOG_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include <ui/workbench/workbench_context_aware.h>
 

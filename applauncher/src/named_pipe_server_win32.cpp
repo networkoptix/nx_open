@@ -113,7 +113,7 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
 
     const QString win32PipeName = QString::fromLatin1("\\\\.\\pipe\\%1").arg(pipeName);
     m_impl->hPipe = CreateNamedPipe(
-        win32PipeName.utf16(),              // pipe name 
+        reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),              // pipe name 
         FILE_FLAG_FIRST_PIPE_INSTANCE | PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,       // read/write access, overlapped I/O
         PIPE_TYPE_MESSAGE |                 // message type pipe 
             PIPE_READMODE_MESSAGE |         // message-read mode 

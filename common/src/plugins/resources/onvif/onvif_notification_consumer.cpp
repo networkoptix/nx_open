@@ -5,7 +5,7 @@
 
 #include "onvif_notification_consumer.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include <utils/network/system_socket.h>
 
@@ -89,7 +89,7 @@ void OnvifNotificationConsumer::removeResourceRegistration( QnPlOnvifResource* c
          )
     {
         if( it->second == resource )
-            it = m_notificationProducerAddressToResource.erase( it );
+            m_notificationProducerAddressToResource.erase( it++ );
         else
             ++it;
     }

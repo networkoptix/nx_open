@@ -1,7 +1,7 @@
 #include "screen_recorder.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
 
 #include <QtOpenGL/QGLWidget>
 

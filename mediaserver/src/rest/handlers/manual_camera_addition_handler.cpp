@@ -16,7 +16,7 @@ QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 
 QHostAddress QnManualCameraAdditionHandler::parseAddrParam(const QString &param, QString &errStr)
 {
-    int ip4Addr = inet_addr(param.toAscii().data());
+    int ip4Addr = inet_addr(param.toLatin1().data());
     if (ip4Addr != 0 && ip4Addr != -1)
         return QHostAddress(param);
     else {

@@ -1,9 +1,11 @@
 #include "video_recorder_settings.h"
 
 #include <QtCore/QSettings>
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QFileDialog>
+#include <QtMultimedia/QAudioDeviceInfo>
+
 #ifdef Q_OS_WIN32
 #   include "device_plugins/desktop_win/win_audio_helper.h"
 #endif
@@ -121,6 +123,11 @@ QnAudioDeviceInfo QnVideoRecorderSettings::primaryAudioDevice() const
     return getDeviceByName(settings.value(QLatin1String("primaryAudioDevice")).toString(), QAudio::AudioInput);
 }
 
+QString QnVideoRecorderSettings::primaryAudioDeviceName() const
+{
+    return settings.value(QLatin1String("primaryAudioDevice")).toString();
+}
+
 void QnVideoRecorderSettings::setPrimaryAudioDeviceByName(const QString &audioDeviceName)
 {
     settings.setValue(QLatin1String("primaryAudioDevice"), audioDeviceName);
@@ -141,6 +148,13 @@ QnAudioDeviceInfo QnVideoRecorderSettings::secondaryAudioDevice() const
 
     return getDeviceByName(settings.value(QLatin1String("secondaryAudioDevice")).toString(), QAudio::AudioInput);
 }
+
+
+QString QnVideoRecorderSettings::secondaryAudioDeviceName() const
+{
+    return settings.value(QLatin1String("secondaryAudioDevice")).toString();
+}
+
 
 void QnVideoRecorderSettings::setSecondaryAudioDeviceByName(const QString &audioDeviceName)
 {

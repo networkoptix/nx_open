@@ -176,9 +176,6 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
 
-#ifndef _DEBUG
-    if (qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource))
-#endif
     {
         m_exportRecorder->setNeedCalcSignature(true);
         m_exportRecorder->setSignLogo(qnSkin->pixmap("logo_1920_1080.png").toImage());

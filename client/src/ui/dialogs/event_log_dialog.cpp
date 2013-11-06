@@ -3,7 +3,7 @@
 
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
 #include <utils/common/event_processors.h>
@@ -39,7 +39,7 @@ namespace {
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint | Qt::Tool),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
@@ -66,7 +66,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->dateEditTo->setDate(dt);
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
-    headers->setResizeMode(QHeaderView::Fixed);
+    headers->setSectionResizeMode(QHeaderView::Fixed);
 
     // init events model
     {
@@ -395,9 +395,9 @@ void QnEventLogDialog::setEventType(BusinessEventType::Value value)
                 1,
                 Qt::MatchExactly | Qt::MatchRecursive);
     if (found.isEmpty())
-        ui->eventComboBox->setCurrentIndex(0);
+        ui->eventComboBox->setCurrentIndex(QModelIndex());
     else
-        ui->eventComboBox->selectIndex(found.first());
+        ui->eventComboBox->setCurrentIndex(found.first());
 }
 
 QString QnEventLogDialog::getTextForNCameras(int n) const

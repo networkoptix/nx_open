@@ -9,8 +9,8 @@
 #include <map>
 #include <vector>
 
-#include <QRegExp>
-#include <QString>
+#include <QtCore/QRegExp>
+#include <QtCore/QString>
 
 
 //!Knows which driver is allowed to process any given camera, and which is not

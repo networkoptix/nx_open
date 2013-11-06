@@ -1,7 +1,7 @@
 #include "x11_launcher_workaround.h"
 #include "x11_win_control.h"
 
-#include <QEvent>
+#include <QtCore/QEvent>
 
 QnX11LauncherWorkaround::QnX11LauncherWorkaround():
     QObject(){

@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <memory>
 
-#include <QMutexLocker>
-#include <QXmlDefaultHandler>
+#include <QtCore/QMutexLocker>
+#include <QtXml/QXmlDefaultHandler>
 
+#include <common/common_globals.h>
 #include <utils/network/aio/aioservice.h>
 #include <utils/network/system_socket.h>
-
 
 using namespace std;
 
@@ -100,14 +100,13 @@ UPNPDeviceSearcher::~UPNPDeviceSearcher()
 void UPNPDeviceSearcher::pleaseStop()
 {
     //stopping dispatching discover packets
-    quint64 timerID = 0;
     {
         QMutexLocker lk( &m_mutex );
         m_terminated = true;
-        timerID = m_timerID;    //using mutex, since this operation is not atomic on x86
     }
-    if( timerID )
-        TimerManager::instance()->joinAndDeleteTimer( timerID );
+    //m_timerID cannot be changed after m_terminated set to true
+    if( m_timerID )
+        TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
     for( std::map<QString, QSharedPointer<AbstractDatagramSocket> >::const_iterator
@@ -198,7 +197,9 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
     dispatchDiscoverPackets();
 
     //adding new timer task
-    m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
+    QMutexLocker lk( &m_mutex );
+    if( !m_terminated )
+        m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
 }
 
 void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw()

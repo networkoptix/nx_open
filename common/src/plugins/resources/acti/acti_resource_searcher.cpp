@@ -1,4 +1,4 @@
-#include <QNetworkReply>
+#include <QtNetwork/QNetworkReply>
 
 #include "acti_resource_searcher.h"
 #include "core/resource/camera_resource.h"
@@ -87,7 +87,7 @@ void QnActiResourceSearcher::at_replyReceived(nx_http::AsyncHttpClient* reply)
     m_cachedXml[host].timer.restart();
     m_httpInProgress.remove(host);
 
-    reply->deleteLater();
+    reply->scheduleForRemoval();
 }
 
 QnActiResourceSearcher& QnActiResourceSearcher::instance()
@@ -167,7 +167,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-	processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
+    processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), result);
 
     return result;
 }

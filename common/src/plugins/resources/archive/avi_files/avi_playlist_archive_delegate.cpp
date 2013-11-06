@@ -1,4 +1,4 @@
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include "avi_playlist_archive_delegate.h"
 #include "utils/common/util.h"

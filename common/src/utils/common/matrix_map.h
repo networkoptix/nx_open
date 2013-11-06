@@ -2,11 +2,11 @@
 #define QN_MATRIX_MAP_H
 
 #include <cassert>
-#include <QPoint>
-#include <QRect>
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
 #include <QHash>
-#include <QSet>
-#include <QPair>
+#include <QtCore/QSet>
+#include <QtCore/QPair>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
 #include <utils/common/hash.h>

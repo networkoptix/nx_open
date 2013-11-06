@@ -10,7 +10,7 @@ extern "C"
 #include "utils/media/sse_helper.h"
 #include "utils/common/synctime.h"
 
-#include <QRegion>
+#include <QtGui/QRegion>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
@@ -78,6 +78,9 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
         return true;
     if( m_ctx == NULL || other->m_ctx == NULL )
         return false;
+    if (m_ctx->width != other->m_ctx->width || m_ctx->height != other->m_ctx->height)
+        return false;
+    
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
 }
 
@@ -152,6 +155,7 @@ QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
     return result;
 }
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {
     for (int i = maskStart; i <= maskEnd; ++i)
@@ -172,13 +176,20 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
     }
     return false;
 }
+#endif	//__i386
 
-bool QnMetaDataV1::mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
         return mathImage_sse41(data, mask, maskStart, maskEnd);
     else 
         return mathImage_sse2(data, mask, maskStart, maskEnd);
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO/ARM
+#endif
 }
 
 
@@ -201,8 +212,9 @@ void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
     addMotion((const quint8*) data->data.data(), data->timestamp);
 }
 
-void QnMetaDataV1::removeMotion(const __m128i* image, int startIndex, int endIndex)
+void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIndex)
 {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
     for (int i = startIndex; i <= endIndex; ++i)
@@ -212,8 +224,14 @@ void QnMetaDataV1::removeMotion(const __m128i* image, int startIndex, int endInd
         src++;
 
     }
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO/ARM
+#endif
 }
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 inline bool metadataIsEmpty_sse2(__m128i* src)
 {
     static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0); /* SSE2. */
@@ -235,13 +253,21 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
     }
     return true;
 }
+#endif
 
 bool QnMetaDataV1::isEmpty() const
 {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
         return metadataIsEmpty_sse41((__m128i*) data.data());
     else 
         return metadataIsEmpty_sse2((__m128i*) data.data());
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+    return false;
+#else
+    //TODO
+#endif
 }
 
 void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration )
@@ -279,6 +305,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     else 
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     __m128i* dst = (__m128i*) data.data();
     __m128i* src = (__m128i*) image;
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
@@ -288,6 +315,11 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
         src++;
 
     }
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
 }
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
@@ -448,4 +480,52 @@ QnCompressedAudioData* QnCompressedAudioData::clone()
     QnCompressedAudioData* rez = new QnCompressedAudioData(data.getAlignment(), data.size());
     rez->assign(this);
     return rez;
+}
+
+void QnCodecAudioFormat::fromAvStream(AVCodecContext* c)
+{
+    if (c->sample_rate)
+        setSampleRate(c->sample_rate);
+
+    if (c->channels) 
+        setChannelCount(c->channels);
+
+    //setCodec("audio/pcm");
+    setByteOrder(QnAudioFormat::LittleEndian);
+
+    switch(c->sample_fmt)
+    {
+    case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
+        setSampleSize(8);
+        setSampleType(QnAudioFormat::UnSignedInt);
+        break;
+
+    case AV_SAMPLE_FMT_S16: ///< signed 16 bits
+        setSampleSize(16);
+        setSampleType(QnAudioFormat::SignedInt);
+        break;
+
+    case AV_SAMPLE_FMT_S32:///< signed 32 bits
+        setSampleSize(32);
+        setSampleType(QnAudioFormat::SignedInt);
+        break;
+
+    case AV_SAMPLE_FMT_FLT:
+        setSampleSize(32);
+        setSampleType(QnAudioFormat::Float);
+        break;
+
+    default:
+        break;
+    }
+
+    if (c->extradata_size > 0)
+    {
+        extraData.resize(c->extradata_size);
+        memcpy(&extraData[0], c->extradata, c->extradata_size);
+    }
+    bitrate = c->bit_rate;
+    channel_layout = c->channel_layout;
+    block_align = c->block_align;
+    m_bitsPerSample = c->bits_per_coded_sample;
 }

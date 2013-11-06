@@ -250,3 +250,6 @@ DEFINES += $$OVERRIDE_DEFINITION
 
 SOURCES += $$PWD/../build/generated/compatibility_info.cpp
 
+mac {
+    OBJECTIVE_SOURCES += $$PWD/mac_utils.mm
+}

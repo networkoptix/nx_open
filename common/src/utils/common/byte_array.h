@@ -1,7 +1,7 @@
 #ifndef QN_BYTE_ARRAY_H
 #define QN_BYTE_ARRAY_H
 
-#include <QByteArray>
+#include <QtCore/QByteArray>
 #include <QtCore/qglobal.h>
 
 class QByteArray;
@@ -73,7 +73,7 @@ public:
     inline void uncheckedWrite( const char *data, unsigned int size )
     {
         Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
-        qMemCopy(m_data + m_size, data, size);
+        memcpy(m_data + m_size, data, size);
         m_size += size;
     }
 

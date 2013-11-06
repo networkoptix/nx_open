@@ -4,8 +4,8 @@
 #include "../abstract_dts_reader_factory.h"
 #include "../abstract_dts_searcher.h"
 
-#include <QHostAddress>
-#include <QMap>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QMap>
 
 
 class QnColdStoreDTSSearcher: public QnAbstractDTSSearcher

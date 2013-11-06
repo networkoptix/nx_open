@@ -2,7 +2,7 @@
 #define QN_SCHEDULE_GRID_WIDGET_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <core/misc/schedule_recording_type.h>
 
 static const int SEL_CELL_CLR_DELTA = 40;

@@ -1,6 +1,6 @@
 #include "workbench_resource.h"
-#include <QApplication>
-#include <QMimeData>
+#include <QtWidgets/QApplication>
+#include <QtCore/QMimeData>
 #include <core/resource_managment/resource_pool.h>
 #include <utils/common/warnings.h>
 #include "file_processor.h"

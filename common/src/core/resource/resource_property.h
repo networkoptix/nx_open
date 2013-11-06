@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_PROPERTY_H
 #define QN_RESOURCE_PROPERTY_H
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 namespace QnResourceProperty {
     namespace {

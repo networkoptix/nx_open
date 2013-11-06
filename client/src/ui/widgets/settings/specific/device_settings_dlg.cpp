@@ -1,13 +1,13 @@
 #include "device_settings_dlg.h"
 
 #include <QtCore/QMetaProperty>
-#include <QtGui/QAbstractButton>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QGroupBox>
-#include <QtGui/QPushButton>
-#include <QtGui/QMessageBox>
-#include <QtGui/QTabWidget>
+#include <QtWidgets/QAbstractButton>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QTabWidget>
 
 #include <api/app_server_connection.h>
 
@@ -200,7 +200,7 @@ void CLAbstractDeviceSettingsDlg::registerWidget(QWidget *widget, const QnParam 
     QMetaProperty userProperty = widget->metaObject()->userProperty();
     if (userProperty.isValid() && userProperty.hasNotifySignal()) {
         const QMetaMethod mSignal = userProperty.notifySignal();
-        const QByteArray signature = QByteArray("2") + QByteArray(mSignal.signature()); // a bit tricky, see Q_SIGNAL definition
+        const QByteArray signature = QByteArray("2") + QByteArray(mSignal.methodSignature()); // a bit tricky, see Q_SIGNAL definition
         connect(widget, signature.constData(), this, SLOT(saveParam()));
     }
     m_widgets.insert(param.name(), widget);

@@ -256,7 +256,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setMAC(QString::fromUtf8(report.value("mac address")));
     m_platform = report.value("platform").trimmed().toUpper();
 
-    bool dualStreaming = report.value("channels").toInt() > 1;
+    bool dualStreaming = report.value("channels").toInt() > 1 || !report.value("video2_resolution_cap").isEmpty();
 
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
@@ -470,9 +470,9 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     url.setScheme(QLatin1String("rtsp"));
     url.setPort(m_rtspPort);
     if (isAudioSupported())
-        url.setPath(QString(QLatin1String("stream%1")).arg(actiChannelNum));
+        url.setPath(QString(QLatin1String("/stream%1/")).arg(actiChannelNum));
     else
-        url.setPath(QString(QLatin1String("track%1")).arg(actiChannelNum));
+        url.setPath(QString(QLatin1String("/track%1/")).arg(actiChannelNum));
     return url.toString();
 }
 

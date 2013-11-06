@@ -1,6 +1,6 @@
 #include "compatibility.h"
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 
 QString stripVersion(const QString& version)

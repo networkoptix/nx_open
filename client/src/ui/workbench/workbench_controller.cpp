@@ -4,19 +4,19 @@
 #include <cmath> /* For std::floor. */
 #include <limits>
 
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGLWidget>
-#include <QGraphicsLinearLayout>
-#include <QAction>
-#include <QMenu>
-#include <QMessageBox>
-#include <QLabel>
-#include <QPropertyAnimation>
-#include <QFileInfo>
-#include <QSettings>
-#include <QFileDialog>
-#include <QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QLabel>
+#include <QtCore/QPropertyAnimation>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSettings>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
@@ -143,6 +143,34 @@ namespace {
 
 } // anonymous namespace
 
+
+/*!
+    Returns true if widget has checked option not set
+*/
+class ResourceWidgetHasNoOptionCondition
+:
+    public InstrumentItemCondition
+{
+public:
+    ResourceWidgetHasNoOptionCondition( QnResourceWidget::Option optionToCheck )
+    :
+        m_optionToCheck( optionToCheck )
+    {
+    }
+
+    //!Implementation of InstrumentItemCondition::oeprator()
+    virtual bool operator()(QGraphicsItem *item, Instrument* /*instrument*/) const
+    {
+        QnResourceWidget* resourceWidget = dynamic_cast<QnResourceWidget*>(item);
+        if( !resourceWidget )
+            return true;
+        return (resourceWidget->options() & m_optionToCheck) == 0;
+    }
+
+private:
+    QnResourceWidget::Option m_optionToCheck;
+};
+
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -213,6 +241,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_resizingInstrument->setEffectRadius(8);
 
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_rotationInstrument->addItemCondition(new ResourceWidgetHasNoOptionCondition( QnResourceWidget::WindowRotationForbidden ));
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
@@ -1034,6 +1063,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
+    data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;

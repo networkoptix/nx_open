@@ -60,7 +60,7 @@ namespace Qn
             case Message_Type_FileUpdate:
                 return QLatin1String("FileUpdate");
             default:
-                return QString::fromAscii("Unknown %1").arg((int)val);
+                return QString::fromLatin1("Unknown %1").arg((int)val);
         }
     }
 }
@@ -122,6 +122,7 @@ bool QnMessage::load(const pb::Message &message)
             oldHardwareId = initialMessage.oldhardwareid().c_str();
             hardwareId1 = initialMessage.hardwareid1().c_str();
             hardwareId2 = initialMessage.hardwareid2().c_str();
+            hardwareId3 = initialMessage.hardwareid3().c_str();
             publicIp = QString::fromStdString(initialMessage.publicip());
 
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());

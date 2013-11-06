@@ -14,12 +14,13 @@
 
 #include <utils/common/log.h>
 
+#include "abstract_request_processor.h"
 #include "named_pipe_socket.h"
 
 
-TaskServerNew::TaskServerNew( BlockingQueue<QSharedPointer<applauncher::api::BaseTask> >* const taskQueue )
+TaskServerNew::TaskServerNew( AbstractRequestProcessor* const requestProcessor )
 :
-    m_taskQueue( taskQueue ),
+    m_requestProcessor( requestProcessor ),
     m_terminated( false )
 {
 }
@@ -55,7 +56,6 @@ bool TaskServerNew::listen( const QString& pipeName )
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )
     {
-        const QString& str = SystemError::toString(osError);
         NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(SystemError::toString(osError)), cl_logDEBUG1 );
         return false;
     }
@@ -106,11 +106,6 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
         return;
     }
 
-    QByteArray responseMsg("ok");
-    unsigned int bytesWritten = 0;
-    clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
-    clientConnection->flush();
-
     applauncher::api::BaseTask* task = NULL;
     if( !applauncher::api::deserializeTask( QByteArray::fromRawData(msgBuf, bytesRead), &task ) )
     {
@@ -118,14 +113,19 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
         return;
     }
 
-#ifdef AK_DEBUG
-    if( task->type == applauncher::api::TaskType::startApplication )
-        ((applauncher::api::StartApplicationTask*)task)->version = "debug";
-#endif
     if( task->type == applauncher::api::TaskType::quit )
         m_terminated = true;
 
-    m_taskQueue->push( QSharedPointer<applauncher::api::BaseTask>(task) );
+    //m_taskQueue->push( std::shared_ptr<applauncher::api::BaseTask>(task) );
+    applauncher::api::Response* response = NULL;
+    m_requestProcessor->processRequest(
+        std::shared_ptr<applauncher::api::BaseTask>(task),
+        &response );
+
+    const QByteArray& responseMsg = response == NULL ? "ok\n\n" : response->serialize();
+    unsigned int bytesWritten = 0;
+    clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
+    clientConnection->flush();
 }
 
 #endif

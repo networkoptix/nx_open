@@ -2,6 +2,8 @@
 #include "resource_consumer.h"
 #include "api/app_server_connection.h"
 
+#include <QtCore/QUrlQuery>
+
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
 static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
@@ -52,7 +54,7 @@ void QnPhysicalCameraResource::setUrl(const QString &url)
     QnVirtualCameraResource::setUrl(url); /* This call emits, so we should not invoke it under lock. */
 
     QMutexLocker lock(&m_mutex);
-    m_channelNumber = QUrl(url).queryItemValue(QLatin1String("channel")).toInt();
+    m_channelNumber = QUrlQuery(QUrl(url).query()).queryItemValue(QLatin1String("channel")).toInt();
     if (m_channelNumber > 0)
         m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
 }

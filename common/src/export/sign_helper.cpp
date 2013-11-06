@@ -1,7 +1,7 @@
 #include "sign_helper.h"
 
-#include <QProcess>
-#include <QTemporaryFile>
+#include <QtCore/QProcess>
+#include <QtCore/QTemporaryFile>
 
 #include "utils/common/util.h"
 #include "licensing/license.h"
@@ -31,6 +31,7 @@ QByteArray SIGNATURE_XOR_MAGIC = QByteArray::fromHex("B80466320F15448096F7CEE337
 
 int getSquareSize(int width, int height, int signBits)
 {
+
     int rowCnt = signBits / 16;
     int colCnt = signBits / rowCnt;
     int SQUARE_SIZE = qMin((height/2-height/32)/rowCnt, (width-width/32)/colCnt);
@@ -60,7 +61,7 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
-    m_hwIdStr = QLatin1String(qnLicensePool->hardwareId2());
+    m_hwIdStr = QLatin1String(qnLicensePool->currentHardwareId());
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
@@ -265,9 +266,9 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     // draw Hash
     int signBits = m_sign.length()*8;
     int rowCnt = signBits / 16;
-    int colCnt = signBits / rowCnt;
+    int colCnt = signBits ? signBits / rowCnt : 0;
 
-    int SQUARE_SIZE = getSquareSize(paintSize.width(), paintSize.height(), signBits);
+    int SQUARE_SIZE = signBits ? getSquareSize(paintSize.width(), paintSize.height(), signBits) : 0;
 
 
     int drawWidth = SQUARE_SIZE * colCnt;
@@ -705,7 +706,7 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = QLatin1String(qnLicensePool->hardwareId2());
+    QString hid = QLatin1String(qnLicensePool->currentHardwareId());
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);

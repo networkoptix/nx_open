@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>plugins</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.0.3-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.0.3-SNAPSHOT</version>
+	<artifactId>quicksyncdecoder</artifactId>
+	<packaging>pom</packaging>
+	<name>HD Witness Intel Quick Sync decoder plugin</name>	
+
+	<properties>
+		<product.title>${quicksyncdecoder.name}</product.title>	
+		<!--Global libs-->
+		<qt.libs>core gui network opengl xml multimedia concurrent</qt.libs>
+		<global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lprotobuf</global.libs>
+		<!--Specific os libs used-->
+		<windows.oslibs>DbgHelp.lib -lDxErr -ld3d9 -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lssleay32 -llibeay32 -lglu32 -lDxva2 -llibmfxmd</windows.oslibs>
+		<windows.oslibs.release></windows.oslibs.release>
+		<windows.oslibs.debug></windows.oslibs.debug>         
+		<!--Global defines-->
+		<global.defines/>
+		<!--Specific os defines-->
+		<windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX</windows.defines>
+	</properties>  
+</project>

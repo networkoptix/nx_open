@@ -2,7 +2,7 @@
 #include "ui_camera_schedule_widget.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -136,6 +136,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
+    m_recordingParamsAvailable(true),
     m_changesDisabled(false),
     m_readOnly(false),
     m_maxFps(0),
@@ -477,8 +478,8 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         qWarning() << "QnCameraScheduleWidget::No record type is selected!";
 
     bool enabled = !ui->noRecordButton->isChecked();
-    ui->fpsSpinBox->setEnabled(enabled);
-    ui->qualityComboBox->setEnabled(enabled);
+    ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
+    ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
 
@@ -558,8 +559,29 @@ void QnCameraScheduleWidget::setMotionAvailable(bool available) {
     updateMotionButtons();
 }
 
-bool QnCameraScheduleWidget::isMotionAvailable() {
+void QnCameraScheduleWidget::setRecordingParamsAvailability(bool available)
+{
+    if(m_recordingParamsAvailable == available)
+        return;
+
+    m_recordingParamsAvailable = available;
+
+    updateGridEnabledState();
+
+    ui->gridWidget->setShowSecondParam(ui->displayQualityCheckBox->isChecked() && m_recordingParamsAvailable);
+    ui->gridWidget->setShowFirstParam(ui->displayFpsCheckBox->isChecked() && m_recordingParamsAvailable);
+    ui->fpsSpinBox->setEnabled(m_recordingParamsAvailable);
+    ui->qualityComboBox->setEnabled(m_recordingParamsAvailable);
+}
+
+bool QnCameraScheduleWidget::isMotionAvailable() const
+{
     return m_motionAvailable;
+}
+
+bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
+{
+    return m_recordingParamsAvailable;
 }
 
 
@@ -569,7 +591,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
     ui->scheduleGridGroupBox->setEnabled(enabled);
     ui->settingsGroupBox->setEnabled(enabled);
-    ui->motionGroupBox->setEnabled(enabled);
+    ui->motionGroupBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
 }
 
@@ -753,12 +775,12 @@ void QnCameraScheduleWidget::at_enableRecordingCheckBox_clicked()
 
 void QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)
 {
-    ui->gridWidget->setShowSecondParam(state);
+    ui->gridWidget->setShowSecondParam(state && m_recordingParamsAvailable);
 }
 
 void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 {
-    ui->gridWidget->setShowFirstParam(state);
+    ui->gridWidget->setShowFirstParam(state && m_recordingParamsAvailable);
 }
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()

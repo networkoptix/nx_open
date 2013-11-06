@@ -1,8 +1,9 @@
 #ifndef _COMMON_COMPATIBILITY_H
 #define _COMMON_COMPATIBILITY_H
 
-#include <QSet>
-#include <QList>
+#include <QtCore/QSet>
+#include <QtCore/QString>
+#include <QtCore/QList>
 
 #include <utils/common/software_version.h>
 

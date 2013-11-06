@@ -5,6 +5,10 @@
 
 #include "file.h"
 
+#include <QtCore/QFileInfo>
+
+#include "async_file_processor.h"
+
 
 static void splitPath( const QString& path, QString* dirPath, QString* fileName )
 {
@@ -59,4 +63,18 @@ QString QnFile::baseName( const QString& path )
 QString QnFile::absolutePath( const QString& path )
 {
     return QFileInfo(path).absolutePath();
+}
+
+bool QnFile::writeAsync( const QByteArray& buffer, AbstractWriteHandler* handler )
+{
+    const std::shared_ptr<QnFile>& sharedThis = shared_from_this();
+    assert( sharedThis );
+    return AsyncFileProcessor::instance()->fileWrite( sharedThis, buffer, handler );
+}
+
+bool QnFile::closeAsync( AbstractCloseHandler* handler )
+{
+    const std::shared_ptr<QnFile>& sharedThis = shared_from_this();
+    assert( sharedThis );
+    return AsyncFileProcessor::instance()->fileClose( sharedThis, handler );
 }

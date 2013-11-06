@@ -1,8 +1,8 @@
 #ifndef DYNAMIC_DEBUGGER_H
 #define DYNAMIC_DEBUGGER_H
 
-#include <QDebug>
-#include <QObject>
+#include <QtCore/QDebug>
+#include <QtCore/QObject>
 
 class QnDynamicDebugger: public QObject {
     Q_OBJECT

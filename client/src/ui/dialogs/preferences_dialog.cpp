@@ -2,9 +2,9 @@
 #include "ui_preferences_dialog.h"
 
 #include <QtCore/QDir>
-#include <QtGui/QToolButton>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
 
 #include <translation/translation_list_model.h>
 
@@ -33,6 +33,9 @@
 #include <ui/widgets/settings/server_settings_widget.h>
 #include <ui/workbench/workbench_auto_starter.h>
 
+#include "custom_file_dialog.h"
+#include "ui/workbench/watchers/workbench_desktop_camera_watcher_win.h"
+
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
     QDialog(parent),
@@ -57,6 +60,9 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
+#ifdef Q_OS_WIN32
+        connect(m_recordingSettingsWidget,  SIGNAL(recordingSettingsChanged()), context->instance<QnWorkbenchDesktopCameraWatcher>(), SLOT(at_recordingSettingsChanged()));
+#endif
     }
 
     if(!context->instance<QnWorkbenchAutoStarter>()->isSupported()) {
@@ -113,7 +119,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
     connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
-    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
 
     initTranslations();
     updateFromSettings();
@@ -174,7 +179,7 @@ void QnPreferencesDialog::accept() {
                     QMessageBox::Ok
         );
         if (button == QMessageBox::Ok) {
-            m_restartPending = restartClient();
+            m_restartPending = applauncher::restartClient() == applauncher::api::ResultType::ok;
             if (!m_restartPending) {
                 QMessageBox::critical(
                             this,
@@ -286,13 +291,13 @@ void QnPreferencesDialog::openPopupSettingsPage() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
-    QFileDialog fileDialog(this);
-    fileDialog.setDirectory(ui->mainMediaFolderLabel->text());
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
+    dialog->setDirectory(ui->mainMediaFolderLabel->text());
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    if (!dialog->exec())
         return;
 
-    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
     if (dir.isEmpty())
         return;
 
@@ -300,13 +305,13 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 }
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
-    QFileDialog fileDialog(this);
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
     //TODO: #Elric call setDirectory
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (!fileDialog.exec())
+    dialog->setFileMode(QFileDialog::DirectoryOnly);
+    if (!dialog->exec())
         return;
 
-    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
     if (dir.isEmpty())
         return;
 
@@ -352,12 +357,21 @@ void QnPreferencesDialog::at_onDecoderPluginsListChanged()
         if( plugin->isHardwareAccelerated() )
         {
             ui->hardwareDecodingCheckBox->show();
+            if( ui->hardwareDecodingCheckBox->isChecked() )
+                ui->hwAccelerationWarningLabel->show();
+            connect( ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
+            //static_cast<QVBoxLayout*>(ui->miscGroupBox->layout())->insertItem( 2, ui->hardwareDecodingControlsLayout );
+            //ui->hardwareDecodingControlsLayout->setEnabled( true );
             return;
         }
     }
 
+    disconnect( ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
+    ui->miscGroupBox->layout()->removeItem( ui->hardwareDecodingControlsLayout );
+    //ui->hardwareDecodingControlsLayout->setEnabled( false );
     ui->hardwareDecodingCheckBox->hide();
     ui->hardwareDecodingLabel->hide();
+    ui->hwAccelerationWarningLabel->hide();
 }
 
 void QnPreferencesDialog::at_downmixAudioCheckBox_toggled(bool checked) {

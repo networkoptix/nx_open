@@ -40,6 +40,7 @@ QnResource::QnResource():
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult())
 {
+    m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
 
 QnResource::~QnResource()
@@ -932,7 +933,7 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 
 int QnResource::initializationAttemptCount() const
 {
-    return m_initializationAttemptCount;
+    return m_initializationAttemptCount.load();
 }
 
 bool QnResource::isInitialized() const

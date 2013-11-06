@@ -1,8 +1,8 @@
 #ifndef __RTSP_DATA_CONSUMER_H__
 #define __RTSP_DATA_CONSUMER_H__
 
-#include <QHostAddress>
-#include <QTime>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QTime>
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "core/datapacket/abstract_data_packet.h"

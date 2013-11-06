@@ -1,4 +1,7 @@
 #include "desktop_resource.h"
+
+#ifdef Q_OS_WIN
+
 #include "device_plugins/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "ui/style/skin.h"
@@ -102,14 +105,16 @@ bool QnDesktopResource::isRendererSlow() const
 
 void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)
 {
-    if (m_connectionPool.contains(mServer))
+    if (m_connectionPool.contains(mServer->getGuid()))
         return;
     QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, mServer));
-    m_connectionPool[mServer] = connection;
+    m_connectionPool[mServer->getGuid()] = connection;
     connection->start();
 }
 
 void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
 {
-    m_connectionPool.remove(mServer);
+    m_connectionPool.remove(mServer->getGuid());
 }
+
+#endif

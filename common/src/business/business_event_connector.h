@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_EVENT_CONNECTOR_H__
 #define __BUSINESS_EVENT_CONNECTOR_H__
 
-#include <QHostAddress>
+#include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/datapacket/abstract_data_packet.h>

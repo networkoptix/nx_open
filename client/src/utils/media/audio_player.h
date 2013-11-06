@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include <QBuffer>
-#include <QMutex>
-#include <QWaitCondition>
+#include <QtCore/QBuffer>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <plugins/storage/memory/ext_iodevice_storage.h>

@@ -1,6 +1,6 @@
 #include "motion_archive.h"
-#include <QDateTime>
-#include <QDir>
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
@@ -176,7 +176,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     QnTimePeriodList rez;
     QFile motionFile, indexFile;
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
-    __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
+    simd128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
 
     Q_ASSERT(((unsigned long)mask)%16 == 0);
@@ -223,7 +223,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
             quint8* curData = buffer;
             while (i < endItr && curData < dataEnd)
             {
-                if (QnMetaDataV1::mathImage((__m128i*) curData, mask, maskStart, maskEnd))
+                if (QnMetaDataV1::mathImage((simd128i*) curData, mask, maskStart, maskEnd))
                 {
                     qint64 fullStartTime = i->start + indexHeader.startTime;
                     if (fullStartTime > msEndTime) {

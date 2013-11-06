@@ -1,4 +1,4 @@
-#include <QWaitCondition>
+#include <QtCore/QWaitCondition>
 
 #include "syncplay_wrapper.h"
 #include "syncplay_archive_delegate.h"
@@ -789,13 +789,14 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
         return;
     d->enabled = true;
     d->speed = currentSpeed;
-
-    bool isPaused = false;
+    bool isPaused = (currentSpeed == 0);
     foreach(const ReaderInfo& info, d->readers) 
     {
         if (info.enabled)
         {
-            isPaused |= info.reader->isMediaPaused();
+            bool isItemPaused = info.reader->isMediaPaused();
+            if (!isItemPaused && isPaused)
+                info.reader->pauseMedia();
 
             if (currentTime != qint64(AV_NOPTS_VALUE)) {
                 setJumpTime(currentTime);
@@ -805,12 +806,12 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
             else {
                 info.reader->setSpeed(currentSpeed);
             }
+            if (isItemPaused && !isPaused)
+                info.reader->resumeMedia();
 
             info.reader->setNavDelegate(this);
         }
     }
-    if (isPaused)
-        pauseMedia();
 }
 
 bool QnArchiveSyncPlayWrapper::isEnabled() const

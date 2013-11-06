@@ -1,8 +1,8 @@
 #include "version.h"
 
-#include <QApplication>
-#include <QDir>
-#include <QSettings>
+#include <QtCore/QDir>
+#include <QtCore/QSettings>
+#include <QtCore/QCoreApplication>
 
 #include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
@@ -32,15 +32,14 @@ void ffmpegInit()
 
 int main(int argc, char *argv[])
 {
-    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-    QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+    QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
+    QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     ffmpegInit();  
     
     // Each user may have it's own traytool running.
-    QApplication app(argc, argv);
-    QApplication::setQuitOnLastWindowClosed(false);
+    QCoreApplication app(argc, argv);
 
     QnCommonModule common(argc, argv);
 

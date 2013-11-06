@@ -1,6 +1,6 @@
 #include "action_conditions.h"
 
-#include <QAction>
+#include <QtWidgets/QAction>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_criterion.h>
@@ -453,7 +453,7 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
 
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
-    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
@@ -511,6 +511,16 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
 
 Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {
+    if  (!context()->user())
+        return Qn::InvisibleAction;
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (snapshotManager()->isFile(layout))
+        return Qn::InvisibleAction;
+    else
+        return Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {

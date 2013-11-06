@@ -243,7 +243,7 @@ int QnActiPtzController::setPosition(const QVector3D &position)
 {
     QMutexLocker lock(&m_mutex);
 
-    qreal zoomPos = qMax(0.0, (position.z()-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
+    qreal zoomPos = qMax(0.0, (double) (position.z()-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
 
     CLHttpStatus status;
 

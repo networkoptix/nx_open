@@ -1,14 +1,16 @@
 #ifndef SERVER_SETTINGS_DIALOG_H
 #define SERVER_SETTINGS_DIALOG_H
 
-#include <QtCore/QWeakPointer>
-#include <QtGui/QDialog>
+
+#include <QtWidgets/QDialog>
+#include <QTimer>
 
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "button_box_dialog.h"
+#include "api/model/rebuild_archive_reply.h"
 
 class QLabel;
 
@@ -50,17 +52,26 @@ private slots:
     void at_storagesTable_cellChanged(int row, int column);
     void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
     void at_pingButton_clicked();
+#ifndef Q_OS_MACX
+    void at_rebuildButton_clicked();
+
+    void at_archiveRebuildReply(int, const QnRebuildArchiveReply& reply, int);
+    void sendNextArchiveRequest();
+    void at_updateRebuildInfo();
+#endif
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
-
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
     QList<QString> m_storageProtocols;
-    QWeakPointer<QLabel> m_tableBottomLabel;
+    QPointer<QLabel> m_tableBottomLabel;
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
+#ifndef Q_OS_MACX
+    QnRebuildArchiveReply m_lastRebuildReply;
+#endif
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

@@ -1,16 +1,16 @@
 #ifndef QN_LICENSING_LICENSE
 #define QN_LICENSING_LICENSE
 
-#include <QByteArray>
-#include <QCoreApplication>
-#include <QMetaType>
+#include <QtCore/QByteArray>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QMetaType>
 #include <QSharedPointer>
-#include <QString>
-#include <QList>
-#include <QMap>
-#include <QMutex>
-#include <QSet>
-#include <QTextStream>
+#include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QSet>
+#include <QtCore/QTextStream>
 
 class QnLicense;
 typedef QSharedPointer<QnLicense> QnLicensePtr;
@@ -150,6 +150,10 @@ public:
     void setHardwareId2(const QByteArray& hardwareId);
     QByteArray hardwareId2() const;
 
+    void setHardwareId3(const QByteArray& hardwareId);
+    QByteArray hardwareId3() const;
+
+    QByteArray currentHardwareId() const;
 signals:
     void licensesChanged();
 
@@ -170,6 +174,9 @@ private:
 
     // The one 1.6 uses
     QByteArray m_hardwareId2;
+
+    // The one for 2.0.2 and later
+    QByteArray m_hardwareId3;
 
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;

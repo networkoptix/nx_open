@@ -29,6 +29,7 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServ
     m_listeners(0),
     m_pointsLimit(pointsLimit),
     m_updatePeriod(defaultUpdatePeriod),
+    m_uptimeMs(0),
     m_apiConnection(apiConnection),
     m_timer(new QTimer())
 {
@@ -58,6 +59,11 @@ qint64 QnMediaServerStatisticsStorage::historyId() const {
 
 int QnMediaServerStatisticsStorage::updatePeriod() const {
     return m_updatePeriod;
+}
+
+qint64 QnMediaServerStatisticsStorage::uptimeMs() const
+{
+    return m_uptimeMs;
 }
 
 void QnMediaServerStatisticsStorage::setFlagsFilter(QnStatisticsDeviceType deviceType, int flags) {
@@ -106,7 +112,11 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
     foreach(QString key, m_history.keys())
         notUpdated << key;
 
-    foreach(const QnStatisticsDataItem &nextData, reply.statistics) {
+    m_uptimeMs = reply.uptimeMs;
+
+    foreach(const QnStatisticsDataItem &nextData, reply.statistics) 
+    {
+
         if (m_flagsFilter.contains(nextData.deviceType) &&
             ((m_flagsFilter[nextData.deviceType] & nextData.deviceFlags) != m_flagsFilter[nextData.deviceType]))
             continue;
@@ -132,5 +142,4 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
 
 //    emit statisticsChanged();
 }
-
 

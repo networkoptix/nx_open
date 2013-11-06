@@ -4,10 +4,11 @@
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QSplitter>
+#include <QtWidgets/QSplitter>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -39,6 +40,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_hasCameraChanges(false),
     m_anyCameraChanges(false),
     m_hasDbChanges(false),
+    m_scheduleEnabledChanged(false),
     m_hasScheduleChanges(false),
     m_hasScheduleControlsChanges(false),
     m_hasMotionControlsChanges(false),
@@ -381,6 +383,14 @@ void QnSingleCameraSettingsWidget::reject()
     updateFromResource();
 }
 
+bool QnSingleCameraSettingsWidget::licensedParametersModified() const
+{
+    if( !hasDbChanges() && !hasCameraChanges() && !hasAnyCameraChanges() )
+        return false;//nothing have been changed
+
+    return m_scheduleEnabledChanged || m_hasScheduleChanges;
+}
+
 void QnSingleCameraSettingsWidget::updateFromResource() {
     loadAdvancedSettings();
 
@@ -485,9 +495,11 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
+    updateRecordingParamsAvailability();
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
+    m_scheduleEnabledChanged = false;
     m_hasScheduleControlsChanges = false;
     m_hasMotionControlsChanges = false;
 
@@ -552,7 +564,10 @@ void QnSingleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
 
     m_hasDbChanges = hasChanges;
     if(!m_hasDbChanges && !hasCameraChanges())
+    {
+        m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -563,7 +578,10 @@ void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
 
     m_hasCameraChanges = hasChanges;
     if(!m_hasCameraChanges && !hasDbChanges())
+    {
+        m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -574,7 +592,10 @@ void QnSingleCameraSettingsWidget::setAnyCameraChanges(bool hasChanges) {
 
     m_anyCameraChanges = hasChanges;
     if(!m_anyCameraChanges && !hasDbChanges())
+    {
+        m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
+    }
 
     emit hasChangesChanged();
 }
@@ -597,6 +618,14 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
         return;
     bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
     m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
+{
+    if (!m_camera)
+        return;
+    
+    ui->cameraScheduleWidget->setRecordingParamsAvailability(!m_camera->hasParam(lit("noRecordingParams")));
 }
 
 void QnSingleCameraSettingsWidget::updateMotionAvailability() {
@@ -806,7 +835,8 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
         
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
         if(url.isValid()) {
-            int port = url.queryItemValue(lit("http_port")).toInt();
+            QUrlQuery query(url);
+            int port = query.queryItemValue(lit("http_port")).toInt();
             if(port == 0)
                 port = url.port(80);
             
@@ -855,6 +885,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
         return;
 
     m_motionWidget = new QnCameraMotionMaskWidget(this);
+
     updateMotionWidgetFromResource();
 
     using ::setReadOnly;
@@ -901,6 +932,8 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
     if (m_camera && m_camera->isAnalog())
         ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
+
+    m_scheduleEnabledChanged = true;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)

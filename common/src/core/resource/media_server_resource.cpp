@@ -1,8 +1,8 @@
 #include "media_server_resource.h"
 
 #include <QtCore/QUrl>
-#include <QCoreApplication>
-#include <QTimer>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 #include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include "utils/common/sleep.h"
@@ -273,6 +273,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
         m_streamingUrl = localOther->getStreamingUrl();
+        m_version = localOther->getVersion();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         

@@ -1,29 +1,13 @@
-
-#ifdef __APPLE__
-#include <GL/gl.h>
-#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
-#include <GL/glext.h> /* Pull in all non-standard OpenGL defines. */
-#endif
-
 #include "gl_functions.h"
-
-#ifndef __APPLE__
-#define GL_GLEXT_PROTOTYPES /* We want typedefs, not function declarations. */
-#include <GL/glext.h>
-#endif
 
 #include <boost/preprocessor/stringize.hpp>
 
 #include <QtCore/QMutex>
+#include <QOpenGLContext>
 
 #include <utils/common/warnings.h>
 
 #include "gl_context_data.h"
-
-
-#ifndef APIENTRY
-#   define APIENTRY
-#endif
 
 namespace {
     bool qn_warnOnInvalidCalls = false;
@@ -36,45 +20,6 @@ namespace {
     };
 
 } // anonymous namespace
-
-namespace QnGl {
-#define WARN()                                                                  \
-    {                                                                           \
-        if(qn_warnOnInvalidCalls)                                               \
-            qnWarning("This function is not supported for current OpenGL context."); \
-    }
-
-    void APIENTRY glProgramStringARB(GLenum, GLenum, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glBindProgramARB(GLenum, GLuint) { WARN(); }
-    void APIENTRY glDeleteProgramsARB(GLsizei, const GLuint *) { WARN(); }
-    void APIENTRY glGenProgramsARB(GLsizei, GLuint *) { WARN(); }
-    void APIENTRY glProgramLocalParameter4fARB(GLenum, GLuint, GLfloat, GLfloat, GLfloat, GLfloat) { WARN(); }
-
-    void APIENTRY glActiveTexture(GLenum) { WARN(); }
-
-    void APIENTRY glBindBuffer(GLenum, GLuint) { WARN(); }
-    void APIENTRY glDeleteBuffers(GLsizei, const GLuint *) { WARN(); }
-    void APIENTRY glGenBuffers(GLsizei, GLuint *) { WARN(); }
-    void APIENTRY glBufferData(GLenum, GLsizeiptrARB, const GLvoid *, GLenum) { WARN(); }
-    void APIENTRY glBufferSubData(GLenum, GLintptrARB, GLsizeiptrARB, const GLvoid *) { WARN(); }
-    GLvoid* APIENTRY glMapBuffer(GLenum, GLenum) { WARN(); return NULL; }
-    GLboolean APIENTRY glUnmapBuffer(GLenum) { WARN(); return false; }
-
-    void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
-    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); }
-    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); }
-
-    GLsync APIENTRY glFenceSync(GLenum, GLbitfield) { WARN(); return 0; }
-    void APIENTRY glDeleteSync(GLsync) { WARN(); }
-    void APIENTRY glWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); }
-    GLAPI GLenum APIENTRY glClientWaitSync(GLsync, GLbitfield, GLuint64) { WARN(); return 0; }
-
-    void APIENTRY glBlendColor(GLfloat, GLfloat, GLfloat, GLfloat) { WARN(); }
-
-#undef WARN
-
-} // namespace QnGl
-
 
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsGlobal
@@ -143,61 +88,13 @@ public:
     {
         qn_glFunctionsGlobal()->initialize(context);
 
-        bool status;
-#define RESOLVE(FUNCTION_TYPE, FUNCTION_NAME)                                   \
-        status &= resolve<FUNCTION_TYPE>(BOOST_PP_STRINGIZE(FUNCTION_NAME), &QnGl::FUNCTION_NAME, &FUNCTION_NAME)
-
-        status = true;
-        RESOLVE(PFNGLPROGRAMSTRINGARBPROC,              glProgramStringARB);
-        RESOLVE(PFNGLBINDPROGRAMARBPROC,                glBindProgramARB);
-        RESOLVE(PFNGLDELETEPROGRAMSARBPROC,             glDeleteProgramsARB);
-        RESOLVE(PFNGLGENPROGRAMSARBPROC,                glGenProgramsARB);
-        RESOLVE(PFNGLPROGRAMLOCALPARAMETER4FARBPROC,    glProgramLocalParameter4fARB);
-        if(status)
-            m_features |= QnGlFunctions::ArbPrograms;
-
-        status = true;
-        RESOLVE(PFNGLACTIVETEXTUREPROC,                 glActiveTexture);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL1_3;
-
-        status = true;
-        RESOLVE(PFNGLBINDBUFFERPROC,                    glBindBuffer);
-        RESOLVE(PFNGLDELETEBUFFERSPROC,                 glDeleteBuffers);
-        RESOLVE(PFNGLGENBUFFERSPROC,                    glGenBuffers);
-        RESOLVE(PFNGLBUFFERDATAPROC,                    glBufferData);
-        RESOLVE(PFNGLBUFFERSUBDATAPROC,                 glBufferSubData);
-        RESOLVE(PFNGLMAPBUFFERPROC,                     glMapBuffer);
-        RESOLVE(PFNGLUNMAPBUFFERPROC,                   glUnmapBuffer);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL1_5;
-
-        status = true;
-        RESOLVE(PFNGLVERTEXATTRIBPOINTERPROC,           glVertexAttribPointer);
-        RESOLVE(PFNGLDISABLEVERTEXATTRIBARRAYPROC,      glDisableVertexAttribArray);
-        RESOLVE(PFNGLENABLEVERTEXATTRIBARRAYPROC,       glEnableVertexAttribArray);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL2_0;
-
-        status = true;
-        RESOLVE(PFNGLFENCESYNCPROC,                     glFenceSync);
-        RESOLVE(PFNGLDELETESYNCPROC,                    glDeleteSync);
-        RESOLVE(PFNGLCLIENTWAITSYNCPROC,                glClientWaitSync);
-        RESOLVE(PFNGLWAITSYNCPROC,                      glWaitSync);
-        if(status)
-            m_features |= QnGlFunctions::OpenGL3_2 | QnGlFunctions::ArbSync;
-
-        RESOLVE(PFNGLBLENDCOLORPROC,                    glBlendColor);
-
-#undef RESOLVE
-
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
         
 #ifdef Q_OS_LINUX
-        QDir atiProcDir(QString::fromAscii("/proc/ati"));
+        QDir atiProcDir(QString::fromLatin1("/proc/ati"));
         if(atiProcDir.exists()) /* Checking for fglrx driver. */
             m_features |= QnGlFunctions::NoOpenGLFullScreen;
 #endif
@@ -215,51 +112,6 @@ public:
     {
         return m_context;
     }
-
-public:
-    PFNGLPROGRAMSTRINGARBPROC glProgramStringARB;
-    PFNGLBINDPROGRAMARBPROC glBindProgramARB;
-    PFNGLDELETEPROGRAMSARBPROC glDeleteProgramsARB;
-    PFNGLGENPROGRAMSARBPROC glGenProgramsARB;
-    PFNGLPROGRAMLOCALPARAMETER4FARBPROC glProgramLocalParameter4fARB;
-
-    PFNGLACTIVETEXTUREPROC glActiveTexture;
-
-    PFNGLBINDBUFFERPROC glBindBuffer;
-    PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-    PFNGLGENBUFFERSPROC glGenBuffers;
-    PFNGLBUFFERDATAPROC glBufferData;
-    PFNGLBUFFERSUBDATAPROC glBufferSubData;
-    PFNGLMAPBUFFERPROC glMapBuffer;
-    PFNGLUNMAPBUFFERPROC glUnmapBuffer;
-
-    PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-    PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
-    PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-
-    PFNGLFENCESYNCPROC glFenceSync;
-    PFNGLDELETESYNCPROC glDeleteSync;
-    PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
-    PFNGLWAITSYNCPROC glWaitSync;
-
-    PFNGLBLENDCOLORPROC glBlendColor;
-
-private:
-    template<class Function>
-    bool resolve(const char *name, const Function &defaultValue, Function *result) {
-        if(!m_context) {
-            *result = defaultValue;
-            return false;
-        }
-            
-        *result = (Function) m_context->getProcAddress(QLatin1String(name));
-        if(*result)
-            return true;
-
-        *result = defaultValue;
-        return false;
-    }
-
 private:
     const QGLContext *m_context;
     QnGlFunctions::Features m_features;
@@ -298,95 +150,6 @@ void QnGlFunctions::setWarningsEnabled(bool enable) {
 
 bool QnGlFunctions::isWarningsEnabled() {
     return qn_warnOnInvalidCalls;
-}
-
-void QnGlFunctions::glProgramStringARB(GLenum target, GLenum format, GLsizei len, const GLvoid *string) const {
-    d->glProgramStringARB(target, format, len, string);
-}
-
-void QnGlFunctions::glBindProgramARB(GLenum target, GLuint program) const {
-    d->glBindProgramARB(target, program);
-}
-
-void QnGlFunctions::glDeleteProgramsARB(GLsizei n, const GLuint *programs) const {
-    d->glDeleteProgramsARB(n, programs);
-}
-
-void QnGlFunctions::glGenProgramsARB(GLsizei n, GLuint *programs) const {
-    d->glGenProgramsARB(n, programs);
-}
-
-void QnGlFunctions::glProgramLocalParameter4fARB(GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const {
-    d->glProgramLocalParameter4fARB(target, index, x, y, z, w);
-}
-
-void QnGlFunctions::glActiveTexture(GLenum texture) {
-    d->glActiveTexture(texture);
-}
-
-void QnGlFunctions::glGenBuffers(GLsizei n, GLuint *buffers) {
-    d->glGenBuffers(n, buffers);
-}
-
-void QnGlFunctions::glBindBuffer(GLenum target, GLuint buffer) {
-    d->glBindBuffer(target, buffer);
-}
-
-void QnGlFunctions::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
-    d->glDeleteBuffers(n, buffers);
-}
-
-void QnGlFunctions::glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage) {
-    d->glBufferData(target, size, data, usage);
-}
-
-void QnGlFunctions::glBufferSubData(GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data) {
-    d->glBufferSubData( target, offset, size, data );
-}
-
-GLvoid *QnGlFunctions::glMapBuffer(GLenum target, GLenum access) {
-    return d->glMapBuffer(target, access);
-}
-
-GLboolean QnGlFunctions::glUnmapBuffer(GLenum target) {
-    return d->glUnmapBuffer(target);
-}
-
-void QnGlFunctions::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
-    d->glVertexAttribPointer(index, size, type, normalized, stride, pointer);
-}
-
-void QnGlFunctions::glEnableVertexAttribArray(GLuint index) {
-    d->glEnableVertexAttribArray(index);
-}
-
-void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
-    d->glDisableVertexAttribArray(index);
-}
-
-GLsync QnGlFunctions::glFenceSync(GLenum condition, GLbitfield flags)
-{
-    return d->glFenceSync(condition, flags);
-}
-
-void QnGlFunctions::glDeleteSync(GLsync sync)
-{
-    d->glDeleteSync(sync);
-}
-
-void QnGlFunctions::glWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
-{
-    d->glWaitSync(sync, flags, timeout);
-}
-
-GLenum QnGlFunctions::glClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
-{
-    return d->glClientWaitSync(sync, flags, timeout);
-}
-
-void QnGlFunctions::glBlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
-{
-    return d->glBlendColor(red, green, blue, alpha);
 }
 
 #ifdef Q_OS_WIN

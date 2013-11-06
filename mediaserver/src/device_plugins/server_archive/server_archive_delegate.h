@@ -1,8 +1,8 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
-#include <QMutex>
-#include <QRegion>
+#include <QtCore/QMutex>
+#include <QtGui/QRegion>
 
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"

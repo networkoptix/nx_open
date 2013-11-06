@@ -3,7 +3,7 @@
 
 #include <QAuthenticator>
 #include <QtCore/QHash>
-#include <QString>
+#include <QtCore/QString>
 #include <QSharedPointer>
 
 #include "socket.h"

@@ -279,7 +279,7 @@ private slots:
 
     void at_calendarWidget_dateClicked(const QDate &date);
 
-
+    void at_tabBar_tabTextChanged();
 private:
     /* Global state. */
 

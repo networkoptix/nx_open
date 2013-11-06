@@ -59,7 +59,7 @@ throw() {
         userMessage.append(QLatin1String(strerror(errno)));
     }
 
-    QByteArray data = userMessage.toAscii();
+    QByteArray data = userMessage.toLatin1();
     strncpy(m_message, data.data(), MAX_ERROR_MSG_LENGTH-1);
     m_message[MAX_ERROR_MSG_LENGTH-1] = 0;
 }
@@ -90,7 +90,7 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
     hints.ai_next = NULL;
 
     addrinfo *addressInfo;
-    int status = getaddrinfo(address.toAscii(), 0, &hints, &addressInfo);
+    int status = getaddrinfo(address.toLatin1(), 0, &hints, &addressInfo);
     if (status != 0) {
 #ifdef UNICODE
         QString errorMessage = QString::fromWCharArray(gai_strerror(status));
@@ -250,8 +250,8 @@ unsigned short Socket::resolveService(const QString &service,
                                       const QString &protocol) {
     struct servent *serv;        /* Structure containing service information */
 
-    if ((serv = getservbyname(service.toAscii(), protocol.toAscii())) == NULL)
-        return atoi(service.toAscii());  /* Service is port number */
+    if ((serv = getservbyname(service.toLatin1(), protocol.toLatin1())) == NULL)
+        return atoi(service.toLatin1());  /* Service is port number */
     else
         return ntohs(serv->s_port);    /* Found port (network byte order) by name */
 }

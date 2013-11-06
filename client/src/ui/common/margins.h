@@ -1,8 +1,8 @@
 #ifndef QN_MARGINS_H
 #define QN_MARGINS_H
 
-#include <QtGlobal>
-#include <QMargins>
+#include <QtCore/QtGlobal>
+#include <QtCore/QMargins>
 
 /**
  * A floating-point counterpart to <tt>QMargins</tt>.

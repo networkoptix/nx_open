@@ -1,7 +1,7 @@
 
 #include "camera_advanced_settings_xml_parser.h"
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 #include "ui/widgets/properties/camera_advanced_settings_widget.h"
 

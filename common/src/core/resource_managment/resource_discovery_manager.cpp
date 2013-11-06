@@ -1,7 +1,7 @@
 
 #include <set>
 
-#include <QtCore/QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "resource_discovery_manager.h"
 #include "utils/common/sleep.h"
@@ -181,7 +181,7 @@ void QnResourceDiscoveryManager::run()
     m_timer.reset();
 }
 
-static int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
+static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
@@ -199,12 +199,13 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
         case initialSearch:
             foreach (QnAbstractResourceSearcher *searcher, searchersList)
             {
-                if (searcher->shouldBeUsed() && dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
+                if (searcher->shouldBeUsed() && searcher->isLocal())
                 {
                     QnResourceList lst = searcher->search();
                     m_resourceProcessor->processResources(lst);
                 }
             }
+            emit localSearchDone();
             m_state = periodicSearch;
             break;
 
@@ -579,3 +580,7 @@ void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
     m_disabledVendorsForAutoSearch = vendors.toSet();
 }
 
+QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
+{ 
+    return m_state; 
+}

@@ -1,7 +1,7 @@
 #ifndef CAMERA_SETTINGS_DIALOG_H
 #define CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
@@ -79,6 +79,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
     void updateFromResource();
     void reject();
     void submitToResource();
@@ -139,6 +141,7 @@ private:
 
     void updateMotionWidgetNeedControlMaxRect();
     void updateMotionAvailability();
+    void updateRecordingParamsAvailability();
 
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
@@ -160,6 +163,7 @@ private:
     bool m_anyCameraChanges;
     bool m_hasDbChanges;
 
+    bool m_scheduleEnabledChanged;
     /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
 

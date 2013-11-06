@@ -29,7 +29,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
         return;
 
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
@@ -110,11 +110,11 @@ int QnOnvifPtzController::stopMove()
 {
     // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
     QString model = m_resource->getModel();
-    if(model == lit("SD8362") || model == lit("SD83X3"))
+    if(model == lit("SD8362") || model == lit("SD83X3") || model == lit("SD81X1"))
         return startMove(0, 0, 0);
 
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     _onvifPtz__Stop request;
     _onvifPtz__StopResponse response;
 
@@ -150,7 +150,7 @@ int QnOnvifPtzController::startMove(const QVector3D &speed)
         yVelocity = -yVelocity;
 
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     _onvifPtz__ContinuousMove request;
     _onvifPtz__ContinuousMoveResponse response;
 
@@ -194,7 +194,7 @@ void QnOnvifPtzController::setMediaProfileToken(const QString& value)
 int QnOnvifPtzController::setPosition(const QVector3D &position)
 {
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     _onvifPtz__AbsoluteMove request;
     _onvifPtz__AbsoluteMoveResponse response;
 
@@ -241,7 +241,7 @@ int QnOnvifPtzController::setPosition(const QVector3D &position)
 int QnOnvifPtzController::getPosition(QVector3D *position)
 {
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     _onvifPtz__GetStatus request;
     _onvifPtz__GetStatusResponse response;
 

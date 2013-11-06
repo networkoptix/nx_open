@@ -1,14 +1,14 @@
 #ifndef __TEST_CAMERA_RESOURCE_SEARCHER_H_
 #define __TEST_CAMERA_RESOURCE_SEARCHER_H_
 
+#include <QtCore/QCoreApplication>
+
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/network/socket.h"
 
 class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
-    QnTestCameraResourceSearcher();
-    virtual ~QnTestCameraResourceSearcher();
 public:
     static QnTestCameraResourceSearcher& instance();
 
@@ -19,10 +19,15 @@ public:
     virtual QString manufacture() const;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+
 private:
+    QnTestCameraResourceSearcher();
+    virtual ~QnTestCameraResourceSearcher();
+
     void sendBroadcast();
     bool updateSocketList();
     void clearSocketList();
+
 private:
     struct DiscoveryInfo
     {

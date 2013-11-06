@@ -33,7 +33,7 @@ signals:
 private:
     friend class QnAbstractReplyProcessor;
 
-    QWeakPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
+    QPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
     QnLayoutResourceList m_resources;
 };
 

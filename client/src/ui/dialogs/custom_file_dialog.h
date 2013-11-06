@@ -3,10 +3,10 @@
 
 #include <QtCore/QMap>
 
-#include <QtGui/QFileDialog>
-#include <QtGui/QCheckBox>
-#include <QtGui/QSpinBox>
-#include <QtGui/QLineEdit>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QLineEdit>
 
 class QnCheckboxControlAbstractDelegate: public QObject
 {
@@ -38,10 +38,7 @@ class QnCustomFileDialog : public QFileDialog
     typedef QFileDialog base_type;
 
 public:
-    explicit QnCustomFileDialog(QWidget *parent = 0,
-                         const QString &caption = QString(),
-                         const QString &directory = QString(),
-                         const QString &filter = QString());
+    explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
     ~QnCustomFileDialog();
 
     /**

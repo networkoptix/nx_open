@@ -6,7 +6,7 @@
 #ifndef AIOSERVICE_H
 #define AIOSERVICE_H
 
-#include <QMutex>
+#include <QtCore/QMutex>
 #include <QSharedPointer>
 
 #include "aioeventhandler.h"
@@ -25,7 +25,6 @@ namespace aio
         \note There is no garantee that one socket is listened for read and write by same thread (this is garanteed with linux/epoll, but not with winxp/select)
         \note All methods are thread-safe
         \todo Socket termination???
-        \todo add timeouts to i/o operations
     */
     class AIOService
     {

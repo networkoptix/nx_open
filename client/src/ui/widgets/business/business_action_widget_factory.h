@@ -1,7 +1,7 @@
 #ifndef BUSINESS_ACTION_WIDGET_FACTORY_H
 #define BUSINESS_ACTION_WIDGET_FACTORY_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <business/actions/abstract_business_action.h>
 

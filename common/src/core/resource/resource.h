@@ -2,13 +2,13 @@
 #define QN_RESOURCE_H
 
 #include <cassert>
-#include <QDateTime>
-#include <QMap>
-#include <QMetaType>
-#include <QSet>
-#include <QStringList>
-#include <QReadWriteLock>
-#include <QThreadPool>
+#include <QtCore/QDateTime>
+#include <QtCore/QMap>
+#include <QtCore/QMetaType>
+#include <QtCore/QSet>
+#include <QtCore/QStringList>
+#include <QtCore/QReadWriteLock>
+#include <QtCore/QThreadPool>
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/common/from_this_to_shared.h"
 #include "utils/common/id.h"
@@ -104,6 +104,7 @@ public:
 
         foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
         no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
+        deprecated = 0x100000,   /**< Resource absent in EC but still used in memory for some reason */
 
         local_media = local | media,
         local_layout = local | layout,

@@ -19,10 +19,11 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(AbstractStreamSocket* connection, const QString& userName)
+void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName)
 {
     connection->setSendTimeout(1);
-    m_connections << ClientConnectionInfo(TCPSocketPtr(connection), userName);
+    QMutexLocker lock(&m_mutex);
+    m_connections << ClientConnectionInfo(connection, userName);
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -38,6 +39,8 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
     if (!rt.isValid())
         return result;
+
+    QMutexLocker lock(&m_mutex);
 
     QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     

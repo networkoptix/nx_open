@@ -1,4 +1,7 @@
+
 #include "translation_list_model.h"
+
+#include <QtGui/QIcon>
 
 #include <common/common_globals.h>
 

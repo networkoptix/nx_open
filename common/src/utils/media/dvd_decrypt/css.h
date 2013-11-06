@@ -32,7 +32,7 @@
 
 #include "dvdcss.h"
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 
 #define KEY_SIZE 5

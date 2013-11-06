@@ -1,7 +1,7 @@
 #ifndef QN_VIEWPORT_ANIMATOR_H
 #define QN_VIEWPORT_ANIMATOR_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include <ui/common/geometry.h>
 #include <client/client_globals.h>
 #include "rect_animator.h"

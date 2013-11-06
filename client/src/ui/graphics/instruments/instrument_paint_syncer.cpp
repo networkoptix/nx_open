@@ -2,7 +2,7 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QDateTime>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
     QObject(parent),
@@ -15,9 +15,6 @@ InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
 
 bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
     if(event->type() != QEvent::UpdateRequest)
-#ifdef __APPLE__
-        if(event->type() != QEvent::Paint)
-#endif
         return false;
 
     if(currentWatched() != watched) {

@@ -4,10 +4,10 @@
 
 #include <QtCore/QTimer>
 
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
-#include <QtGui/QGraphicsSceneContextMenuEvent>
-#include <QtGui/QApplication>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QGraphicsSceneContextMenuEvent>
+#include <QtWidgets/QApplication>
 
 extern "C"
 {
@@ -86,6 +86,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
+    m_updateSliderTimer.restart();
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -780,8 +781,14 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
+#ifdef Q_OS_MAC
+    // todo: MAC  got stuck in full screen mode if update slider to often! #elric: refactor it!
+    if (m_updateSliderTimer.elapsed() < 33)
+        return;
+    m_updateSliderTimer.restart();
+#endif
 
-    QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
@@ -969,16 +976,16 @@ void QnWorkbenchNavigator::updateCalendar() {
     if(!m_calendar)
         return;
     if(m_currentWidgetFlags & WidgetSupportsPeriods)
-        m_calendar->setCurrentWidgetIsCentral(true);
+        m_calendar->setCurrentTimePeriodsVisible(true);
     else
-        m_calendar->setCurrentWidgetIsCentral(false);
+        m_calendar->setCurrentTimePeriodsVisible(false);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
     if(m_updatingScrollBarFromSlider)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updatingSliderFromScrollBar, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromScrollBar, true);
 
     m_timeSlider->setWindow(m_timeScrollBar->value(), m_timeScrollBar->value() + m_timeScrollBar->pageStep());
 }
@@ -988,7 +995,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
         return;
 
     {
-        QnScopedValueRollback<bool> guard(&m_updatingScrollBarFromSlider, true);
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingScrollBarFromSlider, true);
 
         qint64 windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
 

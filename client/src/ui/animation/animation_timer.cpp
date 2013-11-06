@@ -1,6 +1,6 @@
 #include "animation_timer.h"
 #include <cassert>
-#include <QAbstractAnimation>
+#include <QtCore/QAbstractAnimation>
 #include <utils/common/warnings.h>
 
 // -------------------------------------------------------------------------- //

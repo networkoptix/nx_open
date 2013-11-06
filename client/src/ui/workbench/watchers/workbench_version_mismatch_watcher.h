@@ -10,11 +10,15 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 struct QnVersionMismatchData {
-    QnVersionMismatchData(): component(Qn::EnterpriseControllerComponent) {}
+    QnVersionMismatchData(): component(Qn::AnyComponent) {}
+    QnVersionMismatchData(Qn::SystemComponent component, QnSoftwareVersion version):
+        component(component), version(version){}
 
     Qn::SystemComponent component;
     QnSoftwareVersion version;
     QnResourcePtr resource;
+
+    bool isValid() const {return component != Qn::AnyComponent; }
 };
 
 class QnWorkbenchVersionMismatchWatcher: public QObject, public QnWorkbenchContextAware {
@@ -26,8 +30,9 @@ public:
 
     bool hasMismatches() const;
     QList<QnVersionMismatchData> mismatchData() const;
-    QnSoftwareVersion latestVersion() const;
+    QnSoftwareVersion latestVersion(Qn::SystemComponent component = Qn::AnyComponent) const;
 
+    static bool versionMismatches(QnSoftwareVersion left, QnSoftwareVersion right, bool concernBuild = false);
 signals:
     bool mismatchDataChanged();
 

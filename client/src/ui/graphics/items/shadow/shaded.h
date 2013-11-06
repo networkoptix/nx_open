@@ -1,8 +1,8 @@
 #ifndef QN_SHADED_H
 #define QN_SHADED_H
 
-#include <QtGui/QGraphicsItem>
-#include <QEvent>
+#include <QtWidgets/QGraphicsItem>
+#include <QtCore/QEvent>
 
 #include <utils/common/forward.h>
 

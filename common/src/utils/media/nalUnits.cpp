@@ -1,9 +1,9 @@
 #include "nalUnits.h"
 #include <assert.h>
 #include "bitStream.h"
-#include <QString>
-#include <QTextStream>
-#include <QDebug>
+#include <QtCore/QString>
+#include <QtCore/QTextStream>
+#include <QtCore/QDebug>
 
 #ifdef _MSC_VER
 #    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */

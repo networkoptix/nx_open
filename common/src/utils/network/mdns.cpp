@@ -1,8 +1,8 @@
 
 #include "mdns.h"
 
-#include <QDataStream>
-#include <QIODevice>
+#include <QtCore/QDataStream>
+#include <QtCore/QIODevice>
 
 
 void MDNSPacket::toDatagram(QByteArray& datagram)

@@ -1,67 +1,20 @@
 #include "read_only.h"
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtGui/QKeyEvent>
-#include <QMetaProperty>
+#include <QtCore/QMetaProperty>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 
-namespace {
+#include "read_only_event_eater.h"
 
-    class QnReadOnlyEventEater: public QnMultiEventEater {
-    public:
-        QnReadOnlyEventEater(QObject *parent = NULL): QnMultiEventEater(parent) {
-            addEventType(QEvent::MouseButtonPress);
-            addEventType(QEvent::MouseButtonRelease);
-            addEventType(QEvent::MouseButtonDblClick);
-            addEventType(QEvent::MouseMove);
-
-            addEventType(QEvent::Wheel);
-            
-            addEventType(QEvent::NonClientAreaMouseButtonDblClick);
-            addEventType(QEvent::NonClientAreaMouseButtonPress);
-            addEventType(QEvent::NonClientAreaMouseButtonRelease);
-            addEventType(QEvent::NonClientAreaMouseMove);
-
-            addEventType(QEvent::DragEnter);
-            addEventType(QEvent::DragMove);
-            addEventType(QEvent::DragLeave);
-            addEventType(QEvent::Drop);
-
-            addEventType(QEvent::TabletMove);
-            addEventType(QEvent::TabletPress);
-            addEventType(QEvent::TabletRelease);
-
-            addEventType(QEvent::TouchBegin);
-            addEventType(QEvent::TouchEnd);
-            addEventType(QEvent::TouchUpdate);
-
-            addEventType(QEvent::KeyPress);
-            addEventType(QEvent::KeyRelease);
-        }
-
-    protected:
-        virtual bool activate(QObject *, QEvent *event) override {
-            if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
-                QKeyEvent *e = static_cast<QKeyEvent *>(event);
-                if(e->key() == Qt::Key_Tab || e->key() == Qt::Key_Backtab)
-                    return false; /* We want the tab-focus to work. */
-            }
-
-            return true;
-        }
-    };
-
-} // anonymous namespace
-
-Q_DECLARE_METATYPE(QnReadOnlyEventEater *);
 
 namespace {
     QnReadOnlyEventEater *readOnlyEventEater(QWidget *widget) {
         static const char *propertyName = "_qn_readOnlyEventEater";
 
-        QnReadOnlyEventEater *result = widget->property(propertyName).value<QnReadOnlyEventEater *>();
+        QnReadOnlyEventEater *result = widget->property(propertyName).value<QnReadOnlyEventEater*>();
         if(result != NULL)
             return result;
 

@@ -4,6 +4,9 @@
 
 #include <utils/common/warnings.h>
 
+#include <QtCore/QProcess>
+#include <QtCore/QPointer>
+
 #define INVALID_PRIORITY_CLASS 0xDEADF00D
 
 
@@ -95,7 +98,7 @@ private:
     bool valid;
     qint64 pid;
     HANDLE handle;
-    QWeakPointer<QProcess> process;
+    QPointer<QProcess> process;
 };
 
 

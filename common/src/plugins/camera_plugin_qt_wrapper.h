@@ -6,12 +6,12 @@
 #ifndef CAMERA_PLUGIN_QT_WRAPPER_H
 #define CAMERA_PLUGIN_QT_WRAPPER_H
 
-#include <QHostAddress>
-#include <QList>
-#include <QVector>
-#include <QString>
-#include <QStringList>
-#include <QMutex>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QList>
+#include <QtCore/QVector>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QMutex>
 
 #include "camera_plugin.h"
 

@@ -1,6 +1,6 @@
 #include "shaded.h"
 
-#include <QtGui/QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
 #include "shadow_item.h"
 

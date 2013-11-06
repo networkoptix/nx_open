@@ -12,11 +12,12 @@
 #include <QtCore/qmath.h>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsSceneWheelEvent>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
 
 #include <camera/thumbnails_loader.h>
 
@@ -429,6 +430,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_options(0),
     m_zoomAnchor(0),
     m_animating(false),
+    m_kineticsHurried(false),
     m_dragMarker(NoMarker),
     m_dragIsClick(false),
     m_selecting(false),
@@ -457,12 +459,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Prepare kinetic zoom processor. */
     KineticCuttingProcessor *kineticProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
     kineticProcessor->setHandler(this);
-    kineticProcessor->setMaxShiftInterval(0.4);
-    kineticProcessor->setFriction(degreesFor2x / 2);
-    kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
-    kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
-    kineticProcessor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
     registerAnimation(kineticProcessor);
+    updateKineticProcessor();
 
     /* Prepare zoom processor. */
     DragProcessor *dragProcessor = new DragProcessor(this);
@@ -886,6 +884,17 @@ void QnTimeSlider::finishAnimations() {
     kineticProcessor()->reset();
 }
 
+void QnTimeSlider::hurryKineticAnimations() {
+    if(!kineticProcessor()->isRunning())
+        return; /* Nothing to hurry up. */
+
+    if(m_kineticsHurried)
+        return;
+
+    m_kineticsHurried = true;
+    updateKineticProcessor();
+}
+
 void QnTimeSlider::setAnimationStart(qint64 start) {
     m_animationStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
 }
@@ -1073,6 +1082,24 @@ void QnTimeSlider::setLocalOffset(qint64 localOffset) {
 // -------------------------------------------------------------------------- //
 // Updating
 // -------------------------------------------------------------------------- //
+void QnTimeSlider::updateKineticProcessor() {
+    KineticCuttingProcessor *kineticProcessor = checked_cast<KineticCuttingProcessor *>(this->kineticProcessor());
+
+    if(m_kineticsHurried) {
+        kineticProcessor->setMaxShiftInterval(0.4);
+        kineticProcessor->setFriction(degreesFor2x * 2.0);
+        kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
+        kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
+        kineticProcessor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
+    } else {
+        kineticProcessor->setMaxShiftInterval(0.4);
+        kineticProcessor->setFriction(degreesFor2x / 2);
+        kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
+        kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
+        kineticProcessor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
+    }
+}
+
 void QnTimeSlider::updateToolTipVisibility() {
     qint64 pos = sliderPosition();
 
@@ -2029,6 +2056,13 @@ void QnTimeSlider::kineticMove(const QVariant &degrees) {
     
     if(!scaleWindow(factor, m_zoomAnchor))
         kineticProcessor()->reset();
+}
+
+void QnTimeSlider::finishKinetic() {
+    if(m_kineticsHurried) {
+        m_kineticsHurried = false;
+        updateKineticProcessor();
+    }
 }
 
 void QnTimeSlider::keyPressEvent(QKeyEvent *event) {

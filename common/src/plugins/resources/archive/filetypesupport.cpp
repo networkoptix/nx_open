@@ -1,6 +1,6 @@
 #include "filetypesupport.h"
 
-#include <QFile>
+#include <QtCore/QFile>
 extern "C"
 {
     #include <libavutil/avutil.h>

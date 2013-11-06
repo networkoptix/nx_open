@@ -1,6 +1,6 @@
 #include "resource_icon_cache.h"
-#include <QPixmap>
-#include <QPainter>
+#include <QtGui/QPixmap>
+#include <QtGui/QPainter>
 #include "skin.h"
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);

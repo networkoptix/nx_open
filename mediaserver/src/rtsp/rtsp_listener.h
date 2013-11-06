@@ -8,5 +8,5 @@ public:
     explicit QnRtspListener(const QHostAddress& address = QHostAddress::Any, int port = DEFAULT_RTSP_PORT);
     virtual ~QnRtspListener();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner);
 };

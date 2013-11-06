@@ -1,7 +1,7 @@
 #ifndef __PES_PACKET_H
 #define __PES_PACKET_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 const static quint64 MAX_PTS = 8589934592ll - 1;
 const static quint8 PES_DATA_ALIGNMENT = 4;

@@ -6,7 +6,7 @@
 #include <functional> /* For std::binary_function. */
 
 #include <QtCore/QtAlgorithms>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
 
@@ -50,14 +50,13 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
-
-#include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/workaround/gl_widget_factory.h>
 
@@ -80,7 +79,6 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 #include "camera/thumbnails_loader.h" // TODO: remove?
-#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "watchers/workbench_server_time_watcher.h"
 
 
@@ -360,7 +358,6 @@ void QnWorkbenchDisplay::initSceneView() {
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
-        QnGlHardwareChecker::checkCurrentContext(true);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
@@ -374,7 +371,7 @@ void QnWorkbenchDisplay::initSceneView() {
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
 
-#ifndef __APPLE__
+#ifndef Q_OS_MACX
         /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif
@@ -1447,10 +1444,14 @@ void QnWorkbenchDisplay::updateFrameWidths() {
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
+#ifdef Q_OS_MACX
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
+#else
     bool curtained = m_curtainAnimator->isCurtained();
-
     if(m_view != NULL)
         m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+#endif
 }
 
 

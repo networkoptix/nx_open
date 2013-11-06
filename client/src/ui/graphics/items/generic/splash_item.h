@@ -1,10 +1,13 @@
 #ifndef QN_SPLASH_ITEM_H
 #define QN_SPLASH_ITEM_H
 
-#include <QGraphicsObject>
+#include <QtGui/QBrush>
+#include <QtWidgets/QGraphicsObject>
 
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
+
+#include "assert.h"
 
 class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
     Q_OBJECT

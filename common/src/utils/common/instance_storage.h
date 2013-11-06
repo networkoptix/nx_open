@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QByteArray>
-#include <QWeakPointer>
+#include <QPointer>
 #include <QList>
 #include <QHash>
 
@@ -46,7 +46,7 @@ private:
     Q_DISABLE_COPY(QnInstanceStorage);
 
     bool m_thisInitialized;
-    QWeakPointer<QObject> m_this;
+    QPointer<QObject> m_this;
     
     QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: #Elric use std::type_index
     QList<QObject *> m_instances;

@@ -12,7 +12,7 @@
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <QTime>
+#include <QtCore/QTime>
 #include "ui/screen_recording/video_recorder_settings.h"
 
 struct CaptureInfo
@@ -62,7 +62,7 @@ public:
     void pleaseStop();
 private:
     HRESULT        InitD3D(HWND hWnd);
-    bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
+    bool dataToFrame(quint8* data, int dataStride, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(CaptureInfoPtr data);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;

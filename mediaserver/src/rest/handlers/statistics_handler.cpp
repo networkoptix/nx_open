@@ -2,7 +2,7 @@
 
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "platform/platform_abstraction.h"
+#include "platform/core_platform_abstraction.h"
 
 #include "rest/server/rest_server.h"
 
@@ -53,6 +53,10 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
         result.append("</interface>\n");
     }
     result.append("</network>\n");
+
+    result.append("<misc>\n");
+    result.append(QString("<uptimeMs>%1</uptimeMs>\n").arg(m_monitor->upTimeMs()));
+    result.append("</misc>\n");
 
     result.append("<params>\n");
     result.append(QString("<updatePeriod>%1</updatePeriod>\n").arg(m_monitor->updatePeriod()));

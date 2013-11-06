@@ -1,9 +1,9 @@
 #ifndef QN_INSTRUMENT_MANAGER_H
 #define QN_INSTRUMENT_MANAGER_H
 
-#include <QObject>
-#include <QSet>
-#include <QList>
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+#include <QtCore/QList>
 #include "instrument.h"
 #include "installation_mode.h"
 
@@ -149,6 +149,9 @@ public:
 
         return NULL;
     }
+
+    bool isAnimationEnabled() const;
+    void setAnimationsEnabled(bool enabled = true);
 
     AnimationTimer *animationTimer() const;
 

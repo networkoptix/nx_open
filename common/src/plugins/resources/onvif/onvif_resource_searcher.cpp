@@ -5,6 +5,8 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/dataprovider/live_stream_provider.h"
 
+#include <QtCore/QUrlQuery>
+
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
     bool rez = false;
@@ -108,7 +110,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
     if (rpResource) 
     {
-        int channel = url.queryItemValue(QLatin1String("channel")).toInt();
+        int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
         
         if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();
@@ -155,6 +157,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         OnvifResourceInformationFetcher fetcher;
         QnId rt = fetcher.getOnvifResourceType(manufacturer, modelName);
         resource->setVendorName( manufacturer );
+        resource->setName( modelName );
         //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (rt.isValid())
             resource->setTypeId(rt);

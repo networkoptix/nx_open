@@ -20,13 +20,13 @@ copy /Y ..\common\src\plugins\camera_plugin_types.h %TARGET_DIR%\include\plugins
 @rem Copying AXIS plugin
 set PLUGIN_NAME=axiscamplugin
 
-xcopy /Y ..\%PLUGIN_NAME%\*.pro %TARGET_DIR%\sample\%PLUGIN_NAME%\
+xcopy /Y ..\plugins\%PLUGIN_NAME%\*.pro %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\
-xcopy /Y ..\%PLUGIN_NAME%\*.pro %TARGET_DIR%\sample\%PLUGIN_NAME%\
+xcopy /Y ..\plugins\%PLUGIN_NAME%\*.pro %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-copy /Y ..\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
+xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+copy /Y ..\plugins\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
 
 @rem Removing unnecessary source files
 del /Q /F %TARGET_DIR%\sample\%PLUGIN_NAME%\src\compatibility_info.cpp
@@ -47,10 +47,10 @@ set PLUGIN_NAME=image_library_plugin
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
 mkdir %TARGET_DIR%\sample\%PLUGIN_NAME%\win\
-xcopy /Y ..\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
-xcopy /Y ..\%PLUGIN_NAME%\win\* %TARGET_DIR%\sample\%PLUGIN_NAME%\win\
-copy /Y ..\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
+xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.h %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y ..\plugins\%PLUGIN_NAME%\src\*.cpp %TARGET_DIR%\sample\%PLUGIN_NAME%\src\
+xcopy /Y ..\plugins\%PLUGIN_NAME%\win\* %TARGET_DIR%\sample\%PLUGIN_NAME%\win\
+copy /Y ..\plugins\%PLUGIN_NAME%\Doxyfile %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
 
 @rem Removing unnecessary source files
 del /Q /F %TARGET_DIR%\sample\%PLUGIN_NAME%\src\compatibility_info.cpp

@@ -80,7 +80,7 @@ public:
     QMutex sendMutex;
 };
 
-QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(AbstractStreamSocket* socket, void* sslContext, QnDesktopResource* desktop):
+QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
@@ -96,14 +96,14 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
     stop();
     disconnectInternal();
 
-    d->socket = 0; // we have not ownership for socket in this class
+    d->socket.clear(); // we have not ownership for socket in this class
 }
 
 void QnDesktopCameraConnectionProcessor::processRequest()
 {
     Q_D(QnDesktopCameraConnectionProcessor);
-    QString method = d->requestHeaders.method();
-    if (method == lit("PLAY"))
+    QByteArray method = d->request.requestLine.method;
+    if (method == "PLAY")
     {
         if (d->dataProvider == 0) {
             d->dataProvider = d->desktop->createDataProvider(QnResource::Role_Default);
@@ -113,15 +113,15 @@ void QnDesktopCameraConnectionProcessor::processRequest()
             d->dataProvider->start();
         }
     }
-    else if (method == lit("TEARDOWN"))
+    else if (method == "TEARDOWN")
     {
         disconnectInternal();
     }
-    else if (method == lit("KEEP-ALIVE"))
+    else if (method == "KEEP-ALIVE")
     {
         // nothing to do. we restarting timer on any request
     }
-    d->responseHeaders.setValue(lit("cSeq"), d->requestHeaders.value(lit("cSeq")));
+    d->response.headers.insert(std::make_pair("cSeq", d->request.headers["cSeq"]));
     //QMutexLocker lock(&d->sendMutex);
     //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
@@ -239,7 +239,7 @@ void QnDesktopCameraConnection::run()
             continue;
         }
 
-        processor = new QnDesktopCameraConnectionProcessor(connection->getSocket().data(), 0, m_owner);
+        processor = new QnDesktopCameraConnectionProcessor(connection->getSocket(), 0, m_owner);
 
         QTime timeout;
         timeout.restart();

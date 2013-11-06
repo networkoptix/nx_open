@@ -567,16 +567,16 @@ int QnPlAxisResource::getChannelNum() const
     return result;
 }
 
-		// TEMPLATE STRUCT select1st
+        // TEMPLATE STRUCT select1st
 template<class _Pair>
-	struct select1st
+    struct select1st
         : public std::unary_function<_Pair, typename _Pair::first_type>
-	{	// functor for unary first of pair selector operator
-	const typename _Pair::first_type& operator()(const _Pair& _Left) const
-		{	// apply first selector operator to pair operand
-		return (_Left.first);
-		}
-	};
+    {	// functor for unary first of pair selector operator
+    const typename _Pair::first_type& operator()(const _Pair& _Left) const
+        {	// apply first selector operator to pair operand
+        return (_Left.first);
+        }
+    };
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
 QStringList QnPlAxisResource::getRelayOutputList() const

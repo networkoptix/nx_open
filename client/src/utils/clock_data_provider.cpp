@@ -1,6 +1,6 @@
 #include "clock_data_provider.h"
 
-#include <QDateTime>
+#include <QtCore/QDateTime>
 
 #include <client/client_settings.h>
 

@@ -1,7 +1,7 @@
 #ifndef QN_MOVE_INSTRUMENT_H
 #define QN_MOVE_INSTRUMENT_H
 
-#include <QPoint>
+#include <QtCore/QPoint>
 #include "drag_processing_instrument.h"
 #include <ui/common/weak_graphics_item_pointer.h>
 

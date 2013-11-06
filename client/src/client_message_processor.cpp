@@ -2,6 +2,8 @@
 #include <QtCore/QDebug>
 #include <QtCore/QtGlobal>
 #include <QtCore/QThread>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 #include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource_managment/resource_pool.h"
@@ -31,8 +33,13 @@ void QnClientMessageProcessor::init()
 {
     QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
     appServerEventsUrl.setPath(QLatin1String("/events/"));
-    appServerEventsUrl.addQueryItem(QLatin1String("format"), QLatin1String("pb"));
-    appServerEventsUrl.addQueryItem(QLatin1String("guid"), QnAppServerConnectionFactory::clientGuid());
+
+    QUrlQuery query;
+    query.addQueryItem(QLatin1String("format"), QLatin1String("pb"));
+    query.addQueryItem(QLatin1String("guid"), QnAppServerConnectionFactory::clientGuid());
+
+    appServerEventsUrl.setQuery(query);
+
     init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
 }
 
@@ -234,6 +241,8 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             emit fileUpdated(message.filename);
             break;
         }
+    case Qn::Message_Type_RuntimeInfoChange:
+        break; //TODO: #ivigasin what means this message for the client?
     }
     // default-case is not used for a reason
 
@@ -257,6 +266,7 @@ void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
     qnLicensePool->setOldHardwareId(message.oldHardwareId);
     qnLicensePool->setHardwareId1(message.hardwareId1);
     qnLicensePool->setHardwareId2(message.hardwareId2);
+    qnLicensePool->setHardwareId3(message.hardwareId3);
 }
 
 void QnClientMessageProcessor::at_connectionOpened(QnMessage message)

@@ -1,7 +1,7 @@
 
 #include "graphics_path_item.h"
 
-#include <QPainter>
+#include <QtGui/QPainter>
 
 
 GraphicsPathItem::GraphicsPathItem(QGraphicsItem *parent):
