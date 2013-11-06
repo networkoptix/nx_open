@@ -240,9 +240,9 @@ void QnResourceSelectionDialog::at_thumbnailReady(int resourceId, const QPixmap 
     if (m_tooltipResourceId != resourceId)
         return;
     m_screenshotIndex = 1 - m_screenshotIndex;
-    ui->screenshotWidget->setCurrentIndex(m_screenshotIndex);
     if (m_screenshotIndex == 0)
         ui->screenshotLabel->setPixmap(thumbnail);
     else
         ui->screenshotLabel_2->setPixmap(thumbnail);
+    ui->screenshotWidget->setCurrentIndex(m_screenshotIndex);
 }

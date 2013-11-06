@@ -37,7 +37,8 @@ signals:
     void visibleSizeChanged();
     void sizeHintChanged();
 
-    void itemRemoved(QnNotificationWidget *item); // TODO: #GDM symmetry break, where is itemAdded signal?
+    void itemAdded(QnNotificationWidget *item);
+    void itemRemoved(QnNotificationWidget *item);
     void itemCountChanged();
     void notificationLevelChanged();
 

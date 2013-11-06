@@ -35,8 +35,6 @@ protected:
     }
 
     virtual bool event(QWidget *viewport, QEvent *event) override {
-        // TODO: Sasha, AAAAAAAA, refactor ASAP!!!!!!!!
-
         emit activated(viewport, event);
         return false;
     }

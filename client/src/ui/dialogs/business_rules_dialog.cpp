@@ -127,7 +127,7 @@ void QnBusinessRulesDialog::reject() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
+                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 ); //TODO: #GDM calculate once and use anywhere
     if (!hasChanges) {
@@ -330,8 +330,8 @@ void QnBusinessRulesDialog::createActions() {
 }
 
 bool QnBusinessRulesDialog::saveAll() {
-    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, -1, Qt::MatchExactly);
-    QModelIndexList invalid = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ValidRole, false, -1, Qt::MatchExactly);
+    QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, -1, Qt::MatchExactly);
+    QModelIndexList invalid = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ValidRole, false, -1, Qt::MatchExactly);
     QSet<QModelIndex> invalid_modified = invalid.toSet().intersect(modified.toSet());
 
     if (!invalid_modified.isEmpty()) {
@@ -378,7 +378,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
-                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), QnBusiness::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
+                !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 );
     bool canDelete = hasRights && loaded && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();

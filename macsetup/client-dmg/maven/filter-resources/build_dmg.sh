@@ -4,11 +4,12 @@ SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${product.name} ${release.version}"
 DMG_FILE="${product.name} ${release.version}.dmg"
+HELP=${libdir}/help
 
 ln -s /Applications $SRC/Applications
 mv $SRC/client.app "$SRC/${product.name}.app"
 mv "$SRC/DS_Store" "$SRC/.DS_Store"
-python macdeployqt.py "$SRC/${product.name}.app" "$BINARIES" "$LIBRARIES"
+python macdeployqt.py "$SRC/${product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"

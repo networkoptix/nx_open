@@ -474,6 +474,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->show();
     if (!noFullScreen)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
+
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
@@ -507,6 +508,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Process pending events before executing actions. */
     qApp->processEvents();
+
+    // show bet version warning message for the main instance only
+    if (!noSingleApplication &&
+            !qnSettings->isDevMode() &&
+            QLatin1String(QN_BETA) == QLatin1String("true"))
+        context->action(Qn::BetaVersionMessageAction)->trigger();
 
     if (argc <= 1) {
         /* If no input files were supplied --- open connection settings dialog. */

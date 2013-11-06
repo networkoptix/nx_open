@@ -1,23 +1,21 @@
-#ifndef QN_WEEKTIME_SCHEDULE_WIDGET_H
-#define QN_WEEKTIME_SCHEDULE_WIDGET_H
+#ifndef WEEK_TIME_SCHEDULE_DIALOG_H
+#define WEEK_TIME_SCHEDULE_DIALOG_H
 
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QDialog>
-
-class QnWorkbenchContext;
+#include <ui/dialogs/button_box_dialog.h>
 
 namespace Ui {
-    class WeekTimeScheduleWidget;
+class QnWeekTimeScheduleDialog;
 }
 
-// TODO: #GDM this is a dialog => should be named XXXDialog and placed in /dialogs
-// OR we could rework our widget/dialog source placement conventions.
-class QnWeekTimeScheduleWidget: public QDialog
+class QnWeekTimeScheduleDialog : public QnButtonBoxDialog
 {
     Q_OBJECT
+
+    typedef QnButtonBoxDialog base_type;
+
 public:
-    QnWeekTimeScheduleWidget(QWidget *parent = 0);
-    virtual ~QnWeekTimeScheduleWidget();
+    explicit QnWeekTimeScheduleDialog(QWidget *parent = 0);
+    ~QnWeekTimeScheduleDialog();
 
     /**
      * @Return binary data witch schedule. Each hour in a week represented as single bit. Data is converted to HEX string
@@ -30,17 +28,16 @@ signals:
 
 private slots:
     void updateGridParams(bool fromUserInput = false);
-    
+
     void at_gridWidget_cellActivated(const QPoint &cell);
 private:
     void connectToGridWidget();
     void disconnectFromGridWidget();
 
 private:
-    Q_DISABLE_COPY(QnWeekTimeScheduleWidget)
+    Q_DISABLE_COPY(QnWeekTimeScheduleDialog)
 
-    QScopedPointer<Ui::WeekTimeScheduleWidget> ui;
-    QnWorkbenchContext *m_context;
+    QScopedPointer<Ui::QnWeekTimeScheduleDialog> ui;
 
     bool m_disableUpdateGridParams;
 
@@ -50,5 +47,4 @@ private:
     int m_inUpdate;
 };
 
-
-#endif // QN_WEEKTIME_SCHEDULE_WIDGET_H
+#endif // WEEK_TIME_SCHEDULE_DIALOG_H

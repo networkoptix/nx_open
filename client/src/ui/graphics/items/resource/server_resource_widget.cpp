@@ -708,6 +708,12 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
     return result;
 }
 
+Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
+    if (m_resource->getStatus() == QnResource::Offline)
+        return Qn::ServerOfflineOverlay;
+    return base_type::calculateStatusOverlay();
+}
+
 void QnServerResourceWidget::at_statistics_received() {
     m_updatePeriod = m_manager->updatePeriod(m_resource);
 

@@ -88,7 +88,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                 change_dep_path(binary, full_name, join(folder, name))
 
 
-def main(app_path, bindir, libdir):
+def main(app_path, bindir, libdir, helpdir):
     qlibdir = '{env}/qt5/qtbase-x64/lib'.format(env=os.getenv('environment'))
 
     appdir = os.path.basename(app_path)
@@ -99,7 +99,8 @@ def main(app_path, bindir, libdir):
     for binary in prepare(client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir)
 
+    shutil.copytree(helpdir, "{app_path}/Contents/help".format(app_path=app_path))
 
 if __name__ == '__main__':
-    _, appdir, bindir, libdir = sys.argv
-    main(appdir, bindir, libdir)
+    _, appdir, bindir, libdir, helpdir = sys.argv
+    main(appdir, bindir, libdir, helpdir)

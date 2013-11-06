@@ -234,7 +234,6 @@ public:
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
-        EventTypeRole,                              /**< Role for business event type. Used in BusinessEventsLogAction. */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -243,6 +242,17 @@ public:
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
         DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
+
+        ModifiedRole,                               /**< Role for modified state. Value of type bool. */
+        DisabledRole,                               /**< Role for disabled state. Value of type bool. */
+        ValidRole,                                  /**< Role for valid state. Value of type bool. */
+        ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
+        ShortTextRole,                              /**< Role for short text. Value of type QString. */
+
+        EventTypeRole,                              /**< Role for business event type. Value of type BusinessEventType::Value. */
+        EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type BusinessActionType::Value. */
+        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
         RoleCount
     };
