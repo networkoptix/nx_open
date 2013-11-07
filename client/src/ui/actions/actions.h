@@ -733,6 +733,11 @@ namespace Qn {
         ClearTimeSelectionAction,
 
         /**
+         * Scale timeline to match the selection.
+         */
+        ZoomToTimeSelectionAction,
+
+        /**
          * Exports selected range.
          */
         ExportTimeSelectionAction,

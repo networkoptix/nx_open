@@ -72,7 +72,7 @@ QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${customization.dir}/icons/hdw_logo.ico	
+  ICON = ${child.customization.dir}/icons/hdw_logo.ico	
   CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
