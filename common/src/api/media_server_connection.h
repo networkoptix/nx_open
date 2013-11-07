@@ -23,7 +23,6 @@
 #include "abstract_connection.h"
 #include "media_server_cameras_data.h"
 
-class QnPtzSpaceMapper;
 class QnMediaServerResource;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
@@ -47,7 +46,6 @@ signals:
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);
     void finished(int status, const QnStatisticsReply &reply, int handle);
-    void finished(int status, const QnPtzSpaceMapper &reply, int handle);
     void finished(int status, const QVector3D &reply, int handle);
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
@@ -171,7 +169,6 @@ public:
     int ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzMoveToAsync(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzGetPosAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
-    int ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int getStorageSpaceAsync(QObject *target, const char *slot);
 

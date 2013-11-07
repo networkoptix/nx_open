@@ -12,7 +12,7 @@ class QnActiParameterMap;
 class QnActiPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
-    QnActiPtzController(QnActiResource* resource);
+    QnActiPtzController(const QnActiResourcePtr &resource);
     virtual ~QnActiPtzController();
 
     virtual int startMove(const QVector3D &speed) override;
@@ -31,7 +31,7 @@ private:
 
 private:
     QMutex m_mutex;
-    QnActiResource* m_resource;
+    QnActiResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     //QnPtzSpaceMapper *m_spaceMapper;
 

@@ -53,11 +53,10 @@ namespace {
 } // anonymous namespace
 
 
-QnActiPtzController::QnActiPtzController(QnActiResource* resource):
+QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),
-    m_spaceMapper(NULL),
     m_zoomVelocity(0.0),
     m_moveVelocity(0, 0),
     m_minAngle(0.0),
@@ -69,11 +68,7 @@ QnActiPtzController::QnActiPtzController(QnActiResource* resource):
 }
 
 QnActiPtzController::~QnActiPtzController() {
-    if( m_spaceMapper )
-    {
-        delete m_spaceMapper;
-        m_spaceMapper = NULL;
-    }
+    return;
 }
 
 qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)

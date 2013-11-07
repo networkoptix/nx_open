@@ -25,5 +25,6 @@ int QnMappedPtzController::getPosition(QVector3D *position) {
 
 int QnMappedPtzController::getLimits(QnPtzLimits *limits) {
     *limits = m_mapper->logicalLimits();
+    return 0;
 }
 

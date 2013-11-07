@@ -31,7 +31,6 @@ namespace {
         ((StorageSpaceObject,       "storageSpace"))
         ((TimePeriodsObject,        "RecordedTimePeriods"))
         ((StatisticsObject,         "statistics"))
-        ((PtzSpaceMapperObject,     "ptz/getSpaceMapper"))
         ((PtzPositionObject,        "ptz/getPosition"))
         ((PtzSetPositionObject,     "ptz/moveTo"))
         ((PtzStopObject,            "ptz/stop"))
@@ -277,9 +276,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, status, reply, handle);
         break;
     }
-    case PtzSpaceMapperObject:
-        processJsonReply<QnPtzSpaceMapper>(this, response, handle);
-        break;
     case PtzPositionObject: {
         const QByteArray& data = response.data;
         QVector3D reply;
@@ -609,13 +605,6 @@ int QnMediaServerConnection::getStorageStatusAsync(const QString &storageUrl, QO
 
 int QnMediaServerConnection::getStatisticsAsync(QObject *target, const char *slot){
     return sendAsyncGetRequest(StatisticsObject, QnRequestParamList(), QN_REPLY_TYPE(QnStatisticsReply), target, slot);
-}
-
-int QnMediaServerConnection::ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("res_id", camera->getPhysicalId());
-
-    return sendAsyncGetRequest(PtzSpaceMapperObject, params, QN_REPLY_TYPE(QnPtzSpaceMapper), target, slot);
 }
 
 int QnMediaServerConnection::getEventLogAsync(

@@ -1,5 +1,6 @@
 #include "ptz_mapper.h"
 
+#include <utils/common/json.h>
 #include <utils/common/enum_name_mapper.h>
 
 namespace {
@@ -24,10 +25,10 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &logicalToDevice, con
     m_logicalLimits.maxFov = hi.z();
 }
 
-bool deserialize(const QVariant &value, QnSpaceMapperPtr<qreal> *logical) {
+bool deserialize(const QVariant &value, QnSpaceMapperPtr<qreal> *target) {
     if(value.type() == QVariant::Invalid) {
         /* That's null mapper. */
-        *logical = QnSpaceMapperPtr<qreal>();
+        *target = QnSpaceMapperPtr<qreal>();
         return true;
     }
 
@@ -60,7 +61,7 @@ bool deserialize(const QVariant &value, QnSpaceMapperPtr<qreal> *logical) {
     for(int i = 0; i < device.size(); i++)
         sourceToTarget.push_back(qMakePair(device[i] * deviceMultiplier, logical[i] * logicalMultiplier));
 
-    *logical = QnSpaceMapperPtr<qreal>(new QnScalarInterpolationSpaceMapper(sourceToTarget, static_cast<Qn::ExtrapolationMode>(extrapolationMode)));
+    *target = QnSpaceMapperPtr<qreal>(new QnScalarInterpolationSpaceMapper<qreal>(sourceToTarget, static_cast<Qn::ExtrapolationMode>(extrapolationMode)));
     return true;
 }
 
@@ -120,7 +121,7 @@ bool deserialize(const QVariant &value, QnPtzMapperPtr *target) {
 
     *target = QnPtzMapperPtr(new QnPtzMapper(
         QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(fromCamera[0], fromCamera[1], fromCamera[2])),
-        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(toCamera[0], toCamera[1], toCamera[2])),
+        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(toCamera[0], toCamera[1], toCamera[2]))
     ));
     return true;
 }
