@@ -8,26 +8,12 @@
 #include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource_managment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
-#include "utils/common/synctime.h"
+
+#include <utils/common/synctime.h>
+
 #include "licensing/license.h"
 
 #include "client_message_processor.h"
-
-class QnClientMessageProcessorInstance: public QnClientMessageProcessor {
-public:
-    QnClientMessageProcessorInstance() {
-        QThread *thread = new QThread(); // TODO: #Elric leaking thread here.
-        thread->start();
-
-        moveToThread(thread);
-    }
-};
-Q_GLOBAL_STATIC(QnClientMessageProcessorInstance, qn_clientMessageProcessor_instance);
-
-QnClientMessageProcessor* QnClientMessageProcessor::instance()
-{
-    return qn_clientMessageProcessor_instance();
-}
 
 void QnClientMessageProcessor::init()
 {
@@ -54,6 +40,10 @@ void QnClientMessageProcessor::init(const QUrl& url, int timeout)
 
 QnClientMessageProcessor::QnClientMessageProcessor()
 {
+    QThread *thread = new QThread(); // TODO: #Elric leaking thread here.
+    thread->start();
+
+    moveToThread(thread);
 }
 
 void QnClientMessageProcessor::run()
