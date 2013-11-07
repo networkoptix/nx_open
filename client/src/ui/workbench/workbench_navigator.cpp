@@ -1161,6 +1161,13 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         m_timeSlider->setSelectionValid(true);
     } else if(action == m_clearSelectionAction) {
         m_timeSlider->setSelectionValid(false);
+    } else if (action == context()->action(Qn::ZoomToTimeSelectionAction)) {
+        if(!m_timeSlider->isSelectionValid())
+            return;
+
+        m_timeSlider->setValue((m_timeSlider->selectionStart(), m_timeSlider->selectionEnd()) / 2, false);
+        m_timeSlider->finishAnimations();
+        m_timeSlider->setWindow(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd(), true);
     }
 }
 

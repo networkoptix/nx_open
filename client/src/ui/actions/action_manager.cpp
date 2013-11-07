@@ -1231,6 +1231,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Clear Selection")).
         condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod | Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
 
+    factory(Qn::ZoomToTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Zoom to Selection")).
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
+
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selected Area...")).

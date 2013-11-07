@@ -1,0 +1,31 @@
+#ifndef JSON_UTILS_H
+#define JSON_UTILS_H
+
+#include <QtCore/QSize>
+#include <QtCore/QSizeF>
+#include <QtCore/QRect>
+#include <QtCore/QRectF>
+#include <QtCore/QPoint>
+#include <QtCore/QPointF>
+#include <QtCore/QUuid>
+#include <QtGui/QColor>
+#include <QtGui/QRegion>
+
+#include <utils/common/json.h>
+#include <utils/common/json5.h>
+
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QSize)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QSizeF)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QRect)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QRectF)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QPoint)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QPointF)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QUuid)
+QN_DECLARE_SERIALIZATION_FUNCTIONS(QColor)
+
+QN_DECLARE_SERIALIZATION_FUNCTIONS_5(QRect)
+QN_DECLARE_SERIALIZATION_FUNCTIONS_5(QRegion)
+
+void jsonUtilsUnitTest();
+
+#endif // JSON_UTILS_H
