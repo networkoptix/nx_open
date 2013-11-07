@@ -566,7 +566,7 @@
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                 </RegistryKey>
-                        		<RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${appserver.name}\proxyPort" Action="removeOnInstall"/>
+                                <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${appserver.name}\proxyPort" Action="removeOnInstall"/>
                             </Component>
                         </Directory>
 

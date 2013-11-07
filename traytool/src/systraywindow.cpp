@@ -129,7 +129,7 @@ QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnt
 
     m_trayIcon->show();
 
-    setWindowTitle(tr("VMS settings"));
+    setWindowTitle(QString(lit(QN_ORGANIZATION_NAME)) + tr(" Tray Assistant"));
 
     connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
@@ -783,8 +783,8 @@ void QnSystrayWindow::onSettingsAction()
     ui->ecsManuaPublicIPEdit->setText(m_appServerSettings.value(lit("manualPublicIp")).toString());
 
     onRadioButtonEcsPublicIpChanged();
-    ui->ecsPortSpinBox->setValue(m_appServerSettings.value(lit("port")).toInt());
-    ui->mediaProxyPortSpinBox->setValue(m_appServerSettings.value(lit("proxyPort"), DEFAUT_PROXY_PORT).toInt());
+    ui->ecsPortSpinBox->setValue(m_appServerSettings.value(lit("ecPort")).toInt());
+    ui->mediaProxyPortSpinBox->setValue(m_appServerSettings.value(lit("port"), DEFAUT_PROXY_PORT).toInt());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
