@@ -439,6 +439,13 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="browseLogsButton">
+              <property name="text">
+               <string>Browse logs</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="clearCacheButton">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -454,9 +461,6 @@
            </layout>
           </item>
          </layout>
-         <zorder>horizontalLayoutWidget</zorder>
-         <zorder>horizontalLayoutWidget</zorder>
-         <zorder>autoStartLabel</zorder>
         </widget>
        </item>
        <item>

@@ -2,6 +2,8 @@
 #include "ui_preferences_dialog.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
+#include <QtGui/QDesktopServices>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
@@ -119,6 +121,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
     connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
     connect(ui->clearCacheButton,                       SIGNAL(clicked()),                                          action(Qn::ClearCacheAction), SLOT(trigger()));
+    connect(ui->browseLogsButton,                       SIGNAL(clicked()),                                          this,   SLOT(at_browseLogsButton_clicked()));
 
     initTranslations();
     updateFromSettings();
@@ -380,4 +383,15 @@ void QnPreferencesDialog::at_downmixAudioCheckBox_toggled(bool checked) {
 
 void QnPreferencesDialog::at_languageComboBox_currentIndexChanged(int index) {
     ui->languageWarningLabel->setVisible(m_oldLanguage != index);
+}
+
+void QnPreferencesDialog::at_browseLogsButton_clicked() {
+    const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/log");
+    if (!QDir(logsLocation).exists()) {
+        QMessageBox::information(this,
+                                 tr("Information"),
+                                 tr("Folder &1 not exists.").arg(logsLocation));
+        return;
+    }
+    QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
 }
