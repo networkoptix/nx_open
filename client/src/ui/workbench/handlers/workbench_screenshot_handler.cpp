@@ -18,6 +18,7 @@
 
 #include "file_processor.h"
 #include "ui/workbench/workbench_item.h"
+#include "transcoding/filters/time_image_filter.h"
 
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
@@ -50,7 +51,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QString fileName = parameters.argument<QString>(Qn::FileNameRole);
-    bool withTimestamps = true;
+    QnTimeImageFilter::OnScreenDatePos timestampPos = QnTimeImageFilter::Date_None;
     if(fileName.isEmpty()) {
         QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
 
@@ -80,7 +81,20 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        dialog->addCheckBox(tr("Include Timestamp"), &withTimestamps);
+        QComboBox* comboBox = new QComboBox(dialog.data());
+        comboBox->addItem(tr("No timestamp"));
+        comboBox->addItem(tr("Top left corner"));
+        comboBox->addItem(tr("Top right corner"));
+        comboBox->addItem(tr("Bottom right corner"));
+        comboBox->addItem(tr("Bottom left corner"));
+        comboBox->setCurrentIndex(3);
+        QLabel* label = new QLabel(dialog.data());
+        label->setText(tr("Timestamps:"));
+
+        dialog->addWidget(label);
+        dialog->addWidget(comboBox, false);
+
+
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
@@ -113,6 +127,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             );
             return;
         }
+        timestampPos = (QnTimeImageFilter::OnScreenDatePos) comboBox->currentIndex();
     }
 
     QImage screenshot;
@@ -138,7 +153,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             );
         }
 
-        if (withTimestamps) {
+        if (timestampPos != QnTimeImageFilter::Date_None) {
             QString timeStamp;
             qint64 time = display->camDisplay()->getCurrentTime() / 1000;
             if(widget->resource()->toResource()->flags() & QnResource::utc) {
@@ -150,8 +165,8 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             QFont font;
             font.setPixelSize(qMax(screenshot.height() / 20, 12));
 
-            int tsWidht = QFontMetrics(font).width(timeString);
-            int tsDescent = QFontMetrics(font).descent();
+            QFontMetrics fm(font);
+            QSize size = fm.size(0, timeString);
             int spacing = 2;
 
             p.setPen(Qt::black);
@@ -159,7 +174,26 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
 
             QPainterPath path;
-            path.addText(screenshot.width() - tsWidht - spacing*2, screenshot.height() - tsDescent - spacing, font, timeStamp);
+            int x, y;
+            if (timestampPos == QnTimeImageFilter::Date_LeftTop)
+            {
+                x = spacing*2;
+                y = spacing + fm.ascent();
+            }
+            else if (timestampPos == QnTimeImageFilter::Date_RightTop) {
+                x = screenshot.width() - size.width() - spacing*2;
+                y = spacing + fm.ascent();
+            }
+            else if (timestampPos == QnTimeImageFilter::Date_RightBottom) {
+                x = screenshot.width() - size.width() - spacing*2;
+                y = screenshot.height() - fm.descent() - spacing;
+            }
+            else {
+                x = spacing*2;
+                y = screenshot.height() - fm.descent() - spacing;
+            }
+
+            path.addText(x, y, font, timeStamp);
 
             p.drawPath(path);
         }
