@@ -81,16 +81,6 @@
         <qtplugin3/>	
     </properties>
 
-    <modules>
-        <module>build_environment</module>
-        <module>common</module>
-        <module>appserver</module>
-        <!--<module>plugins/axiscamplugin</module>-->
-        <module>plugins/genericrtspplugin</module>
-        <module>mediaserver</module>
-        <module>mediaproxy</module>
-        <!-- <module>testcamera</module> -->
-    </modules>
     <build>
         <defaultGoal>install</defaultGoal>
         <plugins>
@@ -203,7 +193,36 @@
 
     <profiles>
         <profile>
-            <id>noarm</id>
+            <id>build-env</id>
+            <activation>
+                <file>
+                    <missing>build_environment/target/version.h</missing>
+                </file>
+            </activation>
+            <modules>	
+                <module>build_environment</module>       
+            </modules>	
+        </profile>     
+
+        <profile>
+            <id>main</id>
+            <activation>
+                <property>
+                    <name>!skipCommon</name>
+                </property>
+            </activation>
+            <modules>
+                <module>common</module>
+                <module>appserver</module>
+                <!--<module>plugins/axiscamplugin</module>-->
+                <module>plugins/genericrtspplugin</module>
+                <module>mediaserver</module>
+                <module>mediaproxy</module>
+                <!-- <module>testcamera</module> -->
+            </modules>
+        </profile> 
+        <profile>
+            <id>nomac</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -215,7 +234,7 @@
             </properties>
         </profile>  
         <profile>        
-            <id>nomac</id>
+            <id>noarm</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
