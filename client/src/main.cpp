@@ -271,7 +271,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
-    win32_exception::install_handler();
+    win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
