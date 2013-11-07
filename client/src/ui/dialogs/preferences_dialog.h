@@ -55,6 +55,7 @@ private slots:
     void at_onDecoderPluginsListChanged();
     void at_downmixAudioCheckBox_toggled(bool checked);
     void at_languageComboBox_currentIndexChanged(int index);
+    void at_browseLogsButton_clicked();
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
