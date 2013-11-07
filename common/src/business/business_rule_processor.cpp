@@ -135,6 +135,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
     case BusinessActionType::SayText:
         return broadcastBusinessAction(action);
 

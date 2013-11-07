@@ -994,11 +994,14 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
 
 void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
     switch (businessAction->actionType()) {
-    case BusinessActionType::ShowPopup: {
+    case BusinessActionType::ShowPopup:
+    {
             notificationsHandler()->addBusinessAction(businessAction);
             break;
-        }
-    case BusinessActionType::PlaySound: {
+    }
+    case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
+    {
             QString filename = businessAction->getParams().getSoundUrl();
             QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
             // if file is not exists then it is already deleted or just not downloaded yet
@@ -1006,12 +1009,13 @@ void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBu
             AudioPlayer::playFileAsync(filePath);
 //            qDebug() << "play sound action received" << filename << filePath;
             break;
-        }
-    case BusinessActionType::SayText: {
+    }
+    case BusinessActionType::SayText:
+    {
             AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
 //            qDebug() << "speech action received" << businessAction->getParams().getSayText();
             break;
-        }
+    }
     default:
         break;
     }

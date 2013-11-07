@@ -39,6 +39,7 @@ int QnBusiness::actionHelpId(BusinessActionType::Value type) {
     case BusinessActionType::ShowPopup:
         return Qn::EventsActions_ShowNotification_Help;
     case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
         return Qn::EventsActions_PlaySound_Help;
     case BusinessActionType::SayText:
         return Qn::EventsActions_Speech_Help;
