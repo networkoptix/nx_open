@@ -5,10 +5,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/math/color_transformations.h>
-#include <utils/image_provider.h>
-
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
 #include <ui/common/geometry.h>
@@ -17,6 +13,11 @@
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
+
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
+#include <utils/media/audio_player.h>
+#include <utils/image_provider.h>
 
 namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
@@ -230,6 +231,14 @@ void QnNotificationWidget::setTooltipText(const QString &text) {
     m_tooltipWidget->setText(text);
 }
 
+void QnNotificationWidget::setSound(const QString &soundPath, bool loop) {
+    m_soundPath = soundPath;
+    if (loop)
+        AudioPlayer::playFileAsync(soundPath, this, SLOT(at_loop_sound()));
+    else
+        AudioPlayer::playFileAsync(soundPath);
+}
+
 Qn::NotificationLevel QnNotificationWidget::notificationLevel() const {
     return m_notificationLevel;
 }
@@ -384,3 +393,6 @@ void QnNotificationWidget::at_thumbnail_clicked() {
     emit actionTriggered(data.action, data.params);
 }
 
+void QnNotificationWidget::at_loop_sound() {
+    AudioPlayer::playFileAsync(m_soundPath, this, SLOT(at_loop_sound()));
+}

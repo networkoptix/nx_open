@@ -103,6 +103,7 @@ private slots:
     void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+    void at_notificationCache_fileDownloaded(const QString& filename, bool ok);
 
 private:
     /**
@@ -120,6 +121,7 @@ private:
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
+    QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 

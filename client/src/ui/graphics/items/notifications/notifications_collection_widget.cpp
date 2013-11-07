@@ -35,6 +35,7 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 #include <utils/math/color_transformations.h>
+#include <utils/app_server_notification_cache.h>
 
 //TODO: #GDM remove debug
 #include <business/actions/common_business_action.h>
@@ -227,6 +228,9 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     connect(handler,    SIGNAL(cleared()),
             this,       SLOT(hideAll()));
 
+    connect(this->context()->instance<QnAppServerNotificationCache>(), SIGNAL(fileDownloaded(const QString&, bool)),
+            this, SLOT(at_notificationCache_fileDownloaded(const QString&, bool)));
+
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget() {
@@ -279,12 +283,20 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnNotificationWidget *item = new QnNotificationWidget(m_list);
 
-    QString name = getResourceName(resource);
     BusinessEventType::Value eventType = params.getEventType();
 
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
-    item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
+
+    if (businessAction->actionType() == BusinessActionType::PlaySoundRepeated) {
+        QString soundUrl = businessAction->getParams().getSoundUrl();
+        m_itemsByLoadingSound.insert(soundUrl, item);
+        context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
+        item->setNotificationLevel(Qn::SystemNotification);
+    } else {
+        item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
+    }
+
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
     switch (eventType) {
@@ -649,3 +661,14 @@ void QnNotificationsCollectionWidget::at_item_actionTriggered(Qn::ActionId actio
     menu()->trigger(actionId, parameters);
 }
 
+void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const QString &filename, bool ok) {
+    if (!ok)
+        return;
+
+    QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+    foreach (QnNotificationWidget* item, m_itemsByLoadingSound.values(filename)) {
+        item->setSound(filePath, true);
+    }
+    m_itemsByLoadingSound.remove(filename);
+
+}

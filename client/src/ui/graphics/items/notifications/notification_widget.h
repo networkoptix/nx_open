@@ -119,6 +119,8 @@ public:
 
     void setTooltipText(const QString &text);
 
+    void setSound(const QString &soundPath, bool loop);
+
     virtual void setGeometry(const QRectF &geometry) override;
 
 signals:
@@ -143,6 +145,7 @@ private slots:
 
     void at_button_clicked();
     void at_thumbnail_clicked();
+    void at_loop_sound();
 
 private:
     struct ActionData {
@@ -156,6 +159,7 @@ private:
 
     QList<ActionData> m_actions;
     int m_defaultActionIdx;
+    QString m_soundPath;
 
     QGraphicsLinearLayout *m_layout;
     QnProxyLabel *m_textLabel;
