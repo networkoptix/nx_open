@@ -70,6 +70,20 @@ namespace QJson {
     }
 
     /**
+     * Serializes the given value into a JSON string and returns it in the utf-8 format.
+     *
+     * \param value                     Value to serialize.
+     * \returns                         Result JSON string.
+     */
+    template<class T>
+    QString serialized(const T &value) {
+        QByteArray result;
+        serialize(value, &result);
+        return QString::fromUtf8(result);
+    }
+
+
+    /**
      * Deserializes the given intermediate representation of a JSON object.
      * Note that <tt>boost::enable_if</tt> is used to prevent implicit conversions
      * in the first argument.
@@ -111,6 +125,23 @@ namespace QJson {
             return false;
         return QJson_detail::deserialize_value(variant, target);
     }
+
+    /**
+     * Deserializes a value from a JSON utf-8-encoded string.
+     *
+     * \param value                     JSON string to deserialize.
+     * \param[out] success              Deserialization status.
+     * \returns                         Deserialization target.
+     */
+    template<class T>
+    T deserialized(const QString &value, bool *success = NULL) {
+        T target;
+        bool result = deserialize(value.toUtf8(), &target);
+        if (success)
+            *success = result;
+        return target;
+    }
+
 
 } // namespace QJson
 
@@ -293,15 +324,6 @@ QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T)
 QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), any_map);
 #undef QN_DEFINE_CONTAINER_SERIALIZATION_FUNCTIONS
 
-class QUuid;
-void serialize(const QUuid &value, QVariant *target);
-bool deserialize(const QVariant &value, QUuid *target);
-
-class QColor;
-void serialize(const QColor &value, QVariant *target);
-bool deserialize(const QVariant &value, QColor *target);
-
-
 /* Serialization can actually fail for QVariant containers because of types
  * unknown to QJson in them.
  * 
@@ -366,5 +388,45 @@ __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             
     if(!QJson::deserialize(map, BOOST_PP_STRINGIZE(FIELD), &result.FIELD))      \
     return false;
 
+
+/**
+ * This macro generates the necessary boilerplate to (de)serialize class types.
+ * It uses field names for JSON keys.
+ *
+ * \param TYPE                          Struct type to define (de)serialization functions for.
+ * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
+ *                                      given type that are to be (de)serialized.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
+ */
+#define QN_DEFINE_CLASS_SERIALIZATION_FUNCTION(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+__VA_ARGS__ void serialize(const TYPE &value, QVariant *target) {               \
+    QVariantMap result;                                                         \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_SERIALIZATION_STEP_I, ~, FIELD_SEQ)  \
+    *target = result;                                                           \
+}
+
+#define QN_DEFINE_CLASS_DESERIALIZATION_FUNCTION(TYPE, FIELD_SEQ, FIELDTYPE, ... /* PREFIX */) \
+__VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             \
+    if(value.type() != QVariant::Map)                                           \
+        return false;                                                           \
+    QVariantMap map = value.toMap();                                            \
+                                                                                \
+    TYPE result;                                                                \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_DESERIALIZATION_STEP_I, FIELDTYPE, FIELD_SEQ) \
+    *target = result;                                                           \
+    return true;                                                                \
+}
+
+#define QN_DEFINE_CLASS_SERIALIZATION_STEP_I(R, DATA, FIELD)                    \
+    QJson::serialize(value.FIELD(), BOOST_PP_STRINGIZE(FIELD), &result);
+
+#define QN_SET_FIELD(FIELD) result.set##FIELD(v);
+
+#define QN_DEFINE_CLASS_DESERIALIZATION_STEP_I(R, DATA, FIELD)                  \
+{   DATA v;                                        \
+    if(!QJson::deserialize(map, QByteArray(BOOST_PP_STRINGIZE(FIELD)).toLower(), &v))        \
+        return false;                                                           \
+    QN_SET_FIELD(FIELD) \
+}
 
 #endif // QN_JSON_H

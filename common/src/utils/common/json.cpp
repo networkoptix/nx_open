@@ -7,14 +7,29 @@
 #include <QtGui/QColor>
 #include <QtCore/QUuid>
 
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
-#include <utils/common/color.h>
-
 #include "warnings.h"
+#include <utils/common/json_utils.h>
+
+const QLatin1String atomicValue("ATOMIC_VALUE");
 
 void QJson_detail::serialize_json(const QVariant &value, QByteArray *target) {
-    *target = QJsonDocument::fromVariant(value).toJson();
+    switch (value.type()) {
+    case QVariant::Map:
+    case QVariant::List:
+    case QVariant::StringList:
+        *target = QJsonDocument::fromVariant(value).toJson();
+        return;
+    default:
+        break;
+    }
+
+    QVariantMap map;
+    map[atomicValue] = value;
+    *target = QJsonDocument::fromVariant(map).toJson();
 }
 
 bool QJson_detail::deserialize_json(const QByteArray &value, QVariant *target) {
@@ -25,48 +40,16 @@ bool QJson_detail::deserialize_json(const QByteArray &value, QVariant *target) {
         return false;
     }
 
-    *target = result;
-    return true;
-}
-
-void serialize(const QUuid &value, QVariant *target) {
-    *target = value.toString();
-}
-
-bool deserialize(const QVariant &value, QUuid *target) {
-    /* Support JSON null for QUuid, even though we don't generate it on
-     * serialization. */
-    if(value.type() == QVariant::Invalid) {
-        *target = QUuid();
-        return true;
-    }
-
-    if(value.type() != QVariant::String)
-        return false;
-
-    QString string = value.toString();
-    QUuid result(string);
-    if(result.isNull() && string != QLatin1String("00000000-0000-0000-0000-000000000000") && string != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
-        return false;
-
-    *target = result;
-    return true;
-}
-
-void serialize(const QColor &value, QVariant *target) {
-    *target = value.name();
-}
-
-bool deserialize(const QVariant &value, QColor *target) {
-    if(value.type() != QVariant::String)
-        return false;
-    *target = parseColor(value);
+    if (result.type() == QVariant::Map && result.toMap().contains(atomicValue))
+        *target = result.toMap()[atomicValue];
+    else
+        *target = result;
     return true;
 }
 
 void serialize(const QVariant &value, QVariant *target) {
     switch(value.userType()) {
-    case QVariant::Invalid:         *target = QVariant(); break;
+    case QMetaType::UnknownType:    *target = QVariant(); break;
     case QMetaType::QVariantList:   QJson::serialize(value.toList(), target); break;
     case QMetaType::QVariantMap:    QJson::serialize(value.toMap(), target); break;
     case QMetaType::QStringList:    QJson::serialize(value.toStringList(), target); break;
@@ -86,6 +69,13 @@ void serialize(const QVariant &value, QVariant *target) {
     case QMetaType::Long:
     case QMetaType::LongLong:       QJson::serialize(value.toLongLong(), target); break;
     case QMetaType::QColor:         QJson::serialize(value.value<QColor>(), target); break;
+    case QMetaType::QUuid:          QJson::serialize(value.value<QUuid>(), target); break;
+    case QMetaType::QSize:          QJson::serialize(value.value<QSize>(), target); break;
+    case QMetaType::QSizeF:         QJson::serialize(value.value<QSizeF>(), target); break;
+    case QMetaType::QPoint:         QJson::serialize(value.value<QPoint>(), target); break;
+    case QMetaType::QPointF:        QJson::serialize(value.value<QPointF>(), target); break;
+    case QMetaType::QRect:          QJson::serialize(value.value<QRect>(), target); break;
+    case QMetaType::QRectF:         QJson::serialize(value.value<QRectF>(), target); break;
     default:
         qnWarning("Type '%1' is not supported for JSON serialization.", QMetaType::typeName(value.userType()));
         *target = QVariant();
