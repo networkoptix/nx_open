@@ -421,7 +421,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Media proxy port</string>
+               <string>Auxilary port</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

@@ -171,7 +171,10 @@ protected:
 
         QVariant replyVariant;
         int status = sendSyncRequest(operation, object, headers, params, data, &replyVariant);
-        
+
+        if (status)
+            return status;
+
         int replyType = qMetaTypeId<T>();
         if(replyVariant.userType() != replyType)
             qnWarning("Invalid return type of request '%1': expected '%2', got '%3'.", m_nameMapper->name(object), QMetaType::typeName(replyType), replyVariant.typeName());
