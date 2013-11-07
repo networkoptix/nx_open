@@ -6,14 +6,13 @@
 #include "api/message_source.h"
 #include "api/app_server_connection.h"
 #include "core/resource/resource.h"
+#include <utils/common/singleton.h>
 
-class QnClientMessageProcessor : public QObject
+class QnClientMessageProcessor : public QObject, public Singleton<QnClientMessageProcessor>
 {
     Q_OBJECT
 
 public:
-    static QnClientMessageProcessor *instance();
-
     QnClientMessageProcessor();
 
     void stop();

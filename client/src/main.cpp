@@ -326,8 +326,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnPlatformAbstraction> clientPlatform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
 
 #ifdef Q_WS_X11
     //   QnX11LauncherWorkaround x11LauncherWorkaround;
