@@ -803,7 +803,7 @@ const SocketAddress CommunicatingSocket::getForeignAddress()
         qnWarning("Fetch of foreign address failed (getpeername()).");
         return SocketAddress();
     }
-    return SocketAddress( addr.sin_addr, addr.sin_port );
+    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
 //!Implementation of AbstractCommunicatingSocket::isConnected
