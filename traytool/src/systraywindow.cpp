@@ -776,7 +776,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->ecsManuaPublicIPEdit->setText(m_appServerSettings.value(lit("manualPublicIp")).toString());
 
     onRadioButtonEcsPublicIpChanged();
-    ui->ecsPortSpinBox->setValue(m_appServerSettings.value(lit("ecPort")).toInt());
+    ui->ecsPortSpinBox->setValue(m_appServerSettings.value(lit("port")).toInt());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
