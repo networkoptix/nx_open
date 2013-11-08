@@ -60,6 +60,33 @@ QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::Metr
 }
 
 
+QString xorEncrypt(const QString &plaintext, const QString &key) {
+    if (key.isEmpty())
+        return plaintext;
+
+    QByteArray array(plaintext.toUtf8());
+    QByteArray keyArray(key.toUtf8());
+
+    for (int i = 0; i < array.size(); i++)
+        array[i] = array[i] ^ keyArray[i % keyArray.size()];
+
+    return QLatin1String(array.toBase64());
+}
+
+QString xorDecrypt(const QString &crypted, const QString &key) {
+    if (key.isEmpty())
+        return crypted;
+
+    QByteArray array = QByteArray::fromBase64(crypted.toLatin1());
+    QByteArray keyArray(key.toUtf8());
+
+    for(int i = 0; i < array.size(); i++)
+        array[i] = array[i] ^ keyArray[i % keyArray.size()];
+    return QString::fromUtf8(array);
+}
+
+
+
 // -------------------------------------------------------------------------- //
 // String comparison
 // -------------------------------------------------------------------------- //
@@ -225,27 +252,3 @@ QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity cas
 	return retVal;
 }
 
-QString xorEncrypt(const QString &plaintext, const QString &key) {
-    if (key.isEmpty())
-        return plaintext;
-
-    QByteArray array(plaintext.toUtf8());
-    QByteArray keyArray(key.toUtf8());
-
-    for (int i = 0; i < array.size(); i++)
-        array[i] = array[i] ^ keyArray[i % keyArray.size()];
-
-    return QLatin1String(array.toBase64());
-}
-
-QString xorDecrypt(const QString &crypted, const QString &key) {
-    if (key.isEmpty())
-        return crypted;
-
-    QByteArray array = QByteArray::fromBase64(crypted.toLatin1());
-    QByteArray keyArray(key.toUtf8());
-
-    for(int i = 0; i < array.size(); i++)
-        array[i] = array[i] ^ keyArray[i % keyArray.size()];
-    return QString::fromUtf8(array);
-}

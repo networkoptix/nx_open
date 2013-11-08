@@ -14,7 +14,7 @@ struct QnStorageSpaceReply {
     QList<QString> storageProtocols;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storageProtocols), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storageProtocols), inline)
 
 Q_DECLARE_METATYPE(QnStorageSpaceReply);
 

@@ -1,119 +1,136 @@
 #include "json.h"
 
-#include <algorithm> /* For std::copy & std::transform. */
-#include <functional> /* For std::mem_fun_ref. */
-
-#include <QtCore/QMetaType>
-#include <QtGui/QColor>
-#include <QtCore/QUuid>
-
 #include <QtCore/QJsonValue>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
-#include "warnings.h"
-#include <utils/common/json_utils.h>
-
-const QLatin1String atomicValue("ATOMIC_VALUE");
-
-void QJson_detail::serialize_json(const QVariant &value, QByteArray *target) {
+void QJsonDetail::serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format) {
     switch (value.type()) {
-    case QVariant::Map:
-    case QVariant::List:
-    case QVariant::StringList:
-        *target = QJsonDocument::fromVariant(value).toJson();
-        return;
-    default:
+    case QJsonValue::Null:
+        *target = "null";
         break;
-    }
-
-    QVariantMap map;
-    map[atomicValue] = value;
-    *target = QJsonDocument::fromVariant(map).toJson();
-}
-
-bool QJson_detail::deserialize_json(const QByteArray &value, QVariant *target) {
-    QJsonParseError error;
-    QVariant result = QJsonDocument::fromJson(value, &error).toVariant();
-    if(error.error != QJsonParseError::NoError) {
-        qWarning() << error.errorString();
-        return false;
-    }
-
-    if (result.type() == QVariant::Map && result.toMap().contains(atomicValue))
-        *target = result.toMap()[atomicValue];
-    else
-        *target = result;
-    return true;
-}
-
-void serialize(const QVariant &value, QVariant *target) {
-    switch(value.userType()) {
-    case QMetaType::UnknownType:    *target = QVariant(); break;
-    case QMetaType::QVariantList:   QJson::serialize(value.toList(), target); break;
-    case QMetaType::QVariantMap:    QJson::serialize(value.toMap(), target); break;
-    case QMetaType::QStringList:    QJson::serialize(value.toStringList(), target); break;
-    case QMetaType::QChar:          QJson::serialize(value.toString(), target); break;
-    case QMetaType::QString:        QJson::serialize(value.toString(), target); break;
-    case QMetaType::Double:      
-    case QMetaType::Float:          QJson::serialize(value.toDouble(), target); break;
-    case QMetaType::Bool:           QJson::serialize(value.toBool(), target); break;
-    case QMetaType::UChar:
-    case QMetaType::UShort:
-    case QMetaType::UInt:
-    case QMetaType::ULong:
-    case QMetaType::ULongLong:      QJson::serialize(value.toULongLong(), target); break;
-    case QMetaType::Char:
-    case QMetaType::Short:
-    case QMetaType::Int:
-    case QMetaType::Long:
-    case QMetaType::LongLong:       QJson::serialize(value.toLongLong(), target); break;
-    case QMetaType::QColor:         QJson::serialize(value.value<QColor>(), target); break;
-    case QMetaType::QUuid:          QJson::serialize(value.value<QUuid>(), target); break;
-    case QMetaType::QSize:          QJson::serialize(value.value<QSize>(), target); break;
-    case QMetaType::QSizeF:         QJson::serialize(value.value<QSizeF>(), target); break;
-    case QMetaType::QPoint:         QJson::serialize(value.value<QPoint>(), target); break;
-    case QMetaType::QPointF:        QJson::serialize(value.value<QPointF>(), target); break;
-    case QMetaType::QRect:          QJson::serialize(value.value<QRect>(), target); break;
-    case QMetaType::QRectF:         QJson::serialize(value.value<QRectF>(), target); break;
+    case QJsonValue::Bool:
+        *target = value.toBool() ? "true" : "false";
+        break;
+    case QJsonValue::Double:
+        *target = QByteArray::number(value.toDouble(), 'g', 17);
+    case QJsonValue::String:
+        target->clear();
+        target->append('\"');
+        target->append(value.toString().toUtf8());
+        target->append('\"');
+        break;
+    case QJsonValue::Array:
+        *target = QJsonDocument(value.toArray()).toJson(format);
+        break;
+    case QJsonValue::Object:
+        *target = QJsonDocument(value.toObject()).toJson(format);
+        break;
+    case QJsonValue::Undefined:
     default:
-        qnWarning("Type '%1' is not supported for JSON serialization.", QMetaType::typeName(value.userType()));
-        *target = QVariant();
+        target->clear();
         break;
     }
 }
 
-bool deserialize(const QVariant &value, QVariant *target) {
-    *target = value;
-    return true;
-}
-
-void serialize(const QVariantList &value, QVariant *target) {
-    QJson_detail::serialize_list<QVariant, QVariantList>(value, target);
-}
-
-bool deserialize(const QVariant &value, QVariantList *target) {
-    if(value.type() != QVariant::List)
-        return false;
-
-    *target = value.toList();
-    return true;
-}
-
-void serialize(const QVariantMap &value, QVariant *target) {
-    QVariantMap result;
-    for(QVariantMap::const_iterator pos = value.begin(); pos != value.end(); pos++) {
-        QVariant serialized;
-        serialize(*pos, &serialized);
-        result.insert(pos.key(), serialized);
+QJsonValue::Type expected_json_type(const QByteArray &value) {
+    foreach(const char c, value) {
+        switch (c) {
+        case ' ':
+        case '\t':
+        case '\n':
+        case '\v':
+        case '\f':
+        case '\r':
+            continue; /* Whitespace characters. */
+        case 'n':
+            return QJsonValue::Null;
+        case 't':
+        case 'f':
+            return QJsonValue::Bool;
+        case '+':
+        case '-':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '.':
+            return QJsonValue::Double;
+        case '\"':
+            return QJsonValue::String;
+        case '[':
+            return QJsonValue::Array;
+        case '{':
+            return QJsonValue::Object;
+        default:
+            return QJsonValue::Undefined;
+        }
     }
-    *target = result;
+
+    return QJsonValue::Undefined;
 }
 
-bool deserialize(const QVariant &value, QVariantMap *target) {
-    if(value.type() != QVariant::Map)
+
+bool QJsonDetail::deserialize_json(const QByteArray &value, QJsonValue *target) {
+    switch (expected_json_type(value))
+    case QJsonValue::Null: {
+        if(value.trimmed() == "null") {
+            *target = QJsonValue();
+            return true;
+        } else {
+            return false;
+        }
+    case QJsonValue::Bool: {
+        QByteArray trimmed = value.trimmed();
+        if(trimmed == "true") {
+            *target = QJsonValue(true);
+            return true;
+        } else if(trimmed == "false") {
+            *target = QJsonValue(false);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    case QJsonValue::Double: {
+        bool ok;
+        double parsed = value.trimmed().toDouble(&ok);
+        if(ok)
+            *target = QJsonValue(parsed);
+        return ok;
+    }
+    case QJsonValue::String: {
+        QByteArray trimmed = value.trimmed();
+        if(trimmed.startsWith('\"') && trimmed.endsWith('\"')) {
+            *target = QJsonValue(QString::fromUtf8(trimmed.constData() + 1, trimmed.size() - 2));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    case QJsonValue::Array:
+    case QJsonValue::Object: {
+        QJsonParseError error;
+        QJsonDocument document = QJsonDocument::fromJson(value, &error);
+        if(error.error != QJsonParseError::NoError)
+            return false;
+
+        if(document.isArray()) {
+            *target = document.array();
+        } else {
+            *target = document.object();
+        }
+        return true;
+    }
+    case QJsonValue::Undefined:
+    default:
         return false;
-
-    *target = value.toMap();
-    return true;
+    }
 }
+

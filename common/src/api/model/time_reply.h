@@ -14,7 +14,7 @@ struct QnTimeReply {
     qint64 timeZoneOffset;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnTimeReply, (utcTime)(timeZoneOffset), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimeReply, (utcTime)(timeZoneOffset), inline)
 
 Q_DECLARE_METATYPE(QnTimeReply)
 
