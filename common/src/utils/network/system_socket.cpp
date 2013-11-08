@@ -135,7 +135,7 @@ SocketAddress Socket::getLocalAddress() const
     if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
         return SocketAddress();
 
-    return SocketAddress( addr.sin_addr, addr.sin_port );
+    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
 //!Implementation of AbstractSocket::getPeerAddress
