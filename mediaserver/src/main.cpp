@@ -357,24 +357,13 @@ QnAbstractStorageResourceList createStorages()
     return storages;
 }
 
-void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress)
+void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
 {
     if (server->getName().isEmpty())
         server->setName(QString("Server ") + myAddress);
 
-#ifdef _TEST_TWO_SERVERS
-    server->setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(55001));
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
-#else
-    server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-#ifdef USE_SINGLE_STREAMING_PORT
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server->setStreamingUrl(QString("http://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-#else
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
-    server->setStreamingUrl(QString("https://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
-#endif
-#endif
+    server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
+    server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
 QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResource::PanicMode* pm)
@@ -1022,7 +1011,7 @@ void QnMain::run()
             server->setPanicMode(pm);
         }
 
-        setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
+        setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
         QList<QHostAddress> serverIfaceList = allLocalAddresses();
         if (!publicAddress.isNull()) {
