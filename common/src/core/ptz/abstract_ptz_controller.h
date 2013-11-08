@@ -41,7 +41,7 @@ namespace {
  * 
  * Also note that standard PTZ space refers to degrees for pan, tilt and fov.
  */
-class QnAbstractPtzController: public QObject { // TODO: rename QnPtzController
+class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
     /**
@@ -56,9 +56,17 @@ public:
     const QnResourcePtr &resource() const { return m_resource; }
 
     /**
-     * \returns                         PTZ features that this controller implements.
+     * \returns                         PTZ capabilities that this controller implements.
      */
     virtual Qn::PtzCapabilities getCapabilities() = 0;
+
+    /**
+     * \param capabilities              Capabilities to check.
+     * \returns                         Whether this controller implements the given capabilities.
+     */
+    bool hasCapabilities(Qn::PtzCapabilities capabilities) {
+        return (getCapabilities() & capabilities) == capabilities;
+    }
 
     /**
      * Starts PTZ movement. Speed is specified in image-based coordinate space and

@@ -15,12 +15,14 @@ public:
     QnActiPtzController(const QnActiResourcePtr &resource);
     virtual ~QnActiPtzController();
 
+    virtual Qn::PtzCapabilities getCapabilities() override;
     virtual int startMove(const QVector3D &speed) override;
+    virtual int stopMove() override;
+    virtual int getFlip(Qt::Orientations *flip) override;
     virtual int setPosition(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
-    virtual int stopMove() override;
-    virtual Qn::PtzCapabilities getCapabilities() override;
-    //virtual const QnPtzSpaceMapper *getSpaceMapper() override;
+    virtual int getLimits(QnPtzLimits *limits) override;
+    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
 private:
     void init();

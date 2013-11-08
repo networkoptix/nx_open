@@ -10,8 +10,8 @@ class QnRelativePtzController: public QnProxyPtzController {
 public:
     QnRelativePtzController(const QnPtzControllerPtr &baseController);
     
-    //virtual Qn::PtzCapabilities getCapabilities() override;
-    //virtual int relativeMove(const QRectF &viewport) override;
+    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 };
 
 

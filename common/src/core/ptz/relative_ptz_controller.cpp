@@ -5,13 +5,13 @@
 QnRelativePtzController::QnRelativePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController) 
 {
-    assert(baseController->getCapabilities() & Qn::LogicalPositionSpaceCapability);
+    assert(baseController->hasCapabilities(Qn::LogicalPositionSpaceCapability));
 }
 
-/*Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
+Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::ScreenSpaceMovementCapability;
 }
 
-int QnRelativePtzController::relativeMove(const QRectF &viewport) {
-    
-}*/
+int QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+    return 0;
+}

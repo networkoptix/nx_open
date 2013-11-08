@@ -95,6 +95,7 @@ public:
         /* Shortcuts */
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+        AllPtzCapabilities                  = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositionSpaceCapability | ScreenSpaceMovementCapability,
 
         /* Deprecated capabilities. */
         DeprecatedContinuousPtzCapability   = 0x001,

@@ -50,6 +50,11 @@ namespace {
         {1000, 16.0},
     };
 
+    qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)
+    {
+        return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
+    }
+
 } // anonymous namespace
 
 
@@ -71,11 +76,6 @@ QnActiPtzController::~QnActiPtzController() {
     return;
 }
 
-qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)
-{
-    return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
-}
-
 void QnActiPtzController::init() 
 {
     CLHttpStatus status;
@@ -89,12 +89,10 @@ void QnActiPtzController::init()
     QByteArray mirrorMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_MIRROR_MODE"), status);
     m_isMirrored = mirrorMode.toInt() == 1;
 
-    m_capabilities |= Qn::AbsolutePtzCapability;
-    m_capabilities |= Qn::ContinuousPanTiltCapability;
-    m_capabilities |= Qn::ContinuousZoomCapability;
+    m_capabilities |= Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities;
 
     if(m_resource->getModel() == lit("KCM3311"))
-        m_capabilities &= ~Qn::ContinuousPanTiltCapability;
+        m_capabilities &= ~(Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability | Qn::AbsolutePtzCapabilities);
 
     qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
     qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
@@ -103,14 +101,18 @@ void QnActiPtzController::init()
     qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
     if (!m_isFliped) {
         qSwap(minTiltPhysical, maxTiltPhysical);
-        m_capabilities &= ~Qn::AbsolutePtzCapability; // acti 8111 has bug for absolute position if flip turned off
+        m_capabilities &= ~Qn::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
     }
+
+    if(m_capabilities & Qn::AbsolutePtzCapabilities)
+        m_capabilities |= Qn::LogicalPositionSpaceCapability;
 
     QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
     m_minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
     if (zoomParams.size() > 1)
         m_maxAngle = m_resource->unquoteStr(zoomParams[1]).toInt();
 
+#if 0
     QnScalarSpaceMapper xMapper(minPanLogical, maxPanLogical, minPanPhysical, maxPanPhysical, Qn::PeriodicExtrapolation);
     QnScalarSpaceMapper yMapper(minTiltLogical, maxTiltLogical, minTiltPhysical, maxTiltPhysical, Qn::ConstantExtrapolation);
 
@@ -127,6 +129,7 @@ void QnActiPtzController::init()
     m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), 
                                          //QnVectorSpaceMapper(xMapper, yMapper, toCameraZMapper),
                                          QStringList());
+#endif
 }
 
 int QnActiPtzController::stopZoomInternal()
@@ -209,15 +212,8 @@ int QnActiPtzController::startMoveInternal(qreal xVelocityR, qreal yVelocityR)
     return result;
 }
 
-int QnActiPtzController::stopMove()
-{
-    QMutexLocker lock(&m_mutex);
-
-    int errCode1 = 0, errCode2 = 0;
-    errCode1 = stopZoomInternal();
-    errCode2 = stopMoveInternal();
-
-    return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
+Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
+    return m_capabilities;
 }
 
 int QnActiPtzController::startMove(const QVector3D &speed) 
@@ -230,6 +226,17 @@ int QnActiPtzController::startMove(const QVector3D &speed)
         errCode1 = startZoomInternal(speed.z());
     if (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y())) 
         errCode2 = startMoveInternal(speed.x(), speed.y());
+
+    return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
+}
+
+int QnActiPtzController::stopMove()
+{
+    QMutexLocker lock(&m_mutex);
+
+    int errCode1 = 0, errCode2 = 0;
+    errCode1 = stopZoomInternal();
+    errCode2 = stopMoveInternal();
 
     return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }
@@ -279,10 +286,10 @@ int QnActiPtzController::getPosition(QVector3D *position)
     return 0;
 }
 
-Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
-    return m_capabilities;
+int QnActiPtzController::getLimits(QnPtzLimits *limits) {
+    return 1; // TODO: #Elric
 }
 
-const QnPtzSpaceMapper *QnActiPtzController::getSpaceMapper() {
-    return m_spaceMapper;
+int QnActiPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+    return 1;
 }
