@@ -122,7 +122,7 @@ Qn::StreamQuality QnLiveStreamProvider::getQuality() const
 QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
     if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+        if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
             m_softMotionRole = QnResource::Role_LiveVideo;
         else
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;

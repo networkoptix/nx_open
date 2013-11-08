@@ -318,7 +318,7 @@ namespace aio
     {
         m_impl->mutex = mutex;
 
-        setObjectName( QString::fromLatin1("AIOThread") );
+        setObjectName( lit("AIOThread") );
     }
 
     AIOThread::~AIOThread()
