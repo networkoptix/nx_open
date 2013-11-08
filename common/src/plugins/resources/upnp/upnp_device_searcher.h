@@ -164,6 +164,7 @@ private:
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
 
 private slots:
+    void onDeviceDescriptionXmlResponseReceived( nx_http::AsyncHttpClient* httpClient );
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient );
 };
 

@@ -353,6 +353,10 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
     }
 
     QObject::connect(
+        httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),
+        this, SLOT(onDeviceDescriptionXmlResponseReceived(nx_http::AsyncHttpClient*)),
+        Qt::DirectConnection );
+    QObject::connect(
         httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),
         this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClient*)),
         Qt::DirectConnection );
@@ -427,6 +431,11 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
     cacheItem.devInfo = devInfo.devInfo;
     cacheItem.xmlDevInfo = devInfo.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
+}
+
+void UPNPDeviceSearcher::onDeviceDescriptionXmlResponseReceived( nx_http::AsyncHttpClient* httpClient )
+{
+    httpClient->startReadMessageBody();
 }
 
 void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient )
