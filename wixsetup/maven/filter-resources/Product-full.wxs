@@ -646,6 +646,8 @@
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_APPSERVER_PASSWORD]"/>
                                 </RegistryKey>
+                                <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\apiPort" Action="removeOnInstall"/>
+                                <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
                             </Component>
 
                             <Component Id="ServerRtspPlugin">
