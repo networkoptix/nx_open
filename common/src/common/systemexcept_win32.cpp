@@ -71,7 +71,7 @@ static void writeCrashInfo(
     of.close();
 }
 
-static DWORD dumpStackProc( LPVOID lpParam )
+static DWORD WINAPI dumpStackProc( LPVOID lpParam )
 {
     //TODO/IMPL
     HANDLE targetThreadHandle = (HANDLE)lpParam;
@@ -324,7 +324,7 @@ static std::string getCallStack(
 #ifdef _WIN64
     //TODO/IMPL #ak
 #else
-    if( pException )
+    if( contextRecord )
     {
         sf.AddrPC.Offset = contextRecord->Eip;
         sf.AddrStack.Offset = contextRecord->Esp;
