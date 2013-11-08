@@ -15,9 +15,9 @@ namespace nx_http
         m_asyncHttpClient( std::make_shared<AsyncHttpClient>() ),
         m_done( false )
     {
-        connect( m_asyncHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
-        connect( m_asyncHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
-        connect( m_asyncHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onDone()), Qt::DirectConnection );
+        connect( m_asyncHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
+        connect( m_asyncHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
+        connect( m_asyncHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)), this, SLOT(onDone()), Qt::DirectConnection );
     }
 
     HttpClient::~HttpClient()

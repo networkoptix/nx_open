@@ -55,7 +55,7 @@ private:
     QByteArray getDeviceXml(const QUrl& url);
 
 private slots:
-    void at_replyReceived(nx_http::AsyncHttpClient* reply);
+    void at_replyReceived(nx_http::AsyncHttpClientPtr reply);
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

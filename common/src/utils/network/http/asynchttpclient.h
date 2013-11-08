@@ -20,6 +20,9 @@
 
 namespace nx_http
 {
+    class AsyncHttpClient;
+    typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
+
     //!Http client. All operations are done asynchronously using aio::AIOService
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
@@ -99,20 +102,20 @@ namespace nx_http
         void setUserPassword( const QString& userAgent );
 
     signals:
-        void tcpConnectionEstablished( nx_http::AsyncHttpClient* );
+        void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
-        void responseReceived( nx_http::AsyncHttpClient* );
+        void responseReceived( nx_http::AsyncHttpClientPtr );
         //!Message body buffer is not empty
-        void someMessageBodyAvailable( nx_http::AsyncHttpClient* );
+        void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
             Emmitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
         */
-        void done( nx_http::AsyncHttpClient* );
+        void done( nx_http::AsyncHttpClientPtr );
         //!Connection to server has been restored after a sudden disconnect
-        void reconnected( nx_http::AsyncHttpClient* );
+        void reconnected( nx_http::AsyncHttpClientPtr );
 
     protected:
         //!Implementation of aio::AIOEventHandler::eventTriggered

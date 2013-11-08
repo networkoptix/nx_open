@@ -336,7 +336,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
             return;
         }
 
-        //TODO: #ak linear search is not among fastest ones, known to humanity
+        //TODO: #ak linear search is not among fastest ones known to humanity
         for( std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo>::const_iterator
             it = m_httpClients.begin();
             it != m_httpClients.end();
@@ -351,14 +351,14 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
     }
 
     QObject::connect(
-        httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)),
-        this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClient*)),
+        httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+        this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)),
         Qt::DirectConnection );
     if( !httpClient->doGet( descriptionUrl ) )
     {
         QObject::disconnect(
-            httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)),
-            this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClient*)) );
+            httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)) );
 
         QMutexLocker lk( &m_mutex );
         m_httpClients.erase( httpClient );
@@ -426,16 +426,13 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 }
 
-void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient )
+void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     DiscoveredDeviceInfo* ctx = NULL;
     std::shared_ptr<nx_http::AsyncHttpClient> httpClientPtr;
     {
         QMutexLocker lk( &m_mutex );
-        auto it = std::find_if(
-            m_httpClients.begin(),
-            m_httpClients.end(),
-            [httpClient](const HttpClientsDict::value_type& val){ return val.first.get() == httpClient; } );
+        HttpClientsDict::iterator it = m_httpClients.find( httpClient );
         if (it == m_httpClients.end())
             return;
         httpClientPtr = it->first;

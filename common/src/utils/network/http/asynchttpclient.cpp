@@ -68,7 +68,6 @@ namespace nx_http
     {
         //TODO/IMPL #AK need to refactore this method: possibly split to multiple methods
 
-        //ScopedDestructionProhibition undestructable( this );    //~ScopedDestructionProhibition can call delete *this, which will lock m_mutex
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
         QMutexLocker lk( &m_mutex );
@@ -91,7 +90,7 @@ namespace nx_http
                             serializeRequest();
                             m_state = sSendingRequest;
                             lk.unlock();
-                            emit tcpConnectionEstablished( this );
+                            emit tcpConnectionEstablished( sharedThis );
                             lk.relock();
                             continue;
 
@@ -103,7 +102,7 @@ namespace nx_http
                             m_state = sFailed;
                             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
                             lk.unlock();
-                            emit done( this );
+                            emit done( sharedThis );
                             lk.relock();
                             break;
 
@@ -129,7 +128,7 @@ namespace nx_http
                         }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }
@@ -140,7 +139,7 @@ namespace nx_http
                         m_state = sFailed;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }
@@ -172,7 +171,7 @@ namespace nx_http
                         }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }
@@ -190,7 +189,7 @@ namespace nx_http
                             arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }
@@ -217,7 +216,7 @@ namespace nx_http
 
                     m_state = sResponseReceived;
                     lk.unlock();
-                    emit responseReceived( this );
+                    emit responseReceived( sharedThis );
                     lk.relock();
                     if( m_terminated )
                         break;
@@ -228,7 +227,7 @@ namespace nx_http
                         //no message body: done
                         m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }
@@ -237,7 +236,7 @@ namespace nx_http
                         m_state == sReadingMessageBody )                    //client wants to read message body
                     {
                         lk.unlock();
-                        emit someMessageBodyAvailable( this );
+                        emit someMessageBodyAvailable( sharedThis );
                         lk.relock();
                     }
 
@@ -257,7 +256,7 @@ namespace nx_http
 
                     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                     lk.unlock();
-                    emit done( this );
+                    emit done( sharedThis );
                     lk.relock();
                     break;
                 }
@@ -272,7 +271,7 @@ namespace nx_http
                         NX_LOG( QString::fromLatin1("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }
@@ -284,7 +283,7 @@ namespace nx_http
                     if( bytesRead > 0 )
                     {
                         lk.unlock();
-                        emit someMessageBodyAvailable( this );
+                        emit someMessageBodyAvailable( sharedThis );
                         lk.relock();
                         if( m_terminated )
                             break;
@@ -292,7 +291,7 @@ namespace nx_http
                     if( m_state >= sFailed )
                     {
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                     }
                     break;

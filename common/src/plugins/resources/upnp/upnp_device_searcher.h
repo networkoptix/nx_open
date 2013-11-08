@@ -166,7 +166,7 @@ private:
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
 
 private slots:
-    void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient );
+    void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
 };
 
 #endif  //UPNP_DEVICE_SEARCHER_H

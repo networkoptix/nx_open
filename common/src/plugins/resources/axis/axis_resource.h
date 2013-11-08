@@ -69,9 +69,9 @@ public:
     virtual QnAbstractPtzController* getPtzController() override;
 
 public slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClient* httpClient );
+    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -123,7 +123,7 @@ private:
         unsigned int* paramValue );
     void initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    void forgetHttpClient( nx_http::AsyncHttpClient* const httpClient );
+    void forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient );
 
     void initializePtz(CLSimpleHTTPClient *http);
 
