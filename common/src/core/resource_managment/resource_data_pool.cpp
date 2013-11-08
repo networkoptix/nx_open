@@ -11,10 +11,10 @@ struct QnResourceDataPoolChunk {
     QnResourceData data;
 };
 
-bool deserialize(const QVariant &value, QnResourceDataPoolChunk *target) {
-    if(value.type() != QVariant::Map)
+bool deserialize(const QJsonValue &value, QnResourceDataPoolChunk *target) {
+    QJsonObject map;
+    if(!QJson::deserialize(value, &map))
         return false;
-    QVariantMap map = value.toMap();
 
     QnResourceDataPoolChunk result;
     if(!QJson::deserialize(map, "keys", &result.keys) || !QJson::deserialize(value, &result.data))
@@ -72,7 +72,7 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
         return false; /* Read error. */
     file.close();
 
-    QVariantMap map;
+    QJsonObject map;
     if(!QJson::deserialize(data, &map))
         return false;
 

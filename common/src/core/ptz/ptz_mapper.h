@@ -31,7 +31,7 @@ private:
     QnPtzLimits m_logicalLimits;
 };
 
-bool deserialize(const QVariant &value, QnPtzMapperPtr *target);
+bool deserialize(const QJsonValue &value, QnPtzMapperPtr *target);
 
 Q_DECLARE_METATYPE(QnPtzMapperPtr)
 

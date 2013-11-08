@@ -47,6 +47,6 @@ private:
     QHash<QString, QVariant> m_valueByKey;
 };
 
-bool deserialize(const QVariant &value, QnResourceData *target);
+bool deserialize(const QJsonValue &value, QnResourceData *target);
 
 #endif // QN_RESOURCE_DATA_H

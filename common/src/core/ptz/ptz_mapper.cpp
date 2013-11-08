@@ -25,16 +25,16 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &logicalToDevice, con
     m_logicalLimits.maxFov = hi.z();
 }
 
-bool deserialize(const QVariant &value, QnSpaceMapperPtr<qreal> *target) {
-    if(value.type() == QVariant::Invalid) {
+bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
+    if(value.type() == QJsonValue::Null) {
         /* That's null mapper. */
         *target = QnSpaceMapperPtr<qreal>();
         return true;
     }
 
-    if(value.type() != QVariant::Map)
+    QJsonObject map;
+    if(!QJson::deserialize(value, &map))
         return false;
-    QVariantMap map = value.toMap();
 
     /* Note: source == device space, target == logical space. */
 
@@ -65,15 +65,15 @@ bool deserialize(const QVariant &value, QnSpaceMapperPtr<qreal> *target) {
     return true;
 }
 
-bool deserialize(const QVariant &value, PtzMapperPart *target) {
-    if(value.type() == QVariant::Invalid) {
+bool deserialize(const QJsonValue &value, PtzMapperPart *target) {
+    if(value.type() == QJsonValue::Null) {
         *target = PtzMapperPart();
         return true;
     }
 
-    if(value.type() != QVariant::Map)
+    QJsonObject map;
+    if(!QJson::deserialize(value, &map))
         return false;
-    QVariantMap map = value.toMap();
 
     PtzMapperPart local;
     if(
@@ -88,16 +88,16 @@ bool deserialize(const QVariant &value, PtzMapperPart *target) {
     return true;
 }
 
-bool deserialize(const QVariant &value, QnPtzMapperPtr *target) {
-    if(value.type() == QVariant::Invalid) {
+bool deserialize(const QJsonValue &value, QnPtzMapperPtr *target) {
+    if(value.type() == QJsonValue::Null) {
         /* That's null mapper. */
         *target = QnPtzMapperPtr();
         return true;
     }
 
-    if(value.type() != QVariant::Map)
+    QJsonObject map;
+    if(!QJson::deserialize(value, &map))
         return false;
-    QVariantMap map = value.toMap();
 
     PtzMapperPart toCamera, fromCamera;
     if(
