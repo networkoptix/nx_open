@@ -1,7 +1,6 @@
 #include "statistics_colors.h"
 
 #include <utils/common/json.h>
-#include <utils/common/json_utils.h>
 #include <utils/math/math.h>
 
 namespace {
@@ -15,7 +14,7 @@ namespace {
 } // anonymous namespace
 
 namespace detail {
-    QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), static)
+    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), static)
 }
 
 QnStatisticsColors::QnStatisticsColors():
@@ -86,12 +85,12 @@ void QnStatisticsColors::ensureVectors() {
     }
 }
 
-void serialize(const QnStatisticsColors &value, QVariant *target) {
+void serialize(const QnStatisticsColors &value, QJsonValue *target) {
     detail::serialize(value, target);
 }
 
-bool deserialize(const QVariant &value, QnStatisticsColors *target) {
-    if(value.type() == QVariant::Invalid) {
+bool deserialize(const QJsonValue &value, QnStatisticsColors *target) {
+    if(value.type() == QJsonValue::Null) {
         /* That's null color storage. */
         *target = QnStatisticsColors();
         return true;

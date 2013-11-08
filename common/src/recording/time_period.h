@@ -94,8 +94,8 @@ bool operator<(const QnTimePeriod &other, qint64 first);
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(QnTimePeriod)
+Q_DECLARE_METATYPE(QnTimePeriod);
 
-QN_DECLARE_SERIALIZATION_FUNCTIONS(QnTimePeriod)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod);
 
 #endif // QN_TIME_PERIOD_H

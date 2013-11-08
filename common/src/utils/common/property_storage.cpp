@@ -11,7 +11,6 @@
 #include "command_line_parser.h"
 
 #include <utils/common/json.h>
-#include <utils/common/json_utils.h>
 
 // -------------------------------------------------------------------------- //
 // QnPropertyStorageLocker
@@ -179,7 +178,7 @@ void QnPropertyStorage::updateFromSettings(QSettings *settings) {
     updateValuesFromSettings(settings, m_nameById.keys());
 }
 
-void QnPropertyStorage::updateFromJson(const QVariantMap &json) {
+void QnPropertyStorage::updateFromJson(const QJsonObject &json) {
     QnPropertyStorageLocker locker(this);
     updateValuesFromJson(json, m_nameById.keys());
 }
@@ -317,20 +316,20 @@ void QnPropertyStorage::writeValueToSettings(QSettings *settings, int id, const 
     settings->setValue(name(id), value);
 }
 
-void QnPropertyStorage::updateValuesFromJson(const QVariantMap &json, const QList<int> &ids) {
+void QnPropertyStorage::updateValuesFromJson(const QJsonObject &json, const QList<int> &ids) {
     foreach(int id, ids)
         updateValue(id, readValueFromJson(json, id, value(id)));
 }
 
-QVariant QnPropertyStorage::readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) {
+QVariant QnPropertyStorage::readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) {
     // TODO: #Elric need dynamic JSON deserialization here.
     QVariant value = json.value(name(id));
 
-    if(type(id) == QMetaType::QColor) {
+    /*if(type(id) == QMetaType::QColor) {
         QColor color;
         if(QJson::deserialize(value, &color))
             value = color;
-    }
+    }*/ // TODO: #JSON
 
     return value.isValid() ? value : defaultValue; 
 }

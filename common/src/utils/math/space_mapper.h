@@ -62,8 +62,8 @@ private:
     qreal m_logicalMinimum, m_logicalMaximum, m_physicalMinimum, m_physicalMaximum;
 };
 
-void serialize(const QnScalarSpaceMapper &value, QVariant *target);
-bool deserialize(const QVariant &value, QnScalarSpaceMapper *target);
+void serialize(const QnScalarSpaceMapper &value, QJsonValue *target);
+bool deserialize(const QJsonValue &value, QnScalarSpaceMapper *target);
 
 
 // -------------------------------------------------------------------------- //
@@ -118,8 +118,8 @@ private:
     boost::array<QnScalarSpaceMapper, CoordinateCount> m_mappers;
 };
 
-void serialize(const QnVectorSpaceMapper &value, QVariant *target);
-bool deserialize(const QVariant &value, QnVectorSpaceMapper *target);
+void serialize(const QnVectorSpaceMapper &value, QJsonValue *target);
+bool deserialize(const QJsonValue &value, QnVectorSpaceMapper *target);
 
 
 // -------------------------------------------------------------------------- //
@@ -164,8 +164,8 @@ private:
     Qn::SpaceMapperFlags m_flags;
 };
 
-void serialize(const QnPtzSpaceMapper &value, QVariant *target);
-bool deserialize(const QVariant &value, QnPtzSpaceMapper *target);
+void serialize(const QnPtzSpaceMapper &value, QJsonValue *target);
+bool deserialize(const QJsonValue &value, QnPtzSpaceMapper *target);
 
 Q_DECLARE_METATYPE(QnPtzSpaceMapper);
 

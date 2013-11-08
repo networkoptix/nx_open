@@ -8,7 +8,7 @@
 #include "time_period_list.h"
 
 namespace detail {
-    QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnTimePeriod, (startTimeMs)(durationMs), static)
+    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, (startTimeMs)(durationMs), static)
 }
 
 
@@ -213,12 +213,12 @@ QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
     return dbg.space();
 }
 
-void serialize(const QnTimePeriod &value, QVariant *target) {
+void serialize(const QnTimePeriod &value, QJsonValue *target) {
     detail::serialize(value, target);
 }
 
-bool deserialize(const QVariant &value, QnTimePeriod *target) {
-    if(value.type() == QVariant::Invalid) {
+bool deserialize(const QJsonValue &value, QnTimePeriod *target) {
+    if(value.type() == QJsonValue::Null) {
         *target = QnTimePeriod();
         return false;
     }

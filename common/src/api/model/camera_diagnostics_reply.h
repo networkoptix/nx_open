@@ -24,7 +24,7 @@ struct QnCameraDiagnosticsReply
     }
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnCameraDiagnosticsReply, (performedStep)(errorCode)(errorParams), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnCameraDiagnosticsReply, (performedStep)(errorCode)(errorParams), inline)
 
 Q_DECLARE_METATYPE(QnCameraDiagnosticsReply)
 

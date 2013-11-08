@@ -85,8 +85,8 @@ protected:
 
         T reply;
         if(status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply)) {
+            QJsonObject object;
+            if(!QJson::deserialize(response.data, &object) || !QJson::deserialize(object, "reply", &reply)) {
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
                 status = 1;
             }
