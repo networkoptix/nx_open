@@ -4,19 +4,17 @@
 #include <QtCore/QVariant>
 
 template<class T> 
-inline T qvariant_cast(const QVariant &v, const T &defaultValue) {
-    /* Code is copied from Qt. See QVariant implementation. */
+inline T qvariant_cast(const QVariant &value, const T &defaultValue) {
+    const int typeId = qMetaTypeId<T>();
+    if (typeId == value.userType())
+        return *reinterpret_cast<const T *>(value.constData());
 
-    const int vid = qMetaTypeId<T>(static_cast<T *>(0));
-    if (vid == v.userType())
-        return *reinterpret_cast<const T *>(v.constData());
-    if (vid < int(QMetaType::User)) {
-        //T t;
-        //if (qvariant_cast_helper(v, QVariant::Type(vid), &t))
-        //    return t;
-        if( v.canConvert(QVariant::Type(vid)) )
-            return v.value<T>();
+    if (typeId < QMetaType::User && value.userType() < QMetaType::User) {
+        QVariant copy = value;
+        if(copy.convert(typeId))
+            return *reinterpret_cast<const T *>(copy.constData());
     }
+
     return defaultValue;
 }
 

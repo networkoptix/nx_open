@@ -75,7 +75,7 @@ public:
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
      */
-    void addWidget(QWidget *widget);
+    void addWidget(QWidget *widget, bool newRow = true);
 
 private slots:
     void at_accepted();
@@ -84,6 +84,7 @@ private:
     QMap<QCheckBox*, bool *> m_checkBoxes;
     QMap<QSpinBox*, int *> m_spinBoxes;
     QMap<QLineEdit*, QString *> m_lineEdits;
+    int m_currentCol;
 };
 
 #endif // CUSTOM_FILE_DIALOG_H

@@ -66,34 +66,34 @@ namespace {
 
 
 // TODO: #Elric move out
-inline void serialize(const QVector3D &value, QVariant *target) {
-    QVariantMap result;
+inline void serialize(const QVector3D &value, QJsonValue *target) {
+    QJsonObject result;
     QJson::serialize(value.x(), "x", &result);
     QJson::serialize(value.y(), "y", &result);
     QJson::serialize(value.z(), "z", &result);
     *target = result;
 }
 
-inline bool deserialize(const QVariant &value, QVector3D *target) {
-    if(value.type() != QVariant::Map)
+inline bool deserialize(const QJsonValue &value, QVector3D *target) {
+    QJsonObject map;
+    if(!QJson::deserialize(value, &map))
         return false;
-    QVariantMap map = value.toMap();
 
     qreal x, y, z;
     if(
         !QJson::deserialize(map, "x", &x) ||
         !QJson::deserialize(map, "y", &y) ||
         !QJson::deserialize(map, "z", &z)
-        ) {
-            return false;
+    ) {
+        return false;
     }
 
     *target = QVector3D(x, y, z);
     return true;
 }
 
-inline void serialize(const PtzPresetData &value, QVariant *target) {
-    QVariantMap result;
+inline void serialize(const PtzPresetData &value, QJsonValue *target) {
+    QJsonObject result;
     QJson::serialize(value.cameraPhysicalId, "cameraPhysicalId", &result);
     QJson::serialize(value.name, "name", &result);
     QJson::serialize(value.logicalPosition, "logicalPosition", &result);
@@ -102,10 +102,10 @@ inline void serialize(const PtzPresetData &value, QVariant *target) {
     *target = result;
 }
 
-inline bool deserialize(const QVariant &value, PtzPresetData *target) {
-    if(value.type() != QVariant::Map)
+inline bool deserialize(const QJsonValue &value, PtzPresetData *target) {
+    QJsonObject map;
+    if(!QJson::deserialize(value, &map))
         return false;
-    QVariantMap map = value.toMap();
 
     QString cameraPhysicalId, name;
     QVector3D logicalPosition;

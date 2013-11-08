@@ -86,13 +86,11 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Load from internal resource. */
     QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-
-        QJsonParseError error;
-        QVariantMap json = QJsonDocument::fromJson(file.readAll(), &error).toVariant().toMap();
-        if (error.error != QJsonParseError::NoError) {
-            qWarning() << error.errorString();
+        QJsonObject jsonObject;
+        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
+            qWarning() << "Client settings file could not be parsed!";
         } else {
-            updateFromJson(json.value(lit("settings")).toMap());
+            updateFromJson(jsonObject.value(lit("settings")).toObject());
         }
     }
 
@@ -266,11 +264,11 @@ void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {
         return;
     }
 
-    QVariantMap json;
-    if(!QJson::deserialize(reply->readAll(), &json)) {
+    QJsonObject jsonObject;
+    if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
         qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
     } else {
-        updateFromJson(json.value(lit("settings")).toMap());
+        updateFromJson(jsonObject.value(lit("settings")).toObject());
     }
 
     reply->deleteLater();

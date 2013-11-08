@@ -62,16 +62,19 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 
     QString host = url.host();
     CasheInfo info = m_cachedXml.value(host);
-    if (info.xml.isEmpty() || info.timer.elapsed() > CACHE_UPDATE_TIME)
+    if (!m_cachedXml.contains(host) || info.timer.elapsed() > CACHE_UPDATE_TIME)
     {
         if (!m_httpInProgress.contains(url.host())) 
         {
             QString urlStr = url.toString();
 
             nx_http::AsyncHttpClient* request = new nx_http::AsyncHttpClient();
-            connect(request, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(at_replyReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
-            request->doGet(url);
-            m_httpInProgress << url.host();
+            connect(request, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(at_replyReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
+            connect(request, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(at_httpConnectionDone(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
+            if (request->doGet(url))
+                m_httpInProgress << url.host();
+            else
+                request->scheduleForRemoval();
         }
     }
 
@@ -79,6 +82,11 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 }
 
 void QnActiResourceSearcher::at_replyReceived(nx_http::AsyncHttpClient* reply)
+{
+    reply->startReadMessageBody();
+}
+
+void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClient* reply)
 {
     QMutexLocker lock(&m_mutex);
 

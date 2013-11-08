@@ -245,7 +245,7 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
         QnAbstractPtzController *ptzController = res->getPtzController();
         const QnPtzSpaceMapper *spaceMapper = ptzController ? ptzController->getSpaceMapper() : NULL;
         if(spaceMapper) {
-            QVariantMap map;
+            QJsonObject map;
             QJson::serialize(*spaceMapper, "reply", &map);
             QJson::serialize(map, &result);
         } else {

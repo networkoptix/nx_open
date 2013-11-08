@@ -23,7 +23,7 @@ public:
     QList<WSResult> findResources();
 
 private:
-    WSResult parseReply(QByteArray& datagram);
+    WSResult parseReply(const QByteArray& datagram);
 };
 
 #endif // onvif_ws_searcher_helper_h1338

@@ -31,11 +31,11 @@ QnGlobals::QnGlobals(QObject *parent):
 
     QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QVariantMap json;
-        if(!QJson::deserialize(file.readAll(), &json)) {
+        QJsonObject jsonObject;
+        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
             qWarning() << "Client settings file could not be parsed!";
         } else {
-            updateFromJson(json.value(QLatin1String("style")).toMap());
+            updateFromJson(jsonObject.value(QLatin1String("style")).toObject());
         }
     }
 }
@@ -71,7 +71,7 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
     }
 }
 
-QVariant QnGlobals::readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) {
+QVariant QnGlobals::readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) {
     int type = this->type(id);
     if(type == qMetaTypeId<QnStatisticsColors>()) {
         QnStatisticsColors value;

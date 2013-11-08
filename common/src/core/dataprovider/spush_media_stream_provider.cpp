@@ -44,7 +44,7 @@ bool CLServerPushStreamReader::canChangeStatus() const
 void CLServerPushStreamReader::run()
 {
     saveSysThreadID();
-    setPriority(QThread::TimeCriticalPriority);
+    setPriority(QThread::HighPriority);
     NX_LOG("stream reader started", cl_logDEBUG1);
 
     beforeRun();

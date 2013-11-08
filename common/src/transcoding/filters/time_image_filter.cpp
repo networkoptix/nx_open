@@ -13,7 +13,7 @@ static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
 static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, qint64 timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -41,19 +41,19 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
 
     switch(m_dateTextPos)
     {
-    case Date_LeftTop:
+    case Qn::TopLeftCorner:
         m_bufYOffs = 0;
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
-    case Date_RightTop:
+    case Qn::TopRightCorner:
         m_bufYOffs = 0;
         m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
         break;
-    case Date_RightBottom:
+    case Qn::BottomRightCorner:
         m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
         break;
-    case Date_LeftBottom:
+    case Qn::BottomLeftCorner:
     default:
         m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = metric.averageCharWidth()/2;
@@ -77,19 +77,19 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
 {
     switch(m_dateTextPos)
     {
-    case Date_LeftTop:
+    case Qn::TopLeftCorner:
         if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
-    case Date_RightTop:
+    case Qn::TopRightCorner:
         if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
-    case Date_RightBottom:
+    case Qn::BottomRightCorner:
         if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
         break;
-    case Date_LeftBottom:
+    case Qn::BottomLeftCorner:
     default:
         if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;

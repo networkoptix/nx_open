@@ -71,7 +71,7 @@ public:
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
 
-    void updateFromJson(const QVariantMap &json);
+    void updateFromJson(const QJsonObject &json);
 
     // TODO: #Elric we need a way to make command line parameters not to be saved to settings if they are not changed.
 
@@ -95,8 +95,8 @@ protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue);
     virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const;
 
-    virtual void updateValuesFromJson(const QVariantMap &json, const QList<int> &ids);
-    virtual QVariant readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue);
+    virtual void updateValuesFromJson(const QJsonObject &json, const QList<int> &ids);
+    virtual QVariant readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue);
 
     virtual UpdateStatus updateValue(int id, const QVariant &value);
 

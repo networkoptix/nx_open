@@ -314,6 +314,7 @@ inline QChar lit(char c) {
 Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodContent);
+Q_DECLARE_METATYPE(Qn::Corner);
 
 
 #endif // QN_COMMON_GLOBALS_H

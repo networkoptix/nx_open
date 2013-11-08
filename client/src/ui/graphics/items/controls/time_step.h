@@ -9,6 +9,7 @@ class QnTimeStep {
 public:
     enum Type {
         Milliseconds,
+        Hours,
         Days,
         Months,
         Years
