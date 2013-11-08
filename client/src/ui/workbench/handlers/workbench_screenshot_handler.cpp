@@ -51,7 +51,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QString fileName = parameters.argument<QString>(Qn::FileNameRole);
-    QnTimeImageFilter::OnScreenDatePos timestampPos = QnTimeImageFilter::Date_None;
+    Qn::Corner timestampPos = qnSettings->timestampCorner();
     if(fileName.isEmpty()) {
         QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString;
 
@@ -82,12 +82,17 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
         QComboBox* comboBox = new QComboBox(dialog.data());
-        comboBox->addItem(tr("No timestamp"));
-        comboBox->addItem(tr("Top left corner"));
-        comboBox->addItem(tr("Top right corner"));
-        comboBox->addItem(tr("Bottom right corner"));
-        comboBox->addItem(tr("Bottom left corner"));
-        comboBox->setCurrentIndex(3);
+        comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
+        comboBox->addItem(tr("Top left corner"), Qn::TopLeftCorner);
+        comboBox->addItem(tr("Top right corner"), Qn::TopRightCorner);
+        comboBox->addItem(tr("Bottom left corner"), Qn::BottomLeftCorner);
+        comboBox->addItem(tr("Bottom right corner"), Qn::BottomRightCorner);
+        
+        for (int i = 0; i < comboBox->count(); ++i) {
+            if (comboBox->itemData(i) == timestampPos)
+                comboBox->setCurrentIndex(i);
+        }
+
         QLabel* label = new QLabel(dialog.data());
         label->setText(tr("Timestamps:"));
 
@@ -127,7 +132,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             );
             return;
         }
-        timestampPos = (QnTimeImageFilter::OnScreenDatePos) comboBox->currentIndex();
+        timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
     }
 
     QImage screenshot;
@@ -153,7 +158,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             );
         }
 
-        if (timestampPos != QnTimeImageFilter::Date_None) {
+        if (timestampPos != Qn::NoCorner) {
             QString timeStamp;
             qint64 time = display->camDisplay()->getCurrentTime() / 1000;
             if(widget->resource()->toResource()->flags() & QnResource::utc) {
@@ -175,16 +180,16 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
             QPainterPath path;
             int x, y;
-            if (timestampPos == QnTimeImageFilter::Date_LeftTop)
+            if (timestampPos == Qn::TopLeftCorner)
             {
                 x = spacing*2;
                 y = spacing + fm.ascent();
             }
-            else if (timestampPos == QnTimeImageFilter::Date_RightTop) {
+            else if (timestampPos == Qn::TopRightCorner) {
                 x = screenshot.width() - size.width() - spacing*2;
                 y = spacing + fm.ascent();
             }
-            else if (timestampPos == QnTimeImageFilter::Date_RightBottom) {
+            else if (timestampPos == Qn::BottomRightCorner) {
                 x = screenshot.width() - size.width() - spacing*2;
                 y = screenshot.height() - fm.descent() - spacing;
             }
@@ -211,4 +216,5 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QnFileProcessor::createResourcesForFile(fileName);
     
     qnSettings->setLastScreenshotDir(QFileInfo(fileName).absolutePath());
+    qnSettings->setTimestampCorner(timestampPos);
 }

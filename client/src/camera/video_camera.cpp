@@ -119,6 +119,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
                                             QString& fileName, const QString& format, 
                                             QnStorageResourcePtr storage, 
                                             QnStreamRecorder::Role role, 
+                                            Qn::Corner timestamps,
                                             qint64 timeOffsetMs, qint64 serverTimeZoneMs,
                                             QRectF srcRect,
                                             const ImageCorrectionParams& contrastParams,
@@ -172,6 +173,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(role);
+    m_exportRecorder->setTimestampCorner(timestamps);
     m_exportRecorder->setOnScreenDateOffset(timeOffsetMs);
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
