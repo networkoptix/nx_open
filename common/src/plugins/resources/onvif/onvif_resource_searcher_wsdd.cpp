@@ -746,7 +746,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         ctx = new ProbeContext();
         ctx->sock.reset( SocketFactory::createDatagramSocket() );
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
-        if( !ctx->sock->setLocalAddressAndPort(iface.address.toString()) || !ctx->sock->setNonBlockingMode( true ) )
+        if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
             ctx->sock.reset();
             delete ctx;

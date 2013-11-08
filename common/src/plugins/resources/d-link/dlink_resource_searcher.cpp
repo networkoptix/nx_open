@@ -63,16 +63,16 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         if (shouldStop())
             return QnResourceList();
 
-        UDPSocket sock;
+        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
 
-        if (!sock.setLocalAddressAndPort(iface.address.toString(), 0))
+        if (!sock->bind(iface.address.toString(), 0))
             continue;
 
         // sending broadcast
 
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock.sendTo(barequest.data(), barequest.size(), BROADCAST_ADDRESS, 62976);
+            sock->sendTo(barequest.data(), barequest.size(), BROADCAST_ADDRESS, 62976);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -83,15 +83,15 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         time.start();
 
         QnSleep::msleep(150);
-        while (sock.hasData())
+        while (sock->hasData())
         {
             QByteArray datagram;
-            datagram.resize(MAX_DATAGRAM_SIZE);
+            datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
             QString sender;
             quint16 senderPort;
 
-            int readed = sock.recvFrom(datagram.data(), datagram.size(),    sender, senderPort);
+            int readed = sock->recvFrom(datagram.data(), datagram.size(),    sender, senderPort);
 
             if (senderPort != 62976 || readed < 32) // minimum response size
                 continue;

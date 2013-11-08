@@ -1,8 +1,11 @@
+
 #include "pulse_searcher_helper.h"
 #include "utils/network/nettools.h"
+#include "utils/network/system_socket.h"
 #include "utils/common/sleep.h"
 #include "utils/network/mac_address.h"
 #include "../pulse/pulse_resource.h"
+
 
 QnPlPulseSearcherHelper::QnPlPulseSearcherHelper()
 {
@@ -35,7 +38,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         requestDatagram.insert(0, QByteArray("grandstream"));
         requestDatagram.insert(12, 2);
         requestDatagram.insert(13, QByteArray("127.0.0.1"));
-         requestDatagram.resize(43);
+        requestDatagram.resize(43);
 
         socket.sendTo(requestDatagram.data(), requestDatagram.size(), groupAddress, 6789);
 
@@ -43,7 +46,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
         while(socket.hasData())
         {
             QByteArray reply;
-            reply.resize(MAX_DATAGRAM_SIZE);
+            reply.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
             QString sender;
             quint16 senderPort;

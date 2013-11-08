@@ -30,8 +30,8 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
         for (int i = 0; i < ipaddrs.size();++i)
         {
-            QSharedPointer<UDPSocket> sock(new UDPSocket());
-            if (sock->setLocalAddressAndPort(ipaddrs.at(i).address.toString(), androidRecvPort))
+            QSharedPointer<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket());
+            if (sock->bind(ipaddrs.at(i).address.toString(), androidRecvPort))
                 m_socketList << sock;
             m_lastReadSocketTime = time;
         }
@@ -42,7 +42,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         while (m_socketList[i]->hasData())
         {
             QByteArray responseData;
-            responseData.resize(MAX_DATAGRAM_SIZE);
+            responseData.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
             QString sender;
             quint16 senderPort;
@@ -92,7 +92,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             resource->setName(QLatin1String("DroidLive"));
             resource->setMAC(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper());
             //resource->setHostAddress(hostAddr, QnDomainMemory);
-            resource->setDiscoveryAddr(QHostAddress(m_socketList[i]->getLocalAddress()));
+            resource->setDiscoveryAddr(QHostAddress(m_socketList[i]->getLocalAddress().address.toString()));
 
             resource->setUrl(QLatin1String("raw://") + data[1]);
 

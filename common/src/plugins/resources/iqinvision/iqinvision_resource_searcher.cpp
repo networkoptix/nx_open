@@ -230,32 +230,33 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        UDPSocket sendSock, receiveSock;
-        if (!sendSock.setLocalAddressAndPort(iface.address.toString(), NATIVE_DISCOVERY_REQUEST_PORT))
+        std::unique_ptr<AbstractDatagramSocket> sendSock( SocketFactory::createDatagramSocket() );
+        std::unique_ptr<AbstractDatagramSocket> receiveSock( SocketFactory::createDatagramSocket() );
+        if (!sendSock->bind(iface.address.toString(), NATIVE_DISCOVERY_REQUEST_PORT))
             continue;
-        if (!receiveSock.setLocalAddressAndPort(iface.address.toString(), NATIVE_DISCOVERY_RESPONSE_PORT))
+        if (!receiveSock->bind(iface.address.toString(), NATIVE_DISCOVERY_RESPONSE_PORT))
             continue;
 
         for (uint i = 0; i < sizeof(requests)/sizeof(char*); ++i)
         {
             // sending broadcast
             QByteArray datagram(requests[i], REQUEST_SIZE);
-            sendSock.sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, NATIVE_DISCOVERY_REQUEST_PORT);
+            sendSock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, NATIVE_DISCOVERY_REQUEST_PORT);
         }
 
         QTime time;
         time.start();
         QnSleep::msleep(300);
 
-        while (receiveSock.hasData())
+        while (receiveSock->hasData())
         {
             QByteArray datagram;
-            datagram.resize(MAX_DATAGRAM_SIZE);
+            datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
             QString sender;
             quint16 senderPort;
 
-            int readed = receiveSock.recvFrom(datagram.data(), datagram.size(),	sender, senderPort);
+            int readed = receiveSock->recvFrom(datagram.data(), datagram.size(),	sender, senderPort);
 
             if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
                 processNativePacket(result, datagram.left(readed), iface.address);

@@ -13,6 +13,8 @@
 #   include <unistd.h>
 #endif
 
+#include <QtCore/QProcess>
+
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 
@@ -21,7 +23,7 @@ CLPing::CLPing()
 {
 }
 
-bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
+bool CLPing::ping(const QString& ip, int retry, int /*timeoutPerRetry*/, int packetSize)
 {
 #ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -n %2 -l %3");

@@ -19,7 +19,7 @@ QnFlexWatchResourceSearcher::~QnFlexWatchResourceSearcher()
 
 void QnFlexWatchResourceSearcher::clearSocketList()
 {
-    foreach(UDPSocket* sock, m_sockList)
+    foreach(AbstractDatagramSocket* sock, m_sockList)
         delete sock;
     m_sockList.clear();
 }
@@ -38,9 +38,9 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
         clearSocketList();
         foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
         {
-            UDPSocket* sock = new UDPSocket();
+            AbstractDatagramSocket* sock = SocketFactory::createDatagramSocket();
             //if (!bindToInterface(*sock, iface, 51001)) {
-            if (!sock->setLocalAddressAndPort(iface.address.toString(), 51001)) {
+            if (!sock->bind(iface.address.toString(), 51001)) {
                 delete sock;
                 continue;
             }
@@ -55,7 +55,7 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
 void QnFlexWatchResourceSearcher::sendBroadcast()
 {
     QByteArray requestPattertn("53464a001c0000000000000000000000____f850000101000000d976");
-    foreach (UDPSocket* sock, m_sockList)
+    foreach (AbstractDatagramSocket* sock, m_sockList)
     {
         if (shouldStop())
             break;
@@ -81,7 +81,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
 
     QSet<QString> processedMac;
 
-    foreach (UDPSocket* sock, m_sockList)
+    foreach (AbstractDatagramSocket* sock, m_sockList)
     {
         if (shouldStop())
             return QnResourceList();
@@ -89,7 +89,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
         while (sock->hasData())
         {
             QByteArray datagram;
-            datagram.resize(MAX_DATAGRAM_SIZE);
+            datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
             QString sender;
             quint16 senderPort;

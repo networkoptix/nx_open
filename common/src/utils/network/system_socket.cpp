@@ -105,26 +105,26 @@ bool Socket::bind( const SocketAddress& localAddress )
     return setLocalAddressAndPort( localAddress.address.toString(), localAddress.port );
 }
 
-//!Implementation of AbstractSocket::bindToInterface
-bool Socket::bindToInterface( const QnInterfaceAndAddr& iface )
-{
-#ifdef Q_OS_LINUX
-    setLocalPort(0);
-    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length()) >= 0;
-#else
-    bool res = setLocalAddressAndPort(iface.address.toString(), 0);
-#endif
-
-    if( !res )
-    {
-        saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
-    }
-
-    //if (!res)
-    //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
-    return res;
-}
+////!Implementation of AbstractSocket::bindToInterface
+//bool Socket::bindToInterface( const QnInterfaceAndAddr& iface )
+//{
+//#ifdef Q_OS_LINUX
+//    setLocalPort(0);
+//    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length()) >= 0;
+//#else
+//    bool res = setLocalAddressAndPort(iface.address.toString(), 0);
+//#endif
+//
+//    if( !res )
+//    {
+//        saveErrorInfo();
+//        setStatusBit( Socket::sbFailed );
+//    }
+//
+//    //if (!res)
+//    //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
+//    return res;
+//}
 
 //!Implementation of AbstractSocket::getLocalAddress
 SocketAddress Socket::getLocalAddress() const

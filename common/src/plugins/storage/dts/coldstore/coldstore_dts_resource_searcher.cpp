@@ -11,6 +11,7 @@
 #include "../../coldstore/coldstore_api/sfs-client.h"
 #include "coldstore_dts_reader_factory.h"
 #include "utils/network/socket.h"
+#include "utils/network/system_socket.h"
 
 const int coldStoreSendPort = 48102;
 const int coldStoreRecvPort = 48103;
@@ -132,7 +133,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
             while (recvSocket.hasData())
             {
                 QByteArray responseData;
-                responseData.resize(MAX_DATAGRAM_SIZE);
+                responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
 
                 QString sender;
