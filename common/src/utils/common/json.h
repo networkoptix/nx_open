@@ -78,9 +78,14 @@ namespace QJson {
 
     template<class T>
     void serialize(const T &value, const char *key, QJsonObject *target) {
+        QJson::serialize(value, QLatin1String(key), target); // TODO: #Elric remove, use QStringLiteral
+    }
+
+    template<class T>
+    void serialize(const T &value, const QString &key, QJsonObject *target) {
         assert(target);
 
-        QJson::serialize(value, &(*target)[QLatin1String(key)]);
+        QJson::serialize(value, &(*target)[key]);
     }
 
     /**
@@ -124,7 +129,12 @@ namespace QJson {
 
     template<class T>
     bool deserialize(const QJsonObject &value, const char *key, T *target, bool optional = false) {
-        QJsonObject::const_iterator pos = value.find(QLatin1String(key));
+        return QJson::deserialize(value, QLatin1String(key), target, optional); // TODO: #Elric remove, use QStringLiteral
+    }
+
+    template<class T>
+    bool deserialize(const QJsonObject &value, const QString &key, T *target, bool optional = false) {
+        QJsonObject::const_iterator pos = value.find(key);
         if(pos == value.end()) {
             return optional;
         } else {
@@ -218,7 +228,7 @@ namespace QJsonAccessors {
 
 namespace QJsonDetail {
     template<class Class, class Setter, class T>
-    bool deserializeMember(const QJsonObject &value, const char *key, Class &object, const Setter &setter, const T * = NULL) {
+    bool deserializeMember(const QJsonObject &value, const QString &key, Class &object, const Setter &setter, const T * = NULL) {
         using namespace QJsonAccessors;
 
         T member;
@@ -229,7 +239,7 @@ namespace QJsonDetail {
     }
 
     template<class Class, class Setter, class T>
-    bool deserializeMember(const QJsonObject &value, const char *key, Class &object, T Class::*setter, const T * = NULL) {
+    bool deserializeMember(const QJsonObject &value, const QString &key, Class &object, T Class::*setter, const T * = NULL) {
         return QJson::deserialize(value, key, &object.*member);
     }
 
@@ -287,7 +297,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
     QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II FIELD
 
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II(GETTER, SETTER, NAME)        \
-    QJson::serialize(getMember(value, GETTER), NAME, &result);
+    QJson::serialize(getMember(value, GETTER), QStringLiteral(NAME), &result);
 
 #define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I(R, DATA, FIELD)             \
     QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II FIELD
@@ -295,7 +305,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 #define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II(GETTER, SETTER, NAME)      \
     {                                                                           \
         typedef decltype(getMember(result, GETTER)) member_type;                \
-        if(!QJsonDetail::deserializeMember(object, NAME, result, SETTER, static_cast<const member_type *>(NULL))) \
+        if(!QJsonDetail::deserializeMember(object, QStringLiteral(NAME), result, SETTER, static_cast<const member_type *>(NULL))) \
             return false;                                                       \
     }
 
