@@ -11,7 +11,8 @@ export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 ECS_PORT_DEFAULT=7001
 ECS_PROXY_PORT_DEFAULT=7004
 
-CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
+ETC_DIR="/opt/$COMPANY_NAME/entcontroller/etc"
+CONFIG_FILE="$ETC_DIR/entcontroller.conf"
 SSL_DIR="/opt/$COMPANY_NAME/entcontroller/var/ssl"
 SSL_CERT="$SSL_DIR/cert.pem"
 BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
@@ -30,13 +31,16 @@ function replace_var {
     name=$1; shift
     value=$1; shift
 
-    [ -z $value ] && return
-
-    tmpfile=$(mktemp)
-    while read line
-    do
-          echo ${line/^$name=.*$/$name=$replace}
-    done < "$file" > "$tmpfile" && mv "$tmpfile" "$file"
+    if grep "$name=" $file > /dev/null 2>&1
+        tmpfile=$(mktemp)
+        while read line
+        do
+              echo ${line/$name=*/$name=$value}
+        done < "$file" > "$tmpfile" && mv "$tmpfile" "$file"
+    then
+        sed -i "/\[General\]/a \
+$name=$value" $file
+    fi   
 }
 
 function read_config {
@@ -54,6 +58,9 @@ function read_config {
 }
 
 function write_config {
+    [ -d $ETC_DIR ] || mkdir $ETC_DIR
+    [ -f $CONFIG_FILE ] || echo "[General]" > $CONFIG_FILE
+
     replace_var $CONFIG_FILE port $ECS_PORT
     replace_var $CONFIG_FILE proxyPort $ECS_PROXY_PORT
     replace_var $CONFIG_FILE proxyAuthKey $ECS_PROXY_AUTH_KEY

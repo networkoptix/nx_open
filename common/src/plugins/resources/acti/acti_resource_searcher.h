@@ -56,6 +56,7 @@ private:
 
 private slots:
     void at_replyReceived(nx_http::AsyncHttpClientPtr reply);
+    void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
 };
 
 #endif // _ACTI_RESOURCE_SEARCHER_H__

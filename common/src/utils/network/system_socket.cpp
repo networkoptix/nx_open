@@ -105,26 +105,26 @@ bool Socket::bind( const SocketAddress& localAddress )
     return setLocalAddressAndPort( localAddress.address.toString(), localAddress.port );
 }
 
-//!Implementation of AbstractSocket::bindToInterface
-bool Socket::bindToInterface( const QnInterfaceAndAddr& iface )
-{
-#ifdef Q_OS_LINUX
-    setLocalPort(0);
-    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length()) >= 0;
-#else
-    bool res = setLocalAddressAndPort(iface.address.toString(), 0);
-#endif
-
-    if( !res )
-    {
-        saveErrorInfo();
-        setStatusBit( Socket::sbFailed );
-    }
-
-    //if (!res)
-    //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
-    return res;
-}
+////!Implementation of AbstractSocket::bindToInterface
+//bool Socket::bindToInterface( const QnInterfaceAndAddr& iface )
+//{
+//#ifdef Q_OS_LINUX
+//    setLocalPort(0);
+//    bool res = setsockopt(handle(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length()) >= 0;
+//#else
+//    bool res = setLocalAddressAndPort(iface.address.toString(), 0);
+//#endif
+//
+//    if( !res )
+//    {
+//        saveErrorInfo();
+//        setStatusBit( Socket::sbFailed );
+//    }
+//
+//    //if (!res)
+//    //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
+//    return res;
+//}
 
 //!Implementation of AbstractSocket::getLocalAddress
 SocketAddress Socket::getLocalAddress() const
@@ -135,7 +135,7 @@ SocketAddress Socket::getLocalAddress() const
     if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
         return SocketAddress();
 
-    return SocketAddress( addr.sin_addr, addr.sin_port );
+    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
 //!Implementation of AbstractSocket::getPeerAddress
@@ -147,7 +147,7 @@ SocketAddress Socket::getPeerAddress() const
     if (getpeername(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
         return SocketAddress();
 
-    return SocketAddress( addr.sin_addr, addr.sin_port );
+    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
 //!Implementation of AbstractSocket::close
@@ -803,7 +803,7 @@ const SocketAddress CommunicatingSocket::getForeignAddress()
         qnWarning("Fetch of foreign address failed (getpeername()).");
         return SocketAddress();
     }
-    return SocketAddress( addr.sin_addr, addr.sin_port );
+    return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
 //!Implementation of AbstractCommunicatingSocket::isConnected

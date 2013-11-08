@@ -28,7 +28,7 @@ class QnStreamRecorder : public QnAbstractDataConsumer
     Q_OBJECT
 
 public:
-    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithTime, Role_FileExportWithEmptyContext};
+    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
@@ -72,6 +72,7 @@ public:
     QByteArray getSignature() const;
 
     void setRole(Role role);
+    void setTimestampCorner(Qn::Corner pos);
 
     void setStorage(QnStorageResourcePtr storage);
 
@@ -178,6 +179,7 @@ private:
     CodecID m_dstVideoCodec;
     qint64 m_onscreenDateOffset;
     Role m_role;
+    Qn::Corner m_timestampCorner;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;

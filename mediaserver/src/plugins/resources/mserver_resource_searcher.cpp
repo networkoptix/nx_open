@@ -177,7 +177,8 @@ void QnMServerResourceSearcher::updateSocketList()
     {
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();
-        if (socket->bindToInterface(iface))
+        //if (socket->bindToInterface(iface))
+        if (socket->setLocalAddressAndPort(iface.address.toString()))
         {
             socket->setMulticastIF(localAddress);
             m_socketList << socket;

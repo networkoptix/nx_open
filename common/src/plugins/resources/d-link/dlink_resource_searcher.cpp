@@ -3,6 +3,7 @@
 #include "dlink_resource.h"
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
+#include "utils/network/socket.h"
 
 unsigned char request[] = {0xfd, 0xfd, 0x06, 0x00, 0xa1, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
 QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
@@ -62,16 +63,16 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         if (shouldStop())
             return QnResourceList();
 
-        QUdpSocket sock;
+        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
 
-        if (!bindToInterface(sock, iface))
+        if (!sock->bind(iface.address.toString(), 0))
             continue;
 
         // sending broadcast
 
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock.writeDatagram(barequest.data(), barequest.size(),QHostAddress::Broadcast, 62976);
+            sock->sendTo(barequest.data(), barequest.size(), BROADCAST_ADDRESS, 62976);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -82,17 +83,17 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         time.start();
 
         QnSleep::msleep(150);
-        while (sock.hasPendingDatagrams())
+        while (sock->hasData())
         {
             QByteArray datagram;
-            datagram.resize(sock.pendingDatagramSize());
+            datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-            QHostAddress sender;
+            QString sender;
             quint16 senderPort;
 
-            sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
+            int readed = sock->recvFrom(datagram.data(), datagram.size(),    sender, senderPort);
 
-            if (senderPort != 62976 || datagram.size() < 32) // minimum response size
+            if (senderPort != 62976 || readed < 32) // minimum response size
                 continue;
 
             QString name  = QLatin1String("DCS-");
@@ -104,7 +105,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             iqpos+=name.length();
 
-            while (iqpos < datagram.size() && datagram[iqpos] != (char)0)
+            while (iqpos < readed && datagram[iqpos] != (char)0)
             {
                 name += QLatin1Char(datagram[iqpos]);
                 ++iqpos;
@@ -144,7 +145,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(smac);
-            resource->setHostAddress(sender.toString(), QnDomainMemory);
+            resource->setHostAddress(sender, QnDomainMemory);
 
             resource->setDiscoveryAddr(iface.address);
 

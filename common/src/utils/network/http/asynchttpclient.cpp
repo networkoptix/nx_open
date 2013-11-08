@@ -31,7 +31,8 @@ namespace nx_http
         m_state( sInit ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
-        m_terminated( false )
+        m_terminated( false ),
+        m_totalBytesRead( 0 )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
 
@@ -148,6 +149,7 @@ namespace nx_http
                         NX_LOG( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT );
                         aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
                     }
                     break;
@@ -448,7 +450,8 @@ namespace nx_http
         m_httpStreamReader.resetState();
 
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
-        if( !m_socket->setNonBlockingMode( true ) )
+        if( !m_socket->setNonBlockingMode( true ) ||
+            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
         {
             NX_LOG( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );

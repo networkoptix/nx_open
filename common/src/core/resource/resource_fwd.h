@@ -103,4 +103,7 @@ typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceLi
 class QnDesktopResource;
 typedef QSharedPointer<QnDesktopResource> QnDesktopResourcePtr;
 
+class QnThirdPartyResource;
+typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
+
 #endif // QN_RESOURCE_FWD_H

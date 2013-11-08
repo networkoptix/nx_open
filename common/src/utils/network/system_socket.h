@@ -24,6 +24,7 @@
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
+
 /**
  *   Signals a problem with the execution of a socket call.
  */
@@ -80,7 +81,7 @@ public:
     //!Implementation of AbstractSocket::bind
     virtual bool bind( const SocketAddress& localAddress ) override;
     //!Implementation of AbstractSocket::bindToInterface
-    virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
+    //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override;
     //!Implementation of AbstractSocket::getPeerAddress
@@ -419,7 +420,7 @@ public:
      *   Set the multicast send interface
      *   @param multicastIF multicast interface for sending packets
      */
-    bool setMulticastIF(const QString& multicastIF);
+    virtual bool setMulticastIF(const QString& multicastIF) override;
 
     /**
      *   Join the specified multicast group
