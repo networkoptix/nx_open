@@ -30,8 +30,8 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
         for (int i = 0; i < ipaddrs.size();++i)
         {
-            QSharedPointer<QUdpSocket> sock(new QUdpSocket());
-            if (sock->bind(ipaddrs.at(i).address, androidRecvPort))
+            QSharedPointer<UDPSocket> sock(new UDPSocket());
+            if (sock->setLocalAddressAndPort(ipaddrs.at(i).address.toString(), androidRecvPort))
                 m_socketList << sock;
             m_lastReadSocketTime = time;
         }
@@ -39,17 +39,18 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        while (m_socketList[i]->hasPendingDatagrams())
+        while (m_socketList[i]->hasData())
         {
             QByteArray responseData;
-            responseData.resize(m_socketList[i]->pendingDatagramSize());
+            responseData.resize(MAX_DATAGRAM_SIZE);
 
-            QHostAddress sender;
+            QString sender;
             quint16 senderPort;
 
-            m_socketList[i]->readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
-
-            QString response = QLatin1String(responseData);
+            int readed = m_socketList[i]->recvFrom(responseData.data(), responseData.size(),  sender, senderPort);
+            if (readed < 1)
+                continue;
+            QString response = QLatin1String(responseData.left(readed));
 
             QStringList data = response.split(QLatin1Char(';'));
             if (data.size() < 3)
@@ -91,7 +92,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             resource->setName(QLatin1String("DroidLive"));
             resource->setMAC(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper());
             //resource->setHostAddress(hostAddr, QnDomainMemory);
-            resource->setDiscoveryAddr(m_socketList[i]->localAddress());
+            resource->setDiscoveryAddr(QHostAddress(m_socketList[i]->getLocalAddress()));
 
             resource->setUrl(QLatin1String("raw://") + data[1]);
 

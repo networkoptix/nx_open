@@ -31,9 +31,9 @@ private:
 private:
     struct DiscoveryInfo
     {
-        DiscoveryInfo(QUdpSocket* _sock, const QHostAddress& _ifAddr): sock(_sock), ifAddr(_ifAddr) {}
+        DiscoveryInfo(UDPSocket* _sock, const QHostAddress& _ifAddr): sock(_sock), ifAddr(_ifAddr) {}
         ~DiscoveryInfo() { }
-        QUdpSocket* sock;
+        UDPSocket* sock;
         QHostAddress ifAddr;
     };
     QList<DiscoveryInfo> m_sockList;

@@ -38,8 +38,8 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         clearSocketList();
         foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
         {
-            DiscoveryInfo info(new QUdpSocket(), iface.address);
-            if (info.sock->bind(iface.address, 0))
+            DiscoveryInfo info(new UDPSocket(), iface.address);
+            if (info.sock->setLocalAddressAndPort(iface.address.toString(), 0))
                 m_sockList << info;
             else
                 delete info.sock;
@@ -53,7 +53,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
     foreach (const DiscoveryInfo& info, m_sockList)
-        info.sock->writeDatagram(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), QHostAddress::Broadcast, TestCamConst::DISCOVERY_PORT);
+        info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
 }
 
 QnResourceList QnTestCameraResourceSearcher::findResources(void)
@@ -70,18 +70,19 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
     foreach(const DiscoveryInfo& info, m_sockList)
     {
-        QUdpSocket* sock = info.sock;
-        while (sock->hasPendingDatagrams())
+        UDPSocket* sock = info.sock;
+        while (sock->hasData())
         {
             QByteArray responseData;
-            responseData.resize(sock->pendingDatagramSize());
+            responseData.resize(MAX_DATAGRAM_SIZE);
 
 
-            QHostAddress sender;
+            QString sender;
             quint16 senderPort;
-            sock->readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
-
-            QList<QByteArray> params = responseData.split(';');
+            int readed = sock->recvFrom(responseData.data(), responseData.size(), sender, senderPort);
+            if (readed < 1)
+                continue;
+            QList<QByteArray> params = responseData.left(readed).split(';');
             if (params[0] != TestCamConst::TEST_CAMERA_ID_MSG || params.size() < 3)
                 continue;
 
@@ -107,7 +108,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(info.ifAddr);
-                resource->setUrl(QLatin1String("tcp://") + sender.toString() + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
+                resource->setUrl(QLatin1String("tcp://") + sender + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
                 resources.insert(mac, resource);
             }
         }

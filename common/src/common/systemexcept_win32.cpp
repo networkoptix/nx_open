@@ -54,10 +54,18 @@ static LONG WINAPI unhandledSEHandler( __in struct _EXCEPTION_POINTERS* Exceptio
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void win32_exception::install_handler()
+void win32_exception::installGlobalUnhandledExceptionHandler()
+{
+    //_set_se_translator( &win32_exception::translate );
+    SetUnhandledExceptionFilter( &unhandledSEHandler );
+
+    //TODO/IMPL install CRT handlers (invalid parameter, purecall, etc.)
+}
+
+void win32_exception::installThreadSpecificUnhandledExceptionHandler()
 {
     _set_se_translator( &win32_exception::translate );
-    SetUnhandledExceptionFilter( &unhandledSEHandler );
+    //SetUnhandledExceptionFilter( &unhandledSEHandler );
 }
 
 void win32_exception::translate(

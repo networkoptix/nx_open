@@ -222,7 +222,7 @@ bool QnLiveStreamProvider::needMetaData()
     }
     else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
     {
-        bool result = (m_framesSinceLastMetaData > 10 || m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
+        bool result = (m_framesSinceLastMetaData > 10 || m_framesSinceLastMetaData > 0 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
         if (result)
         {
             m_framesSinceLastMetaData = 0;

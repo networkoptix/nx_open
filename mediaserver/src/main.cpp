@@ -104,6 +104,11 @@
 #include "network/authenticate_helper.h"
 #include "rest/handlers/rebuild_archive_handler.h"
 
+#ifdef _WIN32
+#include "common/systemexcept_win32.h"
+#endif
+
+
 #define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -499,7 +504,7 @@ int serverMain(int argc, char *argv[])
     if( logLevel != QString::fromLatin1("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-    qnPlatform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
+    qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
 
@@ -887,7 +892,6 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-
     QFile f(QLatin1String(":/cert.pem"));
     if (!f.open(QIODevice::ReadOnly)) 
     {
@@ -1103,7 +1107,20 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+    QString disabledVendors = qSettings.value("disabledVendors").toString();
+    QStringList disabledVendorList;
+    if (disabledVendors.contains(";"))
+        disabledVendorList = disabledVendors.split(";");
+    else
+        disabledVendorList = disabledVendors.split(" ");
+    QStringList updatedVendorList;        
+    for (int i = 0; i < disabledVendorList.size(); ++i) {
+	if (!disabledVendorList[i].trimmed().isEmpty())
+    	    updatedVendorList << disabledVendorList[i].trimmed();
+    }
+    qWarning() << "disabled vendors amount" << updatedVendorList.size();
+    qWarning() << disabledVendorList;        
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(updatedVendorList);
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
@@ -1137,7 +1154,8 @@ void QnMain::run()
 
     
 
-    QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
+    // Roman asked Ivan to comment it for Brian
+    // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 
     //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
@@ -1341,6 +1359,9 @@ void stopServer(int signal)
 int main(int argc, char* argv[])
 {
     ::srand( ::time(NULL) );
+#ifdef _WIN32
+    win32_exception::installGlobalUnhandledExceptionHandler();
+#endif
 
     QnVideoService service(argc, argv);
 

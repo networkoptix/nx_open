@@ -15,6 +15,9 @@
 
 //TODO/IMPL reconnect
 
+static const int DEFAULT_CONNECT_TIMEOUT = 3000;
+static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
+
 using std::make_pair;
 
 namespace nx_http
@@ -28,7 +31,8 @@ namespace nx_http
         m_state( sInit ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
-        m_terminated( false )
+        m_terminated( false ),
+        m_totalBytesRead( 0 )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
 
@@ -109,11 +113,19 @@ namespace nx_http
                     break;
 
                 case sSendingRequest:
-                    if( eventType == PollSet::etError )
+                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
                     {
-                        if( reconnectIfAppropriate() )
-                            break;
-                        NX_LOG( QString::fromLatin1("Error sending http request to %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        if( eventType == PollSet::etError )
+                        {
+                            if( reconnectIfAppropriate() )
+                                break;
+                            NX_LOG( QString::fromLatin1("Error sending http request to %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        }
+                        else
+                        {
+                            NX_LOG( QString::fromLatin1("Error sending http request from %1. Socket write operation has timed out").
+                                arg(m_url.toString()), cl_logDEBUG1 );
+                        }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -136,6 +148,7 @@ namespace nx_http
                         NX_LOG( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        m_socket->setReadTimeOut( DEFAULT_RESPONSE_READ_TIMEOUT );
                         aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
                     }
                     break;
@@ -143,11 +156,19 @@ namespace nx_http
                 case sReceivingResponse:
                 {
                     Q_ASSERT( eventType != PollSet::etWrite );
-                    if( eventType == PollSet::etError )
+                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
                     {
-                        if( reconnectIfAppropriate() )
-                            break;
-                        NX_LOG( QString::fromLatin1("Error reading http response from %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        if( eventType == PollSet::etError )
+                        {
+                            if( reconnectIfAppropriate() )
+                                break;
+                            NX_LOG( QString::fromLatin1("Error reading http response from %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        }
+                        else
+                        {
+                            NX_LOG( QString::fromLatin1("Error reading http response from %1. Socket read operation has timed out").
+                                arg(m_url.toString()), cl_logDEBUG1 );
+                        }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -383,6 +404,12 @@ namespace nx_http
         return m_url;
     }
 
+    quint64 AsyncHttpClient::totalBytesRead() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_totalBytesRead;
+    }
+
     void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
     {
         //TODO/IMPL
@@ -421,7 +448,8 @@ namespace nx_http
         m_httpStreamReader.resetState();
 
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
-        if( !m_socket->setNonBlockingMode( true ) )
+        if( !m_socket->setNonBlockingMode( true ) ||
+            !m_socket->setWriteTimeOut( DEFAULT_CONNECT_TIMEOUT ) )
         {
             NX_LOG( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
@@ -475,6 +503,8 @@ namespace nx_http
             m_state = sDone;
             return 0;
         }
+
+        m_totalBytesRead += bytesRead;
 
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {

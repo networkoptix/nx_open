@@ -135,9 +135,10 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     if (iqpos<0)
         return local_results;
 
-    int macpos = responseData.indexOf("00", iqpos);
+    int macpos = responseData.indexOf("- 00", iqpos);
     if (macpos < 0)
         return local_results;
+    macpos += 2;
 
     for (int i = iqpos; i < macpos; i++)
     {

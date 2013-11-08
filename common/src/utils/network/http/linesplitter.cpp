@@ -42,7 +42,7 @@ namespace nx_http
 
         //searching line end in data
         //const size_t lineEnd = data.find_first_of( "\r\n", currentDataPos );
-        static const char* CRLF = "\r\n";
+        static const char CRLF[] = "\r\n";
         const char* lineEnd = std::find_first_of( data.data(), data.data()+data.size(), CRLF, CRLF+sizeof(CRLF)-1 );
         if( lineEnd == data.data()+data.size() )
         {

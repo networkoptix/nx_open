@@ -121,7 +121,7 @@ namespace aio
         mutable QMutex processEventsMutex;
 
         //!map<event clock (millis), periodic task data>. todo: #use some thread-safe container on atomic operations instead of map and mutex
-        std::map<qint64, PeriodicTaskData> periodicTasksByClock;
+        std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
         QMutex periodicTasksMutex;
 
         AIOThreadImpl()
@@ -254,7 +254,7 @@ namespace aio
                 {
                     //taking task from queue
                     QMutexLocker lk( &periodicTasksMutex );
-                    std::map<qint64, PeriodicTaskData>::iterator it = periodicTasksByClock.begin();
+                    std::multimap<qint64, PeriodicTaskData>::iterator it = periodicTasksByClock.begin();
                     if( it == periodicTasksByClock.end() || it->first > curClock )
                         break;
                     periodicTaskData = it->second;
