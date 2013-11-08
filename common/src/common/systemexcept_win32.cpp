@@ -37,7 +37,6 @@ unsigned win32_exception::code() const
     return mCode; 
 }
 
-
 bool access_violation::isWrite() const 
 { 
     return mIsWrite; 
@@ -54,51 +53,121 @@ static LONG WINAPI unhandledSEHandler( __in struct _EXCEPTION_POINTERS* Exceptio
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
+static std::string getCallStack(
+    HANDLE threadID,
+    PEXCEPTION_RECORD exceptionRecord,
+    PCONTEXT contextRecord );
+
+static void writeCrashInfo(
+    const char* title,
+    const char* information )
+{
+    const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
+    const QString exceptFileName = QString::fromLatin1("%1/%2_%3.except").arg(exeFileInfo.absoluteDir().absolutePath()).arg(exeFileInfo.baseName()).arg(GetCurrentProcessId());
+
+    std::ofstream of( exceptFileName.toLatin1().constData() );
+    of<<title<<"\n";
+    of.write( information, strlen(information) );
+    of.close();
+}
+
+static DWORD dumpStackProc( LPVOID lpParam )
+{
+    //TODO/IMPL
+    HANDLE targetThreadHandle = (HANDLE)lpParam;
+
+    //suspending thread
+    if( SuspendThread( targetThreadHandle ) == (DWORD)-1 )
+    {
+        //TODO/IMPL
+    }
+
+    //getting thread context
+    CONTEXT threadContext;
+    memset( &threadContext, 0, sizeof(threadContext) );
+    threadContext.ContextFlags = (CONTEXT_FULL);
+    if( !GetThreadContext( targetThreadHandle, &threadContext ) )
+    {
+        //TODO/IMPL
+    }
+
+    //dumping stack
+    const std::string& currentCallStack = getCallStack( targetThreadHandle, NULL, &threadContext );
+    writeCrashInfo( "CRT_INVALID_PARAMETER", currentCallStack.c_str() );
+
+    //terminating process
+    return TerminateProcess( GetCurrentProcess(), 1 ) ? 0 : 1;
+}
+
+static void dumpCrtError( const char* errorName )
+{
+    //creating thread to dump call stack of current thread
+    HANDLE currentThreadExtHandle = INVALID_HANDLE_VALUE;
+    if( DuplicateHandle( GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &currentThreadExtHandle, 0, FALSE, DUPLICATE_SAME_ACCESS ) &&
+        CreateThread( NULL, 0, dumpStackProc, currentThreadExtHandle, 0, NULL ) != NULL )
+    {
+        ::Sleep( 10000 );
+        return;
+    }
+
+    const std::string& currentCallStack = getCallStack( GetCurrentThread(), NULL, NULL );
+    //NOTE on win64 currentCallStack will be empty
+    writeCrashInfo( errorName, currentCallStack.c_str() );
+    TerminateProcess( GetCurrentProcess(), 1 );
+}
+
+static void invalidCrtCallParameterHandler(
+   const wchar_t* /*expression*/,
+   const wchar_t* /*function*/,
+   const wchar_t* /*file*/,
+   unsigned int /*line*/,
+   uintptr_t /*pReserved*/ )
+{
+    dumpCrtError( "CRT_INVALID_PARAMETER" );
+}
+
+static void myPurecallHandler()
+{
+    dumpCrtError( "PURE_VIRTUAL_CALL" );
+}
+
 void win32_exception::installGlobalUnhandledExceptionHandler()
 {
     //_set_se_translator( &win32_exception::translate );
     SetUnhandledExceptionFilter( &unhandledSEHandler );
 
-    //TODO/IMPL install CRT handlers (invalid parameter, purecall, etc.)
+    //installing CRT handlers (invalid parameter, purecall, etc.)
+    _set_invalid_parameter_handler( invalidCrtCallParameterHandler );
+    _set_purecall_handler( myPurecallHandler );
 }
 
 void win32_exception::installThreadSpecificUnhandledExceptionHandler()
 {
     _set_se_translator( &win32_exception::translate );
-    //SetUnhandledExceptionFilter( &unhandledSEHandler );
 }
 
 void win32_exception::translate(
     unsigned int code, 
     PEXCEPTION_POINTERS info )
 {
-    const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
-    const QString exceptFileName = QString::fromLatin1("%1/%2_%3.except").arg(exeFileInfo.absoluteDir().absolutePath()).arg(exeFileInfo.baseName()).arg(GetCurrentProcessId());
-
     switch( code )
     {
         case EXCEPTION_ACCESS_VIOLATION:
         {
-            std::ofstream of( exceptFileName.toLatin1().constData() );
-            of<<"EXCEPTION_ACCESS_VIOLATION\n";
             access_violation e( info );
-            of.write( e.what(), strlen(e.what()) );
-            of.close();
-            TerminateProcess( GetCurrentProcess(), 1 );
+            writeCrashInfo( "EXCEPTION_ACCESS_VIOLATION", e.what() );
             break;
         }
     
         default:
         {
-            std::ofstream of( exceptFileName.toLatin1().constData() );
-            of<<"STRUCTURED EXCEPTION\n";
             win32_exception e( info );
-            of.write( e.what(), strlen(e.what()) );
-            of.close();
-            TerminateProcess( GetCurrentProcess(), 1 );
+            writeCrashInfo( "STRUCTURED EXCEPTION", e.what() );
             break;
         }
     }
+
+    TerminateProcess( GetCurrentProcess(), 1 );
 }
 
 #define SYMSIZE 10000
@@ -208,7 +277,10 @@ static char *trmap(
 //    return path;
 //}
 
-static std::string getCallStack( PEXCEPTION_POINTERS pException )
+static std::string getCallStack(
+    HANDLE threadID,
+    PEXCEPTION_RECORD exceptionRecord,
+    PCONTEXT contextRecord )
 {
     STACKFRAME64 sf;
     BOOL ok;
@@ -222,34 +294,42 @@ static std::string getCallStack( PEXCEPTION_POINTERS pException )
 
     pSym = (PIMAGEHLP_SYMBOL64)GlobalAlloc( GMEM_FIXED, SYMSIZE+MAXTEXT );
     ou = outstr = ((char *)pSym)+SYMSIZE;
-    sprintf(ou, " at %08p:", bp = (BYTE *)(pException->ExceptionRecord->ExceptionAddress));
-    try
+    *ou = '\0';
+    if( exceptionRecord )
     {
-        for( int k = 0; k<12; ++k )
+        sprintf(ou, " at %08p:", bp = (BYTE *)(exceptionRecord->ExceptionAddress));
+        try
         {
-            ou += strlen(ou);
-            sprintf(ou, " %02x", *bp++);
+            for( int k = 0; k<12; ++k )
+            {
+                ou += strlen(ou);
+                sprintf(ou, " %02x", *bp++);
+            }
         }
-    }
-    catch( unsigned int w )
-    {
-        /* Fails if bp is invalid address */
-        w= 0;
-        ou += strlen(ou);
-        sprintf(ou, " Invalid Address");
+        catch( unsigned int w )
+        {
+            /* Fails if bp is invalid address */
+            w= 0;
+            ou += strlen(ou);
+            sprintf(ou, " Invalid Address");
+        }
     }
     ou += strlen(ou);
     sprintf(ou, "\n");
-    prregs( ou+strlen(ou), pException->ContextRecord );
+    if( contextRecord )
+        prregs( ou+strlen(ou), contextRecord );
     Mod.SizeOfStruct = sizeof(Mod);
 
     ZeroMemory(&sf, sizeof(sf));
 #ifdef _WIN64
     //TODO/IMPL #ak
 #else
-    sf.AddrPC.Offset = pException->ContextRecord->Eip;
-    sf.AddrStack.Offset = pException->ContextRecord->Esp;
-    sf.AddrFrame.Offset = pException->ContextRecord->Ebp;
+    if( pException )
+    {
+        sf.AddrPC.Offset = contextRecord->Eip;
+        sf.AddrStack.Offset = contextRecord->Esp;
+        sf.AddrFrame.Offset = contextRecord->Ebp;
+    }
 #endif
     sf.AddrPC.Mode = AddrModeFlat;
     sf.AddrStack.Mode = AddrModeFlat;
@@ -267,9 +347,9 @@ static std::string getCallStack( PEXCEPTION_POINTERS pException )
             IMAGE_FILE_MACHINE_AMD64,
 #endif
             GetCurrentProcess(),
-            GetCurrentThread(),
+            threadID,
             &sf,
-            pException->ContextRecord,
+            contextRecord,
             NULL,
             SymFunctionTableAccess64,
             SymGetModuleBase64,
@@ -439,7 +519,7 @@ win32_exception::win32_exception( PEXCEPTION_POINTERS info )
 
     oss << std::string( "WIN32 SYSTEM EXCEPTION. " ) << exceptToString( info->ExceptionRecord->ExceptionCode );
     oss << "\nCall stack:\n";
-    oss << getCallStack( info );
+    oss << getCallStack( GetCurrentThread(), info->ExceptionRecord, info->ContextRecord );
 
     oss << "ExceptionCode: " << info->ExceptionRecord->ExceptionCode << ".";
     oss << " ExceptionFlags: " << info->ExceptionRecord->ExceptionFlags << ".";

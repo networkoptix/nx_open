@@ -72,10 +72,7 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
             connect(request, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(at_replyReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
             connect(request, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(at_httpConnectionDone(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
             if (request->doGet(url))
-            {
                 m_httpInProgress << url.host();
-                NX_LOG( QString::fromLatin1("Requesting ACTI %1").arg(url.toString()), cl_logALWAYS );
-            }
             else
                 request->scheduleForRemoval();
         }
@@ -86,14 +83,11 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
 
 void QnActiResourceSearcher::at_replyReceived(nx_http::AsyncHttpClient* reply)
 {
-    NX_LOG( QString::fromLatin1("Received HTTP response from ACTI %1").arg(reply->url().toString()), cl_logALWAYS );
     reply->startReadMessageBody();
 }
 
 void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClient* reply)
 {
-    NX_LOG( QString::fromLatin1("Done HTTP request to ACTI %1").arg(reply->url().toString()), cl_logALWAYS );
-    
     QMutexLocker lock(&m_mutex);
 
     QString host = reply->url().host();
