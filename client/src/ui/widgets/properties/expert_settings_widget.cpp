@@ -102,12 +102,12 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     if (sameQuality && quality != Qn::SSQualityNotDefined) {
         ui->qualityOverrideCheckBox->setChecked(true);
         ui->qualityOverrideCheckBox->setVisible(false);
-        ui->qualitySlider->setValue(qualityToSliderPos(quality));
+        ui->qualitySlider->setValue(quality);
     }
     else {
         ui->qualityOverrideCheckBox->setChecked(false);
         ui->qualityOverrideCheckBox->setVisible(true);
-        ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
+        ui->qualitySlider->setValue(Qn::SSQualityMedium );
     }
 
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
@@ -118,7 +118,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
-            && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium;
+            && ui->qualitySlider->value() == Qn::SSQualityMedium;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -136,7 +136,7 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
 
-    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
+    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) ui->qualitySlider->value();
 
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
         if (!isArecontCamera(camera)) {
@@ -167,27 +167,10 @@ void QnAdvancedSettingsWidget::at_restoreDefaultsButton_clicked()
 {
     ui->settingsDisableControlCheckBox->setCheckState(Qt::Unchecked);
     ui->qualityOverrideCheckBox->setChecked(true);
-    ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
+    ui->qualitySlider->setValue(Qn::SSQualityMedium);
 }
 
 void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
-    Qn::SecondStreamQuality quality = sliderPosToQuality(value);
-    ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
-    ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
-}
-
-Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos)
-{
-    if (pos == 0)
-        return Qn::SSQualityDontUse;
-    else
-        return Qn::SecondStreamQuality(pos-1);
-}
-
-int QnAdvancedSettingsWidget::qualityToSliderPos(Qn::SecondStreamQuality quality)
-{
-    if (quality == Qn::SSQualityDontUse)
-        return 0;
-    else
-        return int(quality) + 1;
+    ui->lowQualityWarningLabel->setVisible(value == Qn::SSQualityLow);
+    ui->highQualityWarningLabel->setVisible(value == Qn::SSQualityHigh);
 }

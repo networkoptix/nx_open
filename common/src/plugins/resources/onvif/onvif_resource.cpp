@@ -14,7 +14,6 @@
 #include <onvif/soapNotificationProducerBindingProxy.h>
 #include <onvif/soapEventBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
-#include <onvif/soapSubscriptionManagerBindingProxy.h>
 
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
@@ -477,7 +476,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         ptzCaps = m_ptzController->getCapabilities();
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
-    else if (!hasDualStreaming2())
+    else if (!hasDualStreaming())
         setMotionType(Qn::MT_NoMotion);
 
     
@@ -2093,13 +2092,10 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
 
     const QAuthenticator& auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
-        m_onvifNotificationSubscriptionReference.isEmpty()
-            ? m_eventCapabilities->XAddr
-            : m_onvifNotificationSubscriptionReference.toLatin1().constData(),
+        m_eventCapabilities->XAddr,
         auth.user().toStdString(),
         auth.password().toStdString(),
         m_timeDrift );
-    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     char buf[256];
 
@@ -2405,7 +2401,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         auth.user().toStdString(),
         auth.password().toStdString(),
         m_timeDrift );
-    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     char buf[512];
 
@@ -2449,26 +2444,21 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     Q_UNUSED(utcTerminationTime)
 
     std::string subscriptionID;
-    if( response.SubscriptionReference )
+    if( response.SubscriptionReference &&
+        response.SubscriptionReference->ns1__ReferenceParameters &&
+        response.SubscriptionReference->ns1__ReferenceParameters->__item )
     {
-        if( response.SubscriptionReference->ns1__ReferenceParameters &&
-            response.SubscriptionReference->ns1__ReferenceParameters->__item )
-        {
-            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
-            QXmlSimpleReader reader;
-            SubscriptionReferenceParametersParseHandler handler;
-            reader.setContentHandler( &handler );
-            QBuffer srcDataBuffer;
-            srcDataBuffer.setData(
-                response.SubscriptionReference->ns1__ReferenceParameters->__item,
-                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
-            QXmlInputSource xmlSrc( &srcDataBuffer );
-            if( reader.parse( &xmlSrc ) )
-                m_onvifNotificationSubscriptionID = handler.subscriptionID;
-        }
-
-        if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+        //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
+        QXmlSimpleReader reader;
+        SubscriptionReferenceParametersParseHandler handler;
+        reader.setContentHandler( &handler );
+        QBuffer srcDataBuffer;
+        srcDataBuffer.setData(
+            response.SubscriptionReference->ns1__ReferenceParameters->__item,
+            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+        QXmlInputSource xmlSrc( &srcDataBuffer );
+        if( reader.parse( &xmlSrc ) )
+            m_onvifNotificationSubscriptionID = handler.subscriptionID;
     }
 
     //launching renew-subscription timer
@@ -2503,7 +2493,6 @@ bool QnPlOnvifResource::createPullPointSubscription()
         auth.user().toStdString(),
         auth.password().toStdString(),
         m_timeDrift );
-    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     _onvifEvents__CreatePullPointSubscription request;
     std::string initialTerminationTime = "PT600S";
@@ -2517,26 +2506,21 @@ bool QnPlOnvifResource::createPullPointSubscription()
     }
 
     std::string subscriptionID;
-    if( response.SubscriptionReference )
+    if( response.SubscriptionReference &&
+        response.SubscriptionReference->ns1__ReferenceParameters &&
+        response.SubscriptionReference->ns1__ReferenceParameters->__item )
     {
-        if( response.SubscriptionReference->ns1__ReferenceParameters &&
-            response.SubscriptionReference->ns1__ReferenceParameters->__item )
-        {
-            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
-            QXmlSimpleReader reader;
-            SubscriptionReferenceParametersParseHandler handler;
-            reader.setContentHandler( &handler );
-            QBuffer srcDataBuffer;
-            srcDataBuffer.setData(
-                response.SubscriptionReference->ns1__ReferenceParameters->__item,
-                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
-            QXmlInputSource xmlSrc( &srcDataBuffer );
-            if( reader.parse( &xmlSrc ) )
-                m_onvifNotificationSubscriptionID = handler.subscriptionID;
-        }
-
-        if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+        //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
+        QXmlSimpleReader reader;
+        SubscriptionReferenceParametersParseHandler handler;
+        reader.setContentHandler( &handler );
+        QBuffer srcDataBuffer;
+        srcDataBuffer.setData(
+            response.SubscriptionReference->ns1__ReferenceParameters->__item,
+            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+        QXmlInputSource xmlSrc( &srcDataBuffer );
+        if( reader.parse( &xmlSrc ) )
+            m_onvifNotificationSubscriptionID = handler.subscriptionID;
     }
 
     //adding task to refresh subscription
@@ -2566,7 +2550,6 @@ bool QnPlOnvifResource::pullMessages()
         auth.user().toStdString(),
         auth.password().toStdString(),
         m_timeDrift );
-    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     char buf[512];
 

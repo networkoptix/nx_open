@@ -149,9 +149,8 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
     {
 
-        if (role == QnResource::Role_SecondaryLiveVideo && !hasDualStreaming2())
+        if (role == QnResource::Role_SecondaryLiveVideo && !hasDualStreaming())
             return 0;
-
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
         result->setRole(role);
@@ -276,14 +275,8 @@ const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
     return m_scheduleTasks;
 }
 
-bool QnSecurityCamResource::hasDualStreaming2() const
-{
-    return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
-}
-
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-
     if (!hasParam(lit("hasDualStreaming")))
     {
         //Q_ASSERT(false);
@@ -405,7 +398,7 @@ Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const
             QString s1 = vals[i].toLower();
             if (s1 == lit("hardwaregrid"))
                 return Qn::MT_HardwareGrid;
-            else if (s1 == lit("softwaregrid") && hasDualStreaming2())
+            else if (s1 == lit("softwaregrid") && hasDualStreaming())
                 return Qn::MT_SoftwareGrid;
             else if (s1 == lit("motionwindow"))
                 return Qn::MT_MotionWindow;
@@ -479,7 +472,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const
             else if (s1 == lit("motionwindow"))
                 result |= Qn::MT_MotionWindow;
         }
-        if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
+        if (!hasDualStreaming() && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
             result &= ~Qn::MT_SoftwareGrid;
     }
     else {

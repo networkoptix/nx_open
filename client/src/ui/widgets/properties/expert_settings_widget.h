@@ -4,7 +4,6 @@
 #include <QtGui/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include "core/resource/media_resource.h"
 
 namespace Ui {
     class AdvancedSettingsWidget;
@@ -28,9 +27,6 @@ private slots:
     void at_restoreDefaultsButton_clicked();
     void at_qualitySlider_valueChanged(int value);
 private:
-    Qn::SecondStreamQuality sliderPosToQuality(int pos);
-    int qualityToSliderPos(Qn::SecondStreamQuality quality);
-
     bool isArecontCamera(const QnVirtualCameraResourcePtr &camera) const;
 
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
