@@ -98,6 +98,8 @@ public:
         /** Allow double buffering for openGL context */
         GL_DOUBLE_BUFFER,
 
+        TIMESTAMP_CORNER,
+
         VARIABLE_COUNT
     };
 
@@ -177,6 +179,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
+
+        QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
 
     QN_END_PROPERTY_STORAGE()
 

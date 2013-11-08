@@ -1,6 +1,7 @@
 #include "statistics_colors.h"
 
 #include <utils/common/json.h>
+#include <utils/common/json_utils.h>
 #include <utils/math/math.h>
 
 namespace {

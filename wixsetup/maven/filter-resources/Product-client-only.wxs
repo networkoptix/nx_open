@@ -103,7 +103,6 @@
             DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
             MigrateFeatures="yes" />
 
-        <?define ServerNeedsGuid="INSTALL_SERVER AND NOT SERVER_GUID"?>
         <InstallUISequence>
             <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
             <FindRelatedProducts Before="AppSearch" />
