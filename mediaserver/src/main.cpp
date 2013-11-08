@@ -96,6 +96,10 @@
 #include "core/resource_managment/camera_driver_restriction_list.h"
 #include <utils/network/multicodec_rtp_reader.h>
 
+#ifdef _WIN32
+#include "common/systemexcept_win32.h"
+#endif
+
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -862,7 +866,6 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -1273,6 +1276,10 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+#ifdef _WIN32
+    win32_exception::installGlobalUnhandledExceptionHandler();
+#endif
+
     QnVideoService service(argc, argv);
 
     int result = service.exec();
