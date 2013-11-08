@@ -80,6 +80,9 @@ public:
 
     virtual bool hasDualStreaming() const;
 
+    /* Return true if dual streaming supported and don't blocked by user */ 
+    bool hasDualStreaming2() const;
+
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
