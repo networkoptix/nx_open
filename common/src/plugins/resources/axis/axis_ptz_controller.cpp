@@ -40,7 +40,7 @@ public:
         if(result.isNull())
             return false;
 
-        return QnLexical::deserialize(result, &value);
+        return QnLexical::deserialize(result, value);
     }
 
 private:
