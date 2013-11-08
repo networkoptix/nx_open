@@ -866,7 +866,7 @@ void QnPlOnvifResource::onTimer( const quint64& timerID )
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 {
     QAuthenticator auth(getAuth());
-    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     CameraDiagnostics::Result result = fetchAndSetVideoEncoderOptions(soapWrapper);
     if (!result)
@@ -1035,7 +1035,7 @@ void QnPlOnvifResource::calcTimeDrift()
 
 int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
 {
-    DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), "", "", 0);
+    DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
     _onvifDevice__GetSystemDateAndTime request;
     _onvifDevice__GetSystemDateAndTimeResponse response;
@@ -1213,8 +1213,8 @@ bool QnPlOnvifResource::fetchRelayInputInfo()
     const QAuthenticator& auth = getAuth();
     DeviceIOWrapper soapWrapper(
         m_deviceIOUrl,
-        auth.user().toStdString(),
-        auth.password().toStdString(),
+        auth.user(),
+        auth.password(),
         m_timeDrift );
 
     _onvifDeviceIO__GetDigitalInputs request;
