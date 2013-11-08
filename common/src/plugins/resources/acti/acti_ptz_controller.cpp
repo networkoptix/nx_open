@@ -222,21 +222,17 @@ int QnActiPtzController::startMove(const QVector3D &speed)
 
     int errCode1 = 0, errCode2 = 0;
 
-    if (!qFuzzyIsNull(speed.z())) 
+    if (qFuzzyIsNull(speed.z())) {
+        errCode1 = stopZoomInternal();
+    } else {
         errCode1 = startZoomInternal(speed.z());
-    if (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y())) 
+    }
+
+    if (qFuzzyIsNull(speed.x()) && qFuzzyIsNull(speed.y())) {
+        errCode2 = stopMoveInternal();
+    } else {
         errCode2 = startMoveInternal(speed.x(), speed.y());
-
-    return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
-}
-
-int QnActiPtzController::stopMove()
-{
-    QMutexLocker lock(&m_mutex);
-
-    int errCode1 = 0, errCode2 = 0;
-    errCode1 = stopZoomInternal();
-    errCode2 = stopMoveInternal();
+    }
 
     return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }

@@ -40,10 +40,6 @@ int QnDwZoomPtzController::startMove(const QVector3D &speed) {
     return 0;
 }
 
-int QnDwZoomPtzController::stopMove() {
-    return startMove(QVector3D(0.0, 0.0, 0.0));
-}
-
 int QnDwZoomPtzController::setPosition(const QVector3D &) {
     return 1;
 }

@@ -73,24 +73,11 @@ public:
      * all of its components are expected to be in range <tt>[-1, 1]</tt>. 
      * This means that implementation must handle flipped / mirrored state of 
      * the video stream. 
-     *
+     * 
      * \param speed                     Movement speed. 
      * \returns                         Status code.
      */
     virtual int startMove(const QVector3D &speed) = 0;
-
-    /**
-     * Stops PTZ movement.
-     * 
-     * \returns                         Status code.
-     */
-    virtual int stopMove() = 0;
-
-    /**
-     * \param[out] flip                 Flipped state of the camera's video stream.
-     * \returns                         Status code.
-     */
-    virtual int getFlip(Qt::Orientations *flip) = 0;
 
     /**
      * Sets camera PTZ position. If this controller has 
@@ -124,6 +111,12 @@ public:
      * \returns                         Status code.
      */
     virtual int getLimits(QnPtzLimits *limits) = 0;
+
+    /**
+     * \param[out] flip                 Flipped state of the camera's video stream.
+     * \returns                         Status code.
+     */
+    virtual int getFlip(Qt::Orientations *flip) = 0;
 
     /**
      * Moves camera's viewport relative to current viewport. New viewport 

@@ -4,6 +4,7 @@
 #include <QtCore/QHash>
 
 #include <core/ptz/abstract_ptz_controller.h>
+#include <utils/math/functors.h>
 
 class CLSimpleHTTPClient;
 class QnAxisParameterMap;
@@ -17,7 +18,6 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override;
 
     virtual int startMove(const QVector3D &speed) override;
-    virtual int stopMove() override;
     virtual int getFlip(Qt::Orientations *flip) override;
     virtual int setPosition(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
@@ -35,6 +35,9 @@ private:
 private:
     QnPlAxisResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
+    Qt::Orientations m_flip;
+    QnPtzLimits m_limits;
+    QnLinearFunction m_logicalToCameraZoom, m_cameraToLogicalZoom;
 };
 
 

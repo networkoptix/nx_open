@@ -106,7 +106,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
 
-int QnOnvifPtzController::stopMove()
+int QnOnvifPtzController::stopMoveInternal()
 {
     // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
     QString model = m_resource->getModel();
@@ -144,6 +144,9 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
 
 int QnOnvifPtzController::startMove(const QVector3D &speed)
 {
+    if(qFuzzyIsNull(speed))
+        return stopMoveInternal();
+
     if(m_horizontalFlipped)
         xVelocity = -xVelocity;
     if(m_verticalFlipped)

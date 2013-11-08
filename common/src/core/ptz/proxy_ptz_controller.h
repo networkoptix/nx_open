@@ -16,7 +16,6 @@ public:
 
     virtual Qn::PtzCapabilities getCapabilities() override                          { return m_baseController->getCapabilities(); }
     virtual int startMove(const QVector3D &speed) override                          { return m_baseController->startMove(speed); }
-    virtual int stopMove() override                                                 { return m_baseController->stopMove(); }
     virtual int getFlip(Qt::Orientations *flip) override                            { return m_baseController->getFlip(flip); }
     virtual int setPosition(const QVector3D &position) override                     { return m_baseController->setPosition(position); }
     virtual int getPosition(QVector3D *position) override                           { return m_baseController->getPosition(position); }

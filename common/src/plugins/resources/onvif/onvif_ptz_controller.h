@@ -16,7 +16,6 @@ public:
     QnOnvifPtzController(QnPlOnvifResource* resource);
 
     virtual int startMove(const QVector3D &speed) override;
-    virtual int stopMove() override;
     virtual int setPosition(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
@@ -31,6 +30,7 @@ public:
 
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
+    int stopMoveInternal();
 
 private:
     QnPlOnvifResource* m_resource;
