@@ -201,6 +201,7 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
+    bool isPTZDisabled() const;
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
