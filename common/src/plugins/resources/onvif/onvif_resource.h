@@ -420,7 +420,8 @@ private:
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
     int m_streamConfCounter;
-    CameraDiagnostics::Result m_prevOnvifResultCode;
+    CameraDiagnostics::Result m_prevOnvifResultCode; 
+    QString m_onvifNotificationSubscriptionReference;
 
     bool createPullPointSubscription();
     bool pullMessages();

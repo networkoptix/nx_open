@@ -162,7 +162,29 @@
                     "physical": [0, -90]
                 }
             }
-        }
+        },
+		{	"models": [
+				"LR01"
+			],
+			"fromCamera": {
+                "x": {
+                    "extrapolationMode": "PeriodicExtrapolation",
+                    "logical":  [ -1,    1],
+                    "physical": [-180, 180]
+                },
+                "y": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [1,  -1],
+                    "physical": [0, -90]
+                },
+                "z": {
+                    "extrapolationMode": "ConstantExtrapolation",
+                    "logical":  [0, 1],
+                    "physical": [1, 18],
+                    "physicalMultiplier": 35.25
+                }
+			}
+		}
     ]
 }
 

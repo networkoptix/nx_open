@@ -20,17 +20,19 @@
 #include <QtCore/QJsonDocument>
 
 namespace QJsonDetail {
-    class QJsonValueWrapper {
+    template<class T>
+    class ValueWrapper {
     public:
-        QJsonValueWrapper(const QJsonValue &value): m_value(value) {}
+        ValueWrapper(const T &value): m_value(value) {}
 
-        operator const QJsonValue &() const {
+        operator const T &() const {
             return m_value;
         }
 
     private:
-        const QJsonValue &m_value;
+        const T &m_value;
     };
+
 
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
@@ -47,7 +49,7 @@ namespace QJsonDetail {
          * Note that we wrap a json value into a wrapper so that
          * ADL would find only overloads with QJsonValue as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(QJsonValueWrapper(value), target); /* That's the place where ADL kicks in. */
+        return deserialize(ValueWrapper<QJsonValue>(value), target); /* That's the place where ADL kicks in. */
     }
 
 } // namespace QJsonDetail
@@ -77,15 +79,16 @@ namespace QJson {
     }
 
     template<class T>
-    void serialize(const T &value, const char *key, QJsonObject *target) {
-        QJson::serialize(value, QLatin1String(key), target); // TODO: #Elric remove, use QStringLiteral
-    }
-
-    template<class T>
     void serialize(const T &value, const QString &key, QJsonObject *target) {
         assert(target);
 
-        QJson::serialize(value, &(*target)[key]);
+        QJsonValueRef jsonValue = (*target)[key];
+        QJson::serialize(value, &jsonValue);
+    }
+
+    template<class T>
+    void serialize(const T &value, const char *key, QJsonObject *target) {
+        QJson::serialize(value, QLatin1String(key), target); // TODO: #Elric remove, use QStringLiteral
     }
 
     /**
@@ -128,11 +131,6 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(const QJsonObject &value, const char *key, T *target, bool optional = false) {
-        return QJson::deserialize(value, QLatin1String(key), target, optional); // TODO: #Elric remove, use QStringLiteral
-    }
-
-    template<class T>
     bool deserialize(const QJsonObject &value, const QString &key, T *target, bool optional = false) {
         QJsonObject::const_iterator pos = value.find(key);
         if(pos == value.end()) {
@@ -140,6 +138,11 @@ namespace QJson {
         } else {
             return QJson::deserialize(*pos, target);
         }
+    }
+
+    template<class T>
+    bool deserialize(const QJsonObject &value, const char *key, T *target, bool optional = false) {
+        return QJson::deserialize(value, QLatin1String(key), target, optional); // TODO: #Elric remove, use QStringLiteral
     }
 
     /**
@@ -240,7 +243,7 @@ namespace QJsonDetail {
 
     template<class Class, class Setter, class T>
     bool deserializeMember(const QJsonObject &value, const QString &key, Class &object, T Class::*setter, const T * = NULL) {
-        return QJson::deserialize(value, key, &object.*member);
+        return QJson::deserialize(value, key, &object.*setter);
     }
 
 } // namespace QJsonDetail

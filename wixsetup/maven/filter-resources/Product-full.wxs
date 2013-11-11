@@ -37,7 +37,11 @@
         </SetProperty>
         <SetProperty Id="APPSERVER_PORT" Value="[APPSERVER_PORT32]" After="AppSearch">
             <![CDATA[ APPSERVER_PORT = "" ]]>
-        </SetProperty>        
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]></SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
+        
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch">
             <![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
         </SetProperty>
@@ -45,6 +49,7 @@
         <Property Id="INSTALL_ECS" Secure="yes"/>
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
+        
 
         <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
@@ -108,6 +113,18 @@
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- AppServer properties-->
+        <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
+            <RegistrySearch Id="EcsAllowCameraChangesReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${appserver.name}"
+                            Name="allowCameraChanges"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+
+        <Property Id="ALLOW_CAMERA_CHANGES_REF1" Value="ALLOW_CAMERA_CHANGES"/>
+        <Property Id="ALLOW_CAMERA_CHANGES_REF2" Value="ALLOW_CAMERA_CHANGES"/>
+        
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
                             Root="HKLM"
@@ -548,14 +565,15 @@
                                 <File Id="ecs.log" Name="ecs.log" Source="files/ecs.log" KeyPath="yes"/>
                             </Component>
 
-                            <Component Id="AppServerConfigurationGuid" Permanent="yes" NeverOverwrite="yes">
+                            <Component Id="EcsPermanentConfiguration" Permanent="yes" NeverOverwrite="yes">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}">
+                                    <RegistryValue Type="string" Name="allowCameraChanges" Value="[ALLOW_CAMERA_CHANGES]"/>
                                     <RegistryValue Type="string" Name="ecsGuid" Value="[APPSERVER_GUID]" KeyPath="yes"/>
                                 </RegistryKey>
                             </Component>
 
-                            <Component Id="AppServerConfiguration">
+                            <Component Id="EcsConfiguration">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
@@ -864,8 +882,8 @@
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.log" />           
-            <ComponentRef Id="AppServerConfiguration"/>
-            <ComponentRef Id="AppServerConfigurationGuid"/>
+            <ComponentRef Id="EcsConfiguration"/>
+            <ComponentRef Id="EcsPermanentConfiguration"/>
 
             <ComponentRef Id="ProxyExecutable" />
             <ComponentGroupRef Id="ProxyQTLibraries" />       

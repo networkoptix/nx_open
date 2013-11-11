@@ -56,7 +56,7 @@ static void updateActivity()
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
 
-static const int REALTIME_AUDIO_BUFFER_SIZE = 300; // at ms, max buffer 
+static const int REALTIME_AUDIO_BUFFER_SIZE = 750; // at ms, max buffer 
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer 
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms

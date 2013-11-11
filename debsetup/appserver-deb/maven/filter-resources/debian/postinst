@@ -145,6 +145,7 @@ case "$1" in
       ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
       ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
       ECS_PASSWORD=$(ask_for_value ecsPassword "")
+      ECS_ALLOW_CAMERA_CHANGES=$(ask_for_value ecsAllowCameraChanges "true")
 
       write_config
 
