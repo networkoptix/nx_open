@@ -483,6 +483,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     case BusinessActionType::Diagnostics:           return pb::Diagnostics;
     case BusinessActionType::ShowPopup:             return pb::ShowPopup;
     case BusinessActionType::PlaySound:             return pb::PlaySound;
+    case BusinessActionType::PlaySoundRepeated:     return pb::PlaySoundRepeated;
     case BusinessActionType::SayText:               return pb::SayText;
     }
     return pb::NotDefinedAction;
@@ -643,6 +644,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::Diagnostics:           return BusinessActionType::Diagnostics;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     case pb::PlaySound:             return BusinessActionType::PlaySound;
+    case pb::PlaySoundRepeated:     return BusinessActionType::PlaySoundRepeated;
     case pb::SayText:               return BusinessActionType::SayText;
     }
     return BusinessActionType::NotDefined;

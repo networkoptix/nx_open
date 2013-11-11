@@ -57,8 +57,8 @@ void QnWorkbenchNotificationsHandler::clear() {
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::ShowPopup)
-        return;
+//    if (businessAction->actionType() != BusinessActionType::ShowPopup)
+//        return;
 
     //TODO: #GDM check if camera is visible to us
     QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();

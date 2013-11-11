@@ -116,6 +116,7 @@ namespace BusinessActionType {
                 - soundUrl (string, required)               - url of sound, contains path to sound on the EC
         */
         PlaySound,
+        PlaySoundRepeated,
 
         /*!
             parameters:\n
