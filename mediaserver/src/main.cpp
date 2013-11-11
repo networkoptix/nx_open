@@ -509,16 +509,39 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
-void initAppServerConnection(const QSettings &settings)
+void initAppServerConnection(const QSettings &settings, bool tryDirectConnect)
 {
     QUrl appServerUrl;
 
     // ### remove
     appServerUrl.setScheme(QLatin1String("https"));
-    appServerUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-    appServerUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
-    appServerUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    QString host = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+    int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+    QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
+    QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
+    appServerUrl.setHost(host);
+    appServerUrl.setPort(port);
+    appServerUrl.setUserName(userName);
+    appServerUrl.setPassword(password);
+
+    // check if it proxy connection and direct EC access is available
+    if (tryDirectConnect) {
+        QAuthenticator auth;
+        auth.setUser(userName);
+        auth.setPassword(password);
+        static const int TEST_DIRECT_CONNECT_TIMEOUT = 2000;
+        CLSimpleHTTPClient testClient(host, port, TEST_DIRECT_CONNECT_TIMEOUT, auth);
+        CLHttpStatus result = testClient.doGET(lit("proxy_api/ec_port"));
+        if (result == CL_HTTP_SUCCESS)
+        {
+            QUrl directURL;
+            QByteArray data;
+            testClient.readAll(data);
+            directURL = appServerUrl;
+            directURL.setPort(data.toInt());
+            appServerUrl = directURL;
+        }
+    }
 
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
@@ -917,7 +940,8 @@ void QnMain::run()
     CameraDriverRestrictionList cameraDriverRestrictionList;
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
-    initAppServerConnection(qSettings);
+    bool directConnectTried = true;
+    initAppServerConnection(qSettings, directConnectTried);
 
     QnMulticodecRtpReader::setDefaultTransport( qSettings.value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
@@ -931,6 +955,13 @@ void QnMain::run()
     {
         if (appServerConnection->connect(connectInfo) == 0)
             break;
+
+        if (directConnectTried) {
+            directConnectTried = false;
+            initAppServerConnection(qSettings, directConnectTried);
+            appServerConnection->setUrl(QnAppServerConnectionFactory::defaultUrl());
+            continue;
+        }
 
         cl_log.log("Can't connect to Enterprise Controller: ", appServerConnection->getLastError(), cl_logWARNING);
         if (!needToStop())
