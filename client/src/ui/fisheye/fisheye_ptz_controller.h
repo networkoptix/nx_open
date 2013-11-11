@@ -33,7 +33,6 @@ public:
     virtual ~QnFisheyePtzController();
 
     virtual int startMove(const QVector3D &speed) override;
-    virtual int stopMove() override;
     virtual int setPosition(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
     virtual Qn::PtzCapabilities getCapabilities() override;

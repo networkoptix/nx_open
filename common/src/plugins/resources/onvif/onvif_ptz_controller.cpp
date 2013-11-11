@@ -83,7 +83,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
-    m_ptzCapabilities = Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability | Qn::AbsolutePtzCapability;
+    m_ptzCapabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities;
     m_ptzMapper = qnCommon->instance<QnPtzMapperPool>()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable

@@ -80,12 +80,6 @@ int QnFisheyePtzController::startMove(const QVector3D &speed)
     return 0;
 }
 
-int QnFisheyePtzController::stopMove()
-{
-    m_motion = QVector3D();
-    return 0;
-}
-
 qreal QnFisheyePtzController::boundXAngle(qreal value, qreal fov) const
 {
     //qreal yRange = xRange / m_dstPos.aspectRatio;
