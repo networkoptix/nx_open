@@ -35,7 +35,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_ptz_controller.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
-#include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
 #include "selection_item.h"

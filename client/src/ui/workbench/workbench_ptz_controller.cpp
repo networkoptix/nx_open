@@ -12,10 +12,10 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/fisheye/fisheye_ptz_controller.h>
 
 //#define QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_PTZ_CONTROLLER_DEBUG
@@ -81,11 +81,9 @@ QnWorkbenchPtzController::~QnWorkbenchPtzController() {
 QVector3D QnWorkbenchPtzController::position(const QnMediaResourceWidget *widget) const 
 {
     if (widget->virtualPtzController()) {
-        qreal xPos;
-        qreal yPos;
-        qreal zPos;
-        widget->virtualPtzController()->getPosition(&xPos, &yPos, &zPos);
-        return QVector3D(xPos, yPos, zPos);
+        QVector3D pos;
+        widget->virtualPtzController()->getPosition(&pos);
+        return pos;
     }
 
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
