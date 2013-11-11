@@ -5,7 +5,7 @@
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include <math.h>
 #include "utils/math/space_mapper.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
+#include "core/ptz/abstract_ptz_controller.h"
 #include "core/resource/media_resource.h"
 
 qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
@@ -17,12 +17,12 @@ qreal FISHEYE_FOV = gradToRad(180.0);
 
 qreal MOVETO_ANIMATION_TIME = 0.5;
 
-QnFisheyePtzController::QnFisheyePtzController(QnResource* resource):
-    QnVirtualPtzController(resource),
+QnFisheyePtzController::QnFisheyePtzController(const QnMediaResourcePtr &resource):
+    QnVirtualPtzController(resource->toResourcePtr()),
+    m_resource(resource),
     m_renderer(0),
     m_lastTime(0),
     m_moveToAnimation(false),
-    m_spaceMapper(0),
     m_lastAR(1.0)
 {
     updateSpaceMapper(DewarpingParams().viewMode, 1);
@@ -32,13 +32,11 @@ QnFisheyePtzController::~QnFisheyePtzController()
 {
     if (m_renderer)
         m_renderer->setFisheyeController(0);
-    delete m_spaceMapper;
 }
 
 void QnFisheyePtzController::updateSpaceMapper(DewarpingParams::ViewMode viewMode, int pf)
 {
-    if (m_spaceMapper)
-        delete m_spaceMapper;
+    /*
 
     QnScalarSpaceMapper zMapper(MIN_FOV, MAX_FOV*pf, MIN_FOV, MAX_FOV*pf, Qn::ConstantExtrapolation);
     //qreal minX, maxX, minY, maxY;
@@ -64,6 +62,7 @@ void QnFisheyePtzController::updateSpaceMapper(DewarpingParams::ViewMode viewMod
     m_spaceMapper->setFlags(Qn::FovBasedMapper);
 
     emit spaceMapperChanged();
+    */
 }
 
 void QnFisheyePtzController::addRenderer(QnResourceWidgetRenderer* renderer)
@@ -105,7 +104,7 @@ int QnFisheyePtzController::setPosition(const QVector3D &position)
 {
     m_motion = QVector3D();
 
-    m_dstPos.fov = qBound(MIN_FOV, position.z(), MAX_FOV * m_dewarpingParams.panoFactor);
+    m_dstPos.fov = qBound<qreal>(MIN_FOV, position.z(), MAX_FOV * m_dewarpingParams.panoFactor);
 
     m_dstPos.xAngle = boundXAngle(gradToRad(position.x()), m_dstPos.fov);
     m_dstPos.yAngle = boundYAngle(gradToRad(position.y()), m_dstPos.fov, m_dewarpingParams.panoFactor*m_lastAR, m_dewarpingParams.viewMode);
@@ -134,12 +133,6 @@ Qn::PtzCapabilities QnFisheyePtzController::getCapabilities()
 {
     return Qn::AllPtzCapabilities;
 }
-
-const QnPtzSpaceMapper* QnFisheyePtzController::getSpaceMapper()
-{
-    return m_spaceMapper;
-}
-
 
 void QnFisheyePtzController::at_timer()
 {
@@ -258,7 +251,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
     if (m_resource->getDewarpingParams().viewMode == DewarpingParams::Horizontal) {
         qreal x = c.x() * M_PI;
         qreal y = -c.y() * M_PI;
-        moveTo(radToGrad(x), radToGrad(y), fov);
+        setPosition(QVector3D(radToGrad(x), radToGrad(y), fov));
     }
     else {
         qreal x = -(::atan2(c.y(), c.x()) - M_PI/2.0);
@@ -277,7 +270,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
                 y = r.top() * M_PI;
         }
 
-        moveTo(radToGrad(x), radToGrad(y), fov);
+        setPosition(QVector3D(radToGrad(x), radToGrad(y), fov));
     }
 }
 

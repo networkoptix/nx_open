@@ -93,6 +93,7 @@ public:
         ScreenSpaceMovementCapability       = 0x00040000,
 
         /* Shortcuts */
+        ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
         AllPtzCapabilities                  = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositionSpaceCapability | ScreenSpaceMovementCapability,

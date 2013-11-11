@@ -8,11 +8,10 @@
 // -------------------------------------------------------------------------- //
 // QnOnvifPtzController
 // -------------------------------------------------------------------------- //
-QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource): 
+QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
     QnAbstractPtzController(resource),
     m_resource(resource),
     m_ptzCapabilities(0),
-    m_ptzMapper(NULL),
     m_verticalFlipped(false),
     m_horizontalFlipped(false)
 {
@@ -84,13 +83,14 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     }
 
     m_ptzCapabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities;
-    m_ptzMapper = qnCommon->instance<QnPtzMapperPool>()->mapper(m_resource->getModel());
+    //m_ptzMapper = qnCommon->instance<QnPtzMapperPool>()->mapper(m_resource->getModel());
 
     // TODO: #Elric make configurable
+#if 0
     QString model = m_resource->getModel();
     if(model == lit("FW3471-PS-E")) {
         m_ptzCapabilities |= Qn::OctagonalPtzCapability;
-        m_ptzCapabilities &= ~Qn::AbsolutePtzCapability;
+        m_ptzCapabilities &= ~Qn::AbsolutePtzCapabilities;
     }
     if(model == lit("IPC-HDB3200C")) {
         m_ptzCapabilities = Qn::NoPtzCapabilities;
@@ -101,6 +101,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnPlOnvifResource* resource):
     if(model == lit("DM368") || model == lit("FD8161") || model == lit("FD8362E") || model == lit("FD8361") || model == lit("FD8136") || model == lit("FD8162") || model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
         m_ptzCapabilities = Qn::NoPtzCapabilities;
     }
+#endif // TODO: #PTZ
 
 
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
@@ -111,7 +112,7 @@ int QnOnvifPtzController::stopMoveInternal()
     // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
     QString model = m_resource->getModel();
     if(model == lit("SD8362") || model == lit("SD83X3") || model == lit("SD81X1"))
-        return startMove(0, 0, 0);
+        return startMove(QVector3D());
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -147,10 +148,12 @@ int QnOnvifPtzController::startMove(const QVector3D &speed)
     if(qFuzzyIsNull(speed))
         return stopMoveInternal();
 
+    QVector3D localSpeed = speed;
+
     if(m_horizontalFlipped)
-        xVelocity = -xVelocity;
+        localSpeed.setX(-localSpeed.x());
     if(m_verticalFlipped)
-        yVelocity = -yVelocity;
+        localSpeed.setY(-localSpeed.y());
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -166,10 +169,9 @@ int QnOnvifPtzController::startMove(const QVector3D &speed)
     request.Velocity->PanTilt = new onvifXsd__Vector2D();
     request.Velocity->Zoom = new onvifXsd__Vector1D();
 
-    request.Velocity->PanTilt->x = normalizeSpeed(speed.x(), m_xNativeVelocityCoeff, getXVelocityCoeff());
-    request.Velocity->PanTilt->y = normalizeSpeed(speed.y(), m_yNativeVelocityCoeff, getYVelocityCoeff());
-    request.Velocity->Zoom->x = normalizeSpeed(speed.z(), m_zoomNativeVelocityCoeff, getZoomVelocityCoeff());
-
+    request.Velocity->PanTilt->x = normalizeSpeed(speed.x(), m_xNativeVelocityCoeff, 1.0);
+    request.Velocity->PanTilt->y = normalizeSpeed(speed.y(), m_yNativeVelocityCoeff, 1.0);
+    request.Velocity->Zoom->x = normalizeSpeed(speed.z(), m_zoomNativeVelocityCoeff, 1.0);
 
     int rez = ptz.doContinuousMove(request, response);
     if (rez != SOAP_OK)
@@ -209,12 +211,10 @@ int QnOnvifPtzController::setPosition(const QVector3D &position)
 
     request.Position = new onvifXsd__PTZVector();
     request.Position->PanTilt = new onvifXsd__Vector2D();
-    if (zoomPos != INT_MAX)
-        request.Position->Zoom = new onvifXsd__Vector1D();
+    request.Position->Zoom = new onvifXsd__Vector1D();
     request.Position->PanTilt->x = position.x();
     request.Position->PanTilt->y = position.y();
-    if (request.Position->Zoom)
-        request.Position->Zoom->x = position.z();
+    request.Position->Zoom->x = position.z();
 
     request.Speed = new onvifXsd__PTZSpeed();
     request.Speed->PanTilt = new onvifXsd__Vector2D();
@@ -233,8 +233,7 @@ int QnOnvifPtzController::setPosition(const QVector3D &position)
     delete request.Speed->PanTilt;
     delete request.Speed;
 
-    if (request.Position->Zoom)
-        delete request.Position->Zoom;
+    delete request.Position->Zoom;
     delete request.Position->PanTilt;
     delete request.Position;
 
@@ -276,11 +275,6 @@ int QnOnvifPtzController::getPosition(QVector3D *position)
 Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() 
 {
     return m_ptzCapabilities;
-}
-
-const QnPtzSpaceMapper *QnOnvifPtzController::getSpaceMapper() 
-{
-    return m_ptzMapper;
 }
 
 void QnOnvifPtzController::setFlipped(bool horizontal, bool vertical) 

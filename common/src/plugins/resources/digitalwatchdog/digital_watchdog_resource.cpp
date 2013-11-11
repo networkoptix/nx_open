@@ -21,14 +21,13 @@ QString getIdSuffixByModel(const QString& cameraModel)
 
 QnPlWatchDogResource::QnPlWatchDogResource():
     QnPlOnvifResource(),
+    m_hasZoom(false),
     m_additionalSettings()
 {
-
 }
 
 QnPlWatchDogResource::~QnPlWatchDogResource()
 {
-
 }
 
 bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
@@ -97,7 +96,7 @@ CameraDiagnostics::Result QnPlWatchDogResource::initInternal()
         flipHorizontal = !flipHorizontal;
 
     // TODO: #Elric evil hacks here =(
-    if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) {
+    /*if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) {
         ptzController->setFlipped(flipHorizontal, flipVertical);
 
         if(QnPtzSpaceMapper *mapper = const_cast<QnPtzSpaceMapper *>(ptzController->getSpaceMapper())) {
@@ -112,7 +111,7 @@ CameraDiagnostics::Result QnPlWatchDogResource::initInternal()
                 toCamera.setMapper(QnVectorSpaceMapper::Y, toCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
             }
         }
-    }
+    }*/ // TODO: #PTZ
 
     return result;
 }
@@ -152,11 +151,11 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
 }
 
 QnAbstractPtzController *QnPlWatchDogResource::createPtzController() {
-    return NULL;
-    //QnAbstractPtzController *result = base_type::createPtzController();
-    //if(result)
-    //    return result; /* Use PTZ controller from ONVIF if one is present. */
-    //return m_ptzController.data();
+    if(m_hasZoom) {
+        return new QnDwZoomPtzController(toSharedPointer(this));
+    } else {
+        return base_type::createPtzController();
+    }
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
@@ -171,11 +170,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
-        bool hasFocus = suffix.endsWith(QLatin1String("-FOCUS"));
-        if(hasFocus) {
-            m_ptzController.reset(new QnDwZoomPtzController(this));
-            setPtzCapabilities(m_ptzController->getCapabilities());
-        }
+        if(suffix.endsWith(QLatin1String("-FOCUS")))
+            m_hasZoom = true;
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;

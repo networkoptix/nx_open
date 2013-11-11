@@ -29,7 +29,7 @@ private:
 class QnFisheyePtzController: public QnVirtualPtzController {
     Q_OBJECT
 public:
-    QnFisheyePtzController(QnResource* resource);
+    QnFisheyePtzController(const QnMediaResourcePtr &resource);
     virtual ~QnFisheyePtzController();
 
     virtual int startMove(const QVector3D &speed) override;
@@ -52,6 +52,7 @@ public:
 
     virtual void changePanoMode() override;
     virtual QString getPanoModeText() const override;
+
 signals:
     void dewarpingParamsChanged(DewarpingParams params);
     void spaceMapperChanged();
@@ -65,8 +66,9 @@ private:
     void updateSpaceMapper(DewarpingParams::ViewMode viewMode, int pf);
 
 private:
+    QnMediaResourcePtr m_resource;
     QVector3D m_motion;
-    QnResourceWidgetRenderer* m_renderer;
+    QnResourceWidgetRenderer * m_renderer;
     DewarpingParams m_dewarpingParams;
     DewarpingParams m_srcPos;
     DewarpingParams m_dstPos;

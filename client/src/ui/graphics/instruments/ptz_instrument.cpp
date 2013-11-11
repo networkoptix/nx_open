@@ -36,6 +36,7 @@
 #include <ui/workbench/workbench_ptz_controller.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
+#include <ui/fisheye/fisheye_ptz_controller.h>
 
 #include "selection_item.h"
 
@@ -601,7 +602,8 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
 
     if(PtzOverlayWidget *staticOverlay = overlayWidget(widget)) {
         widget->setOverlayWidgetVisibility(staticOverlay, visibility);
-        staticOverlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
+
+        staticOverlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapabilities == Qn::ContinuousPanTiltCapabilities);
         
         if (widget->virtualPtzController())
             staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());

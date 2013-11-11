@@ -13,7 +13,7 @@ class QnPtzSpaceMapper;
 class QnOnvifPtzController: public QnAbstractPtzController {
     Q_OBJECT
 public:
-    QnOnvifPtzController(QnPlOnvifResource* resource);
+    QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
     virtual int startMove(const QVector3D &speed) override;
     virtual int setPosition(const QVector3D &position) override;
@@ -33,9 +33,8 @@ private:
     int stopMoveInternal();
 
 private:
-    QnPlOnvifResource* m_resource;
+    QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_ptzCapabilities;
-    const QnPtzSpaceMapper *m_ptzMapper;
     QString m_mediaProfile;
     QString m_ptzConfigurationToken;
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative

@@ -2043,12 +2043,12 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
 
-    if (!getPtzfUrl().isEmpty() && !m_ptzController)
+    /*if (!getPtzfUrl().isEmpty() && !m_ptzController)
     {
         QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
         if (!controller->getPtzConfigurationToken().isEmpty())
             m_ptzController.reset(controller.take());
-    }
+    }*/ // TODO: #PTZ
 
     QMutexLocker lock(&m_physicalParamsMutex);
 

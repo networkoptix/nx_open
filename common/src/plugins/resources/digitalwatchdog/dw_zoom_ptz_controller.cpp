@@ -13,6 +13,10 @@ QnDwZoomPtzController::~QnDwZoomPtzController() {
     return;
 }
 
+Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
+    return Qn::ContinuousZoomCapability;
+}
+
 int QnDwZoomPtzController::startMove(const QVector3D &speed) {
     CameraSetting setting(
         QLatin1String("%%Lens%%Zoom"),
@@ -48,7 +52,15 @@ int QnDwZoomPtzController::getPosition(QVector3D *) {
     return 1;
 }
 
-Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
-    return Qn::ContinuousZoomCapability;
+int QnDwZoomPtzController::getLimits(QnPtzLimits *) {
+    return 1;
+}
+
+int QnDwZoomPtzController::getFlip(Qt::Orientations *) {
+    return 1;
+}
+
+int relativeMove(qreal, const QRectF &) {
+    return 1;
 }
 

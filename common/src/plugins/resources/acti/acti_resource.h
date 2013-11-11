@@ -140,7 +140,6 @@ private:
     QList<int> m_availBitrate;
     int m_rtspPort;
     bool m_hasAudio;
-    QScopedPointer<QnActiPtzController> m_ptzController;
     QByteArray m_platform;
     QMutex m_dioMutex;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
