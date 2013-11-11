@@ -84,7 +84,8 @@ struct StrictBitrateInfo {
 // Strict bitrate range for specified cameras
 StrictBitrateInfo strictBitrateList[] =
 {
-    { "DCS-7010L", 4096, 1024*16 }
+    { "DCS-7010L", 4096, 1024*16 },
+    { "DCS-6010L", 0, 1024*2 }
 };
 
 

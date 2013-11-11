@@ -260,7 +260,6 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
             encoder.RateControl->EncodingInterval = 1;
     }
 
-
     if (!encoder.RateControl) 
     {
         qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: RateControl is NULL. UniqueId: " << m_onvifRes->getUniqueId();
