@@ -292,7 +292,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         QString soundUrl = businessAction->getParams().getSoundUrl();
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
-        item->setNotificationLevel(Qn::SystemNotification);
+        item->setNotificationLevel(Qn::SoundNotification);
     } else {
         item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
     }
@@ -383,7 +383,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters &)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters &)), Qt::QueuedConnection);
-    m_list->addItem(item);
+    m_list->addItem(item, item->notificationLevel() == Qn::SoundNotification);
 }
 
 QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
