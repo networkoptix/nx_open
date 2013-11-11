@@ -98,6 +98,7 @@ message InitialMessage {
     optional string systemName                 = 9;
     optional string hardwareId3                = 10;
     optional string sessionKey                 = 11;
+    optional bool allowCameraChanges           = 12;
 }
 
 message FileAddMessage {
@@ -132,6 +133,7 @@ message RuntimeInfoChangeMessage {
     optional string publicIp = 1;
     optional string systemName = 2;
     optional string sessionKey = 3;
+    optional bool allowCameraChanges = 4;
 }
 
 message BusinessRuleResetMessage {

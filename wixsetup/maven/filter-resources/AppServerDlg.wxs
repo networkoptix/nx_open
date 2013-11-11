@@ -11,30 +11,32 @@
     You must not remove this notice, or any other, from this software.
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Fragment>
-		<UI>
-			<Dialog Id="AppServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
-				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
-				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
-					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
-				</Control>
-				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
-				<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="Enterprise Controller Configuration" />
-				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
-				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
-				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
-				<Control Id="FolderLabel" Type="Text" X="15" Y="60" Width="290" Height="18" NoPrefix="yes" Text="Please Specify Enterprise Controller Parameters" />
-				<Control Type="Text" Id="LoginLabel" Width="50" Height="17" X="15" Y="116" Text="Login" />
-				<Control Type="Text" Id="PasswordLabel" Width="73" Height="17" X="15" Y="135" Text="Create Password" />
-				<Control Type="Edit" Id="ProxyPort" Height="15" Width="203" X="112" Y="94" Property="PROXY_PORT" />
-				<Control Type="Edit" Id="Login" X="112" Y="113" Width="203" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
-				<Control Type="Edit" Id="Password" Width="203" Height="15" X="112" Y="132" Property="APPSERVER_PASSWORD" Password="yes" />
-				<Control Type="Edit" Id="PasswordConfirm" Height="15" Width="203" X="112" Y="152" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes" />
-				<Control Id="groupBox1" Type="GroupBox" Height="95" Width="351" X="9" Y="80" Text="Network" />
-				<Control Id="label1" Type="Text" Height="17" Width="50" X="15" Y="97" Text="Proxy Port" />
-				<Control Id="label2" Type="Text" Height="17" Width="73" X="15" Y="154" Text="Confirm Password" />
-			</Dialog>
-		</UI>
-	</Fragment>
+    <Fragment>
+        <UI>
+            <Dialog Id="AppServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+                <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                    <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+                </Control>
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="Enterprise Controller Configuration" />
+                <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
+                <Control Id="FolderLabel" Type="Text" X="14" Y="46" Width="290" Height="18" NoPrefix="yes" Text="Please Specify Enterprise Controller Parameters" />
+                <Control Type="Text" Id="LoginLabel" Width="50" Height="17" X="16" Y="104" Text="Login" />
+                <Control Type="Text" Id="PasswordLabel" Width="73" Height="17" X="16" Y="122" Text="Create Password" />
+                <Control Type="Edit" Id="ProxyPort" Height="15" Width="203" X="112" Y="81" Property="PROXY_PORT" />
+                <Control Type="Edit" Id="Login" X="112" Y="100" Width="203" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
+                <Control Type="Edit" Id="Password" Width="203" Height="15" X="112" Y="119" Property="APPSERVER_PASSWORD" Password="yes" />
+                <Control Type="Edit" Id="PasswordConfirm" Height="15" Width="203" X="112" Y="140" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes" />
+                <Control Id="groupBox1" Type="GroupBox" Height="95" Width="351" X="9" Y="67" Text="Network" />
+                <Control Id="label1" Type="Text" Height="17" Width="50" X="16" Y="84" Text="Proxy Port" />
+                <Control Id="label2" Type="Text" Height="17" Width="73" X="16" Y="141" Text="Confirm Password" />
+                <Control Id="groupBox2" Type="GroupBox" Height="39" Width="351" X="10" Y="173" Text="Extra parameters" />
+                <Control Id="checkBox1" Type="CheckBox" Height="18" Width="340" X="16" Y="188" Text="Allow system to optimize cameras settings (Recommended)" Property="ALLOW_CAMERA_CHANGES_REF1" Indirect="yes" CheckBoxValue="1"/>
+            </Dialog>
+        </UI>
+    </Fragment>
 </Wix>
