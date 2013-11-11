@@ -19,6 +19,8 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     addFlags(live_cam);
 
+    m_cameraControlDisabled = !QnAppServerConnectionFactory::allowCameraChanges();
+
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
@@ -594,7 +596,7 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value)
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    return m_cameraControlDisabled || !QnAppServerConnectionFactory::allowCameraChanges();
+    return m_cameraControlDisabled;
 }
 
 int QnSecurityCamResource::desiredSecondStreamFps() const
