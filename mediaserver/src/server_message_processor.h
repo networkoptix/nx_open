@@ -35,6 +35,7 @@ private slots:
 
 private:
     QSharedPointer<QnMessageSource> m_source;
+    bool m_tryDirectConnect;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

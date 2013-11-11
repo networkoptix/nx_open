@@ -38,13 +38,6 @@
             <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>
         <dependency>
-            <groupId>org.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>${ffmpeg.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}</classifier>
-        </dependency>      
-        <dependency>
             <groupId>org</groupId>
             <artifactId>onvif</artifactId>
             <version>${onvif.version}</version>
@@ -205,6 +198,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>		
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>      
             </dependencies>	          
         </profile>
         <profile>
@@ -247,7 +247,40 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>                   
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>      
             </dependencies>	            
         </profile>      
+
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+
+            <dependencies>	            
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>      
+            </dependencies>	            
+        </profile>
+
     </profiles>	
 </project>

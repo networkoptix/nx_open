@@ -3,6 +3,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <business/business_event_connector.h>
+#include "api/app_server_connection.h"
 
 
 QnSecurityCamResource::QnSecurityCamResource(): 
@@ -17,6 +18,8 @@ QnSecurityCamResource::QnSecurityCamResource():
         m_motionMaskList << QnMotionRegion();
 
     addFlags(live_cam);
+
+    m_cameraControlDisabled = !QnAppServerConnectionFactory::allowCameraChanges();
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 
