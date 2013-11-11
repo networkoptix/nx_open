@@ -47,6 +47,7 @@ public:
 
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
                                  QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 
+                                 Qn::Corner timestamps = Qn::NoCorner,
                                  qint64 timeOffsetMs = 0, qint64 serverTimeZoneMs = Qn::InvalidUtcOffset,
                                  QRectF srcRect = QRectF(),
                                  const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),

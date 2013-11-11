@@ -30,7 +30,7 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettings to be defined somewhere...
+QSettings qSettings;    //TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettings to be defined somewhere...
 
 static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
 
@@ -151,7 +151,15 @@ int main( int argc, char* argv[] )
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
 
-    return applauncherProcess.run();
+    int status = applauncherProcess.run();
+
+    // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
+    while (app.isRunning()) {
+        Sleep(100);
+    } 
+    Sleep(100);
+
+    return status;
 }
 
 int syncDir( const QString& localDir, const QString& remoteUrl )

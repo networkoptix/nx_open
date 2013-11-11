@@ -2,8 +2,6 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <QtNetwork/QUdpSocket>
-
 #include "av_resource.h"
 #include "../tools/AVJpegHeader.h"
 #include "utils/network/nettools.h"
@@ -13,6 +11,7 @@
 #include "plugins/resources/mdns/mdns_device_searcher.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
+#include "utils/network/socket.h"
 
 #define CL_BROAD_CAST_RETRY 1
 
@@ -40,16 +39,16 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         if (shouldStop())
             return QnResourceList();
 
-        QUdpSocket sock;
+        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
 
-        if (!bindToInterface(sock, iface))
+        if (!sock->bind(iface.address.toString(), 0))
             continue;
 
         // sending broadcast
         QByteArray datagram = "Arecont_Vision-AV2000\1";
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock.writeDatagram(datagram.data(), datagram.size(),QHostAddress::Broadcast, 69);
+            sock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, 69);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -62,17 +61,17 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         QnSleep::msleep(150); // to avoid 100% cpu usage
         //while(time.elapsed()<150)
         {
-            while (sock.hasPendingDatagrams())
+            while (sock->hasData())
             {
                 QByteArray datagram;
-                datagram.resize(sock.pendingDatagramSize());
+                datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
 
-                QHostAddress sender;
+                QString sender;
                 quint16 senderPort;
 
-                sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
+                int readed = sock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
 
-                if (senderPort!=69 || datagram.size() < 32) // minimum response size
+                if (senderPort!=69 || readed < 32) // minimum response size
                     continue;
 
                 const unsigned char* data = (unsigned char*)(datagram.data());
@@ -123,7 +122,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (resource==0)
                     continue;
 
-                resource->setHostAddress(sender.toString(), QnDomainMemory);
+                resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(iface.address);
                 resource->setName(QLatin1String("ArecontVision_Abstract"));

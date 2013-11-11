@@ -7,6 +7,10 @@
 
 #include "time_period_list.h"
 
+namespace detail {
+    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, (startTimeMs)(durationMs), static)
+}
+
 
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
 {
@@ -207,4 +211,16 @@ QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
         dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("dd hh:mm"))
                       << " - Now)";
     return dbg.space();
+}
+
+void serialize(const QnTimePeriod &value, QJsonValue *target) {
+    detail::serialize(value, target);
+}
+
+bool deserialize(const QJsonValue &value, QnTimePeriod *target) {
+    if(value.type() == QJsonValue::Null) {
+        *target = QnTimePeriod();
+        return false;
+    }
+    return detail::deserialize(value, target);
 }

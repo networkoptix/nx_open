@@ -10,10 +10,6 @@
 #include "utils/network/system_socket.h"
 
 
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
-
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 
@@ -114,7 +110,8 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         UDPSocket* sock = new UDPSocket();
         QString localAddress = iface.address.toString();
 
-        if (!sock->bindToInterface(iface))
+        //if (!sock->bindToInterface(iface))
+        if (!sock->setLocalAddressAndPort(iface.address.toString()))
         {
             delete sock;
             return 0;

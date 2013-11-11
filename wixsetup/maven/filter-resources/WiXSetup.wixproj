@@ -41,8 +41,8 @@
     <Compile Include="PasswordDlg.wxs" />
     <Compile Include="PortDuplicateDlg.wxs" />
     <Compile Include="PortIsBusyDlg.wxs" />
-    <Compile Include="Product-all.wxs" />
-    <Compile Include="Product-client.wxs" />
+    <Compile Include="Product-client-only.wxs" />
+    <Compile Include="Product-full.wxs" />
     <Compile Include="SelectionWarning.wxs" />
     <Compile Include="UninstallOptionsDlg.wxs" />
     <Compile Include="UpgradeDlg.wxs" />

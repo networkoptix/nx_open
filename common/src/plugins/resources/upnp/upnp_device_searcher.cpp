@@ -215,10 +215,11 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventTyp
                 it != m_socketList.end();
                 ++it )
             {
-                if( it->second.data() != sock )
-                    continue;
-                udpSock = it->second;
-                m_socketList.erase( it );
+                if( it->second.data() == sock ) {
+                    udpSock = it->second;
+                    m_socketList.erase( it );
+                    break;
+                }
             }
         }
         if( udpSock )

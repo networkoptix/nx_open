@@ -11,5 +11,4 @@ inline QTime msecsToTime(qint64 msecs) {
     return QTime(0, 0, 0, 0).addMSecs(msecs); 
 }
 
-
 #endif // QN_TIME_H

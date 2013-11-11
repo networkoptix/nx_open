@@ -3272,6 +3272,7 @@ bool QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll,
                                                       (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage,
                                                        role,
+                                                       Qn::NoCorner,
                                                        timeOffset, serverTimeZone,
                                                        itemData.zoomRect,
                                                        itemData.contrastParams,
@@ -3331,6 +3332,7 @@ void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {
     parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
 
     QnMediaResourceWidget *widget = NULL;
+    Qn::Corner timestampPos = Qn::NoCorner;
 
     if(parameters.size() != 1) {
         if(parameters.size() == 0 && display()->widgets().size() == 1) {
@@ -3391,7 +3393,6 @@ Do you want to continue?"),
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
-    bool withTimestamps = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     DewarpingParams dewarpingParams = itemData.dewarpingParams;
 
@@ -3413,7 +3414,20 @@ Do you want to continue?"),
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
-        dialog->addCheckBox(tr("Include timestamps (requires transcoding)"), &withTimestamps, delegate);
+        //dialog->addCheckBox(tr("Include timestamps (requires transcoding)"), &withTimestamps, delegate);
+        QComboBox* comboBox = new QComboBox(dialog.data());
+        comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
+        comboBox->addItem(tr("Top left corner (required transcoding)"), Qn::TopLeftCorner);
+        comboBox->addItem(tr("Top right corner (required transcoding)"), Qn::TopRightCorner);
+        comboBox->addItem(tr("Bottom left corner (required transcoding)"), Qn::BottomLeftCorner);
+        comboBox->addItem(tr("Bottom right corner (required transcoding)"), Qn::BottomRightCorner);
+
+        QLabel* label = new QLabel(dialog.data());
+        label->setText(tr("Timestamps:"));
+
+        dialog->addWidget(label);
+        dialog->addWidget(comboBox, false);
+
 
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
         if (doTranscode) {
@@ -3429,6 +3443,8 @@ Do you want to continue?"),
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
             return;
 
+        timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
+
         contrastParams.enabled &= doTranscode;
         dewarpingParams.enabled &= doTranscode;
         fileName = dialog->selectedFiles().value(0);
@@ -3438,7 +3454,7 @@ Do you want to continue?"),
         if (fileName.isEmpty())
             return;
 
-        if(doTranscode || withTimestamps) {
+        if(doTranscode || timestampPos != Qn::NoCorner) {
             QMessageBox::StandardButton button = QMessageBox::question(
                 mainWindow(),
                 tr("Save As"),
@@ -3542,8 +3558,6 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (withTimestamps)
-            role = QnStreamRecorder::Role_FileExportWithTime;
         QnMediaResourcePtr mediaRes = m_exportedCamera->getDevice().dynamicCast<QnMediaResource>();
         int timeOffset = 0;
         if(qnSettings->timeMode() == Qn::ServerTimeMode) {
@@ -3553,6 +3567,7 @@ Do you want to continue?"),
         qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1),
                                                   QnStorageResourcePtr(), role,
+                                                  timestampPos,
                                                   timeOffset, serverTimeZone,
                                                   itemData.zoomRect,
                                                   contrastParams,

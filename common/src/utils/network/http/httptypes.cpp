@@ -159,8 +159,12 @@ namespace nx_http
                     return StringType("Continue");
                 case ok:
                     return StringType("OK");
+                case noContent:
+                    return StringType("No Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
+                case moved:
+                    return StringType("Moved");
                 case badRequest:
                     return StringType("Bad Request");
                 case unauthorized:

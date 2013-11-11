@@ -52,6 +52,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
     m_role(Role_ServerRecording),
+    m_timestampCorner(Qn::NoCorner),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0)
@@ -454,7 +455,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
     // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
     // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-    bool isTranscode = m_role == Role_FileExportWithTime || 
+    bool isTranscode = m_timestampCorner != Qn::NoCorner || 
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
         !m_srcRect.isEmpty() ||
         m_contrastParams.enabled ||
@@ -529,10 +530,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 }
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
-                if (m_role == Role_FileExportWithTime) 
-                {
-                    m_videoTranscoder->addFilter(new QnTimeImageFilter(QnTimeImageFilter::Date_RightBottom, m_onscreenDateOffset));
-                }
+                if (m_timestampCorner != Qn::NoCorner) 
+                    m_videoTranscoder->addFilter(new QnTimeImageFilter(m_timestampCorner, m_onscreenDateOffset));
 
                 m_videoTranscoder->setQuality(Qn::QualityHighest);
                 if (!m_srcRect.isEmpty() && !m_dewarpingParams.enabled)
@@ -775,6 +774,11 @@ void QnStreamRecorder::setRole(Role role)
 {
     m_role = role;
     m_forceDefaultCtx = m_role == Role_ServerRecording || m_role == Role_FileExportWithEmptyContext;
+}
+
+void QnStreamRecorder::setTimestampCorner(Qn::Corner pos)
+{
+    m_timestampCorner = pos;
 }
 
 void QnStreamRecorder::setSignLogo(const QImage& logo)

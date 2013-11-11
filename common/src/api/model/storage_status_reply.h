@@ -21,8 +21,8 @@ struct QnStorageStatusReply {
     QnStorageSpaceData storage;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting), inline)
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageStatusReply, (pluginExists)(storage), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageStatusReply, (pluginExists)(storage), inline)
 
 Q_DECLARE_METATYPE(QnStorageStatusReply)
 

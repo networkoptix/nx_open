@@ -21,7 +21,7 @@ private:
     void clearSocketList();
     void sendBroadcast();
 private:
-    QList<QUdpSocket*> m_sockList;
+    QList<AbstractDatagramSocket*> m_sockList;
     qint64 m_sockUpdateTime;
 };
 

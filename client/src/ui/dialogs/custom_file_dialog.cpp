@@ -5,7 +5,8 @@
 #include <QtWidgets/QLabel>
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
-    base_type(parent, caption, directory, filter)
+    base_type(parent, caption, directory, filter),
+    m_currentCol(0)
 {
     setOption(QFileDialog::DontUseNativeDialog);
     connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
@@ -85,13 +86,21 @@ void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
 }
 
 
-void QnCustomFileDialog::addWidget(QWidget *widget) {
+void QnCustomFileDialog::addWidget(QWidget *widget, bool newRow) {
     QGridLayout * gl = dynamic_cast<QGridLayout*>(layout());
     if (gl)
     {
         int r = gl->rowCount();
-        gl->addWidget(widget, r, 0, 1, gl->columnCount());
-        gl->setRowStretch(r, 0);
+        if (newRow) {
+            m_currentCol = 0;
+            gl->addWidget(widget, r, m_currentCol, 1, gl->columnCount());
+
+        }
+        else {
+            gl->addWidget(widget, r-1, m_currentCol);
+        }
+        gl->setRowStretch(r, m_currentCol++);
+        widget->raise();
     }
 }
 

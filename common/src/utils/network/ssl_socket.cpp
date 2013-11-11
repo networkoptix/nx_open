@@ -339,11 +339,11 @@ bool QnSSLSocket::bind( const SocketAddress& localAddress )
     return d->wrappedSocket->bind(localAddress);
 }
 
-bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->bindToInterface(iface);
-}
+//bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
+//{
+//    Q_D(const QnSSLSocket);
+//    return d->wrappedSocket->bindToInterface(iface);
+//}
 
 SocketAddress QnSSLSocket::getLocalAddress() const
 {

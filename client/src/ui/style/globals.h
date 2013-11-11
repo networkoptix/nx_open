@@ -112,7 +112,7 @@ public:
 
 protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual QVariant readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) override;
+    virtual QVariant readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) override;
 
     static QVector<QColor> defaultZoomWindowColors();
 
