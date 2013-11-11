@@ -43,7 +43,7 @@ namespace Qn {
 
 struct QnMessage
 {
-    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(true) {}
 
     Qn::Message_Type messageType;
     quint32 seqNumber;
@@ -75,8 +75,10 @@ struct QnMessage
     QByteArray sessionKey;
     QByteArray hardwareId3;
 
+
     QString filename;
     QString publicIp;
+    bool allowCameraChanges;
 
     bool load(const pb::Message& message);
 

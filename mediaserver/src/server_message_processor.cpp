@@ -79,6 +79,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 
         if (!message.sessionKey.isNull())
             QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
+        QnAppServerConnectionFactory::setAllowCameraChanges(message.allowCameraChanges);
     }
     else if (message.messageType == Qn::Message_Type_License)
     {

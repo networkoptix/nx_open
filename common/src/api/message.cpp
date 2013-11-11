@@ -180,6 +180,8 @@ bool QnMessage::load(const pb::Message &message)
                 systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             if (runtimeInfoChangeMessage.has_sessionkey())
                 sessionKey = runtimeInfoChangeMessage.sessionkey().c_str();
+            if (runtimeInfoChangeMessage.has_allowcamerachanges())
+                allowCameraChanges = runtimeInfoChangeMessage.allowcamerachanges();
             break;
         }
         case pb::Message_Type_BusinessRuleReset:

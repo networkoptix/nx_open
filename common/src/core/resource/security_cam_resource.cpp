@@ -3,6 +3,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <business/business_event_connector.h>
+#include "api/app_server_connection.h"
 
 
 QnSecurityCamResource::QnSecurityCamResource(): 
@@ -593,7 +594,7 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value)
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    return m_cameraControlDisabled;
+    return m_cameraControlDisabled || !QnAppServerConnectionFactory::allowCameraChanges();
 }
 
 int QnSecurityCamResource::desiredSecondStreamFps() const
