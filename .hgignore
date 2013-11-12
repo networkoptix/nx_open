@@ -219,6 +219,8 @@ ios-client/HDWitness/HDWitness/HDWitness-Info.plist
 ios-client/HDWitness/HDWitness/HDWCompatibilityItems.m
 ios-client/Podfile
 ios-client/Pods
+ios-client/HDWitness/Settings.bundle/Root.plist
+ios-client/Podfile.lock
 
 launcher/x86
 launcher/x64
