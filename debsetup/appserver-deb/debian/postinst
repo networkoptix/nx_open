@@ -20,52 +20,18 @@ BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
 ECS_PORT_DEFAULT=7001
 ECS_PROXY_PORT_DEFAULT=7004
 
+CFG_HELPER="$BINDIR/config_helper.py $CONFIG_FILE"
+
 # This is necessary because changed configuration options should take effect 
 # immediately.
+if status $COMPANY_NAME-mediaproxy | grep "start/running" > /dev/null; then
+  stop $COMPANY_NAME-mediaproxy
+fi
+
 if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-entcontroller
 fi
     
-function replace_var {
-    file=$1; shift
-    name=$1; shift
-    value=$1; shift
-
-    if grep "$name=" $file > /dev/null 2>&1
-        tmpfile=$(mktemp)
-        while read line
-        do
-              echo ${line/$name=*/$name=$value}
-        done < "$file" > "$tmpfile" && mv "$tmpfile" "$file"
-    then
-        sed -i "/\[General\]/a \
-$name=$value" $file
-    fi   
-}
-
-function read_config {
-    ECS_PORT=$ECS_PORT_DEFAULT
-    ECS_PROXY_PORT=$ECS_PROXY_PORT_DEFAULT
-
-    [ -f $CONFIG_FILE ] || { true; return; }
-
-    ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port\s*=\s*\(.*\)/\1/g')
-    ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
-    ECS_PROXY_AUTH_KEY=$(cat $CONFIG_FILE | grep proxyAuthKey | head -1 | sed 's/proxyAuthKey\s*=\s*\(.*\)/\1/g')
-
-    [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT || true
-    [ -z "$ECS_PROXY_PORT" ] && ECS_PORT=$ECS_PROXY_PORT_DEFAULT || true
-}
-
-function write_config {
-    [ -d $ETC_DIR ] || mkdir $ETC_DIR
-    [ -f $CONFIG_FILE ] || echo "[General]" > $CONFIG_FILE
-
-    replace_var $CONFIG_FILE port $ECS_PORT
-    replace_var $CONFIG_FILE proxyPort $ECS_PROXY_PORT
-    replace_var $CONFIG_FILE proxyAuthKey $ECS_PROXY_AUTH_KEY
-}
-
 function to_int {
     local -i num="10#${1}"
     echo "${num}"
@@ -88,15 +54,15 @@ function create_dir {
     mkdir -p "$dir"
 }
 
-function validate_ecsPassword {
+function validate_password {
     [ "$IS_ADMIN_PW_SET" = "true" -o -n "$1" ]
 }
 
-function validate_ecsPort {
+function validate_port {
     port_is_ok $1
 }
 
-function valide_ecsProxyPort {
+function valide_proxyPort {
     port_is_ok $1
 }
 
@@ -137,16 +103,20 @@ function ask_for_value {
 
 case "$1" in
   configure)
-      read_config
-
       IS_ADMIN_PW_SET="false"
       [ -f /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db ] && $BINDIR/dbconfig isadminpw && IS_ADMIN_PW_SET="true"
 
-      ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
-      ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
-      ECS_PASSWORD=$(ask_for_value ecsPassword "")
+      ECS_PORT="$($CFG_HELPER port)"
+      [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
+      ECS_PORT=$(ask_for_value port "$ECS_PORT")
+      $CFG_HELPER port "$ECS_PORT"
 
-      write_config
+      ECS_PROXY_PORT="$($CFG_HELPER proxyPort)"
+      [ -z "$ECS_PROXY_PORT" ] && ECS_PROXY_PORT=$ECS_PROXY_PORT_DEFAULT
+      ECS_PROXY_PORT=$(ask_for_value proxyPort "$ECS_PROXY_PORT")
+      $CFG_HELPER proxyPort "$ECS_PROXY_PORT"
+
+      ECS_PASSWORD=$(ask_for_value password "")
 
       dbversion=$("$BINDIR/dbconfig" swversion)
       if [ $dbversion != "0" ]

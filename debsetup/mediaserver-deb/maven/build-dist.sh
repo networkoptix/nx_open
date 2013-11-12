@@ -24,6 +24,7 @@ INITDSTAGE=$STAGE$INITDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_LIB_PATH=${libdir}/build/bin/${build.configuration}
+SCRIPTS_PATH=${basedir}/../scripts
 	
 . $SERVER_BIN_PATH/env.sh
 
@@ -52,6 +53,7 @@ chmod -R 755 $BINSTAGE
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver* $BINSTAGE
+install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # We set rpath as settings capabilities makes LD_LIBRARY_PATH useless
 chrpath -r ../lib $BINSTAGE/mediaserver-bin
