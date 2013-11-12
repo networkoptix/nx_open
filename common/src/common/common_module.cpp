@@ -16,7 +16,6 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     QnCommonMetaTypes::initilize();
     
     /* Init statics. */
-    qnCustomization();
     qnProductFeatures();
 
     QnResourceDataPool *dataPool = instance<QnResourceDataPool>();
