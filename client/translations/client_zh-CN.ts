@@ -1302,7 +1302,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Main Media Folder</source>
-        <translation>主要媒体文件夹</translation>
+        <translation>是指本地录像存储路径</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
@@ -1322,7 +1322,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation>看和感觉</translation>
+        <translation>基本设置</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -1334,7 +1334,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Misc</source>
-        <translation>杂项</translation>
+        <translation>高级设置</translation>
     </message>
     <message>
         <source>Downmix the Audio from 5.1 to 2.1 channels (restart required)</source>
