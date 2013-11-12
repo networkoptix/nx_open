@@ -14,10 +14,11 @@ syntax: glob
 *.ipch
 *.user
 *.orig
+*.xcodeproj/xcuserdata
+*.xcworkspace/xcuserdata
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters
-*.xcodeproj
 *.qm
 *.vcproj
 *.tlog
@@ -214,9 +215,8 @@ ios-client/target
 ios-client/ihdwitness.xcworkspace/xcuserdata
 
 ios-client/Settings.bundle/Root.plist
-ios-client/HDWitness/HDWitness-Info.plist
-ios-client/HDWitness/HDWCompatibilityItems.m
-ios-client/HDWitness/version.h
+ios-client/HDWitness/HDWitness/HDWitness-Info.plist
+ios-client/HDWitness/HDWitness/HDWCompatibilityItems.m
 ios-client/Podfile
 ios-client/Pods
 
