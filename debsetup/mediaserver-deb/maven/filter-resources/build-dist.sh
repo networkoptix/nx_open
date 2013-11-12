@@ -24,6 +24,7 @@ INITDSTAGE=$STAGE$INITDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
+SCRIPTS_PATH=${basedir}/../scripts
 
 # Prepare stage dir
 rm -rf $STAGEBASE
@@ -50,9 +51,13 @@ chmod -R 755 $BINSTAGE
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
+
+# We set rpath as settings capabilities makes LD_LIBRARY_PATH useless
+chrpath -r ../lib $BINSTAGE/mediaserver-bin
 
 # Copy upstart and sysv script
 install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
@@ -70,6 +75,4 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)

@@ -1,38 +1,28 @@
-
-Template: ${deb.customization.company.name}-entcontroller/ecsPort
+Template: ${deb.customization.company.name}-entcontroller/port
 Type: string
 Default:
 Description: Enterprise Controller port:
 
-Template: ${deb.customization.company.name}-entcontroller/ecsPort_invalid
+Template: ${deb.customization.company.name}-entcontroller/port_invalid
 Type: error
 Description: The port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort
-Type: string
-Default:
-Description: Enterprise Controller Media Proxy port:
-
-Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort_invalid
-Type: error
-Description: The port is invalid. Please try again.
-
-Template: ${deb.customization.company.name}-entcontroller/ecsPassword
+Template: ${deb.customization.company.name}-entcontroller/password
 Type: string
 Default: 
 Description: Enterprise Controller password:
  If upgrading leave empty to keep the old password
 
-Template: ${deb.customization.company.name}-entcontroller/ecsPassword_invalid
+Template: ${deb.customization.company.name}-entcontroller/password_invalid
 Type: error
 Description: The password should not be empty
 
-Template: ${deb.customization.company.name}-entcontroller/publicIPEnabled
+Template: ${deb.customization.company.name}-entcontroller/publicIpMode
 Type: select
 Choices: auto, disabled, manual
 Description: Select public IP address usage policy. If unsure leave default value.
 
-Template: ${deb.customization.company.name}-entcontroller/staticPublicIP
+Template: ${deb.customization.company.name}-entcontroller/manualPublicIp
 Type: string
 Description: Your system public IP address:
 
@@ -43,5 +33,4 @@ Description: Keep the database, remove or revert to previous version (if any)
 
 Template: ${deb.customization.company.name}-entcontroller/allowCameraChanges
 Type: boolean
-Default: true
 Description: Allow system to optimize cameras settings (Recommended)
