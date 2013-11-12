@@ -88,7 +88,7 @@ void serialize(const QColor &value, QJsonValue *target) {
 }
 
 bool deserialize(const QJsonValue &value, QColor *target) {
-    if(value.type() != QVariant::String)
+    if(value.type() != QJsonValue::String)
         return false;
     *target = parseColor(value);
     return true;
@@ -113,6 +113,24 @@ TEST_VALUE(QPointF)
 TEST_VALUE(QColor)
 TEST_VALUE(QUuid)
 
+void testRegion(int len) {
+    QRegion region;
+    QRect* rects = new QRect[len];
+    for (int i = 0; i < len; i++) {
+        QRect rect(0, i, i, 1);
+        rects[i] = rect;
+    }
+    region.setRects(rects, len);
+    delete[] rects;
+
+    QByteArray json;
+    QJson::serialize(region, &json);
+    QString result = QString::fromUtf8(json);
+    QRegion newValue;
+    QJson::deserialize(result.toUtf8(), &newValue);
+    Q_ASSERT(region == newValue);
+}
+
 void qnJsonFunctionsUnitTest() {
     testValue(QSize(15, 27));
     testValue(QSizeF(2.0, 0.6666));
@@ -122,4 +140,5 @@ void qnJsonFunctionsUnitTest() {
     testValue(QPointF(4.6, 0.1234));
     testValue(QColor(Qt::gray));
     testValue(QUuid::createUuid());
+    testRegion(332);
 }
