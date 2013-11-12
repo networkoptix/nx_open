@@ -2547,9 +2547,12 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return; /* User does not want it deleted. */
 
     foreach(const QnResourcePtr &resource, resources) {
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout))
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            if(snapshotManager()->isLocal(layout)) {
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
+                continue;
+            }
+        }
 
         connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
