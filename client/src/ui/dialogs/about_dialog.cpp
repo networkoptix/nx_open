@@ -77,8 +77,6 @@ void QnAboutDialog::retranslateUi()
 
     m_copyButton->setText(tr("Copy to Clipboard"));
 
-    setWindowTitle(tr("About"));
-
     QString version = 
         tr(
             "<b>%1</b> version %2 (%3).<br/>\n"
