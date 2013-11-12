@@ -105,7 +105,6 @@
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/local_file_cache.h>
-#include <utils/media/audio_player.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
@@ -216,7 +215,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_messageProcessor_connectionOpened()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -990,37 +988,6 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
 
     context()->instance<QnAppServerNotificationCache>()->getFileList();
-}
-
-void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    switch (businessAction->actionType()) {
-    case BusinessActionType::ShowPopup:
-    {
-            notificationsHandler()->addBusinessAction(businessAction);
-            break;
-    }
-    case BusinessActionType::PlaySound:
-    {
-            QString filename = businessAction->getParams().getSoundUrl();
-            QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
-            // if file is not exists then it is already deleted or just not downloaded yet
-            // I think it should not be played when downloaded
-            AudioPlayer::playFileAsync(filePath);
-            break;
-    }
-    case BusinessActionType::PlaySoundRepeated:
-    {
-            notificationsHandler()->addBusinessAction(businessAction);
-            break;
-    }
-    case BusinessActionType::SayText:
-    {
-            AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
-            break;
-    }
-    default:
-        break;
-    }
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {

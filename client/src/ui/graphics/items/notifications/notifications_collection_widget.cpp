@@ -219,12 +219,16 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     setLayout(layout);
 
     QnWorkbenchNotificationsHandler *handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler, SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
-            this, SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
+    connect(handler,    SIGNAL(businessActionAdded(QnAbstractBusinessActionPtr)),
+            this,       SLOT(showBusinessAction(QnAbstractBusinessActionPtr)));
+    connect(handler,    SIGNAL(businessActionRemoved(QnAbstractBusinessActionPtr)),
+            this,       SLOT(hideBusinessAction(QnAbstractBusinessActionPtr)));
+
     connect(handler,    SIGNAL(systemHealthEventAdded   (QnSystemHealth::MessageType, const QnResourcePtr&)),
             this,       SLOT(showSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
     connect(handler,    SIGNAL(systemHealthEventRemoved (QnSystemHealth::MessageType, const QnResourcePtr&)),
             this,       SLOT(hideSystemHealthMessage    (QnSystemHealth::MessageType, const QnResourcePtr&)));
+
     connect(handler,    SIGNAL(cleared()),
             this,       SLOT(hideAll()));
 
@@ -381,13 +385,42 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
 
+
+    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
+    m_itemsByBusinessRuleId.insert(businessAction->getBusinessRuleId(), item);
+
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters &)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters &)), Qt::QueuedConnection);
-    m_list->addItem(item, item->notificationLevel() == Qn::SoundNotification);
+
+    bool locked = item->notificationLevel() == Qn::SoundNotification; //this will be auto-deleted when event stops
+    m_list->addItem(item, locked);
+}
+
+void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
+    QnId ruleId = businessAction->getBusinessRuleId();
+    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
+    if (!resource)
+        return;
+
+    QnNotificationWidget* item = findItem(ruleId, resource);
+    if (!item)
+        return;
+    m_list->removeItem(item);
+    m_itemsByBusinessRuleId.remove(ruleId, item);
 }
 
 QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
     QList<QnNotificationWidget*> items = m_itemsByMessageType.values(message);
+    foreach (QnNotificationWidget* item, items) {
+        if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
+            continue;
+        return item;
+    }
+    return NULL;
+}
+
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource) {
+    QList<QnNotificationWidget*> items = m_itemsByBusinessRuleId.values(businessRuleId);
     foreach (QnNotificationWidget* item, items) {
         if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
             continue;
@@ -500,6 +533,8 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
 void QnNotificationsCollectionWidget::hideAll() {
     m_list->clear();
     m_itemsByMessageType.clear();
+    m_itemsByLoadingSound.clear();
+    m_itemsByBusinessRuleId.clear();
 }
 
 void QnNotificationsCollectionWidget::updateBlinker() {
@@ -649,11 +684,15 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
 }
 
 void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *item) {
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
-        if (m_itemsByMessageType.remove(message, item) > 0)
-            break;
-    }
+    foreach (QnSystemHealth::MessageType messageType, m_itemsByMessageType.keys(item))
+        m_itemsByMessageType.remove(messageType, item);
+
+    foreach (int ruleId, m_itemsByBusinessRuleId.keys(item))
+        m_itemsByBusinessRuleId.remove(ruleId, item);
+
+    foreach (QString soundPath, m_itemsByLoadingSound.keys(item))
+        m_itemsByLoadingSound.remove(soundPath, item);
+
     qnDeleteLater(item);
 }
 

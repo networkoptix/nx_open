@@ -13,7 +13,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
+#include <utils/media/audio_player.h>
 
 QnShowBusinessEventsHelper::QnShowBusinessEventsHelper(QObject *parent) :
     base_type(QnResourcePtr(),
@@ -44,6 +46,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             this, SLOT(at_eventManager_connectionOpened()));
     connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()),
             this, SLOT(at_eventManager_connectionClosed()));
+    connect(QnClientMessageProcessor::instance(), SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)),
+            this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), SIGNAL(valueChanged(int)), this, SLOT(at_settings_valueChanged(int)));
 }
@@ -192,6 +196,46 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
+}
+
+void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
+    switch (businessAction->actionType()) {
+    case BusinessActionType::ShowPopup:
+    {
+        addBusinessAction(businessAction);
+        break;
+    }
+    case BusinessActionType::PlaySound:
+    {
+        QString filename = businessAction->getParams().getSoundUrl();
+        QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+        // if file is not exists then it is already deleted or just not downloaded yet
+        // I think it should not be played when downloaded
+        AudioPlayer::playFileAsync(filePath);
+        break;
+    }
+    case BusinessActionType::PlaySoundRepeated:
+    {
+        switch (businessAction->getToggleState()) {
+        case Qn::OnState:
+            addBusinessAction(businessAction);
+            break;
+        case Qn::OffState:
+            emit businessActionRemoved(businessAction);
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case BusinessActionType::SayText:
+    {
+        AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
