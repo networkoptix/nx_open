@@ -182,7 +182,12 @@ void QnPreferencesDialog::accept() {
                     QMessageBox::Ok
         );
         if (button == QMessageBox::Ok) {
-            m_restartPending = applauncher::restartClient() == applauncher::api::ResultType::ok;
+
+            QByteArray auth;
+            if (context()->user()) // if we are connected, restore connection after client restart
+                auth = QnAppServerConnectionFactory::defaultUrl().toEncoded();
+
+            m_restartPending = applauncher::restartClient(QnSoftwareVersion(), auth) == applauncher::api::ResultType::ok;
             if (!m_restartPending) {
                 QMessageBox::critical(
                             this,
