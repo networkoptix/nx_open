@@ -166,7 +166,7 @@
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="98"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -301,42 +301,42 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="385"/>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Превышен , максимальный  размер диапазона IP адресов (255)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="398"/>
         <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Найденные камеры:&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="450"/>
         <source>Manuf.</source>
-        <translation type="unfinished"></translation>
+        <translation>Произв.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="460"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="470"/>
         <source>Server is offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер не в сети</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="496"/>
         <source>&amp;Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Добавить выбранные</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="515"/>
         <source>Cl&amp;ose</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Закрыть</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="455"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
 </context>
 <context>
@@ -344,7 +344,7 @@
     <message>
         <location filename="../src/camera/camera_diagnose_tool.cpp" line="142"/>
         <source>No connection to media server %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет соединения с Медиа Сервером %1</translation>
     </message>
 </context>
 <context>
@@ -352,12 +352,12 @@
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.ui" line="14"/>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.ui" line="20"/>
         <source>Diagnostics for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Результаты диагностики по камере</translation>
     </message>
 </context>
 <context>
@@ -365,12 +365,12 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="14"/>
         <source>Camera list</source>
-        <translation type="unfinished"></translation>
+        <translation>Список камер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="22"/>
         <source>Search string:</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск:</translation>
     </message>
 </context>
 <context>
@@ -378,108 +378,108 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="52"/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить лицензии...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="14"/>
         <source>Camera Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор расписания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="22"/>
         <source>Enable Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить запись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="75"/>
         <source>Schedule Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>График планировщика</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="92"/>
         <source>Display Quality on Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Отображать качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="118"/>
         <source>Display FPS on Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Отображать частоту кадров</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="141"/>
         <source>Panic Mode: </source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по тревоге:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="170"/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Примечание: Расписание по серверному времени</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="197"/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки расписания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="205"/>
         <source>FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Частота кадров</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="228"/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="294"/>
         <source>Record Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Писать постоянно</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="348"/>
         <source>Motion Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только движение (ДД)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="399"/>
         <source>Motion+ Lo-Res Always</source>
-        <translation type="unfinished"></translation>
+        <translation>ДД+ низк. кач-во </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="450"/>
         <source>Do not Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Не писать</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="470"/>
         <source>Motion Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по движению</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="490"/>
         <source>Pre-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Пре-запись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="519"/>
         <source>Post-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Пост-запись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="568"/>
         <source>Copy Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать расписание...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="581"/>
         <source>Apply changes before copying schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохраните изменения перед копированием</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="497"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="526"/>
         <source> s</source>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
 </context>
 <context>
@@ -1031,151 +1031,151 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/screen_recording/video_recorder_settings.cpp" line="95"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="639"/>
         <source>Can&apos;t overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно перезаписать файл &apos;%1&apos;. Попробуйте другое имя.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="641"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание</translation>
     </message>
     <message>
         <location filename="../src/client/client_connection_data.cpp" line="54"/>
         <source>* Last used connection *</source>
-        <translation type="unfinished"></translation>
+        <translation>* Последнее подключение *</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="54"/>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Во время %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="56"/>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="33"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="44"/>
         <source>Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Кончается</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="35"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="46"/>
         <source>Starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Начинается</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="37"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="49"/>
         <source>Starts/Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Начинается/Кончается</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="44"/>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>начать</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="45"/>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>закончить</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="51"/>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>Происходит</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="522"/>
         <source>Export selected events to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выбранных событий в файл</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="26"/>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML файл (*.html);;Файл (CSV) с разделителями (*.csv)</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="47"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить как</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="48"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл %1 уже существует. Перезаписать?</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="60"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно перезаписать файл</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="61"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл %1 занят другим процессом. Попробуйте другое имя.</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="35"/>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="52"/>
         <source>Not recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Не записывается</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="37"/>
         <source>Recording everything</source>
-        <translation type="unfinished"></translation>
+        <translation>Записывается постоянно</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="39"/>
         <source>Recording motion only</source>
-        <translation type="unfinished"></translation>
+        <translation>Записывается только движение</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="41"/>
         <source>Recording motion and low quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Записывается движение и низкое качество</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="54"/>
         <source>Continuous</source>
-        <translation type="unfinished"></translation>
+        <translation>Постоянная</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="56"/>
         <source>Motion only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только движение (ДД)</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="58"/>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>ДД + низк. кач-во</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="81"/>
         <source>b/s</source>
-        <translation type="unfinished"></translation>
+        <translation>бит/с</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="82"/>
         <source>Kb/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Кбит/с</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="83"/>
         <source>Mb/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Мбит/с</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="131"/>
         <source>Export selected cameras to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выбранных камер в файл</translation>
     </message>
 </context>
 <context>
@@ -1183,36 +1183,38 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="78"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать в буфер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="80"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>О программе</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="83"/>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; версия %2 (%3).&lt;br/&gt;
+Сборка для %5-%6 с помощью %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="99"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Enterprise controller&lt;/b&gt; не в сети.&lt;br&gt;
+</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="101"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; version %1 at %2:%3.&lt;br&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Enterprise controller&lt;/b&gt; версии %1 адрес %2:%3.&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="112"/>
         <source>&lt;b&gt;Media Server&lt;/b&gt; version %2 at %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Медиа Сервер&lt;/b&gt; версии %2 адрес %3.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="119"/>
@@ -1226,12 +1228,20 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
 &lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; использует следующие внешние библиотеки:&lt;br/&gt;
+&lt;br /&gt;
+&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
+&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
+&lt;b&gt;Color Picker v2.6 Qt Solution&lt;/b&gt; - Copyright (c) 2009 Nokia Corporation.&lt;br/&gt;
+&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
+&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
+&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
+&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="140"/>
         <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="146"/>
@@ -1240,7 +1250,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
 &lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;OpenGL версия&lt;/b&gt;: %1.&lt;br/&gt;
+&lt;b&gt;OpenGL драйвер&lt;/b&gt;: %2.&lt;br/&gt;
+&lt;b&gt;OpenGL производитель&lt;/b&gt;: %3.&lt;br/&gt;
+&lt;b&gt;OpenGL макс. размер текстур&lt;/b&gt;: %4.&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -1248,12 +1261,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action.cpp" line="109"/>
         <source>%n</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action.cpp" line="111"/>
         <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2403,12 +2416,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="59"/>
         <source>[No item selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Элемент не выбран]</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="60"/>
         <source>Image Enhancement - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция изображенияt - %1</translation>
     </message>
 </context>
 <context>
@@ -2421,42 +2434,42 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="32"/>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите для установки периода срабатывания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="42"/>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>Интервал:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="55"/>
         <source>Once per</source>
-        <translation type="unfinished"></translation>
+        <translation>Раз в</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="91"/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Мгновенное</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="9"/>
         <source>sec</source>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="10"/>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation>м</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="11"/>
         <source>hrs</source>
-        <translation type="unfinished"></translation>
+        <translation>ч</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="12"/>
         <source>days</source>
-        <translation type="unfinished"></translation>
+        <translation>д</translation>
     </message>
 </context>
 <context>
@@ -2494,13 +2507,15 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="66"/>
         <source>You have new notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Есть новые оповещения</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="117"/>
         <source>You have %n notifications</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>У вас %n оповещение</numerusform>
+            <numerusform>У вас %n оповещения</numerusform>
+            <numerusform>У вас %n оповещений</numerusform>
         </translation>
     </message>
 </context>
@@ -2509,12 +2524,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="134"/>
         <source>For All Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Для всех</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="135"/>
         <source>For Administrators Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только Администраторам</translation>
     </message>
 </context>
 <context>
@@ -2523,22 +2538,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="746"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="772"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любая Камера&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="750"/>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись или детекция движения отключены для %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="788"/>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>У пользователя %1 неправильный E-Mail: %2</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="826"/>
         <source>%1 of %2 cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 из %2 камер</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="756"/>
@@ -2546,134 +2561,148 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="829"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="852"/>
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Камера</numerusform>
+            <numerusform>%n Камеры</numerusform>
+            <numerusform>%n Камер</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="753"/>
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 из %n камеры</numerusform>
+            <numerusform>%1 из %n камер</numerusform>
+            <numerusform>%1 из %n камер</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="761"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="845"/>
         <source>&lt;System&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Система&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="767"/>
         <source>&lt;Any Server&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой Сервер&gt;</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="769"/>
         <source>%n Server(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Сервер</numerusform>
+            <numerusform>%n Сервера</numerusform>
+            <numerusform>%n Серверов</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="786"/>
         <source>User &apos;%1&apos; has empty E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>У пользователя %1 не задан E-Mail</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="798"/>
         <source>Invalid email address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный E-Mail: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="803"/>
         <source>Select at least one user</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы одного пользователя</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="806"/>
         <source>Send mail to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить письмо %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="808"/>
         <source>%1 users, %2 additional</source>
-        <translation type="unfinished"></translation>
+        <translation>пользователей: %1 , дополнительных: %2 </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="809"/>
         <source>%1 users</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 пользователей</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="813"/>
         <source>Administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation>только для Администраторов</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="815"/>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>Для всех</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="819"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="850"/>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы одну камеру</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="823"/>
         <source>Recording is disabled for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись для %1 отключена</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="833"/>
         <source>Select a sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите звук</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="839"/>
         <source>Enter the text</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите текст</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="863"/>
         <source>Not Applied</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="869"/>
         <source>Every %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждый день</numerusform>
+            <numerusform>Каждые %n дня</numerusform>
+            <numerusform>Каждые %n дней</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="872"/>
         <source>Every %n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждый час</numerusform>
+            <numerusform>Каждые %n часа</numerusform>
+            <numerusform>Каждые %n часов</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="875"/>
         <source>Every %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждую минуту</numerusform>
+            <numerusform>Каждые %n минуты</numerusform>
+            <numerusform>Каждые %n минут</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="877"/>
         <source>Every %n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждую секунду</numerusform>
+            <numerusform>Каждые %n секунды</numerusform>
+            <numerusform>Каждые %n секунд</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="866"/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Мгновенно</translation>
     </message>
 </context>
 <context>
@@ -2681,59 +2710,59 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="23"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="34"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Событие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Когда&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="79"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="224"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="163"/>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation>на</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="86"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой камере&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="155"/>
         <source>Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Расписание...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="185"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Действие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="231"/>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Выберите хотя бы одну камеру&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="304"/>
         <source>Comments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Комментарий:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="163"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>кому</translation>
     </message>
 </context>
 <context>
@@ -2741,84 +2770,84 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="139"/>
         <source>Confirm exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть окно</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="140"/>
         <source>Unsaved changes will be lost. Save?</source>
-        <translation type="unfinished"></translation>
+        <translation>Несохраненные изменения будут утеряны. Продолжить?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error while saving rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при сохранении правила.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
         <source>Hide Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть расширенные</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
         <source>Show Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать расширенные</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
         <source>Error while receiving rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при получении списка правил</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="41"/>
         <source>Reset Default Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Сброс на правила по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="228"/>
         <source>Confirm rules reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтверждение сброса</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что Вы хотите вернуть правила к значениям по умолчанию? Это действие необратимо!</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="271"/>
         <source>Error while deleting rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при удалении правила</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="312"/>
         <source>&amp;New...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Создать...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
         <source>&amp;Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="322"/>
         <source>&amp;Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Расписание...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="339"/>
         <source>Confirm save invalid rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранение некорректноых правил</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="340"/>
         <source>Some rules are not valid. Should we disable them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые правила некорректны. Отключить их?</translation>
     </message>
 </context>
 <context>
@@ -2826,42 +2855,42 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="89"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation>#</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="90"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкл</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="91"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Событие</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="92"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Источник</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="93"/>
         <source>-&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>-&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="94"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Действие</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="95"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="96"/>
         <source>Interval of Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Интервал срабатывания</translation>
     </message>
 </context>
 <context>
@@ -2869,66 +2898,66 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="440"/>
         <source>First address in range is greater than last one</source>
-        <translation type="unfinished"></translation>
+        <translation>Начальный адрес диапазона больше конечного</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="446"/>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Превышен , максимальный  размер диапазона IP адресов (255)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="177"/>
         <source>Add cameras to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить камеры на %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="181"/>
         <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Длбавить камеры...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="182"/>
         <source>Select target mediaserver in the tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите Медиа Сервер в дереве.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="294"/>
         <source>Server is offline.
 Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер не в сети. Добавление камер возможно только на активный сервер.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="509"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="513"/>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Завершено</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="554"/>
         <source>No cameras selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Не выбраны камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="554"/>
         <source>Please select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>пожалуйста выберите хотя бы одну камеру</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="580"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Успешно</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="293"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="526"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="587"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="454"/>
         <source>Camera address field must contain valid url, ip address or rtsp link</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Адрес rfvths должен содержать корректный URL, IP</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="509"/>
