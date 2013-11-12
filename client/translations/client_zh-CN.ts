@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="zh_CN" sourcelanguage="en">
 <context>
+    <name>QnScheduleGridWidget</name>
+    <message>
+        <source></source>
+        <comment>SCHEDULE_GRID_CORNER_TEXT</comment>
+        <translation>全选</translation>
+   </message>
+</context>
+<context>
     <name>AVSettingsDlg</name>
     <message>
         <source>Suggestions...</source>

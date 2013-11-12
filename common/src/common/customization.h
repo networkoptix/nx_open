@@ -30,7 +30,7 @@ namespace Qn {
         } else if(std::strcmp(customizationName, "nnodal") == 0) {
             return NVisionCustomization;
         } else {
-            assert(false);
+            // assert(false); 
             return HdWitnessCustomization;
         }
     }

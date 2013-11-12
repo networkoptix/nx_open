@@ -56,6 +56,7 @@ public:
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
+
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -85,6 +86,7 @@ private:
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
     bool m_showFirstParam;
     bool m_showSecondParam;
+    QString m_cornerText;
     QStringList m_weekDays;
     QVector<QSize> m_weekDaysSize;
     int m_gridLeftOffset;
