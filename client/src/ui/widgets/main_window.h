@@ -121,8 +121,10 @@ private:
     Options m_options;
     QMargins m_frameMargins;
 
-    /** This field is used to restore geometry after switching to fullscreen and back */
+#ifndef Q_OS_MACX
+    /** This field is used to restore geometry after switching to fullscreen and back. Do not used in MacOsX due to its fullscreen mode. */
     QRect m_storedGeometry;
+#endif
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);
