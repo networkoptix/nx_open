@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="54"/>
         <source>Suggestions...</source>
-        <translation type="unfinished"></translation>
+        <translation>Рекомендации</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="240"/>
@@ -24,7 +24,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="20"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация о продукте</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="26"/>
@@ -32,22 +32,22 @@
         <location filename="../src/ui/dialogs/about_dialog.ui" line="64"/>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="83"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="39"/>
         <source>Credits</source>
-        <translation type="unfinished"></translation>
+        <translation>Внешние библиотеки</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="58"/>
         <source>GPU Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Графический адаптер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="77"/>
         <source>Connected servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Используемые серверы</translation>
     </message>
 </context>
 <context>
@@ -55,32 +55,32 @@
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="14"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция изображения</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="23"/>
         <source>Enable enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить коррекцию</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="42"/>
         <source>Gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>Гамма</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="93"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="100"/>
         <source>Black level</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровень черного</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="136"/>
         <source>White level</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровень белого</translation>
     </message>
 </context>
 <context>
@@ -88,77 +88,77 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="214"/>
         <source>Warning! Please read documentation prior to change these settings!</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Ознакомьтесь с документацией прежде чем вносить изменения в данные настройки!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="46"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="40"/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление настройками камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="27"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
+        <translation>Я прочел инструкцию и понимаю, что делаю</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="53"/>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Изменения параметров &quot;Частота кадров&quot; и &quot;качество изображения&quot; в настроках расписания не будут учтены!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="63"/>
         <source>Secondary Stream Quality Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка параметров второго потока</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
         <source>Override current value</source>
-        <translation type="unfinished"></translation>
+        <translation>Переопределить текущие значения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Внимание! Установка низкого качества приведет к уменьшению разрешения &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="167"/>
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Установка высокого качества может привести к увеличению нагрузки на процессор Медиа Сервера, ошибкам сети и т.п.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="234"/>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="250"/>
         <source>Selected camera(s) have no expert settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранный набор камер не поддерживает экспертные настройки</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="101"/>
         <source>Low quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Низкое качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="124"/>
         <source>Medium quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="147"/>
         <source>High quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Высокое качество</translation>
     </message>
 </context>
 <context>
@@ -174,37 +174,37 @@
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="14"/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Связь с событием</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="22"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="33"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="58"/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="70"/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Расширенные...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="86"/>
         <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр по камерам...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="93"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -212,22 +212,22 @@
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="20"/>
         <source>Camera settings: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительные настройки камеры: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="101"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="140"/>
         <source>Unable to save changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу сохранить изменения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="140"/>
         <source>Please try to save changes later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, попробуйте сохранить изменения позднее.</translation>
     </message>
 </context>
 <context>
@@ -235,67 +235,68 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="44"/>
         <source>&amp;Camera Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Адрес камеры:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="54"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Например:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="60"/>
         <source>IP, hostname, RTSP link...</source>
-        <translation type="unfinished"></translation>
+        <translation>IP, доменное имя, RTSP ссылка...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="86"/>
         <source>S&amp;tart IP:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>&amp;Конечный IP</translatorcomment>
+        <translation>&amp;Начальный IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="121"/>
         <source>&amp;End IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Конечный IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="159"/>
         <source>S&amp;ubnet scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Сканировать Сеть</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="185"/>
         <source>&amp;Login:</source>
-        <translation type="unfinished">&amp;Логин</translation>
+        <translation>&amp;Логин:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="220"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Пароль</translation>
+        <translation>&amp;Пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="273"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="285"/>
         <source>&amp;Discovery Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;орт:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="311"/>
         <source>&amp;Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Искать</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="349"/>
         <source>Scanning...</source>
-        <translation type="unfinished"></translation>
+        <translation>Идет поиск...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="368"/>
         <source>Cancel &amp;scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Ос&amp;тановить поиск</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="385"/>
@@ -2500,8 +2501,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>You have %n notifications</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2549,8 +2548,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>%n Camera(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2558,8 +2555,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2578,8 +2573,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="769"/>
         <source>%n Server(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2654,16 +2647,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Every %n days</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="872"/>
         <source>Every %n hours</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2672,16 +2661,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Every %n minutes</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="877"/>
         <source>Every %n seconds</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2972,16 +2957,12 @@ Make sure the server is available and try again.</source>
 It might take a few moments to populate them in the tree.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="587"/>
         <source>Error while adding camera(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3087,16 +3068,12 @@ It might take a few moments to populate them in the tree.</source>
         <source>Camera List - %n camera(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="144"/>
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3225,16 +3202,12 @@ It might take a few moments to populate them in the tree.</source>
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="607"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3243,16 +3216,12 @@ It might take a few moments to populate them in the tree.</source>
         <source>Activate %n more digital license(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="636"/>
         <source>Activate %n more analog license(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3261,16 +3230,12 @@ It might take a few moments to populate them in the tree.</source>
         <source>%n more digital license(s) will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="645"/>
         <source>%n more analog license(s) will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3646,16 +3611,12 @@ You will be asked to restart the client in compatibility mode.</source>
         <source>%n digital license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="89"/>
         <source>%n analog license(s) will be used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3868,8 +3829,6 @@ You will be asked to restart the client in compatibility mode.</source>
         <location filename="../src/ui/models/license_list_model.cpp" line="99"/>
         <source>In %n days</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4247,16 +4206,12 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="424"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5034,16 +4989,12 @@ Recording Schedule is always based on Server Time.</source>
         <source>%n digital license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="634"/>
         <source>%n analog license(s) are used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5516,8 +5467,6 @@ AVAILABLE</source>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5529,8 +5478,6 @@ AVAILABLE</source>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="550"/>
         <source>The following %n layout(s) are being saved.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5703,8 +5650,6 @@ AVAILABLE</source>
         <source>Save changes to the following %n camera(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5717,8 +5662,6 @@ AVAILABLE</source>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5730,8 +5673,6 @@ AVAILABLE</source>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2359"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5754,8 +5695,6 @@ AVAILABLE</source>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2466"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5985,8 +5924,6 @@ and you do not have the rights to overwrite it.</source>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6103,16 +6040,12 @@ Please wait for the camera to go online.</source>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3769"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6121,16 +6054,12 @@ Please wait for the camera to go online.</source>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3808"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6223,8 +6152,6 @@ Please wait for the camera to go online.</source>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6232,16 +6159,12 @@ Please wait for the camera to go online.</source>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="62"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6262,8 +6185,6 @@ Error description: &apos;%2&apos;</source>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="87"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
