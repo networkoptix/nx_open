@@ -22,6 +22,10 @@ ECS_PROXY_PORT_DEFAULT=7004
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
+if status $COMPANY_NAME-mediaproxy | grep "start/running" > /dev/null; then
+  stop $COMPANY_NAME-mediaproxy
+fi
+
 if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-entcontroller
 fi
