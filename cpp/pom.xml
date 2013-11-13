@@ -396,6 +396,25 @@
 									<skip>${replace.skip}</skip>
 								</configuration>								
 							</execution>
+							<execution>
+ 								<id>enable_seh</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<includes>
+										<include>**/${project.artifactId}-${arch}.vcproj</include>
+									</includes>
+									<replacements>
+										<replacement>
+											<token>ExceptionHandling="1"</token>
+											<value>ExceptionHandling="2"</value>
+										</replacement>         
+									</replacements>
+									<skip>${replace.skip}</skip>
+								</configuration>								
+							</execution>
 						</executions>
 					</plugin>
 				</plugins>
