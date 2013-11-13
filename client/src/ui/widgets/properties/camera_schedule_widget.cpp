@@ -97,7 +97,7 @@ namespace {
                         motionOk = false;
                         break;
                     }
-                    if (m_dualStreamingUsed && !camera->hasDualStreaming2()){
+                    if (m_dualStreamingUsed && !camera->hasDualStreaming()){
                         motionOk = false;
                         break;
                     }
@@ -691,7 +691,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
-        hasDualStreaming &= camera->hasDualStreaming2();
+        hasDualStreaming &= camera->hasDualStreaming();
         hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
     }
 
@@ -800,7 +800,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
-        hasDualStreaming &= camera->hasDualStreaming2();
+        hasDualStreaming &= camera->hasDualStreaming();
         hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
     }
 

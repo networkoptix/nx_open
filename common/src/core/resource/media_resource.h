@@ -28,8 +28,7 @@ namespace Qn {
         SSQualityLow, 
         SSQualityMedium, 
         SSQualityHigh, 
-        SSQualityNotDefined,
-        SSQualityDontUse
+        SSQualityNotDefined
     };
 
     QString toDisplayString(Qn::StreamQuality value);

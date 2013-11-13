@@ -20,6 +20,7 @@
 #include "core/resource/camera_resource.h"
 #include "cached_output_stream.h"
 #include "network/authenticate_helper.h"
+#include "../settings.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -321,8 +322,6 @@ static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
 static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
-extern QSettings qSettings;
-
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
@@ -338,7 +337,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = TimerManager::instance()->addTimer(
             this,
@@ -575,24 +574,24 @@ void QnProgressiveDownloadingConsumer::run()
                     archive->open(resource);
                     archive->seek(timeMs, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
-					int counter = 0;
+                    int counter = 0;
                     while (counter < 20)
                     {
                         QnAbstractMediaDataPtr data = archive->getNextData();
                         if (data)
                         {
-							if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
-							{
-								timestamp = data->timestamp;
-								break;
-							}
-							else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
-								continue; // ignore filler packet
-							counter++;
+                            if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
+                            {
+                                timestamp = data->timestamp;
+                                break;
+                            }
+                            else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+                                continue; // ignore filler packet
+                            counter++;
                         }
-						else {
-							counter++;
-						}
+                        else {
+                            counter++;
+                        }
                     }
 
                     QByteArray ts("\"now\"");

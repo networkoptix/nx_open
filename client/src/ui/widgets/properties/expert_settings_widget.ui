@@ -60,7 +60,7 @@
           <item>
            <widget class="QGroupBox" name="qualityGroupBox">
             <property name="title">
-             <string>Secondary Stream Control</string>
+             <string>Secondary Stream Quality Control</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
@@ -73,13 +73,13 @@
              <item>
               <widget class="QSlider" name="qualitySlider">
                <property name="maximum">
-                <number>3</number>
+                <number>2</number>
                </property>
                <property name="pageStep">
                 <number>1</number>
                </property>
                <property name="value">
-                <number>2</number>
+                <number>1</number>
                </property>
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
@@ -95,26 +95,6 @@
                 <property name="spacing">
                  <number>0</number>
                 </property>
-                <item>
-                 <widget class="QLabel" name="labelDontUseQuality">
-                  <property name="text">
-                   <string>Don't use</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QLabel" name="labelLowQuality">
                   <property name="text">
@@ -221,7 +201,7 @@
                <enum>Qt::RichText</enum>
               </property>
               <property name="pixmap">
-               <pixmap>:/skin/warning.png</pixmap>
+               <pixmap resource="../../../../x86/build/client-custom.qrc">:/skin/warning.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -281,7 +261,6 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../../x86/build/client-custom.qrc"/>
   <include location="../../../../x86/build/client-custom.qrc"/>
  </resources>
  <connections/>

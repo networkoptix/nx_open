@@ -26,7 +26,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ioBlockSize = IO_BLOCK_SIZE;
         ffmpegBufferSize = FFMPEG_BUFFER_SIZE;
 #ifdef Q_OS_WIN
-        if (qSettings.value("disableDirectIO").toInt() != 1)
+        if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }

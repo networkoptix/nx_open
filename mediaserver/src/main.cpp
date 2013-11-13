@@ -132,6 +132,16 @@ static const int DEFAULT_STREAMING_PORT = 50000;
 
 static const int PROXY_POOL_SIZE = 8;
 
+//!TODO: #ak have to do something with settings
+class CmdLineArguments
+{
+public:
+    QString logLevel;
+    QString rebuildArchive;
+};
+
+static CmdLineArguments cmdLineArguments;
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -404,7 +414,7 @@ QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
     }
 
     if (!authKey.isEmpty()) {
-        qSettings.setValue("authKey", authKey);
+        MSSettings::roSettings()->setValue("authKey", authKey);
         QnAppServerConnectionFactory::setAuthKey(authKey);
     }
 
@@ -449,25 +459,17 @@ int serverMain(int argc, char *argv[])
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
 
-    QString logLevel;
-    QString rebuildArchive;
-
-    QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
-    commandLineParser.parse(argc, argv, stderr);
-
-    if (rebuildArchive.isEmpty()) {
-        rebuildArchive = qSettingsRunTime.value("rebuild").toString();
+    if (cmdLineArguments.rebuildArchive.isEmpty()) {
+        cmdLineArguments.rebuildArchive = MSSettings::runTimeSettings()->value("rebuild").toString();
     }
-    qSettingsRunTime.remove("rebuild");
+    MSSettings::runTimeSettings()->remove("rebuild");
 
-    if( logLevel != QString::fromLatin1("none") )
+    if( cmdLineArguments.logLevel != QString::fromLatin1("none") )
     {
-        const QString& logDir = qSettings.value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+        const QString& logDir = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
         QDir().mkpath( logDir );
         const QString& logFileName = logDir + QLatin1String("/log_file");
-        //qSettings.setValue("logFile", logFileName);
+        //MSSettings::roSettings()->setValue("logFile", logFileName);
         if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
         {
             qApp->quit();
@@ -475,14 +477,14 @@ int serverMain(int argc, char *argv[])
             return 0;
         }
 
-        QnLog::initLog(logLevel);
+        QnLog::initLog(cmdLineArguments.logLevel);
     }
 
-    if (rebuildArchive == "all")
+    if (cmdLineArguments.rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
-    else if (rebuildArchive == "hq")
+    else if (cmdLineArguments.rebuildArchive == "hq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
-    else if (rebuildArchive == "lq")
+    else if (cmdLineArguments.rebuildArchive == "lq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
@@ -490,7 +492,7 @@ int serverMain(int argc, char *argv[])
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-    if( logLevel != QString::fromLatin1("none") )
+    if( cmdLineArguments.logLevel != QString::fromLatin1("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
@@ -775,7 +777,7 @@ void QnMain::at_connectionOpened()
 
 void QnMain::at_timer()
 {
-    qSettingsRunTime.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -807,7 +809,7 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 
 void QnMain::initTcpListener()
 {
-    int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+    int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
     Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
@@ -841,8 +843,8 @@ void QnMain::initTcpListener()
     m_universalTcpListener->start();
 
 #else
-    int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
-    int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
+    int apiPort = MSSettings::roSettings()->value("apiPort", DEFAULT_REST_PORT).toInt();
+    int streamingPort = MSSettings::roSettings()->value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
@@ -860,17 +862,17 @@ QHostAddress QnMain::getPublicAddress()
     static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://www.thisip.org/cgi-bin/thisip.cgi; http://checkip.eurodyndns.org");
     static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
-    if (qSettings.value("publicIPEnabled").isNull())
-        qSettings.setValue("publicIPEnabled", 1);
+    if (MSSettings::roSettings()->value("publicIPEnabled").isNull())
+        MSSettings::roSettings()->setValue("publicIPEnabled", 1);
 
-    int publicIPEnabled = qSettings.value("publicIPEnabled").toInt();
+    int publicIPEnabled = MSSettings::roSettings()->value("publicIPEnabled").toInt();
 
     if (publicIPEnabled == 0)
         return QHostAddress(); // disabled
     else if (publicIPEnabled > 1)
-        return QHostAddress(qSettings.value("staticPublicIP").toString()); // manually added
+        return QHostAddress(MSSettings::roSettings()->value("staticPublicIP").toString()); // manually added
 
-    QStringList urls = qSettings.value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
+    QStringList urls = MSSettings::roSettings()->value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
 
     QNetworkAccessManager networkManager;
     QList<QNetworkReply*> replyList;
@@ -941,9 +943,9 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
     bool directConnectTried = true;
-    initAppServerConnection(qSettings, directConnectTried);
+    initAppServerConnection(*MSSettings::roSettings(), directConnectTried);
 
-    QnMulticodecRtpReader::setDefaultTransport( qSettings.value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
+    QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
@@ -958,7 +960,7 @@ void QnMain::run()
 
         if (directConnectTried) {
             directConnectTried = false;
-            initAppServerConnection(qSettings, directConnectTried);
+            initAppServerConnection(*MSSettings::roSettings(), directConnectTried);
             appServerConnection->setUrl(QnAppServerConnectionFactory::defaultUrl());
             continue;
         }
@@ -1015,7 +1017,7 @@ void QnMain::run()
 
     QnResourcePool::instance(); // to initialize net state;
 
-    QString appserverHostString = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
+    QString appserverHostString = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
 
     QHostAddress appserverHost;
     do
@@ -1107,7 +1109,7 @@ void QnMain::run()
 
     qnStorageMan->loadFullFileCatalog();
 
-    initAppServerEventConnection(qSettings, m_mediaServer);
+    initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->run();
 
@@ -1128,7 +1130,7 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-    QString disabledVendors = qSettings.value("disabledVendors").toString();
+    QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
     QStringList disabledVendorList;
     if (disabledVendors.contains(";"))
         disabledVendorList = disabledVendors.split(";");
@@ -1136,8 +1138,8 @@ void QnMain::run()
         disabledVendorList = disabledVendors.split(" ");
     QStringList updatedVendorList;        
     for (int i = 0; i < disabledVendorList.size(); ++i) {
-	if (!disabledVendorList[i].trimmed().isEmpty())
-    	    updatedVendorList << disabledVendorList[i].trimmed();
+    if (!disabledVendorList[i].trimmed().isEmpty())
+            updatedVendorList << disabledVendorList[i].trimmed();
     }
     qWarning() << "disabled vendors amount" << updatedVendorList.size();
     qWarning() << disabledVendorList;        
@@ -1216,7 +1218,7 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    m_firstRunningTime = qSettings.value("lastRunningTime").toLongLong();
+    m_firstRunningTime = MSSettings::roSettings()->value("lastRunningTime").toLongLong();
 
     at_timer();
     QTimer timer;
@@ -1289,7 +1291,7 @@ void QnMain::run()
 
     // This method will set flag on message channel to threat next connection close as normal
     appServerConnection->disconnectSync();
-    qSettingsRunTime.setValue("lastRunningTime", 0);
+    MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
@@ -1313,9 +1315,7 @@ protected:
         QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
 
-        const int result = application()->exec();
-
-        return result;
+        return application()->exec();
     }
 
     virtual void start() override
@@ -1323,18 +1323,18 @@ protected:
         QtSingleCoreApplication *application = this->application();
 
         // check if local or remote EC. MServer changes guid depend of this fact
-        bool primaryGuidAbsent = qSettings.value(lit("serverGuid")).isNull();
+        bool primaryGuidAbsent = MSSettings::roSettings()->value(lit("serverGuid")).isNull();
         if (primaryGuidAbsent)
-            qSettings.setValue("separateGuidForRemoteEC", 1);
+            MSSettings::roSettings()->setValue("separateGuidForRemoteEC", 1);
 
-        QString ECHost = resolveHost(qSettings.value("appserverHost").toString()).toString();
+        QString ECHost = resolveHost(MSSettings::roSettings()->value("appserverHost").toString()).toString();
         bool isLocalAddr = (ECHost == lit("127.0.0.1") || ECHost == lit("localhost"));
         foreach(const QHostAddress& addr, allLocalAddresses())
         {
             if (addr.toString() == ECHost)
                 isLocalAddr = true;
         }
-        if (!isLocalAddr && qSettings.value("separateGuidForRemoteEC").toBool())
+        if (!isLocalAddr && MSSettings::roSettings()->value("separateGuidForRemoteEC").toBool())
             setUseAlternativeGuid(true);
 
         QString guid = serverGuid();
@@ -1366,7 +1366,6 @@ private:
     QnMain m_main;
     int m_argc;
     char **m_argv;
-
 };
 
 void stopServer(int signal)
@@ -1377,6 +1376,9 @@ void stopServer(int signal)
     }
 }
 
+static void printVersion();
+static void printHelp();
+
 int main(int argc, char* argv[])
 {
     ::srand( ::time(NULL) );
@@ -1384,9 +1386,63 @@ int main(int argc, char* argv[])
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-    QnVideoService service(argc, argv);
+    //parsing command-line arguments
+    QString configFilePath;
+    QString rwConfigFilePath;
+    bool showVersion = false;
+    bool showHelp = false;
 
-    int result = service.exec();
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
+    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
+    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
+    commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
+    commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
+    commandLineParser.parse(argc, argv, stderr);
 
-    return result;
+    if( showVersion )
+    {
+        printVersion();
+        return 0;
+    }
+
+    if( showHelp )
+    {
+        printHelp();
+        return 0;
+    }
+
+    if( !configFilePath.isEmpty() )
+        MSSettings::initializeROSettingsFromConfFile( configFilePath );
+    if( !rwConfigFilePath.isEmpty() )
+        MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
+
+    QnVideoService service( argc, argv );
+    return service.exec();
+}
+
+static void printVersion()
+{
+    std::cout<<"  "<<QN_APPLICATION_NAME" v."QN_APPLICATION_VERSION<<std::endl;
+}
+
+static void printHelp()
+{
+    printVersion();
+
+    std::cout<<"\n"
+        "  --help                   This help message\n"
+        "  --version                Print version info and exit\n"
+        "  -e                       Start as console application\n"
+        "  --log-level              Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
+#ifdef _DEBUG
+            "DEBUG\n"
+#else
+            "INFO\n"
+#endif
+        "  --rebuild                Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)\n"
+        "  --conf-file              Path to config file. By default "<<MSSettings::defaultROSettingsFilePath().toStdString()<<"\n"
+        "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"
+        ;
 }

@@ -16,8 +16,7 @@ enum CLHttpStatus
     CL_HTTP_AUTH_REQUIRED = 401,
     CL_HTTP_NOT_FOUND,
 
-    CL_TRANSPORT_ERROR = -1,
-    CL_NOT_HTTP = -2
+    CL_TRANSPORT_ERROR = -1
 };
 
 QString toString( CLHttpStatus status );

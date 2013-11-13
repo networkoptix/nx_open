@@ -202,7 +202,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     if (m_lastVideoData)
     {
         result = m_lastVideoData;
-		m_lastVideoData.clear();
+        m_lastVideoData.clear();
         m_demuxedData[channelNum]->clear();
         m_gotSomeFrame = true;
         return result;

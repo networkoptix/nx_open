@@ -17,7 +17,7 @@ static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost()
 {
-    QByteArray result = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
+    QByteArray result = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
     if (result == "localhost" || result == "127.0.0.1")
     {
         QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();

@@ -23,7 +23,7 @@ QnServerMessageProcessor* QnServerMessageProcessor::instance()
 void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)
 {
     m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
-	m_source->setAuthKey(authKey);
+    m_source->setAuthKey(authKey);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
@@ -171,7 +171,7 @@ void QnServerMessageProcessor::at_connectionClosed(QString errorString)
     qDebug() << "QnEventManager::connectionClosed(): Connection aborted:" << errorString;
 
     // update EC port
-    int port = qSettings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt(); // defaulting to proxy
+    int port = MSSettings::roSettings()->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt(); // defaulting to proxy
 
     QUrl url = QnAppServerConnectionFactory::defaultUrl();
     url.setPort(port);

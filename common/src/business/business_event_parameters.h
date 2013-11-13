@@ -76,7 +76,6 @@ public:
 
 private:
     static int getParamIndex(const QString& key);
-
 private:
     BusinessEventType::Value m_eventType;
     qint64 m_timestamp;
