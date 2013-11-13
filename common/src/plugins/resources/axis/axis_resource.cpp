@@ -86,11 +86,8 @@ bool QnPlAxisResource::startInputPortMonitoring()
         if( !p.second )
             continue;   //port already monitored
 
-        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
-            //and forgetHttpClient cannot be called before doGet call
-
         requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
-        std::shared_ptr<nx_http::AsyncHttpClient> httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
         connect( httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
         connect( httpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),    Qt::DirectConnection );
         connect( httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
@@ -99,14 +96,9 @@ bool QnPlAxisResource::startInputPortMonitoring()
         httpClient->setUserPassword( auth.password() );
         
         if( httpClient->doGet( requestUrl ) )
-        {
             p.first->second = httpClient;
-        }
         else
-        {
-            httpClient->scheduleForRemoval();
             m_inputPortHttpMonitor.erase( p.first );
-        }
     }
 
     return true;
@@ -750,8 +742,6 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     }
     boundaryStart += sizeof("boundary=")-1;
     m_multipartContentParser.setBoundary( contentType.mid( boundaryStart-contentType.constData() ) );
-
-    httpClient->startReadMessageBody();
 }
 
 void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )

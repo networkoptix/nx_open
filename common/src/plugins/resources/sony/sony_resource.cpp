@@ -212,7 +212,6 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
     //TODO/IMPL multipart/x-mixed-replace support
 
     m_lineSplitter.reset();
-    m_inputMonitorHttpClient->startReadMessageBody();
 }
 
 void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpClient )

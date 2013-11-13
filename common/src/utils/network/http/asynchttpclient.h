@@ -33,9 +33,11 @@ namespace nx_http
         \note This class methods are not thread-safe
         \note All signals are emitted from io::AIOService threads
         \note State is changed just before emitting signal
+        \warning It is strongly recommended to listen for \a AsyncHttpClient::someMessageBodyAvailable() signal and
+            read current message body buffer with a \a AsyncHttpClient::fetchMessageBodyBuffer() call every time
         \todo pipelining support
         \todo keep-alive connection support
-        \todo entity-body compression support
+        \todo Ability to suspend message body receiving
     */
     class AsyncHttpClient
     :
@@ -63,7 +65,10 @@ namespace nx_http
         AsyncHttpClient();
         virtual ~AsyncHttpClient();
 
-        //!Stops socket event processing. If some event handler is running, method blocks until event handler has been stopped
+        //!Stops socket event processing. If some event handler is running in a thread different from current one, method blocks until event handler had returned
+        /*!
+            \note No signal is emitted after this call
+        */
         virtual void terminate();
 
         State state() const;
@@ -81,11 +86,6 @@ namespace nx_http
         */
         const HttpResponse* response() const;
         StringType contentType() const;
-        //!Start receiving message body
-        /*!
-            \return false if failed to start reading message body
-        */
-        bool startReadMessageBody();
         //!Returns current message body buffer, clearing it
         /*!
             \note This method is thread-safe and can be called in any thread
@@ -106,6 +106,11 @@ namespace nx_http
         //!Emitted when response headers has been read
         void responseReceived( nx_http::AsyncHttpClientPtr );
         //!Message body buffer is not empty
+        /*!
+            Received message body buffer is appended to internal buffer which can be read with \a AsyncHttpClient::fetchMessageBodyBuffer() call.
+            Responsibility for preventing internal message body buffer to grow beyond reasonable sizes lies on user of this class.
+            \warning It is strongly recommended to call \a AsyncHttpClient::fetchMessageBodyBuffer() every time on receiving this signal
+        */
         void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
             Emmitted when http request is done with any result (successfully executed request and received message body, 

@@ -210,9 +210,6 @@ namespace nx_http
                             return;
                     }
 
-                    //should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
-                    aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-
                     const bool messageHasMessageBody = 
                         (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) || (m_httpStreamReader.messageBodyBufferSize() > 0);
 
@@ -234,27 +231,24 @@ namespace nx_http
                         break;
                     }
 
+                    //starting reading message body
+                    m_state = sReadingMessageBody;
+
                     if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
                         m_state == sReadingMessageBody )                    //client wants to read message body
                     {
                         lk.unlock();
                         emit someMessageBodyAvailable( sharedThis );
                         lk.relock();
+                        if( m_terminated )
+                            break;
                     }
-
-                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later, 
-                        //we will not send someMessageBodyAvailable signal for already read message body
 
                     if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
                         break; // wait for more data
 
                     //message body has been received with request
                     assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
-
-                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later 
-                        //and whole message body has been received with response, we MUST NOT emit done now, but wait or user to receive message body
-
-                    //TODO: #AK looks like startReadMessageBody() call was a bad idea...
 
                     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                     lk.unlock();
@@ -363,36 +357,6 @@ namespace nx_http
         if( contentTypeIter == httpMsg.headers().end() )
             return StringType();
         return contentTypeIter->second;
-    }
-
-    //!Start receiving message body
-    /*!
-        \return false if failed to start reading message body
-    */
-    bool AsyncHttpClient::startReadMessageBody()
-    {
-        if( m_state < sResponseReceived )
-        {
-            NX_LOG( QString::fromLatin1("HttpClient (%1). Message body cannot be read while in state %2").
-                arg(m_url.toString()).arg(QLatin1String(toString(m_state))), cl_logDEBUG1 );
-            return false;
-        }
-        else if( m_state > sResponseReceived )
-        {
-            return true;
-        }
-
-        m_state = sReadingMessageBody;
-
-        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this ) )
-        {
-            NX_LOG( QString::fromLatin1("HttpClient (%1). Failed to start socket polling. %2").
-                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
-            m_state = sResponseReceived;
-            return false;
-        }
-
-        return true;
     }
 
     //!Returns current message body buffer, clearing it

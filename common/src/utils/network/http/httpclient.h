@@ -18,6 +18,9 @@
 namespace nx_http
 {
     //!Sync http client
+    /*!
+        \warning Message body is read ascynhronously to some internal buffer
+    */
     class HttpClient
     :
         public QObject
@@ -41,7 +44,6 @@ namespace nx_http
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
-        bool startReadMessageBody();
 
         void setSubsequentReconnectTries( int reconnectTries );
         void setTotalReconnectTries( int reconnectTries );

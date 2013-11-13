@@ -55,7 +55,6 @@ private:
     QByteArray getDeviceXml(const QUrl& url);
 
 private slots:
-    void at_replyReceived(nx_http::AsyncHttpClientPtr reply);
     void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
 };
 

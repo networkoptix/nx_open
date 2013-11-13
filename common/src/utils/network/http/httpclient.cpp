@@ -68,11 +68,6 @@ namespace nx_http
         return m_asyncHttpClient->url();
     }
 
-    bool HttpClient::startReadMessageBody()
-    {
-        return m_asyncHttpClient->startReadMessageBody();
-    }
-
     void HttpClient::setSubsequentReconnectTries( int reconnectTries )
     {
         m_asyncHttpClient->setSubsequentReconnectTries( reconnectTries );
