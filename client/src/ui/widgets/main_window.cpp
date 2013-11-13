@@ -157,13 +157,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    {
-        /* Adjust palette so that inherited background painting is not needed. */
-        QPalette palette = m_view->palette();
-        palette.setColor(QPalette::Background, Qt::black);
-        palette.setColor(QPalette::Base, Qt::black);
-        m_view->setPalette(palette);
-    }
+    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
+    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
 
     m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
