@@ -1392,8 +1392,6 @@ int main(int argc, char* argv[])
     bool showVersion = false;
     bool showHelp = false;
 
-    //TODO/IMPL read path to data directory from command line
-
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
