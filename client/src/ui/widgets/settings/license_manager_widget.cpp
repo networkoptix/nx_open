@@ -21,6 +21,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
+#include "utils/common/json.h"
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -265,6 +266,26 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         QList<QnLicensePtr> licenses;
 
         QByteArray replyData = reply->readAll();
+
+        struct ErrorMessage {
+            QString error;
+            QString message;
+            QStringList arguments;
+        };
+
+        QJsonObject errorMessage;
+        if (QJson::deserialize(replyData, &errorMessage)) {
+            QString message = errorMessage.value(lit("message")).toString();
+            foreach (QJsonValue arg, errorMessage.value(lit("arguments")).toArray()) {
+                message = message.arg(arg.toString());
+            }
+
+            QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license.") + lit(" ") + message);
+            ui->licenseWidget->setState(QnLicenseWidget::Normal);
+
+            return;
+        }
+        
         QTextStream is(&replyData);
         is.setCodec("UTF-8");
 
