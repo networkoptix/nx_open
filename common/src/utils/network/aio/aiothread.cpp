@@ -317,8 +317,6 @@ namespace aio
         m_impl( new AIOThreadImpl() )
     {
         m_impl->mutex = mutex;
-
-        setObjectName( lit("AIOThread") );
     }
 
     AIOThread::~AIOThread()
