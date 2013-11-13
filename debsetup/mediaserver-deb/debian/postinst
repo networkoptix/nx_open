@@ -172,6 +172,8 @@ case "$1" in
           STATIC_PUBLIC_IP=$(ask_for_value staticPublicIP "$STATIC_PUBLIC_IP")
           $CFG_HELPER staticPublicIP "$STATIC_PUBLIC_IP"
       fi
+
+      chmod 600 $CONFIG_FILE
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
