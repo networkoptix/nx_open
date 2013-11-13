@@ -1,6 +1,8 @@
 #ifndef onvif_resource_searcher_wsdd_h
 #define onvif_resource_searcher_wsdd_h
 
+#ifndef DISABLE_ONVIF
+
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
@@ -113,5 +115,7 @@ private:
     bool sendProbe( const QnInterfaceAndAddr& iface );
     bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
+
+#endif //DISABLE_ONVIF
 
 #endif // onvif_resource_searcher_wsdd_h

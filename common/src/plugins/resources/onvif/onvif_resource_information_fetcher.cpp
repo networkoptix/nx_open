@@ -1,3 +1,6 @@
+
+#ifndef DISABLE_ONVIF
+
 #include "onvif_resource_information_fetcher.h"
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
@@ -336,3 +339,5 @@ void OnvifResourceInformationFetcher::pleaseStop()
 {
     m_shouldStop = true;
 }
+
+#endif //DISABLE_ONVIF

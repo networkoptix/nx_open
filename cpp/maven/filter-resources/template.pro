@@ -12,7 +12,7 @@ ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat
-DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
+DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines} ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 CONFIG(debug, debug|release) {

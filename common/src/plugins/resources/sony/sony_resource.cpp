@@ -1,4 +1,6 @@
 
+#ifndef DISABLE_ONVIF
+
 #include "sony_resource.h"
 
 #include <QtCore/QMutexLocker>
@@ -272,3 +274,5 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClient* /*httpClient*
 {
     //TODO/IMPL reconnect
 }
+
+#endif //DISABLE_ONVIF

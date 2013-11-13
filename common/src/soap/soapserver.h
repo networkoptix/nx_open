@@ -6,6 +6,8 @@
 #ifndef SOAPSERVER_H
 #define SOAPSERVER_H
 
+#ifndef DISABLE_ONVIF
+
 #include <string>
 
 #include <plugins/resources/onvif/onvif_notification_consumer.h>
@@ -54,5 +56,7 @@ private:
     OnvifNotificationConsumer m_service;
     bool m_initialized;
 };
+
+#endif //DISABLE_ONVIF
 
 #endif  //SOAPSERVER_H

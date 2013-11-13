@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+#include <iostream>
 
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
@@ -919,9 +920,11 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
+#ifndef DISABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
     QnSoapServer::instance()->start();
+#endif //DISABLE_ONVIF
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
@@ -1172,8 +1175,10 @@ void QnMain::run()
 #endif
 
     //Onvif searcher should be the last:
+#ifndef DISABLE_ONVIF
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
+#endif //DISABLE_ONVIF
 
     
 
@@ -1280,8 +1285,11 @@ void QnMain::run()
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+#ifndef DISABLE_ONVIF
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
+#endif //DISABLE_ONVIF
+
     QnStorageManager::instance()->stopAsyncTasks();
 
     av_lockmgr_register(NULL);

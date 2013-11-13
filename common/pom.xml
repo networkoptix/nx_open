@@ -38,7 +38,7 @@
     </properties>   
 
     <build>
-    </build>    
+    </build>
 
     <profiles>
         <profile>

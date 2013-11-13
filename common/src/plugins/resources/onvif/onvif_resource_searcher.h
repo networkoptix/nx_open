@@ -1,6 +1,7 @@
 #ifndef onvif_resource_searcher_h
 #define onvif_resource_searcher_h
 
+#ifndef DISABLE_ONVIF
 
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_searcher.h"
@@ -35,5 +36,7 @@ public:
 private:
     QList<QnResourcePtr> checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck);
 };
+
+#endif //DISABLE_ONVIF
 
 #endif // onvif_resource_searcher_h

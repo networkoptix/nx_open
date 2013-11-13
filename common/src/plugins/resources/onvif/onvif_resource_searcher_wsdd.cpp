@@ -1,3 +1,6 @@
+
+#ifndef DISABLE_ONVIF
+
 #include "openssl/evp.h"
 
 #include <quuid.h>
@@ -861,3 +864,5 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         //soap_end(ctx.soapWsddProxy.soap);
     }
 }
+
+#endif //DISABLE_ONVIF

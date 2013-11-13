@@ -1,3 +1,6 @@
+
+#ifndef DISABLE_ONVIF
+
 #include "onvif_resource_settings.h"
 #include "onvif/soapImagingBindingProxy.h"
 
@@ -1251,3 +1254,5 @@ void OnvifCameraSettingReader::parentOfRootElemFound(const QString& /*parentId*/
 {
 
 }
+
+#endif //DISABLE_ONVIF

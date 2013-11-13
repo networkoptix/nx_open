@@ -1,3 +1,6 @@
+
+#ifndef DISABLE_ONVIF
+
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_zoom_ptz_controller.h"
@@ -331,3 +334,5 @@ bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QnParam &par
 
     return false;
 }
+
+#endif //DISABLE_ONVIF

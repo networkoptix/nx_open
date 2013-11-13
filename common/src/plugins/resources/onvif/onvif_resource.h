@@ -1,6 +1,8 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#ifndef DISABLE_ONVIF
+
 #include <list>
 #include <memory>
 #include <stack>
@@ -417,7 +419,7 @@ private:
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     QString m_vendorName;
-	
+    
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
     int m_streamConfCounter;
@@ -439,5 +441,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
 };
+
+#endif //DISABLE_ONVIF
 
 #endif //onvif_resource_h
