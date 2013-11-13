@@ -216,14 +216,18 @@ private:
 };
 
 
-class QN_EXPORT QnAppServerConnectionFactory {
+class QN_EXPORT QnAppServerConnectionFactory 
+{
 public:
+    QnAppServerConnectionFactory(): m_defaultMediaProxyPort(0), m_allowCameraChanges(true) {}
+
     static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
     static QByteArray prevSessionKey();
     static QByteArray sessionKey();
+    static bool allowCameraChanges();
     static QString systemName();
     static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
@@ -236,6 +240,7 @@ public:
     static void setDefaultMediaProxyPort(int port);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
+    static void setAllowCameraChanges(bool allowCameraChanges);
     static void setSystemName(const QString& systemName);
 
     static void setSessionKey(const QByteArray& sessionKey);
@@ -257,6 +262,7 @@ private:
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
     QnApiPbSerializer m_serializer;
+    bool m_allowCameraChanges;
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);

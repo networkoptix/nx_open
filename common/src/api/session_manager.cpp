@@ -263,10 +263,28 @@ void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , 
 
 
 
-void QnSessionManager::at_authenticationRequired(QNetworkReply* , QAuthenticator * authenticator)
+void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
-    authenticator->setUser(QnAppServerConnectionFactory::defaultUrl().userName());
-    authenticator->setPassword(QnAppServerConnectionFactory::defaultUrl().password());
+    // QnSessionManager instance can be used with different instances of QnAppServerConnection simultaneously
+    // so we first checking the reply url for login and password - they are present in case of EC connections
+    // otherwise - mediaserver connections do not include login and password in the url, but we can have
+    // mediaserver connections only within one EC session so we can use defaultUrl() method
+
+    bool useDefaultValues = reply->url().userName().isEmpty();
+    QString user = useDefaultValues
+            ? QnAppServerConnectionFactory::defaultUrl().userName()
+            :reply->url().userName();
+    QString password = useDefaultValues
+            ? QnAppServerConnectionFactory::defaultUrl().password()
+            : reply->url().password();
+
+    // if current values are already present in authenticator, do not send them again -
+    // it will cause an infinite loop until a timeout
+    if ((authenticator->user() == user && authenticator->password() == password))
+        return;
+
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
 
 void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {

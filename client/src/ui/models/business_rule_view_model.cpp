@@ -28,37 +28,37 @@
 #include <utils/media/audio_player.h>
 
 namespace {
-    QString toggleStateToModelString(Qn::ToggleState value) {
-        switch( value )
-        {
-            case Qn::OffState:
-                return QObject::tr("Stops");
-            case Qn::OnState:
-                return QObject::tr("Starts");
-            case Qn::UndefinedState:
-                return QObject::tr("Starts/Stops");
-        }
-        return QString();
+QString toggleStateToModelString(Qn::ToggleState value) {
+    switch( value )
+    {
+    case Qn::OffState:
+        return QObject::tr("Stops");
+    case Qn::OnState:
+        return QObject::tr("Starts");
+    case Qn::UndefinedState:
+        return QObject::tr("Starts/Stops");
     }
+    return QString();
+}
 
-    QString toggleStateToString(Qn::ToggleState state) {
-        switch (state) {
-        case Qn::OnState: return QObject::tr("start");
-        case Qn::OffState: return QObject::tr("stop");
-            default: return QString();
-        }
-        return QString();
+QString toggleStateToString(Qn::ToggleState state) {
+    switch (state) {
+    case Qn::OnState: return QObject::tr("start");
+    case Qn::OffState: return QObject::tr("stop");
+    default: return QString();
     }
+    return QString();
+}
 
-    QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
-        QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-        if (BusinessActionType::hasToggleState(actionType))
-            return QObject::tr("While %1").arg(typeStr);
-        else
-            return QObject::tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
-    }
+QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
+    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
+    if (BusinessActionType::hasToggleState(actionType))
+        return QObject::tr("While %1").arg(typeStr);
+    else
+        return QObject::tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
+}
 
-    const int ProlongedActionRole = Qt::UserRole + 2;
+const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
@@ -120,89 +120,99 @@ QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
         switch (role) {
-            case Qt::CheckStateRole:
-                return (m_disabled ? Qt::Unchecked : Qt::Checked);
-
-            case Qt::ToolTipRole:
-            case Qt::StatusTipRole:
-            case Qt::WhatsThisRole:
-            case Qt::AccessibleDescriptionRole:
-                return m_comments.isEmpty() ? QVariant() : m_comments;
-
-            default:
-                break;
-        }
-    }
-
-    switch (role) {
-        case Qt::DisplayRole:
-        case Qt::AccessibleTextRole:
-            return getText(column);
+        case Qt::CheckStateRole:
+            return (m_disabled ? Qt::Unchecked : Qt::Checked);
 
         case Qt::ToolTipRole:
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
-            return m_comments.isEmpty() ? getText(column) : m_comments;
+            return m_comments.isEmpty() ? QVariant() : m_comments;
 
-        case Qt::DecorationRole:
-            return getIcon(column);
-
-        case Qt::EditRole:
-            if (column == QnBusiness::EventColumn)
-                return m_eventType;
-            else if (column == QnBusiness::ActionColumn)
-                return m_actionType;
-            else if (column == QnBusiness::TargetColumn) {
-                if (m_actionType == BusinessActionType::SendMail)
-                    return m_actionParams.getEmailAddress();
-                if (m_actionType == BusinessActionType::ShowPopup)
-                    return (int)m_actionParams.getUserGroup();
-                if (m_actionType == BusinessActionType::PlaySound)
-                    return m_actionParams.getSoundUrl();
-                if (m_actionType == BusinessActionType::SayText)
-                    return m_actionParams.getSayText();
-            } else if (column == QnBusiness::AggregationColumn)
-                return m_aggregationPeriod;
-            break;
-
-        case Qt::TextColorRole:
-            if (m_system)
-                return QBrush(Qt::yellow);
-            break;
-
-        case Qt::BackgroundRole:
-            if (m_system || m_disabled || isValid())
-                break;
-
-            if (!isValid(column))
-                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
-            return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
-
-        case Qn::ModifiedRole:
-            return m_modified;
-        case Qn::DisabledRole:
-            return m_disabled;
-        case Qn::ValidRole:
-            return isValid();
-        case Qn::ActionIsInstantRole:
-            return !BusinessEventType::hasToggleState(m_eventType);
-        case Qn::ShortTextRole:
-            return getText(column, false);
-
-        case Qn::EventTypeRole:
-            return m_eventType;
-        case Qn::EventResourcesRole:
-            return QVariant::fromValue<QnResourceList>(m_eventResources);
-        case Qn::ActionTypeRole:
-            return m_actionType;
-        case Qn::ActionResourcesRole:
-            return QVariant::fromValue<QnResourceList>(m_actionResources);
-
-        case Qn::HelpTopicIdRole:
-            return getHelpTopic(column);
         default:
             break;
+        }
+    }
+
+    switch (role) {
+    case Qt::DisplayRole:
+    case Qt::AccessibleTextRole:
+        return getText(column);
+
+    case Qt::ToolTipRole:
+    case Qt::StatusTipRole:
+    case Qt::WhatsThisRole:
+    case Qt::AccessibleDescriptionRole:
+        return m_comments.isEmpty() ? getText(column) : m_comments;
+
+    case Qt::DecorationRole:
+        return getIcon(column);
+
+    case Qt::EditRole:
+        switch (column) {
+        case QnBusiness::EventColumn:
+            return m_eventType;
+        case QnBusiness::ActionColumn:
+            return m_actionType;
+        case QnBusiness::TargetColumn:
+        {
+            switch (m_actionType) {
+            case BusinessActionType::SendMail:
+                return m_actionParams.getEmailAddress();
+            case BusinessActionType::ShowPopup:
+                return (int)m_actionParams.getUserGroup();
+            case BusinessActionType::PlaySound:
+            case BusinessActionType::PlaySoundRepeated:
+                return m_actionParams.getSoundUrl();
+            case BusinessActionType::SayText:
+                return m_actionParams.getSayText();
+            default:
+                break;
+            }
+        }
+        case QnBusiness::AggregationColumn:
+            return m_aggregationPeriod;
+        default:
+            break;
+        }
+
+    case Qt::TextColorRole:
+        if (m_system)
+            return QBrush(Qt::yellow);
+        break;
+
+    case Qt::BackgroundRole:
+        if (m_system || m_disabled || isValid())
+            break;
+
+        if (!isValid(column))
+            return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+        return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
+
+    case Qn::ModifiedRole:
+        return m_modified;
+    case Qn::DisabledRole:
+        return m_disabled;
+    case Qn::ValidRole:
+        return isValid();
+    case Qn::ActionIsInstantRole:
+        return !BusinessEventType::hasToggleState(m_eventType);
+    case Qn::ShortTextRole:
+        return getText(column, false);
+
+    case Qn::EventTypeRole:
+        return m_eventType;
+    case Qn::EventResourcesRole:
+        return QVariant::fromValue<QnResourceList>(m_eventResources);
+    case Qn::ActionTypeRole:
+        return m_actionType;
+    case Qn::ActionResourcesRole:
+        return QVariant::fromValue<QnResourceList>(m_actionResources);
+
+    case Qn::HelpTopicIdRole:
+        return getHelpTopic(column);
+    default:
+        break;
     }
     return QVariant();
 }
@@ -221,37 +231,49 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         return false;
 
     switch (column) {
-        case QnBusiness::EventColumn:
-            setEventType((BusinessEventType::Value)value.toInt());
-            return true;
-        case QnBusiness::ActionColumn:
-            setActionType((BusinessActionType::Value)value.toInt());
-            return true;
-        case QnBusiness::SourceColumn:
-            setEventResources(value.value<QnResourceList>());
-            return true;
-        case QnBusiness::TargetColumn:
-            if (m_actionType == BusinessActionType::ShowPopup) {
-                QnBusinessActionParameters params = m_actionParams;
-                params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt());
-                setActionParams(params);
-            }
-            else if (m_actionType == BusinessActionType::PlaySound) {
-                QnBusinessActionParameters params;
-                params.setSoundUrl(value.toString());
-                setActionParams(params);
-            } else if (m_actionType == BusinessActionType::SayText) {
-                QnBusinessActionParameters params;
-                params.setSayText(value.toString());
-                setActionParams(params);
-            } else
-                setActionResources(value.value<QnResourceList>());
-            return true;
-        case QnBusiness::AggregationColumn:
-            setAggregationPeriod(value.toInt());
-            return true;
-        default:
+    case QnBusiness::EventColumn:
+        setEventType((BusinessEventType::Value)value.toInt());
+        return true;
+    case QnBusiness::ActionColumn:
+        setActionType((BusinessActionType::Value)value.toInt());
+        return true;
+    case QnBusiness::SourceColumn:
+        setEventResources(value.value<QnResourceList>());
+        return true;
+    case QnBusiness::TargetColumn:
+        switch(m_actionType) {
+        case BusinessActionType::ShowPopup:
+        {
+            QnBusinessActionParameters params = m_actionParams;
+            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt());
+            setActionParams(params);
             break;
+        }
+        case BusinessActionType::PlaySound:
+        case BusinessActionType::PlaySoundRepeated:
+        {
+            QnBusinessActionParameters params;
+            params.setSoundUrl(value.toString());
+            setActionParams(params);
+            break;
+        }
+        case BusinessActionType::SayText:
+        {
+            QnBusinessActionParameters params;
+            params.setSayText(value.toString());
+            setActionParams(params);
+            break;
+        }
+        default:
+            setActionResources(value.value<QnResourceList>());
+            break;
+        }
+        return true;
+    case QnBusiness::AggregationColumn:
+        setAggregationPeriod(value.toInt());
+        return true;
+    default:
+        break;
     }
 
     return false;
@@ -352,7 +374,7 @@ void QnBusinessRuleViewModel::setEventType(const BusinessEventType::Value value)
     QnBusiness::Fields fields = QnBusiness::EventTypeField | QnBusiness::ModifiedField;
 
     if (BusinessEventType::requiresCameraResource(m_eventType) != cameraRequired ||
-             BusinessEventType::requiresServerResource(m_eventType) != serverRequired) {
+            BusinessEventType::requiresServerResource(m_eventType) != serverRequired) {
         fields |= QnBusiness::EventResourcesField;
     }
 
@@ -581,83 +603,86 @@ QStandardItemModel* QnBusinessRuleViewModel::actionTypesModel() {
 
 QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed) const {
     switch (column) {
-        case QnBusiness::ModifiedColumn:
-            {
-                return (m_modified ? QLatin1String("*") : QString());
-            }
-        case QnBusiness::EventColumn:
-            {
-                return eventTypeString(m_eventType,
-                                       m_eventState,
-                                       m_actionType);
-            }
-        case QnBusiness::SourceColumn:
-            return getSourceText(detailed);
-        case QnBusiness::SpacerColumn:
-            return QString();
-        case QnBusiness::ActionColumn:
-            return BusinessActionType::toString(m_actionType);
-        case QnBusiness::TargetColumn:
-            return getTargetText(detailed);
-        case QnBusiness::AggregationColumn:
-            return getAggregationText();
-        default:
-            break;
+    case QnBusiness::ModifiedColumn:
+        return (m_modified ? QLatin1String("*") : QString());
+    case QnBusiness::EventColumn:
+        return eventTypeString(m_eventType,
+                               m_eventState,
+                               m_actionType);
+    case QnBusiness::SourceColumn:
+        return getSourceText(detailed);
+    case QnBusiness::SpacerColumn:
+        return QString();
+    case QnBusiness::ActionColumn:
+        return BusinessActionType::toString(m_actionType);
+    case QnBusiness::TargetColumn:
+        return getTargetText(detailed);
+    case QnBusiness::AggregationColumn:
+        return getAggregationText();
+    default:
+        break;
     }
     return QVariant();
 }
 
 QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
     switch (column) {
-        case QnBusiness::SourceColumn:
-            {
-                QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
-                if (!BusinessEventType::isResourceRequired(m_eventType)) {
-                    return qnResIconCache->icon(QnResourceIconCache::Servers);
-                } else if (resources.size() == 1) {
-                    QnResourcePtr resource = resources.first();
-                    return qnResIconCache->icon(resource->flags(), resource->getStatus());
-                } else if (BusinessEventType::requiresServerResource(m_eventType)){
-                    return qnResIconCache->icon(QnResourceIconCache::Server);
-                } else /* ::requiresCameraResource(m_eventType) */ {
-                    return qnResIconCache->icon(QnResourceIconCache::Camera);
-                }
-            }
-        case QnBusiness::TargetColumn:
-            {
-                if (m_actionType == BusinessActionType::SendMail) {
-                    if (!isValid(QnBusiness::TargetColumn))
-                        return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                    else
-                        return qnResIconCache->icon(QnResourceIconCache::Users);
-
-                } else if (m_actionType == BusinessActionType::ShowPopup) {
-                    if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
-                        return qnResIconCache->icon(QnResourceIconCache::User);
-                    else
-                        return qnResIconCache->icon(QnResourceIconCache::Users);
-
-                } else if (m_actionType == BusinessActionType::PlaySound || m_actionType == BusinessActionType::SayText) {
-                    return qnSkin->icon("tree/sound.png");
-                }
-
-
-
-                QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
-                if (!BusinessActionType::requiresCameraResource(m_actionType)) {
-                    return qnResIconCache->icon(QnResourceIconCache::Servers);
-                } else if (resources.size() == 1) {
-                    QnResourcePtr resource = resources.first();
-                    return qnResIconCache->icon(resource->flags(), resource->getStatus());
-                } else if (resources.isEmpty()) {
-                    return qnResIconCache->icon(QnResourceIconCache::Offline, true);
-                } else {
-                    return qnResIconCache->icon(QnResourceIconCache::Camera);
-                }
-                //TODO: #GDM special icon for sound action
-            }
+    case QnBusiness::SourceColumn:
+    {
+        //TODO: #GDM check all variants or resource requirements: userResource, serverResource
+        QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
+        if (!BusinessEventType::isResourceRequired(m_eventType)) {
+            return qnResIconCache->icon(QnResourceIconCache::Servers);
+        } else if (resources.size() == 1) {
+            QnResourcePtr resource = resources.first();
+            return qnResIconCache->icon(resource->flags(), resource->getStatus());
+        } else if (BusinessEventType::requiresServerResource(m_eventType)){
+            return qnResIconCache->icon(QnResourceIconCache::Server);
+        } else /* ::requiresCameraResource(m_eventType) */ {
+            return qnResIconCache->icon(QnResourceIconCache::Camera);
+        }
+    }
+    case QnBusiness::TargetColumn:
+    {
+        switch (m_actionType) {
+        case BusinessActionType::SendMail:
+        {
+            if (!isValid(QnBusiness::TargetColumn))
+                return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+            else
+                return qnResIconCache->icon(QnResourceIconCache::Users);
+        }
+        case BusinessActionType::ShowPopup:
+        {
+            if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
+                return qnResIconCache->icon(QnResourceIconCache::User);
+            else
+                return qnResIconCache->icon(QnResourceIconCache::Users);
+        }
+        case BusinessActionType::PlaySound:
+        case BusinessActionType::PlaySoundRepeated:
+        case BusinessActionType::SayText:
+            return qnSkin->icon("tree/sound.png");
         default:
             break;
+        }
+
+        //TODO: #GDM check all variants or resource requirements: userResource, serverResource
+        QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
+        if (!BusinessActionType::requiresCameraResource(m_actionType)) {
+            return qnResIconCache->icon(QnResourceIconCache::Servers);
+        } else if (resources.size() == 1) {
+            QnResourcePtr resource = resources.first();
+            return qnResIconCache->icon(resource->flags(), resource->getStatus());
+        } else if (resources.isEmpty()) {
+            return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+        } else {
+            return qnResIconCache->icon(QnResourceIconCache::Camera);
+        }
+        //TODO: #GDM special icon for sound action
+    }
+    default:
+        break;
     }
     return QVariant();
 }
@@ -679,54 +704,62 @@ bool QnBusinessRuleViewModel::isValid() const {
 
 bool QnBusinessRuleViewModel::isValid(int column) const {
     switch (column) {
-        case QnBusiness::SourceColumn:
-            {
-                switch (m_eventType) {
-                    case BusinessEventType::Camera_Motion:
-                        return QnMotionBusinessEvent::isResourcesListValid(m_eventResources);
-                    case BusinessEventType::Camera_Input:
-                        return QnCameraInputEvent::isResourcesListValid(m_eventResources);
-                    default:
-                        return true;
-                }
-            }
-        case QnBusiness::TargetColumn:
-            {
-                if (m_actionType == BusinessActionType::SendMail) {
-                    bool any = false;
-                    foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
-                        QString email = user->getEmail();
-                        if (email.isEmpty() || !QnEmail::isValid(email))
-                            return false;
-                        any = true;
-                    }
-
-                    QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
-                    foreach(const QString &email, additional) {
-                        if (email.trimmed().isEmpty())
-                            continue;
-                        if (!QnEmail::isValid(email))
-                            return false;
-                        any = true;
-                    }
-                    return any;
-                } else if (m_actionType == BusinessActionType::CameraRecording) {
-                    return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
-                } else if (m_actionType == BusinessActionType::CameraOutput || m_actionType == BusinessActionType::CameraOutputInstant) {
-                    return QnCameraOutputBusinessAction::isResourcesListValid(m_actionResources);
-                } else if (m_actionType == BusinessActionType::PlaySound) {
-                    return !m_actionParams.getSoundUrl().isEmpty();
-                }  else if (m_actionType == BusinessActionType::SayText) {
-                    return !m_actionParams.getSayText().isEmpty();
-                }
-
-                QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
-                if (BusinessActionType::requiresCameraResource(m_actionType) && resources.isEmpty()) {
+    case QnBusiness::SourceColumn:
+    {
+        switch (m_eventType) {
+        case BusinessEventType::Camera_Motion:
+            return QnMotionBusinessEvent::isResourcesListValid(m_eventResources);
+        case BusinessEventType::Camera_Input:
+            return QnCameraInputEvent::isResourcesListValid(m_eventResources);
+        default:
+            return true;
+        }
+    }
+    case QnBusiness::TargetColumn:
+    {
+        switch (m_actionType) {
+        case BusinessActionType::SendMail:
+        {
+            bool any = false;
+            foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
+                QString email = user->getEmail();
+                if (email.isEmpty() || !QnEmail::isValid(email))
                     return false;
-                }
+                any = true;
             }
+
+            QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
+            foreach(const QString &email, additional) {
+                if (email.trimmed().isEmpty())
+                    continue;
+                if (!QnEmail::isValid(email))
+                    return false;
+                any = true;
+            }
+            return any;
+        }
+        case BusinessActionType::CameraRecording:
+            return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
+        case BusinessActionType::CameraOutput:
+        case BusinessActionType::CameraOutputInstant:
+            return QnCameraOutputBusinessAction::isResourcesListValid(m_actionResources);
+        case BusinessActionType::PlaySound:
+        case BusinessActionType::PlaySoundRepeated:
+            return !m_actionParams.getSoundUrl().isEmpty();
+        case BusinessActionType::SayText:
+            return !m_actionParams.getSayText().isEmpty();
         default:
             break;
+        }
+
+        //TODO: #GDM check all variants or resource requirements: userResource, serverResource
+        QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
+        if (BusinessActionType::requiresCameraResource(m_actionType) && resources.isEmpty()) {
+            return false;
+        }
+    }
+    default:
+        break;
     }
     return true;
 }
@@ -780,8 +813,9 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
 }
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
-    if (m_actionType == BusinessActionType::SendMail) {
-
+    switch(m_actionType) {
+    case BusinessActionType::SendMail:
+    {
         QStringList receivers;
         QnUserResourceList users =  m_actionResources.filtered<QnUserResource>();
         foreach (const QnUserResourcePtr &user, users) {
@@ -811,13 +845,16 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (additional.size() > 0)
             return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
         return tr("%1 users").arg(users.size());
-
-    } else if (m_actionType == BusinessActionType::ShowPopup) {
+    }
+    case BusinessActionType::ShowPopup:
+    {
         if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
             return tr("Administrators only");
         else
             return tr("All users");
-    } else if (m_actionType == BusinessActionType::CameraRecording) {
+    }
+    case BusinessActionType::CameraRecording:
+    {
         QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
         if (cameras.isEmpty())
             return tr("Select at least one camera");
@@ -831,7 +868,10 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());
-    } else if (m_actionType == BusinessActionType::CameraOutput || m_actionType == BusinessActionType::CameraOutputInstant) {
+    }
+    case BusinessActionType::CameraOutput:
+    case BusinessActionType::CameraOutputInstant:
+    {
         QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
         if (cameras.isEmpty())
             return tr("Select at least one camera");
@@ -845,19 +885,28 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.size() == 1)
             return getResourceName(cameras.first());
         return tr("%n Camera(s)", "", cameras.size());
-    } else if (m_actionType == BusinessActionType::PlaySound) {
+    }
+    case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
+    {
         QString filename = m_actionParams.getSoundUrl();
         if (filename.isEmpty())
             return tr("Select a sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         return soundModel->titleByFilename(filename);
-    } else if (m_actionType == BusinessActionType::SayText) {
+    }
+    case BusinessActionType::SayText:
+    {
         QString text = m_actionParams.getSayText();
         if (text.isEmpty())
             return tr("Enter the text");
         return text;
     }
+    default:
+        break;
+    }
 
+    //TODO: #GDM check all variants or resource requirements: userResource, serverResource
     QnResourceList resources = m_actionResources;
     if (!BusinessActionType::requiresCameraResource(m_actionType)) {
         return tr("<System>");

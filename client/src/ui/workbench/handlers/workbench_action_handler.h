@@ -187,7 +187,6 @@ protected slots:
 
     void at_messageProcessor_connectionClosed();
     void at_messageProcessor_connectionOpened();
-    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();

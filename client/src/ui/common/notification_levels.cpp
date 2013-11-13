@@ -29,6 +29,7 @@ QColor QnNotificationLevels::notificationColor(Qn::NotificationLevel level) {
     case Qn::ImportantNotification: return qnGlobals->notificationColorImportant();
     case Qn::CriticalNotification:  return qnGlobals->notificationColorCritical();
     case Qn::SystemNotification:    return qnGlobals->notificationColorSystem();
+    case Qn::SoundNotification:     return qnGlobals->notificationColorCommon(); //TODO: #GDM add special color
     default:
         qnWarning("Invalid notification level '%1'.", static_cast<int>(level));
         return QColor();

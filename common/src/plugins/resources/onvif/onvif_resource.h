@@ -201,6 +201,7 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
+    bool isPTZDisabled() const;
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
@@ -420,8 +421,7 @@ private:
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
     int m_streamConfCounter;
-    CameraDiagnostics::Result m_prevOnvifResultCode; 
-    QString m_onvifNotificationSubscriptionReference;
+    CameraDiagnostics::Result m_prevOnvifResultCode;
 
     bool createPullPointSubscription();
     bool pullMessages();

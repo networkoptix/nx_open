@@ -29,7 +29,6 @@ struct QnIprangeCheckerHelper
         CLHttpStatus status = http.doGET(QByteArray(""));
         if (status != CL_TRANSPORT_ERROR) 
         {
-            //event if we received not http, considering camera alive
             discoveryAddress = http.getLocalHost();
             QString gg = discoveryAddress.toString();
             online = true;

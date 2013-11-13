@@ -290,81 +290,77 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 if (bufferEnd-curPtr < nalUnitLen)
                     return clearInternalBuffer();
 
-			    nalUnitType = *curPtr & 0x1f;
-	            //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-	            //m_videoBuffer.write((const char*)curPtr, nalUnitLen);
-	            m_chunks.push_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
+                nalUnitType = *curPtr & 0x1f;
+                //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                //m_videoBuffer.write((const char*)curPtr, nalUnitLen);
+                m_chunks.push_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
                 m_videoFrameSize += nalUnitLen + 4;
-	            updateNalFlags(nalUnitType);
+                updateNalFlags(nalUnitType);
                 curPtr += nalUnitLen;
             }
-	        break;
-	    case FU_B_PACKET:
-	    case FU_A_PACKET:
-	        if (bufferEnd-curPtr < 1)
-	            return clearInternalBuffer();
-	        nalUnitType = *curPtr & 0x1f;
-	        updateNalFlags(nalUnitType);
-	        if (*curPtr  & 0x80) // FU_A first packet
-	        {
-	            m_firstSeqNum = sequenceNum;
-	            m_packetPerNal = 0;
-	            //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-	            nalUnitType += 0x40;
-	            //m_videoBuffer.write( (const char*) &nalUnitType, 1);
-	        }
-	        else {
+            break;
+        case FU_B_PACKET:
+        case FU_A_PACKET:
+            if (bufferEnd-curPtr < 1)
+                return clearInternalBuffer();
+            nalUnitType = *curPtr & 0x1f;
+            updateNalFlags(nalUnitType);
+            if (*curPtr  & 0x80) // FU_A first packet
+            {
+                m_firstSeqNum = sequenceNum;
+                m_packetPerNal = 0;
+                //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                nalUnitType += 0x40;
+                //m_videoBuffer.write( (const char*) &nalUnitType, 1);
+            }
+            else {
                 // if packet loss occured in the middle of FU packet, reset flag.
                 // packet loss will be reported on the last FU packet. So, do not report problem twice
-	            isPacketLost = false;
-	        }
+                isPacketLost = false;
+            }
 
-	        if (*curPtr  & 0x40) // FU_A last packet
-	        {
-	            if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
+            if (*curPtr  & 0x40) // FU_A last packet
+            {
+                if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
                     return clearInternalBuffer(); // packet loss detected
-	        }
+            }
 
-	        curPtr++;
-	        if (packetType == FU_B_PACKET)
-	        {
-	            if (bufferEnd-curPtr < 2)
-	                return clearInternalBuffer();
-	            //don = (curPtr[0] << 8) + curPtr[1];
-	            curPtr += 2;
+            curPtr++;
+            if (packetType == FU_B_PACKET)
+            {
+                if (bufferEnd-curPtr < 2)
+                    return clearInternalBuffer();
+                //don = (curPtr[0] << 8) + curPtr[1];
+                curPtr += 2;
 
-	        }
-	        //m_videoBuffer.write( (const char*) curPtr, bufferEnd - curPtr);
-	        if (m_packetPerNal == 0) {// FU_A first packetf
-	            --curPtr;
-	            *curPtr = nalUnitType;
-	        }
-	        m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0));
+            }
+            //m_videoBuffer.write( (const char*) curPtr, bufferEnd - curPtr);
+            if (m_packetPerNal == 0) {// FU_A first packetf
+                --curPtr;
+                *curPtr = nalUnitType;
+            }
+            m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0));
             m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
-	        break;
-	    case MTAP16_PACKET:
-	    case MTAP24_PACKET:
-	        // not implemented
-	        return clearInternalBuffer();
-	    default:
-	        curPtr--;
-	        nalUnitType = *curPtr & 0x1f;
-	        //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-	        //m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
-	        m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
+            break;
+        case MTAP16_PACKET:
+        case MTAP24_PACKET:
+            // not implemented
+            return clearInternalBuffer();
+        default:
+            curPtr--;
+            nalUnitType = *curPtr & 0x1f;
+            //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            //m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
+            m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
             m_videoFrameSize += bufferEnd - curPtr + 4;
-	        updateNalFlags(nalUnitType);
-	        break; // ignore unknown data
+            updateNalFlags(nalUnitType);
+            break; // ignore unknown data
     }
 
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if (rtpHeader->marker) 
-    {
-        if (!m_frameExists)
-            return clearInternalBuffer();
+    if (rtpHeader->marker && m_frameExists)
         result = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
-    }
     return true;
 }

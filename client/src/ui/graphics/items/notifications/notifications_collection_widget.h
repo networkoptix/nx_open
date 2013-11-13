@@ -94,6 +94,7 @@ private slots:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    void hideBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
     void updateBlinker();
 
@@ -103,6 +104,7 @@ private slots:
     void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+    void at_notificationCache_fileDownloaded(const QString& filename, bool ok);
 
 private:
     /**
@@ -115,11 +117,14 @@ private:
 
 private:
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
 
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
+    QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
+    QMultiHash<int, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 

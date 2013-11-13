@@ -6,16 +6,17 @@
 #include <QtCore/QString>
 
 namespace QnLexicalDetail {
-    class QStringWrapper {
+    template<class T>
+    class ValueWrapper {
     public:
-        QStringWrapper(const QString &string): m_string(string) {}
+        ValueWrapper(const T &value): m_value(value) {}
 
-        operator const QString &() const {
-            return m_string;
+        operator const T &() const {
+            return m_value;
         }
 
     private:
-        const QString &m_string;
+        const T &m_value;
     };
 
     template<class T>
@@ -30,7 +31,7 @@ namespace QnLexicalDetail {
          * Note that we wrap a string into a wrapper so that
          * ADL would find only overloads with QString as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(QStringWrapper(value), target);
+        return deserialize(ValueWrapper<QString>(value), target);
     }
 
 } // namespace QnLexicalDetail
