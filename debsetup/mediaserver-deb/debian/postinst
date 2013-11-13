@@ -97,7 +97,7 @@ function ask_for_value {
     echo $RESULT
 }
 
-function validate_ecsPassword {
+function validate_appserverPassword {
     [ -n "$1" ]
 }
 
@@ -111,25 +111,25 @@ function validate_storage {
 
 case "$1" in
   configure)
-      ECS_HOST="$($CFG_HELPER ecsHost)"
+      ECS_HOST="$($CFG_HELPER appserverHost)"
       [ -z "$ECS_HOST" ] && ECS_HOST=$ECS_HOST_DEFAULT
-      ECS_HOST=$(ask_for_value ecsHost "$ECS_HOST")
-      $CFG_HELPER ecsHost "$ECS_HOST"
+      ECS_HOST=$(ask_for_value appserverHost "$ECS_HOST")
+      $CFG_HELPER appserverHost "$ECS_HOST"
 
-      ECS_PORT="$($CFG_HELPER ecsPort)"
+      ECS_PORT="$($CFG_HELPER appserverPort)"
       [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
-      ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
-      $CFG_HELPER ecsPort "$ECS_PORT"
+      ECS_PORT=$(ask_for_value appserverPort "$ECS_PORT")
+      $CFG_HELPER appserverPort "$ECS_PORT"
 
-      ECS_LOGIN="$($CFG_HELPER ecsLogin)"
+      ECS_LOGIN="$($CFG_HELPER appserverLogin)"
       [ -z "$ECS_LOGIN" ] && ECS_LOGIN=$ECS_LOGIN_DEFAULT
-      ECS_LOGIN=$(ask_for_value ecsLogin "$ECS_LOGIN")
-      $CFG_HELPER ecsLogin "$ECS_LOGIN"
+      ECS_LOGIN=$(ask_for_value appserverLogin "$ECS_LOGIN")
+      $CFG_HELPER appserverLogin "$ECS_LOGIN"
 
-      ECS_PASSWORD="$($CFG_HELPER ecsPassword)"
+      ECS_PASSWORD="$($CFG_HELPER appserverPassword)"
       [ -z "$ECS_PASSWORD" ] && ECS_PASSWORD=$ECS_PASSWORD_DEFAULT
-      ECS_PASSWORD=$(ask_for_value ecsPassword "$ECS_PASSWORD")
-      $CFG_HELPER ecsPassword "$ECS_PASSWORD"
+      ECS_PASSWORD=$(ask_for_value appserverPassword "$ECS_PASSWORD")
+      $CFG_HELPER appserverPassword "$ECS_PASSWORD"
 
       TRANSPORT="$($CFG_HELPER transport)"
       [ -z "$ECS_TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
@@ -172,6 +172,8 @@ case "$1" in
           STATIC_PUBLIC_IP=$(ask_for_value staticPublicIP "$STATIC_PUBLIC_IP")
           $CFG_HELPER staticPublicIP "$STATIC_PUBLIC_IP"
       fi
+
+      chmod 600 $CONFIG_FILE
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
