@@ -220,7 +220,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     bool someRecordingIsPresent = false;
 
     QnStorageManager* storageMan = QnStorageManager::instance();
-    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline && storageMan->rebuildState() == QnStorageManager::RebuildState_None)
+    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
     {
         someRecordingIsPresent = true;
 
@@ -498,6 +498,7 @@ void QnRecordingManager::onTimer()
             recorders.recorderLowRes->updateScheduleInfo(time);
         someRecordingIsPresent |= startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
     }
+
     QnStorageManager* storageMan = QnStorageManager::instance();
     if (!someRecordingIsPresent && storageMan->rebuildState() == QnStorageManager::RebuildState_WaitForRecordersStopped)
     {

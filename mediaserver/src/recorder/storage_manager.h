@@ -118,6 +118,7 @@ private:
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role);
+    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QString& mac, QnResource::ConnectionRole role);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;

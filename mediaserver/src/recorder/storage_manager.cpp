@@ -95,12 +95,14 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         QMutexLocker lock(&m_mutexCatalog);
         m_rebuildProgress = 0;
         m_catalogLoaded = false;
+        /*
         foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogHi)
             catalog->beforeRebuildArchive();
         foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogLow)
             catalog->beforeRebuildArchive();
         m_devFileCatalogHi.clear();
         m_devFileCatalogLow.clear();
+        */
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     }
     loadFullFileCatalog(true);
@@ -111,7 +113,8 @@ void QnStorageManager::rebuildCatalogAsync()
 {
     if (m_rebuildState == RebuildState_None) {
         m_rebuildProgress = 0.0;
-        setRebuildState(QnStorageManager::RebuildState_WaitForRecordersStopped);
+        //setRebuildState(QnStorageManager::RebuildState_WaitForRecordersStopped);
+        setRebuildState(QnStorageManager::RebuildState_Started);
     }
 }
 
@@ -160,8 +163,16 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
     {
         if (rebuildMode && m_rebuildState != RebuildState_Started)
             return; // cancel rebuild
-        getFileCatalogInternal(fi.fileName(), role);
-        m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
+        if (rebuildMode)
+        {
+            DeviceFileCatalogPtr catalog(new DeviceFileCatalog(fi.fileName(), role));
+            catalog->doRebuildArchive();
+            addDataToCatalog(catalog, fi.fileName(), role);
+            m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
+        }
+        else {
+            getFileCatalogInternal(fi.fileName(), role);
+        }
     }
 }
 
@@ -737,6 +748,46 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
     return getFileCatalogInternal(mac, role);
 }
 
+void QnStorageManager::addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QString& mac, QnResource::ConnectionRole role)
+{
+    QMutexLocker lock(&m_mutexCatalog);
+    bool hiQuality = role == QnResource::Role_LiveVideo;
+    FileCatalogMap& catalog = hiQuality ? m_devFileCatalogHi : m_devFileCatalogLow;
+    DeviceFileCatalogPtr existingCatalog = catalog[mac];
+    bool isLastRecordRecording = false;
+    if (existingCatalog == 0)
+    {
+        existingCatalog = catalog[mac] = newCatalog;
+    }
+    else 
+    {
+        existingCatalog->close();
+
+        isLastRecordRecording = existingCatalog->isLastRecordRecording();
+        if (!newCatalog->isEmpty() && !existingCatalog->isEmpty()) {
+            // merge data
+            DeviceFileCatalog::Chunk& newChunk = newCatalog->m_chunks.last();
+            int idx = existingCatalog->m_chunks.size()-1;
+            for (; idx >= 0; --idx)
+            {
+                DeviceFileCatalog::Chunk oldChunk = existingCatalog->chunkAt(idx);
+                if (oldChunk.startTimeMs < newChunk.startTimeMs)
+                    break;
+            }
+            for (int i = idx+1; i < existingCatalog->m_chunks.size(); ++i)
+            {
+                if (existingCatalog->m_chunks[i].startTimeMs == newChunk.startTimeMs)
+                    newChunk.durationMs = existingCatalog->m_chunks[i].durationMs;
+                else
+                    newCatalog->addChunk(existingCatalog->m_chunks[i]);
+            }
+
+            existingCatalog = catalog[mac] = newCatalog;
+        }
+    }
+    existingCatalog->rewriteCatalog(isLastRecordRecording);
+}
+
 DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_mutexCatalog);
@@ -746,6 +797,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& mac
     if (fileCatalog == 0)
     {
         fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, role));
+        fileCatalog->readCatalog();
         catalog[mac] = fileCatalog;
     }
     return fileCatalog;
