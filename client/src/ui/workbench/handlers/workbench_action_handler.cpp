@@ -1195,6 +1195,12 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
                 return;
             name = dialog->name();
 
+            // that's the case when user press "Save As" and enters the same name as this layout already has
+            if (name == layout->getName()) {
+                at_saveLayoutAction_triggered(layout);
+                return;
+            }
+
             button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
             if (!canRemoveLayouts(existing)) {
