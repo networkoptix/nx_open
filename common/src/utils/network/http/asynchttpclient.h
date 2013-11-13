@@ -29,7 +29,6 @@ namespace nx_http
         
         \warning Instance of \a AsyncHttpClient MUST be used as shared pointer (std::shared_ptr)
 
-        \note On receiving reply, client will not start downloading message body until \a readMessageBody() call
         \note This class methods are not thread-safe
         \note All signals are emitted from io::AIOService threads
         \note State is changed just before emitting signal
