@@ -22,6 +22,7 @@
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
 #include "utils/common/json.h"
+#include "mustache/mustache.h"
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -267,18 +268,14 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
         QByteArray replyData = reply->readAll();
 
-        struct ErrorMessage {
-            QString error;
-            QString message;
-            QStringList arguments;
-        };
-
+        // If we can deserialize JSON it means there is an error.
         QJsonObject errorMessage;
         if (QJson::deserialize(replyData, &errorMessage)) {
+            QString error = errorMessage.value(lit("error")).toString();
             QString message = errorMessage.value(lit("message")).toString();
-            foreach (QJsonValue arg, errorMessage.value(lit("arguments")).toArray()) {
-                message = message.arg(arg.toString());
-            }
+            QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+
+            message = Mustache::renderTemplate(message, arguments);
 
             QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license.") + lit(" ") + message);
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
