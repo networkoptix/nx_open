@@ -1156,6 +1156,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
     } else {
+        //TODO: #GDM check existing layouts.
+        //TODO: #GDM all remotes layout checking and saving should be done in one place
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
 }
