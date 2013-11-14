@@ -43,7 +43,6 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     m_showBusinessEventsHelper = this->context()->instance<QnShowBusinessEventsHelper>();
 
     connect(ui->showAllCheckBox,        SIGNAL(toggled(bool)),                              this,   SLOT(at_showAllCheckBox_toggled(bool)));
-    connect(this->context(),            SIGNAL(userChanged(const QnUserResourcePtr &)),     this,   SLOT(at_context_userChanged()));
     connect(m_showBusinessEventsHelper, SIGNAL(valueChanged(quint64)),                      this,   SLOT(at_showBusinessEvents_valueChanged(quint64)));
 }
 
@@ -115,9 +114,4 @@ void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged(quint64 value) {
     }
 
     ui->showAllCheckBox->setChecked(all);
-}
-
-
-void QnPopupSettingsWidget::at_context_userChanged() {
-    m_showBusinessEventsHelper->setResource(context()->user());
 }

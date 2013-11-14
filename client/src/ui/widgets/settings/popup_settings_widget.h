@@ -26,7 +26,6 @@ public:
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
     void at_showBusinessEvents_valueChanged(quint64 value);
-    void at_context_userChanged();
 
 private:
     QScopedPointer<Ui::QnPopupSettingsWidget> ui;

@@ -51,10 +51,6 @@ private:
 
     bool isAdmin() const;
 
-private slots:
-    void at_context_userChanged();
-
-
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 

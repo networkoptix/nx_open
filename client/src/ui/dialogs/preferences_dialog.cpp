@@ -30,7 +30,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_recordingSettingsWidget(NULL),
     m_popupSettingsWidget(new QnPopupSettingsWidget(this)),
     m_licenseManagerWidget(NULL),
-    m_serverSettingsWidget(new QnServerSettingsWidget(this))
+    m_serverSettingsWidget(NULL)
 {
     ui->setupUi(this);
 
@@ -44,11 +44,16 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
 
 #ifndef CL_TRIAL_MODE
-    m_licenseManagerWidget = new QnLicenseManagerWidget(this);
-    ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
+    if (isAdmin()) {
+        m_licenseManagerWidget = new QnLicenseManagerWidget(this);
+        ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
+    }
 #endif
 
-    ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
+    if (isAdmin()) {
+        m_serverSettingsWidget = new QnServerSettingsWidget(this);
+        ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
+    }
 
     if (qnSettings->isWritable()) {
         ui->readOnlyWarningLabel->hide();
@@ -64,9 +69,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     }
 
     resize(1, 1); // set widget size to minimal possible
-
-    connect(context, SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
-    at_context_userChanged();
+    updateFromSettings();
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {
@@ -87,10 +90,10 @@ void QnPreferencesDialog::submitToSettings() {
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
 
-    if (isAdmin()) {
+    if (m_serverSettingsWidget)
         m_serverSettingsWidget->submitToSettings();
-        m_popupSettingsWidget->submitToSettings();
-    }
+    m_popupSettingsWidget->submitToSettings();
+
 
     if (qnSettings->isWritable())
         qnSettings->save();
@@ -101,10 +104,10 @@ void QnPreferencesDialog::updateFromSettings() {
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
 
-    if (isAdmin()) {
+    if (m_serverSettingsWidget)
         m_serverSettingsWidget->updateFromSettings();
-        m_popupSettingsWidget->updateFromSettings();
-    }
+
+    m_popupSettingsWidget->updateFromSettings();
 }
 
 bool QnPreferencesDialog::isAdmin() const {
@@ -123,7 +126,8 @@ QnPreferencesDialog::DialogPage QnPreferencesDialog::currentPage() const {
             ui->tabWidget->currentWidget() == m_licenseManagerWidget)
         return LicensesPage;
 
-    if (ui->tabWidget->currentWidget() == m_serverSettingsWidget)
+    if (m_serverSettingsWidget &&
+            ui->tabWidget->currentWidget() == m_serverSettingsWidget)
         return ServerPage;
 
     if (ui->tabWidget->currentWidget() == m_popupSettingsWidget)
@@ -146,8 +150,10 @@ void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::DialogPage page) {
             ui->tabWidget->setCurrentWidget(m_licenseManagerWidget);
         break;
     case ServerPage:
-        ui->tabWidget->setCurrentWidget(m_serverSettingsWidget);
-        m_serverSettingsWidget->updateFocusedElement();
+        if (m_serverSettingsWidget) {
+            ui->tabWidget->setCurrentWidget(m_serverSettingsWidget);
+            m_serverSettingsWidget->updateFocusedElement();
+        }
         break;
     case NotificationsPage:
         ui->tabWidget->setCurrentWidget(m_popupSettingsWidget);
@@ -155,11 +161,4 @@ void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::DialogPage page) {
     default:
         break;
     }
-}
-
-void QnPreferencesDialog::at_context_userChanged() {
-    if (m_licenseManagerWidget)
-        ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(m_licenseManagerWidget), isAdmin());
-    ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(m_serverSettingsWidget), isAdmin());
-    updateFromSettings();
 }
