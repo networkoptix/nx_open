@@ -224,6 +224,12 @@
                                             <value>None</value>
                                         </replacement>
 
+                                        <!-- Enabling SEH exceptions for crash stack dump -->
+                                        <replacement>
+                                            <token><![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
+                                            <value><![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
+                                        </replacement>
+
                                         <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
                                         <!-- <replacement>
 											<xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
