@@ -447,12 +447,6 @@ private:
     int m_exportsToFinishBeforeClosure;
     QObject* m_objectToSignalWhenDone;
     QByteArray m_methodToInvokeWhenDone;
-
-    struct {
-        bool queued;
-        QnSoftwareVersion version;
-        QUrl url;
-    } m_pendingRestart;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

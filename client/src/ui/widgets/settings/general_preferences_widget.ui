@@ -312,48 +312,50 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="hardwareDecodingControlsLayout">
-        <item>
-         <widget class="QLabel" name="hardwareDecodingLabel">
-          <property name="minimumSize">
-           <size>
-            <width>210</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Use Hardware Acceleration:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="hardwareDecodingCheckBox">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="hwAccelerationWarningLabel">
-          <property name="text">
-           <string>Experimental. May result in glitches.</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QWidget" name="hardwareAccelerationWidget" native="true">
+        <layout class="QHBoxLayout" name="hardwareDecodingControlsLayout">
+         <item>
+          <widget class="QLabel" name="hardwareDecodingLabel">
+           <property name="minimumSize">
+            <size>
+             <width>210</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Use Hardware Acceleration:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="hardwareDecodingCheckBox">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="hwAccelerationWarningLabel">
+           <property name="text">
+            <string>Experimental. May result in glitches.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_10">

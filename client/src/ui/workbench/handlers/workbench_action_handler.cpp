@@ -210,8 +210,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_exportsToFinishBeforeClosure(0),
     m_objectToSignalWhenDone(nullptr)
 {
-    m_pendingRestart.queued = false;
-
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
@@ -4139,21 +4137,40 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
-    m_pendingRestart.queued = true;
-
     QnActionParameters parameters = menu()->currentParameters(sender());
-    m_pendingRestart.version = parameters.hasArgument(Qn::SoftwareVersionRole)
+
+    QnSoftwareVersion version = parameters.hasArgument(Qn::SoftwareVersionRole)
             ? parameters.argument<QnSoftwareVersion>(Qn::SoftwareVersionRole)
             : QnSoftwareVersion();
-    m_pendingRestart.url = parameters.hasArgument(Qn::UrlRole)
+    QUrl url = parameters.hasArgument(Qn::UrlRole)
             ? parameters.argument<QUrl>(Qn::UrlRole)
             : context()->user()
               ? QnAppServerConnectionFactory::defaultUrl()
               : QUrl();
+    QByteArray auth = url.toEncoded();
 
     bool isInstalled;
+    bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
+    if (success && isInstalled) {
+        //TODO: #GDM wtf? whats up with order?
+        if(context()->user()) { // TODO: #Elric factor out
+            QnWorkbenchState state;
+            workbench()->submit(state);
 
-    if (applauncher::isVersionInstalled(QnSoftwareVersion(), &isInstalled) != applauncher::api::ResultType::ok) {
+            QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
+            states[context()->user()->getName()] = state;
+            qnSettings->setUserWorkbenchStates(states);
+        }
+
+        menu()->trigger(Qn::ClearCameraSettingsAction);
+        if(!closeAllLayouts(true)) {
+            return;
+        }
+
+        success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
+    }
+
+    if (!success) {
         QMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process is not found"),
@@ -4162,20 +4179,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
                     );
         return;
     }
-
-    if (applauncher::isVersionInstalled(m_pendingRestart.version, &isInstalled) != applauncher::api::ResultType::ok) {
-        if (applauncher::restartClient(m_pendingRestart.version, m_pendingRestart.url.toEncoded()) == applauncher::api::ResultType::ok)
-            QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
-/*                if (!m_restartPending) {
-                    QMessageBox::critical(
-                                this,
-                                tr("Launcher process is not found"),
-                                tr("Cannot restart the client.\n"
-                                   "Please close the application and start it again using the shortcut in the start menu.")
-                                );
-                }*/
-    }
-
+    qApp->exit(0);
 }
 
 void QnWorkbenchActionHandler::checkForClosurePending()

@@ -75,6 +75,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
     connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
+    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -111,10 +112,16 @@ void QnGeneralPreferencesWidget::submitToSettings() {
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(qnSettings->mediaFolder()));
-    ui->downmixAudioCheckBox->setChecked(qnSettings->isAudioDownmixed());
+
+    m_oldDownmix = qnSettings->isAudioDownmixed();
+    ui->downmixAudioCheckBox->setChecked(m_oldDownmix);
+
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->isIpShownInTree());
-    ui->hardwareDecodingCheckBox->setChecked(qnSettings->isHardwareDecodingUsed());
+
+    m_oldHardwareAcceleration = qnSettings->isHardwareDecodingUsed();
+    ui->hardwareDecodingCheckBox->setChecked(m_oldHardwareAcceleration);
+
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
     ui->autoStartCheckBox->setChecked(qnSettings->autoStart());
 
@@ -126,18 +133,16 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
+    m_oldLanguage = 0;
     QString translationPath = qnSettings->translationPath();
     for(int i = 0; i < ui->languageComboBox->count(); i++) {
         QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
         if(translation.filePaths().contains(translationPath)) {
-            ui->languageComboBox->setCurrentIndex(i);
+            m_oldLanguage = i;
             break;
         }
     }
-
-    m_oldDownmix = ui->downmixAudioCheckBox->isChecked();
-    m_oldLanguage = ui->languageComboBox->currentIndex();
-    m_oldHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
+    ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 }
 
 bool QnGeneralPreferencesWidget::confirmCriticalSettings() {
@@ -165,7 +170,7 @@ bool QnGeneralPreferencesWidget::confirmCriticalSettings() {
         switch(QMessageBox::information(
                     this,
                     tr("Information"),
-                    tr("Some changes will take effect only after application restart. Press OK to restart the application now."),
+                    tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                     QMessageBox::Yes
         )) {
@@ -236,7 +241,7 @@ void QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged() {
 
 void QnGeneralPreferencesWidget::at_timeModeComboBox_activated() {
     if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
-        QMessageBox::warning(this, tr("Warning"), tr("This settings will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
+        QMessageBox::warning(this, tr("Warning"), tr("This option will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
     }
 }
 
@@ -248,19 +253,11 @@ void QnGeneralPreferencesWidget::at_pluginManager_pluginLoaded()
     {
         if( plugin->isHardwareAccelerated() )
         {
-            ui->hardwareDecodingCheckBox->show();
-            if( ui->hardwareDecodingCheckBox->isChecked() )
-                ui->hwAccelerationWarningLabel->show();
-            connect( ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
+            ui->hardwareAccelerationWidget->setVisible(true);
             return;
         }
     }
-
-    disconnect( ui->hardwareDecodingCheckBox, SIGNAL(toggled(bool)), ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
-    ui->miscGroupBox->layout()->removeItem( ui->hardwareDecodingControlsLayout );
-    ui->hardwareDecodingCheckBox->hide();
-    ui->hardwareDecodingLabel->hide();
-    ui->hwAccelerationWarningLabel->hide();
+    ui->hardwareAccelerationWidget->setVisible(false);
 }
 
 void QnGeneralPreferencesWidget::at_downmixAudioCheckBox_toggled(bool checked) {
