@@ -18,7 +18,7 @@
 #include <ui/workbench/workbench_context.h>
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnPopupSettingsWidget)
 {

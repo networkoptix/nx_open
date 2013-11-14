@@ -32,7 +32,7 @@ namespace {
 
 
 QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingSettings),
     m_settings(new QnVideoRecorderSettings(this)),

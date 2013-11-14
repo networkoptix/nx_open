@@ -4,24 +4,26 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
 class QnGeneralPreferencesWidget;
 }
 
-class QnGeneralPreferencesWidget : public QWidget, protected QnWorkbenchContextAware
+class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, protected QnWorkbenchContextAware
 {
     Q_OBJECT
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     explicit QnGeneralPreferencesWidget(QWidget *parent = 0);
     ~QnGeneralPreferencesWidget();
 
-    void submitToSettings();
-    void updateFromSettings();
+    virtual void submitToSettings() override;
+    virtual void updateFromSettings() override;
 
-    bool confirmCriticalSettings();
+    virtual bool confirm() override;
 private:
     void initTranslations();
 

@@ -30,7 +30,7 @@
 #include <utils/network/nettools.h>
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnGeneralPreferencesWidget)
 {
@@ -145,7 +145,7 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 }
 
-bool QnGeneralPreferencesWidget::confirmCriticalSettings() {
+bool QnGeneralPreferencesWidget::confirm() {
     bool newHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
     if(newHardwareAcceleration && m_oldHardwareAcceleration != newHardwareAcceleration) {
         switch (QMessageBox::warning(

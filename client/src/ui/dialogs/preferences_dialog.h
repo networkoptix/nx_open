@@ -6,17 +6,10 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/button_box_dialog.h>
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 
 class QnWorkbenchContext;
 class QnClientSettings;
-
-class QnGeneralPreferencesWidget;
-class QnConnectionsSettingsWidget;
-class QnLicenseManagerWidget;
-class QnRecordingSettingsWidget;
-class QnServerSettingsWidget;
-class QnPopupSettingsWidget;
-
 
 namespace Ui {
     class PreferencesDialog;
@@ -49,17 +42,11 @@ private:
     void updateFromSettings();
     void submitToSettings();
 
-    bool isAdmin() const;
-
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 
     QScopedPointer<Ui::PreferencesDialog> ui;
-    QnGeneralPreferencesWidget* m_generalPreferencesWidget;
-    QnRecordingSettingsWidget *m_recordingSettingsWidget;
-    QnPopupSettingsWidget *m_popupSettingsWidget;
-    QnLicenseManagerWidget *m_licenseManagerWidget;
-    QnServerSettingsWidget *m_serverSettingsWidget;
+    QMap<DialogPage, QnAbstractPreferencesWidget*> m_pages;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

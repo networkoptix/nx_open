@@ -6,6 +6,7 @@
 
 #include "licensing/license.h"
 #include "api/app_server_connection.h"
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 
 class QNetworkAccessManager;
 
@@ -15,8 +16,9 @@ namespace Ui {
     class LicenseManagerWidget;
 }
 
-class QnLicenseManagerWidget : public QWidget {
+class QnLicenseManagerWidget : public QnAbstractPreferencesWidget {
     Q_OBJECT
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);

@@ -28,7 +28,7 @@
 #include <utils/common/json.h>
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::LicenseManagerWidget),
     m_httpClient(NULL)
 {

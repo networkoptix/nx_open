@@ -334,4 +334,5 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
                                        ? AdvancedPage
                                        : SimplePage);
     m_settingsReceived = true;
+    updateFocusedElement();
 }

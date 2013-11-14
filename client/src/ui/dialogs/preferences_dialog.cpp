@@ -1,13 +1,6 @@
 #include "preferences_dialog.h"
 #include "ui_preferences_dialog.h"
 
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QFileDialog>
-
-
-#include <utils/common/util.h>
-#include <utils/common/warnings.h>
-#include <utils/applauncher_utils.h>
 #include <client/client_settings.h>
 
 #include <ui/screen_recording/screen_recorder.h>
@@ -25,34 +18,32 @@
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(context),
-    ui(new Ui::PreferencesDialog()),
-    m_generalPreferencesWidget(new QnGeneralPreferencesWidget(this)),
-    m_recordingSettingsWidget(NULL),
-    m_popupSettingsWidget(new QnPopupSettingsWidget(this)),
-    m_licenseManagerWidget(NULL),
-    m_serverSettingsWidget(NULL)
+    ui(new Ui::PreferencesDialog())
 {
     ui->setupUi(this);
 
-    ui->tabWidget->addTab(m_generalPreferencesWidget, tr("General"));
+    m_pages[GeneralPage] = new QnGeneralPreferencesWidget(this);
+    ui->tabWidget->addTab(m_pages[GeneralPage], tr("General"));
 
     if (QnScreenRecorder::isSupported()) {
-        m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-        ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
+        m_pages[RecordingPage] = new QnRecordingSettingsWidget(this);
+        ui->tabWidget->addTab(m_pages[RecordingPage], tr("Screen Recorder"));
     }
 
-    ui->tabWidget->addTab(m_popupSettingsWidget, tr("Notifications"));
+    m_pages[NotificationsPage] = new QnPopupSettingsWidget(this);
+    ui->tabWidget->addTab(m_pages[NotificationsPage], tr("Notifications"));
 
+    bool isAdmin = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
 #ifndef CL_TRIAL_MODE
-    if (isAdmin()) {
-        m_licenseManagerWidget = new QnLicenseManagerWidget(this);
-        ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
+    if (isAdmin) {
+        m_pages[LicensesPage] = new QnLicenseManagerWidget(this);
+        ui->tabWidget->addTab(m_pages[LicensesPage], tr("Licenses"));
     }
 #endif
 
-    if (isAdmin()) {
-        m_serverSettingsWidget = new QnServerSettingsWidget(this);
-        ui->tabWidget->addTab(m_serverSettingsWidget, tr("Server"));
+    if (isAdmin) {
+        m_pages[ServerPage] = new QnServerSettingsWidget(this);
+        ui->tabWidget->addTab(m_pages[ServerPage], tr("Server"));
     }
 
     if (qnSettings->isWritable()) {
@@ -76,89 +67,40 @@ QnPreferencesDialog::~QnPreferencesDialog() {
 }
 
 void QnPreferencesDialog::accept() {
-
-    if (!m_generalPreferencesWidget->confirmCriticalSettings())
-        return;
+    foreach(QnAbstractPreferencesWidget* page, m_pages)
+        if (!page->confirm())
+            return;
 
     submitToSettings();
     base_type::accept();
 }
 
 void QnPreferencesDialog::submitToSettings() {
-    m_generalPreferencesWidget->submitToSettings();
-
-    if (m_recordingSettingsWidget)
-        m_recordingSettingsWidget->submitToSettings();
-
-    if (m_serverSettingsWidget)
-        m_serverSettingsWidget->submitToSettings();
-    m_popupSettingsWidget->submitToSettings();
-
+    foreach(QnAbstractPreferencesWidget* page, m_pages)
+        page->submitToSettings();
 
     if (qnSettings->isWritable())
         qnSettings->save();
 }
 
 void QnPreferencesDialog::updateFromSettings() {
-    m_generalPreferencesWidget->updateFromSettings();
-    if (m_recordingSettingsWidget)
-        m_recordingSettingsWidget->updateFromSettings();
-
-    if (m_serverSettingsWidget)
-        m_serverSettingsWidget->updateFromSettings();
-
-    m_popupSettingsWidget->updateFromSettings();
-}
-
-bool QnPreferencesDialog::isAdmin() const {
-    return accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
+    foreach(QnAbstractPreferencesWidget* page, m_pages)
+        page->updateFromSettings();
 }
 
 QnPreferencesDialog::DialogPage QnPreferencesDialog::currentPage() const {
-    if (ui->tabWidget->currentWidget() == m_generalPreferencesWidget)
-        return GeneralPage;
-
-    if (m_recordingSettingsWidget &&
-            ui->tabWidget->currentWidget() == m_recordingSettingsWidget)
-        return RecordingPage;
-
-    if (m_licenseManagerWidget &&
-            ui->tabWidget->currentWidget() == m_licenseManagerWidget)
-        return LicensesPage;
-
-    if (m_serverSettingsWidget &&
-            ui->tabWidget->currentWidget() == m_serverSettingsWidget)
-        return ServerPage;
-
-    if (ui->tabWidget->currentWidget() == m_popupSettingsWidget)
-        return NotificationsPage;
-
+    for (int i = 0; i < PageCount; ++i) {
+        DialogPage page = static_cast<DialogPage>(i);
+        if (!m_pages.contains(page))
+            continue;
+        if (ui->tabWidget->currentWidget() == m_pages[page])
+            return page;
+    }
     return GeneralPage;
 }
 
 void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::DialogPage page) {
-    switch (page) {
-    case GeneralPage:
-        ui->tabWidget->setCurrentWidget(m_generalPreferencesWidget);
-        break;
-    case RecordingPage:
-        if (m_recordingSettingsWidget)
-            ui->tabWidget->setCurrentWidget(m_recordingSettingsWidget);
-        break;
-    case LicensesPage:
-        if (m_licenseManagerWidget)
-            ui->tabWidget->setCurrentWidget(m_licenseManagerWidget);
-        break;
-    case ServerPage:
-        if (m_serverSettingsWidget) {
-            ui->tabWidget->setCurrentWidget(m_serverSettingsWidget);
-            m_serverSettingsWidget->updateFocusedElement();
-        }
-        break;
-    case NotificationsPage:
-        ui->tabWidget->setCurrentWidget(m_popupSettingsWidget);
-        break;
-    default:
-        break;
-    }
+    if (!m_pages.contains(page))
+        return;
+    ui->tabWidget->setCurrentWidget(m_pages[page]);
 }
