@@ -207,6 +207,7 @@
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
+            <ComponentRef Id="InstallDirRegComp"/>
         </Feature>
 
         <FeatureRef Id="ClientFeature"/>
