@@ -4162,10 +4162,11 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
             qnSettings->setUserWorkbenchStates(states);
         }
 
-        menu()->trigger(Qn::ClearCameraSettingsAction);
+        //TODO: #GDM factor out
         if(!closeAllLayouts(true)) {
             return;
         }
+        menu()->trigger(Qn::ClearCameraSettingsAction);
 
         success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
     }
