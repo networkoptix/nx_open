@@ -82,6 +82,11 @@
                             Win64="no"/>
         </Property>
 
+        <Property Id="INSTALLDIR">
+              <RegistrySearch Id='InstallDirRegistry' Type='raw'
+                    Root='HKLM' Key='Software\[Manufacturer]\${product.name}' Name='InstallDir' />
+        </Property>
+
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\${build.configuration}\CustomActions.dll" />
 
         <!-- Custom actions -->
@@ -97,6 +102,11 @@
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
+
+        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
+                      Value="&quot;[${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             Schedule="afterInstallInitialize"
@@ -120,11 +130,30 @@
         <InstallExecuteSequence>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
+
+            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
+                <![CDATA[ NOT $(var.VmsInstalling) ]]>
+            </Custom>
+            <Custom Action="CloseAppLauncherAction" Before="StopServices">
+                <![CDATA[ NOT $(var.VmsInstalling) ]]>
+            </Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
+
+            <Component Id="InstallDirRegComp">
+                <RegistryKey Id="InstallDirRegRoot"
+                     Action="createAndRemoveOnUninstall"
+                     Key="Software\[Manufacturer]\${product.name}"
+                     Root="HKLM">
+                  <RegistryValue Id="InstallDirReg"
+                         Type="string"
+                         Name="InstallDir"
+                         Value="[INSTALLDIR]" />
+                </RegistryKey>
+            </Component>
 
             <Directory Id="CLIENT_DIRECTORY" Name="Client Media">
                 <Component Id="ClientDirectoryComponent" Permanent="yes">
@@ -178,6 +207,7 @@
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
             <ComponentRef Id="UninstallProgramMenuFolder"/>
+            <ComponentRef Id="InstallDirRegComp"/>
         </Feature>
 
         <FeatureRef Id="ClientFeature"/>
