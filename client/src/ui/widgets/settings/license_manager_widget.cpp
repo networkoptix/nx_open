@@ -275,7 +275,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             QString message = errorMessage.value(lit("message")).toString();
             QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
-            message = Mustache::renderTemplate(message, arguments);
+            message = Mustache::renderTemplate(tr(message.toLatin1().constData()), arguments);
 
             QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license.") + lit(" ") + message);
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
