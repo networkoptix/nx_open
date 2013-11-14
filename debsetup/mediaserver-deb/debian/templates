@@ -27,16 +27,16 @@ Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invali
 Type: error
 Description: Enterprise Controller can't be empty
 
-Template: ${deb.customization.company.name}-mediaserver/port
+Template: ${deb.customization.company.name}-mediaserver/rtspPort
 Type: string
 Default:
 Description: Media Server port:
 
-Template: ${deb.customization.company.name}-mediaserver/port_invalid
+Template: ${deb.customization.company.name}-mediaserver/rtspPort_invalid
 Type: error
 Description: Media Server port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-mediaserver/transport
+Template: ${deb.customization.company.name}-mediaserver/rtspTransport
 Type: select
 Choices: auto, tcp, udp
 Description: Select preferred transport. If unsure leave default value.

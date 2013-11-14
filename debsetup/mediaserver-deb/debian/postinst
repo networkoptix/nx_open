@@ -131,10 +131,15 @@ case "$1" in
       ECS_PASSWORD=$(ask_for_value appserverPassword "$ECS_PASSWORD")
       $CFG_HELPER appserverPassword "$ECS_PASSWORD"
 
-      TRANSPORT="$($CFG_HELPER transport)"
+      PORT="$($CFG_HELPER rtspPort)"
+      [ -z "$PORT" ] && PORT=$PORT_DEFAULT
+      PORT=$(ask_for_value rtspPort "$PORT")
+      $CFG_HELPER rtspPort "$PORT"
+
+      TRANSPORT="$($CFG_HELPER rtspTransport)"
       [ -z "$ECS_TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
-      TRANSPORT=$(ask_for_value transport "$TRANSPORT")
-      $CFG_HELPER transport "$TRANSPORT"
+      TRANSPORT=$(ask_for_value rtspTransport "$TRANSPORT")
+      $CFG_HELPER rtspTransport "$TRANSPORT"
 
       PUBLIC_IP_ENABLED="$($CFG_HELPER publicIPEnabled)"
       case $PUBLIC_IP_ENABLED in
