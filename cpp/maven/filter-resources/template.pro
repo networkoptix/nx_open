@@ -15,6 +15,10 @@ CONFIG -= flat
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines} ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
+
+include( optional_functionality.pri )
+
+
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
   isEmpty(BUILDLIB) {

@@ -5,8 +5,6 @@
     #include <common/common_globals.h>
 #endif
 
-#include "common_config.h"
-
 /* Windows headers. */
 #ifdef _WIN32
 #   include <winsock2.h>
