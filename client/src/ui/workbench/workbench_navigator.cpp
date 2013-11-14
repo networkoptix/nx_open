@@ -1197,15 +1197,18 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 
     /* Update tool tip format. */
     if (value == DATETIME_NOW) {
-        m_timeSlider->setToolTipFormat(tr("'Live'", "LIVE_TOOL_TIP_FORMAT"));
+        m_timeSlider->setToolTipFormat(tr("'Live'"));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
-            m_timeSlider->setToolTipFormat(lit("yyyy MMM dd\nhh:mm:ss"));
+            //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss"));
         } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                m_timeSlider->setToolTipFormat(lit("hh:mm:ss"));
+                //: This is a date/time format for time slider's tooltip for local files. Please translate it only if you're absolutely sure that you know what you're doing.
+                m_timeSlider->setToolTipFormat(tr("hh:mm:ss"));
             } else {
-                m_timeSlider->setToolTipFormat(lit("mm:ss"));
+                //: This is a date/time format for time slider's tooltip for short local files. Please translate it only if you're absolutely sure that you know what you're doing.
+                m_timeSlider->setToolTipFormat(tr("mm:ss"));
             }
         }
     }
