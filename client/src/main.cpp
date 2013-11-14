@@ -366,6 +366,9 @@ int main(int argc, char **argv)
         /* Initialize connections. */
         initAppServerConnection();
         qnSettings->save();
+        if (!QDir(qnSettings->mediaFolder()).exists())
+            QDir().mkpath(qnSettings->mediaFolder());
+
         cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
         QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
