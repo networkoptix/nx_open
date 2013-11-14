@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
@@ -335,4 +335,4 @@ bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QnParam &par
     return false;
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

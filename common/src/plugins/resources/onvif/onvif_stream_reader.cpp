@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <QtCore/QTextStream>
 #include "onvif_resource.h"
@@ -765,4 +765,4 @@ bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
     return m_onvifRes->secondaryResolutionIsLarge();
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

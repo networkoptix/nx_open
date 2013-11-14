@@ -6,7 +6,7 @@
 #ifndef ONVIF_NOTIFICATION_CONSUMER_H
 #define ONVIF_NOTIFICATION_CONSUMER_H
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <map>
 

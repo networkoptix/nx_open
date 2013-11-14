@@ -1,7 +1,7 @@
 #ifndef dw_resource_h_1854
 #define dw_resource_h_1854
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -69,6 +69,6 @@ private:
     DWCameraSettings m_settings;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif //dw_resource_h_1854

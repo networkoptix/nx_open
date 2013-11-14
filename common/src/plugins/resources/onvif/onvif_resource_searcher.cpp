@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "onvif_resource_searcher.h"
 #include "core/resource/camera_resource.h"
@@ -251,4 +251,4 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
 
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <algorithm>
 #include <climits>
@@ -2944,4 +2944,4 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
     return CameraDiagnostics::NoErrorResult();
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

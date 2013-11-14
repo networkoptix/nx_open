@@ -1,7 +1,7 @@
 #ifndef onvif_helper_h
 #define onvif_helper_h
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <QHash>
 #include <QtCore/QString>
@@ -100,6 +100,6 @@ public:
     bool isManufacturerSupported(const QString& manufacturer) const;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // onvif_helper_h

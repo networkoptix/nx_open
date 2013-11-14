@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "flexwatch_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
@@ -75,4 +75,4 @@ bool QnFlexWatchResource::rebootDevice()
     return httpClient.doGET(QLatin1String("cgi-bin/admin/fwdosyscmd.cgi?Command=/sbin/reboot&FwCgiVer=0x0001&RetPage=/admin/close_all.asp")) == CL_HTTP_SUCCESS;
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

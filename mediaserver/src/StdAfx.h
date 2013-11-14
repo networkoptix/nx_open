@@ -3,6 +3,8 @@
     #include <common/common_globals.h>
 #endif
 
+#include <common_config.h>
+
 /* Boost headers. */
 #include <boost/foreach.hpp>
 

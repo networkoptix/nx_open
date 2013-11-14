@@ -1,7 +1,7 @@
 #ifndef __FLEXWATCH_RESOURCE_SEARCHER_H__
 #define __FLEXWATCH_RESOURCE_SEARCHER_H__
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "../mdns/mdns_device_searcher.h"
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
@@ -27,6 +27,6 @@ private:
     qint64 m_sockUpdateTime;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // __FLEXWATCH_RESOURCE_SEARCHER_H__

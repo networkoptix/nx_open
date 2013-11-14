@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "dw_zoom_ptz_controller.h"
 
@@ -71,4 +71,4 @@ const QnPtzSpaceMapper *QnDwZoomPtzController::getSpaceMapper() {
     return NULL;
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

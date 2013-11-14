@@ -1,7 +1,7 @@
 #ifndef onvif_soap_wrapper_h
 #define onvif_soap_wrapper_h
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <QSharedPointer>
 
@@ -540,6 +540,6 @@ public:
     int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif //onvif_soap_wrapper_h

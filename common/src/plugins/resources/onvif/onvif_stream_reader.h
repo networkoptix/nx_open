@@ -1,7 +1,7 @@
 #ifndef onvif_stream_reader_h
 #define onvif_stream_reader_h
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "onvif_helper.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
@@ -103,6 +103,6 @@ private:
     QElapsedTimer m_cachedTimer;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // onvif_stream_reader_h

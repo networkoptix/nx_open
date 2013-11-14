@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "openssl/evp.h"
 
@@ -935,4 +935,4 @@ template const QString SoapWrapper<ImagingBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<ImagingBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<ImagingBindingProxy>::isConflictError();
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

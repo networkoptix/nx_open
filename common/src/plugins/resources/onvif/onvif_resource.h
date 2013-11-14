@@ -1,7 +1,7 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <list>
 #include <memory>
@@ -442,6 +442,6 @@ private:
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif //onvif_resource_h

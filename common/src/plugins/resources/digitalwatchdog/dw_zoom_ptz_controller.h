@@ -1,7 +1,7 @@
 #ifndef QN_DW_ZOOM_PTZ_CONTROLLER_H
 #define QN_DW_ZOOM_PTZ_CONTROLLER_H
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <core/resource/interface/abstract_ptz_controller.h>
 #include "core/resource/media_resource.h"
@@ -25,6 +25,6 @@ private:
 };
 
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // QN_DW_ZOOM_PTZ_CONTROLLER_H

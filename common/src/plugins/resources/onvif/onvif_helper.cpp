@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "onvif_helper.h"
 #include "onvif/soapDeviceBindingProxy.h"
@@ -368,4 +368,4 @@ bool NameHelper::isManufacturerSupported(const QString& manufacturer) const
     return true;
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

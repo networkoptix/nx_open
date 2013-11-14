@@ -6,7 +6,7 @@
 #ifndef SOAPSERVER_H
 #define SOAPSERVER_H
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <string>
 
@@ -57,6 +57,6 @@ private:
     bool m_initialized;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif  //SOAPSERVER_H

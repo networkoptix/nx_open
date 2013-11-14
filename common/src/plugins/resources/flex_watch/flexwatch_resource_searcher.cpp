@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "flexwatch_resource_searcher.h"
 #include "core/resource/camera_resource.h"
@@ -129,4 +129,4 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
     return result;
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

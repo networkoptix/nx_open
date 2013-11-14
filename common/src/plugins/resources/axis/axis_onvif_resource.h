@@ -1,7 +1,7 @@
 #ifndef __AXIS_ONVIF_RESOURCE_H__
 #define __AXIS_ONVIF_RESOURCE_H__
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <map>
 

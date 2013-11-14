@@ -1,7 +1,7 @@
 #ifndef onvif_resource_settings_h_2250
 #define onvif_resource_settings_h_2250
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "../camera_settings/camera_settings.h"
 #include "soap_wrapper.h"
@@ -375,6 +375,6 @@ private:
     OnvifCameraSettingReader();
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif //onvif_resource_settings_h_2250

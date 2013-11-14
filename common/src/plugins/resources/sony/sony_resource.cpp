@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "sony_resource.h"
 
@@ -275,4 +275,4 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClient* /*httpClient*
     //TODO/IMPL reconnect
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

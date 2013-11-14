@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "soapserver.h"
 
@@ -168,4 +168,4 @@ void QnSoapServer::run()
     soap_done( m_service.soap );
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

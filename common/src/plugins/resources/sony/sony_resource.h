@@ -1,7 +1,7 @@
 #ifndef sony_resource_h_1855
 #define sony_resource_h_1855
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <map>
 
@@ -53,6 +53,6 @@ private slots:
 
 //typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif //sony_resource_h_1855

@@ -1,7 +1,7 @@
 #ifndef onvif_resource_information_fetcher_h
 #define onvif_resource_information_fetcher_h
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <QtCore/QCoreApplication>
 
@@ -84,6 +84,6 @@ private:
     bool m_shouldStop;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // onvif_resource_information_fetcher_h

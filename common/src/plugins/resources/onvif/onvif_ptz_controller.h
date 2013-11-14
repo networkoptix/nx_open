@@ -1,7 +1,7 @@
 #ifndef QN_ONVIF_PTZ_CONTROLLER_H
 #define QN_ONVIF_PTZ_CONTROLLER_H
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include <QtCore/QMutex>
 #include <QtCore/QPair>
@@ -48,6 +48,6 @@ private:
     bool m_verticalFlipped, m_horizontalFlipped;
 };
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // QN_ONVIF_PTZ_CONTROLLER_H

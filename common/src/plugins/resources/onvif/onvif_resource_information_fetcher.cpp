@@ -1,5 +1,5 @@
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "onvif_resource_information_fetcher.h"
 #include "onvif_resource.h"
@@ -340,4 +340,4 @@ void OnvifResourceInformationFetcher::pleaseStop()
     m_shouldStop = true;
 }
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF

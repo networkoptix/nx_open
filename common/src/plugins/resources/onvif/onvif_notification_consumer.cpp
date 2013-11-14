@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "onvif_notification_consumer.h"
 

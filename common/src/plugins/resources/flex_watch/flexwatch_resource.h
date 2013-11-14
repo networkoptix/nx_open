@@ -1,7 +1,7 @@
 #ifndef __FLEXWATCH_RESOURCE_H__
 #define __FLEXWATCH_RESOURCE_H__
 
-#ifndef DISABLE_ONVIF
+#ifdef ENABLE_ONVIF
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -28,6 +28,6 @@ private:
 
 typedef QnSharedResourcePointer<QnFlexWatchResource> QnFlexWatchResourcePtr;
 
-#endif //DISABLE_ONVIF
+#endif //ENABLE_ONVIF
 
 #endif // __FLEXWATCH_RESOURCE_H__
