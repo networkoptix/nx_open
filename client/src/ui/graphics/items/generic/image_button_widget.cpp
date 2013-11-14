@@ -733,6 +733,24 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
+
+    // create caching image
+    const static int fontSize = 40;
+    const static qreal offset = 10 * 0.01; // border offset in persents
+
+    QFont font = this->font();
+    font.setPixelSize(fontSize);
+    QFontMetrics m(font);
+    QSize imageSize = m.size(0, m_text);
+    imageSize *= (1.0 + offset*2.0);
+
+    QPixmap pixmap(imageSize);
+    {
+        QPainter p(&pixmap);
+        p.setFont(font);
+        p.drawText(imageSize.width()*offset, imageSize.height()*offset + m.ascent(), m_text);
+    }
+    setPixmap(0, pixmap);
     update();
 }
 
@@ -787,17 +805,6 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
 
     /* Draw image. */ 
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
-
-    /* Draw text. */
-    if(!m_text.isEmpty()) {
-        QFont font = this->font();
-        if(m_relativeFontSize > 0)
-            font.setPixelSize(size().height() * m_relativeFontSize);
-        QnScopedPainterFontRollback fontRollback(painter, font);
-        painter->drawText(rect, Qt::AlignCenter, m_text);
-    }
-
-    painter->setOpacity(opacity);
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {
