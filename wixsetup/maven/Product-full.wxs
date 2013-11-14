@@ -321,6 +321,11 @@
                             Win64="no"/>
         </Property>
 
+        <Property Id="INSTALLDIR">
+              <RegistrySearch Id='InstallDirRegistry' Type='raw'
+                    Root='HKLM' Key='Software\[Manufacturer]\${product.name}' Name='InstallDir' />
+        </Property>
+
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\${build.configuration}\CustomActions.dll" />
 
         <!-- Custom actions -->
@@ -593,6 +598,18 @@
                             <!-- Dummy file. To remove on uninstall.  -->
                             <Component>
                                 <File Id="ecs.log" Name="ecs.log" Source="files/ecs.log" KeyPath="yes"/>
+                            </Component>
+
+                            <Component Id="InstallDirRegComp">
+                                <RegistryKey Id="InstallDirRegRoot"
+                                     Action="createAndRemoveOnUninstall"
+                                     Key="Software\[Manufacturer]\${product.name}"
+                                     Root="HKLM">
+                                  <RegistryValue Id="InstallDirReg"
+                                         Type="string"
+                                         Name="InstallDir"
+                                         Value="[INSTALLDIR]" />
+                                </RegistryKey>
                             </Component>
 
                             <Component Id="AppServerConfigurationGuid" Permanent="yes" NeverOverwrite="yes">
@@ -916,6 +933,7 @@
             <ComponentRef Id="AlwaysFiles"/>
             <ComponentRef Id="ARPAltRegistryEntries"/>            
             <ComponentRef Id="UninstallProgramMenuFolder"/>
+            <ComponentRef Id="InstallDirRegComp"/>
         </Feature>
 
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
