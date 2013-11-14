@@ -560,13 +560,13 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTim
 
 
     //: Format for displaying minute caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm");
+    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "MINUTES");
 
     //: Format for displaying minute caption in timeline's header, with am/pm indicator. Do not translate this string unless you know what you're doing.
     QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap");
 
     //: Format for displaying hour caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
-    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm");
+    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm", "HOURS");
 
     //: Format for displaying hour caption in timeline's header, with am/pm indicator. Do not translate this string unless you know what you're doing.
     QString dateHoursApFormat = tr("dd MMMM yyyy h ap");
