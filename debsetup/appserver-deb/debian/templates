@@ -1,29 +1,29 @@
 
-Template: ${deb.customization.company.name}-entcontroller/ecsPort
+Template: ${deb.customization.company.name}-entcontroller/port
 Type: string
 Default:
 Description: Enterprise Controller port:
 
-Template: ${deb.customization.company.name}-entcontroller/ecsPort_invalid
+Template: ${deb.customization.company.name}-entcontroller/port_invalid
 Type: error
 Description: The port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort
+Template: ${deb.customization.company.name}-entcontroller/proxyPort
 Type: string
 Default:
 Description: Enterprise Controller Media Proxy port:
 
-Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort_invalid
+Template: ${deb.customization.company.name}-entcontroller/proxyPort_invalid
 Type: error
 Description: The port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-entcontroller/ecsPassword
+Template: ${deb.customization.company.name}-entcontroller/password
 Type: string
 Default: 
 Description: Enterprise Controller password:
  If upgrading leave empty to keep the old password
 
-Template: ${deb.customization.company.name}-entcontroller/ecsPassword_invalid
+Template: ${deb.customization.company.name}-entcontroller/password_invalid
 Type: error
 Description: The password should not be empty
 

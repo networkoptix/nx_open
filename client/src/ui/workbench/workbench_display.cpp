@@ -211,7 +211,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_transformListenerInstrument,  SIGNAL(transformChanged(QGraphicsView *)),                  this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeSceneBoundsExtension()));
-    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()));
+
+    //queueing connection because some OS make resize call before move widget to correct postion while expanding it to fullscreen --gdm
+    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()), Qt::QueuedConnection);
+
     connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStopped()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));

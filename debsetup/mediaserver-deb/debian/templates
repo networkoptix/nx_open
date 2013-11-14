@@ -1,42 +1,42 @@
 
-Template: ${deb.customization.company.name}-mediaserver/ecsHost
+Template: ${deb.customization.company.name}-mediaserver/appserverHost
 Type: string
 Default:
 Description: Enterprise Controller host:
 
-Template: ${deb.customization.company.name}-mediaserver/ecsPort
+Template: ${deb.customization.company.name}-mediaserver/appserverPort
 Type: string
 Default:
 Description: Enterprise Controller port:
 
-Template: ${deb.customization.company.name}-mediaserver/ecsPort_invalid
+Template: ${deb.customization.company.name}-mediaserver/appserverPort_invalid
 Type: error
 Description: Enterprise Controller port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-mediaserver/ecsLogin
+Template: ${deb.customization.company.name}-mediaserver/appserverLogin
 Type: string
 Default:
 Description: Enterprise Controller login:
 
-Template: ${deb.customization.company.name}-mediaserver/ecsPassword
+Template: ${deb.customization.company.name}-mediaserver/appserverPassword
 Type: string
 Default: 
 Description: Enterprise Controller password:
 
-Template: ${deb.customization.company.name}-mediaserver/ecsPassword_invalid
+Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invalid
 Type: error
 Description: Enterprise Controller can't be empty
 
-Template: ${deb.customization.company.name}-mediaserver/port
+Template: ${deb.customization.company.name}-mediaserver/rtspPort
 Type: string
 Default:
 Description: Media Server port:
 
-Template: ${deb.customization.company.name}-mediaserver/port_invalid
+Template: ${deb.customization.company.name}-mediaserver/rtspPort_invalid
 Type: error
 Description: Media Server port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-mediaserver/transport
+Template: ${deb.customization.company.name}-mediaserver/rtspTransport
 Type: select
 Choices: auto, tcp, udp
 Description: Select preferred transport. If unsure leave default value.

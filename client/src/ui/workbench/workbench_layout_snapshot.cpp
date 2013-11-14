@@ -6,7 +6,11 @@ QnWorkbenchLayoutSnapshot::QnWorkbenchLayoutSnapshot(const QnLayoutResourcePtr &
     items(resource->getItems()),
     name(resource->getName()),
     cellAspectRatio(resource->cellAspectRatio()),
-    cellSpacing(resource->cellSpacing())
+    cellSpacing(resource->cellSpacing()),
+    backgroundSize(resource->backgroundSize()),
+    backgroundImageFilename(resource->backgroundImageFilename()),
+    backgroundOpacity(resource->backgroundOpacity()),
+    locked(resource->locked())
 {}
 
 bool operator==(const QnWorkbenchLayoutSnapshot &l, const QnWorkbenchLayoutSnapshot &r) {
@@ -14,6 +18,10 @@ bool operator==(const QnWorkbenchLayoutSnapshot &l, const QnWorkbenchLayoutSnaps
         l.name == r.name &&
         l.items == r.items &&
         qFuzzyCompare(l.cellAspectRatio, r.cellAspectRatio) &&
-        qFuzzyCompare(l.cellSpacing, r.cellSpacing);
+        qFuzzyCompare(l.cellSpacing, r.cellSpacing) &&
+        l.backgroundSize == r.backgroundSize &&
+        l.backgroundImageFilename == r.backgroundImageFilename &&
+        qFuzzyCompare(l.backgroundOpacity, r.backgroundOpacity) &&
+        l.locked == r.locked;
 }
 
