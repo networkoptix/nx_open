@@ -60,6 +60,8 @@
         <child.customization>${customization}</child.customization>
         <child.customization.dir>${customization.dir}/child/${child.customization}</child.customization.dir>        
 
+        <additional.defines></additional.defines>
+
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
         <qtlib2>Network</qtlib2>
