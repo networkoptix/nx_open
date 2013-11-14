@@ -18,11 +18,14 @@
 #include <core/resource_managment/resource_pool.h>
 #include <common/customization.h>
 
+#include <mustache/mustache.h>
+
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
-#include "utils/common/json.h"
-#include "mustache/mustache.h"
+#include <utils/common/json.h>
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -38,6 +41,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     m_model->setColumns(columns);
     ui->gridLicenses->setModel(m_model);
     ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
     connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));

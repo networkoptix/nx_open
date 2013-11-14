@@ -8,12 +8,16 @@
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #include <ui/dialogs/custom_file_dialog.h>
-#include <ui/widgets/dwm.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+#include <ui/widgets/dwm.h>
+#include <ui/workbench/workbench_context.h>
 
 #ifdef Q_OS_WIN
-#   include "device_plugins/desktop_win/win_audio_helper.h"
+#   include <device_plugins/desktop_win/win_audio_helper.h>
+#   include <ui/workbench/watchers/workbench_desktop_camera_watcher_win.h>
 #endif
 
 
@@ -29,6 +33,7 @@ namespace {
 
 QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingSettings),
     m_settings(new QnVideoRecorderSettings(this)),
     m_dwm(new QnDwm(this))
@@ -61,6 +66,8 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
         ui->secondaryAudioDeviceComboBox->addItem(deviceName);
     }
 
+    setHelpTopic(this, Qn::SystemSettings_ScreenRecording_Help);
+
     connect(ui->fullscreenButton,               SIGNAL(toggled(bool)),              ui->screenComboBox,         SLOT(setEnabled(bool)));
     connect(ui->fullscreenButton,               SIGNAL(toggled(bool)),              ui->disableAeroCheckBox,    SLOT(setEnabled(bool)));
 
@@ -72,6 +79,10 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
     connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged()));
 
+#ifdef Q_OS_WIN
+    connect(this, SIGNAL(recordingSettingsChanged()), this->context()->instance<QnWorkbenchDesktopCameraWatcher>(), SLOT(at_recordingSettingsChanged()));
+#endif
+
     setWarningStyle(ui->recordingWarningLabel);
     setDefaultSoundIcon(ui->primaryDeviceIconLabel);
     setDefaultSoundIcon(ui->secondaryDeviceIconLabel);
@@ -82,7 +93,6 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
 }
 
 QnRecordingSettingsWidget::~QnRecordingSettingsWidget() {
-    return;
 }
 
 void QnRecordingSettingsWidget::updateFromSettings() {

@@ -17,10 +17,11 @@ class QnPopupSettingsWidget : public QWidget, public QnWorkbenchContextAware
     Q_OBJECT
 
 public:
-    explicit QnPopupSettingsWidget(QnWorkbenchContext *context, QWidget *parent = 0);
+    explicit QnPopupSettingsWidget(QWidget *parent = 0);
     ~QnPopupSettingsWidget();
 
-    void submit();
+    void updateFromSettings();
+    void submitToSettings();
 
 private slots:
     void at_showAllCheckBox_toggled(bool checked);

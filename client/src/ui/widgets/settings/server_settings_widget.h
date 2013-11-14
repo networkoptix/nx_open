@@ -13,8 +13,8 @@ public:
     QnServerSettingsWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnServerSettingsWidget();
 
-    void submit();
-    void update();
+    void submitToSettings();
+    void updateFromSettings();
 
     // now is used only for email setup so parameter is omitted
     void updateFocusedElement();

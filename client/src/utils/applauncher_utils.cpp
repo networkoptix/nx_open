@@ -39,6 +39,9 @@ namespace applauncher
 
     api::ResultType::Value isVersionInstalled( const QnSoftwareVersion& version, bool* const installed )
     {
+        if (version.isNull())
+            version = QnSoftwareVersion(QN_ENGINE_VERSION);
+
         api::IsVersionInstalledRequest request;
         request.version = version.toString(QnSoftwareVersion::MinorFormat);
         api::IsVersionInstalledResponse response;

@@ -104,6 +104,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/applauncher_utils.h>
 #include <utils/local_file_cache.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -209,6 +210,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_exportsToFinishBeforeClosure(0),
     m_objectToSignalWhenDone(nullptr)
 {
+    m_pendingRestart.queued = false;
+
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
@@ -330,6 +333,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -1661,37 +1665,30 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    dialog->setCurrentPage(QnPreferencesDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->openLicensesPage();
+    dialog->setCurrentPage(QnPreferencesDialog::LicensesPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->openServerSettingsPage();
+    dialog->setCurrentPage(QnPreferencesDialog::ServerPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->openPopupSettingsPage();
+    dialog->setCurrentPage(QnPreferencesDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
@@ -4139,6 +4136,46 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
                          QObject::tr("Beta version"),
                          QObject::tr("You are running beta version of %1")
                          .arg(QLatin1String(QN_APPLICATION_NAME)));
+}
+
+void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
+    m_pendingRestart.queued = true;
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    m_pendingRestart.version = parameters.hasArgument(Qn::SoftwareVersionRole)
+            ? parameters.argument<QnSoftwareVersion>(Qn::SoftwareVersionRole)
+            : QnSoftwareVersion();
+    m_pendingRestart.url = parameters.hasArgument(Qn::UrlRole)
+            ? parameters.argument<QUrl>(Qn::UrlRole)
+            : context()->user()
+              ? QnAppServerConnectionFactory::defaultUrl()
+              : QUrl();
+
+    bool isInstalled;
+
+    if (applauncher::isVersionInstalled(QnSoftwareVersion(), &isInstalled) != applauncher::api::ResultType::ok) {
+        QMessageBox::critical(
+                    mainWindow(),
+                    tr("Launcher process is not found"),
+                    tr("Cannot restart the client.\n"
+                       "Please close the application and start it again using the shortcut in the start menu.")
+                    );
+        return;
+    }
+
+    if (applauncher::isVersionInstalled(m_pendingRestart.version, &isInstalled) != applauncher::api::ResultType::ok) {
+        if (applauncher::restartClient(m_pendingRestart.version, m_pendingRestart.url.toEncoded()) == applauncher::api::ResultType::ok)
+            QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
+/*                if (!m_restartPending) {
+                    QMessageBox::critical(
+                                this,
+                                tr("Launcher process is not found"),
+                                tr("Cannot restart the client.\n"
+                                   "Please close the application and start it again using the shortcut in the start menu.")
+                                );
+                }*/
+    }
+
 }
 
 void QnWorkbenchActionHandler::checkForClosurePending()

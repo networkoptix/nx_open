@@ -82,14 +82,14 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 {
 }
 
-void QnSmtpSettingsWidget::update() {
+void QnSmtpSettingsWidget::updateFromSettings() {
     m_settingsReceived = false;
 
     m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                 this, SLOT(at_settings_received(int, const QnKvPairList&, int)));
 }
 
-void QnSmtpSettingsWidget::submit() {
+void QnSmtpSettingsWidget::submitToSettings() {
     QnEmail::Settings result = settings();
     QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(),
                                                                         context()->instance<QnWorkbenchNotificationsHandler>(),

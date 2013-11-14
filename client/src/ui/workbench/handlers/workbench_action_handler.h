@@ -352,6 +352,8 @@ protected slots:
 
     void at_betaVersionMessageAction_triggered();
 
+    void at_queueAppRestartAction_triggered();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -445,6 +447,12 @@ private:
     int m_exportsToFinishBeforeClosure;
     QObject* m_objectToSignalWhenDone;
     QByteArray m_methodToInvokeWhenDone;
+
+    struct {
+        bool queued;
+        QnSoftwareVersion version;
+        QUrl url;
+    } m_pendingRestart;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

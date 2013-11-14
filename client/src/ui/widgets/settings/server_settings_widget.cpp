@@ -12,12 +12,12 @@ QnServerSettingsWidget::~QnServerSettingsWidget() {
     return;
 }
 
-void QnServerSettingsWidget::submit() {
-    ui->smtpSettingsWidget->submit();
+void QnServerSettingsWidget::submitToSettings() {
+    ui->smtpSettingsWidget->submitToSettings();
 }
 
-void QnServerSettingsWidget::update() {
-    ui->smtpSettingsWidget->update();
+void QnServerSettingsWidget::updateFromSettings() {
+    ui->smtpSettingsWidget->updateFromSettings();
 }
 
 void QnServerSettingsWidget::updateFocusedElement() {

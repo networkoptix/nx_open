@@ -4,7 +4,9 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include "ui/screen_recording/video_recorder_settings.h"
+#include <ui/screen_recording/video_recorder_settings.h>
+#include <ui/workbench/workbench_context_aware.h>
+
 
 namespace Ui {
     class RecordingSettings;
@@ -12,7 +14,7 @@ namespace Ui {
 
 class QnDwm;
 
-class QnRecordingSettingsWidget : public QWidget
+class QnRecordingSettingsWidget : public QWidget, protected QnWorkbenchContextAware
 {
     Q_OBJECT
 

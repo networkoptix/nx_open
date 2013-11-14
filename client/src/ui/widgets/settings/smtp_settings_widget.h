@@ -36,8 +36,8 @@ public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
 
-    void update();
-    void submit();
+    void updateFromSettings();
+    void submitToSettings();
 
     void updateFocusedElement();
 
