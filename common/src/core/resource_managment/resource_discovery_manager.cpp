@@ -11,7 +11,6 @@
 #include "utils/common/util.h"
 #include "api/app_server_connection.h"
 #include "utils/common/synctime.h"
-#include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
 #include "plugins/resources/upnp/upnp_device_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
