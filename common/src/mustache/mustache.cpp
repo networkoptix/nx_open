@@ -19,7 +19,7 @@
 
 using namespace Mustache;
 
-QString Mustache::renderTemplate(const QString& templateString, const QVariantHash& args)
+QString Mustache::renderTemplate(const QString& templateString, const QVariant& args)
 {
 	Mustache::QtVariantContext context(args);
 	Mustache::Renderer renderer;

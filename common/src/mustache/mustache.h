@@ -248,6 +248,6 @@ private:
 };
 
 /** A convenience function which renders a template using the given data. */
-QString renderTemplate(const QString& templateString, const QVariantHash& args);
+QString renderTemplate(const QString& templateString, const QVariant& args);
 
 };
