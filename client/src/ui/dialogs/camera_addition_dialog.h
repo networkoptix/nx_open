@@ -55,6 +55,8 @@ private:
     int fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
     void updateSubnetMode();
+
+    bool serverOnline() const;
     bool ensureServerOnline();
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);

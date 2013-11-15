@@ -135,33 +135,26 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->camerasTable,       SIGNAL(cellClicked(int,int)),                   this,   SLOT(at_camerasTable_cellClicked(int, int)));
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),                          this,   SLOT(at_subnetCheckbox_toggled(bool)));
     connect(ui->closeButton,        SIGNAL(clicked()),                              this,   SLOT(accept()));
+    connect(ui->scanButton,         SIGNAL(clicked()),                              this,   SLOT(at_scanButton_clicked()));
+    connect(ui->addButton,          SIGNAL(clicked()),                              this,   SLOT(at_addButton_clicked()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          this,   SLOT(at_portAutoCheckBox_toggled(bool)));
     connect(qnResPool,              SIGNAL(resourceChanged(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceChanged(const QnResourcePtr &)));
     connect(qnResPool,              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
 
-    ui->scanProgressBar->setVisible(false);
-    ui->stopScanButton->setVisible(false);
-    ui->validateLabelSearch->setVisible(false);
-    ui->serverOfflineLabel->setVisible(false);
-
-    ui->cameraIpLineEdit->setMinimumSize(ui->startIPLineEdit->minimumSizeHint());
-
     ui->addButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
 
-    connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
-    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
-
     setWarningStyle(ui->validateLabelSearch);
-    setWarningStyle(ui->serverOfflineLabel);
+    ui->validateLabelSearch->setVisible(false);
 
-    updateSubnetMode();
-    clearTable();
+    setWarningStyle(ui->serverOfflineLabel);
+    ui->serverOfflineLabel->setVisible(false);
+
+//    updateSubnetMode();
 
     /* Set focus on scan button so that placeholder text is visible in ip/url line edit.  */
     ui->scanButton->setFocus();
-    ui->cameraIpLineEdit->setText(QString());
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -280,10 +273,13 @@ void QnCameraAdditionDialog::updateSubnetMode() {
     }
 }
 
-bool QnCameraAdditionDialog::ensureServerOnline() {
-    if (m_server && m_server->getStatus() != QnResource::Offline)
-        return true;
+bool QnCameraAdditionDialog::serverOnline() const {
+    return m_server && m_server->getStatus() != QnResource::Offline;
+}
 
+bool QnCameraAdditionDialog::ensureServerOnline() {
+    if (serverOnline())
+        return true;
 
     QMessageBox::critical(this,
                           tr("Error"),
@@ -339,7 +335,7 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value) {
     m_inIpRangeEdit = false;
 }
 
-void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column) {
+void QnCameraAdditionDialog::at_camerasTable_cellChanged(int row, int column) {
     Q_UNUSED(row)
 
     if (column > CheckBoxColumn)
@@ -457,22 +453,13 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     }
 
     clearTable();
-    ui->scanButton->setEnabled(false);
-    ui->startIPLineEdit->setEnabled(false);
-    ui->cameraIpLineEdit->setEnabled(false);
-    ui->endIPLineEdit->setEnabled(false);
-    ui->portAutoCheckBox->setEnabled(false);
-    ui->portSpinBox->setEnabled(false);
-    ui->subnetCheckbox->setEnabled(false);
-    ui->loginLineEdit->setEnabled(false);
-    ui->passwordLineEdit->setEnabled(false);
-
     ui->validateLabelSearch->setVisible(false);
-    ui->scanProgressBar->setVisible(true);
-    ui->stopScanButton->setVisible(true);
+    ui->scanParamsWidget->setEnabled(false);
+    ui->scanStackedWidget->setCurrentWidget(ui->stopScanPage);
     ui->stopScanButton->setFocus();
 
     QnConnectionRequestResult result;
+    //TODO: #GDM progress for multiple addresses scan
     m_server->apiConnection()->searchCameraAsync(startAddrStr, endAddrStr, username, password, port, &result, SLOT(processReply(int, const QVariant &, int)));
 
     QEventLoop loop;
@@ -482,18 +469,9 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
     loop.exec();
 
-    ui->scanButton->setEnabled(m_server);
-    ui->startIPLineEdit->setEnabled(true);
-    ui->cameraIpLineEdit->setEnabled(true);
-    ui->endIPLineEdit->setEnabled(true);
-    ui->portAutoCheckBox->setEnabled(true);
-    ui->portSpinBox->setEnabled(true);
-    ui->subnetCheckbox->setEnabled(true);
-    ui->loginLineEdit->setEnabled(true);
-    ui->passwordLineEdit->setEnabled(true);
-
-    ui->stopScanButton->setVisible(false);
-    ui->scanProgressBar->setVisible(false);
+    ui->scanButton->setEnabled(serverOnline());
+    ui->scanParamsWidget->setEnabled(true);
+    ui->scanStackedWidget->setCurrentWidget(ui->startScanPage);
 
     if(result.isFinished()) {
         if(result.status() == 0) {
@@ -509,11 +487,11 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
                 QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
             }
         } else {
-            if (!ensureServerOnline())
+            if (!serverOnline())
                 return;
 
             QString error;
-            if (0) { // TODO: #Elric
+            if (0) { // TODO: #Elric WTF?
                 error = tr("Could not connect to server.\nMake sure the server is available and try again.");
             } else {
                 error = tr("Server returned an error.");

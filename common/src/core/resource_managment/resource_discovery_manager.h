@@ -9,7 +9,7 @@
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"
-
+#include <utils/common/json.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -25,6 +25,27 @@ struct QnManualCameraInfo
     QnAbstractResourceSearcher* searcher;
 };
 typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
+
+struct QnManualSearchStatus {
+    enum Status {
+        Init,
+        CheckingOnline,
+        CheckingHost,
+        Finished,
+
+        Count
+    };
+
+    QnManualSearchStatus(){}
+    QnManualSearchStatus(Status status, int current, int total):
+        status(status), current(current), total(total){}
+
+    int status;
+    int current;
+    int total;
+};
+
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualSearchStatus)
 
 class QnAbstractResourceSearcher;
 
@@ -91,6 +112,10 @@ public:
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
 
+    bool getSearchStatus(const QUuid &searchProcessUuid, QnManualSearchStatus &status);
+    void setSearchStatus(const QUuid &searchProcessUuid, const QnManualSearchStatus &status);
+    void clearSearchStatus(const QUuid &searchProcessUuid);
+
     //!This method MUST be called from non-GUI thread, since it can block for some time
     void doResourceDiscoverIteration();
 
@@ -101,6 +126,10 @@ public slots:
 
 protected:
     QMutex m_discoveryMutex;
+
+    /** Mutex that is used to synchronize access to manual camera addition progress. */
+    QMutex m_searchProcessStatusMutex;
+
     unsigned int m_runNumber;
 
     virtual void run();
@@ -143,6 +172,8 @@ private:
     State m_state;
     QSet<QString> m_recentlyDeleted;
     const CameraDriverRestrictionList* m_cameraDriverRestrictionList;
+
+    QHash<QUuid, QnManualSearchStatus> m_searchProcessStatuses;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

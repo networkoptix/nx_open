@@ -9,6 +9,8 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
 
+#include <utils/common/json.h>
+
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
 
@@ -76,7 +78,7 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList &params
     QnResourceList resources = QnResourceDiscoveryManager::instance()->findResources(addr1, addr2, auth, port);
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
-    // TODO #GDM implement simple XML-builder, will be quite useful
+    //TODO: #GDM morph to json? whats with compatibility?
 
     resultByteArray.append("<root>\n");
     {
@@ -129,6 +131,28 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList &params
     }
     resultByteArray.append("</root>\n");
 
+    return CODE_OK;
+}
+
+int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType) {
+    contentType = "application/json";
+
+    QUuid processGuid;
+    for (int i = 0; i < params.size(); ++i)
+    {
+        QPair<QString, QString> param = params[i];
+        if (param.first == "guid")
+            processGuid = QUuid(param.second);
+    }
+
+    if (processGuid.isNull())
+        return CODE_INVALID_PARAMETER;
+
+    QnManualSearchStatus status;
+    if (!QnResourceDiscoveryManager::instance()->getSearchStatus(processGuid, status))
+        return CODE_NOT_FOUND;
+
+    QJson::serialize(status, &resultByteArray);
     return CODE_OK;
 }
 
@@ -202,8 +226,6 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList &params, Q
 
 int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType)
 {
-    Q_UNUSED(contentType)
-
     QString localPath = path;
     while(localPath.endsWith('/'))
         localPath.chop(1);
@@ -212,6 +234,8 @@ int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnReque
         return searchAction(params, resultByteArray, contentType);
     else if (action == "add")
         return addAction(params, resultByteArray, contentType);
+    else if (action == "status")
+        return searchStatusAction(params, resultByteArray, contentType);
     else {
         resultByteArray.append("<?xml version=\"1.0\"?>\n");
         resultByteArray.append("<root>\n");
@@ -242,5 +266,8 @@ QString QnManualCameraAdditionHandler::description() const
         "<BR>Param <b>url</b> - camera url returned by scan request."
         "<BR>Param <b>manufacturer</b> - camera manufacturer.</i>"
         "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-        "<BR>Param <b>password</b> - password for the cameras. Can be omitted.";
+        "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
+        "<BR>"
+        "<BR><b>api/manualCamera/status</b> - manual addition progress."
+        "<BR>Param <b>guid</b> - process uuid.";
 }

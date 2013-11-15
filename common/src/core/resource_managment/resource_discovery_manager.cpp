@@ -21,6 +21,10 @@
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
 
+namespace detail {
+    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualSearchStatus, (status)(current)(total), static)
+}
+
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
 QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
@@ -383,16 +387,21 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     return !resources.isEmpty();
 }
 
-struct ManualSearcherHelper
+
+/**
+ * @brief The ManualSearchPluginsEnumerator struct      Struct for testing one network interface during manual cameras searching
+ *                                                      with all registered camera plugins until one of them succeeds.
+ */
+struct ManualSearchPluginsEnumerator
 {
-    ManualSearcherHelper(): plugins(0) {}
+    ManualSearchPluginsEnumerator(): plugins(0) {}
 
     QUrl url;
     QnResourceDiscoveryManager::ResourceSearcherList* plugins;
     QList<QnResourcePtr> resList;
     QAuthenticator auth;
 
-    void f()
+    void search()
     {
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
@@ -408,7 +417,6 @@ struct ManualSearcherHelper
 
 QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port)
 {
-    
     {
         QString str;
         QTextStream stream(&str);
@@ -416,6 +424,12 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         stream << "Looking for cameras... StartAddr = " << startAddr << "  EndAddr = " << endAddr << "   login/pass = " << auth.user() << "/" << auth.password();
         cl_log.log(str, cl_logINFO);
     }
+
+    QUuid processUuid = QUuid::createUuid();
+    qDebug() << "searching" << processUuid.toString();
+
+
+    setSearchStatus(processUuid, QnManualSearchStatus(QnManualSearchStatus::Init, 0, 0));
 
     //=======================================
     QnIprangeChecker ip_cheker;
@@ -440,10 +454,10 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
     //now lets check each one of online machines...
 
-    QList<ManualSearcherHelper> testList;
+    QList<ManualSearchPluginsEnumerator> testList;
     foreach(const QString& addr, online)
     {
-        ManualSearcherHelper t;
+        ManualSearchPluginsEnumerator t;
         if( QUrl(addr).scheme().isEmpty() )
             t.url.setHost(addr);
         else
@@ -455,20 +469,12 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         testList.push_back(t);
     }
 
-    /*
-    int threads = 4;
-    QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) 
-        global->releaseThread();
-    QtConcurrent::blockingMap(testList, &ManualSearcherHelper::f);
-    for (int i = 0; i < threads; ++i )
-        global->reserveThread();
-    */
     int startIdx = 0;
     static const int SEARCH_THREAD_AMOUNT = 4;
     int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
     while (startIdx < testList.size()) {
-        QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearcherHelper::f);
+        setSearchStatus(processUuid, QnManualSearchStatus(QnManualSearchStatus::CheckingHost, startIdx, testList.size()));
+        QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearchPluginsEnumerator::search);
         startIdx = endIdx;
         endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
     }
@@ -476,23 +482,9 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
 
     QnResourceList result;
 
-    foreach(const ManualSearcherHelper& h, testList)
+    foreach(const ManualSearchPluginsEnumerator& h, testList)
     {
         result.append(h.resList);
-        /*
-        for (int i = 0; i < h.resList.size(); ++i)
-        {
-            if (qnResPool->hasSuchResource(h.resList[i]->getUniqueId())) // already in resource pool 
-                continue;
-
-            // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
-            QnResourcePtr existRes = qnResPool->getResourceByUrl(h.url.host());
-            if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
-                continue;
-
-            result.push_back(h.resList[i]);
-        }
-        */
     }
 
     cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);
@@ -501,8 +493,28 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         cl_log.log(res->toString(), cl_logINFO);
     }
 
-
+    clearSearchStatus(processUuid);
     return result;
+}
+
+bool QnResourceDiscoveryManager::getSearchStatus(const QUuid &searchProcessUuid, QnManualSearchStatus &status) {
+    QMutexLocker lock(&m_searchProcessStatusMutex);
+
+    if (!m_searchProcessStatuses.contains(searchProcessUuid))
+        return false;
+
+    status = m_searchProcessStatuses[searchProcessUuid];
+    return true;
+}
+
+void QnResourceDiscoveryManager::setSearchStatus(const QUuid &searchProcessUuid, const QnManualSearchStatus &status) {
+    QMutexLocker lock(&m_searchProcessStatusMutex);
+    m_searchProcessStatuses[searchProcessUuid] = status;
+}
+
+void QnResourceDiscoveryManager::clearSearchStatus(const QUuid &searchProcessUuid) {
+     QMutexLocker lock(&m_searchProcessStatusMutex);
+     m_searchProcessStatuses.remove(searchProcessUuid);
 }
 
 bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCamerasMap& cameras)
@@ -582,4 +594,13 @@ void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
 { 
     return m_state; 
+}
+
+
+void serialize(const QnManualSearchStatus &value, QJsonValue *target) {
+    detail::serialize(value, target);
+}
+
+bool deserialize(const QJsonValue &value, QnManualSearchStatus *target) {
+    return detail::deserialize(value, target);
 }

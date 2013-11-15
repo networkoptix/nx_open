@@ -17,6 +17,7 @@ protected:
 
 private:
     int searchAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
+    int searchStatusAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
     int addAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
     QHostAddress parseAddrParam(const QString &param, QString &errStr);
 };
