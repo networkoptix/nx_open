@@ -21,10 +21,6 @@
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
 
-namespace detail {
-    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualSearchStatus, (status)(current)(total), static)
-}
-
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
 QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
@@ -429,7 +425,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     qDebug() << "searching" << processUuid.toString();
 
 
-    setSearchStatus(processUuid, QnManualSearchStatus(QnManualSearchStatus::Init, 0, 0));
+    setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::Init, 0, 0));
 
     //=======================================
     QnIprangeChecker ip_cheker;
@@ -473,7 +469,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     static const int SEARCH_THREAD_AMOUNT = 4;
     int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
     while (startIdx < testList.size()) {
-        setSearchStatus(processUuid, QnManualSearchStatus(QnManualSearchStatus::CheckingHost, startIdx, testList.size()));
+        setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, startIdx, testList.size()));
         QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearchPluginsEnumerator::search);
         startIdx = endIdx;
         endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
@@ -497,7 +493,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     return result;
 }
 
-bool QnResourceDiscoveryManager::getSearchStatus(const QUuid &searchProcessUuid, QnManualSearchStatus &status) {
+bool QnResourceDiscoveryManager::getSearchStatus(const QUuid &searchProcessUuid, QnManualCameraSearchStatus &status) {
     QMutexLocker lock(&m_searchProcessStatusMutex);
 
     if (!m_searchProcessStatuses.contains(searchProcessUuid))
@@ -507,7 +503,7 @@ bool QnResourceDiscoveryManager::getSearchStatus(const QUuid &searchProcessUuid,
     return true;
 }
 
-void QnResourceDiscoveryManager::setSearchStatus(const QUuid &searchProcessUuid, const QnManualSearchStatus &status) {
+void QnResourceDiscoveryManager::setSearchStatus(const QUuid &searchProcessUuid, const QnManualCameraSearchStatus &status) {
     QMutexLocker lock(&m_searchProcessStatusMutex);
     m_searchProcessStatuses[searchProcessUuid] = status;
 }
@@ -594,13 +590,4 @@ void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
 { 
     return m_state; 
-}
-
-
-void serialize(const QnManualSearchStatus &value, QJsonValue *target) {
-    detail::serialize(value, target);
-}
-
-bool deserialize(const QJsonValue &value, QnManualSearchStatus *target) {
-    return detail::deserialize(value, target);
 }

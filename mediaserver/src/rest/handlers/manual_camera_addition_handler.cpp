@@ -7,6 +7,7 @@
 #include "core/resource/resource.h"
 #include "core/resource_managment/resource_searcher.h"
 #include "core/resource_managment/resource_pool.h"
+#include <core/resource_managment/manual_camera_addition.h>
 #include "core/resource/camera_resource.h"
 
 #include <utils/common/json.h>
@@ -148,7 +149,7 @@ int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParamList &
     if (processGuid.isNull())
         return CODE_INVALID_PARAMETER;
 
-    QnManualSearchStatus status;
+    QnManualCameraSearchStatus status;
     if (!QnResourceDiscoveryManager::instance()->getSearchStatus(processGuid, status))
         return CODE_NOT_FOUND;
 
