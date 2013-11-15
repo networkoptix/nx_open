@@ -109,7 +109,6 @@
 #include "common/systemexcept_win32.h"
 #endif
 
-
 #define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -1166,12 +1165,9 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopCameraResourceSearcher::instance());
 
-#ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
-    {
-        QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
-        QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
-    }
+#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+    QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
+    QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
 #endif
 
     //Onvif searcher should be the last:
@@ -1258,12 +1254,9 @@ void QnMain::run()
     delete ThirdPartyResourceSearcher::instance();
     ThirdPartyResourceSearcher::initStaticInstance( NULL );
 
-#ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
-    {
-        delete QnPlVmax480ResourceSearcher::instance();
-        QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
-    }
+#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+    delete QnPlVmax480ResourceSearcher::instance();
+    QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
 #endif
 
     delete UPNPDeviceSearcher::instance();
@@ -1389,6 +1382,18 @@ static void printHelp();
 
 int main(int argc, char* argv[])
 {
+#if __arm__
+#if defined(__GNUC__)
+# if defined(__i386__)
+        /* Enable Alignment Checking on x86 */
+        __asm__("pushf\norl $0x40000,(%esp)\npopf");
+# elif defined(__x86_64__) 
+             /* Enable Alignment Checking on x86_64 */
+            __asm__("pushf\norl $0x40000,(%rsp)\npopf");
+# endif
+#endif
+#endif //__arm__
+
     ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
@@ -1432,7 +1437,7 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout<<"  "<<QN_APPLICATION_NAME" v."QN_APPLICATION_VERSION<<std::endl;
+    std::cout<<"  "<<QN_APPLICATION_NAME" v."<<QN_APPLICATION_VERSION<<std::endl;
 }
 
 static void printHelp()
