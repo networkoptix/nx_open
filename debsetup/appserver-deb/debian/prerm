@@ -7,6 +7,10 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
 COMPANY_NAME="${deb.customization.company.name}"
 
+if [ -e "/etc/init/$COMPANY_NAME-mediaproxy.conf" ]; then
+	invoke-rc.d $COMPANY_NAME-mediaproxy stop || exit $?
+fi
+
 if [ -e "/etc/init/$COMPANY_NAME-entcontroller.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-entcontroller stop || exit $?
 fi
