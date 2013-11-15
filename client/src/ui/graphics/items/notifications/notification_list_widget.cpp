@@ -175,7 +175,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
     if (m_collapsedItemCountChanged) {
         m_collapser.animation.source = m_collapser.item->y();
-        m_collapser.item->setText(tr("%1 items more").arg(collapsedItemsCount));
+        m_collapser.item->setText(tr("%n item(s) more", "", collapsedItemsCount));
         m_collapsedItemCountChanged = false;
         m_speedUp = 1.0 + collapsedItemsCount / 10.0;
     }

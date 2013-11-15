@@ -1,6 +1,8 @@
 #ifndef QN_TIME_SLIDER_H
 #define QN_TIME_SLIDER_H
 
+#include <QtCore/QLocale>
+
 #include <utils/math/functors.h>
 
 #include <recording/time_period_list.h>
@@ -198,8 +200,8 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
     static QVector<QnTimeStep> createRelativeSteps();
-    static QVector<QnTimeStep> createAbsoluteSteps();
-    static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
+    static void createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTimeStep> *relativeSteps);
+    static void enumerateSteps(QVector<QnTimeStep> &steps);
 
 private:
     enum Marker {
@@ -309,6 +311,7 @@ private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
     friend class QnTimeSliderChunkPainter;
+    friend class QnTimeSliderStepStorage;
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;
@@ -362,6 +365,8 @@ private:
     QVector<qint64> m_indicators;
 
     qint64 m_localOffset;
+
+    QLocale m_locale;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);
