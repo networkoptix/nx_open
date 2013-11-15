@@ -18,9 +18,12 @@
 #include <core/resource_managment/resource_pool.h>
 #include <common/customization.h>
 
+#include <mustache/mustache.h>
+
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
+#include <utils/common/json.h>
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QWidget(parent),
@@ -265,6 +268,24 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         QList<QnLicensePtr> licenses;
 
         QByteArray replyData = reply->readAll();
+
+        // If we can deserialize JSON it means there is an error.
+        QVariantMap errorMessage;
+        if (QJson::deserialize(replyData, &errorMessage)) {
+            QString error = errorMessage.value(lit("error")).toString();
+            // TODO: Afeksnadr Lokhin, find CORRECT message here
+            QString messageId = errorMessage.value(lit("messageId")).toString();
+            QString message = errorMessage.value(lit("message")).toString();
+            QVariantMap arguments = errorMessage.value(lit("arguments")).toMap();
+
+            message = Mustache::renderTemplate(tr(message.toLatin1().constData()), arguments);
+
+            QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license.") + lit(" ") + message);
+            ui->licenseWidget->setState(QnLicenseWidget::Normal);
+
+            return;
+        }
+
         QTextStream is(&replyData);
         is.setCodec("UTF-8");
 
