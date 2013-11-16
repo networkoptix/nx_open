@@ -115,7 +115,7 @@ unix:!mac {
   ${arch}:!arm {
     QMAKE_CXXFLAGS += -msse2
   } else {
-    LIBS -= -lssl
+    #LIBS -= -lssl
   } 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
