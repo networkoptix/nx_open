@@ -43,15 +43,14 @@ EOF
 
 mkdir $WSDIR
 
-pushd $WSDIR
+cd $WSDIR
 
 hg clone ssh://hg@noptix.enk.me/hg/buildenv
-pushd buildenv
-# ./get_buildenv.sh
-popd
+cd buildenv
+./get_buildenv.sh
+
+cd $WSDIR
 
 hg clone /vagrant netoptix_vms
 cp /vagrant/.hg/hgrc netoptix_vms/.hg
-
-popd
 
