@@ -14,9 +14,10 @@ then
 
     add-apt-repository ppa:pi-rho/dev
     add-apt-repository http://enk.me/dw
+    add-apt-repository ppa:cassou/emacs
 
     apt-get update
-    apt-get install -y tmux
+    apt-get install -y tmux emacs24-nox
 
     su - vagrant $0
     exit 0
