@@ -11,8 +11,7 @@ Vagrant.configure("2") do |config|
   #config.vm.network :private_network, ip: "192.168.33.10"
   config.vm.network :public_network
   config.vm.provision :shell, :path => ".vagrant/bootstrap.sh"  
-  config.vm.network :forwarded_port, guest: 4001, host: 4001
-  config.vm.network :forwarded_port, guest: 4004, host: 4004
+  config.vm.network :forwarded_port, guest: 7011, host: 7011
   config.ssh.private_key_path = "~/.ssh/id_rsa"
   config.ssh.forward_agent = true
 
@@ -68,8 +67,9 @@ Vagrant.configure("2") do |config|
     #vb.gui = true
     #vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natnet1", "172.23.24/24"]
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
     vb.customize ["modifyvm", :id, "--cpus", "2"]
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
   end
   #
   # View the documentation for the provider you're using for more

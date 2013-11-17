@@ -27,6 +27,7 @@ WSDIR=$HOME/workspace
 
 cp /vagrant/.vagrant/.hgrc ~
 cp /vagrant/.vagrant/.vimrc ~
+cp /vagrant/.vagrant/.tmux.conf ~
 
 grep environment ~/.profile > /dev/null 2>&1 || {
 echo "" >> ~/.profile
