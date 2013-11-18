@@ -244,7 +244,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
+            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) && cameraRes->hasDualStreaming2(); 
 
             if (runSecondStream)
             {
@@ -323,6 +323,13 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
             const Recorders& recorders = itrRec.value();
             if (recorders.recorderHiRes)
                 recorders.recorderHiRes->updateCamera(res);
+
+            if (recorders.recorderHiRes && providerLow && !recorders.recorderLowRes)
+            {
+                QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
+                if (recorderLowRes) 
+                    recorderLowRes->setDualStreamingHelper(recorders.recorderHiRes->getDualStreamingHelper());
+            }
             if (recorders.recorderLowRes)
                 recorders.recorderLowRes->updateCamera(res);
 

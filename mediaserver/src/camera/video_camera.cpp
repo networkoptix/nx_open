@@ -294,15 +294,14 @@ QnAbstractMediaStreamDataProviderPtr QnVideoCamera::getLiveReader(QnResource::Co
 {
     QMutexLocker lock(&m_getReaderMutex);
 
-    if (m_primaryReader == 0 && !m_resource->isDisabled() && m_resource->isInitialized())
+    if (!m_resource->isDisabled() && m_resource->isInitialized()) 
     {
-        createReader(QnResource::Role_LiveVideo);
-        createReader(QnResource::Role_SecondaryLiveVideo);
-        //if (m_primaryReader)
-        //    m_primaryReader->start();
-        //if (m_secondaryReader)
-        //    m_secondaryReader->start();
+        if (role == QnResource::Role_LiveVideo && m_primaryReader == 0)
+            createReader(QnResource::Role_LiveVideo);
+        else if (role == QnResource::Role_SecondaryLiveVideo && m_secondaryReader == 0)
+            createReader(QnResource::Role_SecondaryLiveVideo);
     }
+
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 

@@ -481,6 +481,11 @@ void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr hel
     m_dualStreamingHelper = helper;
 }
 
+QnDualStreamingHelperPtr QnServerStreamRecorder::getDualStreamingHelper() const
+{
+    return m_dualStreamingHelper;
+}
+
 int QnServerStreamRecorder::getFRAfterThreshold() const
 {
     return m_forcedSchedileRecord.getAfterThreshold();
