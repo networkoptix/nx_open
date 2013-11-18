@@ -187,8 +187,10 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
         return mathImage_sse2(data, mask, maskStart, maskEnd);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
+    return false;
 #else
-    //TODO/ARM
+    //TODO: C fallback routine
+    return false;
 #endif
 }
 
@@ -227,7 +229,7 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    //TODO/ARM
+    //TODO: C fallback routine
 #endif
 }
 
@@ -264,9 +266,10 @@ bool QnMetaDataV1::isEmpty() const
         return metadataIsEmpty_sse2((__m128i*) data.data());
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
-    return false;
+    return true;
 #else
-    //TODO
+    //TODO: C fallback routine
+    return true;
 #endif
 }
 
@@ -318,7 +321,7 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    //TODO
+    //TODO: C fallback routine
 #endif
 }
 

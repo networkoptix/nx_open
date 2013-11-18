@@ -25,6 +25,7 @@ extern "C"
 #include "win_audio_helper.h"
 #include "decoders/audio/ffmpeg_audio.h"
 #include "utils/common/synctime.h"
+#include "utils/media/ffmpeg_helper.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
 // I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
