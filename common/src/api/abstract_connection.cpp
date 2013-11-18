@@ -48,13 +48,15 @@ void QnAbstractConnection::setNameMapper(QnEnumNameMapper *nameMapper) {
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
     QnAbstractReplyProcessor *processor = newReplyProcessor(object);
 
-    QByteArray signal;
-    if(replyTypeName == NULL) {
-        signal = SIGNAL(finished(int, int));
-    } else {
-        signal = QString::fromLatin1("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
+    if (target && slot) {
+        QByteArray signal;
+        if(replyTypeName == NULL) {
+            signal = SIGNAL(finished(int, int));
+        } else {
+            signal = QString::fromLatin1("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
+        }
+        processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }
-    processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
 
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,

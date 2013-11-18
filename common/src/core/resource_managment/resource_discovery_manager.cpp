@@ -411,7 +411,7 @@ struct ManualSearchPluginsEnumerator
 };
 
 
-QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port)
+void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port)
 {
     {
         QString str;
@@ -421,11 +421,10 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         cl_log.log(str, cl_logINFO);
     }
 
-    QUuid processUuid = QUuid::createUuid();
     qDebug() << "searching" << processUuid.toString();
 
 
-    setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::Init, 0, 0));
+    setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingOnline, 0, 1));
 
     //=======================================
     QnIprangeChecker ip_cheker;
@@ -444,6 +443,14 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
     foreach(const QString& addr, online)
     {
         cl_log.log(addr, cl_logINFO);
+    }
+
+    {
+        QnManualCameraSearchStatus status;
+        if (!getSearchStatus(processUuid, status)) {
+            qDebug() << "aborting search stage 0" << processUuid;
+            return;
+        }
     }
 
     //=======================================
@@ -473,28 +480,66 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearchPluginsEnumerator::search);
         startIdx = endIdx;
         endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+
+        QnManualCameraSearchStatus status;
+        if (!getSearchStatus(processUuid, status)) {
+            qDebug() << "aborting search" << processUuid;
+            return; //search aborted
+        }
+
+        //TODO: #GDM incremental populate the results list
     }
 
 
-    QnResourceList result;
+    QnResourceList cameras;
 
     foreach(const ManualSearchPluginsEnumerator& h, testList)
     {
-        result.append(h.resList);
+        cameras.append(h.resList);
     }
 
-    cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);
-    foreach(QnResourcePtr res, result)
+    cl_log.log("Found ",  cameras.size(), " new resources", cl_logINFO);
+    foreach(QnResourcePtr res, cameras)
     {
         cl_log.log(res->toString(), cl_logINFO);
     }
 
-    clearSearchStatus(processUuid);
-    return result;
+    QnManualCameraSearchCameraList results;
+    foreach(const QnResourcePtr &resource, cameras){
+        QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resource->getTypeId());
+        bool existsInPool = false;
+        if (qnResPool->hasSuchResource(resource->getUniqueId())) {
+            existsInPool = true; // already in resource pool
+        }
+        else {
+            // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
+            QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
+            if (netRes) {
+                QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+                foreach(QnNetworkResourcePtr existRes, existResList)
+                {
+                    if (existRes->getTypeId() != netRes->getTypeId())
+                        existsInPool = true; // camera found by different drivers
+
+                    QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
+                    if (!existCam->isManuallyAdded())
+                        existsInPool = true; // block manual and auto add in same time
+                }
+            }
+        }
+
+        results << QnManualCameraSearchSingleCamera(resource->getName(),
+                                                    resource->getUrl(),
+                                                    resourceType->getName(),
+                                                    existsInPool);
+    }
+
+    setSearchResults(processUuid, results);
+    setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::Finished, 1, 1));
 }
 
 bool QnResourceDiscoveryManager::getSearchStatus(const QUuid &searchProcessUuid, QnManualCameraSearchStatus &status) {
-    QMutexLocker lock(&m_searchProcessStatusMutex);
+    QMutexLocker lock(&m_searchProcessMutex);
 
     if (!m_searchProcessStatuses.contains(searchProcessUuid))
         return false;
@@ -504,13 +549,28 @@ bool QnResourceDiscoveryManager::getSearchStatus(const QUuid &searchProcessUuid,
 }
 
 void QnResourceDiscoveryManager::setSearchStatus(const QUuid &searchProcessUuid, const QnManualCameraSearchStatus &status) {
-    QMutexLocker lock(&m_searchProcessStatusMutex);
+    QMutexLocker lock(&m_searchProcessMutex);
     m_searchProcessStatuses[searchProcessUuid] = status;
 }
 
-void QnResourceDiscoveryManager::clearSearchStatus(const QUuid &searchProcessUuid) {
-     QMutexLocker lock(&m_searchProcessStatusMutex);
+QnManualCameraSearchCameraList QnResourceDiscoveryManager::getSearchResults(const QUuid &searchProcessUuid) {
+    QMutexLocker lock(&m_searchProcessMutex);
+
+    if (!m_searchProcessResults.contains(searchProcessUuid))
+        return QnManualCameraSearchCameraList();
+
+    return m_searchProcessResults[searchProcessUuid];
+}
+
+void QnResourceDiscoveryManager::setSearchResults(const QUuid &searchProcessUuid, const QnManualCameraSearchCameraList &results) {
+    QMutexLocker lock(&m_searchProcessMutex);
+    m_searchProcessResults[searchProcessUuid] = results;
+}
+
+void QnResourceDiscoveryManager::clearSearch(const QUuid &searchProcessUuid) {
+     QMutexLocker lock(&m_searchProcessMutex);
      m_searchProcessStatuses.remove(searchProcessUuid);
+     m_searchProcessResults.remove(searchProcessUuid);
 }
 
 bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCamerasMap& cameras)

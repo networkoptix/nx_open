@@ -2285,13 +2285,34 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
     if(resources.size() != 1)
         return;
 
+    QnMediaServerResourcePtr server = resources[0];
+
     bool newlyCreated = false;
     if(!cameraAdditionDialog()) {
         m_cameraAdditionDialog = new QnCameraAdditionDialog(mainWindow());
         newlyCreated = true;
     }
+    QnCameraAdditionDialog* dialog = cameraAdditionDialog();
+
+    if (dialog->server() != server) {
+        if (dialog->state() == QnCameraAdditionDialog::Searching
+                || dialog->state() == QnCameraAdditionDialog::Adding) {
+
+            int result = QMessageBox::warning(
+                        mainWindow(),
+                        tr("Process is in progress"),
+                        tr("Camera addition is already in progress."\
+                           "Are you sure you want to cancel current process?"), //TODO: #GDM show current process details
+                        QMessageBox::Ok | QMessageBox::Cancel,
+                        QMessageBox::Cancel
+            );
+            if (result != QMessageBox::Ok)
+                return;
+        }
+        dialog->setServer(server);
+    }
+
     QRect oldGeometry = cameraAdditionDialog()->geometry();
-    cameraAdditionDialog()->setServer(resources[0]);
     cameraAdditionDialog()->show();
     if(!newlyCreated)
         cameraAdditionDialog()->setGeometry(oldGeometry);
@@ -4132,9 +4153,9 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
-    QMessageBox::warning(context()->mainWindow(),
-                         QObject::tr("Beta version"),
-                         QObject::tr("You are running beta version of %1")
+    QMessageBox::warning(mainWindow(),
+                         tr("Beta version"),
+                         tr("You are running beta version of %1")
                          .arg(QLatin1String(QN_APPLICATION_NAME)));
 }
 
