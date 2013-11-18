@@ -373,9 +373,9 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
             camera->initAsync(false);
         }
 
-		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
-		if (!mServer || mServer->getGuid() != serverGuid())
-			return; // it is camera from other server
+        QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
+        if (!mServer || mServer->getGuid() != serverGuid())
+            return; // it is camera from other server
 
         updateCamera(camera);
 
