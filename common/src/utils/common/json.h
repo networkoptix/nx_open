@@ -248,6 +248,7 @@ namespace QJsonDetail {
 
 } // namespace QJsonDetail
 
+#ifndef Q_MOC_RUN
 
 /**
  * \param TYPE                          Type to declare json (de)serialization functions for.
@@ -312,6 +313,14 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
             return false;                                                       \
     }
 
+#else // Q_MOC_RUN
+
+/* Qt moc chokes on our macro hell, so we make things easier for it. */
+#define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
+
+#endif // Q_MOC_RUN
 
 #include "json_functions.h"
 
