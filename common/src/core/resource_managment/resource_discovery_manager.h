@@ -2,14 +2,18 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <memory> // for auto_ptr
+
 #include <QtCore/QThread>
-#include <QAuthenticator>
 #include <QtCore/QTimer>
-#include "utils/common/long_runnable.h"
-#include "utils/network/netstate.h"
-#include "core/resource/resource.h"
-#include "utils/network/nettools.h"
-#include <core/resource_managment/manual_camera_addition.h>
+#include <QtNetwork/QAuthenticator>
+
+#include <api/media_server_cameras_data.h>
+
+#include <core/resource/resource.h>
+
+#include <utils/common/long_runnable.h>
+#include <utils/network/netstate.h>
+#include <utils/network/nettools.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -85,7 +89,7 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
+    void searchResources(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port);
     bool registerManualCameras(const QnManualCamerasMap& cameras);
     //QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
@@ -93,7 +97,11 @@ public:
 
     bool getSearchStatus(const QUuid &searchProcessUuid, QnManualCameraSearchStatus &status);
     void setSearchStatus(const QUuid &searchProcessUuid, const QnManualCameraSearchStatus &status);
-    void clearSearchStatus(const QUuid &searchProcessUuid);
+
+    QnManualCameraSearchCameraList getSearchResults(const QUuid &searchProcessUuid);
+    void setSearchResults(const QUuid &searchProcessUuid, const QnManualCameraSearchCameraList &results);
+
+    void clearSearch(const QUuid &searchProcessUuid);
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
     void doResourceDiscoverIteration();
@@ -107,7 +115,7 @@ protected:
     QMutex m_discoveryMutex;
 
     /** Mutex that is used to synchronize access to manual camera addition progress. */
-    QMutex m_searchProcessStatusMutex;
+    QMutex m_searchProcessMutex;
 
     unsigned int m_runNumber;
 
@@ -153,6 +161,7 @@ private:
     const CameraDriverRestrictionList* m_cameraDriverRestrictionList;
 
     QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
+    QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

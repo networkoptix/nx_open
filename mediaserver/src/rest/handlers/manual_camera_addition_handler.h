@@ -16,8 +16,10 @@ protected:
     virtual QString description() const;
 
 private:
-    int searchAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
+    int searchStartAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
     int searchStatusAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
+    int searchStopAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
+
     int addAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType);
     QHostAddress parseAddrParam(const QString &param, QString &errStr);
 };
