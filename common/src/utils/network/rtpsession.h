@@ -365,6 +365,11 @@ private:
     QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
     QString m_videoLayout;
+
+    char* m_additionalReadBuffer;
+    int m_additionalReadBufferSize;
+
+    int readSocketWithBuffering( quint8* buf, size_t bufSize );
 };
 
 #endif //rtp_session_h_1935_h
