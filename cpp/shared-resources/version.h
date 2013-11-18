@@ -7,6 +7,7 @@
 /* 
  * Some defines from the build system. Feel free to use these.
  */
+#define QN_BETA                         "${beta}"
 #define QN_ORGANIZATION_NAME            "${company.name}"
 #define QN_APPLICATION_NAME             "${product.title}"
 #define QN_APPLICATION_VERSION          "${release.version}.${buildNumber}"
