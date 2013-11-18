@@ -33,7 +33,9 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
     QnAbstractMediaStreamDataProvider::setRole(role);
     {
         QMutexLocker mtx(&m_livemutex);
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         updateSoftwareMotion();
+#endif
 
         if (role == QnResource::Role_SecondaryLiveVideo)
         {
@@ -134,6 +136,7 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 {
 }
 
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
@@ -145,6 +148,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
         }
     }
 }
+#endif
 
 bool QnLiveStreamProvider::canChangeStatus() const
 {
@@ -208,6 +212,7 @@ bool QnLiveStreamProvider::needMetaData()
 
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (getRole() == roleForMotionEstimation()) {
             for (int i = 0; i < m_layout->channelCount(); ++i)
             {
@@ -218,6 +223,7 @@ bool QnLiveStreamProvider::needMetaData()
                 }
             }
         }
+#endif
         return false;
     }
     else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
@@ -238,6 +244,7 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
 {
     m_framesSinceLastMetaData++;
 
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         if( m_motionEstimation[videoData->channelNumber].analizeFrame(videoData) )
         {
@@ -248,6 +255,7 @@ void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
                 onStreamResolutionChanged( videoData->channelNumber, newResolution );
             }
         }
+#endif
 }
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
@@ -286,9 +294,11 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnMetaDataV1Ptr QnLiveStreamProvider::getMetaData()
 {
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
+#endif
         return getCameraMetadata();
 }
 

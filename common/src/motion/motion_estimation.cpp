@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
+
 #include "motion_estimation.h"
 
 #include <cmath>
@@ -202,7 +205,7 @@ inline __m128i advanced_sad(const __m128i src1, const __m128i src2)
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    //TODO
+    //TODO: C fallback routine
 #endif
 
 void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
@@ -530,7 +533,6 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 #else
     //TODO
 #endif
-
 
             squareStep++;
             if (squareStep == sqWidthSteps) 
@@ -913,6 +915,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     }
 }
 
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 {
     QMutexLocker lock(&m_mutex);
@@ -1025,6 +1028,7 @@ bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
     return true;
 }
+#endif
 
 void QnMotionEstimation::postFiltering()
 {
@@ -1137,3 +1141,5 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     }
     m_lastImgWidth = m_lastImgHeight = 0;
 }
+
+#endif //ENABLE_SOFTWARE_MOTION_DETECTION

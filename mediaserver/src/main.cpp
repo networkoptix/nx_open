@@ -346,22 +346,23 @@ static QStringList listRecordFolders()
 
 QnAbstractStorageResourceList createStorages()
 {
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
-
     QnAbstractStorageResourceList storages;
-    bool isBigStorageExist = false;
+    //bool isBigStorageExist = false;
+    qint64 bigStorageThreshold = 0;
     foreach(QString folderPath, listRecordFolders()) {
         QnStorageResourcePtr storage = createStorage(folderPath);
-        isBigStorageExist |= storage->isUsedForWriting() && storage->getTotalSpace() > BIG_STORAGE_THRESHOLD;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
         cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
     }
-    if (isBigStorageExist) {
-        for (int i = 0; i < storages.size(); ++i) {
-            QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
-            if (storage->getTotalSpace() <= BIG_STORAGE_THRESHOLD)
-                storage->setUsedForWriting(false);
-        }
+    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+
+    for (int i = 0; i < storages.size(); ++i) {
+        QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        if (available < bigStorageThreshold)
+            storage->setUsedForWriting(false);
     }
 
     return storages;

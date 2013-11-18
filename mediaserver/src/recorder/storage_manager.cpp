@@ -540,25 +540,31 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
-    QSet<QnStorageResourcePtr> smallStorages;
 
     QnStorageManager::StorageMap storageRoots = getAllStorages();
+    qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > BIG_STORAGE_THRESHOLD)
-                result << fileStorage;
-            else
-                smallStorages << fileStorage;
+            bigStorageThreshold = qMax(bigStorageThreshold, available);
         }
     }
-    if (result.isEmpty())
-        return smallStorages; // try small storages if no big storages
-    else
-        return result;
+    bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
+
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
+        {
+            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+            if (available >= bigStorageThreshold)
+                result << fileStorage;
+        }
+    }
+    return result;
 }
 
 void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
@@ -639,7 +645,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     const QSet<QnStorageResourcePtr> storages = getWritableStorages();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-		QnStorageResourcePtr storage = *itr;
+        QnStorageResourcePtr storage = *itr;
         qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
         float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
@@ -664,10 +670,10 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     }
 
     if (result) {
-		qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
     }
     else {
-		qDebug() << "No storage available for recording";
+        qDebug() << "No storage available for recording";
         if (!m_warnSended) {
             emit noStoragesAvailable();
             m_warnSended = true;
@@ -808,7 +814,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     // 1.4 to 1.5 compatibility notes:
     // 1.5 prevent duplicates path to same physical storage (aka c:/test and c:/test/)
     // for compatibility with 1.4 I keep all such patches as difference keys to same storage
-	// In other case we are going to lose archive from 1.4 because of storage_index is different for same physical folder
+    // In other case we are going to lose archive from 1.4 because of storage_index is different for same physical folder
     // If several storage keys are exists, function return minimal storage index
 
     storageIndex = -1;

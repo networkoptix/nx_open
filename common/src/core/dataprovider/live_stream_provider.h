@@ -43,7 +43,9 @@ public:
 
     void setUseSoftwareMotion(bool value);
 
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     void updateSoftwareMotion();
+#endif
     bool canChangeStatus() const;
 
     virtual bool secondaryResolutionIsLarge() const { return false; }
@@ -76,7 +78,9 @@ private:
     QTime m_timeSinceLastMetaData; //used only for live providers
 
     QnResource::ConnectionRole m_softMotionRole;
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+#endif
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     const QnResourceVideoLayout* m_layout;
