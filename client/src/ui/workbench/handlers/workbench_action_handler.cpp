@@ -4153,9 +4153,9 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
-    QMessageBox::warning(context()->mainWindow(),
-                         QObject::tr("Beta version"),
-                         QObject::tr("You are running beta version of %1")
+    QMessageBox::warning(mainWindow(),
+                         tr("Beta version"),
+                         tr("You are running beta version of %1")
                          .arg(QLatin1String(QN_APPLICATION_NAME)));
 }
 
