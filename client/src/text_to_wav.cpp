@@ -15,7 +15,7 @@
 static char festivalVoxPath[256];
 
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
 #include <stdio.h>
 #else
 namespace
@@ -246,7 +246,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
 
     if( result )
     {
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
         //open_memstream is present
         char* buf = NULL;
         size_t bufSize = 0;
