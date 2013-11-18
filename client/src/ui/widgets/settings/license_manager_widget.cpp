@@ -277,6 +277,8 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         QJsonObject errorMessage;
         if (QJson::deserialize(replyData, &errorMessage)) {
             QString error = errorMessage.value(lit("error")).toString();
+            // TODO: Afeksnadr Lokhin, find CORRECT message here
+            QString messageId = errorMessage.value(lit("messageId")).toString();
             QString message = errorMessage.value(lit("message")).toString();
             QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
@@ -287,7 +289,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
             return;
         }
-        
+
         QTextStream is(&replyData);
         is.setCodec("UTF-8");
 

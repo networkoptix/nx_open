@@ -215,7 +215,7 @@ void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
 const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
-        const QnRtpStreamReader* rtspReader = dynamic_cast<const QnRtpStreamReader*>(dataProvider);
+        const QnISDStreamReader* rtspReader = dynamic_cast<const QnISDStreamReader*>(dataProvider);
         if (rtspReader && rtspReader->getDPAudioLayout())
             return rtspReader->getDPAudioLayout();
         else
