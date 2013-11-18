@@ -62,7 +62,7 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
     void stopAsyncTasks();
