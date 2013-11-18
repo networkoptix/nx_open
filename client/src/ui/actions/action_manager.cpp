@@ -602,6 +602,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Show Version Mismatch Message"));
 
+    factory(Qn::BetaVersionMessageAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Beta Version Warning Message"));
+
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
         text(tr("Open in Browser..."));
