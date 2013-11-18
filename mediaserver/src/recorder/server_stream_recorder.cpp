@@ -151,8 +151,9 @@ void QnServerStreamRecorder::updateStreamParams()
 
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
     return recType == Qn::RecordingType_MotionOnly || 
-           (m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ);
+           (m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ && camera->hasDualStreaming2());
 }
 
 void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
@@ -221,10 +222,11 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
             updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
     }
     QnScheduleTask task = currentScheduleTask();
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
 
     if (task.getRecordingType() == Qn::RecordingType_Run)
         return true;
-    else if (task.getRecordingType() == Qn::RecordingType_MotionPlusLQ && m_role == QnResource::Role_SecondaryLiveVideo)
+    else if (task.getRecordingType() == Qn::RecordingType_MotionPlusLQ && (m_role == QnResource::Role_SecondaryLiveVideo || !camera->hasDualStreaming2()))
         return true;
     else if (task.getRecordingType() == Qn::RecordingType_Never)
     {
