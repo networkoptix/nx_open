@@ -646,7 +646,10 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     //unsigned int port = DEFAULT_RTP_PORT;
 
     if (m_tcpSock->isClosed())
+    {
         m_tcpSock->reopen();
+        m_additionalReadBufferSize = 0;
+    }
 
     m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT);
 
