@@ -15,6 +15,7 @@ V14 = Version(1, 4)
 V15 = Version(1, 5)
 V16 = Version(1, 6)
 V20 = Version(2, 0)
+V21 = Version(2, 1)
            
 COMPATIBILITY_INFO = (
     (V15, (IOSCL,), V16), # iOS V1.5 can connect to 1.6
@@ -32,6 +33,13 @@ COMPATIBILITY_INFO = (
     
     (V16, (MS,), V20), # MediaServer V1.6 can connect to 2.0
     (V20, (MS,), V16), # MediaServer V2.0 can connect to 1.6
+
+    (V20, (CL,MS,IOSCL,ANDROID), V21),
+    (V21, (CL,MS,IOSCL,ANDROID), V20),
+
+    (V16, (CL,MS,IOSCL,ANDROID), V21),
+    (V21, (CL,MS,IOSCL,ANDROID), V16),
+
 #    (V13, (CL,), Range(V12, V12)),
 #    (V14, (CL,), Range(V12, V13)),
 )
