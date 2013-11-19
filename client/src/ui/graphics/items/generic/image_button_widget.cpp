@@ -23,6 +23,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
+#include <ui/common/palette.h>
 
 
 #define QN_IMAGE_BUTTON_WIDGET_DEBUG
@@ -715,10 +716,12 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    m_relativeFontSize(-1.0),
-    m_relativeFrameWidth(-1.0)
+    m_relativeFontSize(1.0),
+    m_relativeFrameWidth(-1.0),
+    m_windowBrush(Qt::NoBrush)
 {
     setFrameShape(Qn::NoFrame);
+    FramedBase::setWindowBrush(Qt::NoBrush);
 
     qFill(m_opacities, -1.0);
     m_opacities[0] = 1.0;
@@ -733,25 +736,7 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
-
-    // create caching image
-    const static int fontSize = 40;
-    const static qreal offset = 10 * 0.01; // border offset in persents
-
-    QFont font = this->font();
-    font.setPixelSize(fontSize);
-    QFontMetrics m(font);
-    QSize imageSize = m.size(0, m_text);
-    imageSize *= (1.0 + offset*2.0);
-
-    QPixmap pixmap(imageSize);
-    {
-        QPainter p(&pixmap);
-        p.setFont(font);
-        p.drawText(imageSize.width()*offset, imageSize.height()*offset + m.ascent(), m_text);
-    }
-    setPixmap(0, pixmap);
-    update();
+    updatePixmap();
 }
 
 qreal QnTextButtonWidget::relativeFontSize() const {
@@ -763,7 +748,7 @@ void QnTextButtonWidget::setRelativeFontSize(qreal relativeFontSize) {
         return;
 
     m_relativeFontSize = relativeFontSize;
-    update();
+    updatePixmap();
 }
 
 qreal QnTextButtonWidget::relativeFrameWidth() const {
@@ -791,6 +776,31 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
     }
 }
 
+QBrush QnTextButtonWidget::windowBrush() const {
+    return m_windowBrush;
+}
+
+void QnTextButtonWidget::setWindowBrush(const QBrush &windowBrush) {
+    /*
+     * Opaque color usage leads to graphic artefacts during painting. --gdm
+     */
+    Q_ASSERT(windowBrush.color().alpha() == 255);
+
+    if (m_windowBrush == windowBrush)
+        return;
+
+    m_windowBrush = windowBrush;
+    updatePixmap();
+}
+
+QColor QnTextButtonWidget::windowColor() const {
+    return windowBrush().color();
+}
+
+void QnTextButtonWidget::setWindowColor(const QColor &windowColor) {
+    setWindowBrush(windowColor);
+}
+
 void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     /* Skip Framed implementation. */
     QnImageButtonWidget::paint(painter, option, widget);
@@ -800,11 +810,38 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * linearCombine(1.0 - progress, stateOpacity(startState), progress, stateOpacity(endState)));
 
-    /* Draw frame. */
-    paintFrame(painter, rect);
-
     /* Draw image. */ 
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
+
+    /* Draw frame. */
+    paintFrame(painter, rect);
+}
+
+void QnTextButtonWidget::updatePixmap() {
+    // create caching image
+    const static int fontSize = 40;
+    const static qreal offset = 10 * 0.01; // border offset in percents
+
+    QFont font = this->font();
+    font.setPixelSize(fontSize * m_relativeFontSize);
+    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+    QFontMetrics metrics(font);
+    QSize imageSize = metrics.size(0, m_text);
+    if (imageSize.width() == 0)
+        return; // font still not initialized
+
+    imageSize *= (1.0 + offset*2.0);
+
+    QPixmap pixmap(imageSize);
+    {
+        QPainter p(&pixmap);
+        p.fillRect(pixmap.rect(), m_windowBrush);
+        p.setFont(font);
+        p.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
+    }
+
+    setPixmap(0, pixmap);
+    update();
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {

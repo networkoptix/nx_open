@@ -148,6 +148,12 @@ namespace Qn {
          */
         VersionMismatchMessageAction,
 
+
+        /**
+         * Displays beta version warning dialog.
+         */
+        BetaVersionMessageAction,
+
         /**
          * Opens the provided url in the default browser.
          *

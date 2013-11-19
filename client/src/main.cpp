@@ -515,6 +515,12 @@ int main(int argc, char **argv)
         /* Process pending events before executing actions. */
         qApp->processEvents();
 
+        // show beta version warning message for the main instance only
+        if (!noSingleApplication &&
+                !qnSettings->isDevMode() &&
+                QLatin1String(QN_BETA) == QLatin1String("true"))
+            context->action(Qn::BetaVersionMessageAction)->trigger();
+
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */
             if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {

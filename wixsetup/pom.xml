@@ -60,9 +60,9 @@
     </dependencies>
 
     <build>
+        <finalName>${finalName}</finalName>
         <directory>${arch}</directory>
         <sourceDirectory>${root.dir}/wixsetup</sourceDirectory>
-        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -91,7 +91,9 @@
         <profile>
             <id>installer</id>
             <activation>                
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>!installer-skip</name>
+                </property>
             </activation>           
             <build>
                 <plugins>
@@ -190,7 +192,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>
                                 </configuration>                    
                             </execution>
-                            
+
                             <execution>
                                 <id>vox-heat</id>
                                 <phase>process-sources</phase>
@@ -411,5 +413,28 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>
+        <profile>
+            <id>beta</id>
+            <activation>
+                <property>
+                    <name>!beta</name>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>    
+            </properties>
+        </profile>	      
+        <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}</finalName>    
+            </properties>
+        </profile>	  
+    </profiles>        
 </project>

@@ -34,6 +34,7 @@
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
+        <beta>true</beta>
 
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	

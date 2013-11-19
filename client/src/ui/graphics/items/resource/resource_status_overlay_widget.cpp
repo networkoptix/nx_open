@@ -40,8 +40,8 @@ namespace {
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
     const QColor textColor(255, 96, 96, 128);
-    const QColor buttonBaseColor(255, 32, 32, 160);
-    const QColor buttonBorderColor(255, 32, 32, 255);
+    const QColor buttonBaseColor(255, 32, 32);
+    const QColor buttonBorderColor(255, 32, 32);
 
 } // anonymous namespace
 
@@ -72,7 +72,6 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_diagnosticsButton = new QnTextButtonWidget(this);
     m_diagnosticsButton->setText(tr("Diagnose..."));
     m_diagnosticsButton->setFrameShape(Qn::RectangularFrame);
-    m_diagnosticsButton->setRelativeFontSize(0.5);
     m_diagnosticsButton->setRelativeFrameWidth(1.0 / 16.0);
     m_diagnosticsButton->setStateOpacity(0, 0.4);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
