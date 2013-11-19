@@ -12,6 +12,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/math/linear_combination.h>
+#include <utils/math/color_transformations.h>
 #include <client/client_settings.h>
 
 #include <ui/animation/variant_animator.h>
@@ -23,6 +24,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
+#include <ui/common/palette.h>
 
 
 #define QN_IMAGE_BUTTON_WIDGET_DEBUG
@@ -379,6 +381,12 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glColor(0.0, 0.0, 0.0, painter->opacity());
+    glBegin(GL_QUADS);
+    glVertices(rect);
+    glEnd();
+
     glColor(1.0, 1.0, 1.0, painter->opacity());
 
     if (isOne || isZero) {
@@ -715,7 +723,7 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    m_relativeFontSize(-1.0),
+    m_relativeFontSize(1.0),
     m_relativeFrameWidth(-1.0)
 {
     setFrameShape(Qn::NoFrame);
@@ -733,25 +741,7 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
-
-    // create caching image
-    const static int fontSize = 40;
-    const static qreal offset = 10 * 0.01; // border offset in persents
-
-    QFont font = this->font();
-    font.setPixelSize(fontSize);
-    QFontMetrics m(font);
-    QSize imageSize = m.size(0, m_text);
-    imageSize *= (1.0 + offset*2.0);
-
-    QPixmap pixmap(imageSize);
-    {
-        QPainter p(&pixmap);
-        p.setFont(font);
-        p.drawText(imageSize.width()*offset, imageSize.height()*offset + m.ascent(), m_text);
-    }
-    setPixmap(0, pixmap);
-    update();
+    updatePixmap();
 }
 
 qreal QnTextButtonWidget::relativeFontSize() const {
@@ -763,7 +753,7 @@ void QnTextButtonWidget::setRelativeFontSize(qreal relativeFontSize) {
         return;
 
     m_relativeFontSize = relativeFontSize;
-    update();
+    updatePixmap();
 }
 
 qreal QnTextButtonWidget::relativeFrameWidth() const {
@@ -805,6 +795,41 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
 
     /* Draw image. */ 
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
+}
+
+void QnTextButtonWidget::updatePixmap() {
+    // create caching image
+    const static int fontSize = 40;
+    const static qreal offset = 10 * 0.01; // border offset in percents
+    const static int divider = 8;
+
+    QFont font = this->font();
+    font.setPixelSize(fontSize * m_relativeFontSize);
+    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+    QFontMetrics metrics(font);
+    QSize imageSize = metrics.size(0, m_text);
+    imageSize *= (1.0 + offset*2.0);
+
+    if (imageSize.width() % divider != 0)
+        imageSize.setWidth((imageSize.width() / divider + 1) * divider);
+
+    if (imageSize.height() % divider != 0)
+        imageSize.setHeight((imageSize.height() / divider + 1) * divider);
+
+    QPixmap pixmap(imageSize);
+    {
+        QPainter p(&pixmap);
+        p.fillRect(pixmap.rect(), windowBrush());
+        p.setFont(font);
+        p.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
+    }
+    setPixmap(0, pixmap);
+    update();
+}
+
+void QnTextButtonWidget::updateFrame() {
+    updatePixmap();
+    FramedBase::updateFrame();
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {
