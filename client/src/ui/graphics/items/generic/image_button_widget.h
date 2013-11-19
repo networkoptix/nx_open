@@ -197,11 +197,12 @@ public:
     void setStateOpacity(StateFlags stateFlags, qreal opacity);
 
     virtual void setGeometry(const QRectF &geometry) override;
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
 
+    void updatePixmap();
+    virtual void updateFrame() override;
 protected:
     StateFlags validOpacityState(StateFlags flags) const;
 
