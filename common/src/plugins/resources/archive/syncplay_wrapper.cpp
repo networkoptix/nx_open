@@ -541,7 +541,12 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 
             if (!i->buffering)
                 d->bufferingCnt++;
             i->buffering = true;
-            d->bufferingTime = bufferingTime;
+            if (d->bufferingCnt == 1)
+                d->bufferingTime = bufferingTime;
+            else if (d->speed >= 0)
+                d->bufferingTime = qMin(d->bufferingTime, bufferingTime);
+            else
+                d->bufferingTime = qMax(d->bufferingTime, bufferingTime);
             break;
         }
     }
