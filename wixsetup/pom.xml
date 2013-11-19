@@ -60,6 +60,7 @@
     </dependencies>
 
     <build>
+        <finalName>${finalName}</finalName>
         <directory>${arch}</directory>
         <sourceDirectory>${root.dir}/wixsetup</sourceDirectory>
         <plugins>
@@ -90,7 +91,9 @@
         <profile>
             <id>installer</id>
             <activation>                
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>!installer-skip</name>
+                </property>
             </activation>           
             <build>
                 <plugins>
@@ -189,7 +192,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>
                                 </configuration>                    
                             </execution>
-                            
+
                             <execution>
                                 <id>vox-heat</id>
                                 <phase>process-sources</phase>
@@ -409,7 +412,7 @@
             </plugin> -->
                 </plugins>
             </build>
-
+        </profile>
         <profile>
             <id>beta</id>
             <activation>
@@ -419,19 +422,19 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>    
             </properties>
         </profile>	      
         <profile>
-            <id>beta</id>
+            <id>nobeta</id>
             <activation>
                 <property>
-                    <name>beta</name>
-                    <value>false</value>
+                    <name>!beta</name>
                 </property>
             </activation>
             <properties>
-                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${install.type}-${arch}</finalName>    
             </properties>
-        </profile>	          
+        </profile>	  
+    </profiles>        
 </project>

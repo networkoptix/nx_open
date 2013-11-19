@@ -22,8 +22,12 @@
         <profile>
             <id>installer</id>
             <activation>                
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>!installer-skip</name>
+                </property>
             </activation>           
         </profile>
-    </profiles>    
+
+
+    </profiles>
 </project>
