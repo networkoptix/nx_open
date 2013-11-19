@@ -45,7 +45,6 @@ protected:
 
     void initSelf(QGraphicsWidget *self);
 
-    virtual void updateFrame();
 private:
     QGraphicsWidget *m_self;
     qreal m_frameWidth;
