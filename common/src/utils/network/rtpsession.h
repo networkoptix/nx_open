@@ -2,6 +2,7 @@
 #define rtp_session_h_1935_h
 
 #include <memory>
+#include <vector>
 
 #include <QAuthenticator>
 
@@ -265,7 +266,7 @@ public:
     * @param channelNumber buffer number
     * @return amount of readed bytes
     */
-    int readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber);
+    int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
 
     void sendBynaryResponse(quint8* buffer, int size);
@@ -275,7 +276,7 @@ public:
 
     void setUsePredefinedTracks(int numOfVideoChannel);
 
-    static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
+    static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
 
     bool setTCPReadBufferSize(int value);
 
@@ -347,7 +348,7 @@ private:
     // format: key - track number, value - codec name
     TrackMap m_sdpTracks;
 
-    QTime m_keepAliveTime;
+    QElapsedTimer m_keepAliveTime;
 
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;

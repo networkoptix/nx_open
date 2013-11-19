@@ -135,7 +135,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     int videoRetryCount = 0;
     int channelNum = 0;
 
-    QTime dataTimer;
+    QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
@@ -146,6 +146,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             break; // error
         RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(channelNum);
         int rtpBufferOffset = m_demuxedData[channelNum]->size() - readed;
+
         if (format == RTPSession::TT_VIDEO && m_videoParser) 
         {
             if (!m_videoParser->processData((quint8*)m_demuxedData[channelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIO->getStatistic(), m_lastVideoData)) 
@@ -261,8 +262,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     timeVal.tv_sec  = 0;
     timeVal.tv_usec = 100*1000;
 
-
-    QTime dataTimer;
+    QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)

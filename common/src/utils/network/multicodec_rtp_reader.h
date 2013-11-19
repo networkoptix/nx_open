@@ -1,6 +1,8 @@
 #ifndef __MULTI_CODEC_RTP_READER__
 #define __MULTI_CODEC_RTP_READER__
 
+#include <vector>
+
 #include "core/resource/resource_consumer.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/camera/camera_diagnostics.h"
@@ -57,7 +59,7 @@ private:
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
-	void buildClientRTCPReport(quint8 chNumber);
+    void buildClientRTCPReport(quint8 chNumber);
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
 private:
@@ -70,7 +72,7 @@ private:
 
     QString m_request;
 
-    QVector<QnByteArray*> m_demuxedData;
+    std::vector<QnByteArray*> m_demuxedData;
     QnAbstractMediaDataPtr m_lastVideoData;
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;
