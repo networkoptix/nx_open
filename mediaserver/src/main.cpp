@@ -517,7 +517,7 @@ void initAppServerConnection(const QSettings &settings, bool tryDirectConnect)
     QUrl appServerUrl;
 
     // ### remove
-    appServerUrl.setScheme(QLatin1String("https"));
+    appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     QString host = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
     int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
@@ -560,7 +560,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     QUrl appServerEventsUrl;
 
     // ### remove
-    appServerEventsUrl.setScheme(QLatin1String("https"));
+    appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
