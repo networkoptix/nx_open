@@ -101,6 +101,7 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
+#include "utils/network/simple_http_client.h"
 #include "utils/network/ssl_socket.h"
 #include "network/authenticate_helper.h"
 #include "rest/handlers/rebuild_archive_handler.h"
