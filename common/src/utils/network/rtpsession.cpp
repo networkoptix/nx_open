@@ -391,6 +391,7 @@ RTPSession::RTPSession():
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
     m_additionalReadBuffer( nullptr ),
+    m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 )
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
@@ -1520,6 +1521,13 @@ quint8* RTPSession::prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int c
 
 int RTPSession::readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber)
 {
+//#ifdef HOTSPOT_SEARCH
+//    int readed2 = readSocketWithBuffering( m_responseBuffer, RTSP_BUFFER_LEN );
+//    //int readed2 = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
+//    std::cout<<"Read "<<readed2<<" bytes from RTP socket\n";
+//    return readed2;
+//#endif
+
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
@@ -1540,9 +1548,11 @@ int RTPSession::readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& chan
     quint8* data = prepareDemuxedData(demuxedData, channelNumber, dataLen);
     //quint8* data = (quint8*) dataVect->data() + dataVect->size() - dataLen;
 
+//#ifndef HOTSPOT_SEARCH
     memcpy(data, m_responseBuffer, copyLen);
     if (m_responseBufferLen > copyLen)
         memmove(m_responseBuffer, m_responseBuffer + copyLen, m_responseBufferLen - copyLen);
+//#endif
     data += copyLen;
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
@@ -1950,10 +1960,9 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize )
         if( m_additionalReadBufferSize > 0 )
         {
             const size_t bytesToCopy = std::min<int>( m_additionalReadBufferSize, bufSize );
-            memcpy( buf, m_additionalReadBuffer, bytesToCopy );
+            memcpy( buf, m_additionalReadBuffer + m_additionalReadBufferPos, bytesToCopy );
+            m_additionalReadBufferPos += bytesToCopy;
             m_additionalReadBufferSize -= bytesToCopy;
-            if( m_additionalReadBufferSize > 0 )
-                memmove( m_additionalReadBuffer, m_additionalReadBuffer+bytesToCopy, m_additionalReadBufferSize );
             bufSize -= bytesToCopy;
             buf += bytesToCopy;
         }
@@ -1962,6 +1971,10 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize )
             return bufSizeBak;
 
         m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
+        m_additionalReadBufferPos = 0;
+//#ifdef HOTSPOT_SEARCH
+//        std::cout<<"Read "<<m_additionalReadBufferSize<<" bytes from RTP socket\n";
+//#endif
         if( m_additionalReadBufferSize <= 0 )
             return bufSizeBak - bufSize;
     }

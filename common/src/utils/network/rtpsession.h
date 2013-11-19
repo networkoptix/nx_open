@@ -367,6 +367,7 @@ private:
     QString m_videoLayout;
 
     char* m_additionalReadBuffer;
+    int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
 
     int readSocketWithBuffering( quint8* buf, size_t bufSize );
