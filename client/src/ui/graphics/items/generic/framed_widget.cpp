@@ -31,7 +31,7 @@ void FramedBase::setFrameWidth(qreal frameWidth) {
         return;
 
     m_frameWidth = frameWidth;
-    updateFrame();
+    m_self->update();
 }
 
 Qn::FrameShape FramedBase::frameShape() const {
@@ -43,7 +43,7 @@ void FramedBase::setFrameShape(Qn::FrameShape frameShape) {
         return;
 
     m_frameShape = frameShape;
-    updateFrame();
+    m_self->update();
 }
 
 Qt::PenStyle FramedBase::frameStyle() const {
@@ -55,7 +55,7 @@ void FramedBase::setFrameStyle(Qt::PenStyle frameStyle) {
         return;
 
     m_frameStyle = frameStyle;
-    updateFrame();
+    m_self->update();
 }
 
 QBrush FramedBase::frameBrush() const {
@@ -66,7 +66,6 @@ void FramedBase::setFrameBrush(const QBrush &frameBrush) {
     /* Note that we cannot optimize the setPalette call away because palette stores
      * bitmask of changed colors for palette inheritance handling. */
     setPaletteBrush(m_self, QPalette::Highlight, frameBrush);
-    updateFrame();
 }
 
 QColor FramedBase::frameColor() const {
@@ -85,7 +84,6 @@ void FramedBase::setWindowBrush(const QBrush &windowBrush) {
     /* Note that we cannot optimize the setPalette call away because palette stores
      * bitmask of changed colors for palette inheritance handling. */
     setPaletteBrush(m_self, QPalette::Window, windowBrush);
-    updateFrame();
 }
 
 QColor FramedBase::windowColor() const {
@@ -110,9 +108,4 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     } else {
         painter->drawEllipse(frameRect);
     }
-}
-
-void FramedBase::updateFrame() {
-    if (m_self)
-        m_self->update();
 }
