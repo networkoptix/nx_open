@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_resource.h"
 #include "desktop_camera_reader.h"
 #include "serverutil.h"
@@ -59,3 +62,5 @@ CameraDiagnostics::Result QnDesktopCameraResource::initInternal()
 {
     return CameraDiagnostics::NoErrorResult();
 }
+
+#endif //ENABLE_DESKTOP_CAMERA
