@@ -229,7 +229,6 @@ public:
         base_type(parent, windowFlags)
     {
         setFrameShape(Qn::EllipticalFrame);
-        setRelativeFontSize(0.5);
         setRelativeFrameWidth(1.0 / 16.0);
         
         setStateOpacity(0, 0.4);
@@ -296,12 +295,15 @@ public:
 
         /* Note that construction order is important as it defines which items are on top. */
         m_manipulatorWidget = new PtzManipulatorWidget(this);
-        m_zoomInButton = new PtzImageButtonWidget(this);
-        m_zoomOutButton = new PtzImageButtonWidget(this);
-        m_modeButton = new PtzImageButtonWidget(this);
 
+        m_zoomInButton = new PtzImageButtonWidget(this);
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
+
+        m_zoomOutButton = new PtzImageButtonWidget(this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
+
+        m_modeButton = new PtzImageButtonWidget(this);
+        m_modeButton->setFrameShape(Qn::RectangularFrame);
         m_modeButton->setText(lit("90"));
         m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
