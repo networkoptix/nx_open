@@ -417,8 +417,7 @@
             <id>beta</id>
             <activation>
                 <property>
-                    <name>beta</name>
-                    <value>true</value>
+                    <name>!beta</name>
                 </property>
             </activation>
             <properties>
@@ -429,11 +428,12 @@
             <id>nobeta</id>
             <activation>
                 <property>
-                    <name>!beta</name>
+                    <name>beta</name>
+                    <value>false</value>
                 </property>
             </activation>
             <properties>
-                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${install.type}-${arch}</finalName>    
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}</finalName>    
             </properties>
         </profile>	  
     </profiles>        

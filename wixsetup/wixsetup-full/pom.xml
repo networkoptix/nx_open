@@ -17,17 +17,4 @@
         <root.dir>${basedir}/../..</root.dir>
         <install.type>full</install.type>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>installer</id>
-            <activation>                
-                <property>
-                    <name>!installer-skip</name>
-                </property>
-            </activation>           
-        </profile>
-
-
-    </profiles>
 </project>
