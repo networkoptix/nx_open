@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
@@ -158,3 +161,5 @@ void QnDesktopCameraResourceSearcher::releaseConnection(TCPSocketPtr socket)
         }
     }
 }
+
+#endif //ENABLE_DESKTOP_CAMERA
