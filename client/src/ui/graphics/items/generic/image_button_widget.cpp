@@ -8,10 +8,6 @@
 #include <QtGui/QStyle>
 #include <QtOpenGL/QGLContext>
 
-#include <utils/common/warnings.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/checked_cast.h>
-#include <utils/math/linear_combination.h>
 #include <client/client_settings.h>
 
 #include <ui/animation/variant_animator.h>
@@ -25,8 +21,13 @@
 #include <ui/common/accessor.h>
 #include <ui/common/palette.h>
 
+#include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
+#include <utils/math/linear_combination.h>
+#include <utils/math/color_transformations.h>
 
-#define QN_IMAGE_BUTTON_WIDGET_DEBUG
+//#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
@@ -716,12 +717,11 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    m_relativeFontSize(1.0),
     m_relativeFrameWidth(-1.0),
     m_windowBrush(Qt::NoBrush)
 {
     setFrameShape(Qn::NoFrame);
-    FramedBase::setWindowBrush(Qt::NoBrush);
+    base_type::setWindowBrush(Qt::NoBrush);
 
     qFill(m_opacities, -1.0);
     m_opacities[0] = 1.0;
@@ -736,19 +736,12 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
-    updatePixmap();
-}
-
-qreal QnTextButtonWidget::relativeFontSize() const {
-    return m_relativeFontSize;
-}
-
-void QnTextButtonWidget::setRelativeFontSize(qreal relativeFontSize) {
-    if(qFuzzyCompare(m_relativeFontSize, relativeFontSize))
-        return;
-
-    m_relativeFontSize = relativeFontSize;
-    updatePixmap();
+    if (text.isEmpty()) {
+        base_type::setWindowBrush(m_windowBrush);
+    } else {
+        base_type::setWindowBrush(Qt::NoBrush);
+        updatePixmap();
+    }
 }
 
 qreal QnTextButtonWidget::relativeFrameWidth() const {
@@ -781,16 +774,14 @@ QBrush QnTextButtonWidget::windowBrush() const {
 }
 
 void QnTextButtonWidget::setWindowBrush(const QBrush &windowBrush) {
-    /*
-     * Opaque color usage leads to graphic artefacts during painting. --gdm
-     */
-    Q_ASSERT(windowBrush.color().alpha() == 255);
-
     if (m_windowBrush == windowBrush)
         return;
 
     m_windowBrush = windowBrush;
-    updatePixmap();
+    if (m_text.isEmpty())
+        base_type::setWindowBrush(windowBrush);
+    else
+        updatePixmap();
 }
 
 QColor QnTextButtonWidget::windowColor() const {
@@ -818,12 +809,15 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
 }
 
 void QnTextButtonWidget::updatePixmap() {
+    if (m_text.isEmpty())
+        return;
+
     // create caching image
     const static int fontSize = 40;
     const static qreal offset = 10 * 0.01; // border offset in percents
 
     QFont font = this->font();
-    font.setPixelSize(fontSize * m_relativeFontSize);
+    font.setPixelSize(fontSize);
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
     QFontMetrics metrics(font);
     QSize imageSize = metrics.size(0, m_text);
@@ -835,7 +829,8 @@ void QnTextButtonWidget::updatePixmap() {
     QPixmap pixmap(imageSize);
     {
         QPainter p(&pixmap);
-        p.fillRect(pixmap.rect(), m_windowBrush);
+        /* Opaque color usage leads to graphic artefacts during painting. --gdm */
+        p.fillRect(pixmap.rect(), withAlpha(m_windowBrush.color(), 255));
         p.setFont(font);
         p.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
     }

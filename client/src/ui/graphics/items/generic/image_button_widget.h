@@ -188,9 +188,6 @@ public:
     const QString &text() const;
     void setText(const QString &text);
 
-    qreal relativeFontSize() const;
-    void setRelativeFontSize(qreal relativeFontSize);
-
     qreal relativeFrameWidth() const;
     void setRelativeFrameWidth(qreal relativeFrameWidth);
 
@@ -214,7 +211,6 @@ protected:
 
 private:
     QString m_text;
-    qreal m_relativeFontSize;
     qreal m_relativeFrameWidth;
     boost::array<qreal, FLAGS_MAX + 1> m_opacities;
     QBrush m_windowBrush;
