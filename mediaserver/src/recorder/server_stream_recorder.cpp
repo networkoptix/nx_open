@@ -29,7 +29,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_usedSpecialRecordingMode(false),
     m_lastMotionState(false),
     m_queuedSize(0),
-    m_lastMediaTime(AV_NOPTS_VALUE)
+    m_lastMediaTime(AV_NOPTS_VALUE),
+    m_diskErrorWarned(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -62,8 +63,11 @@ void QnServerStreamRecorder::at_recordingFailed(QString msg)
 {
     Q_UNUSED(msg)
 	Q_ASSERT(m_mediaServer);
-    if (m_mediaServer)
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError ,m_storage);
+    if (m_mediaServer) {
+        if (!m_diskErrorWarned)
+            emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError ,m_storage);
+        m_diskErrorWarned = true;
+    }
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -411,7 +415,8 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
     // for empty schedule we record all time
     beforeProcessData(media);
-    return QnStreamRecorder::processData(data);
+    bool rez =  QnStreamRecorder::processData(data);
+    return rez;
 }
 
 void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
@@ -504,4 +509,10 @@ bool QnServerStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
     writeRecentlyMotion(md->timestamp);
     return QnStreamRecorder::saveData(md);
+}
+
+void QnServerStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
+{
+    QnStreamRecorder::writeData(md, streamIndex);
+    m_diskErrorWarned = false;
 }

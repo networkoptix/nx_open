@@ -532,8 +532,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
             candidates << bitrateInfo[i].second;
     }
 
-    // select storage with maximum free space
-    qint64 maxFreeSpace = -INT_MAX;
+    // select storage with maximum free space and do not use storages without free space at all
+    qint64 maxFreeSpace = 0;
     for (int i = 0; i < candidates.size(); ++i)
     {   
         qint64 freeSpace = candidates[i]->getFreeSpace();

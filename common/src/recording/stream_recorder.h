@@ -126,8 +126,8 @@ protected:
     bool addSignatureFrame(QString& errorString);
     void markNeedKeyData();
     virtual bool saveData(QnAbstractMediaDataPtr md);
+    virtual void writeData(QnAbstractMediaDataPtr md, int streamIndex);
 private:
-    void writeData(QnAbstractMediaDataPtr md, int streamIndex);
     void updateSignatureAttr();
     qint64 findNextIFrame(qint64 baseTime);
 protected:

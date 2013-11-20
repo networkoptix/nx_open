@@ -447,6 +447,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     if (err < 0) {
         m_lastErrMessage = tr("Can't create output file '%1' for video recording.").arg(m_fileName);
         cl_log.log(m_lastErrMessage, cl_logERROR);
+        msleep(500); // avoid createFile flood
         return false;
     }
 
@@ -627,6 +628,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             avformat_close_input(&m_formatCtx);
             m_lastErrMessage = tr("Can't create output file '%1'.").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
+            msleep(500); // avoid createFile flood
             return false;
         }
 

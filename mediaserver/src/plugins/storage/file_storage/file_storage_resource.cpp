@@ -158,8 +158,16 @@ bool QnFileStorageResource::isStorageAvailable()
             dir.rmdir(tmpDir);
             return true;
         }
-        else 
+        else {
+#ifdef WIN32
+            if (::GetLastError() == ERROR_DISK_FULL)
+                return true;
+#else
+            if (errno == ENOSPC)
+                return true;
+#endif
             return false;
+        }
     }
 
     return false;
