@@ -13,13 +13,28 @@
 #include <utils/network/tcp_connection_priv.h>
 
 
+namespace {
+    static const int searchThreadCount = 4;
+}
+
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
 
 }
 
 void searchResourcesAsync(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
-    QnResourceDiscoveryManager::instance()->searchResources(processUuid, startAddr, endAddr, auth, port);
+
+    QThreadPool* global = QThreadPool::globalInstance();
+
+    //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
+    for (int i = 0; i < searchThreadCount; ++i )
+        global->releaseThread();
+
+    QnResourceDiscoveryManager::instance()->searchResources(processUuid, startAddr, endAddr, auth, port, searchThreadCount);
+
+    // Returning maxThreadCount() to its original value
+    for (int i = 0; i < searchThreadCount; ++i )
+        global->reserveThread();
 }
 
 int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamList &params,  JsonResult &result)

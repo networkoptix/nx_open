@@ -347,18 +347,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
-/*
-QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
-{
-    QnResourceList resources;
-    appendManualDiscoveredResources(resources);
-    if (processDiscoveredResources(resources))
-        return resources;
-    else
-        return QnResourceList();
-}
-*/
-
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
     QMutexLocker lock(&m_discoveryMutex);
@@ -387,16 +375,43 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     return !resources.isEmpty();
 }
 
-
 /**
  * @brief The ManualSearchPluginsEnumerator struct      Struct for testing one network interface during manual cameras searching
- *                                                      with all registered camera plugins until one of them succeeds.
+ *                                                      with all registered camera plugins simultaneously.
  */
-struct ManualSearchPluginsEnumerator
-{
-    ManualSearchPluginsEnumerator(const QString &addr, int port, const QAuthenticator &auth):
+struct ManualSearchPluginsEnumerator {
+
+    typedef QList<QnResourcePtr> MapResult;
+
+    //TODO: #GDM use this reduce accumulator on hte upper level too, update progress here
+    struct ManualSearchPluginsReduceAccumulator {
+        MapResult results;
+
+        ManualSearchPluginsReduceAccumulator (){}
+
+        void reduceFunction(const MapResult &mapped) {
+            results << mapped;
+        }
+    };
+
+    struct ManualSearchPluginsMapSearcher {
+
+        ManualSearchPluginsMapSearcher(QnAbstractNetworkResourceSearcher* plugin, const QUrl &url, const QAuthenticator &auth):
+            plugin(plugin), url(url), auth(auth) {}
+
+
+        MapResult mapFunction() const {
+            return plugin->checkHostAddr(url, auth, true);
+        }
+
+        QnAbstractNetworkResourceSearcher* plugin;
+        QUrl url;
+        QAuthenticator auth;
+    };
+
+    ManualSearchPluginsEnumerator(const QString &addr, int port, const QAuthenticator &auth, QnResourceDiscoveryManager::ResourceSearcherList* plugins):
         auth(auth),
-        plugins(0)
+        plugins(plugins)
     {
         if( QUrl(addr).scheme().isEmpty() )
             url.setHost(addr);
@@ -412,19 +427,33 @@ struct ManualSearchPluginsEnumerator
     QList<QnResourcePtr> resList;
 
     void search() {
-        foreach(QnAbstractResourceSearcher* as, *plugins)
-        {
+        QList<ManualSearchPluginsMapSearcher> candidates;
+        foreach(QnAbstractResourceSearcher* as, *plugins) {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
             Q_ASSERT( ns );
-            resList = ns->checkHostAddr(url, auth, true);
-            if (!resList.isEmpty())
-                break;
+            candidates << ManualSearchPluginsMapSearcher(ns, url, auth);
         }
+
+        int candidatesCount = candidates.size();
+
+        QThreadPool* global = QThreadPool::globalInstance();
+        //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
+        for (int i = 0; i < candidatesCount; ++i ) //TODO: #GDM morph this to QnScopedRollbackValue
+            global->releaseThread();
+
+        ManualSearchPluginsReduceAccumulator reducer = QtConcurrent::blockingMappedReduced(
+                    candidates, &ManualSearchPluginsMapSearcher::mapFunction, &ManualSearchPluginsReduceAccumulator::reduceFunction);
+
+        // Returning maxThreadCount() to its original value
+        for (int i = 0; i < candidatesCount; ++i )
+            global->reserveThread();
+
+        resList = reducer.results;
     }
 };
 
 
-void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port)
+void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port, int threadCount)
 {
     {
         QString str;
@@ -440,8 +469,7 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
     bool singleAddressCheck = endAddr.isNull();
 
     if (singleAddressCheck) {
-        ManualSearchPluginsEnumerator t(startAddr, port, auth);
-        t.plugins = &m_searchersList; // I assume m_searchersList is constant during server life cycle
+        ManualSearchPluginsEnumerator t(startAddr, port, auth, &m_searchersList); // I assume m_searchersList is constant during server life cycle
         if (!setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, 1, 1)))
             return;
         t.search();
@@ -453,6 +481,7 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
                                                         resourceExistsInPool(resource));
         if (!setSearchResults(processUuid, results))
             return;
+
     } else { //subnet scan
         quint32 startIPv4Addr = QHostAddress(startAddr).toIPv4Address();
         quint32 endIPv4Addr = QHostAddress(endAddr).toIPv4Address();
@@ -471,20 +500,19 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
         foreach(const QString& addr, online)
         {
             cl_log.log(addr, cl_logINFO);
-            ManualSearchPluginsEnumerator t(addr, port, auth);
-            t.plugins = &m_searchersList; // I assume m_searchersList is constant during server life cycle
+            ManualSearchPluginsEnumerator t(addr, port, auth, &m_searchersList); // I assume m_searchersList is constant during server life cycle
             testList.push_back(t);
         }
 
         quint32 total = endIPv4Addr - startIPv4Addr;
         int startIdx = 0;
 
-        static const int SEARCH_THREAD_AMOUNT = 4;
-        int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+        int endIdx = qMin(testList.size(), startIdx + threadCount);
         while (startIdx < testList.size()) {
 
             QList<ManualSearchPluginsEnumerator>::Iterator iter = testList.begin() + startIdx;
             qint32 progress = QHostAddress(iter->url.host()).toIPv4Address() - startIPv4Addr;
+            qDebug() << "checking host" << progress << iter->url;
             if (!setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, progress, total)))
                 return;
 
@@ -507,7 +535,7 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
             }
 
             startIdx = endIdx;
-            endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+            endIdx = qMin(testList.size(), startIdx + threadCount);
         }
     }
     setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::Finished, 1, 1));

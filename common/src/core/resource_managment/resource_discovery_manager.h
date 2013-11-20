@@ -90,7 +90,6 @@ public:
     void setReady(bool ready);
 
     bool registerManualCameras(const QnManualCamerasMap& cameras);
-    //QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
 
@@ -102,8 +101,9 @@ public:
      * @param endAddr                       End address. Can be IPv4 address or empty.
      * @param auth                          Login and password to http authentication.
      * @param port                          Queried port. Can be 0 - in this case default http port (80) will be used.
+     * @param threadCount                   Number of threads that will be used for searching.
      */
-    void searchResources(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port);
+    void searchResources(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port, int threadCount);
 
     /**
      * @brief getSearchStatus               Get status of the manual camera search process. Thread-safe.
@@ -151,6 +151,11 @@ public:
      */
     void clearSearch(const QUuid &searchProcessUuid);
 
+    /**
+     * @brief resourceExistsInPool          Check if found camera is already exists in pool by its unique ID. For onvif cameras host is also checked.
+     * @param resource                      Camera resource.
+     * @return                              True if resource is already in resource pool, false otherwise.
+     */
     bool resourceExistsInPool(const QnResourcePtr &resource) const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time

@@ -710,11 +710,11 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     {
         QString host;
         if (m_subnetMode) {
-            host =  QHostAddress(QHostAddress(ui->startIPLineEdit->text()).toIPv4Address() + result.status.current).toString();
+            host = QHostAddress(QHostAddress(ui->startIPLineEdit->text()).toIPv4Address() + result.status.current).toString();
         } else {
-            host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).toString();
+            host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).host();
         }
-        ui->scanProgressBar->setFormat(tr("Checking host %1").arg(host));
+        ui->scanProgressBar->setFormat(tr("Checking host %1...").arg(host));
         break;
     }
 
