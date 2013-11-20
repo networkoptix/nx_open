@@ -6,6 +6,7 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QStyle>
+#include <QtGui/QPixmapCache>
 #include <QtOpenGL/QGLContext>
 
 #include <client/client_settings.h>
