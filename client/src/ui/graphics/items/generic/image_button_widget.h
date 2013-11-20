@@ -195,12 +195,6 @@ public:
     void setStateOpacity(StateFlags stateFlags, qreal opacity);
 
     virtual void setGeometry(const QRectF &geometry) override;
-
-    QBrush windowBrush() const;
-    void setWindowBrush(const QBrush &windowBrush);
-
-    QColor windowColor() const;
-    void setWindowColor(const QColor &windowColor);
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
@@ -213,7 +207,6 @@ private:
     QString m_text;
     qreal m_relativeFrameWidth;
     boost::array<qreal, FLAGS_MAX + 1> m_opacities;
-    QBrush m_windowBrush;
 };
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

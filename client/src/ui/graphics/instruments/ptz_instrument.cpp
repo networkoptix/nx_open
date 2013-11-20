@@ -303,7 +303,6 @@ public:
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setFrameShape(Qn::RectangularFrame);
         m_modeButton->setText(lit("90"));
         m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
