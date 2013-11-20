@@ -719,6 +719,10 @@ begin_label:
             }
         }
     }
+    else if (m_currentData->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        m_skipFramesToTime = 0;
+    }
 
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
