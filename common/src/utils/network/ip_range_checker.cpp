@@ -10,9 +10,9 @@
 #include "simple_http_client.h"
 
 
-struct QnIprangeCheckerHelper 
+struct QnIpRangeCheckerHelper
 {
-    QnIprangeCheckerHelper(quint32 _ip, int _port): ip(_ip), port(_port), online(false) {}
+    QnIpRangeCheckerHelper(quint32 _ip, int _port): ip(_ip), port(_port), online(false) {}
 
     quint32 ip;
     int port;
@@ -23,15 +23,14 @@ struct QnIprangeCheckerHelper
     {
         online = false;
         
-        QString ips = QHostAddress(ip).toString();
-
         CLSimpleHTTPClient http (QHostAddress(ip), port, 1500, QAuthenticator());
         CLHttpStatus status = http.doGET(QByteArray(""));
+        qDebug() << "scanning online" << QHostAddress(ip).toString() << status;
         if (status != CL_TRANSPORT_ERROR) 
         {
             //event if we received not http, considering camera alive
             discoveryAddress = http.getLocalHost();
-            QString gg = discoveryAddress.toString();
+            qDebug() << "discovered address" << discoveryAddress.toString();
             online = true;
         }
 
@@ -39,17 +38,17 @@ struct QnIprangeCheckerHelper
 };
 
 
-QnIprangeChecker::QnIprangeChecker()
+QnIpRangeChecker::QnIpRangeChecker()
 {
 
 }
 
-QnIprangeChecker::~QnIprangeChecker()
+QnIpRangeChecker::~QnIpRangeChecker()
 {
 
 }
 
-QList<QString> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddress endAddr, int port)
+QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const QHostAddress &endAddr, int port)
 {
     // sorry; did not have time to mess with asiynch qt sockets + thread isuses;
     // so bad(slow) implementaiton here 
@@ -59,30 +58,27 @@ QList<QString> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostAddres
     if (endIpv4 < startIpv4)
         return QList<QString>();
 
-    QList<QnIprangeCheckerHelper> candidates;
+    QList<QnIpRangeCheckerHelper> candidates;
 
     for (quint32 i = startIpv4; i <= endIpv4; ++i)
     {
-        QnIprangeCheckerHelper helper(i, port);
+        QnIpRangeCheckerHelper helper(i, port);
         candidates.push_back(helper);
     }
 
 
-    int threads = 32;
+    static const int SCAN_THREAD_AMOUNT = 32;
     QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) global->releaseThread();
-    QtConcurrent::blockingMap(candidates, &QnIprangeCheckerHelper::check);
-    for (int i = 0; i < threads; ++i )global->reserveThread();
+    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i ) global->reserveThread();
+    QtConcurrent::blockingMap(candidates, &QnIpRangeCheckerHelper::check);
+    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i )global->releaseThread();
 
 
-    QList<QString> result;
+    QStringList result;
 
-
-    foreach(QnIprangeCheckerHelper h, candidates)
-    {
+    foreach(QnIpRangeCheckerHelper h, candidates)
         if(h.online)
-            result.push_back(QHostAddress(h.ip).toString());
-    }
+            result << QHostAddress(h.ip).toString();
 
     return result;
 }

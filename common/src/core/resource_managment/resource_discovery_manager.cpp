@@ -1,22 +1,26 @@
+#include "resource_discovery_manager.h"
 
 #include <set>
 
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-#include "resource_discovery_manager.h"
-#include "utils/common/sleep.h"
-#include "resource_searcher.h"
-#include "../resource/network_resource.h"
-#include "resource_pool.h"
-#include "utils/common/util.h"
-#include "api/app_server_connection.h"
-#include "utils/common/synctime.h"
-#include "utils/network/ip_range_checker.h"
-#include "plugins/resources/upnp/upnp_device_searcher.h"
-#include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/storage_resource.h"
-#include "camera_driver_restriction_list.h"
+
+#include <api/app_server_connection.h>
+
+#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_managment/camera_driver_restriction_list.h>
+#include <core/resource_managment/resource_searcher.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <plugins/resources/upnp/upnp_device_searcher.h>
+#include <plugins/storage/dts/abstract_dts_searcher.h>
+
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/network/ip_range_checker.h>
 
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
@@ -390,15 +394,24 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
  */
 struct ManualSearchPluginsEnumerator
 {
-    ManualSearchPluginsEnumerator(): plugins(0) {}
+    ManualSearchPluginsEnumerator(const QString &addr, int port, const QAuthenticator &auth):
+        auth(auth),
+        plugins(0)
+    {
+        if( QUrl(addr).scheme().isEmpty() )
+            url.setHost(addr);
+        else
+            url.setUrl(addr);
+        if (port)
+            url.setPort(port);
+    }
 
     QUrl url;
+    QAuthenticator auth;
     QnResourceDiscoveryManager::ResourceSearcherList* plugins;
     QList<QnResourcePtr> resList;
-    QAuthenticator auth;
 
-    void search()
-    {
+    void search() {
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
@@ -421,88 +434,73 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
         cl_log.log(str, cl_logINFO);
     }
 
-    qDebug() << "searching" << processUuid.toString();
-
-
     setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingOnline, 0, 1));
 
-    //=======================================
-    QnIprangeChecker ip_cheker;
-
-    cl_log.log("Checking for online addresses....", cl_logINFO);
-
-    QList<QString> online;
-    if (endAddr.isNull())
-        online << startAddr;
-    else
-        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
-
-
-    cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
-
-    foreach(const QString& addr, online)
-    {
-        cl_log.log(addr, cl_logINFO);
-    }
-
-    {
-        QnManualCameraSearchStatus status;
-        if (!getSearchStatus(processUuid, status)) {
-            qDebug() << "aborting search stage 0" << processUuid;
-            return;
-        }
-    }
-
-    //=======================================
-
-    //now lets check each one of online machines...
-
-    QList<ManualSearchPluginsEnumerator> testList;
-    foreach(const QString& addr, online)
-    {
-        ManualSearchPluginsEnumerator t;
-        if( QUrl(addr).scheme().isEmpty() )
-            t.url.setHost(addr);
-        else
-            t.url.setUrl(addr);
-        if (port)
-            t.url.setPort(port);
-        t.auth = auth;
-        t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
-        testList.push_back(t);
-    }
-
-    int startIdx = 0;
-    static const int SEARCH_THREAD_AMOUNT = 4;
-    int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
-    while (startIdx < testList.size()) {
-        setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, startIdx, testList.size()));
-        QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearchPluginsEnumerator::search);
-        startIdx = endIdx;
-        endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
-
-        QnManualCameraSearchStatus status;
-        if (!getSearchStatus(processUuid, status)) {
-            qDebug() << "aborting search" << processUuid;
-            return; //search aborted
-        }
-
-        //TODO: #GDM incremental populate the results list
-    }
-
+    bool singleAddressCheck = endAddr.isNull();
 
     QnResourceList cameras;
 
-    foreach(const ManualSearchPluginsEnumerator& h, testList)
-    {
-        cameras.append(h.resList);
+    if (singleAddressCheck) {
+        ManualSearchPluginsEnumerator t(startAddr, port, auth);
+        t.plugins = &m_searchersList; // I assume m_searchersList is constant during server life cycle
+        setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, 1, 1));
+        t.search();
+        cameras.append(t.resList);
     }
+    else {
+        quint32 startIPv4Addr = QHostAddress(startAddr).toIPv4Address();
+        quint32 endIPv4Addr = QHostAddress(endAddr).toIPv4Address();
+        if (endIPv4Addr < startIPv4Addr)
+            return;
+
+        cl_log.log("Checking for online addresses....", cl_logINFO);
+        QnIpRangeChecker ip_cheker;
+        QStringList online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
+        if (!isSearchActive(processUuid))
+            return;
+
+        qDebug() << "online scan" << online.size();
+        cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
+
+        QList<ManualSearchPluginsEnumerator> testList;
+        foreach(const QString& addr, online)
+        {
+            qDebug() << "found online addr" << addr;
+            cl_log.log(addr, cl_logINFO);
+            ManualSearchPluginsEnumerator t(addr, port, auth);
+            t.plugins = &m_searchersList; // I assume m_searchersList is constant during server life cycle
+            testList.push_back(t);
+        }
+
+        quint32 total = endIPv4Addr - startIPv4Addr;
+        int startIdx = 0;
+
+        static const int SEARCH_THREAD_AMOUNT = 4;
+        int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+        while (startIdx < testList.size()) {
+
+            QList<ManualSearchPluginsEnumerator>::Iterator iter = testList.begin() + startIdx;
+            qint32 progress = QHostAddress(iter->url.host()).toIPv4Address() - startIPv4Addr;
+            qDebug() << "progress" << progress << "total" << total;
+            setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, progress, total));
+
+            QtConcurrent::blockingMap(iter, testList.begin() + endIdx, &ManualSearchPluginsEnumerator::search);
+            for (QList<ManualSearchPluginsEnumerator>::Iterator i = testList.begin() + startIdx; i < testList.begin() + endIdx; ++i) {
+                cameras.append(i->resList);
+            }
+
+            startIdx = endIdx;
+            endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+
+            if (!isSearchActive(processUuid))
+                return; //search aborted
+        }
+    }
+
 
     cl_log.log("Found ",  cameras.size(), " new resources", cl_logINFO);
     foreach(QnResourcePtr res, cameras)
-    {
         cl_log.log(res->toString(), cl_logINFO);
-    }
 
     QnManualCameraSearchCameraList results;
     foreach(const QnResourcePtr &resource, cameras){
@@ -565,6 +563,11 @@ QnManualCameraSearchCameraList QnResourceDiscoveryManager::getSearchResults(cons
 void QnResourceDiscoveryManager::setSearchResults(const QUuid &searchProcessUuid, const QnManualCameraSearchCameraList &results) {
     QMutexLocker lock(&m_searchProcessMutex);
     m_searchProcessResults[searchProcessUuid] = results;
+}
+
+bool QnResourceDiscoveryManager::isSearchActive(const QUuid &searchProcessUuid) {
+    QMutexLocker lock(&m_searchProcessMutex);
+    return m_searchProcessStatuses.contains(searchProcessUuid);
 }
 
 void QnResourceDiscoveryManager::clearSearch(const QUuid &searchProcessUuid) {

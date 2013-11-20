@@ -82,8 +82,8 @@ int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
-    qDebug() << d->clientRequest;
+//    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
+//    qDebug() << d->clientRequest;
 
 #ifdef USE_NX_HTTP
     d->request = nx_http::HttpRequest();

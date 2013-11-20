@@ -343,20 +343,14 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzStopObject:
     case PtzMoveObject:
     case CameraAddObject:
+        //TODO: #GDM processJsonReply if needed
         emitFinished(this, response.status, handle);
         break;
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
     case CameraSearchStopObject:
     {
-        QnManualCameraSearchProcessReply reply;
-        if (response.status == 0)  {
-            QJson::deserialize(response.data, &reply);
-        } else {
-            qnWarning("Camera search failed: %1.", response.data);
-        }
-
-        emitFinished(this, response.status, reply, handle);
+        processJsonReply<QnManualCameraSearchProcessReply>(this, response, handle);
         break;
     }
     case EventLogObject: {

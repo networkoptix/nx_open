@@ -10,7 +10,7 @@
 
 static const int PORT_TO_SCAN = 80;
 
-QnIprangeCheckerAsync::QnIprangeCheckerAsync()
+QnIpRangeCheckerAsync::QnIpRangeCheckerAsync()
 :
     m_portToScan( 0 ),
     m_endIpv4( 0 ),
@@ -18,13 +18,13 @@ QnIprangeCheckerAsync::QnIprangeCheckerAsync()
 {
 }
 
-QnIprangeCheckerAsync::~QnIprangeCheckerAsync()
+QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
 {
     pleaseStop();
     waitForScanToFinish();
 }
 
-void QnIprangeCheckerAsync::pleaseStop()
+void QnIpRangeCheckerAsync::pleaseStop()
 {
     //TODO/IMPL
 }
@@ -32,7 +32,7 @@ void QnIprangeCheckerAsync::pleaseStop()
 //static const int SOCKET_CONNECT_TIMEOUT_MILLIS = 2000;
 static const int MAX_HOSTS_CHECKED_SIMULTANEOUSLY = 256;
 
-QList<QString> QnIprangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
+QStringList QnIpRangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
 {
     m_openedIPs.clear();
 
@@ -57,7 +57,7 @@ QList<QString> QnIprangeCheckerAsync::onlineHosts( const QHostAddress& startAddr
     return m_openedIPs;
 }
 
-//void QnIprangeCheckerAsync::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
+//void QnIpRangeCheckerAsync::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
 //{
 //    QMutexLocker lk( &m_mutex );
 //
@@ -73,7 +73,7 @@ QList<QString> QnIprangeCheckerAsync::onlineHosts( const QHostAddress& startAddr
 //        m_cond.wakeAll();
 //}
 
-bool QnIprangeCheckerAsync::launchHostCheck()
+bool QnIpRangeCheckerAsync::launchHostCheck()
 {
     quint32 ipToCheck = m_nextIPToCheck++;
     if( ipToCheck > m_endIpv4 )
@@ -118,7 +118,7 @@ bool QnIprangeCheckerAsync::launchHostCheck()
     return true;
 }
 
-void QnIprangeCheckerAsync::waitForScanToFinish()
+void QnIpRangeCheckerAsync::waitForScanToFinish()
 {
     //waiting for scan to finish
     QMutexLocker lk( &m_mutex );
@@ -126,17 +126,17 @@ void QnIprangeCheckerAsync::waitForScanToFinish()
         m_cond.wait( lk.mutex() );
 }
 
-void QnIprangeCheckerAsync::onTcpConnectionEstablished( nx_http::AsyncHttpClient* httpClient )
+void QnIpRangeCheckerAsync::onTcpConnectionEstablished( nx_http::AsyncHttpClient* httpClient )
 {
     //QMutexLocker lk( &m_mutex );
     //m_socketsBeingScanned[httpClient] = sPortOpened;
 }
 
-void QnIprangeCheckerAsync::onResponseReceived( nx_http::AsyncHttpClient* httpClient )
+void QnIpRangeCheckerAsync::onResponseReceived( nx_http::AsyncHttpClient* httpClient )
 {
 }
 
-void QnIprangeCheckerAsync::onDone( nx_http::AsyncHttpClient* httpClient )
+void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClient* httpClient )
 {
     QMutexLocker lk( &m_mutex );
 

@@ -152,6 +152,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     ui->scanProgressWidget->setVisible(false);
     ui->addProgressBar->setVisible(false);
+
+    resize(width(), 1); // set widget height to minimal possible
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -319,7 +321,7 @@ void QnCameraAdditionDialog::updateSubnetMode() {
                                                : ui->pageSingleCamera);
 
     if (m_subnetMode) {
-        ui->startIPLineEdit->setText(ui->cameraIpLineEdit->text());
+        ui->startIPLineEdit->setText(ui->singleCameraLineEdit->text());
         QHostAddress startAddr(ui->startIPLineEdit->text());
         if (startAddr.toIPv4Address()) {
             ui->startIPLineEdit->setText(startAddr.toString());
@@ -335,8 +337,8 @@ void QnCameraAdditionDialog::updateSubnetMode() {
             ui->startIPLineEdit->setFocus();
         }
     } else {
-        ui->cameraIpLineEdit->setText(ui->startIPLineEdit->text());
-        ui->cameraIpLineEdit->setFocus();
+        ui->singleCameraLineEdit->setText(ui->startIPLineEdit->text());
+        ui->singleCameraLineEdit->setFocus();
     }
 }
 
@@ -518,7 +520,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             return;
         }
     } else {
-        const QString& userInput = ui->cameraIpLineEdit->text();
+        QString userInput = ui->singleCameraLineEdit->text();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
             ui->validateLabelSearch->setText(tr("Camera address field must contain valid url, ip address or rtsp link"));
@@ -705,8 +707,16 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         ui->scanProgressBar->setFormat(tr("Scanning available hosts..."));
         break;
     case QnManualCameraSearchStatus::CheckingHost:
-        ui->scanProgressBar->setFormat(tr("Checking host..."));
+    {
+        QString host;
+        if (m_subnetMode) {
+            host =  QHostAddress(QHostAddress(ui->startIPLineEdit->text()).toIPv4Address() + result.status.current).toString();
+        } else {
+            host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).toString();
+        }
+        ui->scanProgressBar->setFormat(tr("Checking host %1").arg(host));
         break;
+    }
 
     case QnManualCameraSearchStatus::Finished:
     case QnManualCameraSearchStatus::Aborted:
@@ -736,9 +746,5 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     ui->scanProgressBar->setMaximum(result.status.total);
     ui->scanProgressBar->setValue(result.status.current);
     m_server->apiConnection()->searchCameraAsyncStatus(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-
-}
-
-void QnCameraAdditionDialog::at_addRequestReply(int status, const QVariant &reply, int handle) {
 
 }

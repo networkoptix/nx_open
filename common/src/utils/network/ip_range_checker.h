@@ -5,13 +5,13 @@
 #include <QtCore/QObject>
 
 
-class QnIprangeChecker : public QObject
+class QnIpRangeChecker : public QObject
 {
     Q_OBJECT
 public:
-    QnIprangeChecker();
-    ~QnIprangeChecker();
-    QList<QString> onlineHosts(QHostAddress startAddr, QHostAddress endAddr, int port);
+    QnIpRangeChecker();
+    ~QnIpRangeChecker();
+    QStringList onlineHosts(const QHostAddress &startAddr, const QHostAddress &endAddr, int port);
 private:
 
 };

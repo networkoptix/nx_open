@@ -101,6 +101,7 @@ public:
     QnManualCameraSearchCameraList getSearchResults(const QUuid &searchProcessUuid);
     void setSearchResults(const QUuid &searchProcessUuid, const QnManualCameraSearchCameraList &results);
 
+    bool isSearchActive(const QUuid &searchProcessUuid);
     void clearSearch(const QUuid &searchProcessUuid);
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
