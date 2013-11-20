@@ -459,13 +459,11 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
         if (!isSearchActive(processUuid))
             return;
 
-        qDebug() << "online scan" << online.size();
         cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
 
         QList<ManualSearchPluginsEnumerator> testList;
         foreach(const QString& addr, online)
         {
-            qDebug() << "found online addr" << addr;
             cl_log.log(addr, cl_logINFO);
             ManualSearchPluginsEnumerator t(addr, port, auth);
             t.plugins = &m_searchersList; // I assume m_searchersList is constant during server life cycle
@@ -481,7 +479,6 @@ void QnResourceDiscoveryManager::searchResources(const QUuid &processUuid, const
 
             QList<ManualSearchPluginsEnumerator>::Iterator iter = testList.begin() + startIdx;
             qint32 progress = QHostAddress(iter->url.host()).toIPv4Address() - startIPv4Addr;
-            qDebug() << "progress" << progress << "total" << total;
             setSearchStatus(processUuid, QnManualCameraSearchStatus(QnManualCameraSearchStatus::CheckingHost, progress, total));
 
             QtConcurrent::blockingMap(iter, testList.begin() + endIdx, &ManualSearchPluginsEnumerator::search);

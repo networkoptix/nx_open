@@ -25,12 +25,10 @@ struct QnIpRangeCheckerHelper
         
         CLSimpleHTTPClient http (QHostAddress(ip), port, 1500, QAuthenticator());
         CLHttpStatus status = http.doGET(QByteArray(""));
-        qDebug() << "scanning online" << QHostAddress(ip).toString() << status;
         if (status != CL_TRANSPORT_ERROR) 
         {
             //event if we received not http, considering camera alive
             discoveryAddress = http.getLocalHost();
-            qDebug() << "discovered address" << discoveryAddress.toString();
             online = true;
         }
 
