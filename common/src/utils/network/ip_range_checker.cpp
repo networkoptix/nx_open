@@ -22,7 +22,6 @@ struct QnIpRangeCheckerHelper
     void check()
     {
         online = false;
-        
         CLSimpleHTTPClient http (QHostAddress(ip), port, 1500, QAuthenticator());
         CLHttpStatus status = http.doGET(QByteArray(""));
         if (status != CL_TRANSPORT_ERROR) 
@@ -31,7 +30,6 @@ struct QnIpRangeCheckerHelper
             discoveryAddress = http.getLocalHost();
             online = true;
         }
-
     }
 };
 
@@ -67,10 +65,16 @@ QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const Q
 
     static const int SCAN_THREAD_AMOUNT = 32;
     QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i ) global->reserveThread();
-    QtConcurrent::blockingMap(candidates, &QnIpRangeCheckerHelper::check);
-    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i )global->releaseThread();
 
+    //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
+    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i )
+        global->releaseThread();
+
+    QtConcurrent::blockingMap(candidates, &QnIpRangeCheckerHelper::check);
+
+    // Returning maxThreadCount() to its original value
+    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i )
+        global->reserveThread();
 
     QStringList result;
 
