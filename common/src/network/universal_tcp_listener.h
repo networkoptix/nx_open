@@ -3,7 +3,8 @@
 
 #include <QMultiMap>
 #include <QWaitCondition>
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
+
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
 
@@ -61,7 +62,7 @@ private:
         AwaitProxyInfo() { timer.restart(); }
 
         QSharedPointer<AbstractStreamSocket> socket;
-        QTime timer;
+        QElapsedTimer timer;
     };
 
     QList<HandlerInfo> m_handlers;

@@ -1,6 +1,7 @@
 #ifndef __STORAGE_MANAGER_H__
 #define __STORAGE_MANAGER_H__
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
@@ -143,7 +144,7 @@ private:
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     QTime m_lastTestTime;
-    QTime m_storageWarnTimer;
+    QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
     QMap<QnId, bool> m_diskFullWarned;
     RebuildState m_rebuildState;

@@ -4,9 +4,10 @@
 #include "utils/network/tcp_listener.h"
 #include "universal_tcp_listener.h"
 
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 
 #include <common/common_globals.h>
+
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
 static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
@@ -116,7 +117,7 @@ void QnProxySenderConnection::run()
 
     // wait main request from remote host
     bool gotRequest = false;
-    QTime timer;
+    QElapsedTimer timer;
     timer.restart();
     int cseq = 0;
     while (!m_needStop && d->socket->isConnected())

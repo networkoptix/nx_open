@@ -46,7 +46,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
         return getMetaData();
 
     QnAbstractDataPacketPtr result;
-    QTime getTimer;
+    QElapsedTimer getTimer;
     getTimer.restart();
     while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
     {

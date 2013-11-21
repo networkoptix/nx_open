@@ -800,9 +800,6 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
 
 void QnApiPbSerializer::deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized actions."));
@@ -1021,9 +1018,6 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
 
 void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActionList &actions, QByteArray &data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
 
     for (int i = 0; i < actions.size(); ++i)

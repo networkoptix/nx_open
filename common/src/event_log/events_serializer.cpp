@@ -1,6 +1,7 @@
 #include "events_serializer.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QElapsedTimer>
 
 
 inline int readInt(quint8* &curPtr)
@@ -12,7 +13,7 @@ inline int readInt(quint8* &curPtr)
 
 void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, const QByteArray& data)
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     QnBusinessActionDataList& events = *(eventsPtr.data());
