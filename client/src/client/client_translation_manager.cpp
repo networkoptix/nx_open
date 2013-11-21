@@ -16,7 +16,7 @@ QnClientTranslationManager::~QnClientTranslationManager() {
     return;
 }
 
-QString QnClientTranslationManager::getCurrentLanguage() const {
+QString QnClientTranslationManager::getCurrentLanguage() {
     QString translationPath = qnSettings->translationPath();
     foreach(const QnTranslation &translation, loadTranslations()) {
         if(translation.filePaths().contains(translationPath)) {
