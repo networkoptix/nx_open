@@ -8,7 +8,7 @@
         <translation type="obsolete">连接失败（connect()）</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="489"/>
+        <location filename="../src/utils/network/socket.cpp" line="490"/>
         <source>Connect failed (connect()). %1</source>
         <translation>连接失败（connect()）. %1</translation>
     </message>
@@ -1436,32 +1436,32 @@ for recording to %1.</source>
         <translation>无法为视频录像创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="500"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation>无法为录像分配输出流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="592"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation>无法分配输出音频流。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="600"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation>内部服务器错误：无效音频编码信息</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="629"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation>无法创建输出文件&apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="642"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="753"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
     </message>
@@ -1606,7 +1606,7 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTestCameraResourceSearcher</name>
     <message>
-        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="89"/>
+        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="90"/>
         <source>TestCameraLive</source>
         <translation>测试摄像机实时</translation>
     </message>
@@ -1744,7 +1744,7 @@ You cannot record video from cameras.</source>
 <context>
     <name>UDPSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="889"/>
+        <location filename="../src/utils/network/socket.cpp" line="890"/>
         <source>Disconnect failed (connect()).</source>
         <translation>离线失败(connect())。</translation>
     </message>

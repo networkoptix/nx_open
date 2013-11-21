@@ -4,7 +4,7 @@
 <context>
     <name>CommunicatingSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="489"/>
+        <location filename="../src/utils/network/socket.cpp" line="490"/>
         <source>Connect failed (connect()). %1</source>
         <translation>Échec de connexion (connect ()). %1</translation>
     </message>
@@ -997,32 +997,32 @@ Assurez-vos que la caméra est branchée sur le réseau. Essayez de redémarrer 
         <translation>Impossible de créer un fichier de sorti &apos;%1&apos; pour l&apos;enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="500"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation>Impossible d&apos;allouer le flux de sortie pour l&apos;enregistrement.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="592"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation>Impossible d&apos;allouer le flux audio de sortie.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="600"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation>Erreur interne du serveur: informations du codec audio invalide</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="629"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation>Impossible de créer le fichier de sortie &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="642"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation>Le Codec vidéo ou audio est incompatible avec le format%1. Essayez un autre format.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="753"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Erreur lors de la génération de filigrane pour le fichier &apos;%1&apos;.</translation>
     </message>
@@ -1167,7 +1167,7 @@ Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
 <context>
     <name>QnTestCameraResourceSearcher</name>
     <message>
-        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="89"/>
+        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="90"/>
         <source>TestCameraLive</source>
         <translation>Test de caméra en direct</translation>
     </message>
@@ -1216,7 +1216,7 @@ Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
 <context>
     <name>UDPSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="889"/>
+        <location filename="../src/utils/network/socket.cpp" line="890"/>
         <source>Disconnect failed (connect()).</source>
         <translation>Echec de déconnexion (connect()).</translation>
     </message>
