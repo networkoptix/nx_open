@@ -81,7 +81,7 @@ private:
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
-    QTime m_statsTimer;
+    QElapsedTimer m_statsTimer;
     double m_minJitter;
     double m_maxJitter;
     double m_jitterSum;

@@ -1,7 +1,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 
 #include "coldstore_dts_resource_searcher.h"
 #include "utils/network/nettools.h"
@@ -123,7 +123,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
         sendSocket.sendTo(m_request->data(), m_request->size(), groupAddress.toString(), coldStoreSendPort);
 
 
-        QTime time;
+        QElapsedTimer time;
         time.start();
 
         QList<QHostAddress> server_list;
@@ -187,7 +187,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
 
     QByteArray ipba = addr.toString().toLocal8Bit();
     const char* ip = ipba.data();
-	
+    
 //	cl_log.log(QLatin1String("CS checking for files"), cl_logALWAYS);
 
     if (sfs_client->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
@@ -232,8 +232,8 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         if (*data == 0) break;
         tmp = QLatin1String(data);
         data += tmp.length()+1;
-		tmp.remove(0,7);
-	    fileList.push_back(tmp);
+        tmp.remove(0,7);
+        fileList.push_back(tmp);
     }
     
     foreach(const QString& fn, fileList)
@@ -246,7 +246,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         unit.factory = m_factoryList[addr.toString()]; // it does exist
         unit.resourceID = mac;
                 
-		result.push_back(unit);
+        result.push_back(unit);
     }
 
     

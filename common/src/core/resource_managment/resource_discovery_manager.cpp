@@ -270,9 +270,6 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
 
 QnResourceList QnResourceDiscoveryManager::findNewResources()
 {
-    QTime time;
-    time.start();
-
     QnResourceList resources;
     std::set<QString> resourcePhysicalIDs;    //used to detect duplicate resources (same resource found by multiple drivers)
     m_searchersListMutex.lock();
@@ -339,7 +336,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     if (processDiscoveredResources(resources)) 
     {
         dtsAssignment();
-        //cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
         return resources;
     }
     else {

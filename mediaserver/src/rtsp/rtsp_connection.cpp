@@ -1,4 +1,5 @@
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QUuid>
 #include <QtCore/QSet>
@@ -1444,7 +1445,7 @@ void QnRtspConnectionProcessor::run()
 
     processRequest();
 
-    QTime t;
+    QElapsedTimer t;
     while (!m_needStop && d->socket->isConnected())
     {
         t.restart();

@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DESKTOP_CAMERA
 
+#include <QtCore/QElapsedTimer>
+
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
 #include "utils/network/simple_http_client.h"
 
@@ -44,7 +46,7 @@ private:
         TCPSocketPtr socket;
         int useCount;
         quint32 cSeq;
-        QTime timer;
+        QElapsedTimer timer;
         QString userName;
     };
 

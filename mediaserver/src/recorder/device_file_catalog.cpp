@@ -1,4 +1,7 @@
+
 #include <QtCore/QDir>
+#include <QtCore/QElapsedTimer>
+
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
@@ -157,8 +160,8 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
    
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
-	if (chunk.timeZone != -1)
-		fileDate = fileDate.toUTC().addSecs(chunk.timeZone*60);
+    if (chunk.timeZone != -1)
+        fileDate = fileDate.toUTC().addSecs(chunk.timeZone*60);
 
     int currentParts[4];
     currentParts[0] = fileDate.date().year();
@@ -363,7 +366,7 @@ void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnResource
 
 bool DeviceFileCatalog::doRebuildArchive()
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
     qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
 
@@ -405,7 +408,7 @@ bool DeviceFileCatalog::doRebuildArchive()
 
 void DeviceFileCatalog::deserializeTitleFile()
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     QMutexLocker lock(&m_mutex);
@@ -469,7 +472,7 @@ void DeviceFileCatalog::deserializeTitleFile()
                 needRewriteCatalog = true;
                 continue;
             }
-			//storage->addWritedSpace(chunkFileSize);
+            //storage->addWritedSpace(chunkFileSize);
 
             /*
             if (lastFileDuplicateName()) {
@@ -623,53 +626,53 @@ bool DeviceFileCatalog::isEmpty() const
 
 void DeviceFileCatalog::deleteFirstRecord()
 {
-	QnStorageResourcePtr storage;
-	QString delFileName;
-	QString motionDirName;
-	{
-		QMutexLocker lock(&m_mutex);
-		if (m_chunks.isEmpty())
-			return;
+    QnStorageResourcePtr storage;
+    QString delFileName;
+    QString motionDirName;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_chunks.isEmpty())
+            return;
 
-		static const int DELETE_COEFF = 1000;
+        static const int DELETE_COEFF = 1000;
 
-		if (m_firstDeleteCount < m_chunks.size()) 
-		{
-			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
-			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
+        if (m_firstDeleteCount < m_chunks.size()) 
+        {
+            storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
+            delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
 
-			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
+            QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
-			if (m_firstDeleteCount < m_chunks.size()-1)
-			{
-				QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
-				if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
-					motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
-			}
-			m_firstDeleteCount++;
-		}
-		else {
-			m_firstDeleteCount = 0;
-			emit firstDataRemoved(m_chunks.size());
-			m_chunks.clear();
-			m_lastAddIndex = -1;
-		}
-		if (m_firstDeleteCount == DELETE_COEFF) {
-			emit firstDataRemoved(DELETE_COEFF);
-			m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
-			m_lastAddIndex -= DELETE_COEFF;
-			m_firstDeleteCount = 0;
-		}
-	}
+            if (m_firstDeleteCount < m_chunks.size()-1)
+            {
+                QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
+                if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
+                    motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
+            }
+            m_firstDeleteCount++;
+        }
+        else {
+            m_firstDeleteCount = 0;
+            emit firstDataRemoved(m_chunks.size());
+            m_chunks.clear();
+            m_lastAddIndex = -1;
+        }
+        if (m_firstDeleteCount == DELETE_COEFF) {
+            emit firstDataRemoved(DELETE_COEFF);
+            m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
+            m_lastAddIndex -= DELETE_COEFF;
+            m_firstDeleteCount = 0;
+        }
+    }
 
     if (storage) {
-	    if (!delFileName.isEmpty())
-	    {
-		    //storage->addWritedSpace(-deletedSize);
-		    storage->removeFile(delFileName);
-	    }
-	    if (!motionDirName.isEmpty())
-		    storage->removeDir(motionDirName);
+        if (!delFileName.isEmpty())
+        {
+            //storage->addWritedSpace(-deletedSize);
+            storage->removeFile(delFileName);
+        }
+        if (!motionDirName.isEmpty())
+            storage->removeDir(motionDirName);
     }
 }
 

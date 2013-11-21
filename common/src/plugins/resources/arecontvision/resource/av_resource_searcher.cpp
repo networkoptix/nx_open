@@ -56,10 +56,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         }
 
         // collecting response
-        QTime time;
-        time.start();
         QnSleep::msleep(150); // to avoid 100% cpu usage
-        //while(time.elapsed()<150)
         {
             while (sock->hasData())
             {

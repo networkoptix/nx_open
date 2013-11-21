@@ -78,10 +78,11 @@ PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 # Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
 QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_INCLUDED -DBOOST_MPL_NOT_HPP_INCLUDED -DBOOST_MPL_VOID_HPP_INCLUDED
 
+CONFIG += ${arch}
+
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${child.customization.dir}/icons/hdw_logo.ico	
-  CONFIG += ${arch}
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
   win32-msvc* {
@@ -112,10 +113,10 @@ unix: {
 unix:!mac {
   QMAKE_CXXFLAGS += -std=c++0x -fpermissive
   LIBS += ${linux.oslibs}
-  ${arch}:!arm {
+  !arm {
     QMAKE_CXXFLAGS += -msse2
   } else {
-    #LIBS -= -lssl
+    LIBS -= -lssl
   } 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}

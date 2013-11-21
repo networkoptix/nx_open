@@ -1,3 +1,5 @@
+
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QWaitCondition>
 
 #include "syncplay_wrapper.h"
@@ -69,7 +71,7 @@ public:
     bool blockSetSpeedSignal;
     qint64 lastJumpTime;
     int bufferingCnt;
-    QTime timer;
+    QElapsedTimer timer;
     double speed;
     
     bool enabled;

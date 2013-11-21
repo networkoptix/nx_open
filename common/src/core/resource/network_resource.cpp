@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <QtCore/QElapsedTimer>
+
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
@@ -229,7 +231,7 @@ bool QnNetworkResource::conflicting()
     if (checkNetworkStatus(QnNetworkResource::BadHostAddr))
         return false;
 
-    QTime time;
+    QElapsedTimer time;
     time.restart();
     CL_LOG(cl_logDEBUG2) cl_log.log("begining of QnNetworkResource::conflicting() ",  cl_logDEBUG2);
 

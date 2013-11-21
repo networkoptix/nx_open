@@ -9,7 +9,6 @@
 
 #include <QtGui/QImage>
 #include <QtGui/QColor>
-#include <QtCore/QTime>
 #include <QtCore/QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"

@@ -163,7 +163,7 @@ bool VMaxStreamFetcher::vmaxConnect()
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)
 #endif
     {
-        QTime t;
+        QElapsedTimer t;
         t.restart();
         QMutexLocker lock(&m_connectMtx);
         while (!m_vmaxConnection && t.elapsed() < PROCESS_TIMEOUT && !m_needStop)
@@ -307,7 +307,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     int ch = mediaData->channelNumber & 0xff;
 
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     bool needWait = false;

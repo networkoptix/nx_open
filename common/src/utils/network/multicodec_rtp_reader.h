@@ -79,7 +79,7 @@ private:
     QnRtspTimeHelper m_timeHelper;
     QVector<int> m_gotKeyData;
     bool m_pleaseStop;
-    QTime m_rtcpReportTimer;
+    QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
     QnResource::ConnectionRole m_role;
 };

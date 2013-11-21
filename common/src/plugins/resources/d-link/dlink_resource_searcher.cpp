@@ -79,9 +79,6 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         }
 
         // collecting response
-        QTime time;
-        time.start();
-
         QnSleep::msleep(150);
         while (sock->hasData())
         {

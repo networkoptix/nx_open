@@ -244,8 +244,6 @@ QnResourceList QnPlIqResourceSearcher::findResources()
             sendSock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, NATIVE_DISCOVERY_REQUEST_PORT);
         }
 
-        QTime time;
-        time.start();
         QnSleep::msleep(300);
 
         while (receiveSock->hasData())
