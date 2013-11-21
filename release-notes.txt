@@ -1,9 +1,34 @@
+----------------------------------------------2.1.0.xxxx-------------------------------------------
+MAC Client is released
+
+1. Linux Client created incorrect Media Folder un user's home directory. Fixed
+2. If open Multi-Video it played back but did not display in the tree. Fixed
+3. Some specific ACTi cameras were not supported. Fixed
+4. Vivotek support is improved: SD81X1 is supported and PTZ is fixed for Sd8111 
+5. It was not possible choose separate analog channels for events. Fixed
+6. E-Mail templates displayed product name incorrectly. Fixed
+7. Linux media server stability is improved if working with large number of cameras (> 128)
+8. In some cases analog encoders were found with wrong number of channels. Fixed
+9. New AXIS models are supported
+10. Some cameras were reported wrongly as PTZ thus de-warping could not be enabled. Fixed
+11. Added D-Link DCS-6010L
+12. If save a layout with existing name it was duplicated. Now it is suggested to overwrite it
+13. If license activation is failed, much more information is given
+14. Layout background (E-Mapping) didn't restored properly after logout. Fixed
+15. Added Audio recording for ISD cameras and generic RTSP streams
+16. If remove EC on Linux, mediaproxy process didn't stop. Fixed
+17. Text to speech did not work properly on Linux. Fixed
+18. If several storages are installed and their size differ, then storages are used smarter
+19. "You are running Beta version" message is introduced.
+20. If media servers and/or Enterprise Controller have different versions, then the warning is given
+21. If a new Media Server was installed this was not reflected in About screen until client restart. Fixed
+
 ----------------------------------------------2.0.2.4814-------------------------------------------
-1. If stop Media Server correctly, Media Server Failure event was generated. Fixed
-2. ZN-D1MAP  and Ampleye B.V. - Nox-20A9 is supported properly.
+1. If media server was restarted manually, it resulted in "Media Server restarted after crash". Fixed
+2. Some advanced RTSP extensions are now supported
 3. Media Server is optimized.
-4. Healt Monitoring did not display proper network usage under Linux. Fixed.
-5.  Server could crash in very rare case ( nobody complained specifically about it, was found in the house!)
+4. Network statistics did not work on Linux media servers on some network adapters. Fixed
+5. Server could crash in very rare case ( nobody complained specifically about it, was found in the house!)
 
 ----------------------------------------------2.0.2.4780-------------------------------------------
 1. Discovery and Arecont Streams were stuck in some network environments. (Arecont cameras are showing older recorded footage as live footage in spectrum). Fixed.
