@@ -1085,6 +1085,14 @@ p, li { white-space: pre-wrap; }
         <source>Export selected cameras to file</source>
         <translation>Exportez les caméras sélectionnées vers un fichier</translation>
     </message>
+    <message>
+        <source>Beta version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAboutDialog</name>
@@ -2112,6 +2120,10 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <source>How-to Videos and FAQ...</source>
         <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
         <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
+    </message>
+    <message>
+        <source>Show Beta Version Warning Message</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3804,6 +3816,26 @@ Flux d&apos;archive autorisé: %4</translation>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation>Vous n&apos;avez pas de licence valide activée. S&apos;il vous plait, activez votre licence commerciale.</translation>
+    </message>
+    <message>
+        <source>Database error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The license key is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

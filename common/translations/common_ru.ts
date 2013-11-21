@@ -4,7 +4,7 @@
 <context>
     <name>CommunicatingSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="489"/>
+        <location filename="../src/utils/network/socket.cpp" line="490"/>
         <source>Connect failed (connect()). %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -856,32 +856,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="500"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="592"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="600"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="629"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="642"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="751"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="753"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1006,7 +1006,7 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTestCameraResourceSearcher</name>
     <message>
-        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="89"/>
+        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="90"/>
         <source>TestCameraLive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1055,7 +1055,7 @@ You cannot record video from cameras.</source>
 <context>
     <name>UDPSocket</name>
     <message>
-        <location filename="../src/utils/network/socket.cpp" line="889"/>
+        <location filename="../src/utils/network/socket.cpp" line="890"/>
         <source>Disconnect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>
