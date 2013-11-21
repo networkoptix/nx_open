@@ -755,6 +755,15 @@ void QnSystrayWindow::onSettingsAction()
     ui->groupBoxPublicIP->setChecked(allowPublicIP > 0);
     ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
     ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
+    
+    Qt::CheckState discoveryState = Qt::Checked;
+    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
+    if (disabledVendors == lit("all"))
+        discoveryState = Qt::Unchecked;
+    else if (!disabledVendors.isEmpty())
+        discoveryState = Qt::PartiallyChecked;
+    ui->checkBoxDiscovery->setCheckState(discoveryState);
+
     onRadioButtonPublicIpChanged();
 
     QString rtspTransport = m_mediaServerSettings.value(lit("rtspTransport"), lit("AUTO")).toString().toUpper();
@@ -1001,6 +1010,16 @@ void QnSystrayWindow::saveData()
         m_mediaServerSettings.setValue(lit("publicIPEnabled"), 1);
     else
         m_mediaServerSettings.setValue(lit("publicIPEnabled"), 2);
+
+    Qt::CheckState discoveryState = ui->checkBoxDiscovery->checkState();
+    if (discoveryState != Qt::PartiallyChecked)
+    {
+        QString disabledVendors;
+        if (discoveryState == Qt::Checked)
+            m_mediaServerSettings.setValue(lit("disabledVendors"), lit(""));
+        else
+            m_mediaServerSettings.setValue(lit("disabledVendors"), lit("all"));
+    }
 }
 
 void QnSystrayWindow::onTestButtonClicked()

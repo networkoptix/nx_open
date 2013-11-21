@@ -102,7 +102,7 @@ QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()));
+    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()) && !m_disabledVendorsForAutoSearch.contains(lit("all")));
     m_searchersList.push_back(serv);
 }
 
