@@ -7,8 +7,6 @@
 
 #include "workbench_context_aware.h"
 
-typedef 
-
 class QnWorkbenchCustomizer: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 
@@ -20,9 +18,6 @@ public:
     void unregisterObject(const QString &key);
 
     void customize(const QVariant &cusomization);
-
-private:
-    QnJsonSerializer *serializer(int type);
 
 private:
     QHash<QString, QWeakPointer<QObject> > m_objectByKey;

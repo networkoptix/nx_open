@@ -8,14 +8,38 @@ public:
     QnObjectStarCustomizationSerializer(QObject *parent = NULL): 
         QObject(parent),
         QnJsonSerializer(QMetaType::QObjectStar)
-    {}
+    {
+        m_serializerByType.insert(QMetaType::QObjectStar, this);
+    }
 
 protected:
-    virtual void serializeInternal(const void *value, QVariant *target) const = 0;
-    virtual bool deserializeInternal(const QVariant &value, void *target) const = 0;
+    virtual void serializeInternal(const void *, QVariant *) const {
+        assert(false); /* We should never get here. */
+    }
+    
+    virtual bool deserializeInternal(const QVariant &value, void *target) const {
+        QObject *object = *static_cast<QObject **>(target);
+
+        QVariantMap map;
+        if(!QJson::deserialize(value, &map))
+            return false;
+
+        
+    }
 
 private:
+    QnJsonSerializer *serializer(int type) {
+        QnJsonSerializer *result = m_serializerByType.value(type);
+        if(!result) {
+            /* QnJsonSerializer does locking, so we use local cache to avoid it. */
+            result = QnJsonSerializer::forType(type); 
+            m_serializerByType[type] = result;
+        }
+        return result;
+    }
 
+private:
+    QnFlatMap<int, QnJsonSerializer *> m_serializerByType;
 };
 
 
@@ -28,7 +52,7 @@ public:
 
 
 private:
-    QnFlatMap<int, QnJsonSerializer *> m_serializerByType;
+    
 };
 
 
@@ -57,12 +81,3 @@ void QnWorkbenchCustomizer::customize(const QVariant &cusomization) {
     
 }
 
-QnJsonSerializer *QnWorkbenchCustomizer::serializer(int type) {
-    QnJsonSerializer *result = m_serializerByType.value(type);
-    if(!result) {
-        /* QnJsonSerializer does locking, so we use local cache to avoid it. */
-        result = QnJsonSerializer::forType(type); 
-        m_serializerByType[type] = result;
-    }
-    return result;
-}
