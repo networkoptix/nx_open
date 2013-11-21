@@ -10,6 +10,12 @@ class QnClientTranslationManager: public QnTranslationManager {
 public:
     QnClientTranslationManager(QObject *parent = NULL);
     virtual ~QnClientTranslationManager();
+
+    /**
+     * Get locale code of the current translation language.
+     * If no corresponding translation found, empty string is returned.
+     */
+    QString getCurrentLanguage() const;
 };
 
 #endif // QN_CLIENT_TRANSLATION_MANAGER_H

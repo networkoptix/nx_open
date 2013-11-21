@@ -16,3 +16,12 @@ QnClientTranslationManager::~QnClientTranslationManager() {
     return;
 }
 
+QString QnClientTranslationManager::getCurrentLanguage() const {
+    QString translationPath = qnSettings->translationPath();
+    foreach(const QnTranslation &translation, loadTranslations()) {
+        if(translation.filePaths().contains(translationPath)) {
+            return translation.localeCode();
+        }
+    }
+    return QString();
+}
