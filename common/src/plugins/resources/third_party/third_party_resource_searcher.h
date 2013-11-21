@@ -68,7 +68,6 @@ protected:
 
 private:
     QList<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
-    QVector<nxcip::CameraInfo> m_cameraInfoTempArray;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList;
 
     //!Searchers resources using custom search method
