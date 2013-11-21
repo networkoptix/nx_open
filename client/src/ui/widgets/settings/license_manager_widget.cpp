@@ -15,7 +15,11 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <client/client_translation_manager.h>
+
 #include <core/resource_managment/resource_pool.h>
+
+#include <common/common_module.h>
 #include <common/customization.h>
 
 #include <mustache/mustache.h>
@@ -151,6 +155,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         params.addQueryItem(QLatin1String("hwid3"), hardwareId3);
     params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
+    params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
     QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
     m_replyKeyMap[reply] = licenseKey;
