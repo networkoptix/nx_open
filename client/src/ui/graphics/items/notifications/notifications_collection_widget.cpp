@@ -373,7 +373,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         );
         break;
     }
-    case BusinessEventType::MediaServer_Conflict: {
+    case BusinessEventType::MediaServer_Conflict:
+    case BusinessEventType::MediaServer_Started: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             QString(),

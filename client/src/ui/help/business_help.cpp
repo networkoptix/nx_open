@@ -20,6 +20,8 @@ int QnBusiness::eventHelpId(BusinessEventType::Value type) {
         return Qn::EventsActions_MediaServerFailure_Help;
     case BusinessEventType::MediaServer_Conflict:
         return Qn::EventsActions_MediaServerConflict_Help;
+    case BusinessEventType::MediaServer_Started:
+        return Qn::EventsActions_MediaServerStarted_Help;
     default:
         return -1;
     }

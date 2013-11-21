@@ -67,6 +67,9 @@ namespace BusinessEventType {
         /** Two or more mediaservers are running. */
         MediaServer_Conflict,
 
+        /** Media server started */
+        MediaServer_Started,
+
         /** Event type is not defined. Used in rules. */
         NotDefined,
 

@@ -135,6 +135,7 @@ QN_HELP_TOPIC(EventsActions_CameraIpConflict_Help,				"camera_ip_conflict.htm")
 QN_HELP_TOPIC(EventsActions_CameraInput_Help,					"input_signal_on_camera.htm")
 QN_HELP_TOPIC(EventsActions_MediaServerFailure_Help,			"media_server_failure.htm")
 QN_HELP_TOPIC(EventsActions_MediaServerConflict_Help,			"media_servers_conflict.htm")
+QN_HELP_TOPIC(EventsActions_MediaServerStarted_Help,			"media_servers_started.htm")
 
 QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm")
 QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm")
