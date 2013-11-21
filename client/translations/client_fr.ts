@@ -465,33 +465,6 @@
     </message>
 </context>
 <context>
-    <name>CompatibilityVersionInstallationDialog</name>
-    <message>
-        <source>Dialog</source>
-        <translation type="unfinished">Dialogue</translation>
-    </message>
-    <message>
-        <source>Installing version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installation failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not cancel installation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installation completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installation has been cancelled</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
@@ -1008,7 +981,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation type="obsolete">* Dernière connexion utilisée *</translation>
+        <translation>* Dernière connexion utilisée *</translation>
     </message>
     <message>
         <source>While %1</source>
@@ -1066,27 +1039,27 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Not recording</source>
-        <translation type="obsolete">N&apos;enregistre pas</translation>
+        <translation>N&apos;enregistre pas</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation type="obsolete">Enregistre tout</translation>
+        <translation>Enregistre tout</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation type="obsolete">Enregistrement sur mouvement seulement</translation>
+        <translation>Enregistrement sur mouvement seulement</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation type="obsolete">Enregistrement sur mouvement et basse qualité</translation>
+        <translation>Enregistrement sur mouvement et basse qualité</translation>
     </message>
     <message>
         <source>Motion only</source>
-        <translation type="obsolete">Mouvement seulement</translation>
+        <translation>Mouvement seulement</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation type="obsolete">Mouvement et Basse réso</translation>
+        <translation>Mouvement et Basse réso</translation>
     </message>
     <message>
         <source>b/s</source>
@@ -1106,11 +1079,19 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Continuous</source>
-        <translation type="obsolete">Continu</translation>
+        <translation>Continu</translation>
     </message>
     <message>
         <source>Export selected cameras to file</source>
         <translation>Exportez les caméras sélectionnées vers un fichier</translation>
+    </message>
+    <message>
+        <source>Beta version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2141,7 +2122,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
     </message>
     <message>
-        <source>Change Camera Aspect Ratio...</source>
+        <source>Show Beta Version Warning Message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3375,17 +3356,6 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     </message>
 </context>
 <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished">Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S&apos;il vous plait, sélectionnez un autre périphérique audio ou &apos;Aucun&apos; comme valeur dans la configuration d&apos;enregistrement</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find video encoder </source>
-        <translation type="unfinished">Ne trouve pas l&apos;encodeur vidéo</translation>
-    </message>
-</context>
-<context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -3585,19 +3555,19 @@ Vous serez invité à redémarrer le client en mode compatibilité.</translation
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="obsolete">Nous avons détecté que votre carte vidéo n&apos;est pas supportée. Vous pouvez procéder à vos propres risques .&lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut regler le problème, mais rien ne garantie que cela va aider. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.) &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>Nous avons détecté que votre carte vidéo n&apos;est pas supportée. Vous pouvez procéder à vos propres risques .&lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut regler le problème, mais rien ne garantie que cela va aider. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.) &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation type="obsolete">Conseil Critique - Performance</translation>
+        <translation>Conseil Critique - Performance</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="obsolete">Nous avons détecté que les pilotes de votre carte vidéo ne sont pas installés ou à jour. &lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut améliorer considérablement les performances de votre système lors de la visualisation vidéo. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.)  &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a</translation>
+        <translation>Nous avons détecté que les pilotes de votre carte vidéo ne sont pas installés ou à jour. &lt;br/&gt;Installer ou mettre à jour les pilotes de votre carte vidéo peut améliorer considérablement les performances de votre système lors de la visualisation vidéo. .&lt;br/&gt; Pour des instructions sur comment installer ou mettre à jour vos pilotes vidéo, allez sur ce lien (Anglais Seul.)  &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation type="obsolete"> Conseil Important - Performance</translation>
+        <translation> Conseil Important - Performance</translation>
     </message>
 </context>
 <context>
@@ -3847,6 +3817,26 @@ Flux d&apos;archive autorisé: %4</translation>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation>Vous n&apos;avez pas de licence valide activée. S&apos;il vous plait, activez votre licence commerciale.</translation>
     </message>
+    <message>
+        <source>Database error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The license key is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
@@ -4016,29 +4006,10 @@ S’il vous plait, fermer l&apos;application et redémarrer en utilisant le racc
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation type="obsolete">Vous êtes sur le point de vous connecter sur un Contrôleur Entreprise avec une version différente:
+        <translation>Vous êtes sur le point de vous connecter sur un Contrôleur Entreprise avec une version différente:
 - Version Cliente: %1
 - Version EC: %2
 La version cliente %2 est requise pour vous connecter sur ce Serveur Entreprise. S&apos;il vous plait télécharger la version %2 du produit et faites la mise à jour.</translation>
-    </message>
-    <message>
-        <source>* Last used connection *</source>
-        <translation type="unfinished">* Dernière connexion utilisée *</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Unable to connect to applauncher to enable client compatibility mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Client Version %3 is required to connect to this Enterprise Controller.
-Download version %3?</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4614,37 +4585,6 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
     </message>
 </context>
 <context>
-    <name>QnRecordingStatusHelper</name>
-    <message>
-        <source>Not recording</source>
-        <translation type="unfinished">N&apos;enregistre pas</translation>
-    </message>
-    <message>
-        <source>Recording everything</source>
-        <translation type="unfinished">Enregistre tout</translation>
-    </message>
-    <message>
-        <source>Recording motion only</source>
-        <translation type="unfinished">Enregistrement sur mouvement seulement</translation>
-    </message>
-    <message>
-        <source>Recording motion and low quality</source>
-        <translation type="unfinished">Enregistrement sur mouvement et basse qualité</translation>
-    </message>
-    <message>
-        <source>Continuous</source>
-        <translation type="unfinished">Continu</translation>
-    </message>
-    <message>
-        <source>Motion only</source>
-        <translation type="unfinished">Mouvement seulement</translation>
-    </message>
-    <message>
-        <source>Motion + Lo-Res</source>
-        <translation type="unfinished">Mouvement et Basse réso</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
@@ -4737,13 +4677,6 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
     </message>
 </context>
 <context>
-    <name>QnScreenRecorder</name>
-    <message>
-        <source>Screen capturing subsystem is not initialized yet. Please try latter</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
@@ -4758,7 +4691,7 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
     <name>QnServerResourceWidget</name>
     <message>
         <source>%1 (%2)</source>
-        <translation type="obsolete">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>Show Log</source>
@@ -4767,14 +4700,6 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
     <message>
         <source>Check Issues</source>
         <translation>Vérifier les problèmes</translation>
-    </message>
-    <message>
-        <source>%1 %2 </source>
-        <translation type="unfinished">%1% {1 %2 ?}</translation>
-    </message>
-    <message>
-        <source>(up %1 days, %2)</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4806,14 +4731,6 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
     <message>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;Ajouter stockage externe...&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Attention</translation>
-    </message>
-    <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. Depending on the total size of archive it can take several hours. This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6095,22 +6012,6 @@ Description de l&apos;erreur: &apos;%2&apos;</translation>
     <message>
         <source>Ping</source>
         <translation>Ping</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
     </message>
 </context>
 <context>

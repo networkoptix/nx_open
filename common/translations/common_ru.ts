@@ -4,7 +4,7 @@
 <context>
     <name>CommunicatingSocket</name>
     <message>
-        <location filename="../src/utils/network/system_socket.cpp" line="660"/>
+        <location filename="../src/utils/network/socket.cpp" line="490"/>
         <source>Connect failed (connect()). %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -30,16 +30,52 @@
 <context>
     <name>Language</name>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="145"/>
+        <location filename="../src/translation/translation_manager.cpp" line="144"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>ru</translation>
     </message>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="142"/>
+        <location filename="../src/translation/translation_manager.cpp" line="141"/>
         <source>Language Name</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>Русский</translation>
+    </message>
+</context>
+<context>
+    <name>QDnsLookup</name>
+    <message>
+        <location filename="../src/qt5/network/qdnslookup.cpp" line="449"/>
+        <source>Operation cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QDnsLookupRunnable</name>
+    <message>
+        <location filename="../src/qt5/network/qdnslookup.cpp" line="968"/>
+        <source>Invalid domain name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="67"/>
+        <source>Server could not process query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="71"/>
+        <source>Server failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="75"/>
+        <source>Non existent domain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qt5/network/qdnslookup_win.cpp" line="79"/>
+        <source>Server refused to answer</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -126,72 +162,72 @@
 <context>
     <name>QnApiPbSerializer</name>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="657"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="653"/>
         <source>Cannot parse serialized cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="666"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="662"/>
         <source>Cannot parse serialized servers.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="675"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="671"/>
         <source>Cannot parse serialized layouts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="695"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="691"/>
         <source>Cannot parse serialized users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="704"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="700"/>
         <source>Cannot parse serialized resources.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="713"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="709"/>
         <source>Cannot parse serialized resource types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="722"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="718"/>
         <source>Cannot parse serialized licenses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="732"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="728"/>
         <source>Cannot parse serialized camera history.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="742"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="738"/>
         <source>Cannot parse serialized key-value pairs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="752"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="748"/>
         <source>Cannot parse serialized settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="762"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="758"/>
         <source>Cannot parse serialized connection information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="784"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="780"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="789"/>
         <source>Cannot parse serialized action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="805"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized actions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -387,36 +423,31 @@
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="298"/>
-        <source>Connection to camera was unexpectedly closed %1</source>
+        <source>Connection to camera was unexpectedly closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="327"/>
-        <source>HDD/SSD disk %1 is full! Disk contains too much data out of VMS storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="306"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="305"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="311"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="310"/>
         <source>Server terminated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="315"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="314"/>
         <source>Server started after crash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="323"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="322"/>
         <source>Not enough HDD/SSD speed for recording to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="319"/>
+        <location filename="../src/business/business_strings_helper.cpp" line="318"/>
         <source>I/O Error occured at %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -424,119 +455,119 @@
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="27"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="25"/>
         <source>ok</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="33"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check if Media Server is up and has the proper version.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="97"/>
         <source>Media stream is opened but no media data was received</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="127"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="125"/>
         <source>(unknown)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="29"/>
         <source>Media server %1 is not available.
  Check that media server is up and running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="37"/>
         <source>Cannot connect to http port %1.
  Make sure the camera is plugged into the network.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="41"/>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="46"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="51"/>
         <source>Error parsing camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="56"/>
         <source>No supported media track(s) at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="61"/>
         <source>Not authorized. Url %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="65"/>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="70"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="75"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="80"/>
         <source>Unknown Camera Issue.
  Please, contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="84"/>
         <source>I/O error. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="87"/>
         <source>Server has been stopped.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="91"/>
         <source>Invalid data received from camera: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="94"/>
         <source>Too many media errors. Please open camera issues dialog for more details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="110"/>
         <source>Unknown error. Please contact support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="114"/>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
         <source> Parameters: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -557,12 +588,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <location filename="../src/utils/common/environment.cpp" line="55"/>
+        <location filename="../src/utils/common/environment.cpp" line="51"/>
         <source>Launching Windows Explorer failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/environment.cpp" line="56"/>
+        <location filename="../src/utils/common/environment.cpp" line="52"/>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -666,22 +697,22 @@
 <context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="234"/>
+        <location filename="../src/licensing/license.cpp" line="233"/>
         <source>Free</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="235"/>
+        <location filename="../src/licensing/license.cpp" line="234"/>
         <source>Trial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="236"/>
+        <location filename="../src/licensing/license.cpp" line="235"/>
         <source>Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="237"/>
+        <location filename="../src/licensing/license.cpp" line="236"/>
         <source>Professional</source>
         <translation type="unfinished"></translation>
     </message>
@@ -691,19 +722,6 @@
     <message>
         <location filename="../src/core/resource/media_server_resource.cpp" line="26"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnMulticodecRtpReader</name>
-    <message>
-        <location filename="../src/utils/network/multicodec_rtp_reader.cpp" line="234"/>
-        <source>(primary video)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/network/multicodec_rtp_reader.cpp" line="236"/>
-        <source>(secondary video)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -718,29 +736,29 @@
 <context>
     <name>QnSignHelper</name>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="66"/>
-        <location filename="../src/export/sign_helper.cpp" line="711"/>
+        <location filename="../src/export/sign_helper.cpp" line="65"/>
+        <location filename="../src/export/sign_helper.cpp" line="710"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="261"/>
+        <location filename="../src/export/sign_helper.cpp" line="260"/>
         <source>Hardware ID: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="69"/>
-        <location filename="../src/export/sign_helper.cpp" line="715"/>
+        <location filename="../src/export/sign_helper.cpp" line="68"/>
+        <location filename="../src/export/sign_helper.cpp" line="714"/>
         <source>FREE license</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="262"/>
+        <location filename="../src/export/sign_helper.cpp" line="261"/>
         <source>Licensed to: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/export/sign_helper.cpp" line="263"/>
+        <location filename="../src/export/sign_helper.cpp" line="262"/>
         <source>Watermark: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -838,32 +856,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="499"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="500"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="591"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="592"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="599"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="600"/>
         <source>Internal server error: invalid audio codec information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="628"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="629"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="640"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="642"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="756"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="753"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -955,32 +973,32 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="305"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="280"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="307"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="282"/>
         <source>Not Found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="309"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="284"/>
         <source>Not Implemented</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="311"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="286"/>
         <source>Unsupported Transport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="313"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="288"/>
         <source>Internal Server Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="315"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="290"/>
         <source>Invalid Parameter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -988,7 +1006,7 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTestCameraResourceSearcher</name>
     <message>
-        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="89"/>
+        <location filename="../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="90"/>
         <source>TestCameraLive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1011,12 +1029,12 @@ You cannot record video from cameras.</source>
 <context>
     <name>QnTranslationListModel</name>
     <message>
-        <location filename="../src/translation/translation_list_model.cpp" line="66"/>
+        <location filename="../src/translation/translation_list_model.cpp" line="63"/>
         <source>%1 (built-in)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/translation/translation_list_model.cpp" line="68"/>
+        <location filename="../src/translation/translation_list_model.cpp" line="65"/>
         <source>%1 (external)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1024,8 +1042,21 @@ You cannot record video from cameras.</source>
 <context>
     <name>Socket</name>
     <message>
-        <location filename="../src/utils/network/system_socket.cpp" line="521"/>
+        <location filename="../src/utils/network/socket.cpp" line="350"/>
         <source>Couldn&apos;t resolve %1: %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/network/socket.cpp" line="198"/>
+        <source>WSACleanup() failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UDPSocket</name>
+    <message>
+        <location filename="../src/utils/network/socket.cpp" line="890"/>
+        <source>Disconnect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
