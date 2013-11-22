@@ -9,20 +9,26 @@ class Component:
 
 class Version:
     "Single version"
+    VERSIONS = []
     def __init__(self, *args):
         self.version = args
+        Version.VERSIONS.append(self)
+        Version.VERSIONS.sort()
         
     def __len__(self):
         return 1
 
     def __getitem__(self, key):
         if key == 0:
-            return self.version
+            return self
 
         raise IndexError()
 
     def __eq__(self, other):
         return self.version == other.version
+
+    def __repr__(self):
+        return str(self.version)
 
 class Range:
     "Version range"
@@ -31,11 +37,11 @@ class Range:
         self.xto = xto
 
     def __len__(self):
-        return self.xto.version[1] - self.xfrom.version[1] + 1
+        return Version.VERSIONS.index(self.xto) - Version.VERSIONS.index(self.xfrom) + 1
 
     def __getitem__(self, key):
         if 0 <= key < self.__len__():
-            return (self.xfrom.version[0], self.xfrom.version[1] + key)
+            return Version.VERSIONS[Version.VERSIONS.index(self.xfrom) + key]
 
         raise IndexError()
 
