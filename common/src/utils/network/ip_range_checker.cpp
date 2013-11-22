@@ -9,6 +9,8 @@
 #include "socket.h"
 #include "simple_http_client.h"
 
+#include <utils/common/scoped_thread_rollback.h>
+
 
 struct QnIpRangeCheckerHelper
 {
@@ -18,9 +20,11 @@ struct QnIpRangeCheckerHelper
     int port;
     bool online;
     QHostAddress discoveryAddress;
+    QStringList results;
 
-    void check()
+    QStringList check()
     {
+        results.clear();
         online = false;
         CLSimpleHTTPClient http (QHostAddress(ip), port, 1500, QAuthenticator());
         CLHttpStatus status = http.doGET(QByteArray(""));
@@ -30,18 +34,30 @@ struct QnIpRangeCheckerHelper
             discoveryAddress = http.getLocalHost();
             online = true;
         }
+        if (online)
+            results << QHostAddress(ip).toString();
+        return results;
     }
 };
 
+struct QnTestAddress {
+    quint32 ip;
+    int port;
 
-QnIpRangeChecker::QnIpRangeChecker()
-{
+    QnTestAddress(quint32 ip, int port): ip(ip), port(port) {}
+};
 
+QStringList mapFunction(QnTestAddress address) {
+    CLSimpleHTTPClient http (QHostAddress(address.ip), address.port, 1500, QAuthenticator());
+    CLHttpStatus status = http.doGET(QByteArray(""));
+    if (status == CL_TRANSPORT_ERROR)
+        return QStringList();
+
+    return QStringList() << QHostAddress(address.ip).toString();
 }
 
-QnIpRangeChecker::~QnIpRangeChecker()
-{
-
+void reduceFunction(QStringList &finalResult, const QStringList &intermediateResult) {
+    finalResult << intermediateResult;
 }
 
 QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const QHostAddress &endAddr, int port)
@@ -52,7 +68,7 @@ QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const Q
     quint32 endIpv4 = endAddr.toIPv4Address();
 
     if (endIpv4 < startIpv4)
-        return QList<QString>();
+        return QStringList();
 
     QList<QnIpRangeCheckerHelper> candidates;
 
@@ -64,20 +80,11 @@ QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const Q
 
 
     static const int SCAN_THREAD_AMOUNT = 32;
-    QThreadPool* global = QThreadPool::globalInstance();
-
-    //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
-    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i )
-        global->releaseThread();
+    QN_INCREASE_MAX_THREADS(SCAN_THREAD_AMOUNT)
 
     QtConcurrent::blockingMap(candidates, &QnIpRangeCheckerHelper::check);
 
-    // Returning maxThreadCount() to its original value
-    for (int i = 0; i < SCAN_THREAD_AMOUNT; ++i )
-        global->reserveThread();
-
     QStringList result;
-
     foreach(QnIpRangeCheckerHelper h, candidates)
         if(h.online)
             result << QHostAddress(h.ip).toString();
@@ -85,3 +92,15 @@ QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const Q
     return result;
 }
 
+QFuture<QStringList> QnIpRangeChecker::onlineHostsAsync(const QHostAddress &startAddr, const QHostAddress &endAddr, int port) {
+    quint32 startIpv4 = startAddr.toIPv4Address();
+    quint32 endIpv4 = endAddr.toIPv4Address();
+    QList<QnTestAddress> candidates;
+    for (quint32 i = startIpv4; i <= endIpv4; ++i)
+    {
+        QnTestAddress helper(i, port);
+        candidates.push_back(helper);
+    }
+
+    return QtConcurrent::mappedReduced(candidates, &mapFunction, &reduceFunction);
+}
