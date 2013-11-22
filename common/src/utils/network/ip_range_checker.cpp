@@ -20,17 +20,13 @@ struct QnTestAddress {
 
 QStringList mapFunction(QnTestAddress address) {
     CLSimpleHTTPClient http (QHostAddress(address.ip), address.port, 1500, QAuthenticator());
-    qDebug() << "tesing online start" << QHostAddress(address.ip).toString();
     CLHttpStatus status = http.doGET(QByteArray(""));
     if (status == CL_TRANSPORT_ERROR)
         return QStringList();
-
-    qDebug() << "tesing online finished" << QHostAddress(address.ip).toString();
     return QStringList() << QHostAddress(address.ip).toString();
 }
 
 void reduceFunction(QStringList &finalResult, const QStringList &intermediateResult) {
-    qDebug() << "folding online result" << intermediateResult.join(QLatin1String(" "));
     finalResult << intermediateResult;
 }
 

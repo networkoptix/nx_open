@@ -552,7 +552,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
         return; //TODO: #GDM do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-    ui->scanProgressBar->setFormat(tr("Stopping search..."));
+    ui->scanProgressBar->setFormat(tr("Finishing search..."));
     ui->scanProgressBar->setMaximum(1);
     ui->scanProgressBar->setValue(0);
     m_processUuid = QUuid();
@@ -722,7 +722,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
             } else {
                 host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).host();
             }
-            ui->scanProgressBar->setFormat(tr("Scanning host %1...").arg(host));
+            ui->scanProgressBar->setFormat(tr("Scanning host %1... (%2 cameras found)").arg(host).arg(result.cameras.size()));
         }
         break;
     case QnManualCameraSearchStatus::Finished:
