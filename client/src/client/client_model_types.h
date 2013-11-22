@@ -5,11 +5,20 @@
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QDataStream>
 
 #include <utils/common/struct_functions.h>
 #include <recording/time_period.h>
+
+// -------------------------------------------------------------------------- //
+// Qt-based
+// -------------------------------------------------------------------------- //
+typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
+
+Q_DECLARE_METATYPE(QnWeakObjectHash)
 
 
 // -------------------------------------------------------------------------- //
@@ -94,6 +103,9 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 
 Q_DECLARE_METATYPE(QnLicenseWarningState);
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
+
+
+
 
 
 #endif // QN_CLIENT_MODEL_TYPES_H

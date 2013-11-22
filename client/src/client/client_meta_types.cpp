@@ -49,6 +49,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
+    qRegisterMetaType<QnWeakObjectHash>();
 
     qn_clientMetaTypes_initialized = true;
 }

@@ -5,7 +5,11 @@
 #include <QtCore/QHash>
 #include <QtCore/QWeakPointer>
 
+#include <client/client_model_types.h>
+
 #include "workbench_context_aware.h"
+
+class QnJsonSerializer;
 
 class QnWorkbenchCustomizer: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -17,10 +21,11 @@ public:
     void registerObject(const QString &key, QObject *object);
     void unregisterObject(const QString &key);
 
-    void customize(const QVariant &cusomization);
+    void customize(const QVariant &customization);
 
 private:
-    QHash<QString, QWeakPointer<QObject> > m_objectByKey;
+    QnWeakObjectHash m_objectByKey;
+    QScopedPointer<QnJsonSerializer> m_serializer;
 };
 
 
