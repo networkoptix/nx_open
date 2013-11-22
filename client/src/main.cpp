@@ -271,7 +271,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
-    win32_exception::install_handler();
+    win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
@@ -366,6 +366,9 @@ int main(int argc, char **argv)
         /* Initialize connections. */
         initAppServerConnection();
         qnSettings->save();
+        if (!QDir(qnSettings->mediaFolder()).exists())
+            QDir().mkpath(qnSettings->mediaFolder());
+
         cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
         QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
@@ -511,6 +514,12 @@ int main(int argc, char **argv)
 
         /* Process pending events before executing actions. */
         qApp->processEvents();
+
+        // show beta version warning message for the main instance only
+        if (!noSingleApplication &&
+                !qnSettings->isDevMode() &&
+                QLatin1String(QN_BETA) == QLatin1String("true"))
+            context->action(Qn::BetaVersionMessageAction)->trigger();
 
         if (argc <= 1) {
             /* If no input files were supplied --- open connection settings dialog. */

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -34,6 +34,7 @@
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
+        <beta>true</beta>
 
         <ClientHelpSourceDir>${libdir}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/${build.configuration}/vox</ClientVoxSourceDir>		                                  	
@@ -68,7 +69,7 @@
         <module>appserver</module>
         <module>common</module>
         <module>applauncher</module>
-        <module>axiscamplugin</module>
+        <!-- <module>axiscamplugin</module> -->
         <module>genericrtspplugin</module>
         <module>mediaserver</module>
         <module>mediaproxy</module>
@@ -166,11 +167,12 @@
             </activation>
             <modules>
                 <module>quicksyncdecoder</module>	
-                <module>axiscamplugin</module>
+                <!-- <module>axiscamplugin</module> -->
                 <module>genericrtspplugin</module>
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
-                <module>wixsetup</module>
+                <module>wixsetup/wixsetup-full</module>
+                <module>wixsetup/wixsetup-client-only</module>
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
@@ -248,6 +250,23 @@
                 <arch>x86</arch>
             </properties>
         </profile>	
+        <profile>
+            <id>linux-x86-on-x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.spec>linux-g++-32</qt.spec>
+            </properties>
+        </profile>	        
         <profile>
             <id>android</id>
             <activation>

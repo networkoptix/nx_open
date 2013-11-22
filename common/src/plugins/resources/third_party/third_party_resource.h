@@ -48,6 +48,9 @@ public:
     virtual void setCropingPhysical( QRect croppingRect ) override;
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
+
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
@@ -97,7 +100,5 @@ private:
 
     bool initializeIOPorts();
 };
-
-typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
 
 #endif  //THIRD_PARTY_RESOURCE_H

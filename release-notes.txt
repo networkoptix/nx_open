@@ -1,3 +1,82 @@
+----------------------------------------------2.1.0.xxxx-------------------------------------------
+MAC Client is released
+
+1. Linux Client created incorrect Media Folder un user's home directory. Fixed
+2. If open Multi-Video it played back but did not display in the tree. Fixed
+3. Some specific ACTi cameras were not supported. Fixed
+4. Vivotek support is improved: SD81X1 is supported and PTZ is fixed for Sd8111 
+5. It was not possible choose separate analog channels for events. Fixed
+6. E-Mail templates displayed product name incorrectly. Fixed
+7. Linux media server stability is improved if working with large number of cameras (> 128)
+8. In some cases analog encoders were found with wrong number of channels. Fixed
+9. New AXIS models are supported
+10. Some cameras were reported wrongly as PTZ thus de-warping could not be enabled. Fixed
+11. Added D-Link DCS-6010L
+12. If save a layout with existing name it was duplicated. Now it is suggested to overwrite it
+13. If license activation is failed, much more information is given
+14. Layout background (E-Mapping) didn't restored properly after logout. Fixed
+15. Added Audio recording for ISD cameras and generic RTSP streams
+16. If remove EC on Linux, mediaproxy process didn't stop. Fixed
+17. Text to speech did not work properly on Linux. Fixed
+18. If several storages are installed and their size differ, then storages are used smarter
+19. "You are running Beta version" message is introduced.
+20. If media servers and/or Enterprise Controller have different versions, then the warning is given
+21. If a new Media Server was installed this was not reflected in About screen until client restart. Fixed
+
+----------------------------------------------2.0.2.4814-------------------------------------------
+1. If media server was restarted manually, it resulted in "Media Server restarted after crash". Fixed
+2. Some advanced RTSP extensions are now supported
+3. Media Server is optimized.
+4. Network statistics did not work on Linux media servers on some network adapters. Fixed
+5. Server could crash in very rare case ( nobody complained specifically about it, was found in the house!)
+
+----------------------------------------------2.0.2.4780-------------------------------------------
+1. Discovery and Arecont Streams were stuck in some network environments. (Arecont cameras are showing older recorded footage as live footage in spectrum). Fixed.
+
+----------------------------------------------2.0.2.4775-------------------------------------------
+1. Some Acti cameras are adjusted to support Dual-Streaming properly. The problem was that camera always sent parameter "Channel" =1. We used it  to recognize dual-streaming camera or not.
+Now we check an additional parameter and Acti camera recognized as dual-streaming.
+
+----------------------------------------------2.0.2.4753-------------------------------------------
+1. If exported layout is saved in media folder it appears under user as soon as user is logged in.
+2. Added a new hardwareid for license activations.
+
+----------------------------------------------2.0.1.4737-------------------------------------------
+1.While upgrading from 1.5 -> 2.0 some rare machine could lost license. Fixed.
+2.Dewapinng for arecont is enabled.
+3.If you save layout with dewarped images – it will save all dewarping angles.
+4.New arecont cameras are supported. ( like XXXXv1X and such ).
+5.Displayed incorrect time in multi-export. Fixed.
+6.Generic RTSP did not work on linux server. Fixed.
+7.Linux server crash in some very rare environment( with some printers). Fixed
+
+----------------------------------------------2.0.0.4646-------------------------------------------
+1.If change SMTP server in advanced E-Mail settings, then the previous settings were restored if reopen the settings form. Fixed.
+2.Arecont Vision AV5125DNv1x and Axis207 are added
+3.x64 Client for Linux could not use images for E-Mapping in some cases. Fixed
+4.Media Server could not be installed out-of the box on the clean Ubuntu machine. Fixed
+
+----------------------------------------------2.0.0.4620-------------------------------------------
+1.Media Server required additional dependencies and cannot be installed and started in one click in some cases. This happened ONLY on fresh install (not upgrade) on a clean Ubuntu 12 and IF there were no other DWS components (EC and Client had not been installed previously).
+2.x64 Linux Client had an issue with images processing. This resulted in inability to load 
+images for E-Mapping and incorrect tree drawing.
+3.Linux Client hanged on NVidia cards if VSync was enabled (was fixed before, but not fully).
+
+----------------------------------------------2.0.0.4575-------------------------------------------
+1. Camera IP conflict for rtsp link. Fixed.
+
+----------------------------------------------2.0.0.4565-------------------------------------------
+1.Debbie's concern with Zoom windows on rotated items. Actually it was designed to "remember" the orientation of the item zomm window was taken from. We agree that can be confusing and implemented a bit different behavior. Now zoom window is rotated along with the source camera. Check this out and tell me what do you think. I think this behavior is better than the previous.
+This fix was minor and do not need any additional testing.
+
+2.Panoramic sensor fix. Actually as Sergey told, we applied the fix that disabled flip automatically. In this case sensors were OK but sometimes the flip was required in the software (rotate the item and save layout). We didn't want to do a deeper fix because this is may cause potential regress issues. Now we did it and tested everything in our lab. 
+
+The fix works as following: once the flip is applied the software recognizes it IF THE STREAM IS REOPENED. So, if the camera is not being recorded, you can just reopen it on Scene and the sensors will be in the correct order. However, if the camera is being recorded, it will be necessary to either change the recording parameters, or disable recording, wait a bit then enable it, or restart media server. We cannot detect flip on the fly. 
+
+3.If enable custom camera's streams control on Expert Camera Settings they are applied only until Media Server is restarted. Fixed 
+4.Now it is possible to add any RTSP streams. Earlier it was not possible to view streams generated by specific Media servers (camera streams worked well).
+5.External Storages (USB hard drives or Samba shares) that are offline could decrease writing speed. Fixed. 
+
 ----------------------------------------------- 2.0 -----------------------------------------------
 
 ANDROID CLIENT:

@@ -18,8 +18,12 @@ if [[ -z $buildlib ]]; then
 
   for i in ${qtplugin1} ${qtplugin2}
   do
-    cp -Rf `find $QTPLUG -iname $i` ${libdir}/bin/debug/
-    cp -Rf `find $QTPLUG -iname $i` ${libdir}/bin/release/
+    FOUND_ENTRIES="`find $QTPLUG -iname $i`"
+
+    if [ ! -z $FOUND_ENTRIES ]; then
+      cp -Rf $FOUND_ENTRIES ${libdir}/bin/debug/
+      cp -Rf $FOUND_ENTRIES ${libdir}/bin/release/
+    fi
   done
 
 fi

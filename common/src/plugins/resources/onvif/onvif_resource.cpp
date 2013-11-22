@@ -68,6 +68,12 @@ StrictResolution strictResolutionList[] =
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
 
+// disable PTZ for this cameras
+QString strictPTZList[] =
+{
+    lit("N53F-F")
+};
+
 
 struct StrictBitrateInfo {
     const char* model;
@@ -78,7 +84,8 @@ struct StrictBitrateInfo {
 // Strict bitrate range for specified cameras
 StrictBitrateInfo strictBitrateList[] =
 {
-    { "DCS-7010L", 4096, 1024*16 }
+    { "DCS-7010L", 4096, 1024*16 },
+    { "DCS-6010L", 0, 1024*2 }
 };
 
 
@@ -558,6 +565,16 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
     }
+}
+
+bool QnPlOnvifResource::isPTZDisabled() const
+{
+    for (uint i = 0; i < sizeof(strictPTZList) / sizeof(QString); ++i)
+    {
+        if (getModel() == strictPTZList[i])
+            return true;
+    }
+    return false;
 }
 
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
@@ -1321,6 +1338,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         // determine amount encoder configurations per each video source
         confRangeStart = confRangeEnd/m_maxChannels * getChannel();
         confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
+
+        if (confRangeEnd > confResponse.Configurations.size()) {
+            qWarning() << "invalid channel number " << getChannel()+1 << "for camera" << getHostAddress() << "max channels=" << m_maxChannels;
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
+        }
     }
 
     QList<VideoOptionsLocal> optionsList;
@@ -1713,6 +1735,18 @@ bool QnPlOnvifResource::detectVideoSourceCount()
         return false;
     }
     m_maxChannels = (int) response.VideoSources.size();
+
+    if (m_maxChannels > 1)
+    {
+        VideoConfigsReq confRequest;
+        VideoConfigsResp confResponse;
+        soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
+        if (soapRes != SOAP_OK)
+            return false;
+        if (confResponse.Configurations.size() < m_maxChannels)
+            m_maxChannels = confResponse.Configurations.size();
+    }
+
     return true;
 }
 
@@ -1752,13 +1786,26 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 
     onvifXsd__VideoSource* conf = response.VideoSources.at(getChannel());
 
-        if (conf) {
-            QMutexLocker lock(&m_mutex);
-        m_videoSourceToken = QString::fromStdString(conf->token);
-        //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
-        return CameraDiagnostics::NoErrorResult();
+    if (!conf)
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (2)"));
+
+    QMutexLocker lock(&m_mutex);
+    m_videoSourceToken = QString::fromStdString(conf->token);
+    //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
+
+    if (m_maxChannels > 1)
+    {
+        VideoConfigsReq confRequest;
+        VideoConfigsResp confResponse;
+        soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
+        if (soapRes != SOAP_OK)
+            return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
+
+        if (confResponse.Configurations.size() < m_maxChannels)
+            m_maxChannels = confResponse.Configurations.size();
     }
-    return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoSources"), QLatin1String("missing video source configuration (2)"));
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
@@ -2014,7 +2061,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
 
-    if (!getPtzfUrl().isEmpty() && !m_ptzController)
+    if (!getPtzfUrl().isEmpty() && !m_ptzController && !isPTZDisabled())
     {
         QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
         if (!controller->getPtzConfigurationToken().isEmpty())

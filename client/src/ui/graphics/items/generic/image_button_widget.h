@@ -188,9 +188,6 @@ public:
     const QString &text() const;
     void setText(const QString &text);
 
-    qreal relativeFontSize() const;
-    void setRelativeFontSize(qreal relativeFontSize);
-
     qreal relativeFrameWidth() const;
     void setRelativeFrameWidth(qreal relativeFrameWidth);
 
@@ -198,17 +195,16 @@ public:
     void setStateOpacity(StateFlags stateFlags, qreal opacity);
 
     virtual void setGeometry(const QRectF &geometry) override;
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
 
+    void updatePixmap();
 protected:
     StateFlags validOpacityState(StateFlags flags) const;
 
 private:
     QString m_text;
-    qreal m_relativeFontSize;
     qreal m_relativeFrameWidth;
     boost::array<qreal, FLAGS_MAX + 1> m_opacities;
 };

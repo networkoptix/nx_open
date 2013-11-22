@@ -15,6 +15,9 @@
 
 //TODO/IMPL reconnect
 
+static const int DEFAULT_CONNECT_TIMEOUT = 3000;
+static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
+
 using std::make_pair;
 
 namespace nx_http
@@ -28,18 +31,19 @@ namespace nx_http
         m_state( sInit ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
-        m_terminated( false )
+        m_terminated( false ),
+        m_totalBytesRead( 0 )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
 
-        AsyncHttpClient_instanceCount.ref();
+        //AsyncHttpClient_instanceCount.ref();
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
         terminate();
 
-        AsyncHttpClient_instanceCount.deref();
+        //AsyncHttpClient_instanceCount.deref();
     }
 
     void AsyncHttpClient::terminate()
@@ -56,7 +60,7 @@ namespace nx_http
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
 
-            //AIOService guarantees that eventTriggered had return and will never be called with m_socket
+            //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
         }
     }
 
@@ -92,7 +96,7 @@ namespace nx_http
                         case PollSet::etTimedOut:
                         case PollSet::etError:
                             cl_log.log( QString::fromLatin1("Failed to connect to %1:%2. %3").arg(m_url.host()).arg(m_url.port()).
-                                arg(SystemError::toString(eventType != PollSet::etTimedOut ? m_socket->prevErrorCode() : SystemError::timedOut)), cl_logWARNING );
+                                arg(SystemError::toString(eventType != PollSet::etTimedOut ? m_socket->prevErrorCode() : SystemError::timedOut)), cl_logDEBUG1 );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
@@ -108,12 +112,20 @@ namespace nx_http
                     break;
 
                 case sSendingRequest:
-                    if( eventType == PollSet::etError )
+                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
                     {
-                        if( reconnectIfAppropriate() )
-                            break;
-                        cl_log.log( QString::fromLatin1("Error sending http request to %1. %2").
-                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                        if( eventType == PollSet::etError )
+                        {
+                            if( reconnectIfAppropriate() )
+                                break;
+                            cl_log.log( QString::fromLatin1("Error sending http request to %1. %2").
+                                arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logDEBUG1 );
+                        }
+                        else
+                        {
+                            cl_log.log( QString::fromLatin1("Error sending http request from %1. Socket write operation has timed out").
+                                arg(m_url.toString()), cl_logDEBUG1 );
+                        }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -123,7 +135,7 @@ namespace nx_http
 
                     if( !sendRequest() )
                     {
-                        cl_log.log( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                        cl_log.log( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         m_state = sFailed;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
                         lk.unlock();
@@ -133,9 +145,10 @@ namespace nx_http
                     }
                     if( (int)m_requestBytesSent == m_requestBuffer.size() )
                     {
-                        cl_log.log( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        cl_log.log( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        m_socket->setReadTimeOut( DEFAULT_RESPONSE_READ_TIMEOUT );
                         aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
                     }
                     break;
@@ -143,12 +156,20 @@ namespace nx_http
                 case sReceivingResponse:
                 {
                     Q_ASSERT( eventType != PollSet::etWrite );
-                    if( eventType == PollSet::etError )
+                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
                     {
-                        if( reconnectIfAppropriate() )
-                            break;
-                        cl_log.log( QString::fromLatin1("Error reading http response from %1. %2").
-                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                        if( eventType == PollSet::etError )
+                        {
+                            if( reconnectIfAppropriate() )
+                                break;
+                            cl_log.log( QString::fromLatin1("Error reading http response from %1. %2").
+                                arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logDEBUG1 );
+                        }
+                        else
+                        {
+                            cl_log.log( QString::fromLatin1("Error reading http response from %1. Socket read operation has timed out").
+                                arg(m_url.toString()), cl_logDEBUG1 );
+                        }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -158,17 +179,9 @@ namespace nx_http
 
                     readAndParseHttp();
                     //TODO/IMPL reconnect in case of error
-                    if( m_state >= sFailed )
-                    {
-                        lk.unlock();
-                        emit done( this );
-                        lk.relock();
-                        if( m_terminated )
-                            break;
-                    }
 
                     if( m_httpStreamReader.state() == HttpStreamReader::readingMessageHeaders )
-                        break;
+                        break;  //response has not been read yet
 
                     //read http message headers
                     if( m_httpStreamReader.message().type != nx_http::MessageType::response )
@@ -181,14 +194,11 @@ namespace nx_http
                         lk.relock();
                         break;
                     }
+
                     //response read
                     cl_log.log( QString::fromLatin1("Http response from %1 has been successfully read. Status line: %2(%3)").
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                         arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG1 );
-                    //TODO/IMPL should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
-                    if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
-                        break; // wait more data
-                    aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
 
                     const HttpResponse* response = m_httpStreamReader.message().response;
                     if( response->statusLine.statusCode == StatusCode::unauthorized
@@ -199,6 +209,12 @@ namespace nx_http
                             return;
                     }
 
+                    //should only call removeFromWatch if startReadMessageBody has not been called from responseReceived connected slot
+                    aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
+
+                    const bool messageHasMessageBody = 
+                        (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) || (m_httpStreamReader.messageBodyBufferSize() > 0);
+
                     m_state = sResponseReceived;
                     lk.unlock();
                     emit responseReceived( this );
@@ -206,24 +222,43 @@ namespace nx_http
                     if( m_terminated )
                         break;
 
-                    if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
+                    //is message body follows?
+                    if( !messageHasMessageBody )
                     {
-                        m_state = sDone;
+                        //no message body: done
+                        m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                         lk.unlock();
                         emit done( this );
                         lk.relock();
-                        if( m_terminated )
-                            break;
+                        break;
                     }
-                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later, we will not send someMessageBodyAvailable signal
-                    if( m_state == sReadingMessageBody &&
-                        m_httpStreamReader.state() == HttpStreamReader::readingMessageBody && 
-                        m_httpStreamReader.messageBodyBufferSize() > 0 )
+
+                    if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
+                        m_state == sReadingMessageBody )                    //client wants to read message body
                     {
                         lk.unlock();
                         emit someMessageBodyAvailable( this );
                         lk.relock();
                     }
+
+                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later, 
+                        //we will not send someMessageBodyAvailable signal for already read message body
+
+                    if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
+                        break; // wait for more data
+
+                    //message body has been received with request
+                    assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
+
+                    //TODO/FIXME/BUG in case if startReadMessageBody is called not from responseReceived but later 
+                        //and whole message body has been received with response, we MUST NOT emit done now, but wait or user to receive message body
+
+                    //TODO: #AK looks like startReadMessageBody() call was a bad idea...
+
+                    m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
+                    lk.unlock();
+                    emit done( this );
+                    lk.relock();
                     break;
                 }
 
@@ -235,7 +270,7 @@ namespace nx_http
                         if( reconnectIfAppropriate() )
                             break;
                         cl_log.log( QString::fromLatin1("Error reading http response message body from %1. %2").
-                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logWARNING );
+                            arg(m_url.toString()).arg(SystemError::toString(m_socket->prevErrorCode())), cl_logDEBUG1 );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( this );
@@ -331,11 +366,15 @@ namespace nx_http
     */
     bool AsyncHttpClient::startReadMessageBody()
     {
-        if( m_state != sResponseReceived )
+        if( m_state < sResponseReceived )
         {
             cl_log.log( QString::fromLatin1("HttpClient (%1). Message body cannot be read while in state %2").
-                arg(m_url.toString()).arg(QLatin1String(toString(m_state))), cl_logWARNING );
+                arg(m_url.toString()).arg(QLatin1String(toString(m_state))), cl_logDEBUG1 );
             return false;
+        }
+        else if( m_state > sResponseReceived )
+        {
+            return true;
         }
 
         m_state = sReadingMessageBody;
@@ -343,7 +382,7 @@ namespace nx_http
         if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this ) )
         {
             cl_log.log( QString::fromLatin1("HttpClient (%1). Failed to start socket polling. %2").
-                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
             m_state = sResponseReceived;
             return false;
         }
@@ -360,6 +399,12 @@ namespace nx_http
     const QUrl& AsyncHttpClient::url() const
     {
         return m_url;
+    }
+
+    quint64 AsyncHttpClient::totalBytesRead() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_totalBytesRead;
     }
 
     void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
@@ -400,7 +445,8 @@ namespace nx_http
         m_httpStreamReader.resetState();
 
         m_socket = QSharedPointer<TCPSocket>( new TCPSocket() );
-        if( !m_socket->setNonBlockingMode( true ) )
+        if( !m_socket->setNonBlockingMode( true ) ||
+            !m_socket->setWriteTimeOut( DEFAULT_CONNECT_TIMEOUT ) )
         {
             cl_log.log( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
@@ -454,10 +500,12 @@ namespace nx_http
             return 0;
         }
 
+        m_totalBytesRead += bytesRead;
+
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
             cl_log.log( QString::fromLatin1("Error parsing http response from %1. %2").
-                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
+                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1 );
             m_state = sFailed;
             return -1;
         }

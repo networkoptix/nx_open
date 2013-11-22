@@ -136,7 +136,7 @@ QVariantHash QnBusinessStringsHelper::eventDescriptionMap(const QnAbstractBusine
 
     QVariantHash contextMap;
 
-    contextMap[tpProductName] = lit(QN_PRODUCT_NAME);
+    contextMap[tpProductName] = lit(QN_PRODUCT_NAME_LONG);
     contextMap[tpEvent] = eventName(eventType);
     contextMap[tpSource] = eventSource(params, useIp);
     if (eventType == BusinessEventType::Camera_Motion) {

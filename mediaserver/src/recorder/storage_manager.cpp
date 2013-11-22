@@ -421,25 +421,31 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
-    QSet<QnStorageResourcePtr> smallStorages;
 
     QnStorageManager::StorageMap storageRoots = getAllStorages();
+    qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > BIG_STORAGE_THRESHOLD)
-                result << fileStorage;
-            else
-                smallStorages << fileStorage;
+            bigStorageThreshold = qMax(bigStorageThreshold, available);
         }
     }
-    if (result.isEmpty())
-        return smallStorages; // try small storages if no big storages
-    else
-        return result;
+    bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
+
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
+        {
+            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+            if (available >= bigStorageThreshold)
+                result << fileStorage;
+        }
+    }
+    return result;
 }
 
 void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
@@ -526,8 +532,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
             candidates << bitrateInfo[i].second;
     }
 
-    // select storage with maximum free space
-    qint64 maxFreeSpace = -INT_MAX;
+    // select storage with maximum free space and do not use storages without free space at all
+    qint64 maxFreeSpace = 0;
     for (int i = 0; i < candidates.size(); ++i)
     {   
         qint64 freeSpace = candidates[i]->getFreeSpace();

@@ -314,6 +314,15 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         }
     }
 
+    // if interface list is changed, remove old sockets
+    std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
+    for(; itr != m_ifaceToSock.end() ; ++itr) {
+        ProbeContext& ctx = *itr->second;
+        ctx.sock.reset();
+        delete itr->second;
+    }
+    m_ifaceToSock.clear();
+
     foreach(QnInterfaceAndAddr iface, intfList)
     {
         if (m_shouldStop)
@@ -736,13 +745,15 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     {
         ctx = new ProbeContext();
         ctx->sock.reset( new UDPSocket() );
-        if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        if( !ctx->sock->setLocalAddressAndPort(iface.address.toString()) || !ctx->sock->setNonBlockingMode( true ) )
         {
             ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
         }
+        ctx->sock->setMulticastIF(iface.address.toString());
 
         ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
         ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
@@ -752,8 +763,10 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
         ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
         ctx->soapWsddProxy.soap->fopen = NULL;
-        ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
-        ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+        //ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
+        //ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+        ctx->soapWsddProxy.soap->socket = -1;
+        ctx->soapWsddProxy.soap->master = -1;
     }
 
     fillWsddStructs( ctx->wsddProbe, ctx->replyTo );

@@ -77,22 +77,18 @@ void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
     //TODO/IMPL
 }
 
-#if 0
 const QnResourceAudioLayout* QnThirdPartyResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
-    //TODO/IMPL
-    return NULL;
-    //if (isAudioEnabled()) {
-    //    const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
-    //    if (axisReader && axisReader->getDPAudioLayout())
-    //        return axisReader->getDPAudioLayout();
-    //    else
-    //        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-    //}
-    //else
-    //    return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    if (isAudioEnabled()) {
+        const ThirdPartyStreamReader* reader = dynamic_cast<const ThirdPartyStreamReader*>(dataProvider);
+        if (reader && reader->getDPAudioLayout())
+            return reader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
-#endif
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
 QStringList QnThirdPartyResource::getRelayOutputList() const

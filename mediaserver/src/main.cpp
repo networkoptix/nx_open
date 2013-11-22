@@ -96,6 +96,10 @@
 #include "core/resource_managment/camera_driver_restriction_list.h"
 #include <utils/network/multicodec_rtp_reader.h>
 
+#ifdef _WIN32
+#include "common/systemexcept_win32.h"
+#endif
+
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -322,22 +326,23 @@ static QStringList listRecordFolders()
 
 QnAbstractStorageResourceList createStorages()
 {
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
-
     QnAbstractStorageResourceList storages;
-    bool isBigStorageExist = false;
+    //bool isBigStorageExist = false;
+    qint64 bigStorageThreshold = 0;
     foreach(QString folderPath, listRecordFolders()) {
         QnStorageResourcePtr storage = createStorage(folderPath);
-        isBigStorageExist |= storage->isUsedForWriting() && storage->getTotalSpace() > BIG_STORAGE_THRESHOLD;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
         cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
     }
-    if (isBigStorageExist) {
-        for (int i = 0; i < storages.size(); ++i) {
-            QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
-            if (storage->getTotalSpace() <= BIG_STORAGE_THRESHOLD)
-                storage->setUsedForWriting(false);
-        }
+    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+
+    for (int i = 0; i < storages.size(); ++i) {
+        QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        if (available < bigStorageThreshold)
+            storage->setUsedForWriting(false);
     }
 
     return storages;
@@ -484,7 +489,7 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
-    platform->process(NULL)->setPriority(QnPlatformProcess::TimeCriticalPriority);
+    platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
     ffmpegInit();
 
@@ -542,9 +547,12 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toAscii(), EVENT_RECONNECT_TIMEOUT);
 }
 
+
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_waitExtIpFinished(false),
+    m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -724,6 +732,15 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
         qWarning() << "Error saving server.";
 }
 
+void QnMain::at_connectionOpened()
+{
+    if (m_firstRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
+        m_firstRunningTime*1000,
+        QnBusiness::MServerIssueStarted);
+    m_firstRunningTime = 0;
+}
+
 void QnMain::at_timer()
 {
     qSettings.setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
@@ -850,7 +867,6 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -1028,7 +1044,20 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
+    QString disabledVendors = qSettings.value("disabledVendors").toString();
+    QStringList disabledVendorList;
+    if (disabledVendors.contains(";"))
+        disabledVendorList = disabledVendors.split(";");
+    else
+        disabledVendorList = disabledVendors.split(" ");
+    QStringList updatedVendorList;        
+    for (int i = 0; i < disabledVendorList.size(); ++i) {
+	if (!disabledVendorList[i].trimmed().isEmpty())
+    	    updatedVendorList << disabledVendorList[i].trimmed();
+    }
+    qWarning() << "disabled vendors amount" << updatedVendorList.size();
+    qWarning() << disabledVendorList;        
+    QnResourceDiscoveryManager::instance()->setDisabledVendors(updatedVendorList);
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
@@ -1061,7 +1090,8 @@ void QnMain::run()
 
     
 
-    QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
+    // Roman asked Ivan to comment it for Brian
+    // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
 
     //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
@@ -1101,9 +1131,12 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
+    m_firstRunningTime = qSettings.value("lastRunningTime").toLongLong();
+
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
     timer.start(60 * 1000);
 
 
@@ -1244,6 +1277,10 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+#ifdef _WIN32
+    win32_exception::installGlobalUnhandledExceptionHandler();
+#endif
+
     QnVideoService service(argc, argv);
 
     int result = service.exec();

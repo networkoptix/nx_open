@@ -99,14 +99,13 @@ UPNPDeviceSearcher::~UPNPDeviceSearcher()
 void UPNPDeviceSearcher::pleaseStop()
 {
     //stopping dispatching discover packets
-    quint64 timerID = 0;
     {
         QMutexLocker lk( &m_mutex );
         m_terminated = true;
-        timerID = m_timerID;    //using mutex, since this operation is not atomic on x86
     }
-    if( timerID )
-        TimerManager::instance()->joinAndDeleteTimer( timerID );
+    //m_timerID cannot be changed after m_terminated set to true
+    if( m_timerID )
+        TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
     for( std::map<QString, QSharedPointer<UDPSocket> >::const_iterator
@@ -197,7 +196,9 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
     dispatchDiscoverPackets();
 
     //adding new timer task
-    m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
+    QMutexLocker lk( &m_mutex );
+    if( !m_terminated )
+        m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
 }
 
 void UPNPDeviceSearcher::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
@@ -213,10 +214,11 @@ void UPNPDeviceSearcher::eventTriggered( Socket* sock, PollSet::EventType eventT
                 it != m_socketList.end();
                 ++it )
             {
-                if( it->second.data() != sock )
-                    continue;
-                udpSock = it->second;
-                m_socketList.erase( it );
+                if( it->second.data() == sock ) {
+                    udpSock = it->second;
+                    m_socketList.erase( it );
+                    break;
+                }
             }
         }
         if( udpSock )
@@ -351,6 +353,10 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
     }
 
     QObject::connect(
+        httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),
+        this, SLOT(onDeviceDescriptionXmlResponseReceived(nx_http::AsyncHttpClient*)),
+        Qt::DirectConnection );
+    QObject::connect(
         httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),
         this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClient*)),
         Qt::DirectConnection );
@@ -425,6 +431,11 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
     cacheItem.devInfo = devInfo.devInfo;
     cacheItem.xmlDevInfo = devInfo.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
+}
+
+void UPNPDeviceSearcher::onDeviceDescriptionXmlResponseReceived( nx_http::AsyncHttpClient* httpClient )
+{
+    httpClient->startReadMessageBody();
 }
 
 void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient )

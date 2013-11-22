@@ -190,7 +190,8 @@ void QnMessageSource::httpReadyRead()
             }
             else if (QnMessage::nextSeqNumber(m_seqNumber) != message.seqNumber)
             {
-                qWarning() << "QnMessageSource::httpReadyRead(): One or more event are lost. Emitting connectionReset().";
+                qWarning() << "QnMessageSource::httpReadyRead(): One or more event are lost. Emitting connectionReset(). Expected: " 
+                    << QnMessage::nextSeqNumber(m_seqNumber) << ". Got: " << message.seqNumber;
 
                 // Tracking is on and some events are missed and/or reconnect occured
                 m_seqNumber = message.seqNumber;

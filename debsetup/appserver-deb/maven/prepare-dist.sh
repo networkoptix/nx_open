@@ -10,8 +10,6 @@
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 
-sudo chown -R $USER:sudo ${project.build.directory}
-
 chmod 755 ./init.d/*
 chmod 755 ./debian/prerm 
 chmod 755 ./debian/postinst

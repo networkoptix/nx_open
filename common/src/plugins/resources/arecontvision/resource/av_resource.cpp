@@ -4,8 +4,6 @@
 #include "av_singesensor.h"
 #include "core/resource/resource_command_processor.h"
 
-#include <QtNetwork/QUdpSocket>
-
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #elif defined(QT_LINUXBASE)
@@ -120,9 +118,9 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
     {
         return false; // never change ip 
 
-        QUdpSocket sock;
+        UDPSocket sock;
 
-        sock.bind(getDiscoveryAddr() , 0); // address usesd to find cam
+        sock.setLocalAddressAndPort(getDiscoveryAddr().toString() , 0); // address usesd to find cam
         QString m_local_adssr_srt = getDiscoveryAddr().toString(); // debug only
         QString new_ip_srt = ip.toString(); // debug only
 
@@ -138,8 +136,8 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
         quint32 new_ip = htonl(ip.toIPv4Address());
         memcpy(data + shift + 6, &new_ip,4);
 
-        sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
-        sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
+        sock.sendTo(data, shift + 10, BROADCAST_ADDRESS, 69);
+        sock.sendTo(data, shift + 10, BROADCAST_ADDRESS, 69);
 
         removeARPrecord(ip);
         removeARPrecord(resolveAddress(getHostAddress()));

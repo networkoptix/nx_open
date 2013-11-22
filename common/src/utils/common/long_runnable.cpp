@@ -205,12 +205,12 @@ void QnLongRunnable::stop() {
 }
 
 void QnLongRunnable::at_started() {
+#ifdef _WIN32
+    win32_exception::installThreadSpecificUnhandledExceptionHandler();
+#endif
+
     if(m_pool)
         m_pool->startedNotify(this);
-
-#ifdef _WIN32
-    win32_exception::install_handler();
-#endif
 }
 
 void QnLongRunnable::at_finished() {

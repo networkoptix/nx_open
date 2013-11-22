@@ -354,15 +354,15 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     if (!m_model)
         return;
 
-    Qn::NodeType node = BusinessActionType::requiresCameraResource(m_model->actionType())
-            ? Qn::ServersNode
-            : BusinessActionType::requiresUserResource(m_model->actionType())
-              ? Qn::UsersNode
-              : Qn::BastardNode;
-    if (node == Qn::BastardNode)
+    QnResourceSelectionDialog::SelectionTarget target;
+    if (BusinessActionType::requiresCameraResource(m_model->actionType()))
+        target = QnResourceSelectionDialog::CameraResourceTarget;
+    else if (BusinessActionType::requiresUserResource(m_model->actionType()))
+        target = QnResourceSelectionDialog::UserResourceTarget;
+    else
         return;
 
-    QnResourceSelectionDialog dialog(node, this);
+    QnResourceSelectionDialog dialog(target, this);
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)

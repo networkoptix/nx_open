@@ -331,6 +331,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
+    connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -1074,7 +1075,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         AddToLayoutParams addParams;
         addParams.usePosition = !position.isNull();
         addParams.position = position;
-        addParams.time = parameters.argument(Qn::ItemTimeRole, -1);
+        addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
         addToLayout(layout, resources, addParams);
         return;
     }
@@ -1156,6 +1157,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
     } else {
+        //TODO: #GDM check existing layouts.
+        //TODO: #GDM all remotes layout checking and saving should be done in one place
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
 }
@@ -1194,6 +1197,12 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
             name = dialog->name();
+
+            // that's the case when user press "Save As" and enters the same name as this layout already has
+            if (name == layout->getName()) {
+                at_saveLayoutAction_triggered(layout);
+                return;
+            }
 
             button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
@@ -1599,8 +1608,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
         if (wlayout)
             wlayout->centralizeItems();
     }
-
-    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
@@ -3756,8 +3763,6 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
         }
     }
     layout->setBackgroundSize(QSize(w, h));
-
-    at_saveLayoutAction_triggered(layout);  //TODO: #GDM add background to snapshot manager and set modified flag instead
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {
@@ -3953,6 +3958,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         return;
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
+    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::MediaServerComponent);
+
+    // if some component is newer than the newest mediaserver, focus on its version
+    if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
+        latestMsVersion = latestVersion;
 
     QString components;
     foreach(const QnVersionMismatchData &data, watcher->mismatchData()) {
@@ -3976,11 +3986,15 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             break;
         }
 
-        if(!isCompatible(data.version, latestVersion))
+        bool updateRequested = data.component == Qn::MediaServerComponent
+                ? QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true)
+                : QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestVersion);
+        if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
         
         components += component;
     }
+
 
     QString message = tr(
         "Some components of the system are not upgraded:<br/>"
@@ -3988,11 +4002,18 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "%1"
         "<br/>"
         "Please upgrade all components to the latest version %2."
-    ).arg(components).arg(watcher->latestVersion().toString());
+    ).arg(components).arg(latestMsVersion.toString());
 
     QnMessageBox::warning(mainWindow(), Qn::VersionMismatch_Help, tr("Version Mismatch"), message);
 }
 
 void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
     menu()->trigger(Qn::VersionMismatchMessageAction);
+}
+
+void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
+    QMessageBox::warning(context()->mainWindow(),
+                         QObject::tr("Beta version"),
+                         QObject::tr("You are running beta version of %1")
+                         .arg(QLatin1String(QN_APPLICATION_NAME)));
 }

@@ -13,7 +13,7 @@
                 <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
                 <Control Id="groupBox1" Type="GroupBox" Height="160" Width="346" X="9" Y="61" Text="Uninstall options" />
-                <?if ${install.type} = all ?>
+                <?if ${install.type} = full ?>
                 <Control Id="radioButtonGroupBox1" Type="RadioButtonGroup" Height="44" Width="335" X="15" Y="75" Property="REMOVE_DATABASE">
                     <RadioButtonGroup Property="REMOVE_DATABASE">
                         <RadioButton X="4" Y="25" Height="18" Width="331" Text="Keep ${product.name} Database" Value="0" />

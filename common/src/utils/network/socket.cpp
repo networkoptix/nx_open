@@ -374,7 +374,8 @@ bool Socket::createSocket(int type, int protocol)
 #endif
 
     // Make a new socket
-    return (sockDesc = socket(PF_INET, type, protocol)) > 0;
+    sockDesc = socket(PF_INET, type, protocol);
+    return  sockDesc > 0;
 }
 
 
@@ -943,6 +944,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
     return rtn;
 }
 
+/*
 bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
 {
 #ifdef Q_OS_LINUX
@@ -962,6 +964,7 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
     //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
     return res;
 }
+*/
 
 bool Socket::setReadTimeOut( unsigned int ms )
 {
@@ -975,6 +978,7 @@ bool Socket::setReadTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
+        setStatusBit( Socket::sbFailed );
         qWarning()<<"handle("<<sockDesc<<"). setReadTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
@@ -999,6 +1003,7 @@ bool Socket::setWriteTimeOut( unsigned int ms )
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
+        setStatusBit( Socket::sbFailed );
         qWarning()<<"handle("<<sockDesc<<"). setWriteTimeOut("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }

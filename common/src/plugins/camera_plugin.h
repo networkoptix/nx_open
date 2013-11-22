@@ -154,6 +154,9 @@ namespace nxcip
         virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, CameraInfo* cameraInfo ) = 0;
 
         //!Instanciates camera manager instance based on \a info
+        /*!
+            \note This method MUST be thread-safe (can be called by multiple threads using same interface pointer)
+        */
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
         //!Get model model names, reserved by the plugin
