@@ -180,25 +180,43 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
             if(index == -1)
                 continue;
 
-            params->insert(line.left(index), line.mid(index + 1));
+            QString key = line.left(index);
+            QString value = line.mid(index + 1);
+
+            for (int i = 2; i <= 4; ++i) {
+                key.replace(lit("root.PTZ.Support.S%1").arg(i), lit("root.PTZ.Support.S1")); // TODO: #Elric evil hardcode, implement properly
+                key.replace(lit("root.PTZ.Various.V%1").arg(i), lit("root.PTZ.Various.V1"));
+            }
+
+            params->insert(key, value);
         }
     }
 
     return true;
 }
 
+QString QnAxisPtzController::getCameraNum()
+{
+    QString camNum;
+    QVariant val;
+    m_resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+    if (val.toInt() > 1)
+        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNum());
+    return camNum;
+}
+
 int QnAxisPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) {
      // TODO: #Elric *90? Just move all logical-physical transformations to mediaserver.
-    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(xVelocity * 90).arg(yVelocity * 90).arg(zoomVelocity));
+    return !query(lit("com/ptz.cgi?%1continuouspantiltmove=%2,%3&continuouszoommove=%4").arg(getCameraNum()).arg(xVelocity * 90).arg(yVelocity * 90).arg(zoomVelocity));
 }
 
 int QnAxisPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) {
-    return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(xPos).arg(yPos).arg(zoomPos));
+    return !query(lit("com/ptz.cgi?%1pan=%2&tilt=%3&zoom=%4").arg(getCameraNum()).arg(xPos).arg(yPos).arg(zoomPos));
 }
 
 int QnAxisPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) {
     QnAxisParameterMap params;
-    int status = !query(lit("com/ptz.cgi?query=position"), &params);
+    int status = !query(lit("com/ptz.cgi?%1query=position").arg(getCameraNum()), &params);
     if(status != 0)
         return status;
 
