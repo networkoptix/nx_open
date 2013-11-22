@@ -73,8 +73,6 @@ protected:
 
     QnWorkbenchNavigator *navigator() const;
 
-    QnWorkbenchCustomizer *customizer() const;
-
     QWidget *mainWindow() const;
 
 private:

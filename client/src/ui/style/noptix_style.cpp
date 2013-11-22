@@ -24,6 +24,7 @@
 #include <ui/widgets/palette_widget.h>
 
 #include "noptix_style_animator.h"
+#include "customizer.h"
 #include "globals.h"
 #include "skin.h"
 

@@ -675,12 +675,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
-    customizer()->registerObject(lit("timeSlider"), m_sliderItem->timeSlider());
-    customizer()->registerObject(lit("timeScrollBar"), m_sliderItem->timeScrollBar());
-    customizer()->registerObject(lit("speedSlider"), m_sliderItem->speedSlider());
-    customizer()->registerObject(lit("volumeSlider"), m_sliderItem->volumeSlider());
-    customizer()->registerObject(lit("volumeSlider"), m_sliderItem->volumeSlider());
-
     connect(sliderZoomInButton,         SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomInButton_pressed()));
     connect(sliderZoomInButton,         SIGNAL(released()),                         this,           SLOT(at_sliderZoomInButton_released()));
     connect(sliderZoomOutButton,        SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomOutButton_pressed()));

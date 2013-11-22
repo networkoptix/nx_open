@@ -37,7 +37,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
-    m_customizer = instance<QnWorkbenchCustomizer>();
 
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
@@ -60,7 +59,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
 
     /* Destroy typed subobjects in reverse order to how they were constructed. */
     QnInstanceStorage::clear();
-    m_customizer = NULL;
     m_userWatcher = NULL;
     m_layoutWatcher = NULL;
 

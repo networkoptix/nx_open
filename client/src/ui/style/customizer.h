@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+class QnJsonSerializer;
+
 class QnCustomizer: public QObject {
     Q_OBJECT
 public:
@@ -17,6 +19,7 @@ public:
 
 private:
     QVariantMap m_customization;
+    QScopedPointer<QnJsonSerializer> m_serializer;
 };
 
 
