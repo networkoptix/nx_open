@@ -13,6 +13,7 @@
 class QnManualCameraAdditionHandler: public QnJsonRestHandler {
 public:
     QnManualCameraAdditionHandler();
+    ~QnManualCameraAdditionHandler();
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
@@ -51,7 +52,7 @@ private:
     /** Mutex that is used to synchronize access to manual camera addition progress. */
     QMutex m_searchProcessMutex;
 
-    QHash<QUuid, QnManualCameraSearcher> m_searchProcesses;
+    QHash<QUuid, QnManualCameraSearcher*> m_searchProcesses;
 };
 
 #endif // QN_MANUAL_CAMERA_ADDITION_HANDLER_H

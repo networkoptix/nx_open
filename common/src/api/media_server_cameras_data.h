@@ -18,7 +18,7 @@ struct QnManualCameraSearchStatus {
         Count
     };
 
-    QnManualCameraSearchStatus(){}
+    QnManualCameraSearchStatus(): state(Aborted) {}
     QnManualCameraSearchStatus(State state, int current, int total):
         state(state), current(current), total(total){}
 

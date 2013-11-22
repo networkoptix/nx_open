@@ -93,14 +93,8 @@ QStringList QnIpRangeChecker::onlineHosts(const QHostAddress &startAddr, const Q
 }
 
 QFuture<QStringList> QnIpRangeChecker::onlineHostsAsync(const QHostAddress &startAddr, const QHostAddress &endAddr, int port) {
-    quint32 startIpv4 = startAddr.toIPv4Address();
-    quint32 endIpv4 = endAddr.toIPv4Address();
     QList<QnTestAddress> candidates;
-    for (quint32 i = startIpv4; i <= endIpv4; ++i)
-    {
-        QnTestAddress helper(i, port);
-        candidates.push_back(helper);
-    }
-
+    for (quint32 i = startAddr.toIPv4Address(); i <= endAddr.toIPv4Address(); ++i)
+        candidates << QnTestAddress(i, port);
     return QtConcurrent::mappedReduced(candidates, &mapFunction, &reduceFunction);
 }

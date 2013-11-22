@@ -24,9 +24,12 @@ protected:
 
     bool isCancelled() const;
 private:
+    /** Mutex that is used to synchronize access to private fields. */
+    mutable QMutex m_mutex;
+
     QnManualCameraSearchStatus::State m_state;
-    QFuture<QStringList> m_onlineHosts;
-    QFuture<QnManualCameraSearchCameraList> m_results;
+    QFuture<QStringList> *m_onlineHosts;
+    QFuture<QnManualCameraSearchCameraList> *m_results;
 };
 
 #endif // MANUAL_CAMERA_SEARCHER_H

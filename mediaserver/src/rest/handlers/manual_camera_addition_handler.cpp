@@ -19,7 +19,13 @@ namespace {
 
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
+}
 
+QnManualCameraAdditionHandler::~QnManualCameraAdditionHandler() {
+    foreach (QnManualCameraSearcher* process, m_searchProcesses) {
+        process->cancel();
+        delete process;
+    }
 }
 
 void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
@@ -59,13 +65,13 @@ int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamList &p
 
     QUuid processUuid = QUuid::createUuid();
 
-    QnManualCameraSearcher searcher;
+    QnManualCameraSearcher* searcher = new QnManualCameraSearcher();
     {
         QMutexLocker lock(&m_searchProcessMutex);
         m_searchProcesses.insert(processUuid, searcher);
     }
 
-    QtConcurrent::run(&searchResourcesAsync, &searcher, addr1, addr2, auth, port);
+    QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port);
 
     QnManualCameraSearchProcessReply reply;
     reply.status = getSearchStatus(processUuid);
@@ -112,22 +118,22 @@ int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParamList &pa
     if (processUuid.isNull())
         return CODE_INVALID_PARAMETER;
 
+    QnManualCameraSearcher* process(NULL);
     if (isSearchActive(processUuid)) {
         QMutexLocker lock(&m_searchProcessMutex);
-        m_searchProcesses[processUuid].cancel();
+        process = m_searchProcesses[processUuid];
+        process->cancel();
+        m_searchProcesses.remove(processUuid);
     }
 
     QnManualCameraSearchProcessReply reply;
     reply.processUuid = processUuid;
-    reply.status = getSearchStatus(processUuid);
-    reply.cameras = getSearchResults(processUuid);
-    result.setReply(reply);
-
-    if (isSearchActive(processUuid)) {
-        QMutexLocker lock(&m_searchProcessMutex);
-        m_searchProcesses.remove(processUuid);
+    if (process) {
+        reply.status = process->status();
+        reply.cameras = process->results();
+        delete process;
     }
-
+    result.setReply(reply);
     return CODE_OK;
 }
 
@@ -197,7 +203,7 @@ QnManualCameraSearchStatus QnManualCameraAdditionHandler::getSearchStatus(const 
     if (!m_searchProcesses.contains(searchProcessUuid))
         return QnManualCameraSearchStatus();
 
-    return m_searchProcesses[searchProcessUuid].status();
+    return m_searchProcesses[searchProcessUuid]->status();
 }
 
 QnManualCameraSearchCameraList QnManualCameraAdditionHandler::getSearchResults(const QUuid &searchProcessUuid) {
@@ -206,7 +212,7 @@ QnManualCameraSearchCameraList QnManualCameraAdditionHandler::getSearchResults(c
     if (!m_searchProcesses.contains(searchProcessUuid))
         return QnManualCameraSearchCameraList();
 
-    return m_searchProcesses[searchProcessUuid].results();
+    return m_searchProcesses[searchProcessUuid]->results();
 }
 
 bool QnManualCameraAdditionHandler::isSearchActive(const QUuid &searchProcessUuid) {
