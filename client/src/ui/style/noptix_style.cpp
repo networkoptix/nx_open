@@ -250,7 +250,7 @@ void QnNoptixStyle::polish(QWidget *widget) {
         itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization
     }
 
-    m_customizer->customize(currentTarget(widget));
+    m_customizer->customize(const_cast<QObject *>(currentTarget(widget)));
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {

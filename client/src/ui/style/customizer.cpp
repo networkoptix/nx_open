@@ -165,6 +165,18 @@ QnCustomizer::~QnCustomizer() {
     return;
 }
 
+void QnCustomizer::setCustomization(const QString &customizationFileName) {
+    QFile file(customizationFileName);
+    if(!file.open(QFile::ReadOnly))
+        return;
+
+    QVariantMap customization;
+    if(!QJson::deserialize(file.readAll(), &customization))
+        return;
+
+    setCustomization(customization);
+}
+
 void QnCustomizer::setCustomization(const QVariantMap &customization) {
     m_customization = customization;
 }
@@ -188,7 +200,7 @@ void QnCustomizer::customize(QObject *object) {
     }
 
     for(int i = metaObjects.size() - 1; i >= 0; i--)
-        customize(object, QLatin1String(metaObject->className()));
+        customize(object, QLatin1String(metaObjects[i]->className()));
 }
 
 void QnCustomizer::customize(QObject *object, const QString &key) {

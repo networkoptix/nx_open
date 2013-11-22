@@ -11,6 +11,7 @@ public:
     QnCustomizer(QObject *parent = NULL);
     virtual ~QnCustomizer();
 
+    void setCustomization(const QString &customizationFileName);
     void setCustomization(const QVariantMap &customization);
     const QVariantMap &customization() const;
 

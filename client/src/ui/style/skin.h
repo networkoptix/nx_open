@@ -43,6 +43,7 @@ public:
     QPixmap pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
     QPixmap pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
 
+    // TODO: #Elric this one creates NEW style => naming is evil. Remove?
     QStyle *style();
 
     static QnSkin *instance();
