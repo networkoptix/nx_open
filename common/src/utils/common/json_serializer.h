@@ -11,6 +11,7 @@ public:
     virtual ~QnJsonSerializer() {}
 
     static QnJsonSerializer *forType(int type);
+    static QList<QnJsonSerializer *> allSerializers();
     static void registerSerializer(QnJsonSerializer *serializer);
     
     template<class T>
@@ -54,28 +55,25 @@ private:
 };
 
 
-namespace QJsonDetail {
-    template<class T>
-    class QnAdlJsonSerializer: public QnJsonSerializer {
-    public:
-        QnAdlJsonSerializer(): QnJsonSerializer(qMetaTypeId<T>()) {}
+template<class T>
+class QnAdlJsonSerializer: public QnJsonSerializer {
+public:
+    QnAdlJsonSerializer(): QnJsonSerializer(qMetaTypeId<T>()) {}
 
-    protected:
-        virtual void serializeInternal(const void *value, QVariant *target) const override {
-            QJson::serialize(*static_cast<const T *>(value), target);
-        }
+protected:
+    virtual void serializeInternal(const void *value, QVariant *target) const override {
+        QJson::serialize(*static_cast<const T *>(value), target);
+    }
 
-        virtual bool deserializeInternal(const QVariant &value, void *target) const override {
-            return QJson::deserialize(value, static_cast<T *>(target));
-        }
-    };
-
-} // namespace QJsonDetail
+    virtual bool deserializeInternal(const QVariant &value, void *target) const override {
+        return QJson::deserialize(value, static_cast<T *>(target));
+    }
+};
 
 
 template<class T>
 void QnJsonSerializer::registerSerializer() {
-    registerSerializer(new QJsonDetail::QnAdlJsonSerializer<T>());
+    registerSerializer(new QnAdlJsonSerializer<T>());
 }
 
 

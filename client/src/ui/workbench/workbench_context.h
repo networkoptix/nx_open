@@ -23,6 +23,7 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
+class QnWorkbenchCustomizer;
 class QnActionManager;
 
 /**
@@ -66,6 +67,10 @@ public:
 
     QnWorkbenchNavigator *navigator() const {
         return m_navigator.data();
+    }
+
+    QnWorkbenchCustomizer *customizer() const {
+        return m_customizer;
     }
 
     QWidget *mainWindow() const {
@@ -113,6 +118,7 @@ private:
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;
+    QnWorkbenchCustomizer *m_customizer;
 };
 
 

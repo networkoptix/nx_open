@@ -1,14 +1,98 @@
 #include "workbench_customizer.h"
 
+#include <utils/common/json_serializer.h>
+#include <utils/common/flat_map.h>
+
+
+// --------------------------------------------------------------------------- //
+// QnPaletteCustomizationSerializer
+// --------------------------------------------------------------------------- //
+typedef QColor QnColorGroup[QPalette::NColorRoles];
+typedef QnColorGroup QnPaletteColors[QPalette::NColorGroups + 1];
+
+bool deserialize(const QVariant &value, QnColorGroup *target) {
+    QVariantMap map;
+    if(!QJson::deserialize(value, &map))
+        return false;
+
+    return
+        QJson::deserialize(map, "windowText",       &(*target)[QPalette::WindowText],       true) && 
+        QJson::deserialize(map, "button",           &(*target)[QPalette::Button],           true) && 
+        QJson::deserialize(map, "light",            &(*target)[QPalette::Light],            true) && 
+        QJson::deserialize(map, "midlight",         &(*target)[QPalette::Midlight],         true) && 
+        QJson::deserialize(map, "dark",             &(*target)[QPalette::Dark],             true) && 
+        QJson::deserialize(map, "mid",              &(*target)[QPalette::Mid],              true) && 
+        QJson::deserialize(map, "text",             &(*target)[QPalette::Text],             true) && 
+        QJson::deserialize(map, "brightText",       &(*target)[QPalette::BrightText],       true) && 
+        QJson::deserialize(map, "buttonText",       &(*target)[QPalette::ButtonText],       true) && 
+        QJson::deserialize(map, "base",             &(*target)[QPalette::Base],             true) && 
+        QJson::deserialize(map, "window",           &(*target)[QPalette::Window],           true) && 
+        QJson::deserialize(map, "shadow",           &(*target)[QPalette::Shadow],           true) && 
+        QJson::deserialize(map, "highlight",        &(*target)[QPalette::Highlight],        true) && 
+        QJson::deserialize(map, "highlightedText",  &(*target)[QPalette::HighlightedText],  true) && 
+        QJson::deserialize(map, "link",             &(*target)[QPalette::Link],             true) && 
+        QJson::deserialize(map, "linkVisited",      &(*target)[QPalette::LinkVisited],      true) && 
+        QJson::deserialize(map, "alternateBase",    &(*target)[QPalette::AlternateBase],    true) && 
+        QJson::deserialize(map, "toolTipBase",      &(*target)[QPalette::ToolTipBase],      true) && 
+        QJson::deserialize(map, "toolTipText",      &(*target)[QPalette::ToolTipText],      true);
+}
+
+bool deserialize(const QVariant &value, QnPaletteColors *target) {
+    QVariantMap map;
+    if(!QJson::deserialize(value, &map))
+        return false;
+
+    return 
+        QJson::deserialize(map, "disabled",         &(*target)[QPalette::Disabled],         true) && 
+        QJson::deserialize(map, "active",           &(*target)[QPalette::Active],           true) && 
+        QJson::deserialize(map, "inactive",         &(*target)[QPalette::Inactive],         true) && 
+        QJson::deserialize(map, "default",          &(*target)[QPalette::NColorGroups],     true);
+}
+
+bool deserialize(const QVariant &value, QPalette *target) {
+    QnPaletteColors colors;
+    if(!QJson::deserialize(value, &colors))
+        return false;
+
+    for(int role = 0; role < QPalette::NColorRoles; role++) {
+        const QColor &color = colors[QPalette::NColorGroups][role];
+        if(color.isValid())
+            target->setColor(static_cast<QPalette::ColorRole>(role), color);
+    }
+
+    for(int group = 0; group < QPalette::NColorGroups; group++) {
+        for(int role = 0; role < QPalette::NColorRoles; role++) {
+            const QColor &color = colors[group][role];
+            if(color.isValid())
+                target->setColor(static_cast<QPalette::ColorGroup>(group), static_cast<QPalette::ColorRole>(role), color);
+        }
+    }
+
+    return true;
+}
+
+void serialize(const QPalette &value, QVariant *target) {
+    assert(false);
+}
+
+typedef QnAdlJsonSerializer<QPalette> QnPaletteCustomizationSerializer;
+
+
 // --------------------------------------------------------------------------- //
 // QnObjectStarCustomizationSerializer
 // --------------------------------------------------------------------------- //
 class QnObjectStarCustomizationSerializer: public QnJsonSerializer {
 public:
     QnObjectStarCustomizationSerializer(): 
-        QnJsonSerializer(QMetaType::QObjectStar)
+        QnJsonSerializer(QMetaType::QObjectStar),
+        m_paletteSerializer(new QnPaletteCustomizationSerializer)
     {
+        /* QnJsonSerializer does locking, so we use local cache to avoid it. */
+        foreach(QnJsonSerializer *serializer, QnJsonSerializer::allSerializers())
+            m_serializerByType.insert(serializer->type(), serializer);
+
         m_serializerByType.insert(QMetaType::QObjectStar, this);
+        m_serializerByType.insert(QMetaType::QPalette, m_paletteSerializer.data());
     }
 
 protected:
@@ -18,6 +102,9 @@ protected:
     
     virtual bool deserializeInternal(const QVariant &value, void *target) const {
         QObject *object = *static_cast<QObject **>(target);
+        if(!object)
+            return false;
+
         const QMetaObject *metaObject = object->metaObject();
 
         QVariantMap map;
@@ -35,7 +122,7 @@ protected:
                     return false;
 
                 QVariant targetValue = p.read(object);
-                QnJsonSerializer *serializer = this->serializer(targetValue.userType());
+                const QnJsonSerializer *serializer = m_serializerByType.value(targetValue.userType());
                 if(!serializer)
                     return false;
 
@@ -46,7 +133,7 @@ protected:
                 continue;
             }
 
-            QObject *child = findDirectChild(object, key);
+            QObject *child = object->findChild<QObject *>(key);
             if(child != NULL) {
                 if(!this->deserialize(jsonValue, &child))
                     return false;
@@ -60,24 +147,7 @@ protected:
     }
 
 private:
-    static QObject *findDirectChild(QObject *parent, const QString &name) {
-        foreach(QObject *child, parent->children())
-            if(child->objectName() == name)
-                return child;
-        return NULL;
-    }
-    
-    QnJsonSerializer *serializer(int type) {
-        QnJsonSerializer *result = m_serializerByType.value(type);
-        if(!result) {
-            /* QnJsonSerializer does locking, so we use local cache to avoid it. */
-            result = QnJsonSerializer::forType(type); 
-            m_serializerByType[type] = result;
-        }
-        return result;
-    }
-
-private:
+    QScopedPointer<QnJsonSerializer> m_paletteSerializer;
     QnFlatMap<int, QnJsonSerializer *> m_serializerByType;
 };
 
@@ -139,6 +209,10 @@ QnWorkbenchCustomizer::QnWorkbenchCustomizer(QObject *parent):
 
 QnWorkbenchCustomizer::~QnWorkbenchCustomizer() {
     return;
+}
+
+void QnWorkbenchCustomizer::customize(const QString &key, QObject *object) {
+
 }
 
 void QnWorkbenchCustomizer::registerObject(const QString &key, QObject *object) {

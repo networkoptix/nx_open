@@ -14,6 +14,7 @@
 
 #include "time_step.h"
 #include "camera/thumbnail.h"
+#include "time_slider_colors.h"
 
 class QTimer;
 
@@ -22,9 +23,10 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
-    Q_OBJECT;
-    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
-    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
+    Q_OBJECT
+    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
+    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd)
+    Q_PROPERTY(QnTimeSliderColors colors READ colors WRITE setColors)
 
     typedef Animated<QnToolTipSlider> base_type;
 
@@ -160,6 +162,9 @@ public:
 
     qint64 localOffset() const;
     void setLocalOffset(qint64 utcOffset);
+
+    const QnTimeSliderColors &colors() const;
+    void setColors(const QnTimeSliderColors &colors);
 
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -306,6 +311,8 @@ private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
     friend class QnTimeSliderChunkPainter;
+
+    QnTimeSliderColors m_colors;
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;

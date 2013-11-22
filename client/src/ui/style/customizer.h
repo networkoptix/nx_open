@@ -1,0 +1,23 @@
+#ifndef QN_CUSTOMIZER_H
+#define QN_CUSTOMIZER_H
+
+#include <QtCore/QObject>
+
+class QnCustomizer: public QObject {
+    Q_OBJECT
+public:
+    QnCustomizer(QObject *parent = NULL);
+    virtual ~QnCustomizer();
+
+    void setCustomization(const QVariantMap &customization);
+    const QVariantMap &customization() const;
+
+    void customize(QObject *object);
+    void customize(QObject *object, const QString &key);
+
+private:
+    QVariantMap m_customization;
+};
+
+
+#endif // QN_CUSTOMIZER_H

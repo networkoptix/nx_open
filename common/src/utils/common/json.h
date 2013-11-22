@@ -365,4 +365,37 @@ __VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             
     return false;
 
 
+
+
+
+
+
+// TODO: #Elric implement properly in default
+#define QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+__VA_ARGS__ void serialize(const TYPE &value, QVariant *target) {               \
+    QVariantMap result;                                                         \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_SERIALIZATION_OPTIONAL_STEP_I, ~, FIELD_SEQ) \
+    *target = result;                                                           \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             \
+    if(value.type() != QVariant::Map)                                           \
+        return false;                                                           \
+    QVariantMap map = value.toMap();                                            \
+                                                                                \
+    TYPE result = *target; /* TODO: #Elric note the copy here */                \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DESERIALIZATION_OPTIONAL_STEP_I, ~, FIELD_SEQ) \
+    *target = result;                                                           \
+    return true;                                                                \
+}
+
+#define QN_DEFINE_STRUCT_SERIALIZATION_OPTIONAL_STEP_I(R, DATA, FIELD)          \
+    QJson::serialize(value.FIELD, BOOST_PP_STRINGIZE(FIELD), &result);
+
+#define QN_DEFINE_STRUCT_DESERIALIZATION_OPTIONAL_STEP_I(R, DATA, FIELD)        \
+    if(!QJson::deserialize(map, BOOST_PP_STRINGIZE(FIELD), &result.FIELD, true)) \
+        return false;
+
+
+
 #endif // QN_JSON_H

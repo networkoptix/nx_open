@@ -74,7 +74,7 @@ protected:
  * Frame width and color are configurable.
  */
 class QnFramedWidget: public Framed<GraphicsWidget> {
-    Q_OBJECT;
+    Q_OBJECT
     typedef Framed<GraphicsWidget> base_type;
 
 public:

@@ -36,7 +36,7 @@ public:
 
     template<class T>
     void insert() {
-        insert(new QJsonDetail::QnAdlJsonSerializer<T>());
+        insert(new QnAdlJsonSerializer<T>());
     }
 };
 
@@ -48,6 +48,10 @@ Q_GLOBAL_STATIC(QnJsonSerializerStorage, qn_jsonSerializerStorage);
 // -------------------------------------------------------------------------- //
 QnJsonSerializer *QnJsonSerializer::forType(int type) {
     return qn_jsonSerializerStorage()->value(type);
+}
+
+QList<QnJsonSerializer *> QnJsonSerializer::allSerializers() {
+    return qn_jsonSerializerStorage()->values();
 }
 
 void QnJsonSerializer::registerSerializer(QnJsonSerializer *serializer) {

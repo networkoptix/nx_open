@@ -18,10 +18,7 @@ public:
     QnWorkbenchCustomizer(QObject *parent = NULL);
     virtual ~QnWorkbenchCustomizer();
 
-    void registerObject(const QString &key, QObject *object);
-    void unregisterObject(const QString &key);
-
-    void customize(const QVariant &customization);
+    void customize(const QString &key, QObject *object);
 
 private:
     QnWeakObjectHash m_objectByKey;

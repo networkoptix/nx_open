@@ -53,7 +53,8 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_hoverAnimator(new QnNoptixStyleAnimator(this)),
     m_rotationAnimator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
-    m_globals(qnGlobals)
+    m_globals(qnGlobals),
+    m_customizer(new QnCustomizer(this))
 {
     GraphicsStyle::setBaseStyle(this);
 
@@ -241,15 +242,19 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 }
 
 void QnNoptixStyle::polish(QWidget *widget) {
-    base_type::polish(widget);
+    if(widget)
+        base_type::polish(widget);
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18));
+        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization
     }
+
+    m_customizer->customize(currentTarget(widget));
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {
-    base_type::unpolish(widget);
+    if(widget)
+        base_type::unpolish(widget);
 }
 
 bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {

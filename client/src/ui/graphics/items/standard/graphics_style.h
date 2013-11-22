@@ -20,31 +20,18 @@ public:
 
     const QObject *currentTarget(const QWidget *widget) const;
 
-    void drawItemText(QPainter *painter, const QRect &rectangle, int alignment, const QPalette &palette, bool enabled, const QString &text, QPalette::ColorRole textRole = QPalette::NoRole) const
-    { baseStyle()->drawItemText(painter, rectangle, alignment, palette, enabled, text, textRole); }
-    void drawItemPixmap(QPainter *painter, const QRect &rectangle, int alignment, const QPixmap &pixmap) const
-    { baseStyle()->drawItemPixmap(painter, rectangle, alignment, pixmap); }
+    void drawItemText(QPainter *painter, const QRect &rectangle, int alignment, const QPalette &palette, bool enabled, const QString &text, QPalette::ColorRole textRole = QPalette::NoRole) const { baseStyle()->drawItemText(painter, rectangle, alignment, palette, enabled, text, textRole); }
+    void drawItemPixmap(QPainter *painter, const QRect &rectangle, int alignment, const QPixmap &pixmap) const { baseStyle()->drawItemPixmap(painter, rectangle, alignment, pixmap); }
 
-    QRect itemTextRect(const QFontMetrics &metrics, const QRect &rectangle, int alignment, bool enabled, const QString &text) const
-    { return baseStyle()->itemTextRect(metrics, rectangle, alignment, enabled, text); }
-    QRect itemPixmapRect(const QRect &rectangle, int alignment, const QPixmap &pixmap) const
-    { return baseStyle()->itemPixmapRect(rectangle, alignment, pixmap); }
+    QRect itemTextRect(const QFontMetrics &metrics, const QRect &rectangle, int alignment, bool enabled, const QString &text) const { return baseStyle()->itemTextRect(metrics, rectangle, alignment, enabled, text); }
+    QRect itemPixmapRect(const QRect &rectangle, int alignment, const QPixmap &pixmap) const { return baseStyle()->itemPixmapRect(rectangle, alignment, pixmap); }
 
-    QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const
-    { return baseStyle()->generatedIconPixmap(iconMode, pixmap, option); }
-    QPalette standardPalette() const
-    { return baseStyle()->standardPalette(); }
+    QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const { return baseStyle()->generatedIconPixmap(iconMode, pixmap, option); }
+    QPalette standardPalette() const { return baseStyle()->standardPalette(); }
 
-    void polish(QApplication *application)
-    { baseStyle()->polish(application); }
-    void unpolish(QApplication *application)
-    { baseStyle()->unpolish(application); }
-    void polish(QWidget *widget)
-    { baseStyle()->polish(widget); }
-    void unpolish(QWidget *widget)
-    { baseStyle()->unpolish(widget); }
-    void polish(QPalette &palette)
-    { baseStyle()->polish(palette); }
+    void polish(QGraphicsWidget *widget);
+    void unpolish(QGraphicsWidget *widget);
+    void polish(QPalette &palette);
 
     QPixmap standardPixmap(QStyle::StandardPixmap standardPixmap, const QStyleOption *option = 0, const QGraphicsWidget *widget = 0) const;
     void drawComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QGraphicsWidget *widget = 0) const;

@@ -11,6 +11,7 @@ class QStyleOptionProgressBarV2;
 class QnNoptixStyleAnimator;
 class QnSkin;
 class QnGlobals;
+class QnCustomizer;
 
 class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
     Q_OBJECT;
@@ -20,6 +21,8 @@ class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
 public:
     QnNoptixStyle(QStyle *style = NULL);
     virtual ~QnNoptixStyle();
+
+    QnCustomizer *customizer() const { return m_customizer; }
 
     virtual QPixmap	generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const override;
 
@@ -64,6 +67,7 @@ private:
     QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
     QnGlobals *m_globals;
+    QnCustomizer *m_customizer;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
     QPixmap m_grooveBorder, m_grooveBody, m_sliderHandleHovered, m_sliderHandle;
 };
