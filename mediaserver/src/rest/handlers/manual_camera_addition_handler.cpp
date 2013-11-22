@@ -5,10 +5,7 @@
 
 #include <api/media_server_cameras_data.h>
 #include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource/resource.h>
-//#include <core/resource_managment/resource_searcher.h>
-#include <core/resource_managment/resource_pool.h>
-#include <core/resource/camera_resource.h>
+
 #include <utils/common/json.h>
 #include <utils/network/tcp_connection_priv.h>
 

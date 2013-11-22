@@ -42,6 +42,7 @@ public:
         Initial,            /**< Ready to search cameras. */
         InitialOffline,     /**< Server is offline. */
         Searching,          /**< Search in progress. */
+        Stopping,           /**< Stopping search. */
         CamerasFound,       /**< Some cameras found, ready to add. */
         CamerasOffline,     /**< Some cameras found but server went offline. */
         Adding,             /**< Adding in progress */

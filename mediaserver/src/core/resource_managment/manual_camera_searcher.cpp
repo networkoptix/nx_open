@@ -89,6 +89,10 @@ struct PluginsEnumerator {
         return result;
     }
 
+    static int pluginsCount() {
+        return QnResourceDiscoveryManager::instance()->plugins().size();
+    }
+
     QUrl url;
     QAuthenticator auth;
 };
@@ -100,7 +104,7 @@ void reduceFunction(QnManualCameraSearchCameraList &finalResult, const QnManualC
 QnManualCameraSearcher::QnManualCameraSearcher():
     m_state(QnManualCameraSearchStatus::Init),
     m_onlineHosts(NULL),
-    m_results(NULL)
+    m_scanProgress(NULL)
 {
 }
 
@@ -126,6 +130,7 @@ void QnManualCameraSearcher::run(const QString &startAddr, const QString &endAdd
             return;
 
         QStringList onlineHosts;
+        QFuture<QStringList> future;
         {
             QN_INCREASE_MAX_THREADS(qMin(endIPv4Addr - startIPv4Addr, onlineScanThreadCount));
             {
@@ -133,10 +138,13 @@ void QnManualCameraSearcher::run(const QString &startAddr, const QString &endAdd
                 if (m_state == QnManualCameraSearchStatus::Aborted)
                     return;
                 m_state = QnManualCameraSearchStatus::CheckingOnline;
-                QFuture<QStringList> future = QnIpRangeChecker::onlineHostsAsync(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
+                future = QnIpRangeChecker::onlineHostsAsync(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
                 m_onlineHosts = &future;
             }
-            onlineHosts = m_onlineHosts->result(); //here we are waiting for the results
+            m_onlineHosts->waitForFinished();
+            if (m_onlineHosts->isCanceled())
+                return;
+            onlineHosts = m_onlineHosts->result();
             {
                 QMutexLocker lock(&m_mutex);
                 m_onlineHosts = NULL;
@@ -152,18 +160,26 @@ void QnManualCameraSearcher::run(const QString &startAddr, const QString &endAdd
     }
 
     {
-        QMutexLocker lock(&m_mutex);
-        if (m_state == QnManualCameraSearchStatus::Aborted)
+        QFuture<QnManualCameraSearchCameraList> results;
+        QN_INCREASE_MAX_THREADS(onlineScanThreadCount);
+        {
+            QMutexLocker lock(&m_mutex);
+            if (m_state == QnManualCameraSearchStatus::Aborted)
+                return;
+            results = QtConcurrent::mappedReduced(checkers, &SinglePluginChecker::mapFunction, &reduceFunction);
+            m_scanProgress = &results;
+        }
+        m_scanProgress->waitForFinished();
+        if (m_scanProgress->isCanceled())
             return;
-        QFuture<QnManualCameraSearchCameraList> results = QtConcurrent::mappedReduced(checkers, &SinglePluginChecker::mapFunction, &reduceFunction);
-        m_results = &results;
-    }
-    m_results->result();
-    {
-         QMutexLocker lock(&m_mutex);
-         if (m_state == QnManualCameraSearchStatus::Aborted)
-             return;
-         m_state = QnManualCameraSearchStatus::Finished;
+        {
+             QMutexLocker lock(&m_mutex);
+             m_results = m_scanProgress->result();
+             m_scanProgress = NULL;
+             if (m_state == QnManualCameraSearchStatus::Aborted)
+                 return;
+             m_state = QnManualCameraSearchStatus::Finished;
+        }
     }
 
 }
@@ -180,10 +196,10 @@ void QnManualCameraSearcher::cancel() {
         m_onlineHosts->waitForFinished();
         break;
     case QnManualCameraSearchStatus::CheckingHost:
-        if (!m_results)
+        if (!m_scanProgress)
             return;
-        m_results->cancel();
-        m_results->waitForFinished();
+        m_scanProgress->cancel();
+        m_scanProgress->waitForFinished();
         break;
     default:
         break;
@@ -202,9 +218,14 @@ QnManualCameraSearchStatus QnManualCameraSearcher::status() const {
             return QnManualCameraSearchStatus(m_state, 0, 1);
         return QnManualCameraSearchStatus(m_state, m_onlineHosts->progressValue(), m_onlineHosts->progressMaximum() - m_onlineHosts->progressMinimum());
     case QnManualCameraSearchStatus::CheckingHost:
-        if (!m_results)
+    {
+        if (!m_scanProgress)
             return QnManualCameraSearchStatus(m_state, 0, 1);
-        return QnManualCameraSearchStatus(m_state, m_results->progressValue(), m_results->progressMaximum() - m_results->progressMinimum());
+        int divider = PluginsEnumerator::pluginsCount();
+        return QnManualCameraSearchStatus(m_state,
+                                          m_scanProgress->progressValue() / divider,
+                                          (m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum()) / divider);
+    }
     default:
         break;
     }
@@ -216,9 +237,7 @@ QnManualCameraSearchCameraList QnManualCameraSearcher::results() const {
     switch(m_state) {
     case QnManualCameraSearchStatus::Finished:
     case QnManualCameraSearchStatus::Aborted:
-        if (m_results && !m_results->isRunning())
-            return m_results->result();
-        break;
+        return m_results;
     default:
         break;
     }

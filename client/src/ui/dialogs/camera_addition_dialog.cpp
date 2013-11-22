@@ -188,7 +188,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
     m_state = state;
 
     ui->validateLabelSearch->setVisible(false);         // hide on every state change
-    ui->scanProgressWidget->setVisible(m_state == Searching);
+    ui->scanProgressWidget->setVisible(m_state == Searching || m_state == Stopping);
     ui->addProgressBar->setVisible(m_state == Adding);
     ui->scanParamsWidget->setEnabled(m_state == Initial);
     ui->serverOfflineLabel->setVisible(m_state == InitialOffline || m_state == CamerasOffline);
@@ -223,6 +223,10 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->stageStackedWidget->setEnabled(true);
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
+        ui->stopScanButton->setEnabled(false);
+        ui->closeButton->setFocus();
+        break;
+    case Stopping:
         ui->stopScanButton->setEnabled(false);
         ui->closeButton->setFocus();
         break;
@@ -541,6 +545,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
 void QnCameraAdditionDialog::at_stopScanButton_clicked() {
     if (m_state != Searching)
         return;
+    setState(Stopping);
 
     // init stage, cannot stop the process
     if (m_processUuid.isNull())
@@ -688,7 +693,7 @@ void QnCameraAdditionDialog::at_resPool_resourceRemoved(const QnResourcePtr &res
 void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &reply, int handle) {
     Q_UNUSED(handle)
 
-    if (m_state != Searching)
+    if (m_state != Searching && m_state != Stopping)
         return;
 
     if (status != 0) {
@@ -701,26 +706,28 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     switch (result.status.state) {
     case QnManualCameraSearchStatus::Init:
-        ui->scanProgressBar->setFormat(tr("Initializing scan..."));
+        if (m_state == Searching)
+            ui->scanProgressBar->setFormat(tr("Initializing scan..."));
         break;
     case QnManualCameraSearchStatus::CheckingOnline:
-        ui->scanProgressBar->setFormat(tr("Scanning available hosts..."));
+        if (m_state == Searching)
+            ui->scanProgressBar->setFormat(tr("Scanning available hosts..."));
         break;
     case QnManualCameraSearchStatus::CheckingHost:
-    {
-        QString host;
-        if (m_subnetMode) {
-            host = QHostAddress(QHostAddress(ui->startIPLineEdit->text()).toIPv4Address() + result.status.current).toString();
-        } else {
-            host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).host();
+        if (m_state == Searching)
+        {
+            QString host;
+            if (m_subnetMode) {
+                host = QHostAddress(QHostAddress(ui->startIPLineEdit->text()).toIPv4Address() + result.status.current).toString();
+            } else {
+                host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).host();
+            }
+            ui->scanProgressBar->setFormat(tr("Scanning host %1...").arg(host));
         }
-        ui->scanProgressBar->setFormat(tr("Checking host %1...").arg(host));
         break;
-    }
-
     case QnManualCameraSearchStatus::Finished:
     case QnManualCameraSearchStatus::Aborted:
-        if (!m_processUuid.isNull())
+        if (m_state == Searching)
             m_server->apiConnection()->searchCameraAsyncStop(m_processUuid); //clear mediaserver cache
 
         if (result.cameras.size() > 0) {
@@ -728,15 +735,15 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
             int newCameras = fillTable(result.cameras);
             if (newCameras == 0)
                 QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
-
         } else {
             setState(Initial);
             QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
         }
         m_processUuid = QUuid();
-        // return now, do not update processUuid and progressBar
-        return;
     }
+
+    if (m_state != Searching)
+        return;
 
     if (m_processUuid.isNull()) {
         m_processUuid = result.processUuid;
@@ -746,5 +753,4 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     ui->scanProgressBar->setMaximum(result.status.total);
     ui->scanProgressBar->setValue(result.status.current);
     m_server->apiConnection()->searchCameraAsyncStatus(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-
 }

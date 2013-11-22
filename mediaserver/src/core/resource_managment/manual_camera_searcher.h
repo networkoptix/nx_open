@@ -29,7 +29,8 @@ private:
 
     QnManualCameraSearchStatus::State m_state;
     QFuture<QStringList> *m_onlineHosts;
-    QFuture<QnManualCameraSearchCameraList> *m_results;
+    QFuture<QnManualCameraSearchCameraList> *m_scanProgress;
+    QnManualCameraSearchCameraList m_results;
 };
 
 #endif // MANUAL_CAMERA_SEARCHER_H
