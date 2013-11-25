@@ -152,6 +152,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         palette.setColor(QPalette::Background, Qt::black);
         palette.setColor(QPalette::Base, Qt::black);
         m_view->setPalette(palette);
+
+        // TODO: #Elric move to ctor^ ?
     }
 
     m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));

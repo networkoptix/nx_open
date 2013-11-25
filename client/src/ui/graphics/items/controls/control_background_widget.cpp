@@ -1,4 +1,4 @@
-#include "control_background_item.h"
+#include "control_background_widget.h"
 
 namespace {
     QLinearGradient borderGradient(Qn::Border border) {
