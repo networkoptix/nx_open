@@ -4,6 +4,7 @@
 #include <utils/common/json.h>
 #include <utils/common/json_serializer.h>
 #include <utils/common/flat_map.h>
+#include <utils/common/property_storage.h>
 
 // TODO: #Elric error messages
 
@@ -109,11 +110,18 @@ protected:
         if(!object)
             return false;
 
-        const QMetaObject *metaObject = object->metaObject();
-
         QVariantMap map;
         if(!QJson::deserialize(value, &map))
             return false;
+
+        // TODO: #Elric hack
+        if(object->inherits("QnPropertyStorage")) {
+            QnPropertyStorage *storage = static_cast<QnPropertyStorage *>(object);
+            storage->updateFromJson(map);
+            return true;
+        }
+
+        const QMetaObject *metaObject = object->metaObject();
 
         for(QVariantMap::const_iterator pos = map.begin(); pos != map.end(); pos++) {
             const QString &key = pos.key();
