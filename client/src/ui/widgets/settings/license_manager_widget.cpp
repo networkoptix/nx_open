@@ -294,7 +294,10 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
             message = Mustache::renderTemplate(message, arguments);
 
-            QMessageBox::information(this, tr("License Activation"), tr("There was a problem activating your license.") + lit(" ") + message);
+            /* QNetworkReply slots should not start eventLoop */
+            emit showMessageLater(tr("License Activation"),
+                                  tr("There was a problem activating your license.") + lit(" ") + message,
+                                  true);
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
 
             return;
