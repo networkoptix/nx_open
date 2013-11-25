@@ -278,7 +278,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         // If we can deserialize JSON it means there is an error.
         QVariantMap errorMessage;
         if (QJson::deserialize(replyData, &errorMessage)) {
-            QString error = errorMessage.value(lit("error")).toString();
+//            QString error = errorMessage.value(lit("error")).toString();
             QString messageId = errorMessage.value(lit("messageId")).toString();
             QString message = errorMessage.value(lit("message")).toString();
             QVariantMap arguments = errorMessage.value(lit("arguments")).toMap();
@@ -290,9 +290,9 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             } else if(messageId == lit("InvalidKey")) {
                 message = tr("The license key is invalid.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.");
+                message = tr("You are trying to activate {{brand}} license on %1. This is not allowed.").arg(QLatin1String(QN_PRODUCT_NAME_LONG));
             } else if(messageId == lit("AlreadyActivated")) {
-                message = tr("This license key has been previously activated to {{hwid}} on {{time}}.");
+                message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
             }
 
             message = Mustache::renderTemplate(message, arguments);
