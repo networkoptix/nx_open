@@ -546,10 +546,11 @@ void QnProgressiveDownloadingConsumer::run()
                 sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
-            if (dataProvider) {
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            dataProvider = liveReader;
+            if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
-                dataProvider->start();
+                liveReader->startIfNotRunning(true);
                 camera->inUse(this);
             }
         }

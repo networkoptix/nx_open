@@ -31,7 +31,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
 
     // get URL
 
-    if (!m_stardotRes->isCameraControlDisabled())
+    if (!isCameraControlDisabled())
     {
         QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
         int bitrate = m_stardotRes->suggestBitrateKbps(getQuality(), m_stardotRes->getResolution(), getFps());

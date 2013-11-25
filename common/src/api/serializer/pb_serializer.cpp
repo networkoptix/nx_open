@@ -508,6 +508,7 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
     case BusinessEventType::Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
     case BusinessEventType::MediaServer_Failure: return pb::MediaServer_Failure;
     case BusinessEventType::MediaServer_Conflict:return pb::MediaServer_Conflict;
+    case BusinessEventType::MediaServer_Started: return pb::MediaServer_Started;
     default:
         break;
     }
@@ -628,6 +629,7 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     case pb::Camera_Ip_Conflict:    return BusinessEventType::Camera_Ip_Conflict;
     case pb::MediaServer_Failure:   return BusinessEventType::MediaServer_Failure;
     case pb::MediaServer_Conflict:  return BusinessEventType::MediaServer_Conflict;
+    case pb::MediaServer_Started:  return BusinessEventType::MediaServer_Started;
     }
     return BusinessEventType::NotDefined;
 }

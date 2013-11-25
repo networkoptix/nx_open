@@ -11,7 +11,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
     m_framesSinceLastMetaData(0),
     m_softMotionRole(QnResource::Role_Default),
     m_softMotionLastChannel(0),
-    m_secondaryQuality(Qn::SSQualityNotDefined)
+    m_secondaryQuality(Qn::SSQualityNotDefined),
+    m_canTouchCameraSettings(true)
 {
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
@@ -328,4 +329,24 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 
     netRes->unlockConsumers();
     return rez;
+}
+
+void QnLiveStreamProvider::startIfNotRunning(bool canTouchCameraSettings)
+{
+    QMutexLocker mtx(&m_mutex);
+    if (!isRunning())    
+    {
+        m_canTouchCameraSettings = canTouchCameraSettings;
+        start();
+    }
+    else if (!m_canTouchCameraSettings && canTouchCameraSettings) {
+        m_canTouchCameraSettings = canTouchCameraSettings; // now we can control camera settings
+        updateStreamParamsBasedOnFps();
+    }
+}
+
+bool QnLiveStreamProvider::isCameraControlDisabled() const
+{
+    QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+    return (camRes && camRes->isCameraControlDisabled()) || !m_canTouchCameraSettings;
 }

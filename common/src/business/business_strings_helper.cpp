@@ -50,6 +50,8 @@ QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
         return tr("Media Server Failure");
     case BusinessEventType::MediaServer_Conflict:
         return tr("Media Server Conflict");
+    case BusinessEventType::MediaServer_Started:
+        return tr("Media Server started");
     case BusinessEventType::AnyCameraIssue:
         return tr("Any camera issue");
     case BusinessEventType::AnyServerIssue:
@@ -91,6 +93,9 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case BusinessEventType::MediaServer_Conflict:
         return tr("Media Server \"%1\" Conflict").arg(resourceName);
+
+    case BusinessEventType::MediaServer_Started:
+        return tr("Media Server \"%1\" started").arg(resourceName);
 
     default:
         break;
@@ -162,13 +167,13 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case BusinessEventType::Camera_Input: {
         result = tr("Input port: %1").arg(params.getInputPortId());
         break;
-                                          }
+    }
     case BusinessEventType::Storage_Failure:
     case BusinessEventType::Network_Issue:
     case BusinessEventType::MediaServer_Failure: {
         result += tr("Reason: %1").arg(eventReason(params));
         break;
-                                                 }
+    }
     case BusinessEventType::Camera_Ip_Conflict: {
         result += tr("Conflict address: %1").arg(params.getSource());
 
@@ -178,7 +183,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
             result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
         }
         break;
-                                                }
+    }
     case BusinessEventType::MediaServer_Conflict: {
         QVariantList conflicts;
         int n = 0;
@@ -187,7 +192,10 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
             result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
         }
         break;
-                                                  }
+    }
+    case BusinessEventType::MediaServer_Started: 
+        break;
+    
     default:
         break;
     }
@@ -211,7 +219,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParam
     case BusinessEventType::MediaServer_Failure: {
         detailsMap[tpReason] = eventReason(params);
         break;
-                                                 }
+    }
     case BusinessEventType::Camera_Ip_Conflict: {
         detailsMap[lit("cameraConflictAddress")] = params.getSource();
         QVariantList conflicts;
@@ -225,7 +233,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParam
         detailsMap[lit("cameraConflicts")] = conflicts;
 
         break;
-                                                }
+    }
     case BusinessEventType::MediaServer_Conflict: {
         QVariantList conflicts;
         int n = 0;

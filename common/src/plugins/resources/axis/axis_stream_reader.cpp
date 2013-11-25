@@ -157,7 +157,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     // --------------- update or insert new profile ----------------------
     
-    if (action == QByteArray("add") || !m_axisRes->isCameraControlDisabled())
+    if (action == QByteArray("add") || !isCameraControlDisabled())
     {
         QString streamProfile;
         QTextStream str(&streamProfile);

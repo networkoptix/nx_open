@@ -51,6 +51,14 @@ public:
     virtual bool secondaryResolutionIsLarge() const { return false; }
 
     static bool hasRunningLiveProvider(QnNetworkResourcePtr netRes);
+
+    /*!
+        Start provider if not running yet.
+        @param canTouchCameraSettings can control camera settings if true
+    */
+    void startIfNotRunning(bool canTouchCameraSettings);
+
+    bool isCameraControlDisabled() const;
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -72,6 +80,7 @@ private:
     //int m_NumaberOfVideoChannels;
     Qn::StreamQuality m_quality;
     bool m_qualityUpdatedAtLeastOnce;
+    bool m_canTouchCameraSettings;
 
     mutable float m_fps; //used only for live providers
     unsigned int m_framesSinceLastMetaData; // used only for live providers
@@ -88,5 +97,7 @@ private:
     bool m_isPhysicalResource;
     Qn::SecondStreamQuality  m_secondaryQuality;
 };
+
+typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
 
 #endif //live_strem_provider_h_1508

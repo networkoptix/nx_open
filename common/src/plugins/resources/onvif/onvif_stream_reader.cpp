@@ -104,7 +104,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     int currentFps = getFps();
     Qn::StreamQuality currentQuality = getQuality();
 
-    if (!m_streamUrl.isEmpty() && m_onvifRes->isCameraControlDisabled())
+    if (!m_streamUrl.isEmpty() && isCameraControlDisabled())
     {
         m_cachedFps = -1;
         *streamUrl = m_streamUrl;
@@ -371,7 +371,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
-    if (m_onvifRes->isCameraControlDisabled())
+    if (isCameraControlDisabled())
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
     updateVideoEncoder(*encoderParamsToSet, isPrimary);
@@ -638,7 +638,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.audioEncoderId = QString::fromStdString(result->token);
 
-    if (m_onvifRes->isCameraControlDisabled())
+    if (isCameraControlDisabled())
         return CameraDiagnostics::NoErrorResult();    // do not update audio encoder params
 
     updateAudioEncoder(*result, isPrimary);
