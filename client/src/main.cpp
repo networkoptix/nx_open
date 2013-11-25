@@ -302,6 +302,7 @@ int main(int argc, char **argv)
         int screen = -1;
         QString authenticationString, delayedDrop, instantDrop, logLevel;
         QString translationPath;
+        QString customizationPath = lit(":/skin");
         bool devBackgroundEditable = false;
         bool skipMediaFolderScan = false;
         bool noFullScreen = false;
@@ -320,6 +321,7 @@ int main(int argc, char **argv)
         commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
         commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
         commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
+        commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
         commandLineParser.parse(argc, argv, stderr);
 
         /* Dev mode. */
@@ -335,8 +337,8 @@ int main(int argc, char **argv)
             qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
         }
 
-        QScopedPointer<QnSkin> skin(new QnSkin(lit(":/skin")));
-        QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(lit(":/skin/customization.json"))));
+        QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
+        QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
 
         /* Initialize application instance. */
         application->setQuitOnLastWindowClosed(true);
