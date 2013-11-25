@@ -47,7 +47,7 @@
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
-#include <ui/graphics/items/controls/control_background_item.h>
+#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
@@ -280,7 +280,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(250, 0);
 
-    m_treeBackgroundItem = new QnControlBackgroundItem(Qn::LeftBorder, m_controlsWidget);
+    m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
 
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
@@ -340,7 +340,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Title bar. */
-    m_titleBackgroundItem = new QnControlBackgroundItem(Qn::TopBorder, m_controlsWidget);
+    m_titleBackgroundItem = new QnControlBackgroundWidget(Qn::TopBorder, m_controlsWidget);
 
     m_titleItem = new QnClickableWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
@@ -437,7 +437,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Notifications panel. */
-    m_notificationsBackgroundItem = new QnControlBackgroundItem(Qn::RightBorder, m_controlsWidget);
+    m_notificationsBackgroundItem = new QnControlBackgroundWidget(Qn::RightBorder, m_controlsWidget);
 
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);

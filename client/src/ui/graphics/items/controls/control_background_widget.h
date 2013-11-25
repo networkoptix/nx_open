@@ -6,14 +6,14 @@
 #include <ui/graphics/items/generic/framed_widget.h>
 
 // TODO: #Elric widget, not item
-class QnControlBackgroundItem: public QnFramedWidget {
+class QnControlBackgroundWidget: public QnFramedWidget {
     Q_OBJECT
     Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)
     typedef QnFramedWidget base_type;
 
 public:
-    QnControlBackgroundItem(QGraphicsItem *parent = NULL);
-    QnControlBackgroundItem(Qn::Border gradientBorder, QGraphicsItem *parent = NULL);
+    QnControlBackgroundWidget(QGraphicsItem *parent = NULL);
+    QnControlBackgroundWidget(Qn::Border gradientBorder, QGraphicsItem *parent = NULL);
 
     Qn::Border gradientBorder() const;
     void setGradientBorder(Qn::Border gradientBorder);

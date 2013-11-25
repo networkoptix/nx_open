@@ -13,19 +13,19 @@ namespace {
 
 } // anonymous namespace
 
-QnControlBackgroundItem::QnControlBackgroundItem(QGraphicsItem *parent):
+QnControlBackgroundWidget::QnControlBackgroundWidget(QGraphicsItem *parent):
     base_type(parent)
 {
     init(Qn::TopBorder);
 }
 
-QnControlBackgroundItem::QnControlBackgroundItem(Qn::Border gradientBorder, QGraphicsItem *parent): 
+QnControlBackgroundWidget::QnControlBackgroundWidget(Qn::Border gradientBorder, QGraphicsItem *parent): 
     base_type(parent) 
 {
     init(gradientBorder);
 }
 
-void QnControlBackgroundItem::init(Qn::Border gradientBorder) {
+void QnControlBackgroundWidget::init(Qn::Border gradientBorder) {
     m_gradientBorder = gradientBorder;
     m_colors << QColor(0, 0, 0, 255) << QColor(0, 0, 0, 64);
     
@@ -35,11 +35,11 @@ void QnControlBackgroundItem::init(Qn::Border gradientBorder) {
     updateWindowBrush();
 }
 
-Qn::Border QnControlBackgroundItem::gradientBorder() const {
+Qn::Border QnControlBackgroundWidget::gradientBorder() const {
     return m_gradientBorder;
 }
 
-void QnControlBackgroundItem::setGradientBorder(Qn::Border gradientBorder) {
+void QnControlBackgroundWidget::setGradientBorder(Qn::Border gradientBorder) {
     if(m_gradientBorder == gradientBorder)
         return;
 
@@ -48,11 +48,11 @@ void QnControlBackgroundItem::setGradientBorder(Qn::Border gradientBorder) {
     updateWindowBrush();
 }
 
-const QVector<QColor> &QnControlBackgroundItem::colors() const {
+const QVector<QColor> &QnControlBackgroundWidget::colors() const {
     return m_colors;
 }
 
-void QnControlBackgroundItem::setColors(const QVector<QColor> &colors) {
+void QnControlBackgroundWidget::setColors(const QVector<QColor> &colors) {
     if(m_colors == colors)
         return;
 
@@ -61,7 +61,7 @@ void QnControlBackgroundItem::setColors(const QVector<QColor> &colors) {
     updateWindowBrush();
 }
 
-void QnControlBackgroundItem::updateWindowBrush() {
+void QnControlBackgroundWidget::updateWindowBrush() {
     if(m_colors.isEmpty()) {
         setWindowBrush(Qt::transparent);
         return;
