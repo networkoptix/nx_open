@@ -84,6 +84,7 @@ private slots:
     void at_scanButton_clicked();
     void at_stopScanButton_clicked();
     void at_addButton_clicked();
+    void at_backToScanButton_clicked();
     void at_subnetCheckbox_toggled(bool toggled);
     void at_portAutoCheckBox_toggled(bool toggled);
     void at_resPool_resourceChanged(const QnResourcePtr &resource);

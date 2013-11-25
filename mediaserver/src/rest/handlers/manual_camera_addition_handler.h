@@ -10,6 +10,8 @@
 
 #include <rest/server/json_rest_handler.h>
 
+#include <utils/common/request_param_wrapper.h>
+
 class QnManualCameraAdditionHandler: public QnJsonRestHandler {
 public:
     QnManualCameraAdditionHandler();
@@ -20,9 +22,9 @@ protected:
     virtual QString description() const;
 
 private:
-    int searchStartAction(const QnRequestParamList &params, JsonResult &result);
-    int searchStatusAction(const QnRequestParamList &params, JsonResult &result);
-    int searchStopAction(const QnRequestParamList &params, JsonResult &result);
+    int searchStartAction(const QnRequestParamWrapper &params, JsonResult &result);
+    int searchStatusAction(const QnRequestParamWrapper &params, JsonResult &result);
+    int searchStopAction(const QnRequestParamWrapper &params, JsonResult &result);
     int addCamerasAction(const QnRequestParamList &params, JsonResult &result);
 
 
@@ -32,14 +34,7 @@ private:
      * @param searchProcessUuid             Uuid of the process.
      * @return                              Status of the process.
      */
-    QnManualCameraSearchStatus getSearchStatus(const QUuid &searchProcessUuid);
-
-    /**
-     * @brief getSearchResults              Get results of the manual camera search process. Thread-safe.
-     * @param searchProcessUuid             Uuid of the process.
-     * @return                              Results of the process.
-     */
-    QnManualCameraSearchCameraList getSearchResults(const QUuid &searchProcessUuid);
+    QnManualCameraSearchProcessStatus getSearchStatus(const QUuid &searchProcessUuid);
 
     /**
      * @brief isSearchActive                Check if there is running manual camera search process with the uuid provided.
@@ -53,6 +48,7 @@ private:
     QMutex m_searchProcessMutex;
 
     QHash<QUuid, QnManualCameraSearcher*> m_searchProcesses;
+    QHash<QUuid, QFuture<void> > m_searchProcessRuns;
 };
 
 #endif // QN_MANUAL_CAMERA_ADDITION_HANDLER_H

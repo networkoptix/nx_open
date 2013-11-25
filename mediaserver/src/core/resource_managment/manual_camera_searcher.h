@@ -17,9 +17,7 @@ public:
     void run(const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port);
     void cancel();
 
-    QnManualCameraSearchStatus status() const;
-    QnManualCameraSearchCameraList results() const;
-
+    QnManualCameraSearchProcessStatus status() const;
 protected:
 
     bool isCancelled() const;
@@ -28,6 +26,7 @@ private:
     mutable QMutex m_mutex;
 
     QnManualCameraSearchStatus::State m_state;
+    bool m_singleAddressCheck;
     QFuture<QStringList> *m_onlineHosts;
     QFuture<QnManualCameraSearchCameraList> *m_scanProgress;
     QnManualCameraSearchCameraList m_results;
