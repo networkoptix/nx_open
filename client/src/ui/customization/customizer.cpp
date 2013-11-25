@@ -137,6 +137,22 @@ protected:
                 continue;
             }
 
+            // TODO: #Elric extend properly
+            if(object->inherits("QApplication")) {
+                if(key == lit("palette")) {
+                    const QnJsonSerializer *serializer = m_serializerByType.value(QMetaType::QPalette);
+                    if(!serializer)
+                        return false;
+
+                    QPalette palette;
+                    if(!serializer->deserialize(jsonValue, &palette))
+                        return false;
+
+                    static_cast<QApplication *>(object)->setPalette(palette);
+                    continue;
+                }
+            }
+
             QObject *child = object->findChild<QObject *>(key);
             if(child != NULL) {
                 if(!this->deserialize(jsonValue, &child))

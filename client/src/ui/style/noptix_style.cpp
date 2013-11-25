@@ -216,12 +216,12 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
-    QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
+    /*QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
 
     QPalette palette = application->palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
     palette.setColor(QPalette::Button, activeColor);
-    application->setPalette(palette);
+    application->setPalette(palette);*/
 
     QFont font;
     font.setPixelSize(12);
