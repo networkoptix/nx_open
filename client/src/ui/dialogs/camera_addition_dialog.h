@@ -42,6 +42,7 @@ public:
         Initial,            /**< Ready to search cameras. */
         InitialOffline,     /**< Server is offline. */
         Searching,          /**< Search in progress. */
+        Stopping,           /**< Stopping search. */
         CamerasFound,       /**< Some cameras found, ready to add. */
         CamerasOffline,     /**< Some cameras found but server went offline. */
         Adding,             /**< Adding in progress */
@@ -83,6 +84,7 @@ private slots:
     void at_scanButton_clicked();
     void at_stopScanButton_clicked();
     void at_addButton_clicked();
+    void at_backToScanButton_clicked();
     void at_subnetCheckbox_toggled(bool toggled);
     void at_portAutoCheckBox_toggled(bool toggled);
     void at_resPool_resourceChanged(const QnResourcePtr &resource);

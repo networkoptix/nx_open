@@ -7,6 +7,9 @@
 
 #include <utils/common/json.h>
 
+/**
+ * State of the running manual camera search process.
+ */
 struct QnManualCameraSearchStatus {
     enum State {
         Init,
@@ -18,7 +21,7 @@ struct QnManualCameraSearchStatus {
         Count
     };
 
-    QnManualCameraSearchStatus(){}
+    QnManualCameraSearchStatus(): state(Aborted) {}
     QnManualCameraSearchStatus(State state, int current, int total):
         state(state), current(current), total(total){}
 
@@ -55,11 +58,25 @@ typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera, (name)(url)(manufacturer)(existsInPool), inline)
 
 /**
- *  Reply
+ * Status of the manual camera search process: state and results by the time.
+ */
+struct QnManualCameraSearchProcessStatus {
+    QnManualCameraSearchStatus status;
+    QnManualCameraSearchCameraList cameras;
+};
+
+/**
+ * Manual camera search process request reply: process uuid, state and results by the time.
  */
 struct QnManualCameraSearchProcessReply {
-    QnManualCameraSearchStatus status;
+
+    QnManualCameraSearchProcessReply() {}
+
+    QnManualCameraSearchProcessReply(const QUuid &uuid, const QnManualCameraSearchProcessStatus &processStatus):
+        processUuid(uuid), status(processStatus.status), cameras(processStatus.cameras) {}
+
     QUuid processUuid;
+    QnManualCameraSearchStatus status;
     QnManualCameraSearchCameraList cameras;
 };
 
