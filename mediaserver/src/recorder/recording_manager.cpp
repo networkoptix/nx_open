@@ -213,8 +213,8 @@ bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bo
 
 bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
     QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
 
     if (!cameraRes->isInitialized() && !cameraRes->isDisabled())
@@ -237,7 +237,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                 }
                 recorderHiRes->start();
             }
-            providerHi->start();
+            providerHi->startIfNotRunning(true);
         }
 
         if (providerLow && recorderHiRes) {
@@ -254,7 +254,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                     }
                     recorderLowRes->start();
                 }
-                providerLow->start();
+                providerLow->startIfNotRunning(true);
             }
             else {
                 if (recorderLowRes)

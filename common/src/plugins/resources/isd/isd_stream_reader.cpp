@@ -33,7 +33,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
 
     CLSimpleHTTPClient http (res->getHostAddress(), 80, 3000, res->getAuth());
 
-    if (!res->isCameraControlDisabled())
+    if (!isCameraControlDisabled())
     {
         QByteArray request;
         QString result;
