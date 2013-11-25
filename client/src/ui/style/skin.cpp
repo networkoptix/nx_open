@@ -10,8 +10,6 @@
 
 #include <utils/common/warnings.h>
 
-#include <client/config.h>
-
 #include "noptix_style.h"
 
 namespace {
@@ -184,5 +182,5 @@ QStyle *QnSkin::style() {
 QString QnSkin::path(const QString &name) const {
     if (name.isEmpty())
         return name;
-    return QLatin1String(QN_SKIN_PATH) + QLatin1String("/skin/") + name;
+    return QLatin1String(":") + QLatin1String("/skin/") + name;
 }
