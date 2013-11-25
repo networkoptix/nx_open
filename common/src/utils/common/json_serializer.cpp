@@ -26,6 +26,7 @@ public:
         insert<unsigned long long>();
 
         insert<QColor>();
+        insert<QFont>();
     }
 
     using base_type::insert;

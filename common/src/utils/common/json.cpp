@@ -4,8 +4,9 @@
 #include <functional> /* For std::mem_fun_ref. */
 
 #include <QtCore/QMetaType>
+#include <QtCore/QUuid>
 #include <QtGui/QColor>
-#include <QUuid>
+#include <QtGui/QFont>
 
 #include <qjson/serializer.h>
 #include <qjson/parser.h>
@@ -64,6 +65,33 @@ bool deserialize(const QVariant &value, QColor *target) {
         return false;
     *target = parseColor(value);
     return true;
+}
+
+void serialize(const QFont &value, QVariant *target) {
+    assert(false); /* Won't need for now. */ // TODO: #Elric
+}
+
+bool deserialize(const QVariant &value, QFont *target) {
+    if(value.userType() == QMetaType::QString) {
+        *target = QFont(value.toString());
+        return true;
+    } else if(value.userType() == QMetaType::QVariantMap) {
+        QVariantMap map = value.toMap();
+        QString family;
+        int pointSize = -1;
+
+        if(
+            !QJson::deserialize(map, "family", &family) ||
+            !QJson::deserialize(map, "pointSize", &pointSize, true)
+        ) {
+            return false;
+        }
+
+        *target = QFont(family, pointSize);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void serialize(const QVariant &value, QVariant *target) {

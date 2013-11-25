@@ -299,6 +299,10 @@ class QColor;
 void serialize(const QColor &value, QVariant *target);
 bool deserialize(const QVariant &value, QColor *target);
 
+class QFont;
+void serialize(const QFont &value, QVariant *target);
+bool deserialize(const QVariant &value, QFont *target);
+
 
 /* Serialization can actually fail for QVariant containers because of types
  * unknown to QJson in them.

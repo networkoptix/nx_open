@@ -420,11 +420,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_thumbnailsVisible(false),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
 {
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255)); // TODO: #Elric customize color
-
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnailsStepSizeTimer()));
@@ -468,6 +466,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Run handlers. */
     updateSteps();
     updateMinimalWindow();
+    updatePixmapCache();
     sliderChange(SliderRangeChange);
 }
 
@@ -1059,6 +1058,11 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
 // -------------------------------------------------------------------------- //
 // Updating
 // -------------------------------------------------------------------------- //
+void QnTimeSlider::updatePixmapCache() {
+    m_pixmapCache->setFont(font());
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255)); // TODO: #Elric customize color
+}
+
 void QnTimeSlider::updateToolTipVisibility() {
     qint64 pos = sliderPosition();
 
@@ -2135,6 +2139,13 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
     event->ignore();
     return;
+}
+
+void QnTimeSlider::changeEvent(QEvent *event) {
+    base_type::changeEvent(event);
+
+    if(event->type() == QEvent::FontChange)
+        updatePixmapCache();
 }
 
 void QnTimeSlider::startDragProcess(DragInfo *) {

@@ -5,6 +5,9 @@
 #include <utils/common/json_serializer.h>
 #include <utils/common/flat_map.h>
 
+// TODO: #Elric error messages
+
+
 // --------------------------------------------------------------------------- //
 // QnPaletteCustomizationSerializer
 // --------------------------------------------------------------------------- //

@@ -10,6 +10,8 @@
 #include "ui/workbench/workbench_ptz_preset_manager.h"
 #include "ui/actions/actions.h"
 #include "ui/actions/action_parameters.h"
+#include "ui/graphics/items/controls/time_slider_colors.h"
+#include "utils/common/json_serializer.h"
 
 namespace {
 
@@ -50,6 +52,9 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnWeakObjectHash>();
+    qRegisterMetaType<QnTimeSliderColors>();
+
+    QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
 
     qn_clientMetaTypes_initialized = true;
 }

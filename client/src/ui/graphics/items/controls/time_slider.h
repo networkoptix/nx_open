@@ -188,6 +188,7 @@ protected:
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
@@ -274,6 +275,7 @@ private:
     void drawThumbnails(QPainter *painter, const QRectF &rect);
     void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
 
+    void updatePixmapCache();
     void updateVisibleLineCount();
     void updateToolTipVisibility();
     void updateToolTipText();

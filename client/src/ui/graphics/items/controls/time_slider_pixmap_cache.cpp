@@ -22,10 +22,17 @@ QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache() {
     m_pixmapByLongPositionKey.clear();
 }
 
-Q_GLOBAL_STATIC(QnTimeSliderPixmapCache, qn_timeSliderPixmapCache_instance)
+const QFont &QnTimeSliderPixmapCache::font() const {
+    return m_font;
+}
 
-QnTimeSliderPixmapCache *QnTimeSliderPixmapCache::instance() {
-    return qn_timeSliderPixmapCache_instance();
+void QnTimeSliderPixmapCache::setFont(const QFont &font) {
+    if(m_font == font)
+        return;
+
+    m_font = font;
+
+    clear();
 }
 
 const QPixmap &QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
