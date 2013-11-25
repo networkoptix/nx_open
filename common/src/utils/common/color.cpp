@@ -3,6 +3,7 @@
 QColor parseColor(const QString &name, const QColor &defaultValue) {
     QString trimmedName = name.trimmed();
     if(trimmedName.startsWith(QLatin1String("QColor"))) {
+        /* QColor(R, G, B, A) format. */
         trimmedName = trimmedName.mid(trimmedName.indexOf(QLatin1Char('(')) + 1);
         trimmedName = trimmedName.left(trimmedName.lastIndexOf(QLatin1Char(')')));
 
@@ -24,7 +25,22 @@ QColor parseColor(const QString &name, const QColor &defaultValue) {
             result.setAlpha(colors[3]);
 
         return result;
+    } else if(trimmedName.startsWith(L'#') && trimmedName.size() == 9) {
+        /* #RRGGBBAA format. */
+
+        QColor result(trimmedName.left(7));
+        if(!result.isValid())
+            return defaultValue;
+
+        bool success = false;
+        int alpha = trimmedName.right(2).toInt(&success, 16);
+        if(!success)
+            return defaultValue;
+
+        result.setAlpha(alpha);
+        return result;
     } else {
+        /* Named format. */
         QColor result(trimmedName);
         if(result.isValid()) {
             return result;

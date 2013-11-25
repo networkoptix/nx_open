@@ -32,6 +32,7 @@ public:
     Q_NAMESPACE
 #endif
 
+        // TODO: #5.0 use Qt::Edge
     /**
      * Generic enumeration describing borders of a rectangle.
      */

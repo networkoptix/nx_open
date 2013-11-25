@@ -55,6 +55,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnTimeSliderColors>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
+    QnJsonSerializer::registerSerializer<QVector<QColor> >();
+    QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 
     qn_clientMetaTypes_initialized = true;
 }
