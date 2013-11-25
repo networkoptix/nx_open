@@ -14,6 +14,7 @@
 #include "utils/common/json_serializer.h"
 #include "ui/customization/customization.h"
 #include "ui/graphics/view/gradient_background_painter.h"
+#include "ui/delegates/calendar_item_delegate.h"
 
 namespace {
 
@@ -57,11 +58,14 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnCustomization>();
     qRegisterMetaType<QnGradientBackgroundPainterColors>();
+    qRegisterMetaType<QnCalendarItemDelegateColors>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnGradientBackgroundPainterColors>();
+    QnJsonSerializer::registerSerializer<QnCalendarItemDelegateColors>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >();
     QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 
     qn_clientMetaTypes_initialized = true;
 }
+

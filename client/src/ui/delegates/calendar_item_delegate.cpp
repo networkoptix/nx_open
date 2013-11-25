@@ -10,32 +10,6 @@
 
 
 namespace {
-    const QColor selectionColor = withAlpha(qnGlobals->selectionColor(), 192);
-    
-    const QColor primaryRecordingColor(32, 128, 32, 255);
-    const QColor secondaryRecordingColor(32, 255, 32, 255);
-
-    const QColor primaryMotionColor(128, 0, 0, 255);
-    const QColor secondaryMotionColor(255, 0, 0, 255);
-
-    const QColor separatorColor(0, 0, 0, 255);
-
-    QColor primaryColor(QnCalendarItemDelegate::FillType fillType) {
-        switch(fillType) {
-        case QnCalendarItemDelegate::MotionFill:    return primaryMotionColor;
-        case QnCalendarItemDelegate::RecordingFill: return primaryRecordingColor;
-        default:                                    return QColor();
-        }
-    }
-
-    QColor secondaryColor(QnCalendarItemDelegate::FillType fillType) {
-        switch(fillType) {
-        case QnCalendarItemDelegate::MotionFill:    return secondaryMotionColor;
-        case QnCalendarItemDelegate::RecordingFill: return secondaryRecordingColor;
-        default:                                    return QColor();
-        }
-    }
-
     QnCalendarItemDelegate::FillType fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) {
         if(periodStorage.periods(Qn::MotionContent).intersects(period)) {
             return QnCalendarItemDelegate::MotionFill;
@@ -48,9 +22,44 @@ namespace {
 
 } // anonymous namespace
 
+
+QnCalendarItemDelegateColors::QnCalendarItemDelegateColors() {
+    selection = withAlpha(qnGlobals->selectionColor(), 192);
+    primaryRecording = QColor(32, 128, 32, 255);
+    secondaryRecording = QColor(32, 255, 32, 255);
+    primaryMotion = QColor(128, 0, 0, 255);
+    secondaryMotion = QColor(255, 0, 0, 255);
+    separator = QColor(0, 0, 0, 255);
+}
+
+QColor QnCalendarItemDelegateColors::primary(int fillType) const {
+    switch(fillType) {
+    case QnCalendarItemDelegate::MotionFill:    return primaryMotion;
+    case QnCalendarItemDelegate::RecordingFill: return primaryRecording;
+    default:                                    return QColor();
+    }
+}
+
+QColor QnCalendarItemDelegateColors::secondary(int fillType) const {
+    switch(fillType) {
+    case QnCalendarItemDelegate::MotionFill:    return secondaryMotion;
+    case QnCalendarItemDelegate::RecordingFill: return secondaryRecording;
+    default:                                    return QColor();
+    }
+}
+
+
 QnCalendarItemDelegate::QnCalendarItemDelegate(QObject *parent):
     base_type(parent) 
 {}
+
+const QnCalendarItemDelegateColors &QnCalendarItemDelegate::colors() const {
+    return m_colors;
+}
+
+void QnCalendarItemDelegate::setColors(const QnCalendarItemDelegateColors &colors) {
+    m_colors = colors;
+}
 
 void QnCalendarItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     base_type::paint(painter, option, index);
@@ -77,19 +86,19 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palett
 
     /* Draw background. */
     if(primaryFill != EmptyFill)
-        painter->fillRect(rect, QBrush(primaryColor(primaryFill), Qt::SolidPattern));
+        painter->fillRect(rect, QBrush(m_colors.primary(primaryFill), Qt::SolidPattern));
     if(secondaryFill != EmptyFill && secondaryFill != primaryFill)
-        painter->fillRect(rect, QBrush(secondaryColor(secondaryFill), Qt::Dense6Pattern));
+        painter->fillRect(rect, QBrush(m_colors.secondary(secondaryFill), Qt::Dense6Pattern));
 
     /* Selection frame. */
     if (isSelected) {
-        painter->setPen(QPen(selectionColor, 3, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        painter->setPen(QPen(m_colors.selection, 3, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         painter->setBrush(Qt::NoBrush);
         painter->drawRect(rect.adjusted(2, 2, -2, -2));
     }
 
     /* Common black frame. */
-    painter->setPen(QPen(separatorColor, 1));
+    painter->setPen(QPen(m_colors.separator, 1));
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(rect);
 
