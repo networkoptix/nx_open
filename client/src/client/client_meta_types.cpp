@@ -12,6 +12,8 @@
 #include "ui/actions/action_parameters.h"
 #include "ui/graphics/items/controls/time_slider_colors.h"
 #include "utils/common/json_serializer.h"
+#include "ui/customization/customization.h"
+#include "ui/graphics/view/gradient_background_painter.h"
 
 namespace {
 
@@ -53,8 +55,11 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<QnTimeSliderColors>();
+    qRegisterMetaType<QnCustomization>();
+    qRegisterMetaType<QnGradientBackgroundPainterColors>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
+    QnJsonSerializer::registerSerializer<QnGradientBackgroundPainterColors>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >();
     QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 

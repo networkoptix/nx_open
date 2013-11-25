@@ -18,6 +18,7 @@ class Instrumented;
 class InstrumentedBase {
 private:
     InstrumentedBase();
+    virtual ~InstrumentedBase();
 
     void updateScene(QGraphicsScene *scene, QGraphicsItem *item);
 

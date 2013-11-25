@@ -22,8 +22,6 @@ public:
     QnNoptixStyle(QStyle *style = NULL);
     virtual ~QnNoptixStyle();
 
-    QnCustomizer *customizer() const { return m_customizer; }
-
     virtual QPixmap	generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const override;
 
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;

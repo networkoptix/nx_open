@@ -3,6 +3,8 @@
 
 InstrumentedBase::InstrumentedBase(): m_scene(NULL) {}
 
+InstrumentedBase::~InstrumentedBase() {}
+
 void InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem *item) {
     if(m_scene == scene)
         return;

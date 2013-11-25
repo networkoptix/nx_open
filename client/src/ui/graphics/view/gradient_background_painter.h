@@ -6,7 +6,10 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QWeakPointer>
 
+#include <utils/common/json.h>
+
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/customization/customized.h>
 
 #include "graphics_view.h" /* For QnLayerPainter. */
 
@@ -16,9 +19,23 @@ class QnGlFunctions;
 class QnClientSettings;
 class QnRadialGradientPainter;
 
-class QnGradientBackgroundPainter: public QObject, public QnLayerPainter, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor);
+struct QnGradientBackgroundPainterColors {
+    QnGradientBackgroundPainterColors();
+
+    QColor normal;
+    QColor panic;
+};
+
+Q_DECLARE_METATYPE(QnGradientBackgroundPainterColors)
+
+QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(QnGradientBackgroundPainterColors, (normal)(panic), inline)
+
+
+class QnGradientBackgroundPainter: public Customized<QObject>, public QnLayerPainter, public QnWorkbenchContextAware {
+    Q_OBJECT
+    Q_PROPERTY(QColor currentColor READ currentColor WRITE setCurrentColor)
+    Q_PROPERTY(QnGradientBackgroundPainterColors colors READ colors WRITE setColors)
+    typedef Customized<QObject> base_type;
 
 public:
     /**
@@ -31,6 +48,9 @@ public:
 
     virtual void drawLayer(QPainter *painter, const QRectF &rect) override;
 
+    const QnGradientBackgroundPainterColors &colors();
+    void setColors(const QnGradientBackgroundPainterColors &colors);
+
 protected:
     virtual void installedNotify() override;
 
@@ -40,8 +60,8 @@ protected:
      */
     qreal position();
 
-    QColor backgroundColor() const;
-    void setBackgroundColor(const QColor &backgroundColor);
+    QColor currentColor() const;
+    void setCurrentColor(const QColor &backgroundColor);
 
     VariantAnimator *backgroundColorAnimator();
 
@@ -55,7 +75,8 @@ private:
     VariantAnimator *m_backgroundColorAnimator;
     QElapsedTimer m_timer;
 
-    QColor m_backgroundColor;
+    QnGradientBackgroundPainterColors m_colors;
+    QColor m_currentColor;
     qreal m_cycleIntervalSecs;
 };
 

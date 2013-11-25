@@ -164,27 +164,22 @@ QnCustomizer::QnCustomizer(QObject *parent):
     m_serializer(new QnObjectStarCustomizationSerializer())
 {}
 
+QnCustomizer::QnCustomizer(const QnCustomization &customization, QObject *parent):
+    QObject(parent),
+    m_serializer(new QnObjectStarCustomizationSerializer())
+{
+    setCustomization(customization);
+}
+
 QnCustomizer::~QnCustomizer() {
     return;
 }
 
-void QnCustomizer::setCustomization(const QString &customizationFileName) {
-    QFile file(customizationFileName);
-    if(!file.open(QFile::ReadOnly))
-        return;
-
-    QVariantMap customization;
-    if(!QJson::deserialize(file.readAll(), &customization))
-        return;
-
-    setCustomization(customization);
-}
-
-void QnCustomizer::setCustomization(const QVariantMap &customization) {
+void QnCustomizer::setCustomization(const QnCustomization &customization) {
     m_customization = customization;
 }
 
-const QVariantMap &QnCustomizer::customization() const {
+const QnCustomization &QnCustomizer::customization() const {
     return m_customization;
 }
 
@@ -203,12 +198,12 @@ void QnCustomizer::customize(QObject *object) {
     }
 
     for(int i = metaObjects.size() - 1; i >= 0; i--)
-        customize(object, QLatin1String(metaObjects[i]->className()));
+        customize(object, m_customization.data(), QLatin1String(metaObjects[i]->className()));
 }
 
-void QnCustomizer::customize(QObject *object, const QString &key) {
-    QVariantMap::const_iterator pos = m_customization.find(key);
-    if(pos == m_customization.end())
+void QnCustomizer::customize(QObject *object, const QVariantMap &customization, const QString &key) {
+    QVariantMap::const_iterator pos = customization.find(key);
+    if(pos == customization.end())
         return;
     
     m_serializer->deserialize(*pos, &object);

@@ -101,7 +101,7 @@ extern "C"
 #include "text_to_wav.h"
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
-#include "ui/style/customizer.h"
+#include "ui/customization/customizer.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -458,9 +458,9 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
-        QnNoptixStyle *style = dynamic_cast<QnNoptixStyle *>(qnSkin->style()); // TODO: #Elric dynamic_cast is evil here!
-        style->customizer()->setCustomization(lit(":/skin/customization.json"));
-        qApp->setStyle(style); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+        QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(lit(":/skin/customization.json"))));
+
+        qApp->setStyle(qnSkin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         
 
         /* Load translation. */

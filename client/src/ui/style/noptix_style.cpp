@@ -15,16 +15,15 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
 #include <utils/common/util.h>
-
-#include <ui/common/text_pixmap_cache.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
-#include <ui/common/geometry.h>
 
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/common/geometry.h>
+#include <ui/customization/customizer.h>
 #include <ui/widgets/palette_widget.h>
 
 #include "noptix_style_animator.h"
-#include "customizer.h"
 #include "globals.h"
 #include "skin.h"
 
@@ -55,7 +54,7 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_rotationAnimator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
     m_globals(qnGlobals),
-    m_customizer(new QnCustomizer(this))
+    m_customizer(qnCustomizer)
 {
     GraphicsStyle::setBaseStyle(this);
 
@@ -247,7 +246,7 @@ void QnNoptixStyle::polish(QWidget *widget) {
         base_type::polish(widget);
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization
+        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization?
     }
 
     m_customizer->customize(const_cast<QObject *>(currentTarget(widget)));
