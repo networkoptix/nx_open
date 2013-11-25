@@ -54,9 +54,24 @@ void DiscoveryManager::getVendorName( char* buf ) const
     strcpy( buf, VENDOR_NAME );
 }
 
-int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
+int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
 {
-    return nxcip::NX_NOT_IMPLEMENTED;
+    const char* mac = "543959ab129a";
+    const char* modelName = "ISD-xxx";
+    const char* firmware = "1.0.0"; // todo: implement me!
+    const char* host = "127.0.0.1";
+    const char* loginToUse = "";
+    const char* passwordToUse = "";
+
+    memset( cameras, 0, sizeof(*cameras) );
+    strncpy( cameras->uid, mac, sizeof(cameras->uid)-1 );
+    strncpy( cameras->modelName, modelName, sizeof(cameras->modelName)-1 );
+    strncpy( cameras->firmware, firmware, sizeof(cameras->firmware)-1 );
+    strncpy( cameras->url, host, sizeof(cameras->url)-1 );
+    strcpy( cameras->defaultLogin, loginToUse );
+    strcpy( cameras->defaultPassword, passwordToUse );
+
+    return nxcip::NX_NO_ERROR;
 }
 
 int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
