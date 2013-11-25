@@ -16,9 +16,6 @@
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
 
-
-class DirContentsManager;
-
 //!Reads picture files from specified directory as video-stream
 class StreamReader
 :
@@ -30,7 +27,6 @@ public:
     */
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
-        DirContentsManager* const dirContentsManager,
         unsigned int frameDurationUsec,
         bool liveMode );
     virtual ~StreamReader();

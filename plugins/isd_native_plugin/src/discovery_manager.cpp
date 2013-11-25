@@ -71,7 +71,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     strcpy( cameras->defaultLogin, loginToUse );
     strcpy( cameras->defaultPassword, passwordToUse );
 
-    return nxcip::NX_NO_ERROR;
+    return 1;
 }
 
 int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )

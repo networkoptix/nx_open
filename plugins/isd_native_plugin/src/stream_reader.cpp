@@ -35,7 +35,6 @@ static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
-    DirContentsManager* const dirContentsManager,
     unsigned int frameDurationUsec,
     bool liveMode )
 :
@@ -83,7 +82,7 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
-    return nxcip::NX_NO_ERROR;
+    return nxcip::NX_NO_DATA;
 }
 
 void StreamReader::interrupt()

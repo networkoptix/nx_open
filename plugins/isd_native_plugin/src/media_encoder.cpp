@@ -88,6 +88,12 @@ int MediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBitrateKbps*/ 
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
+    if( !m_streamReader.get() )
+        m_streamReader.reset( new StreamReader(
+        &m_refManager,
+        m_frameDurationUsec,
+        true ) );
+
     m_streamReader->addRef();
     return m_streamReader.get();
 }
