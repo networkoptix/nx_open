@@ -1,6 +1,6 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include <client/config.h>
+#include <common/config.h>
 #ifdef __cplusplus
 #   include <common/common_globals.h>
 #endif

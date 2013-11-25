@@ -458,9 +458,10 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
+        QScopedPointer<QnSkin> skin(new QnSkin(lit(":/skin")));
         QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(lit(":/skin/customization.json"))));
 
-        qApp->setStyle(qnSkin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+        qApp->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
         
 
         /* Load translation. */

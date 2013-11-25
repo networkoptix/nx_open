@@ -56,14 +56,34 @@ namespace {
 
 } // anonymous namespace
 
-Q_GLOBAL_STATIC(QnSkin, qn_skin_instance);
-
-QnSkin::QnSkin() {
-    QPixmapCache::setCacheLimit(64 * 1024); // 64 MB
+QnSkin::QnSkin(QObject *parent):
+    QObject(parent)
+{
+    init(QString());
+}
+       
+QnSkin::QnSkin(const QString &basePath, QObject *parent):
+    QObject(parent)
+{
+    init(basePath);
 }
 
-QnSkin *QnSkin::instance() {
-    return qn_skin_instance();
+void QnSkin::init(const QString &basePath) {
+    if(basePath.isNull()) {
+        m_basePath = lit(":/skin");
+    } else {
+        m_basePath = QDir::toNativeSeparators(basePath);
+    }
+    if(!m_basePath.endsWith(QDir::separator()))
+        m_basePath += QDir::separator();
+
+    int cacheLimit = 64 * 1024; // 64 MB
+    if(QPixmapCache::cacheLimit() < cacheLimit)
+        QPixmapCache::setCacheLimit(cacheLimit);
+}
+
+QnSkin::~QnSkin() {
+    return ;
 }
 
 QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
@@ -182,5 +202,5 @@ QStyle *QnSkin::style() {
 QString QnSkin::path(const QString &name) const {
     if (name.isEmpty())
         return name;
-    return QLatin1String(":") + QLatin1String("/skin/") + name;
+    return m_basePath + name;
 }
