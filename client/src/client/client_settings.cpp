@@ -7,8 +7,6 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-#include <client/config.h>
-
 #include <utils/common/util.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
@@ -82,7 +80,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     addArgumentName(UPDATES_ENABLED,       "--updates-enabled");
 
     /* Load from internal resource. */
-    QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
+    QFile file(QLatin1String(":/skin") + QLatin1String("/globals.json")); // TODO: #Elric
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QVariantMap json;
         if(!QJson::deserialize(file.readAll(), &json)) {

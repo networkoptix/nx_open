@@ -11,8 +11,6 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
-#include <client/config.h>
-
 #include <utils/common/color.h>
 #include <utils/common/module_resources.h>
 
@@ -29,7 +27,7 @@ QnGlobals::QnGlobals(QObject *parent):
 
     init();
 
-    QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
+    QFile file(QLatin1String(":/skin") + QLatin1String("/globals.json")); // TODO: #Elric
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QVariantMap json;
         if(!QJson::deserialize(file.readAll(), &json)) {

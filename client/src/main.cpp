@@ -335,10 +335,14 @@ int main(int argc, char **argv)
             qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
         }
 
+        QScopedPointer<QnSkin> skin(new QnSkin(lit(":/skin")));
+        QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(lit(":/skin/customization.json"))));
+
         /* Initialize application instance. */
         application->setQuitOnLastWindowClosed(true);
         application->setWindowIcon(qnSkin->icon("window_icon.png"));
         application->setStartDragDistance(20);
+        application->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
@@ -458,11 +462,6 @@ int main(int argc, char **argv)
 #endif // Q_OS_WIN
         QnResourceDiscoveryManager::instance()->start();
 
-        QScopedPointer<QnSkin> skin(new QnSkin(lit(":/skin")));
-        QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(lit(":/skin/customization.json"))));
-
-        qApp->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
-        
 
         /* Load translation. */
         QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
