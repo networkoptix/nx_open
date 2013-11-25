@@ -1,8 +1,7 @@
 #include "notifications_collection_widget.h"
 
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsLinearLayout>
+#include <QApplication>
+#include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/common/delete_later.h>
 
@@ -529,12 +528,11 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = qnResPool->getResources().filtered<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
             if (!sampleServer)
                 continue;
             resource = sampleServer;
             break;
-        case QnSystemHealth::StoragesAreFull:
-            continue;
         default:
             break;
         }
