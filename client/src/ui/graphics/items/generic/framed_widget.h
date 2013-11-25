@@ -75,6 +75,13 @@ protected:
  */
 class QnFramedWidget: public Framed<GraphicsWidget> {
     Q_OBJECT
+    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
+    Q_PROPERTY(Qn::FrameShape frameShape READ frameShape WRITE setFrameShape)
+    Q_PROPERTY(Qt::PenStyle frameStyle READ frameStyle WRITE setFrameStyle)
+    Q_PROPERTY(QBrush frameBrush READ frameBrush WRITE setFrameBrush)
+    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
+    Q_PROPERTY(QBrush windowBrush READ windowBrush WRITE setWindowBrush)
+    Q_PROPERTY(QColor windowColor READ windowColor WRITE setWindowColor)
     typedef Framed<GraphicsWidget> base_type;
 
 public:
