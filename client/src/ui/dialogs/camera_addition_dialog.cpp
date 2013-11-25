@@ -731,18 +731,13 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         break;
     case QnManualCameraSearchStatus::CheckingOnline:
         if (m_state == Searching)
-            ui->progressBar->setFormat(tr("Scanning available hosts..."));
+            ui->progressBar->setFormat(tr("Scanning online hosts..."));
         break;
     case QnManualCameraSearchStatus::CheckingHost:
-        if (m_state == Searching)
-        {
-            QString host;
-            if (m_subnetMode) {
-                host = QHostAddress(QHostAddress(ui->startIPLineEdit->text()).toIPv4Address() + result.status.current).toString();
-            } else {
-                host = QUrl::fromUserInput(ui->singleCameraLineEdit->text()).host();
-            }
-            ui->progressBar->setFormat(tr("Scanning host %1... (%2 cameras found)").arg(host).arg(result.cameras.size()));
+        if (m_state == Searching) {
+            int hostNum = m_subnetMode ? 2 : 1;
+            ui->progressBar->setFormat(tr("Scanning hosts... (%1)", "", hostNum)
+                                       .arg(tr("%n cameras found", "", result.cameras.size())));
         }
         break;
     case QnManualCameraSearchStatus::Finished:
@@ -750,13 +745,12 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         if (m_state == Searching)
             m_server->apiConnection()->searchCameraAsyncStop(m_processUuid); //clear mediaserver cache
 
-        setState(CamerasFound);
         if (result.cameras.size() > 0) {
-//            setState(CamerasFound);
+            setState(CamerasFound);
             if (newCameras == 0)
                 QMessageBox::information(this, tr("Finished"), tr("All cameras are already in the resource tree."));
         } else {
-//            setState(Initial);
+            setState(Initial);
             QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
         }
         m_processUuid = QUuid();

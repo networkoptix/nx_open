@@ -128,8 +128,8 @@ void QnManualCameraSearcher::run(const QString &startAddr, const QString &endAdd
             return;
 
         QStringList onlineHosts;
-        QFuture<QStringList> future;
         {
+            QFuture<QStringList> future;
             QN_INCREASE_MAX_THREADS(qMin(endIPv4Addr - startIPv4Addr, onlineScanThreadCount));
             {
                 QMutexLocker lock(&m_mutex);
@@ -250,12 +250,9 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
         if (!m_scanProgress) {
             result.status = QnManualCameraSearchStatus(m_state, 0, 1);
         } else {
-            int divider = m_singleAddressCheck
-                    ? 1
-                    : PluginsEnumerator::pluginsCount();
             result.status = QnManualCameraSearchStatus(m_state,
-                                                       m_scanProgress->progressValue() / divider,
-                                                       (m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum()) / divider);
+                                                       m_scanProgress->progressValue(),
+                                                       (m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum()));
         }
         break;
     }
