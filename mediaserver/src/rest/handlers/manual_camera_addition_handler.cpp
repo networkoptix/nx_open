@@ -5,10 +5,7 @@
 
 #include <api/media_server_cameras_data.h>
 #include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource/resource.h>
-#include <core/resource_managment/resource_searcher.h>
-#include <core/resource_managment/resource_pool.h>
-#include <core/resource/camera_resource.h>
+
 #include <utils/common/json.h>
 #include <utils/network/tcp_connection_priv.h>
 
@@ -19,48 +16,29 @@ namespace {
 
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
-
 }
 
-void searchResourcesAsync(const QUuid &processUuid, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
-
-    QThreadPool* global = QThreadPool::globalInstance();
-
-    //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
-    for (int i = 0; i < searchThreadCount; ++i )
-        global->releaseThread();
-
-    QnResourceDiscoveryManager::instance()->searchResources(processUuid, startAddr, endAddr, auth, port, searchThreadCount);
-
-    // Returning maxThreadCount() to its original value
-    for (int i = 0; i < searchThreadCount; ++i )
-        global->reserveThread();
-}
-
-int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamList &params,  JsonResult &result)
-{
-    int port = 0;
-    QAuthenticator auth;
-    auth.setUser("admin");
-    auth.setPassword("admin"); // default values
-
-    QString addr1;
-    QString addr2;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "start_ip") 
-            addr1 = param.second;
-        else if (param.first == "end_ip")
-            addr2 = param.second;
-        else if (param.first == "user")
-            auth.setUser(param.second);
-        else if (param.first == "password")
-            auth.setPassword(param.second);
-        else if (param.first == "port")
-            port = param.second.toInt();
+QnManualCameraAdditionHandler::~QnManualCameraAdditionHandler() {
+    foreach (QnManualCameraSearcher* process, m_searchProcesses) {
+        process->cancel();
+        delete process;
     }
+}
+
+void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
+    searcher->run(startAddr, endAddr, auth, port);
+}
+
+int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamWrapper &params,  JsonResult &result)
+{
+    QAuthenticator auth;
+    auth.setUser(params.value("user", "admin"));
+    auth.setPassword(params.value("password", "admin"));
+
+    QString addr1 = params.value("start_ip");
+    QString addr2 = params.value("end_ip");
+
+    int port = params.value("port").toInt();
 
     if (addr1.isNull())
         return CODE_INVALID_PARAMETER;
@@ -69,66 +47,65 @@ int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamList &p
         addr2.clear();
 
     QUuid processUuid = QUuid::createUuid();
-    QnManualCameraSearchStatus status(QnManualCameraSearchStatus::Init, 0, 1);
-    QnResourceDiscoveryManager::instance()->setSearchStatus(processUuid, status, false);
-    QnResourceDiscoveryManager::instance()->setSearchResults(processUuid, QnManualCameraSearchCameraList(), false);
 
-    QtConcurrent::run(&searchResourcesAsync, processUuid, addr1, addr2, auth, port);
+    QnManualCameraSearcher* searcher = new QnManualCameraSearcher();
+    {
+        QMutexLocker lock(&m_searchProcessMutex);
+        m_searchProcesses.insert(processUuid, searcher);
+    }
 
-    QnManualCameraSearchProcessReply reply;
-    reply.status = status;
-    reply.processUuid = processUuid;
+    m_searchProcessRuns.insert(processUuid,
+        QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port)
+                               );
+
+    QnManualCameraSearchProcessReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
 
     return CODE_OK;
 }
 
-int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParamList &params, JsonResult &result) {
-    QUuid processUuid;
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "uuid")
-            processUuid = QUuid(param.second);
-    }
+int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParamWrapper &params, JsonResult &result) {
+    QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
         return CODE_INVALID_PARAMETER;
 
-    if (!QnResourceDiscoveryManager::instance()->isSearchActive(processUuid))
+    if (!isSearchActive(processUuid))
         return CODE_NOT_FOUND;
 
-    QnManualCameraSearchProcessReply reply;
-    reply.processUuid = processUuid;
-    reply.status = QnResourceDiscoveryManager::instance()->getSearchStatus(processUuid);
-    reply.cameras = QnResourceDiscoveryManager::instance()->getSearchResults(processUuid);
+    QnManualCameraSearchProcessReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
 
     return CODE_OK;
 }
 
 
-int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParamList &params, JsonResult &result) {
-    QUuid processUuid;
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "uuid")
-            processUuid = QUuid(param.second);
-    }
+int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParamWrapper &params, JsonResult &result) {
+    QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
         return CODE_INVALID_PARAMETER;
 
+    QnManualCameraSearcher* process(NULL);
+    if (isSearchActive(processUuid)) {
+        QMutexLocker lock(&m_searchProcessMutex);
+        process = m_searchProcesses[processUuid];
+        process->cancel();
+        m_searchProcesses.remove(processUuid);
+    }
+
+    m_searchProcessRuns[processUuid].waitForFinished();
+    m_searchProcessRuns.remove(processUuid);
+
     QnManualCameraSearchProcessReply reply;
-
-    QnManualCameraSearchStatus status(QnManualCameraSearchStatus::Aborted, 1, 1);
-    reply.status = status;
     reply.processUuid = processUuid;
-    reply.cameras = QnResourceDiscoveryManager::instance()->getSearchResults(processUuid);
+    if (process) {
+        QnManualCameraSearchProcessStatus processStatus = process->status();
+        reply.status = processStatus.status;
+        reply.cameras = processStatus.cameras;
 
-    QnResourceDiscoveryManager::instance()->clearSearch(processUuid);
-
+        delete process;
+    }
     result.setReply(reply);
 
     return CODE_OK;
@@ -192,6 +169,20 @@ int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnReque
         return addCamerasAction(params, result);
     else
         return CODE_NOT_FOUND;
+}
+
+QnManualCameraSearchProcessStatus QnManualCameraAdditionHandler::getSearchStatus(const QUuid &searchProcessUuid) {
+    QMutexLocker lock(&m_searchProcessMutex);
+
+    if (!m_searchProcesses.contains(searchProcessUuid))
+        return QnManualCameraSearchProcessStatus();
+
+    return m_searchProcesses[searchProcessUuid]->status();
+}
+
+bool QnManualCameraAdditionHandler::isSearchActive(const QUuid &searchProcessUuid) {
+    QMutexLocker lock(&m_searchProcessMutex);
+    return m_searchProcesses.contains(searchProcessUuid);
 }
 
 QString QnManualCameraAdditionHandler::description() const
