@@ -20,7 +20,8 @@ public:
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
-        unsigned int cSeq );
+        unsigned int cSeq,
+        nxcip::CompressionType codec);
     virtual ~ILPVideoPacket();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -68,6 +69,7 @@ private:
     unsigned int m_flags;
     nxcip::Picture* m_motionData;
     unsigned int m_cSeq;
+    nxcip::CompressionType m_codec;
 };
 
 #endif  //ILP_VIDEO_PACKET_H

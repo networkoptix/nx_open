@@ -22,6 +22,8 @@
 #include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
+#include "vmux_iface.h"
+#include <iostream>
 
 #define GENERATE_RANDOM_MOTION
 #ifdef GENERATE_RANDOM_MOTION
@@ -43,8 +45,7 @@ StreamReader::StreamReader(
     m_curTimestamp( 0 ),
     m_frameDuration( frameDurationUsec ),
     m_nextFrameDeployTime( 0 ),
-    m_isReverse( false ),
-    m_cSeq( 0 )
+    m_initialized(false)
 {
 }
 
@@ -82,7 +83,46 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
-    return nxcip::NX_NO_DATA;
+    std::cout << "ISD plugin getNextData started" << std::endl;
+
+    Vmux vmux;
+    vmux_frame_t frame;
+    vmux_stream_info_t stream_info;
+    int rv = 0;
+
+    if (!m_initialized)
+    {
+        int info_size = sizeof(stream_info);
+        int streamId = 0;
+        rv = vmux.GetStreamInfo (streamId, &stream_info, &info_size);
+        if (rv) {
+            std::cout << "ISD plugin: can't get stream info" << std::endl;
+            return nxcip::NX_NO_DATA; // error
+        }
+
+        rv = vmux.StartVideo (streamId);
+        if (rv) {
+            std::cout << "ISD plugin: can't start video" << std::endl;
+            return nxcip::NX_NO_DATA; // error
+        }
+        m_initialized = true;
+    }
+
+    rv = vmux.GetFrame (&frame);
+
+    std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
+
+    std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
+        0,
+        frame.vmux_info.PTS,
+        nxcip::MediaDataPacket::fKeyPacket, // frame.vmux_info.pic_type == 0
+        0, // cseq
+        nxcip::CODEC_ID_H264)); 
+    videoPacket->resizeBuffer( frame.frame_size );
+    memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
+
+    *lpPacket = videoPacket.release();
+    return nxcip::NX_NO_ERROR;
 }
 
 void StreamReader::interrupt()

@@ -42,7 +42,6 @@ public:
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
-
 private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNumber;
@@ -50,9 +49,7 @@ private:
     const unsigned int m_frameDuration;
     nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
     mutable Mutex m_mutex;
-    bool m_isReverse;
-    unsigned int m_cSeq;
-
+    bool m_initialized;
 };
 
 #endif  //ILP_STREAM_READER_H

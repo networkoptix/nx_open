@@ -16,7 +16,8 @@ ILPVideoPacket::ILPVideoPacket(
     int channelNumber,
     nxcip::UsecUTCTimestamp _timestamp,
     unsigned int flags,
-    unsigned int cSeq )
+    unsigned int cSeq,
+    nxcip::CompressionType codec)
 :
     m_refManager( this ),
     m_channelNumber( channelNumber ),
@@ -25,7 +26,8 @@ ILPVideoPacket::ILPVideoPacket(
     m_bufSize( 0 ),
     m_flags( flags ),
     m_motionData( NULL ),
-    m_cSeq( cSeq )
+    m_cSeq( cSeq ),
+    m_codec( codec )
 {
 }
 
@@ -111,7 +113,7 @@ unsigned int ILPVideoPacket::channelNumber() const
 //!Implementation of nxpl::MediaDataPacket::codecType
 nxcip::CompressionType ILPVideoPacket::codecType() const
 {
-    return nxcip::CODEC_ID_MJPEG;
+    return m_codec;
 }
 
 unsigned int ILPVideoPacket::flags() const
