@@ -26,8 +26,7 @@ public:
     /*!
         \param liveMode In this mode, plays all pictures in a loop
     */
-    StreamReader(
-        nxpt::CommonRefManager* const parentRefManager, bool isPrimary);
+    StreamReader( nxpt::CommonRefManager* const parentRefManager, int encoderNum);
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -43,7 +42,7 @@ public:
     virtual void interrupt() override;
 private:
     nxpt::CommonRefManager m_refManager;
-    bool m_isPrimary;
+    int m_encoderNum;
     bool m_initialized;
     nxcip::CompressionType m_codec;
 

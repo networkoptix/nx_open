@@ -29,11 +29,10 @@
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 #endif
 
-
-StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, bool isPrimary)
+StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int encoderNum)
 :
     m_refManager( parentRefManager ),
-    m_isPrimary( isPrimary ),
+    m_encoderNum( encoderNum ),
     m_initialized(false),
     m_codec(nxcip::CODEC_ID_NONE)
 {
@@ -83,20 +82,19 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     if (!m_initialized)
     {
         int info_size = sizeof(stream_info);
-        int streamId = m_isPrimary ? 0 : 1;
-        rv = vmux.GetStreamInfo (streamId, &stream_info, &info_size);
+        rv = vmux.GetStreamInfo (m_encoderNum, &stream_info, &info_size);
         if (rv) {
             std::cout << "ISD plugin: can't get stream info" << std::endl;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
-	if (stream_info.enc_type == 1)
+	if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
 	    m_codec = nxcip::CODEC_ID_H264;
-	else if (stream_info.enc_type == ?)
+	else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
 	    m_codec = nxcip::CODEC_ID_MJPEG;
 	else
 	    return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-        rv = vmux.StartVideo (streamId);
+        rv = vmux.StartVideo (m_encoderNum);
         if (rv) {
             std::cout << "ISD plugin: can't start video" << std::endl;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
