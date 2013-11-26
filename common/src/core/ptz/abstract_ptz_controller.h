@@ -11,27 +11,6 @@
 #include "ptz_fwd.h"
 #include "ptz_limits.h"
 
-namespace {
-    qreal gradToRad(qreal x) { return x * M_PI / 180.0; }
-    qreal radToGrad(qreal x) { return x * 180.0 / M_PI; }
-
-    /**
-     * \param fovDegreees               Width-based FOV in degrees.
-     * \returns                         Width-based 35mm-equivalent focal length.
-     */
-    qreal fovTo35mmEquiv(qreal fovRad) {
-        return (36.0 / 2.0) / std::tan((fovRad / 2.0));
-    }
-
-    /**
-     * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
-     * \returns                         Width-based FOV in degrees.
-     */
-    qreal mm35EquivToFov(qreal mm35Equiv) {
-        return std::atan((36.0 / 2.0) / mm35Equiv) * 2.0;
-    }
-
-} // anonymous namespace
 
 /**
  * A thread-safe interface for accessing camera's PTZ functions.

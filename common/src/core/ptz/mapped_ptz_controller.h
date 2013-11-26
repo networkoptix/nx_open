@@ -4,6 +4,10 @@
 #include "proxy_ptz_controller.h"
 #include "ptz_mapper.h"
 
+/**
+ * A proxy ptz controller that uses a PTZ space mapper to provide absolute
+ * PTZ commands in standard PTZ space.
+ */
 class QnMappedPtzController: public QnProxyPtzController {
     Q_OBJECT;
     typedef QnProxyPtzController base_type;
