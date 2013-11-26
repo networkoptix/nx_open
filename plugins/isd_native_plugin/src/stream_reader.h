@@ -15,6 +15,7 @@
 
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
+#include "vmux_iface.h"
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -50,6 +51,8 @@ private:
     nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
     mutable Mutex m_mutex;
     bool m_initialized;
+
+    Vmux vmux;
 };
 
 #endif  //ILP_STREAM_READER_H

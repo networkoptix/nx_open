@@ -22,7 +22,6 @@
 #include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
-#include "vmux_iface.h"
 #include <iostream>
 
 #define GENERATE_RANDOM_MOTION
@@ -85,7 +84,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     std::cout << "ISD plugin getNextData started" << std::endl;
 
-    Vmux vmux;
+    //Vmux vmux;
     vmux_frame_t frame;
     vmux_stream_info_t stream_info;
     int rv = 0;
@@ -109,13 +108,16 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
 
     rv = vmux.GetFrame (&frame);
+    if (rv) {
+	std::cout << "Can't read video frame" << std::endl;
+    }
 
     std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
 
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0,
-        frame.vmux_info.PTS,
-        nxcip::MediaDataPacket::fKeyPacket, // frame.vmux_info.pic_type == 0
+        (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000,
+        (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0),
         0, // cseq
         nxcip::CODEC_ID_H264)); 
     videoPacket->resizeBuffer( frame.frame_size );
