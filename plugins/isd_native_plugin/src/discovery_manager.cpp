@@ -15,6 +15,13 @@
 #include "camera_manager.h"
 #include "plugin.h"
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <stdio.h>
+#include <string.h>
 
 DiscoveryManager::DiscoveryManager()
 :
@@ -54,12 +61,33 @@ void DiscoveryManager::getVendorName( char* buf ) const
     strcpy( buf, VENDOR_NAME );
 }
 
+void mac_eth0(char  MAC_str[13], char** host)
+{
+    #define HWADDR_len 6
+    memset(MAC_str, 0, sizeof(MAC_str));
+    int s,i;
+    struct ifreq ifr;
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    strcpy(ifr.ifr_name, "eth0");
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
+	for (i=0; i<HWADDR_len; i++)
+    	sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+    }
+    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
+	const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+	*host = inet_ntoa(ip->sin_addr);
+    }
+}
+
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
 {
-    const char* mac = "543959ab129a";
+    //const char* mac = "543959ab129a";
+    char  mac[13];
+    char* host;
+    mac_eth0(mac, &host);
     const char* modelName = "ISD-xxx";
     const char* firmware = "1.0.0"; // todo: implement me!
-    const char* host = "127.0.0.1";
+    //const char* host = "127.0.0.1";
     const char* loginToUse = "";
     const char* passwordToUse = "";
 
