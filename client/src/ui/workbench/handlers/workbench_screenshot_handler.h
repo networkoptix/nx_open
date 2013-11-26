@@ -5,8 +5,11 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchScreenshotHandler: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+/**
+ * @brief The QnWorkbenchScreenshotHandler class            Handler for the screenshots related actions.
+ */
+class QnWorkbenchScreenshotHandler: public QObject, protected QnWorkbenchContextAware {
+    Q_OBJECT
 public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
