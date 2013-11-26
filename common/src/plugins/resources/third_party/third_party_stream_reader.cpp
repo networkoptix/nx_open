@@ -294,7 +294,7 @@ CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compress
 QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader )
 {
     nxcip::MediaDataPacket* packet = NULL;
-    if( streamReader->getNextData( &packet ) != nxcip::NX_NO_ERROR )
+    if( streamReader->getNextData( &packet ) != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
     nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
