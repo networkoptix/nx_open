@@ -8,6 +8,8 @@
 
 #include <utils/common/json.h>
 
+#include <client/client_color_types.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/customization/customized.h>
 
@@ -19,22 +21,10 @@ class QnGlFunctions;
 class QnClientSettings;
 class QnRadialGradientPainter;
 
-struct QnGradientBackgroundPainterColors {
-    QnGradientBackgroundPainterColors();
-
-    QColor normal;
-    QColor panic;
-};
-
-Q_DECLARE_METATYPE(QnGradientBackgroundPainterColors)
-
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(QnGradientBackgroundPainterColors, (normal)(panic), inline)
-
-
 class QnGradientBackgroundPainter: public Customized<QObject>, public QnLayerPainter, public QnWorkbenchContextAware {
     Q_OBJECT
     Q_PROPERTY(QColor currentColor READ currentColor WRITE setCurrentColor)
-    Q_PROPERTY(QnGradientBackgroundPainterColors colors READ colors WRITE setColors)
+    Q_PROPERTY(QnBackgroundColors colors READ colors WRITE setColors)
     typedef Customized<QObject> base_type;
 
 public:
@@ -48,8 +38,8 @@ public:
 
     virtual void drawLayer(QPainter *painter, const QRectF &rect) override;
 
-    const QnGradientBackgroundPainterColors &colors();
-    void setColors(const QnGradientBackgroundPainterColors &colors);
+    const QnBackgroundColors &colors();
+    void setColors(const QnBackgroundColors &colors);
 
 protected:
     virtual void installedNotify() override;
@@ -75,7 +65,7 @@ private:
     VariantAnimator *m_backgroundColorAnimator;
     QElapsedTimer m_timer;
 
-    QnGradientBackgroundPainterColors m_colors;
+    QnBackgroundColors m_colors;
     QColor m_currentColor;
     qreal m_cycleIntervalSecs;
 };

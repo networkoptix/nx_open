@@ -23,16 +23,7 @@ namespace {
 } // anonymous namespace
 
 
-QnCalendarItemDelegateColors::QnCalendarItemDelegateColors() {
-    selection = withAlpha(qnGlobals->selectionColor(), 192);
-    primaryRecording = QColor(32, 128, 32, 255);
-    secondaryRecording = QColor(32, 255, 32, 255);
-    primaryMotion = QColor(128, 0, 0, 255);
-    secondaryMotion = QColor(255, 0, 0, 255);
-    separator = QColor(0, 0, 0, 255);
-}
-
-QColor QnCalendarItemDelegateColors::primary(int fillType) const {
+QColor QnCalendarColors::primary(int fillType) const {
     switch(fillType) {
     case QnCalendarItemDelegate::MotionFill:    return primaryMotion;
     case QnCalendarItemDelegate::RecordingFill: return primaryRecording;
@@ -40,7 +31,7 @@ QColor QnCalendarItemDelegateColors::primary(int fillType) const {
     }
 }
 
-QColor QnCalendarItemDelegateColors::secondary(int fillType) const {
+QColor QnCalendarColors::secondary(int fillType) const {
     switch(fillType) {
     case QnCalendarItemDelegate::MotionFill:    return secondaryMotion;
     case QnCalendarItemDelegate::RecordingFill: return secondaryRecording;
@@ -53,11 +44,11 @@ QnCalendarItemDelegate::QnCalendarItemDelegate(QObject *parent):
     base_type(parent) 
 {}
 
-const QnCalendarItemDelegateColors &QnCalendarItemDelegate::colors() const {
+const QnCalendarColors &QnCalendarItemDelegate::colors() const {
     return m_colors;
 }
 
-void QnCalendarItemDelegate::setColors(const QnCalendarItemDelegateColors &colors) {
+void QnCalendarItemDelegate::setColors(const QnCalendarColors &colors) {
     m_colors = colors;
 }
 

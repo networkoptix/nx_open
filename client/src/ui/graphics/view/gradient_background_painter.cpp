@@ -17,11 +17,6 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
 
-QnGradientBackgroundPainterColors::QnGradientBackgroundPainterColors() {
-    normal = QColor(26, 26, 240, 40);
-    panic = QColor(255, 0, 0, 255);
-}
-
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -91,11 +86,11 @@ void QnGradientBackgroundPainter::setCurrentColor(const QColor &backgroundColor)
     m_currentColor = backgroundColor;
 }
 
-const QnGradientBackgroundPainterColors &QnGradientBackgroundPainter::colors() {
+const QnBackgroundColors &QnGradientBackgroundPainter::colors() {
     return m_colors;
 }
 
-void QnGradientBackgroundPainter::setColors(const QnGradientBackgroundPainterColors &colors) {
+void QnGradientBackgroundPainter::setColors(const QnBackgroundColors &colors) {
     m_colors = colors;
     
     updateBackgroundColor(true);

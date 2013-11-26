@@ -3,8 +3,11 @@
 
 #include <utils/math/functors.h>
 
+#include <client/client_color_types.h>
+
 #include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
+#include <camera/thumbnail.h>
 
 #include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
@@ -13,8 +16,6 @@
 #include <ui/animation/animated.h>
 
 #include "time_step.h"
-#include "camera/thumbnail.h"
-#include "time_slider_colors.h"
 
 class QTimer;
 

@@ -9,9 +9,11 @@
 #include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QDataStream>
+#include <QtGui/QVector3D>
 
 #include <utils/common/struct_functions.h>
 #include <recording/time_period.h>
+
 
 // -------------------------------------------------------------------------- //
 // Qt-based
@@ -104,6 +106,22 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 Q_DECLARE_METATYPE(QnLicenseWarningState);
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
 
+
+// -------------------------------------------------------------------------- //
+// QnPtzPreset
+// -------------------------------------------------------------------------- //
+struct QnPtzPreset {
+    QnPtzPreset(): hotkey(-1) {};
+    QnPtzPreset(int hotkey, const QString &name, const QVector3D &logicalPosition): hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
+
+    bool isNull() const { return name.isEmpty(); }
+
+    int hotkey;
+    QString name;
+    QVector3D logicalPosition;
+};
+
+Q_DECLARE_METATYPE(QnPtzPreset);
 
 
 

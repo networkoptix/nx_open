@@ -4,36 +4,17 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QStyledItemDelegate>
 
-#include <utils/common/json.h>
+#include <client/client_color_types.h>
 
 #include <ui/customization/customized.h>
 
 class QnTimePeriod;
 class QnTimePeriodStorage;
 
-struct QnCalendarItemDelegateColors {
-    QnCalendarItemDelegateColors();
-
-    QColor selection;
-    QColor primaryRecording;
-    QColor secondaryRecording;
-    QColor primaryMotion;
-    QColor secondaryMotion;
-    QColor separator;
-
-    QColor primary(int fillType) const;
-    QColor secondary(int fillType) const;
-};
-
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(QnCalendarItemDelegateColors, 
-    (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), inline)
-
-Q_DECLARE_METATYPE(QnCalendarItemDelegateColors)
-
 
 class QnCalendarItemDelegate: public Customized<QStyledItemDelegate> {
     Q_OBJECT
-    Q_PROPERTY(QnCalendarItemDelegateColors colors READ colors WRITE setColors)
+    Q_PROPERTY(QnCalendarColors colors READ colors WRITE setColors)
     typedef Customized<QStyledItemDelegate> base_type;
 
 public:
@@ -45,8 +26,8 @@ public:
 
     QnCalendarItemDelegate(QObject *parent = NULL);
 
-    const QnCalendarItemDelegateColors &colors() const;
-    void setColors(const QnCalendarItemDelegateColors &colors);
+    const QnCalendarColors &colors() const;
+    void setColors(const QnCalendarColors &colors);
 
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     
@@ -54,7 +35,7 @@ public:
     void paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, bool isEnabled, bool isSelected, FillType primaryFill, FillType secondaryFill, const QString &text) const;
 
 private:
-    QnCalendarItemDelegateColors m_colors;
+    QnCalendarColors m_colors;
 };
 
 #endif // QN_CALENDAR_ITEM_DELEGATE_H

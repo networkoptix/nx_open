@@ -3,28 +3,13 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QVector3D>
 
 #include <api/model/kvpair.h>
 #include <core/resource/resource_fwd.h>
 
+#include <client/client_model_types.h>
+
 #include "workbench_context_aware.h"
-
-// TODO: move to client model types?
-struct QnPtzPreset {
-    QnPtzPreset(): hotkey(-1) {};
-    QnPtzPreset(int hotkey, const QString &name, const QVector3D &logicalPosition): hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
-
-    bool isNull() const {
-        return name.isEmpty();
-    }
-
-    int hotkey;
-    QString name;
-    QVector3D logicalPosition;
-};
-Q_DECLARE_METATYPE(QnPtzPreset);
-
 
 class QnWorkbenchPtzPresetManagerPrivate;
 

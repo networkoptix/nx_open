@@ -1,8 +1,9 @@
-#include "time_slider_colors.h"
+#include "client_color_types.h"
 
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
+
 
 QnTimeSliderColors::QnTimeSliderColors() {
     tickmark = QColor(255, 255, 255, 255);
@@ -25,4 +26,18 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     dateOverlay = QColor(255, 255, 255, 48);
     dateOverlayAlternate = withAlpha(selection, 48);
+}
+
+QnBackgroundColors::QnBackgroundColors() {
+    normal = QColor(26, 26, 240, 40);
+    panic = QColor(255, 0, 0, 255);
+}
+
+QnCalendarColors::QnCalendarColors() {
+    selection = withAlpha(qnGlobals->selectionColor(), 192);
+    primaryRecording = QColor(32, 128, 32, 255);
+    secondaryRecording = QColor(32, 255, 32, 255);
+    primaryMotion = QColor(128, 0, 0, 255);
+    secondaryMotion = QColor(255, 0, 0, 255);
+    separator = QColor(0, 0, 0, 255);
 }
