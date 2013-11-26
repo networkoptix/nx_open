@@ -72,7 +72,7 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
-    //std::cout << "ISD plugin getNextData started" << std::endl;
+    //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
 
     //Vmux vmux;
     vmux_frame_t frame;
@@ -110,9 +110,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 
     if (frame.vmux_info.pic_type == 1) {
-	std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
+	//std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
-    //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
+    //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
 
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel

@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "media_encoder.h"
+#include <iostream>
 
 
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
@@ -66,7 +67,9 @@ int CameraManager::getEncoderCount( int* encoderCount ) const
 //!Implementation of nxcip::BaseCameraManager::getEncoder
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if( encoderIndex != 0 )
+    //std::cout << "get encoder #" << encoderIndex << std::endl;
+
+    if( encoderIndex > 1 )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
     if( !m_encoder[encoderIndex].get() )
