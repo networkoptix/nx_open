@@ -69,8 +69,8 @@ void QnVideoCamera::startDisplay()
     CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::startDisplay "), m_resource->toResource()->getUniqueId(), cl_logDEBUG1);
 
     m_camdispay.start();
-    //m_reader->start(QThread::HighestPriority);
-    m_reader->start(QThread::HighPriority);
+    if (m_reader)
+        m_reader->start(QThread::HighPriority);
     m_displayStarted = true;
 }
 
@@ -79,14 +79,16 @@ void QnVideoCamera::stopDisplay()
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
     m_displayStarted = false;
-    m_reader->stop();
+    if (m_reader)
+        m_reader->stop();
     m_camdispay.stop();
     m_camdispay.clearUnprocessedData();
 }
 
 void QnVideoCamera::beforeStopDisplay()
 {
-    m_reader->pleaseStop();
+    if (m_reader)
+        m_reader->pleaseStop();
     m_camdispay.pleaseStop();
 }
 
@@ -107,7 +109,9 @@ QnCamDisplay* QnVideoCamera::getCamDisplay()
 
 const QnStatistics* QnVideoCamera::getStatistics(int channel)
 {
-    return m_reader->getStatistics(channel);
+    if (m_reader)
+        return m_reader->getStatistics(channel);
+    return NULL;
 }
 
 void QnVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
@@ -128,6 +132,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     if (startTime > endTime)
         qSwap(startTime, endTime);
 
+    QMutexLocker lock(&m_exportMutex);
     if (m_exportRecorder == 0)
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(QnResource::Role_Default);
@@ -192,17 +197,20 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
 
 void QnVideoCamera::at_exportProgress(int value)
 {
+    qDebug() << "export progress" << value;
     emit exportProgress(value + m_progressOffset);
 }
 
 void QnVideoCamera::onExportFinished(QString fileName)
 {
+    qDebug() << "export finished";
     stopExport();
     emit exportFinished(fileName);
 }
 
 void QnVideoCamera::onExportFailed(QString fileName)
 {
+    qDebug() << "export failed";
     stopExport();
     emit exportFailed(fileName);
 }

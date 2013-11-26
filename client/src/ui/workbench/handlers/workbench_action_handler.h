@@ -306,7 +306,6 @@ protected slots:
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
 
-    void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_camera_exportFinished(QString fileName);
     void at_camera_exportFailed(QString errorMessage);
@@ -329,7 +328,6 @@ protected slots:
         \return true, if export continues. false, if nothing more to export
     */
     bool at_layoutCamera_exportFinished(QString fileName);
-    void at_layoutCamera_exportFinished2();
     void at_layout_exportFinished();
     void at_layoutCamera_exportFailed(QString errorMessage);
 
@@ -363,9 +361,7 @@ private:
     */
     bool saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly, bool cancellable, bool newWindowOpenable);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
-#ifdef Q_OS_WIN
-    QString binaryFilterName() const;
-#endif
+
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
@@ -437,10 +433,7 @@ private:
     QnStorageResourcePtr m_exportStorage;
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;
-    //QString m_layoutExportMessage;
     LayoutExportMode m_layoutExportMode;
-    int m_exportRetryCount; // anitvirus sometimes block exe file. workaround
-    QString m_exportTmpFileName;
 
     QTimer *m_tourTimer;
 
