@@ -30,21 +30,12 @@ static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 #endif
 
 
-static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
-static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
-
-StreamReader::StreamReader(
-    nxpt::CommonRefManager* const parentRefManager,
-    unsigned int frameDurationUsec,
-    bool liveMode )
+StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, bool isPrimary)
 :
     m_refManager( parentRefManager ),
-    m_encoderNumber( 0 ),
-    m_curTimestamp( 0 ),
-    m_frameDuration( frameDurationUsec ),
-    m_nextFrameDeployTime( 0 ),
-    m_initialized(false)
+    m_isPrimary( isPrimary ),
+    m_initialized(false),
+    m_codec(nxcip::CODEC_ID_NONE)
 {
 }
 
@@ -92,17 +83,23 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     if (!m_initialized)
     {
         int info_size = sizeof(stream_info);
-        int streamId = 0;
+        int streamId = m_isPrimary ? 0 : 1;
         rv = vmux.GetStreamInfo (streamId, &stream_info, &info_size);
         if (rv) {
             std::cout << "ISD plugin: can't get stream info" << std::endl;
-            return nxcip::NX_NO_DATA; // error
+            return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
+	if (stream_info.enc_type == 1)
+	    m_codec = nxcip::CODEC_ID_H264;
+	else if (stream_info.enc_type == ?)
+	    m_codec = nxcip::CODEC_ID_MJPEG;
+	else
+	    return nxcip::NX_INVALID_ENCODER_NUMBER;
 
         rv = vmux.StartVideo (streamId);
         if (rv) {
             std::cout << "ISD plugin: can't start video" << std::endl;
-            return nxcip::NX_NO_DATA; // error
+            return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
         m_initialized = true;
     }
@@ -110,6 +107,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     rv = vmux.GetFrame (&frame);
     if (rv) {
 	std::cout << "Can't read video frame" << std::endl;
+        return nxcip::NX_IO_ERROR; // error
     }
 
 
@@ -123,7 +121,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000,
         (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0),
         0, // cseq
-        nxcip::CODEC_ID_H264)); 
+        m_codec)); 
     videoPacket->resizeBuffer( frame.frame_size );
     memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
 

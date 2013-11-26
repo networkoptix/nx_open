@@ -27,9 +27,7 @@ public:
         \param liveMode In this mode, plays all pictures in a loop
     */
     StreamReader(
-        nxpt::CommonRefManager* const parentRefManager,
-        unsigned int frameDurationUsec,
-        bool liveMode );
+        nxpt::CommonRefManager* const parentRefManager, bool isPrimary);
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -45,12 +43,9 @@ public:
     virtual void interrupt() override;
 private:
     nxpt::CommonRefManager m_refManager;
-    int m_encoderNumber;
-    nxcip::UsecUTCTimestamp m_curTimestamp;
-    const unsigned int m_frameDuration;
-    nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
-    mutable Mutex m_mutex;
+    bool m_isPrimary;
     bool m_initialized;
+    nxcip::CompressionType m_codec;
 
     Vmux vmux;
 };

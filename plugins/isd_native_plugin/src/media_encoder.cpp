@@ -91,8 +91,7 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     if( !m_streamReader.get() )
         m_streamReader.reset( new StreamReader(
         &m_refManager,
-        m_frameDurationUsec,
-        true ) );
+        true) );
 
     m_streamReader->addRef();
     return m_streamReader.get();
