@@ -69,10 +69,10 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     if( encoderIndex != 0 )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this, encoderIndex) );
-    m_encoder->addRef();
-    *encoderPtr = m_encoder.get();
+    if( !m_encoder[encoderIndex].get() )
+        m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex) );
+    m_encoder[encoderIndex]->addRef();
+    *encoderPtr = m_encoder[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
 }
