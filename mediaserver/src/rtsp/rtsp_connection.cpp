@@ -1,4 +1,5 @@
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QUuid>
 #include <QtCore/QSet>
@@ -164,8 +165,8 @@ public:
         deleteDP();
     }
 
-    QnAbstractMediaStreamDataProviderPtr liveDpHi;
-    QnAbstractMediaStreamDataProviderPtr liveDpLow;
+    QnLiveStreamProviderPtr liveDpHi;
+    QnLiveStreamProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     Mode liveMode;
@@ -945,7 +946,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-                d->liveDpHi->start();
+                d->liveDpHi->startIfNotRunning(true);
             }
         }
         if (!d->liveDpLow && d->liveDpHi)
@@ -959,7 +960,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
-                    d->liveDpLow->start();
+                    d->liveDpLow->startIfNotRunning(true);
             }
         }
     }
@@ -1444,7 +1445,7 @@ void QnRtspConnectionProcessor::run()
 
     processRequest();
 
-    QTime t;
+    QElapsedTimer t;
     while (!m_needStop && d->socket->isConnected())
     {
         t.restart();

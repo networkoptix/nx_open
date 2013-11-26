@@ -51,7 +51,7 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.mid(1);
         bool needAuth = path != lit("api/ping");
 
-        QTime t;
+        QElapsedTimer t;
         t.restart();
         while (needAuth && !qnAuthHelper->authenticate(d->request, d->response))
         {

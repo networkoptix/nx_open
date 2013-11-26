@@ -7,6 +7,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "utils/common/synctime.h"
 #include <deque>
+#include "core/dataprovider/live_stream_provider.h"
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -203,9 +204,9 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             m_activityStartTime = usecTime;
             m_nextMinTryTime = usecTime + (rand()%100 + 60*5) * 1000000ll;
             m_camera->inUse(this);
-            QnAbstractMediaStreamDataProviderPtr provider = m_camera->getLiveReader(m_role);
+            QnLiveStreamProviderPtr provider = m_camera->getLiveReader(m_role);
             if (provider)
-                provider->start();
+                provider->startIfNotRunning(false);
         }
         else if (m_activityStarted && usecTime - m_activityStartTime > GET_FRAME_MAX_TIME )
         {
@@ -273,10 +274,10 @@ QnVideoCamera::~QnVideoCamera()
 void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
-    QnAbstractMediaStreamDataProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
+    QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
-        reader = QnAbstractMediaStreamDataProviderPtr(dynamic_cast<QnAbstractMediaStreamDataProvider*> (m_resource->createDataProvider(role)));
+        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*> (m_resource->createDataProvider(role)));
         if (reader == 0)
             return;
 
@@ -290,19 +291,18 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
     }
 }
 
-QnAbstractMediaStreamDataProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_getReaderMutex);
 
-    if (m_primaryReader == 0 && !m_resource->isDisabled() && m_resource->isInitialized())
+    if (!m_resource->isDisabled() && m_resource->isInitialized()) 
     {
-        createReader(QnResource::Role_LiveVideo);
-        createReader(QnResource::Role_SecondaryLiveVideo);
-        //if (m_primaryReader)
-        //    m_primaryReader->start();
-        //if (m_secondaryReader)
-        //    m_secondaryReader->start();
+        if (role == QnResource::Role_LiveVideo && m_primaryReader == 0)
+            createReader(QnResource::Role_LiveVideo);
+        else if (role == QnResource::Role_SecondaryLiveVideo && m_secondaryReader == 0)
+            createReader(QnResource::Role_SecondaryLiveVideo);
     }
+
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 

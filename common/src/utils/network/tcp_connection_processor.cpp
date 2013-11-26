@@ -82,8 +82,8 @@ int QnTCPConnectionProcessor::isFullMessage(const QByteArray& message)
 void QnTCPConnectionProcessor::parseRequest()
 {
     Q_D(QnTCPConnectionProcessor);
-    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
-    qDebug() << d->clientRequest;
+//    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
+//    qDebug() << d->clientRequest;
 
 #ifdef USE_NX_HTTP
     d->request = nx_http::HttpRequest();
@@ -341,7 +341,7 @@ bool QnTCPConnectionProcessor::readRequest()
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QTime globalTimeout;
+    //QElapsedTimer globalTimeout;
 #ifdef USE_NX_HTTP
     d->request = nx_http::HttpRequest();
     d->response = nx_http::HttpResponse();
@@ -359,7 +359,7 @@ bool QnTCPConnectionProcessor::readRequest()
         readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) 
         {
-            globalTimeout.restart();
+            //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
             if (isFullMessage(d->clientRequest))
             {

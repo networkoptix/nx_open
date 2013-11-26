@@ -29,7 +29,7 @@ namespace {
         QnConnectionData connection;
         connection.name = settings->value(QLatin1String("name")).toString();
         connection.url = settings->value(QLatin1String("url")).toString();
-        connection.url.setScheme(QLatin1String("https"));
+        connection.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
 
         return connection;
@@ -113,7 +113,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
-        result.url.setScheme(QLatin1String("https"));
+        result.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
         result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
         result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
@@ -121,7 +121,10 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         result.readOnly = true;
 
         if(!result.isValid())
-            result.url = QUrl(QString(QLatin1String("https://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
+            result.url = QUrl(QString(QLatin1String("%1://admin@%2:%3")).
+                arg(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http")).
+                arg(QLatin1String(DEFAULT_APPSERVER_HOST)).
+                arg(DEFAULT_APPSERVER_PORT));
 
         return QVariant::fromValue<QnConnectionData>(result);
     }

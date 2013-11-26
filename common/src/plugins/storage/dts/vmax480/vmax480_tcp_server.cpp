@@ -215,9 +215,6 @@ void QnVMax480ConnectionProcessor::run()
     {
         quint8 vMaxHeader[16];
 
-        QTime t;
-        t.restart();
-
         if (!readBuffer(vMaxHeader, sizeof(vMaxHeader)))
         {
             if (!d->socket->isConnected())

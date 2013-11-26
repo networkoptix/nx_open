@@ -11,6 +11,7 @@
 #include "settings.h"
 #include "business/business_rule_processor.h"
 #include "business/business_event_connector.h"
+#include "utils/network/simple_http_client.h"
 
 Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
 
@@ -22,7 +23,7 @@ QnServerMessageProcessor* QnServerMessageProcessor::instance()
 void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)
 {
     m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
-	m_source->setAuthKey(authKey);
+    m_source->setAuthKey(authKey);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
@@ -36,6 +37,7 @@ void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, 
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 {
+    m_tryDirectConnect = true;
 }
 
 void QnServerMessageProcessor::run()
@@ -58,7 +60,7 @@ void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
     QnAppServerConnectionFactory::setSystemName(message.systemName);
     QnAppServerConnectionFactory::setPublicIp(message.publicIp);
     QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
-
+    m_tryDirectConnect = true;
     emit connectionOpened();
 }
 
@@ -77,6 +79,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 
         if (!message.sessionKey.isNull())
             QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
+        QnAppServerConnectionFactory::setAllowCameraChanges(message.allowCameraChanges);
     }
     else if (message.messageType == Qn::Message_Type_License)
     {
@@ -166,4 +169,34 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 void QnServerMessageProcessor::at_connectionClosed(QString errorString)
 {
     qDebug() << "QnEventManager::connectionClosed(): Connection aborted:" << errorString;
+
+    // update EC port
+    int port = MSSettings::roSettings()->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt(); // defaulting to proxy
+
+    QUrl url = QnAppServerConnectionFactory::defaultUrl();
+    url.setPort(port);
+    QnAppServerConnectionFactory::setDefaultUrl(url);
+
+    // check if it proxy connection and direct EC access is available
+    if (m_tryDirectConnect) {
+        m_tryDirectConnect = false;
+        QAuthenticator auth;
+        auth.setUser(url.userName());
+        auth.setPassword(url.password());
+        static const int TEST_DIRECT_CONNECT_TIMEOUT = 2000;
+        CLSimpleHTTPClient testClient(url.host(), port, TEST_DIRECT_CONNECT_TIMEOUT, auth);
+        CLHttpStatus result = testClient.doGET(lit("proxy_api/ec_port"));
+        if (result == CL_HTTP_SUCCESS)
+        {
+            QUrl directURL;
+            QByteArray data;
+            testClient.readAll(data);
+            directURL = url;
+            directURL.setPort(data.toInt());
+            QnAppServerConnectionFactory::setDefaultUrl(directURL);
+        }
+    }
+
+
+    //appServerConnection->setUrl(QnAppServerConnectionFactory::defaultUrl());
 }

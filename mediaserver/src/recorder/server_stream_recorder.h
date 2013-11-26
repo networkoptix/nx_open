@@ -23,6 +23,7 @@ public:
     void updateScheduleInfo(qint64 timeMs);
 
     void setDualStreamingHelper(QnDualStreamingHelperPtr helper);
+    QnDualStreamingHelperPtr getDualStreamingHelper() const;
 
     /*
     * Ignore current schedule task param and start (or restart) recording with specified params. 

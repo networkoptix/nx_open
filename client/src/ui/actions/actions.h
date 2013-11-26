@@ -177,6 +177,17 @@ namespace Qn {
         OpenBusinessRulesAction,
 
 
+        /**
+         * Tries to restart the application as soon as all modal dialogs are closed.
+         * Parameters:
+         * <tt>QnSoftwareVersion  SoftwareVersionRole</tt>  --- application version that should be started.
+         *                                                      If not provided, current version will be used.
+         * <tt>QUrl UrlRole</tt>                            --- url the application should connect to.
+         *                                                      If not provided, current connection info will be used.
+         */
+        QueueAppRestartAction,
+
+
         /* Main menu actions. */
 
         /**

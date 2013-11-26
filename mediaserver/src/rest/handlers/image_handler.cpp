@@ -158,6 +158,8 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
                 video = camera->getLastVideoFrame(!useHQ);
         }
         if (!video) {
+            video = camera->getLastVideoFrame(!useHQ);
+
             serverDelegate.open(res);
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);

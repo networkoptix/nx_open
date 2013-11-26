@@ -1,6 +1,8 @@
 #ifndef onvif_helper_h
 #define onvif_helper_h
 
+#ifdef ENABLE_ONVIF
+
 #include <QHash>
 #include <QtCore/QString>
 #include <QtCore/QSet>
@@ -97,5 +99,7 @@ public:
     bool isSupported(const QString& cameraName) const;
     bool isManufacturerSupported(const QString& manufacturer) const;
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_helper_h

@@ -1,6 +1,8 @@
 
 #include "events_db.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include "business/events/abstract_business_event.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
@@ -212,7 +214,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     const QnId& businessRuleId) const
 
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     QList<QnAbstractBusinessActionPtr> result;
@@ -265,7 +267,7 @@ void QnEventsDB::getAndSerializeActions(
                                         const QnId& businessRuleId) const
 
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);

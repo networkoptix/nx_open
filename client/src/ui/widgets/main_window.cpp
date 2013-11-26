@@ -352,15 +352,16 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         return;
 
     if(fullScreen) {
+#ifndef Q_OS_MACX
         m_storedGeometry = geometry();
+#endif
         showFullScreen();
     } else if(isFullScreen()) {
         showNormal();
+#ifndef Q_OS_MACX
         setGeometry(m_storedGeometry);
-    }
-#ifdef Q_OS_MACX
-    display()->fitInView(true);
 #endif
+    }
 }
 
 void QnMainWindow::setAnimationsEnabled(bool enabled) {
@@ -372,7 +373,6 @@ void QnMainWindow::showFullScreen() {
 #if defined Q_OS_MACX
     mac_showFullScreen((void*)winId(), true);
     updateDecorationsState();
-    display()->fitInView(true);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
@@ -382,7 +382,6 @@ void QnMainWindow::showNormal() {
 #if defined Q_OS_MACX
     mac_showFullScreen((void*)winId(), false);
     updateDecorationsState();
-    display()->fitInView(true);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif

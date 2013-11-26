@@ -1,6 +1,8 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#ifdef ENABLE_ONVIF
+
 #include <list>
 #include <memory>
 #include <stack>
@@ -201,6 +203,7 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
+    bool isPTZDisabled() const;
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
@@ -416,7 +419,7 @@ private:
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     QString m_vendorName;
-	
+    
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
     int m_streamConfCounter;
@@ -439,5 +442,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif //onvif_resource_h

@@ -35,10 +35,10 @@ private:
     QQueue<int> m_daysToRequest;
     bool m_waitingAnswer;
     State m_state;
-    QTime m_updateTimer;
+    QElapsedTimer m_updateTimer;
     bool m_firstRange;
     QnTimePeriod m_archiveRange;
-    QTime m_waitTimer;
+    QElapsedTimer m_waitTimer;
     VMaxStreamFetcher* m_streamFetcher;
     QnResource* m_res;
     bool m_gotAllData;

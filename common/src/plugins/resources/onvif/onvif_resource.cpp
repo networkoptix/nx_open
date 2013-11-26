@@ -1,4 +1,6 @@
 
+#ifdef ENABLE_ONVIF
+
 #include <algorithm>
 #include <climits>
 #include <cmath>
@@ -67,6 +69,12 @@ StrictResolution strictResolutionList[] =
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
 
+// disable PTZ for this cameras
+QString strictPTZList[] =
+{
+    lit("N53F-F")
+};
+
 
 struct StrictBitrateInfo {
     const char* model;
@@ -77,7 +85,8 @@ struct StrictBitrateInfo {
 // Strict bitrate range for specified cameras
 StrictBitrateInfo strictBitrateList[] =
 {
-    { "DCS-7010L", 4096, 1024*16 }
+    { "DCS-7010L", 4096, 1024*16 },
+    { "DCS-6010L", 0, 1024*2 }
 };
 
 
@@ -557,6 +566,16 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
     }
+}
+
+bool QnPlOnvifResource::isPTZDisabled() const
+{
+    for (uint i = 0; i < sizeof(strictPTZList) / sizeof(QString); ++i)
+    {
+        if (getModel() == strictPTZList[i])
+            return true;
+    }
+    return false;
 }
 
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
@@ -2043,7 +2062,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
 
-    /*if (!getPtzfUrl().isEmpty() && !m_ptzController)
+    /*if (!getPtzfUrl().isEmpty() && !m_ptzController && !isPTZDisabled())
     {
         QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
         if (!controller->getPtzConfigurationToken().isEmpty())
@@ -2942,3 +2961,5 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
 
     return CameraDiagnostics::NoErrorResult();
 }
+
+#endif //ENABLE_ONVIF

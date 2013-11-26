@@ -40,7 +40,6 @@ private:
     void createMask(const QRegion& region);
 
     // mach one motion image by mask
-    bool mathImage(const __m128i* data);
     void mathImage(
         const QList<QRegion>& regions,
         QnResourcePtr res,

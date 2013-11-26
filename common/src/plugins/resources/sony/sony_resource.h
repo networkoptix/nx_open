@@ -1,6 +1,8 @@
 #ifndef sony_resource_h_1855
 #define sony_resource_h_1855
 
+#ifdef ENABLE_ONVIF
+
 #include <map>
 
 #include <QtCore/QMutex>
@@ -50,5 +52,7 @@ private slots:
 };
 
 //typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
+
+#endif //ENABLE_ONVIF
 
 #endif //sony_resource_h_1855

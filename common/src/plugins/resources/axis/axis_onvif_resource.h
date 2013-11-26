@@ -1,6 +1,8 @@
 #ifndef __AXIS_ONVIF_RESOURCE_H__
 #define __AXIS_ONVIF_RESOURCE_H__
 
+#ifdef ENABLE_ONVIF
+
 #include <map>
 
 #include <QtCore/QMutex>
@@ -28,5 +30,7 @@ public:
 };
 
 typedef QnSharedResourcePointer<QnAxisOnvifResource> QnAxisOnvifResourcePtr;
+
+#endif  //ENABLE_ONVIF
 
 #endif //__AXIS_ONVIF_RESOURCE_H__

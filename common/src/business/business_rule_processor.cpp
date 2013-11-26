@@ -135,6 +135,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
     case BusinessActionType::SayText:
         return broadcastBusinessAction(action);
 
@@ -292,12 +293,13 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
 
     QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
-    if (!aggInfo.initialized())
+    bool isFirstCall = !aggInfo.initialized();
+    if (isFirstCall)
         aggInfo.init(bEvent, rule, currentTime);
 
     aggInfo.append(bEvent->getRuntimeParams());
 
-    if (currentTime > aggInfo.estimatedEnd())
+    if (isFirstCall || currentTime > aggInfo.estimatedEnd())
     {
         QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
                                                                                         aggInfo.event(),

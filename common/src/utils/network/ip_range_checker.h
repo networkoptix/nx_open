@@ -1,19 +1,14 @@
 #ifndef ip_range_checker_h_1427
 #define ip_range_checker_h_1427
 
-#include <QtNetwork/QHostInfo>
 #include <QtCore/QObject>
+#include <QtCore/QFuture>
 
+#include <QtNetwork/QHostInfo>
 
-class QnIprangeChecker : public QObject
-{
-    Q_OBJECT
+class QnIpRangeChecker {
 public:
-    QnIprangeChecker();
-    ~QnIprangeChecker();
-    QList<QString> onlineHosts(QHostAddress startAddr, QHostAddress endAddr, int port);
-private:
-
+    static QFuture<QStringList> onlineHostsAsync(const QHostAddress &startAddr, const QHostAddress &endAddr, int port);
 };
 
 

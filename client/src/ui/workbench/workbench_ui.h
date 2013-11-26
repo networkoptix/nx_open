@@ -186,6 +186,7 @@ protected:
     void updateViewportMargins();
 
     void updateTreeGeometry();
+    Q_SLOT void updateTreeResizerGeometry();
     Q_SLOT void updateNotificationsGeometry();
     void updateFpsGeometry();
     void updateCalendarGeometry();
@@ -240,13 +241,14 @@ private slots:
     void at_controlsWidget_geometryChanged();
 
     void at_sliderItem_geometryChanged();
-    void at_sliderResizerItem_geometryChanged();
+    void at_sliderResizerWidget_geometryChanged();
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
     void at_toggleSliderAction_toggled(bool checked);
 
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
+    void at_treeResizerWidget_geometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeShowButton_toggled(bool checked);
@@ -343,10 +345,13 @@ private:
     /** Navigation item. */
     QnNavigationItem *m_sliderItem;
 
-    QGraphicsWidget *m_sliderResizerItem;
+    QGraphicsWidget *m_sliderResizerWidget;
 
     bool m_ignoreSliderResizerGeometryChanges;
     bool m_ignoreSliderResizerGeometryChanges2;
+
+    bool m_ignoreTreeResizerGeometryChanges;
+    bool m_ignoreTreeResizerGeometryChanges2;
 
     bool m_sliderZoomingIn, m_sliderZoomingOut;
 
@@ -369,6 +374,7 @@ private:
 
     /** Navigation tree widget. */
     QnResourceBrowserWidget *m_treeWidget;
+    QGraphicsWidget *m_treeResizerWidget;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget *m_treeItem;

@@ -1084,8 +1084,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     if (emptyData && !flushCurrentBuffer)
     {
-        if (speed == 0)
-            return true;
+        //if (speed == 0) 
+        //    return true;
 
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling

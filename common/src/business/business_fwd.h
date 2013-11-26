@@ -67,6 +67,9 @@ namespace BusinessEventType {
         /** Two or more mediaservers are running. */
         MediaServer_Conflict,
 
+        /** Media server started */
+        MediaServer_Started,
+
         /** Event type is not defined. Used in rules. */
         NotDefined,
 
@@ -116,6 +119,7 @@ namespace BusinessActionType {
                 - soundUrl (string, required)               - url of sound, contains path to sound on the EC
         */
         PlaySound,
+        PlaySoundRepeated,
 
         /*!
             parameters:\n

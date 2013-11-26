@@ -95,7 +95,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnCamerasFoundInfoList>();
+    qRegisterMetaType<QnManualCameraSearchProcessReply>();
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();

@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="zh_CN" sourcelanguage="en">
 <context>
+    <name>QnScheduleGridWidget</name>
+    <message>
+        <source></source>
+        <comment>SCHEDULE_GRID_CORNER_TEXT</comment>
+        <translation>全选</translation>
+   </message>
+</context>
+<context>
     <name>AVSettingsDlg</name>
     <message>
         <source>Suggestions...</source>
@@ -1302,7 +1310,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Main Media Folder</source>
-        <translation>主要媒体文件夹</translation>
+        <translation>是指本地录像存储路径</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
@@ -1322,7 +1330,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation>看和感觉</translation>
+        <translation>基本设置</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -1334,7 +1342,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Misc</source>
-        <translation>杂项</translation>
+        <translation>高级设置</translation>
     </message>
     <message>
         <source>Downmix the Audio from 5.1 to 2.1 channels (restart required)</source>
@@ -6335,117 +6343,66 @@ AVAILABLE</source>
         <translation>没有可用的缩图</translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <comment>DEFAULT_TOOL_TIP_FORMAT</comment>
-        <translation type="obsolete">时:分:秒</translation>
-    </message>
-    <message>
         <source>ms</source>
         <translation>毫秒</translation>
-    </message>
-    <message>
-        <source>10ms</source>
-        <translation type="obsolete">10毫秒</translation>
-    </message>
-    <message>
-        <source>50ms</source>
-        <translation type="obsolete">50毫秒</translation>
-    </message>
-    <message>
-        <source>100ms</source>
-        <translation type="obsolete">100毫秒</translation>
-    </message>
-    <message>
-        <source>500ms</source>
-        <translation type="obsolete">500毫秒</translation>
     </message>
     <message>
         <source>s</source>
         <translation>秒</translation>
     </message>
     <message>
-        <source>59s</source>
-        <translation type="obsolete">59秒</translation>
-    </message>
-    <message>
         <source>m</source>
         <translation>分</translation>
-    </message>
-    <message>
-        <source>59m</source>
-        <translation type="obsolete">59分</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm ap</source>
-        <translation type="obsolete">日 月 年 时:分</translation>
     </message>
     <message>
         <source>h</source>
         <translation>时</translation>
     </message>
     <message>
-        <source>23h</source>
-        <translation type="obsolete">23时</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy h ap</source>
-        <translation type="obsolete">日 月 年 时</translation>
-    </message>
-    <message>
-        <source>dd MMM</source>
-        <translation type="obsolete">日 月</translation>
-    </message>
-    <message>
-        <source>29 Mar</source>
-        <translation type="obsolete">3月29日</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy</source>
-        <translation type="obsolete">日 月 年</translation>
-    </message>
-    <message>
-        <source>MMMM</source>
-        <translation type="obsolete">月</translation>
-    </message>
-    <message>
-        <source>September</source>
-        <translation type="obsolete">9月</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <translation type="obsolete">月 年</translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <translation type="obsolete">年</translation>
-    </message>
-    <message>
-        <source>2000</source>
-        <translation type="obsolete">2000</translation>
-    </message>
-    <message>
         <source>d</source>
         <translation>日</translation>
-    </message>
-    <message>
-        <source>29d</source>
-        <translation type="obsolete">29日</translation>
     </message>
     <message>
         <source>M</source>
         <translation>月</translation>
     </message>
     <message>
-        <source>11M</source>
-        <translation type="obsolete">11月</translation>
-    </message>
-    <message>
         <source>y</source>
         <translation>年</translation>
     </message>
     <message>
-        <source>2000y</source>
-        <translation type="obsolete">2000年</translation>
+        <source>dd MMMM</source>
+        <translation>d日</translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <translation>M月</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <translation>yyyy年</translation>
+    </message>
+    <message>
+        <source>auto</source>
+        <translation>none</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>MINUTES</comment>
+        <translation>yyyy年MM月dd日 hh:mm</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>HOURS</comment>
+        <translation>yyyy年MM月dd日 h时</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <translation>yyyy年MM月dd日</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <translation>yyyy年MM月</translation>
     </message>
 </context>
 <context>
@@ -7342,19 +7299,16 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>yyyy MMM dd
 hh:mm:ss</source>
-        <comment>CAMERA_TOOL_TIP_FORMAT</comment>
-        <translation type="obsolete">年 月 日
-时:分:秒</translation>
+        <translation>yyyy年MM月dd日
+hh:mm:ss</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <comment>LONG_TOOL_TIP_FORMAT</comment>
-        <translation type="obsolete">时:分:秒</translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <comment>SHORT_TOOL_TIP_FORMAT</comment>
-        <translation type="obsolete">分:秒</translation>
+        <translation>mm:ss</translation>
     </message>
 </context>
 <context>

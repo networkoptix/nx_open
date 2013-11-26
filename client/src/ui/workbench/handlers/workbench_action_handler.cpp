@@ -104,8 +104,8 @@
 #include <utils/license_usage_helper.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
+#include <utils/applauncher_utils.h>
 #include <utils/local_file_cache.h>
-#include <utils/media/audio_player.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
@@ -216,7 +216,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_messageProcessor_connectionOpened()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)), this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -332,6 +331,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -992,31 +992,6 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
 
-void QnWorkbenchActionHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
-    switch (businessAction->actionType()) {
-    case BusinessActionType::ShowPopup: {
-            notificationsHandler()->addBusinessAction(businessAction);
-            break;
-        }
-    case BusinessActionType::PlaySound: {
-            QString filename = businessAction->getParams().getSoundUrl();
-            QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
-            // if file is not exists then it is already deleted or just not downloaded yet
-            // I think it should not be played when downloaded
-            AudioPlayer::playFileAsync(filePath);
-//            qDebug() << "play sound action received" << filename << filePath;
-            break;
-        }
-    case BusinessActionType::SayText: {
-            AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
-//            qDebug() << "speech action received" << businessAction->getParams().getSayText();
-            break;
-        }
-    default:
-        break;
-    }
-}
-
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
@@ -1207,6 +1182,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly, true, true); // overwrite layout file
     } else {
+        //TODO: #GDM check existing layouts.
+        //TODO: #GDM all remotes layout checking and saving should be done in one place
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     }
 }
@@ -1245,6 +1222,12 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
             name = dialog->name();
+
+            // that's the case when user press "Save As" and enters the same name as this layout already has
+            if (name == layout->getName()) {
+                at_saveLayoutAction_triggered(layout);
+                return;
+            }
 
             button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
@@ -1682,37 +1665,30 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    dialog->setCurrentPage(QnPreferencesDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->openLicensesPage();
+    dialog->setCurrentPage(QnPreferencesDialog::LicensesPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->openServerSettingsPage();
+    dialog->setCurrentPage(QnPreferencesDialog::ServerPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->openPopupSettingsPage();
+    dialog->setCurrentPage(QnPreferencesDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-    if (dialog->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
@@ -2309,13 +2285,34 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
     if(resources.size() != 1)
         return;
 
+    QnMediaServerResourcePtr server = resources[0];
+
     bool newlyCreated = false;
     if(!cameraAdditionDialog()) {
         m_cameraAdditionDialog = new QnCameraAdditionDialog(mainWindow());
         newlyCreated = true;
     }
+    QnCameraAdditionDialog* dialog = cameraAdditionDialog();
+
+    if (dialog->server() != server) {
+        if (dialog->state() == QnCameraAdditionDialog::Searching
+                || dialog->state() == QnCameraAdditionDialog::Adding) {
+
+            int result = QMessageBox::warning(
+                        mainWindow(),
+                        tr("Process is in progress"),
+                        tr("Camera addition is already in progress."\
+                           "Are you sure you want to cancel current process?"), //TODO: #GDM show current process details
+                        QMessageBox::Ok | QMessageBox::Cancel,
+                        QMessageBox::Cancel
+            );
+            if (result != QMessageBox::Ok)
+                return;
+        }
+        dialog->setServer(server);
+    }
+
     QRect oldGeometry = cameraAdditionDialog()->geometry();
-    cameraAdditionDialog()->setServer(resources[0]);
     cameraAdditionDialog()->show();
     if(!newlyCreated)
         cameraAdditionDialog()->setGeometry(oldGeometry);
@@ -2541,9 +2538,12 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return; /* User does not want it deleted. */
 
     foreach(const QnResourcePtr &resource, resources) {
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout))
+        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            if(snapshotManager()->isLocal(layout)) {
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
+                continue;
+            }
+        }
 
         connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
@@ -4153,10 +4153,57 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
-    QMessageBox::warning(context()->mainWindow(),
-                         QObject::tr("Beta version"),
-                         QObject::tr("You are running beta version of %1")
+    QMessageBox::warning(mainWindow(),
+                         tr("Beta version"),
+                         tr("You are running beta version of %1")
                          .arg(QLatin1String(QN_APPLICATION_NAME)));
+}
+
+void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnSoftwareVersion version = parameters.hasArgument(Qn::SoftwareVersionRole)
+            ? parameters.argument<QnSoftwareVersion>(Qn::SoftwareVersionRole)
+            : QnSoftwareVersion();
+    QUrl url = parameters.hasArgument(Qn::UrlRole)
+            ? parameters.argument<QUrl>(Qn::UrlRole)
+            : context()->user()
+              ? QnAppServerConnectionFactory::defaultUrl()
+              : QUrl();
+    QByteArray auth = url.toEncoded();
+
+    bool isInstalled;
+    bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
+    if (success && isInstalled) {
+        //TODO: #GDM wtf? whats up with order?
+        if(context()->user()) { // TODO: #Elric factor out
+            QnWorkbenchState state;
+            workbench()->submit(state);
+
+            QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
+            states[context()->user()->getName()] = state;
+            qnSettings->setUserWorkbenchStates(states);
+        }
+
+        //TODO: #GDM factor out
+        if(!closeAllLayouts(true)) {
+            return;
+        }
+        menu()->trigger(Qn::ClearCameraSettingsAction);
+
+        success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
+    }
+
+    if (!success) {
+        QMessageBox::critical(
+                    mainWindow(),
+                    tr("Launcher process is not found"),
+                    tr("Cannot restart the client.\n"
+                       "Please close the application and start it again using the shortcut in the start menu.")
+                    );
+        return;
+    }
+    qApp->exit(0);
 }
 
 void QnWorkbenchActionHandler::checkForClosurePending()

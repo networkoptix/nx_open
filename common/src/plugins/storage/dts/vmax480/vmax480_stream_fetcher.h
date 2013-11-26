@@ -1,6 +1,7 @@
 #ifndef __VMAX480_STREAM_FETCHER_H__
 #define __VMAX480_STREAM_FETCHER_H__
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QProcess>
 #include <QtCore/QSet>
 #include <QtCore/QWaitCondition>
@@ -109,7 +110,7 @@ private:
     int m_lastSpeed;
     qint64 m_lastSeekPos;
     bool m_beforeSeek;
-    QTime m_seekTimer;
+    QElapsedTimer m_seekTimer;
     bool m_isPlaying;
     bool m_keepAllChannels;
     QnPlaybackMaskHelper m_playbackMaskHelper;

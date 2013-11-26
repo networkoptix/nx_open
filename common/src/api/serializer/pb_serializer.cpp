@@ -483,6 +483,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     case BusinessActionType::Diagnostics:           return pb::Diagnostics;
     case BusinessActionType::ShowPopup:             return pb::ShowPopup;
     case BusinessActionType::PlaySound:             return pb::PlaySound;
+    case BusinessActionType::PlaySoundRepeated:     return pb::PlaySoundRepeated;
     case BusinessActionType::SayText:               return pb::SayText;
     }
     return pb::NotDefinedAction;
@@ -507,6 +508,7 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
     case BusinessEventType::Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
     case BusinessEventType::MediaServer_Failure: return pb::MediaServer_Failure;
     case BusinessEventType::MediaServer_Conflict:return pb::MediaServer_Conflict;
+    case BusinessEventType::MediaServer_Started: return pb::MediaServer_Started;
     default:
         break;
     }
@@ -627,6 +629,7 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     case pb::Camera_Ip_Conflict:    return BusinessEventType::Camera_Ip_Conflict;
     case pb::MediaServer_Failure:   return BusinessEventType::MediaServer_Failure;
     case pb::MediaServer_Conflict:  return BusinessEventType::MediaServer_Conflict;
+    case pb::MediaServer_Started:  return BusinessEventType::MediaServer_Started;
     }
     return BusinessEventType::NotDefined;
 }
@@ -643,6 +646,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::Diagnostics:           return BusinessActionType::Diagnostics;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     case pb::PlaySound:             return BusinessActionType::PlaySound;
+    case pb::PlaySoundRepeated:     return BusinessActionType::PlaySoundRepeated;
     case pb::SayText:               return BusinessActionType::SayText;
     }
     return BusinessActionType::NotDefined;
@@ -775,6 +779,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     connectInfo->ecsGuid = QString::fromUtf8(pb_connectInfo.ecsguid().c_str());
     connectInfo->publicIp = QString::fromUtf8(pb_connectInfo.publicip().c_str());
     connectInfo->brand = QString::fromUtf8(pb_connectInfo.brand().c_str());
+    connectInfo->allowCameraChanges = pb_connectInfo.allowcamerachanges();
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &businessRules, const QByteArray &data)
@@ -797,9 +802,6 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
 
 void QnApiPbSerializer::deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized actions."));
@@ -1018,9 +1020,6 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
 
 void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActionList &actions, QByteArray &data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
 
     for (int i = 0; i < actions.size(); ++i)

@@ -213,14 +213,17 @@ bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bo
 
 bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
     QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
+
+    if (!cameraRes->isInitialized() && !cameraRes->isDisabled())
+        cameraRes->initAsync(true);
 
     bool someRecordingIsPresent = false;
 
     QnStorageManager* storageMan = QnStorageManager::instance();
-    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline && storageMan->rebuildState() == QnStorageManager::RebuildState_None)
+    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
     {
         someRecordingIsPresent = true;
 
@@ -234,14 +237,14 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                 }
                 recorderHiRes->start();
             }
-            providerHi->start();
+            providerHi->startIfNotRunning(true);
         }
 
         if (providerLow && recorderHiRes) {
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
+            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) && cameraRes->hasDualStreaming2(); 
 
             if (runSecondStream)
             {
@@ -251,7 +254,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                     }
                     recorderLowRes->start();
                 }
-                providerLow->start();
+                providerLow->startIfNotRunning(true);
             }
             else {
                 if (recorderLowRes)
@@ -320,6 +323,13 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
             const Recorders& recorders = itrRec.value();
             if (recorders.recorderHiRes)
                 recorders.recorderHiRes->updateCamera(res);
+
+            if (recorders.recorderHiRes && providerLow && !recorders.recorderLowRes)
+            {
+                QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
+                if (recorderLowRes) 
+                    recorderLowRes->setDualStreamingHelper(recorders.recorderHiRes->getDualStreamingHelper());
+            }
             if (recorders.recorderLowRes)
                 recorders.recorderLowRes->updateCamera(res);
 
@@ -370,9 +380,9 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
             camera->initAsync(false);
         }
 
-		QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
-		if (!mServer || mServer->getGuid() != serverGuid())
-			return; // it is camera from other server
+        QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
+        if (!mServer || mServer->getGuid() != serverGuid())
+            return; // it is camera from other server
 
         updateCamera(camera);
 
@@ -498,6 +508,7 @@ void QnRecordingManager::onTimer()
             recorders.recorderLowRes->updateScheduleInfo(time);
         someRecordingIsPresent |= startOrStopRecording(itrRec.key(), camera, recorders.recorderHiRes, recorders.recorderLowRes);
     }
+
     QnStorageManager* storageMan = QnStorageManager::instance();
     if (!someRecordingIsPresent && storageMan->rebuildState() == QnStorageManager::RebuildState_WaitForRecordersStopped)
     {

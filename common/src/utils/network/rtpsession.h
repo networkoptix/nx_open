@@ -2,6 +2,7 @@
 #define rtp_session_h_1935_h
 
 #include <memory>
+#include <vector>
 
 #include <QAuthenticator>
 
@@ -80,7 +81,7 @@ private:
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
-    QTime m_statsTimer;
+    QElapsedTimer m_statsTimer;
     double m_minJitter;
     double m_maxJitter;
     double m_jitterSum;
@@ -265,7 +266,7 @@ public:
     * @param channelNumber buffer number
     * @return amount of readed bytes
     */
-    int readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber);
+    int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
 
     void sendBynaryResponse(quint8* buffer, int size);
@@ -275,7 +276,7 @@ public:
 
     void setUsePredefinedTracks(int numOfVideoChannel);
 
-    static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
+    static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
 
     bool setTCPReadBufferSize(int value);
 
@@ -347,7 +348,7 @@ private:
     // format: key - track number, value - codec name
     TrackMap m_sdpTracks;
 
-    QTime m_keepAliveTime;
+    QElapsedTimer m_keepAliveTime;
 
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
@@ -365,6 +366,12 @@ private:
     QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
     QString m_videoLayout;
+
+    char* m_additionalReadBuffer;
+    int m_additionalReadBufferPos;
+    int m_additionalReadBufferSize;
+
+    int readSocketWithBuffering( quint8* buf, size_t bufSize );
 };
 
 #endif //rtp_session_h_1935_h

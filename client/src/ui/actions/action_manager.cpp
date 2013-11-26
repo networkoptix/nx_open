@@ -417,6 +417,10 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
 
+    factory(Qn::QueueAppRestartAction).
+        flags(Qn::NoTarget).
+        text(tr("Restart application"));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).

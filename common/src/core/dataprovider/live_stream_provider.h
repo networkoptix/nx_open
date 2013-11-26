@@ -43,12 +43,22 @@ public:
 
     void setUseSoftwareMotion(bool value);
 
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     void updateSoftwareMotion();
+#endif
     bool canChangeStatus() const;
 
     virtual bool secondaryResolutionIsLarge() const { return false; }
 
     static bool hasRunningLiveProvider(QnNetworkResourcePtr netRes);
+
+    /*!
+        Start provider if not running yet.
+        @param canTouchCameraSettings can control camera settings if true
+    */
+    void startIfNotRunning(bool canTouchCameraSettings);
+
+    bool isCameraControlDisabled() const;
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -70,13 +80,16 @@ private:
     //int m_NumaberOfVideoChannels;
     Qn::StreamQuality m_quality;
     bool m_qualityUpdatedAtLeastOnce;
+    bool m_canTouchCameraSettings;
 
     mutable float m_fps; //used only for live providers
     unsigned int m_framesSinceLastMetaData; // used only for live providers
     QTime m_timeSinceLastMetaData; //used only for live providers
 
     QnResource::ConnectionRole m_softMotionRole;
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
+#endif
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     const QnResourceVideoLayout* m_layout;
@@ -84,5 +97,7 @@ private:
     bool m_isPhysicalResource;
     Qn::SecondStreamQuality  m_secondaryQuality;
 };
+
+typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
 
 #endif //live_strem_provider_h_1508

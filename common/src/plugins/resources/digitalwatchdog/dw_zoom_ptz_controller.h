@@ -1,7 +1,9 @@
 #ifndef QN_DW_ZOOM_PTZ_CONTROLLER_H
 #define QN_DW_ZOOM_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_ONVIF
 #include <core/ptz/abstract_ptz_controller.h>
+
 
 class QnDwZoomPtzController: public QnAbstractPtzController {
     Q_OBJECT;
@@ -21,5 +23,7 @@ public:
 private:
     QnPlWatchDogResourcePtr m_resource;
 };
+
+#endif // ENABLE_ONVIF
 
 #endif // QN_DW_ZOOM_PTZ_CONTROLLER_H

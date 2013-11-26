@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "dw_zoom_ptz_controller.h"
 
 #include <plugins/resources/camera_settings/camera_settings.h>
@@ -64,3 +67,4 @@ int relativeMove(qreal, const QRectF &) {
     return 1;
 }
 
+#endif //ENABLE_ONVIF

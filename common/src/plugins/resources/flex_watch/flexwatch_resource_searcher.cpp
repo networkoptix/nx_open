@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "flexwatch_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "flexwatch_resource.h"
@@ -66,7 +69,7 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
         QByteArray pattern = requestPattertn.replace("____", rndPattern);
         QByteArray request = QByteArray::fromHex(pattern);
         // sending broadcast
-		sock->sendTo(request.data(), request.size(), BROADCAST_ADDRESS, 51000);
+        sock->sendTo(request.data(), request.size(), BROADCAST_ADDRESS, 51000);
     }
 }
 
@@ -125,3 +128,5 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
     sendBroadcast();
     return result;
 }
+
+#endif //ENABLE_ONVIF

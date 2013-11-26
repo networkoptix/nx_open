@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include <QTextStream>
 #include "desktop_camera_reader.h"
 #include "utils/common/sleep.h"
@@ -179,3 +182,5 @@ const QnResourceAudioLayout* QnDesktopCameraStreamReader::getDPAudioLayout() con
     QMutexLocker lock(&m_audioLayoutMutex);
     return m_audioLayout;
 }
+
+#endif  //ENABLE_DESKTOP_CAMERA

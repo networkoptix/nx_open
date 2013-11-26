@@ -1,6 +1,8 @@
 #ifndef ___DESKTOP_CAMERA_RESOURCE_SEARCHER_H__
 #define ___DESKTOP_CAMERA_RESOURCE_SEARCHER_H__
 
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include <QMap>
 #include <QMutex>
 
@@ -42,5 +44,7 @@ public:
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 };
 typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
+
+#endif //ENABLE_DESKTOP_CAMERA
 
 #endif // _DESKTOP_CAMERA_RESOURCE_SEARCHER_H__

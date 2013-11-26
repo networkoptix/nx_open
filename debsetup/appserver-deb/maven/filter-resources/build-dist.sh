@@ -30,6 +30,7 @@ INITDSTAGE=$STAGE$INITDTARGET
 PROXY_BIN_PATH=${libdir}/bin/${build.configuration}
 PROXY_LIB_PATH=${libdir}/lib/${build.configuration}
 ECS_PRESTAGE_PATH=${libdir}/../../appserver/setup/build/stage
+SCRIPTS_PATH=${basedir}/../scripts
 	
 #. $SERVER_BIN_PATH/env.sh
 
@@ -76,6 +77,8 @@ find $SHARESTAGE -name \*.pyc -delete
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
+install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
+
 install -m 644 init/networkoptix-mediaproxy.conf $INITSTAGE/${COMPANY_NAME}-mediaproxy.conf
 install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE/${COMPANY_NAME}-mediaproxy
 
@@ -92,5 +95,4 @@ install -m 644 debian/conffiles $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)

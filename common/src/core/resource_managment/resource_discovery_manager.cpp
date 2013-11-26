@@ -1,23 +1,26 @@
+#include "resource_discovery_manager.h"
 
 #include <set>
 
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-#include "resource_discovery_manager.h"
-#include "utils/common/sleep.h"
-#include "resource_searcher.h"
-#include "../resource/network_resource.h"
-#include "resource_pool.h"
-#include "utils/common/util.h"
-#include "api/app_server_connection.h"
-#include "utils/common/synctime.h"
-#include "utils/network/ping.h"
-#include "utils/network/ip_range_checker.h"
-#include "plugins/resources/upnp/upnp_device_searcher.h"
-#include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/storage_resource.h"
-#include "camera_driver_restriction_list.h"
+
+#include <api/app_server_connection.h>
+
+#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_managment/camera_driver_restriction_list.h>
+#include <core/resource_managment/resource_searcher.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <plugins/resources/upnp/upnp_device_searcher.h>
+#include <plugins/storage/dts/abstract_dts_searcher.h>
+
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/network/ip_range_checker.h>
 
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
@@ -99,7 +102,7 @@ QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()));
+    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()) && !m_disabledVendorsForAutoSearch.contains(lit("all")));
     m_searchersList.push_back(serv);
 }
 
@@ -267,9 +270,6 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
 
 QnResourceList QnResourceDiscoveryManager::findNewResources()
 {
-    QTime time;
-    time.start();
-
     QnResourceList resources;
     std::set<QString> resourcePhysicalIDs;    //used to detect duplicate resources (same resource found by multiple drivers)
     m_searchersListMutex.lock();
@@ -336,25 +336,12 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     if (processDiscoveredResources(resources)) 
     {
         dtsAssignment();
-        //cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
         return resources;
     }
     else {
         return QnResourceList();
     }
 }
-
-/*
-QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
-{
-    QnResourceList resources;
-    appendManualDiscoveredResources(resources);
-    if (processDiscoveredResources(resources))
-        return resources;
-    else
-        return QnResourceList();
-}
-*/
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
@@ -382,128 +369,6 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     }
 
     return !resources.isEmpty();
-}
-
-struct ManualSearcherHelper
-{
-    ManualSearcherHelper(): plugins(0) {}
-
-    QUrl url;
-    QnResourceDiscoveryManager::ResourceSearcherList* plugins;
-    QList<QnResourcePtr> resList;
-    QAuthenticator auth;
-
-    void f()
-    {
-        foreach(QnAbstractResourceSearcher* as, *plugins)
-        {
-            QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            Q_ASSERT( ns );
-            resList = ns->checkHostAddr(url, auth, true);
-            if (!resList.isEmpty())
-                break;
-        }
-    }
-};
-
-
-QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port)
-{
-    
-    {
-        QString str;
-        QTextStream stream(&str);
-
-        stream << "Looking for cameras... StartAddr = " << startAddr << "  EndAddr = " << endAddr << "   login/pass = " << auth.user() << "/" << auth.password();
-        cl_log.log(str, cl_logINFO);
-    }
-
-    //=======================================
-    QnIprangeChecker ip_cheker;
-
-    cl_log.log("Checking for online addresses....", cl_logINFO);
-
-    QList<QString> online;
-    if (endAddr.isNull())
-        online << startAddr;
-    else
-        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr), port ? port : 80);
-
-
-    cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
-
-    foreach(const QString& addr, online)
-    {
-        cl_log.log(addr, cl_logINFO);
-    }
-
-    //=======================================
-
-    //now lets check each one of online machines...
-
-    QList<ManualSearcherHelper> testList;
-    foreach(const QString& addr, online)
-    {
-        ManualSearcherHelper t;
-        if( QUrl(addr).scheme().isEmpty() )
-            t.url.setHost(addr);
-        else
-            t.url.setUrl(addr);
-        if (port)
-            t.url.setPort(port);
-        t.auth = auth;
-        t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
-        testList.push_back(t);
-    }
-
-    /*
-    int threads = 4;
-    QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) 
-        global->releaseThread();
-    QtConcurrent::blockingMap(testList, &ManualSearcherHelper::f);
-    for (int i = 0; i < threads; ++i )
-        global->reserveThread();
-    */
-    int startIdx = 0;
-    static const int SEARCH_THREAD_AMOUNT = 4;
-    int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
-    while (startIdx < testList.size()) {
-        QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearcherHelper::f);
-        startIdx = endIdx;
-        endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
-    }
-
-
-    QnResourceList result;
-
-    foreach(const ManualSearcherHelper& h, testList)
-    {
-        result.append(h.resList);
-        /*
-        for (int i = 0; i < h.resList.size(); ++i)
-        {
-            if (qnResPool->hasSuchResource(h.resList[i]->getUniqueId())) // already in resource pool 
-                continue;
-
-            // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
-            QnResourcePtr existRes = qnResPool->getResourceByUrl(h.url.host());
-            if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
-                continue;
-
-            result.push_back(h.resList[i]);
-        }
-        */
-    }
-
-    cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);
-    foreach(QnResourcePtr res, result)
-    {
-        cl_log.log(res->toString(), cl_logINFO);
-    }
-
-
-    return result;
 }
 
 bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCamerasMap& cameras)
@@ -547,6 +412,10 @@ bool QnResourceDiscoveryManager::containManualCamera(const QString& uniqId)
 {
     QMutexLocker lock(&m_searchersListMutex);
     return m_manualCameraMap.contains(uniqId);
+}
+
+QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {
+    return m_searchersList;
 }
 
 void QnResourceDiscoveryManager::dtsAssignment()

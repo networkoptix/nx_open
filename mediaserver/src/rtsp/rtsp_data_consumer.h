@@ -2,7 +2,8 @@
 #define __RTSP_DATA_CONSUMER_H__
 
 #include <QtNetwork/QHostAddress>
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
+
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "core/datapacket/abstract_data_packet.h"
@@ -78,7 +79,7 @@ private:
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;
-    QTime m_timer;
+    QElapsedTimer m_timer;
     //quint16 m_sequence[MAX_RTP_CHANNELS];
     //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
@@ -112,7 +113,7 @@ private:
     
     qint64 m_firstLiveTime;
     qint64 m_lastLiveTime;
-    QTime m_liveTimer;
+    QElapsedTimer m_liveTimer;
     mutable QMutex m_liveTimingControlMtx;
     bool m_allowAdaptiveStreaming;
 

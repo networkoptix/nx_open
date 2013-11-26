@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "onvif_ptz_controller.h"
 #include "plugins/resources/onvif/onvif_resource.h"
 #include "soap_wrapper.h"
@@ -291,4 +294,5 @@ void QnOnvifPtzController::getFlipped(bool *horizontal, bool *vertical)
         *vertical = m_verticalFlipped;
 }
 
+#endif //ENABLE_ONVIF
 

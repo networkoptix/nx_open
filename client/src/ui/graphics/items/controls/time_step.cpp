@@ -187,7 +187,7 @@ QString toShortString(qint64 msecs, const QnTimeStep &step) {
     case QnTimeStep::Hours:
         return QString::number(timeToMSecs(QDateTime::fromMSecsSinceEpoch(msecs).time()) / step.unitMSecs % step.wrapUnits) + step.format;
     default:
-        return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.format);
+        return QLocale().toString(QDateTime::fromMSecsSinceEpoch(msecs), step.format);
     }
 }
 
@@ -195,7 +195,7 @@ QString toLongString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) {
         return QString();
     } else {
-        return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.longFormat);
+        return QLocale().toString(QDateTime::fromMSecsSinceEpoch(msecs), step.longFormat);
     }
 }
 

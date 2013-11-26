@@ -63,6 +63,12 @@ void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, 
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 
+void QnBusinessEventConnector::at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp)
+{
+    QnMServerStartedBusinessEventPtr mserverEvent(new QnMServerStartedBusinessEvent(resource, timeStamp));
+    qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
+}
+
 void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList , qint64 timeStamp)
 {
     QnIPConflictBusinessEventPtr ipConflictEvent(new QnIPConflictBusinessEvent(resource, hostAddress, macAddrList, timeStamp));

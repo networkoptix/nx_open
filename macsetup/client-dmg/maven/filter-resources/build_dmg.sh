@@ -14,6 +14,8 @@ python macdeployqt.py "$SRC/${product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP
 SetFile -c icnC $SRC/.VolumeIcon.icns
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"
 
+[ "$1" == "rwonly" ] && exit 0
+
 rm -rf $TMP
 mkdir -p $TMP
 

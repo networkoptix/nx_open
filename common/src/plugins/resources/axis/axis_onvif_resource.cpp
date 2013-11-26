@@ -1,4 +1,6 @@
 
+#ifdef ENABLE_ONVIF
+
 #include "axis_onvif_resource.h"
 
 #include <QtCore/QMutexLocker>
@@ -17,3 +19,5 @@ int QnAxisOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolutio
     Q_UNUSED(fps)
     return 0;
 }
+
+#endif  //ENABLE_ONVIF

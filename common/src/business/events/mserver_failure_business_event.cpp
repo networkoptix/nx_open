@@ -11,3 +11,12 @@ QnMServerFailureBusinessEvent::QnMServerFailureBusinessEvent(
                             reasonCode)
 {
 }
+
+QnMServerStartedBusinessEvent::QnMServerStartedBusinessEvent(
+    const QnResourcePtr& resource,
+    qint64 timeStamp):
+base_type(BusinessEventType::MediaServer_Started,
+    resource,
+    timeStamp)
+{
+}

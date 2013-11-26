@@ -48,9 +48,19 @@ QString QnPlISDResourceSearcher::manufacture() const
     return QLatin1String(QnPlIsdResource::MANUFACTURE);
 }
 
+static const QLatin1String DEFAULT_ISD_USERNAME( "root" );
+static const QLatin1String DEFAULT_ISD_PASSWORD( "admin" );
 
-QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& authOriginal, bool doMultichannelCheck)
 {
+    QAuthenticator auth( authOriginal );
+
+    if( auth.user().isEmpty() )
+        auth.setUser( DEFAULT_ISD_USERNAME );
+    if( auth.password().isEmpty() )
+        auth.setPassword( DEFAULT_ISD_PASSWORD );
+
+
     Q_UNUSED(doMultichannelCheck)
 
     QString host = url.host();
@@ -130,7 +140,6 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
-
     QList<QnNetworkResourcePtr> local_result;
 
 

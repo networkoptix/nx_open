@@ -777,7 +777,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     // TODO: #Elric no pre-spaces in translatable strings, translators mess it up.
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
+    if (!(m_resource->toResource()->flags() & QnResource::local))
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
 #endif
 
     QString timeString;
