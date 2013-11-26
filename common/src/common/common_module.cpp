@@ -18,9 +18,9 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     /* Init statics. */
     qnProductFeatures();
 
-    QnResourceDataPool *dataPool = instance<QnResourceDataPool>();
-    loadResourceData(dataPool, QLatin1String(":/resource_data.json"));
-    loadResourceData(dataPool, QCoreApplication::applicationDirPath() + QLatin1String("/resource_data.json"));
+    m_dataPool = instance<QnResourceDataPool>();
+    loadResourceData(m_dataPool, lit(":/resource_data.json"));
+    loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"));
 
     /* Init members. */
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();

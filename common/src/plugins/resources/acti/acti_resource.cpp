@@ -310,7 +310,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     initializeIO( report );
 
-    QScopedPointer<QnAbstractPtzController> ptzController(createPtzController());
+    QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
     setPtzCapabilities(ptzController->getCapabilities());
 
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
@@ -533,7 +533,7 @@ bool QnActiResource::hasDualStreaming() const
     return mediaVariant.toInt();
 }
 
-QnAbstractPtzController *QnActiResource::createPtzController()
+QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
 {
     return new QnActiPtzController(toSharedPointer(this));
 }

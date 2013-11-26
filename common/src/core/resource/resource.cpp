@@ -772,7 +772,24 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
 QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole role)
 {
     Q_UNUSED(role)
-    return 0;
+    return NULL;
+}
+
+QnAbstractPtzController *QnResource::createPtzController() {
+    QnAbstractPtzController *result = createPtzControllerInternal();
+    if(!result)
+        return result;
+
+    /* Do some sanity checking. */
+    Qn::PtzCapabilities capabilities = result->getCapabilities();
+    if((capabilities & Qn::LogicalPositionSpaceCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
+        qnCritical("Logical position space capability is defined for a PTZ controller that does not support absolute movement.");
+    
+    return result;
+}
+
+QnAbstractPtzController *QnResource::createPtzControllerInternal() {
+    return NULL;
 }
 
 void QnResource::initializationDone()
@@ -939,10 +956,6 @@ int QnResource::initializationAttemptCount() const
 bool QnResource::isInitialized() const
 {
     return m_initialized;
-}
-
-QnAbstractPtzController *QnResource::createPtzController() {
-    return NULL;
 }
 
 void QnResource::setUniqId(const QString& value)

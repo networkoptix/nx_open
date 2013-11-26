@@ -30,7 +30,7 @@ public:
     virtual ~QnThirdPartyResource();
 
     //!Implementation of QnResource::getPtzController
-    virtual QnAbstractPtzController *createPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
     //!Implementation of QnNetworkResource::ping

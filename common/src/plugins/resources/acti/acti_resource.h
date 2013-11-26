@@ -54,7 +54,7 @@ public:
     int roundBitrate(int srcBitrateKbps) const;
 
     bool isAudioSupported() const;
-    virtual QnAbstractPtzController *createPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;

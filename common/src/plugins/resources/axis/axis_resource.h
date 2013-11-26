@@ -66,7 +66,7 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual QnAbstractPtzController *createPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClient* httpClient );

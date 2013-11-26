@@ -936,7 +936,7 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     setPtzCapabilities(controller->getCapabilities());
 }
 
-QnAbstractPtzController *QnPlAxisResource::createPtzController() {
+QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     if(getPtzCapabilities() == 0) {
         return NULL;
     } else {

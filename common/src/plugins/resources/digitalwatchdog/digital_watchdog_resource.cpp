@@ -153,11 +153,11 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
     return qMax(1024,result);
 }
 
-QnAbstractPtzController *QnPlWatchDogResource::createPtzController() {
+QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() {
     if(m_hasZoom) {
         return new QnDwZoomPtzController(toSharedPointer(this));
     } else {
-        return base_type::createPtzController();
+        return base_type::createPtzControllerInternal();
     }
 }
 

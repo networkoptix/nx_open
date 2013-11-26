@@ -177,7 +177,7 @@ public:
     static int calcTimeDrift(const QString& deviceUrl);
 
 
-    virtual QnAbstractPtzController *createPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     bool fetchAndSetDeviceInformation(bool performSimpleCheck);
 
     //!Relay input with token \a relayToken has changed its state to \a active

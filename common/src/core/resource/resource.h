@@ -251,8 +251,6 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
-
     static void stopAsyncTasks();
 
     /**
@@ -262,6 +260,8 @@ public:
     bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
     void setPtzCapabilities(Qn::PtzCapabilities capabilities);
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
+
+    QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
@@ -287,7 +287,7 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove bool param
 
     void ptzCapabilitiesChanged(const QnResourcePtr &resource);
 public:
@@ -316,6 +316,7 @@ protected:
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
     virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
     //!Called just after successful \a initInternal()

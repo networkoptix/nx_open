@@ -103,6 +103,7 @@ public:
 
 private:
     ConnectiveBase() {}
+    virtual ~ConnectiveBase() {}
 
     template<class Base, bool baseIsConnective>
     friend class ::Connective; /* So that only this class can access our methods. */
