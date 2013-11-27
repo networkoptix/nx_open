@@ -15,8 +15,8 @@ typedef struct {
 #define VPKT_INFO  1 // payload is vmux_stream_info_t
 #define VPKT_FRAME 2 // payload is vmux_frame_t
     unsigned int payload_length; /* either 
-				    sizeof vmux_stream_info_t or
-				    sizeof vmux_frame_t */
+                    sizeof vmux_stream_info_t or
+                    sizeof vmux_frame_t */
 } vmux_pkt_hdr_t;
 
 typedef struct {
@@ -103,10 +103,10 @@ class Vmux {
        stream_info gets stream info data
        *info_size 
          IN: size of stream_info buffer
-	 OUT: # of bytes written
+     OUT: # of bytes written
        Returns 0 on success, !0 on failure. */
     int GetStreamInfo (int stream, vmux_stream_info_t *stream_info,
-		       int *info_size);
+               int *info_size);
     /* Set downsample to 1, 2, or 4.
        Not valid with h264 or jpeg streams.
        Returns 0 on success or -1 if ds is out of range. */
@@ -117,10 +117,10 @@ class Vmux {
        jpeg_info gets stream info data
        *info_size 
          IN: size of jpeg_info buffer
-	 OUT: # of bytes written
+     OUT: # of bytes written
        Returns 0 on success, !0 on failure. */
     int GetJpegInfo   (int stream, vmux_jpeg_info_t *jpeg_info,
-		       int *info_size);
+               int *info_size);
 #ifdef EXTRA_THREAD
     void VideoThread (void);
 #endif
