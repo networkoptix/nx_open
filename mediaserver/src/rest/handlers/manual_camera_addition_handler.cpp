@@ -25,7 +25,7 @@ QnManualCameraAdditionHandler::~QnManualCameraAdditionHandler() {
     }
 }
 
-void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
+static void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
     searcher->run(startAddr, endAddr, auth, port);
 }
 
