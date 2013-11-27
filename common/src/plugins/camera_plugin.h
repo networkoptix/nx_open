@@ -567,6 +567,31 @@ namespace nxcip
     };
 
 
+    //!Extends \a BaseCameraManager2 by adding motion regions
+    class BaseCameraManager3
+    :
+        public BaseCameraManager2
+    {
+    public:
+        //!Enumeration of supported camera capabilities (bit flags)
+        enum CameraCapability3
+        { 
+            motionRegionCapability = 0x2000   //!<if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
+        };
+
+        virtual ~BaseCameraManager3() {}
+
+        //!If camera plugin implements this interface. It MUST report motion only on for region specified with this method
+        /*!
+            \param motionMask 8bpp (format \a nxcip::PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            pixel value designates motion sensitivity for pixel position.
+            255 - no motion for pixel coordinates( aka motion mask), 0 - maximum possible motion sensitivity. For instance: motion detection algorithm may use this value
+            to compare absolute difference between pixels of Y plane in subsequent frames. If difference is less then value in a mask, motion is not detected.
+        */
+        virtual int setMotionMask( Picture* motionMask ) = 0;
+    };
+
+
     // {8BAB5BC7-BEFC-4629-921F-8390A29D8A16}
     static const nxpl::NX_GUID IID_CameraPTZManager = { { 0x8b, 0xab, 0x5b, 0xc7, 0xbe, 0xfc, 0x46, 0x29, 0x92, 0x1f, 0x83, 0x90, 0xa2, 0x9d, 0x8a, 0x16 } };
 

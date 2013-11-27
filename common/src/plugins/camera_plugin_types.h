@@ -35,6 +35,8 @@ namespace nxcip
         PIX_FMT_YUV444P,
         //!1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb
         PIX_FMT_MONOBLACK,
+        //!Y plane only, 8bpp
+        PIX_FMT_GRAY8,
         //!packed RGB 8:8:8, 24bpp, RGBRGB...
         PIX_FMT_RGB24,
         //!planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
