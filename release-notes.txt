@@ -22,6 +22,9 @@ MAC Client is released
 19. "You are running Beta version" message is introduced.
 20. If media servers and/or Enterprise Controller have different versions, then the warning is given
 21. If a new Media Server was installed this was not reflected in About screen until client restart. Fixed
+22. Mouse Wheel does not effect in Scene zoom
+23. License activation messages improved
+24. Fixed the bug with incorrect Timeline display mode when DST shift occurs
 
 ----------------------------------------------2.0.2.4814-------------------------------------------
 1. If media server was restarted manually, it resulted in "Media Server restarted after crash". Fixed
