@@ -90,7 +90,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_ptz_preset_manager.h>
-#include <ui/workbench/workbench_ptz_controller.h>
 
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
@@ -1029,7 +1028,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
     QPointer<QnResourceWidget> guard(widget);
 
     
-
+#if 0
     QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
     QVector3D position = ptzController->position(widget);
 
@@ -1048,6 +1047,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
 
         menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
     }
+#endif
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -3739,6 +3739,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
+#if 0
     QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(widget);
     if(qIsNaN(position)) {
         QMessageBox::critical(
@@ -3761,6 +3762,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         return;
 
     context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, dialog->preset());
+#endif
 }
 
 void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
@@ -3794,8 +3796,10 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
         return;
     }
 
+#if 0
     action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     context()->instance<QnWorkbenchPtzController>()->setPosition(widget, preset.logicalPosition);
+#endif
 }
 
 void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {

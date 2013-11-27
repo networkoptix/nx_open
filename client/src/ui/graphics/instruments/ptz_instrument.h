@@ -16,13 +16,11 @@
 #include "core/ptz/abstract_ptz_controller.h"
 
 class FixedArSelectionItem;
-class QnSplashItem;
 class PtzOverlayWidget;
 class PtzElementsWidget;
 class PtzManipulatorWidget;
 
-class QnWorkbenchPtzController;
-class QnWorkbenchPtzMapperWatcher;
+class QnSplashItem;
 class QnMediaResourceWidget;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
@@ -122,9 +120,6 @@ private:
         QRectF pendingAbsoluteMove;
         PtzOverlayWidget *overlayWidget;
     };
-
-    QnWorkbenchPtzController *m_ptzController;
-    QnWorkbenchPtzMapperWatcher *m_mapperWatcher;
 
     int m_clickDelayMSec;
     qreal m_expansionSpeed;

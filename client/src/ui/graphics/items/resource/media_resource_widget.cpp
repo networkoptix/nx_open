@@ -189,7 +189,7 @@ void QnMediaResourceWidget::updateFisheyeController() {
 
     if (m_resource->isFisheye()) {
         if (!m_fisheyePtz) {
-            m_fisheyePtz = new QnFisheyePtzController(base_type::resource().data());
+            m_fisheyePtz = new QnFisheyePtzController(m_resource);
             connect(m_fisheyePtz, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
             connect(m_fisheyePtz, SIGNAL(spaceMapperChanged()), this, SLOT(updateAspectRatio()));
             m_fisheyePtz->addRenderer(m_renderer);
@@ -322,7 +322,7 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
 
         if(m_motionSensitivity.size() != channelCount()) {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
-            resizeList(m_motionSensitivity, channelCount());
+            qnResizeList(m_motionSensitivity, channelCount());
         }
     } else if(m_resource->toResource()->hasFlags(QnResource::motion)) {
         for(int i = 0, count = channelCount(); i < count; i++)
@@ -711,10 +711,10 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
 void QnMediaResourceWidget::channelLayoutChangedNotify() {
     base_type::channelLayoutChangedNotify();
 
-    resizeList(m_motionSelection, channelCount());
-    resizeList(m_motionSelectionPathCache, channelCount());
-    resizeList(m_motionSensitivity, channelCount());
-    resizeList(m_paintedChannels, channelCount());
+    qnResizeList(m_motionSelection, channelCount());
+    qnResizeList(m_motionSelectionPathCache, channelCount());
+    qnResizeList(m_motionSensitivity, channelCount());
+    qnResizeList(m_paintedChannels, channelCount());
 
     while(m_binaryMotionMask.size() > channelCount()) {
         qFreeAligned(m_binaryMotionMask.back());
@@ -826,10 +826,11 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result |= MotionSearchButton;
 
     if(m_camera
-            && (m_camera->getPtzCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability))
-            && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
-            )
+        && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities)
+        && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
+    ) {
         result |= PtzButton;
+    }
     
     if (m_resource && m_resource->isFisheye()) {
         result |= FishEyeButton;
@@ -931,7 +932,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     bool ptzEnabled = 
-        checked && (m_camera && (m_camera->getPtzCapabilities() & (Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability)));
+        checked && (m_camera && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities));
 
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);

@@ -40,7 +40,7 @@ DewarpingParams DewarpingParams::deserialize(const QByteArray &data) {
     if(data.startsWith('0') || data.startsWith('1')) {
         /* V0. */
         QList<QByteArray> params = data.split(';');
-        resizeList(params, 7);
+        qnResizeList(params, 7);
         result.enabled          = params[0].toInt() > 0;
         result.viewMode         = (ViewMode) params[1].toInt();
         result.xAngle           = params[2].toDouble();

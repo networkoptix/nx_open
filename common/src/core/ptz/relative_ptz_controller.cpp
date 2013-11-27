@@ -29,6 +29,8 @@ int QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewp
     if(getPosition(&oldPosition) != 0)
         return 1;
 
+    // TODO: #Elric also take flip into account.
+
     /* Passed viewport should be square, but who knows... */
     float zoom = 1.0 / qMax(viewport.width(), viewport.height()); /* For 2x zoom we'll get 2.0 here. */
 

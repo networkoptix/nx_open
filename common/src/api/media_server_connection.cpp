@@ -32,10 +32,7 @@ namespace {
         ((StorageSpaceObject,       "storageSpace"))
         ((TimePeriodsObject,        "RecordedTimePeriods"))
         ((StatisticsObject,         "statistics"))
-        ((PtzPositionObject,        "ptz/getPosition"))
-        ((PtzSetPositionObject,     "ptz/moveTo"))
-        ((PtzStopObject,            "ptz/stop"))
-        ((PtzMoveObject,            "ptz/move"))
+        ((PtzContinuousMoveObject,  "ptz/continuousMove"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
         ((TimeObject,               "gettime"))
@@ -279,21 +276,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, status, reply, handle);
         break;
     }
-    case PtzPositionObject: {
-        const QByteArray& data = response.data;
-        QVector3D reply;
-
-        if(response.status == 0) {
-            reply.setX(extractXmlBody(data, "xPos").toDouble());
-            reply.setY(extractXmlBody(data, "yPos").toDouble());
-            reply.setZ(extractXmlBody(data, "zoomPos").toDouble());
-        } else {
-//            qnWarning("Could not get ptz position from camera: %1.", response.errorString);
-        }
-
-        emitFinished(this, response.status, reply, handle);
-        break;
-    }
     case GetParamsObject: {
         QnStringVariantPairList reply;
 
@@ -335,9 +317,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case TimeObject:
         processJsonReply<QnTimeReply>(this, response, handle);
         break;
-    case PtzSetPositionObject:
-    case PtzStopObject:
-    case PtzMoveObject:
+    case PtzContinuousMoveObject:
     case CameraAddObject:
         //TODO: #GDM processJsonReply if needed
         emitFinished(this, response.status, handle);
@@ -527,44 +507,16 @@ int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStri
     return sendAsyncGetRequest(CameraAddObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  camera->getPhysicalId());
     params << QnRequestParam("xSpeed",  QString::number(speed.x()));
     params << QnRequestParam("ySpeed",  QString::number(speed.y()));
-    params << QnRequestParam("zoomSpeed", QString::number(speed.z()));
+    params << QnRequestParam("zSpeed",  QString::number(speed.z()));
     params << QnRequestParam("seqId",   sequenceId.toString());
     params << QnRequestParam("seqNum",  QString::number(sequenceNumber));
 
-    return sendAsyncGetRequest(PtzMoveObject, params, NULL, target, slot);
-}
-
-int QnMediaServerConnection::ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("res_id",  camera->getPhysicalId());
-    params << QnRequestParam("seqId",   sequenceId.toString());
-    params << QnRequestParam("seqNum",  QString::number(sequenceNumber));
-
-    return sendAsyncGetRequest(PtzStopObject, params, NULL, target, slot);
-}
-
-int QnMediaServerConnection::ptzMoveToAsync(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("res_id",  camera->getPhysicalId());
-    params << QnRequestParam("xPos",    QString::number(pos.x()));
-    params << QnRequestParam("yPos",    QString::number(pos.y()));
-    params << QnRequestParam("zoomPos", QString::number(pos.z()));
-    params << QnRequestParam("seqId",   sequenceId.toString());
-    params << QnRequestParam("seqNum",  QString::number(sequenceNumber));
-
-    return sendAsyncGetRequest(PtzSetPositionObject, params, NULL, target, slot);
-}
-
-int QnMediaServerConnection::ptzGetPosAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("res_id",  camera->getPhysicalId());
-
-    return sendAsyncGetRequest(PtzPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
+    return sendAsyncGetRequest(PtzContinuousMoveObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {

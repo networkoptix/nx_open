@@ -34,6 +34,18 @@ QnFisheyePtzController::~QnFisheyePtzController()
         m_renderer->setFisheyeController(0);
 }
 
+int QnFisheyePtzController::getLimits(QnPtzLimits *limits) {
+    return 1;
+}
+
+int QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
+    return 1;
+}
+
+int QnFisheyePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+    return 1;
+}
+
 void QnFisheyePtzController::updateSpaceMapper(DewarpingParams::ViewMode viewMode, int pf)
 {
     /*
@@ -71,7 +83,7 @@ void QnFisheyePtzController::addRenderer(QnResourceWidgetRenderer* renderer)
     m_renderer->setFisheyeController(this);
 }
 
-int QnFisheyePtzController::startMove(const QVector3D &speed)
+int QnFisheyePtzController::continuousMove(const QVector3D &speed)
 {
     m_motion = speed;
     m_lastTime = getUsecTimer();
@@ -100,7 +112,7 @@ qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov, qreal aspectRa
         return qBound(m_yRange.min, value, m_yRange.max - yFov);
 }
 
-int QnFisheyePtzController::setPosition(const QVector3D &position)
+int QnFisheyePtzController::absoluteMove(const QVector3D &position)
 {
     m_motion = QVector3D();
 
@@ -251,7 +263,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
     if (m_resource->getDewarpingParams().viewMode == DewarpingParams::Horizontal) {
         qreal x = c.x() * M_PI;
         qreal y = -c.y() * M_PI;
-        setPosition(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
+        absoluteMove(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
     }
     else {
         qreal x = -(::atan2(c.y(), c.x()) - M_PI/2.0);
@@ -270,7 +282,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
                 y = r.top() * M_PI;
         }
 
-        setPosition(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
+        absoluteMove(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
     }
 }
 
