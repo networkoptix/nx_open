@@ -1,4 +1,3 @@
-
 #include "workbench_screenshot_handler.h"
 
 #include <QtWidgets/QAction>
