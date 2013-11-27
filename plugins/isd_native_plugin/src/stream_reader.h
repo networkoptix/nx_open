@@ -17,6 +17,8 @@
 #include "mutex.h"
 #include "vmux_iface.h"
 
+class MotionDataPicture;
+
 //!Reads picture files from specified directory as video-stream
 class StreamReader
 :
@@ -41,12 +43,19 @@ public:
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 private:
+    bool StreamReader::needMetaData();
+    MotionDataPicture* getMotionData();
+private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNum;
     bool m_initialized;
     nxcip::CompressionType m_codec;
-
+    nxcip::UsecUTCTimestamp m_lastVideoTime;
+    nxcip::UsecUTCTimestamp m_lastMotionTime;
     Vmux vmux;
+    
+    Vmux* vmux_motion;
+    vmux_stream_info_t motion_stream_info;
 };
 
 #endif  //ILP_STREAM_READER_H

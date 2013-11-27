@@ -94,7 +94,6 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
 #endif
     const char* modelName = "ISD-xxx";
     const char* firmware = "1.0.0"; // todo: implement me!
-    //const char* host = "127.0.0.1";
     const char* loginToUse = "";
     const char* passwordToUse = "";
 
