@@ -147,6 +147,12 @@ int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::Time
     return nxcip::NX_NO_ERROR;
 }
 
+int CameraManager::setMotionMask( nxcip::Picture* motionMask )
+{
+    //TODO/IMPL
+    return nxcip::NX_NO_ERROR;
+}
+
 const nxcip::CameraInfo& CameraManager::info() const
 {
     return m_info;
