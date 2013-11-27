@@ -56,6 +56,10 @@ ISDMotionEstimation::ISDMotionEstimation():
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         m_frameBuffer[i] = 0;
 
+    m_motionMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+    m_motionSensMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
+    memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
+    memset(sensitivityToMask, 0, MD_WIDTH * MD_HEIGHT);
 }
 
 #define min(a,b) (a < b ? a : b)
@@ -193,6 +197,7 @@ void ISDMotionEstimation::scaleFrame(const uint8_t* data, int width, int height,
 
 bool ISDMotionEstimation::analizeFrame(const uint8_t* data, int width, int height, int stride)
 {
+    Mutex::ScopedLock lock(&m_mutex);
 
     int idx = m_totalFrames % FRAMES_BUFFER_SIZE;
     int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
@@ -362,6 +367,8 @@ void ISDMotionEstimation::analizeMotionAmount(uint8_t* frame)
 
 void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 {
+    Mutex::ScopedLock lock(&m_mutex);
+
     nxpt::freeAligned(m_motionMask);
     nxpt::freeAligned(m_motionSensMask);
     m_motionMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
@@ -382,7 +389,7 @@ void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 
 MotionDataPicture* ISDMotionEstimation::getMotion()
 {
-    MotionDataPicture* motionData = new MotionDataPicture();
+    MotionDataPicture* motionData = new MotionDataPicture(nxcip::PIX_FMT_MONOBLACK);
 
     // scale result motion (height already valid, scale width ony. Data rotates, so actually duplicate or remove some lines
     int lineStep = (m_scaledWidth*65536) / MD_WIDTH;

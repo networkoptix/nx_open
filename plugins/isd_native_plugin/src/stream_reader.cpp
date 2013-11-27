@@ -119,6 +119,11 @@ MotionDataPicture* StreamReader::getMotionData()
     return m_motionEstimation.getMotion();
 }
 
+void StreamReader::setMotionMask(const uint8_t* data)
+{
+    m_motionEstimation.setMotionMask(data);
+}
+
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;

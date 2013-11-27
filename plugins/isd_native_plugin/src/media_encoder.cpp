@@ -20,6 +20,8 @@ MediaEncoder::MediaEncoder(
 
 MediaEncoder::~MediaEncoder()
 {
+    if (m_motionMask)
+        m_motionMask->releaseRef();
 }
 
 void* MediaEncoder::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -87,11 +89,22 @@ int MediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBitrateKbps*/ 
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
-    if( !m_streamReader.get() )
+    if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
         &m_refManager,
         m_encoderNum) );
-
+        m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+    }
     m_streamReader->addRef();
     return m_streamReader.get();
+}
+
+void MediaEncoder::setMotionMask( nxcip::Picture* motionMask )
+{
+    if (m_motionMask)
+        m_motionMask->releaseRef();
+    m_motionMask = motionMask;
+    m_motionMask->addRef();
+    if (m_streamReader.get())
+        m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
 }

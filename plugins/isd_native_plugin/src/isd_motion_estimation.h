@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include "mutex.h"
 
 class MotionDataPicture;
 
@@ -26,6 +27,7 @@ private:
     void scaleMask(uint8_t* mask, uint8_t* scaledMask);
     void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer);
 private:
+    Mutex m_mutex;
     int m_scaledWidth;
     uint32_t* m_resultMotion;
     uint8_t* m_scaledMask; 

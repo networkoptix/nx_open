@@ -43,6 +43,8 @@ public:
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
+
+    void setMotionMask(const uint8_t* data);
 private:
     bool StreamReader::needMetaData();
     MotionDataPicture* getMotionData();

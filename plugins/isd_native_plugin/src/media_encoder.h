@@ -52,11 +52,13 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual nxcip::StreamReader* getLiveStreamReader() override;
 
+    void setMotionMask( nxcip::Picture* motionMask );
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
     unsigned int m_encoderNum;
+    nxcip::Picture* m_motionMask;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

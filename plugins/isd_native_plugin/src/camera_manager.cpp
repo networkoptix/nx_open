@@ -25,6 +25,9 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
 
 CameraManager::~CameraManager()
 {
+    if (m_motionMask)
+        m_motionMask->releaseRef();
+
 }
 
 void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -75,6 +78,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     if( !m_encoder[encoderIndex].get() )
         m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex) );
     m_encoder[encoderIndex]->addRef();
+    m_encoder[encoderIndex]->setMotionMask(m_motionMask);
     *encoderPtr = m_encoder[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
@@ -150,6 +154,15 @@ int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::Time
 int CameraManager::setMotionMask( nxcip::Picture* motionMask )
 {
     //TODO/IMPL
+    if (m_motionMask)
+        m_motionMask->releaseRef();
+    m_motionMask = motionMask;
+    motionMask->addRef();
+    if (m_encoder[0].get())
+        m_encoder[0]->setMotionMask(m_motionMask);
+    if (m_encoder[1].get())
+        m_encoder[1]->setMotionMask(m_motionMask);
+
     return nxcip::NX_NO_ERROR;
 }
 

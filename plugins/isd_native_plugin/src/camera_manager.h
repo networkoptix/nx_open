@@ -71,6 +71,7 @@ private:
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder[2];
+    nxcip::Picture* m_motionMask;
 };
 
 #endif  //ILP_CAMERA_MANAGER_H
