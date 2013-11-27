@@ -15,11 +15,14 @@
 #include "camera_manager.h"
 #include "plugin.h"
 
+#ifndef WIN32
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
@@ -61,10 +64,10 @@ void DiscoveryManager::getVendorName( char* buf ) const
     strcpy( buf, VENDOR_NAME );
 }
 
+#ifndef WIN32
 void mac_eth0(char  MAC_str[13], char** host)
 {
     #define HWADDR_len 6
-    memset(MAC_str, 0, sizeof(MAC_str));
     int s,i;
     struct ifreq ifr;
     s = socket(AF_INET, SOCK_DGRAM, 0);
@@ -78,13 +81,17 @@ void mac_eth0(char  MAC_str[13], char** host)
 	*host = inet_ntoa(ip->sin_addr);
     }
 }
+#endif
 
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
 {
     //const char* mac = "543959ab129a";
     char  mac[13];
-    char* host;
+    memset(mac, 0, sizeof(mac));
+    char* host = 0;
+#ifndef WIN32
     mac_eth0(mac, &host);
+#endif
     const char* modelName = "ISD-xxx";
     const char* firmware = "1.0.0"; // todo: implement me!
     //const char* host = "127.0.0.1";
@@ -95,7 +102,8 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     strncpy( cameras->uid, mac, sizeof(cameras->uid)-1 );
     strncpy( cameras->modelName, modelName, sizeof(cameras->modelName)-1 );
     strncpy( cameras->firmware, firmware, sizeof(cameras->firmware)-1 );
-    strncpy( cameras->url, host, sizeof(cameras->url)-1 );
+    if (host)
+        strncpy( cameras->url, host, sizeof(cameras->url)-1 );
     strcpy( cameras->defaultLogin, loginToUse );
     strcpy( cameras->defaultPassword, passwordToUse );
 
