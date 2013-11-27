@@ -56,7 +56,7 @@ public:
      * \param speed                     Movement speed. 
      * \returns                         Status code.
      */
-    virtual int startMove(const QVector3D &speed) = 0;
+    virtual int continuousMove(const QVector3D &speed) = 0;
 
     /**
      * Sets camera PTZ position. If this controller has 
@@ -68,7 +68,7 @@ public:
      * \param position                  Position to move to.
      * \returns                         Status code.
      */
-    virtual int setPosition(const QVector3D &position) = 0;
+    virtual int absoluteMove(const QVector3D &position) = 0;
 
     /**
      * Gets PTZ position from camera. If this controller has 

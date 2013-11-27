@@ -23,35 +23,6 @@ public:
     virtual ~QnWorkbenchPtzController();
 
     /**
-     * \param camera                    Camera to get PTZ position for.
-     * \returns                         Current PTZ position for the given camera,
-     *                                  or NaN if it is not available.
-     *                                  Use <tt>qIsNaN</tt> to check for NaN.
-     */
-    QVector3D position(const QnMediaResourceWidget *widget) const;
-
-    QVector3D physicalPosition(const QnMediaResourceWidget *widget) const;
-
-    /**
-     * \param camera                    Camera to set PTZ position for.
-     * \param position                  New PTZ position for the given camera.
-     */
-    void setPosition(const QnMediaResourceWidget *widget, const QVector3D &position);
-
-    void setPhysicalPosition(const QnMediaResourceWidget *widget, const QVector3D &physicalPosition);
-
-    // TODO: #Elric remove?
-    void updatePosition(const QnMediaResourceWidget* widget);
-
-    /**
-     * \param camera                    Camera to get current PTZ continuous movement speed for.
-     * \returns                         Current PTZ continuous movement speed for the given
-     *                                  camera, or NaN if it is not available.
-     *                                  Use <tt>qIsNaN</tt> to check for NaN.
-     */
-    QVector3D movement(const QnMediaResourceWidget *widget) const;
-
-    /**
      * \param camera                    Camera to set current PTZ continuous movement speed for.
      * \param movement                  New PTZ continuous movement speed for the given camera.
      */

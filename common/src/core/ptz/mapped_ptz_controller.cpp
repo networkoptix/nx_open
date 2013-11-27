@@ -13,8 +13,8 @@ Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::LogicalPositionSpaceCapability;
 }
 
-int QnMappedPtzController::setPosition(const QVector3D &position) {
-    return base_type::setPosition(m_mapper->logicalToDevice(position));
+int QnMappedPtzController::absoluteMove(const QVector3D &position) {
+    return base_type::absoluteMove(m_mapper->logicalToDevice(position));
 }
 
 int QnMappedPtzController::getPosition(QVector3D *position) {

@@ -12,8 +12,8 @@ public:
     virtual ~QnDwZoomPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual int startMove(const QVector3D &speed) override;
-    virtual int setPosition(const QVector3D &position) override;
+    virtual int continuousMove(const QVector3D &speed) override;
+    virtual int absoluteMove(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
 
     virtual int getLimits(QnPtzLimits *limits) override;

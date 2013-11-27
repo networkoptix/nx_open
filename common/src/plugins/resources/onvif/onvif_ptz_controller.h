@@ -17,8 +17,8 @@ class QnOnvifPtzController: public QnAbstractPtzController {
 public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
-    virtual int startMove(const QVector3D &speed) override;
-    virtual int setPosition(const QVector3D &position) override;
+    virtual int continuousMove(const QVector3D &speed) override;
+    virtual int absoluteMove(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
     //virtual const QnPtzSpaceMapper *getSpaceMapper() override;

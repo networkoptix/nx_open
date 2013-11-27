@@ -201,7 +201,7 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-int QnAxisPtzController::startMove(const QVector3D &speed) {
+int QnAxisPtzController::continuousMove(const QVector3D &speed) {
     return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
 }
 
@@ -210,7 +210,7 @@ int QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     return 0;
 }
 
-int QnAxisPtzController::setPosition(const QVector3D &position) {
+int QnAxisPtzController::absoluteMove(const QVector3D &position) {
     return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())));
 }
 

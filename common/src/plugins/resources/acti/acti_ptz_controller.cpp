@@ -216,7 +216,7 @@ Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
     return m_capabilities;
 }
 
-int QnActiPtzController::startMove(const QVector3D &speed) 
+int QnActiPtzController::continuousMove(const QVector3D &speed) 
 {
     QMutexLocker lock(&m_mutex);
 
@@ -237,7 +237,7 @@ int QnActiPtzController::startMove(const QVector3D &speed)
     return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
 }
 
-int QnActiPtzController::setPosition(const QVector3D &position) 
+int QnActiPtzController::absoluteMove(const QVector3D &position) 
 {
     QMutexLocker lock(&m_mutex);
 

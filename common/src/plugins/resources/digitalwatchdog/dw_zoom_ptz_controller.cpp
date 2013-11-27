@@ -20,7 +20,7 @@ Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
     return Qn::ContinuousZoomCapability;
 }
 
-int QnDwZoomPtzController::startMove(const QVector3D &speed) {
+int QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
     CameraSetting setting(
         QLatin1String("%%Lens%%Zoom"),
         QLatin1String("Zoom"),
@@ -47,7 +47,7 @@ int QnDwZoomPtzController::startMove(const QVector3D &speed) {
     return 0;
 }
 
-int QnDwZoomPtzController::setPosition(const QVector3D &) {
+int QnDwZoomPtzController::absoluteMove(const QVector3D &) {
     return 1;
 }
 

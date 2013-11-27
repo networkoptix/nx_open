@@ -105,7 +105,7 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
     QnLexical::deserialize(params.value("ySpeed"), &ySpeed);
     QnLexical::deserialize(params.value("zSpeed"), &zSpeed);
 
-    if (controller->startMove(QVector3D(xSpeed, ySpeed, zSpeed)) == 0) {
+    if (controller->continuousMove(QVector3D(xSpeed, ySpeed, zSpeed)) == 0) {
         return CODE_OK;
     } else {
         return CODE_INTERNAL_ERROR;

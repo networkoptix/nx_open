@@ -115,7 +115,7 @@ int QnOnvifPtzController::stopMoveInternal()
     // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
     QString model = m_resource->getModel();
     if(model == lit("SD8362") || model == lit("SD83X3") || model == lit("SD81X1"))
-        return startMove(QVector3D());
+        return continuousMove(QVector3D());
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -146,7 +146,7 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
     return rez;
 }
 
-int QnOnvifPtzController::startMove(const QVector3D &speed)
+int QnOnvifPtzController::continuousMove(const QVector3D &speed)
 {
     if(qFuzzyIsNull(speed))
         return stopMoveInternal();
@@ -199,7 +199,7 @@ void QnOnvifPtzController::setMediaProfileToken(const QString& value)
     m_mediaProfile = value;
 }
 
-int QnOnvifPtzController::setPosition(const QVector3D &position)
+int QnOnvifPtzController::absoluteMove(const QVector3D &position)
 {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());

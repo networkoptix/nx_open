@@ -72,5 +72,5 @@ int QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewp
     newPosition.setZ(qBound<float>(limits.minFov, newPosition.z(), limits.maxFov));
 
     /* Send it to the camera. */
-    return setPosition(newPosition);
+    return absoluteMove(newPosition);
 }

@@ -16,9 +16,9 @@ public:
     virtual ~QnActiPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual int startMove(const QVector3D &speed) override;
+    virtual int continuousMove(const QVector3D &speed) override;
     virtual int getFlip(Qt::Orientations *flip) override;
-    virtual int setPosition(const QVector3D &position) override;
+    virtual int absoluteMove(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
     virtual int getLimits(QnPtzLimits *limits) override;
     virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
