@@ -44,6 +44,7 @@ public:
     * Export motion stream to separate file
     */
     void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
+    QSharedPointer<QBuffer> motionIODevice(int channel);
 
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
                                  QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 

@@ -248,6 +248,10 @@ void QnVideoCamera::setMotionIODevice(QSharedPointer<QBuffer> value, int channel
     m_motionFileList[channel] = value;
 }
 
+QSharedPointer<QBuffer> QnVideoCamera::motionIODevice(int channel) {
+    return m_motionFileList[channel];
+}
+
 QString QnVideoCamera::exportedFileName() const
 {
     QMutexLocker lock(&m_exportMutex);

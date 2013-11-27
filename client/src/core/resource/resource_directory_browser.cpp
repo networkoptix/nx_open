@@ -169,11 +169,11 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         if (data.size() >= (int)sizeof(quint32))
         {
             quint32 flags = *((quint32*) data.data());
-            if (flags & 1) {
+            if (flags & StorageFlags::ReadOnly) {
                 Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
                 layout->setData(Qn::LayoutPermissionsRole, (int) permissions);
             }
-            if (flags & 2)
+            if (flags & StorageFlags::ContainsCameras)
                 layoutWithCameras = true;
         }
         //layout->setLocalRange(QnTimePeriod().deserialize(data));

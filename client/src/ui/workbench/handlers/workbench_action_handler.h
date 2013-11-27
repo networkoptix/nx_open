@@ -306,10 +306,6 @@ protected slots:
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
 
-    void at_exportLayoutAction_triggered();
-    void at_camera_exportFinished(QString fileName);
-    void at_camera_exportFailed(QString errorMessage);
-
     void at_resources_saved(int status, const QnResourceList &resources, int handle);
     void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
     void at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
@@ -324,16 +320,7 @@ protected slots:
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
-    /*!
-        \return true, if export continues. false, if nothing more to export
-    */
-    bool at_layoutCamera_exportFinished(QString fileName);
-    void at_layout_exportFinished();
-    void at_layoutCamera_exportFailed(QString errorMessage);
-
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
-    void at_cancelExport();
 
     void at_whatsThisAction_triggered();
 
@@ -353,17 +340,8 @@ protected slots:
     void at_queueAppRestartAction_triggered();
 
 private:
-    enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
-
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    /*!
-        \return true, if started saving process (that MUST be awaited for)
-    */
-    bool saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly, bool cancellable, bool newWindowOpenable);
-    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
 
-    bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-    void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
     void notifyAboutUpdate(bool alwaysNotify);
 
     /**
@@ -423,17 +401,13 @@ private:
     QList<QnMimeData> m_delayedDrops;
     QList<QnMimeData> m_instantDrops;
 
-    QnVideoCamera* m_layoutExportCamera;
-    QnVideoCamera* m_exportedCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QPointer<QnProgressDialog> m_exportProgressDialog;
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
-    QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
-    QnMediaResourcePtr m_exportedMediaRes;
-    LayoutExportMode m_layoutExportMode;
+
+
 
     QTimer *m_tourTimer;
 

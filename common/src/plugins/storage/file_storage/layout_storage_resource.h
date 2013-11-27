@@ -10,12 +10,18 @@ extern "C"
 #include "core/resource/storage_resource.h"
 #include "recording/time_period_list.h"
 
+class QnLayoutFile;
+
+enum StorageFlags {
+    ReadOnly        = 0x1,
+    ContainsCameras = 0x2,
+
+    Count
+};
+
 /*
 * QnLayoutFileStorageResource uses for layout export
 */
-
-class QnLayoutFile;
-
 class QnLayoutFileStorageResource: public QnStorageResource
 {
 public:
