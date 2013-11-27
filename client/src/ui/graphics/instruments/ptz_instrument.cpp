@@ -614,8 +614,8 @@ void PtzInstrument::updateCapabilities(const QnResourcePtr &resource) {
 
 void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
+    
     Qn::PtzCapabilities oldCapabilities = data.capabilities;
-
     data.capabilities = widget->ptzController()->getCapabilities();
 
     if(oldCapabilities != data.capabilities)
@@ -768,9 +768,6 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
         if(widget->resource()) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
 
-            PtzData &data = m_dataByWidget[widget];
-            //data.currentSpeed = data.requestedSpeed = m_ptzController->movement(widget);
-
             updateCapabilities(widget);
             updateOverlayWidget(widget);
 
@@ -872,7 +869,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             manipulator = NULL;
     }
 
-    if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::AbsolutePtzCapabilities))
+    if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::ScreenSpaceMovementCapability))
         return false;
 
     m_skipNextAction = false;
@@ -880,7 +877,6 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     m_target = target;
     m_manipulator = manipulator;
 
-    //ptzUpdate(target);
     dragProcessor()->mousePressEvent(target, event);
     
     event->accept();
@@ -1029,12 +1025,11 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
 }
 
 void PtzInstrument::at_display_resourceAdded(const QnResourcePtr &resource) {
-    connect(resource, SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(updateCapabilities(const QnResourcePtr  &)));
+    connect(resource, SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(updateCapabilities(const QnResourcePtr &)));
 }
 
 void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource) {
-    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-        disconnect(camera, NULL, this, NULL);
+    disconnect(resource, NULL, this, NULL);
 }
 
 void PtzInstrument::at_ptzController_positionChanged(const QnMediaResourceWidget* widget) {
