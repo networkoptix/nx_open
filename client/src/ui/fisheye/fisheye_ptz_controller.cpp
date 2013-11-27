@@ -9,11 +9,11 @@
 #include "core/resource/media_resource.h"
 
 qreal MAX_MOVE_SPEED = 1.0; // 1 rad per second
-qreal MAX_ZOOM_SPEED = gradToRad(30.0); // zoom speed
-qreal MIN_FOV = gradToRad(20.0);
-qreal MAX_FOV = gradToRad(90.0);
+qreal MAX_ZOOM_SPEED = qDegreesToRadians(30.0); // zoom speed
+qreal MIN_FOV = qDegreesToRadians(20.0);
+qreal MAX_FOV = qDegreesToRadians(90.0);
 
-qreal FISHEYE_FOV = gradToRad(180.0);
+qreal FISHEYE_FOV = qDegreesToRadians(180.0);
 
 qreal MOVETO_ANIMATION_TIME = 0.5;
 
@@ -106,8 +106,8 @@ int QnFisheyePtzController::setPosition(const QVector3D &position)
 
     m_dstPos.fov = qBound<qreal>(MIN_FOV, position.z(), MAX_FOV * m_dewarpingParams.panoFactor);
 
-    m_dstPos.xAngle = boundXAngle(gradToRad(position.x()), m_dstPos.fov);
-    m_dstPos.yAngle = boundYAngle(gradToRad(position.y()), m_dstPos.fov, m_dewarpingParams.panoFactor*m_lastAR, m_dewarpingParams.viewMode);
+    m_dstPos.xAngle = boundXAngle(qDegreesToRadians(position.x()), m_dstPos.fov);
+    m_dstPos.yAngle = boundYAngle(qDegreesToRadians(position.y()), m_dstPos.fov, m_dewarpingParams.panoFactor*m_lastAR, m_dewarpingParams.viewMode);
     m_srcPos = m_dewarpingParams;
 
     if (m_dstPos.xAngle - m_srcPos.xAngle > M_PI)
@@ -121,8 +121,8 @@ int QnFisheyePtzController::setPosition(const QVector3D &position)
 
 int QnFisheyePtzController::getPosition(QVector3D *position)
 {
-    position->setX(radToGrad(m_dewarpingParams.xAngle));
-    position->setY(radToGrad(m_dewarpingParams.yAngle));
+    position->setX(qRadiansToDegrees(m_dewarpingParams.xAngle));
+    position->setY(qRadiansToDegrees(m_dewarpingParams.yAngle));
     position->setZ(m_dewarpingParams.fov);
 
     return 0;
@@ -199,7 +199,7 @@ DewarpingParams QnFisheyePtzController::updateDewarpingParams(float ar)
     newParams.enabled = m_dewarpingParams.enabled;
 
     DewarpingParams camParams = m_resource->getDewarpingParams();
-    newParams.fovRot = gradToRad(camParams.fovRot);
+    newParams.fovRot = qDegreesToRadians(camParams.fovRot);
     newParams.viewMode = camParams.viewMode;
     newParams.panoFactor = m_dewarpingParams.panoFactor;
     if (newParams.viewMode == DewarpingParams::Horizontal)
@@ -251,7 +251,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
     if (m_resource->getDewarpingParams().viewMode == DewarpingParams::Horizontal) {
         qreal x = c.x() * M_PI;
         qreal y = -c.y() * M_PI;
-        setPosition(QVector3D(radToGrad(x), radToGrad(y), fov));
+        setPosition(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
     }
     else {
         qreal x = -(::atan2(c.y(), c.x()) - M_PI/2.0);
@@ -270,7 +270,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
                 y = r.top() * M_PI;
         }
 
-        setPosition(QVector3D(radToGrad(x), radToGrad(y), fov));
+        setPosition(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
     }
 }
 
