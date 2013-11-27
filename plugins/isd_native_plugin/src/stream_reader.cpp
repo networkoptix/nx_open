@@ -92,12 +92,15 @@ MotionDataPicture* StreamReader::getMotionData()
 {
     if (!vmux_motion)
     {
+	vmux_motion = new Vmux();
         int info_size = sizeof(motion_stream_info);
         int rv = vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
-        if (rv)
+        if (rv) {
+	    std::cout << "can't get stream info for motion stream" << std::endl;
             return 0; // error
+	}
 
-        std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch;
+        std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
 
         rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
         if (rv)
