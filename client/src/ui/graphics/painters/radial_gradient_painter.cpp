@@ -70,5 +70,5 @@ void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
 }
 
 void QnRadialGradientPainter::paint() {
-    paint(1.0);
+    paint(Qt::white);
 }
