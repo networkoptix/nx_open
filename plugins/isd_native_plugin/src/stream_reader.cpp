@@ -115,10 +115,8 @@ MotionDataPicture* StreamReader::getMotionData()
         return 0; // return error
     }
 
-    //image_size = stream_info.width * stream_info.height;
-    //pitch_size = stream_info.pitch * stream_info.height;
-    MotionDataPicture* motionData = new MotionDataPicture();
-    return motionData;
+    m_motionEstimation.analizeFrame(frame.frame_addr , motion_stream_info.width, motion_stream_info.height, motion_stream_info.pitch);
+    return m_motionEstimation.getMotion();
 }
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )

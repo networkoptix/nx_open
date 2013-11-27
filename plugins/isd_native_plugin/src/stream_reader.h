@@ -16,6 +16,7 @@
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
 #include "vmux_iface.h"
+#include "isd_motion_estimation.h"
 
 class MotionDataPicture;
 
@@ -56,6 +57,7 @@ private:
     
     Vmux* vmux_motion;
     vmux_stream_info_t motion_stream_info;
+    ISDMotionEstimation m_motionEstimation;
 };
 
 #endif  //ILP_STREAM_READER_H
