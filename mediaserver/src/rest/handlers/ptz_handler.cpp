@@ -85,7 +85,7 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
     }
 
     QString seqId = params.value("seqId");
-    qint64 seqNum = params.value("seqNum").toLongLong();
+    int seqNum = params.value("seqNum").toInt();
     if(!checkSequence(seqId, seqNum))
         return CODE_OK;
 
