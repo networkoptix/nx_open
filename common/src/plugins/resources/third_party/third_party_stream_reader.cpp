@@ -14,6 +14,7 @@
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
 #include "utils/network/http/httptypes.h"
+#include "motion_data_picture.h"
 
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
@@ -45,6 +46,55 @@ void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData
 {
     //TODO/IMPL
     parent_type::onGotVideoFrame( videoData );
+}
+
+static int sensitivityToMask[10] = 
+{
+    255, //  0
+    26,
+    22,
+    18,
+    16,
+    14,
+    12,
+    11,
+    10,
+    9, // 9
+};
+
+void ThirdPartyStreamReader::updateSoftwareMotion()
+{
+    nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
+    if( !camManager2 )
+        return;
+
+    if( m_thirdPartyRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation() )
+    {
+        if( m_thirdPartyRes->getVideoLayout()->channelCount() > 0 )
+        {
+            MotionDataPicture* motionMask = new MotionDataPicture( nxcip::PIX_FMT_GRAY8 );
+            const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
+            //converting region
+            for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
+            {
+                foreach( const QRect& rect, region.getRectsBySens(sens) )
+                {
+                    for( int y = rect.top(); y <= rect.bottom(); ++y )
+                        for( int x = rect.left(); x <= rect.right(); ++x )
+                        {
+                            assert( x < motionMask->width() && y < motionMask->height() );
+                            motionMask->setPixel( x, y, sensitivityToMask[sens] );
+                            //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
+                            //m_motionSensMask[x * MD_HEIGHT + y] = sens;
+                        }
+                }
+            }
+            camManager2->setMotionMask( motionMask );
+            motionMask->releaseRef();
+        }
+    }
+
+    camManager2->releaseRef();
 }
 
 CameraDiagnostics::Result ThirdPartyStreamReader::openStream()

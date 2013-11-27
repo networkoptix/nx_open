@@ -56,6 +56,8 @@ public:
     virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
     //!Implementation of nxcip::BaseCameraManager2::find
     virtual int find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const override;
+    //!Implementation of nxcip::BaseCameraManager2::setMotionMask
+    virtual int setMotionMask( nxcip::Picture* motionMask ) override;
 
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();

@@ -9,16 +9,21 @@
 #include <stdint.h>
 
 #include <plugins/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
 
 
+/*!
+    Supports only \a nxcip::PIX_FMT_MONOBLACK and \a nxcip::PIX_FMT_GRAY8
+*/
 class MotionDataPicture
 :
     public nxcip::Picture
 {
 public:
-    MotionDataPicture();
+    /*!
+        Supports only \a nxcip::PIX_FMT_MONOBLACK and \a nxcip::PIX_FMT_GRAY8
+    */
+    MotionDataPicture( nxcip::PixelFormat _pixelFormat );
     virtual ~MotionDataPicture();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -30,15 +35,16 @@ public:
 
     //!Returns pixel format
     virtual nxcip::PixelFormat pixelFormat() const override;
+    virtual int planeCount() const override;
     //!Width (pixels)
     virtual int width() const override;
     //!Hidth (pixels)
     virtual int height() const override;
     //!Length of horizontal line in bytes
-    virtual int xStride() const override;
+    virtual int xStride( int planeNumber ) const override;
     //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-    virtual const void* scanLine( int lineNumber ) const override;
-    virtual void* scanLine( int lineNumber ) override;
+    virtual const void* scanLine( int planeNumber, int lineNumber ) const override;
+    virtual void* scanLine( int planeNumber, int lineNumber ) override;
     /*!
         \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
             \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
@@ -50,6 +56,7 @@ public:
     void fillRect( int x, int y, int width, int height, int val );
 
 private:
+    nxcip::PixelFormat m_pixelFormat;
     nxpt::CommonRefManager m_refManager;
     uint8_t* m_data;
     size_t m_width;

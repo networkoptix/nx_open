@@ -15,8 +15,8 @@ class CLServerPushStreamReader : public QnLiveStreamProvider
     Q_OBJECT;
 
 public:
-	CLServerPushStreamReader(QnResourcePtr dev );
-	virtual ~CLServerPushStreamReader(){stop();}
+    CLServerPushStreamReader(QnResourcePtr dev );
+    virtual ~CLServerPushStreamReader(){stop();}
 
     virtual bool isStreamOpened() const = 0;
     //!Returns last HTTP response code (even if used media protocol is not http)
@@ -34,7 +34,7 @@ public:
 protected:
     virtual CameraDiagnostics::Result openStream() = 0;
     virtual void closeStream() = 0;
-	void pleaseReOpen();
+    void pleaseReOpen();
     virtual void afterUpdate() override;
     virtual void beforeRun() override;
     virtual bool canChangeStatus() const;
@@ -42,7 +42,7 @@ protected:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 
 private:
-	virtual void run() override; // in a loop: takes data from device and puts into queue
+    virtual void run() override; // in a loop: takes data from device and puts into queue
 
 private:
     bool m_needReopen;

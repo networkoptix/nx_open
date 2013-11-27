@@ -288,7 +288,7 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
 
     for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); ++y )
     {
-        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
+        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( 0, y );
         for( int x = 0; x < std::min<int>(motionPicture.width(), MD_WIDTH); ++x )
         {
             int pixel = *(srcMotionDataLine + x/CHAR_BIT) & (1 << (x%CHAR_BIT));

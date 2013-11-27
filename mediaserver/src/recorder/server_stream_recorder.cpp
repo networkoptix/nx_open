@@ -425,13 +425,11 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_mediaProvider)
     {   
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
         liveProvider->updateSoftwareMotion();
     }
-#endif
 }
 
 QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* provider)
