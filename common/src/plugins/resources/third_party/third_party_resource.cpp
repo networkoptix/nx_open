@@ -183,7 +183,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !regions.isEmpty() )
     {
         //filling in motion mask
-        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture() );
+        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::PIX_FMT_MONOBLACK ) );
 
         QRegion unitedRegion;
         for( QList<QRegion>::const_iterator
