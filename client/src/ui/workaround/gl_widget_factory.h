@@ -29,13 +29,13 @@ public:
         Widget *result = new Widget(localFormat, parent, /* shareWidget = */ NULL, windowFlags);
 
 #ifdef Q_OS_LINUX
-//        result->makeCurrent();
-//        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-//        if (!vendor.toLower().contains("nvidia")) {
-//            QGLFormat localFormat = result->format();
-//            localFormat.setSwapInterval(1); /* Turn vsync on. */
-//            result->setFormat(localFormat);
-//        }
+        result->makeCurrent();
+        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+        if (!vendor.toLower().contains("nvidia")) {
+            QGLFormat localFormat = result->format();
+            localFormat.setSwapInterval(1); /* Turn vsync on. */
+            result->setFormat(localFormat);
+        }
 #endif
 
         return result;
