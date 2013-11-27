@@ -4,6 +4,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 
+#include <utils/common/enum_name_mapper.h>
+
 #include <rest/server/json_rest_handler.h>
 
 class QnPtzHandler: public QnJsonRestHandler {
@@ -27,11 +29,11 @@ private:
         int sequence;
     };
 
-    QHash<QString, int> m_actionByName;
+    QnEnumNameMapper m_actionNameMapper;
     bool m_detectAvailableOnly;
     
-    static QMap<QString, SequenceInfo> m_sequencedRequests;
-    static QMutex m_sequenceMutex;
+    QMap<QString, SequenceInfo> m_sequencedRequests;
+    QMutex m_sequenceMutex;
 };
 
 #endif // QN_PTZ_HANDLER_H

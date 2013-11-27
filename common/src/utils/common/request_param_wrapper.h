@@ -3,6 +3,7 @@
 
 #include <utils/common/request_param.h>
 
+// TODO: #Elric drop, we have QnRequestParams
 class QnRequestParamWrapper {
 public:
     QnRequestParamWrapper(const QnRequestParamList &list) {

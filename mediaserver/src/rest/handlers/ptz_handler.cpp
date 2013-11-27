@@ -11,8 +11,12 @@
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
-QMap<QString, QnPtzHandler::SequenceInfo> QnPtzHandler::m_sequencedRequests;
-QMutex QnPtzHandler::m_sequenceMutex;
+namespace {
+    QN_DEFINE_NAME_MAPPED_ENUM(PtzAction,
+        ((PtzContinousMoveAction, "continuousMove"))
+    );
+
+} // anonymous namespace
 
 enum PtzAction {
     PtzContinousMoveAction,
@@ -22,10 +26,7 @@ enum PtzAction {
 };
 
 QnPtzHandler::QnPtzHandler() {
-    m_actionByName.insert("continuousMove", PtzContinousMoveAction);
-    m_actionByName.insert("absoluteMove", PtzAbsoluteMoveAction);
-    m_actionByName.insert("relativeMove", PtzRelativeMoveAction);
-    m_actionByName.insert("getPosition", PtzGetPositionAction);
+    m_actionNameMapper = createEnumNameMapper<PtzAction>();
 }
 
 void QnPtzHandler::cleanupOldSequence()

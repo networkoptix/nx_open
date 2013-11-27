@@ -24,6 +24,14 @@ QnPtzControllerPool::~QnPtzControllerPool() {
 	return;
 }
 
+QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const {
+	auto pos = m_dataByResource.find(resource);
+	if(pos == m_dataByResource.end())
+		return QnPtzControllerPtr();
+
+	return pos->defaultController;
+}
+
 void QnPtzControllerPool::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
 	connect(resource, SIGNAL(initAsyncFinished(const QnResourcePtr &, bool)), this, SLOT(at_resource_initAsyncFinished(const QnResourcePtr &)));
 
@@ -49,6 +57,8 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
         return;
 
 	if(data.deviceController) {
+		data.defaultController = data.deviceController;
+
         if(data.deviceController->hasCapabilities(Qn::LogicalPositionSpaceCapability)) {
             data.logicalController = data.deviceController;
         } else if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper()) {
@@ -57,6 +67,8 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
     }
 
 	if(data.logicalController) {
+		data.defaultController = data.logicalController;
+
         if(data.logicalController->hasCapabilities(Qn::ScreenSpaceMovementCapability)) {
             data.relativeController = data.logicalController;
         } else {
@@ -64,7 +76,11 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
         }
     }
 
+	if(data.relativeController)
+		data.defaultController = data.relativeController;
+
 	m_dataByResource.insert(resource, data);
-
-
 }
+
+
+

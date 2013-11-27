@@ -29,7 +29,7 @@ void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &start
     searcher->run(startAddr, endAddr, auth, port);
 }
 
-int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamWrapper &params,  JsonResult &result)
+int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &params,  JsonResult &result)
 {
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
@@ -64,7 +64,7 @@ int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParamWrapper
     return CODE_OK;
 }
 
-int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParamWrapper &params, JsonResult &result) {
+int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &params, JsonResult &result) {
     QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
@@ -80,7 +80,7 @@ int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParamWrappe
 }
 
 
-int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParamWrapper &params, JsonResult &result) {
+int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &params, JsonResult &result) {
     QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
@@ -112,17 +112,11 @@ int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParamWrapper 
 }
 
 
-int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParamList &params,  JsonResult &result)
+int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &params,  JsonResult &result)
 {
     QAuthenticator auth;
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "user")
-            auth.setUser(param.second);
-        else if (param.first == "password")
-            auth.setPassword(param.second);
-    }
+    auth.setUser(params["user"]);
+    auth.setPassword(params["password"]);
 
     QString resType;
     QUrl url;
@@ -154,7 +148,7 @@ int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParamList &pa
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) {
+int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) {
     QString localPath = path;
     while(localPath.endsWith('/'))
         localPath.chop(1);

@@ -18,6 +18,8 @@ public:
     QnPtzControllerPool(QObject *parent = NULL);
     virtual ~QnPtzControllerPool();
 
+    QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
+
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
@@ -28,6 +30,8 @@ private:
         QnPtzControllerPtr deviceController;
         QnPtzControllerPtr logicalController;
         QnPtzControllerPtr relativeController;
+
+        QnPtzControllerPtr defaultController;
     };
 
     QHash<QnResourcePtr, PtzData> m_dataByResource;
