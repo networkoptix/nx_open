@@ -68,7 +68,7 @@ private:
     nxpt::ScopedRef<IsdNativePlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    std::auto_ptr<MediaEncoder> m_encoder;
+    std::auto_ptr<MediaEncoder> m_encoder[2];
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

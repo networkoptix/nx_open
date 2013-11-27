@@ -26,7 +26,7 @@ class MediaEncoder
 public:
     MediaEncoder(
         CameraManager* const cameraManager,
-        unsigned int frameDurationUsec );
+        unsigned int encoderNum );
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -56,7 +56,7 @@ private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
-    unsigned int m_frameDurationUsec;
+    unsigned int m_encoderNum;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

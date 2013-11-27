@@ -15,6 +15,9 @@
 
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
+#include "vmux_iface.h"
+
+class MotionDataPicture;
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -25,10 +28,7 @@ public:
     /*!
         \param liveMode In this mode, plays all pictures in a loop
     */
-    StreamReader(
-        nxpt::CommonRefManager* const parentRefManager,
-        unsigned int frameDurationUsec,
-        bool liveMode );
+    StreamReader( nxpt::CommonRefManager* const parentRefManager, int encoderNum);
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -43,13 +43,19 @@ public:
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 private:
+    bool StreamReader::needMetaData();
+    MotionDataPicture* getMotionData();
+private:
     nxpt::CommonRefManager m_refManager;
-    int m_encoderNumber;
-    nxcip::UsecUTCTimestamp m_curTimestamp;
-    const unsigned int m_frameDuration;
-    nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
-    mutable Mutex m_mutex;
+    int m_encoderNum;
     bool m_initialized;
+    nxcip::CompressionType m_codec;
+    nxcip::UsecUTCTimestamp m_lastVideoTime;
+    nxcip::UsecUTCTimestamp m_lastMotionTime;
+    Vmux vmux;
+    
+    Vmux* vmux_motion;
+    vmux_stream_info_t motion_stream_info;
 };
 
 #endif  //ILP_STREAM_READER_H
