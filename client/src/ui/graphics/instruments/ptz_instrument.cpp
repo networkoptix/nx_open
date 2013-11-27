@@ -616,11 +616,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
     Qn::PtzCapabilities oldCapabilities = data.capabilities;
 
-    /*if (widget->virtualPtzController()) {
-        data.capabilities = widget->virtualPtzController()->getCapabilities();
-    } else {
-        data.capabilities = widget->resource()->toResource()->getPtzCapabilities();
-    }*/
+    data.capabilities = widget->ptzController()->getCapabilities();
 
     if(oldCapabilities != data.capabilities)
         updateOverlayWidget(widget);
@@ -670,7 +666,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
         (data.currentSpeed - data.requestedSpeed).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
 
     if(instant) {
-        //m_ptzController->setMovement(widget, data.requestedSpeed);
+        widget->ptzController()->continuousMove(data.requestedSpeed);
         data.currentSpeed = data.requestedSpeed;
         data.pendingAbsoluteMove = QRectF();
 
