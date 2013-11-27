@@ -29,7 +29,7 @@ void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &start
     searcher->run(startAddr, endAddr, auth, port);
 }
 
-int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &params,  JsonResult &result)
+int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &params,  QnJsonRestResult &result)
 {
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
@@ -64,7 +64,7 @@ int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &para
     return CODE_OK;
 }
 
-int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &params, JsonResult &result) {
+int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result) {
     QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
@@ -80,7 +80,7 @@ int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &par
 }
 
 
-int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &params, JsonResult &result) {
+int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &params, QnJsonRestResult &result) {
     QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
@@ -112,43 +112,37 @@ int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &param
 }
 
 
-int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &params,  JsonResult &result)
+int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result)
 {
     QAuthenticator auth;
-    auth.setUser(params["user"]);
-    auth.setPassword(params["password"]);
+    auth.setUser(params.value("user"));
+    auth.setPassword(params.value("password"));
 
-    QString resType;
-    QUrl url;
-    QnManualCamerasMap cameras;
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "url") 
-        {
-            if (!url.isEmpty()) {
-                QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
-                if (itr.value().resType == 0)
-                    return CODE_INVALID_PARAMETER;
-            }
-            url = param.second;
+    QnManualCameraInfoMap infos;
+    for(int i = 0, skipped = 0; skipped < 5; i++) {
+        QString url = params.value("url" + QString::number(i));
+        QString manufacturer = params.value("manufacturer" + QString::number(i));
+
+        if(url.isEmpty() || manufacturer.isEmpty()) {
+            skipped++;
+            continue;
         }
-        else if (param.first == "manufacturer")
-            resType = param.second;
+
+        QnManualCameraInfo info(url, auth, manufacturer);
+        if(info.resType.isNull()) {
+            result.setError(-1, lit("Invalid camera manufacturer '%1'.").arg(manufacturer));
+            return CODE_INVALID_PARAMETER;
+        }
+
+        infos.insert(url, info);
     }
 
-    if (!url.isEmpty()) {
-        QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
-        if (itr.value().resType == 0)
-            return CODE_INVALID_PARAMETER;
-    }
-    
-    bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(cameras);
+    bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);
     result.setReply(registered);
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) {
+int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     QString localPath = path;
     while(localPath.endsWith('/'))
         localPath.chop(1);

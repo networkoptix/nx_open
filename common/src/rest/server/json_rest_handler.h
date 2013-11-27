@@ -5,98 +5,47 @@
 
 #include <utils/common/json.h>
 
+class QnJsonRestResult {
+public:
+    QnJsonRestResult();
+
+    const QString &errorText() const;
+    void setErrorText(const QString &errorText);
+    int errorId() const;
+    void setErrorId(int errorId);
+    void setError(int errorId, const QString &errorText);
+
+    QVariant reply() const;
+
+    template<class T>
+    void setReply(const T &reply) {
+        QJson::serialize(reply, &m_reply);
+    }
+
+    QByteArray serialize();
+
+private:
+    QString m_errorText;
+    int m_errorId;
+    QJsonValue m_reply;
+};
+
+
 class QnJsonRestHandler: public QnRestRequestHandler {
     Q_OBJECT
 public:
-    class JsonResult {
-    public:
-        JsonResult(): m_errorId(-1) {}
+    QnJsonRestHandler();
+    virtual ~QnJsonRestHandler();
 
-        const QString &errorText() const {
-            return m_errorText;
-        }
-
-        void setErrorText(const QString &errorText) {
-            m_errorText = errorText;
-        }
-
-        int errorId() const {
-            return m_errorId;
-        }
-
-        void setErrorId(int errorId) {
-            m_errorId = errorId;
-        }
-
-        void setError(int errorId, const QString &errorText) {
-            m_errorId = errorId;
-            m_errorText = errorText;
-        }
-
-        template<class T>
-        void setReply(const T &reply) {
-            QJson::serialize(reply, &m_reply);
-        }
-
-        QVariant reply() const {
-            return m_reply;
-        }
-
-        QByteArray serialize() {
-            QJsonObject object;
-            if(!m_errorText.isEmpty())
-                object[QLatin1String("errorText")] = m_errorText;
-            if(m_errorId != -1)
-                object[QLatin1String("errorId")] = m_errorId;
-            object[QLatin1String("reply")] = m_reply;
-
-            QByteArray result;
-            QJson::serialize(object, &result);
-            return result;
-        }
-
-    private:
-        QString m_errorText;
-        int m_errorId;
-        QJsonValue m_reply;
-    };
-
-    QnJsonRestHandler(): m_contentType("application/json") {}
-
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override {
-        JsonResult jsonResult;
-        int returnCode = executeGet(path, processParams(params), jsonResult);
-
-        result = jsonResult.serialize();
-        contentType = m_contentType;
-
-        return returnCode;
-    }
-
-    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) override {
-        JsonResult jsonResult;
-        int returnCode = executePost(path, processParams(params), body, jsonResult);
-        
-        result = jsonResult.serialize();
-        contentType = m_contentType;
-
-        return returnCode;
-    }
-
-    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) = 0;
-    
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, JsonResult &result) {
-        Q_UNUSED(body);
-        return executeGet(path, params, result);
-    }
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) = 0;
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
 
 protected:
-    QnRequestParams processParams(const QnRequestParamList &params) {
-        QnRequestParams result;
-        foreach(const QnRequestParam &param, params)
-            result.insert(param.first, param.second);
-        return result;
-    }
+    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override;
+    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) override;
+
+private:
+    QnRequestParams processParams(const QnRequestParamList &params);
 
 private:
     QByteArray m_contentType;

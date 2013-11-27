@@ -8,7 +8,7 @@
 
 QnTimeHandler::QnTimeHandler() {}
 
-int QnTimeHandler::executeGet(const QString &, const QnRequestParams &, JsonResult &result) {
+int QnTimeHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
     QnTimeReply reply;
     reply.timeZoneOffset = currentTimeZone() * 1000ll;
     reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();

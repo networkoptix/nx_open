@@ -24,7 +24,7 @@ QnCameraDiagnosticsHandler::QnCameraDiagnosticsHandler()
 int QnCameraDiagnosticsHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams &params,
-    JsonResult& result )
+    QnJsonRestResult& result )
 {
     QString resID = params.value("res_id");
     CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));

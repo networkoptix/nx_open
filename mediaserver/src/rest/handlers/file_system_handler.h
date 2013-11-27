@@ -9,7 +9,7 @@ class QnFileSystemHandler: public QnJsonRestHandler {
 public:
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
     virtual QString description() const override;
 };
 

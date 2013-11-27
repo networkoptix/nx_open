@@ -56,7 +56,7 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) {
+int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     QString localPath = path;
     while(localPath.endsWith('/'))
         localPath.chop(1);

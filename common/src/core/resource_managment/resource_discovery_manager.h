@@ -28,7 +28,7 @@ struct QnManualCameraInfo
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
 };
-typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
+typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
 class QnAbstractResourceSearcher;
 
@@ -89,7 +89,7 @@ public:
 
     void setReady(bool ready);
 
-    bool registerManualCameras(const QnManualCamerasMap& cameras);
+    bool registerManualCameras(const QnManualCameraInfoMap& cameras);
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
 
@@ -132,7 +132,7 @@ private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QnManualCamerasMap m_manualCameraMap;
+    QnManualCameraInfoMap m_manualCameraMap;
 
     bool m_server;
     volatile bool m_ready;

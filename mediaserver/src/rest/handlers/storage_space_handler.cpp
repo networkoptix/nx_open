@@ -27,7 +27,7 @@ QnStorageSpaceHandler::QnStorageSpaceHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, JsonResult &result) {
+int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
     QnStorageSpaceReply reply;
 
     QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);

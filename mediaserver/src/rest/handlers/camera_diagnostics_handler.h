@@ -20,7 +20,7 @@ public:
     QnCameraDiagnosticsHandler();
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, JsonResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
     virtual QString description() const override;
 
 private:

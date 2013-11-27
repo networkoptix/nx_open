@@ -670,7 +670,7 @@ void QnMain::loadResourcesFromECS()
         QnSleep::msleep(10000);
     }
 
-    QnManualCamerasMap manualCameras;
+    QnManualCameraInfoMap manualCameras;
     foreach(const QnSecurityCamResourcePtr &camera, cameras)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(camera->getId());
