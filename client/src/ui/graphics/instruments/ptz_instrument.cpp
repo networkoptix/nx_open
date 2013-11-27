@@ -532,9 +532,11 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
-    overlay->modeButton()->setTarget(widget);
-    overlay->modeButton()->setVisible(widget->virtualPtzController() != NULL);
-    overlay->setMarkersVisible(widget->virtualPtzController() == NULL);
+    //overlay->modeButton()->setTarget(widget);
+    //overlay->modeButton()->setVisible(widget->virtualPtzController() != NULL);
+    //overlay->setMarkersVisible(widget->virtualPtzController() == NULL);
+    overlay->modeButton()->setVisible(false); // TODO: #PTZ
+
     data.overlayWidget = overlay;
 
     connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
@@ -599,8 +601,8 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
 
         staticOverlay->manipulatorWidget()->setVisible((m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapabilities) == Qn::ContinuousPanTiltCapabilities);
         
-        if (widget->virtualPtzController())
-            staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
+        //if (widget->virtualPtzController())
+            //staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
     }
 }
 
@@ -614,11 +616,11 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
     Qn::PtzCapabilities oldCapabilities = data.capabilities;
 
-    if (widget->virtualPtzController()) {
+    /*if (widget->virtualPtzController()) {
         data.capabilities = widget->virtualPtzController()->getCapabilities();
     } else {
         data.capabilities = widget->resource()->toResource()->getPtzCapabilities();
-    }
+    }*/
 
     if(oldCapabilities != data.capabilities)
         updateOverlayWidget(widget);
@@ -683,7 +685,7 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
 
-    if (!target()->virtualPtzController()) {
+    /*if (!target()->virtualPtzController()) {
         // built in virtual PTZ execute command too fast. animation looks bad
         QnSplashItem *splashItem = newSplashItem(target());
         splashItem->setSplashType(QnSplashItem::Circular);
@@ -692,7 +694,7 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
         m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
     } else {
         target()->virtualPtzController()->setAnimationEnabled(true);
-    }
+    }*/
 
     ptzMoveTo(target(), pos);
 }
@@ -714,6 +716,7 @@ void PtzInstrument::processPtzDoubleClick() {
     if(!target() || m_skipNextAction)
         return;
 
+#if 0
     if (!target()->virtualPtzController()) {
         QnSplashItem *splashItem = newSplashItem(target());
         splashItem->setSplashType(QnSplashItem::Rectangular);
@@ -731,6 +734,7 @@ void PtzInstrument::processPtzDoubleClick() {
     } else {
         emit doubleClicked(target());
     }
+#endif
 }
 
 
@@ -909,10 +913,10 @@ void PtzInstrument::startDrag(DragInfo *) {
         ensureElementsWidget();
         opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
         /* Everything else will be initialized in the first call to drag(). */
-    } else if (target()->virtualPtzController()) {
+    } /*else if (target()->virtualPtzController()) {
         target()->virtualPtzController()->setAnimationEnabled(false);
         target()->setCursor(Qt::BlankCursor);
-    } else {
+    }*/ else {
         ensureSelectionItem();
         selectionItem()->setParentItem(target());
         selectionItem()->setViewport(m_viewport.data());
@@ -962,7 +966,9 @@ void PtzInstrument::dragMove(DragInfo *info) {
         arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
-    } else if (target()->virtualPtzController()) {
+    } 
+#if 0
+    else if (target()->virtualPtzController()) {
         QCursor::setPos(info->mousePressScreenPos());
         if(info->mouseScreenPos() != info->mousePressScreenPos()) {
             QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
@@ -975,7 +981,9 @@ void PtzInstrument::dragMove(DragInfo *info) {
             QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
             m_ptzController->setPhysicalPosition(target(), position + positionDelta);*/
         }
-    } else {
+    } 
+#endif
+    else {
         ensureSelectionItem();
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
     }
@@ -990,9 +998,9 @@ void PtzInstrument::finishDrag(DragInfo * info) {
 
             ensureElementsWidget();
             opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
-        } else if (target()->virtualPtzController()) {
+        } /*else if (target()->virtualPtzController()) {
             target()->unsetCursor();
-        } else {
+        } */else {
             ensureSelectionItem();
             opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 

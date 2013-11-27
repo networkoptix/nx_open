@@ -103,7 +103,7 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-    QnVirtualPtzController *virtualPtzController() const;
+    QnPtzControllerPtr ptzController() const;
 
 signals:
     void motionSelectionChanged();
@@ -204,7 +204,7 @@ private:
 
     QStaticText m_sensStaticText[10];
 
-    QnFisheyePtzController* m_fisheyePtz;
+    QnPtzControllerPtr m_ptzController;
 };
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H
