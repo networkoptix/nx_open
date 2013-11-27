@@ -3,7 +3,7 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${product.name} ${release.version}"
-DMG_FILE="${product.name} ${release.version}.dmg"
+DMG_FILE="${project.build.finalName}.dmg"
 HELP=${libdir}/help
 
 ln -s /Applications $SRC/Applications
