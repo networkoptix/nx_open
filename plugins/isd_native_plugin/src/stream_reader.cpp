@@ -29,17 +29,23 @@
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 #endif
 
+static const int64_t MOTION_TIMEOUT_USEC = 1000ll * 300;
+
 StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int encoderNum)
 :
     m_refManager( parentRefManager ),
     m_encoderNum( encoderNum ),
     m_initialized(false),
-    m_codec(nxcip::CODEC_ID_NONE)
+    m_codec(nxcip::CODEC_ID_NONE),
+    m_lastVideoTime(0),
+    m_lastMotionTime(0),
+    vmux_motion(0)
 {
 }
 
 StreamReader::~StreamReader()
 {
+    delete vmux_motion;
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -68,6 +74,51 @@ unsigned int StreamReader::addRef()
 unsigned int StreamReader::releaseRef()
 {
     return m_refManager.releaseRef();
+}
+
+bool StreamReader::needMetaData()
+{
+    if (m_encoderNum == 1) {
+        if (m_lastVideoTime - m_lastMotionTime >= MOTION_TIMEOUT_USEC)
+        {
+            m_lastMotionTime = m_lastVideoTime;
+            return true;
+        }
+    }
+    return false;
+}
+
+MotionDataPicture* StreamReader::getMotionData()
+{
+    if (!vmux_motion)
+    {
+	vmux_motion = new Vmux();
+        int info_size = sizeof(motion_stream_info);
+        int rv = vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
+        if (rv) {
+	    std::cout << "can't get stream info for motion stream" << std::endl;
+            return 0; // error
+	}
+
+        std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
+
+        rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
+        if (rv)
+            return 0; // error
+    }
+
+    vmux_frame_t frame;
+    int rv = vmux_motion->GetFrame (&frame);
+    if (rv) {
+        delete vmux_motion;
+        vmux_motion = 0; // close motion stream
+        return 0; // return error
+    }
+
+    //image_size = stream_info.width * stream_info.height;
+    //pitch_size = stream_info.pitch * stream_info.height;
+    MotionDataPicture* motionData = new MotionDataPicture();
+    return motionData;
 }
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
@@ -122,6 +173,14 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         m_codec)); 
     videoPacket->resizeBuffer( frame.frame_size );
     memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
+    m_lastVideoTime = videoPacket->timestamp();
+    if (needMetaData()) {
+        MotionDataPicture* motionData = getMotionData();
+        if (motionData) {
+            videoPacket->setMotionData( motionData );
+            motionData->releaseRef();   //videoPacket takes reference to motionData
+        }
+    }
 
     *lpPacket = videoPacket.release();
     return nxcip::NX_NO_ERROR;
