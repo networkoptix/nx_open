@@ -1,13 +1,13 @@
 #include "ptz_handler.h"
 
-#include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
-#include "utils/common/util.h"
-#include "utils/common/json.h"
-#include "utils/math/space_mapper.h"
-#include "core/resource/network_resource.h"
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource/camera_resource.h"
+#include <utils/common/json.h>
+#include <utils/common/lexical.h>
+#include <utils/network/tcp_connection_priv.h>
+
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/camera_resource.h>
+
+#include <ptz/ptz_controller_pool.h>
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
@@ -17,13 +17,6 @@ namespace {
     );
 
 } // anonymous namespace
-
-enum PtzAction {
-    PtzContinousMoveAction,
-    PtzAbsoluteMoveAction,
-    PtzRelativeMoveAction,
-    PtzGetPositionAction,
-};
 
 QnPtzHandler::QnPtzHandler() {
     m_actionNameMapper = createEnumNameMapper<PtzAction>();
@@ -62,45 +55,64 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
         localPath.chop(1);
     
     QString actionName = localPath.mid(localPath.lastIndexOf('/') + 1);
-    int action = m_actionByName.value(actionName, -1);
+    int action = m_actionNameMapper.value(actionName, -1);
     if(action == -1) {
-        result.setErrorText(QString("Unknown action '%1'.").arg(actionName));
+        result.setError(-1, lit("Unknown action '%1'.").arg(actionName));
         return CODE_INVALID_PARAMETER;
     }
     
     QString resourceId = params.value("res_id");
     if(resourceId.isEmpty()) {
-        result.setErrorText("Parameter 'res_id' is absent or empty.");
+        result.setError(-1, lit("Parameter 'res_id' is absent or empty."));
         return CODE_INVALID_PARAMETER;
     }
 
     QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(resourceId).dynamicCast<QnVirtualCameraResource>();
     if(!camera) {
-        result.setErrorText(QString("Camera resource '%1' not found.").arg(resourceId));
+        result.setError(-1, lit("Camera resource '%1' not found.").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
 
     if (camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
-        result.setErrorText(QString("Camera resource '%1' is not ready yet.").arg(resourceId));
+        result.setError(-1, lit("Camera resource '%1' is not ready yet.").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
 
-    QnAbstractPtzControllerPtr ptzController;
-    if (ptz == 0) {
-        result.setErrorText(QString("PTZ is not supported by camera '%1'").arg(resourceId));
+    QnPtzControllerPtr controller = qnPtzPool->controller(camera);
+    if (!controller) {
+        result.setError(-1, lit("PTZ is not supported by camera '%1'").arg(resourceId));
         return CODE_INVALID_PARAMETER;
     }
+
+    QString seqId = params.value("seqId");
+    qint64 seqNum = params.value("seqNum").toLongLong();
+    if(!checkSequence(seqId, seqNum))
+        return CODE_OK;
 
     switch(action) {
-    case PtzContinousMoveAction: {
-        QVector3D speed;
-
+    case PtzContinousMoveAction:    return executeContinuousMove(controller, params, result);
+    default:                        return CODE_INVALID_PARAMETER;
     }
+}
 
+
+int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    qreal xSpeed = 0.0;
+    qreal ySpeed = 0.0;
+    qreal zSpeed = 0.0;
+    
+    QnLexical::deserialize(params.value("xSpeed"), &xSpeed);
+    QnLexical::deserialize(params.value("ySpeed"), &ySpeed);
+    QnLexical::deserialize(params.value("zSpeed"), &zSpeed);
+
+    if (controller->startMove(QVector3D(xSpeed, ySpeed, zSpeed)) == 0) {
+        return CODE_OK;
+    } else {
+        return CODE_INTERNAL_ERROR;
     }
+}
 
-
-
+#if 0
     /*QnVirtualCameraResourcePtr resource;
 
     qreal xSpeed = 0;
@@ -271,12 +283,7 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
     return errStr.isEmpty() ? CODE_OK : CODE_INVALID_PARAMETER;
 
 }
-
-int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
-}
+#endif
 
 QString QnPtzHandler::description() const
 {

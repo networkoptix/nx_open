@@ -6,6 +6,8 @@
 
 #include <utils/common/enum_name_mapper.h>
 
+#include <core/ptz/ptz_fwd.h>
+
 #include <rest/server/json_rest_handler.h>
 
 class QnPtzHandler: public QnJsonRestHandler {
@@ -18,6 +20,8 @@ protected:
     virtual QString description() const;
 
 private:
+    int executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
 
