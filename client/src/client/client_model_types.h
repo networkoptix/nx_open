@@ -95,5 +95,11 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 Q_DECLARE_METATYPE(QnLicenseWarningState);
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
 
+/**
+ * Mapping from resource physical id to aspect ratio.
+ */
+typedef QHash<QString, qreal> QnAspectRatioHash;
+Q_DECLARE_METATYPE(QnAspectRatioHash)
+
 
 #endif // QN_CLIENT_MODEL_TYPES_H
