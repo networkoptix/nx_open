@@ -7,7 +7,7 @@
 #   
 #endif
 #include <assert.h>
-#include "plugins/resources/third_party/motion_data_picture.h"
+#include "motion_data_picture.h"
 
 static int sensitivityToMask[10] = 
 {
@@ -389,7 +389,7 @@ void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 
 MotionDataPicture* ISDMotionEstimation::getMotion()
 {
-    MotionDataPicture* motionData = new MotionDataPicture(nxcip::PIX_FMT_MONOBLACK);
+    MotionDataPicture* motionData = new MotionDataPicture();
 
     // scale result motion (height already valid, scale width ony. Data rotates, so actually duplicate or remove some lines
     int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
