@@ -19,7 +19,8 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_capabilities( 
         //nxcip::BaseCameraManager::dtsArchiveCapability | 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::shareFpsCapability)
+        nxcip::BaseCameraManager::shareFpsCapability),
+    m_motionMask(0)
 {
 }
 
