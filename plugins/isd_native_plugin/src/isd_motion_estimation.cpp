@@ -1,13 +1,14 @@
 #include "isd_motion_estimation.h"
 
 #ifndef WIN32
-#   include <sys/socket.h>
+#   include <arpa/inet.h>
 #else
 #   include <WinSock2.h>
 #   
 #endif
 #include <assert.h>
 #include "motion_data_picture.h"
+#include "limits.h"
 
 static int sensitivityToMask[10] = 
 {
@@ -49,9 +50,9 @@ ISDMotionEstimation::ISDMotionEstimation():
 
     m_lastImgWidth(0),
     m_lastImgHeight(0),
-    m_isNewMask(false),
     m_scaleXStep(0),
-    m_scaleYStep(0)
+    m_scaleYStep(0),
+    m_isNewMask(false)
 {
     m_frameDeltaBuffer = 0;
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
@@ -329,7 +330,7 @@ void ISDMotionEstimation::analizeMotionAmount(uint8_t* frame)
 void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 {
     Mutex::ScopedLock lock(&m_mutex);
-
+    m_isNewMask = true;
     nxpt::freeAligned(m_motionMask);
     nxpt::freeAligned(m_motionSensMask);
     m_motionMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
