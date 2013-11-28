@@ -7,7 +7,7 @@
 #   
 #endif
 #include <assert.h>
-#include "motion_data_picture.h"
+#include <plugins/resources/third_party/motion_data_picture.h>
 #include "limits.h"
 
 static const int sensitivityToMask[10] = 
@@ -351,7 +351,7 @@ void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 
 MotionDataPicture* ISDMotionEstimation::getMotion()
 {
-    MotionDataPicture* motionData = new MotionDataPicture();
+    MotionDataPicture* motionData = new MotionDataPicture(nxcip::PIX_FMT_MONOBLACK);
     memcpy(motionData->data(), m_resultMotion, MD_WIDTH * MD_HEIGHT / 8);
     memset(m_resultMotion, 0, MD_HEIGHT * MD_WIDTH / 8);
     m_totalFrames++;
