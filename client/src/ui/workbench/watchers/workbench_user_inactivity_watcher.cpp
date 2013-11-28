@@ -78,16 +78,16 @@ quint32 QnWorkbenchUserInactivityWatcher::idlePeriod() const {
     return idle;
 }
 
-bool QnWorkbenchUserInactivityWatcher::isUserInactive() const {
+bool QnWorkbenchUserInactivityWatcher::state() const {
     return m_userIsInactive;
 }
 
-void QnWorkbenchUserInactivityWatcher::setUserInactive(bool userIsInactive) {
+void QnWorkbenchUserInactivityWatcher::setState(bool userIsInactive) {
     if (m_userIsInactive == userIsInactive)
         return;
 
     m_userIsInactive = userIsInactive;
-    emit userInactivityStatusChanged(userIsInactive);
+    emit stateChanged(userIsInactive);
 }
 
 bool QnWorkbenchUserInactivityWatcher::isEnabled() const {
@@ -95,13 +95,14 @@ bool QnWorkbenchUserInactivityWatcher::isEnabled() const {
 }
 
 void QnWorkbenchUserInactivityWatcher::setEnabled(bool enable) {
-    if (enable != isEnabled()) {
-        if (enable) {
-            m_timerId = startTimer(checkInterval);
-        } else {
-            killTimer(m_timerId);
-            m_timerId = -1;
-        }
+    if (enable == isEnabled())
+        return;
+
+    if (enable) {
+        m_timerId = startTimer(checkInterval);
+    } else {
+        killTimer(m_timerId);
+        m_timerId = -1;
     }
 }
 
@@ -116,10 +117,11 @@ void QnWorkbenchUserInactivityWatcher::setIdleTimeout(quint32 timeout) {
 }
 
 void QnWorkbenchUserInactivityWatcher::checkInactivity() {
-    setUserInactive(idlePeriod() >= idleTimeout());
+    setState(idlePeriod() >= idleTimeout());
 }
 
-void QnWorkbenchUserInactivityWatcher::timerEvent(QTimerEvent *) {
+void QnWorkbenchUserInactivityWatcher::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event)
     checkInactivity();
 }
 

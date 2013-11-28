@@ -243,7 +243,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
-    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(userInactivityStatusChanged(bool)),  this,   SLOT(updateUserInactivityState(bool)));
+    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(stateChanged(bool)), this,   SLOT(at_userInactivityWatcher_stateChanged(bool)));
 
     updateLines();
     updateCalendar();
@@ -643,18 +643,6 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
     else
         m_currentMediaWidget->display()->archiveReader()->pauseMedia();
     m_currentMediaWidget->display()->camDisplay()->playAudio(playing);
-}
-
-void QnWorkbenchNavigator::updateUserInactivityState(bool userIsInactive) {
-    if (userIsInactive != isPlaying())
-        return;
-
-    if (userIsInactive)
-        setPlayingTemporary(false);
-    else if (m_autoPaused)
-        setPlayingTemporary(true);
-
-    m_autoPaused = userIsInactive;
 }
 
 // -------------------------------------------------------------------------- //
@@ -1442,3 +1430,14 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
     }
 }
 
+void QnWorkbenchNavigator::at_userInactivityWatcher_stateChanged(bool userIsInactive) {
+    if (userIsInactive != isPlaying())
+        return;
+
+    if (userIsInactive)
+        setPlayingTemporary(false);
+    else if (m_autoPaused)
+        setPlayingTemporary(true);
+
+    m_autoPaused = userIsInactive;
+}
