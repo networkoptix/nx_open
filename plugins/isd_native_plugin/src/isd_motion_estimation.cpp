@@ -102,8 +102,8 @@ void ISDMotionEstimation::reallocateMask(int width, int height)
         memset(m_frameBuffer[i], 0, MD_HEIGHT * MD_WIDTH);
     }
     m_filteredFrame = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH, 32);
-    m_resultMotion = new uint32_t[MD_HEIGHT/4 * MD_WIDTH];
-    memset(m_resultMotion, 0, MD_HEIGHT * MD_WIDTH);
+    m_resultMotion = new uint32_t[MD_HEIGHT * MD_WIDTH / 32];
+    memset(m_resultMotion, 0, MD_HEIGHT * MD_WIDTH / 8);
 
     // scale motion mask to scaled 
     memcpy(m_scaledMask, m_motionMask, MD_WIDTH * MD_HEIGHT);
