@@ -646,6 +646,8 @@ void QnImageButtonWidget::setCached(bool cached) {
         return;
 
     m_cached = cached;
+
+    invalidatePixmapCache();
 }
 
 void QnImageButtonWidget::setFixedSize(qreal size) {
@@ -669,7 +671,16 @@ void QnImageButtonWidget::ensurePixmapCache() const {
         if(m_pixmaps[i].isNull()) {
             m_pixmapCache[i] = m_pixmaps[i];
         } else {
-            m_pixmapCache[i] = QPixmap::fromImage(m_pixmaps[i].toImage().scaled(size().toSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+            QSize size = this->size().toSize();
+            QString key = lit("ibw_%1_%2x%3").arg(m_pixmaps[i].cacheKey()).arg(size.width()).arg(size.height());
+
+            QPixmap pixmap;
+            if (!QPixmapCache::find(key, &pixmap)) {
+                pixmap = QPixmap::fromImage(m_pixmaps[i].toImage().scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+                QPixmapCache::insert(key, pixmap);
+            }
+
+            m_pixmapCache[i] = pixmap;
         }
     }
 
