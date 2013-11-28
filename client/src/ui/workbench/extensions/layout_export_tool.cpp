@@ -146,11 +146,11 @@ bool QnLayoutExportTool::start() {
     delete device;
 
     device = m_storage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
-    quint32 flags = m_readOnly ? StorageFlags::ReadOnly : 0;
+    quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
 
     foreach (const QnMediaResourcePtr resource, m_resources) {
         if (resource->toResource()->hasFlags(QnResource::utc)) {
-            flags |= StorageFlags::ContainsCameras;
+            flags |= QnLayoutFileStorageResource::ContainsCameras;
             break;
         }
     }
