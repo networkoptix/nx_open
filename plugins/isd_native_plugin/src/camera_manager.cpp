@@ -79,7 +79,8 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     if( !m_encoder[encoderIndex].get() )
         m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex) );
     m_encoder[encoderIndex]->addRef();
-    m_encoder[encoderIndex]->setMotionMask(m_motionMask);
+    if (m_motionMask)
+        m_encoder[encoderIndex]->setMotionMask(m_motionMask);
     *encoderPtr = m_encoder[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
