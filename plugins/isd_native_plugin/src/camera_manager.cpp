@@ -20,7 +20,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
         //nxcip::BaseCameraManager::dtsArchiveCapability | 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::shareFpsCapability),
-    m_motionMask(0)
+    m_motionMask( nullptr )
 {
 }
 
@@ -140,7 +140,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
 {
     *dtsArchiveReader = 0;
-    return nxcip::NX_NO_ERROR;
+    return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
@@ -150,7 +150,7 @@ int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::Time
     resTimePeriods->timePeriods.push_back( std::make_pair( m_dirContentsManager.minTimestamp(), m_dirContentsManager.maxTimestamp() ) );
     *timePeriods = resTimePeriods.release();
     */
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 int CameraManager::setMotionMask( nxcip::Picture* motionMask )
@@ -177,4 +177,3 @@ nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
 }
-
