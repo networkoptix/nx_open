@@ -1,7 +1,8 @@
 #include "notifications_collection_widget.h"
 
-#include <QApplication>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/delete_later.h>
 
