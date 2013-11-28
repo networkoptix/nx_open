@@ -15,8 +15,8 @@ MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
     m_pixelFormat( _pixelFormat ),
     m_refManager( this ),
     m_data( NULL ),
-    m_width( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
-    m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT ),
+    m_width( nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT ),
+    m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
     m_stride( 0 )
 {
     assert( m_pixelFormat == nxcip::PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::PIX_FMT_GRAY8 );
@@ -24,10 +24,10 @@ MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
     switch( m_pixelFormat )
     {
         case nxcip::PIX_FMT_MONOBLACK:
-            m_stride = nxpt::alignUp( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, CHAR_BIT ) / CHAR_BIT;
+            m_stride = nxpt::alignUp( m_width, CHAR_BIT ) / CHAR_BIT;
             break;
         case nxcip::PIX_FMT_GRAY8:
-            m_stride = nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH;
+            m_stride = m_width;
             break;
         default:
             m_stride = 0;
@@ -84,13 +84,13 @@ int MotionDataPicture::planeCount() const
 //!Width (pixels)
 int MotionDataPicture::width() const
 {
-    return nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH;
+    return m_width;
 }
 
 //!Hidth (pixels)
 int MotionDataPicture::height() const
 {
-    return nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT;
+    return m_height;
 }
 
 //!Length of horizontal line in bytes
