@@ -82,8 +82,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
                     for( int y = rect.top(); y <= rect.bottom(); ++y )
                         for( int x = rect.left(); x <= rect.right(); ++x )
                         {
-                            assert( x < motionMask->width() && y < motionMask->height() );
-                            motionMask->setPixel( x, y, sensitivityToMask[sens] );
+                            assert( y < motionMask->width() && x < motionMask->height() );
+                            motionMask->setPixel( y, x, sensitivityToMask[sens] );
                             //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
                             //m_motionSensMask[x * MD_HEIGHT + y] = sens;
                         }
