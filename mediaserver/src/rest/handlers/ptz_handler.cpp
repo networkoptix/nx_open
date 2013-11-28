@@ -13,7 +13,8 @@ static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(PtzAction,
-        ((PtzContinousMoveAction, "continuousMove"))
+        ((PtzContinousMoveAction,   "ptz/continuousMove"))
+        ((PtzRelativeMoveAction,    "ptz/relativeMove"))
     );
 
 } // anonymous namespace
@@ -50,18 +51,13 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
 }
 
 int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
-    QString localPath = path;
-    while(localPath.endsWith('/'))
-        localPath.chop(1);
-    
-    QString actionName = localPath.mid(localPath.lastIndexOf('/') + 1);
-    int action = m_actionNameMapper.value(actionName, -1);
+    int action = m_actionNameMapper.value(path, -1);
     if(action == -1) {
         result.setError(-1, lit("Unknown action '%1'.").arg(actionName));
         return CODE_INVALID_PARAMETER;
     }
     
-    QString resourceId = params.value("res_id");
+    QString resourceId = params.value("resourceId");
     if(resourceId.isEmpty()) {
         result.setError(-1, lit("Parameter 'res_id' is absent or empty."));
         return CODE_INVALID_PARAMETER;
@@ -84,13 +80,14 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
         return CODE_INVALID_PARAMETER;
     }
 
-    QString seqId = params.value("seqId");
-    int seqNum = params.value("seqNum").toInt();
+    QString seqId = params.value("sequenceId");
+    int seqNum = params.value("sequenceNumber").toInt();
     if(!checkSequence(seqId, seqNum))
         return CODE_OK;
 
     switch(action) {
     case PtzContinousMoveAction:    return executeContinuousMove(controller, params, result);
+    case PtzRelativeMoveAction:     return executeRelativeMove(controller, params, result);
     default:                        return CODE_INVALID_PARAMETER;
     }
 }
@@ -110,6 +107,11 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
     } else {
         return CODE_INTERNAL_ERROR;
     }
+}
+
+int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio;
+    
 }
 
 #if 0

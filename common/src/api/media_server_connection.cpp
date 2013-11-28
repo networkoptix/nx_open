@@ -33,6 +33,7 @@ namespace {
         ((TimePeriodsObject,        "RecordedTimePeriods"))
         ((StatisticsObject,         "statistics"))
         ((PtzContinuousMoveObject,  "ptz/continuousMove"))
+        ((PtzRelativeMoveObject,    "ptz/relativeMove"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
         ((TimeObject,               "gettime"))
@@ -494,7 +495,6 @@ int QnMediaServerConnection::searchCameraAsyncStop(const QUuid &processUuid, QOb
     return sendAsyncGetRequest(CameraSearchStopObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
 }
 
-
 int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;
     for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
@@ -509,15 +509,30 @@ int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStri
 
 int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("res_id",  camera->getPhysicalId());
-    params << QnRequestParam("xSpeed",  QString::number(speed.x()));
-    params << QnRequestParam("ySpeed",  QString::number(speed.y()));
-    params << QnRequestParam("zSpeed",  QString::number(speed.z()));
-    params << QnRequestParam("seqId",   sequenceId.toString());
-    params << QnRequestParam("seqNum",  QString::number(sequenceNumber));
+    params << QnRequestParam("resourceId",      camera->getPhysicalId());
+    params << QnRequestParam("xSpeed",          QString::number(speed.x()));
+    params << QnRequestParam("ySpeed",          QString::number(speed.y()));
+    params << QnRequestParam("zSpeed",          QString::number(speed.z()));
+    params << QnRequestParam("sequenceId",      sequenceId.toString());
+    params << QnRequestParam("sequenceNumber",  QString::number(sequenceNumber));
 
     return sendAsyncGetRequest(PtzContinuousMoveObject, params, NULL, target, slot);
 }
+
+int QnMediaServerConnection::ptzRelativeMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("resourceId",      camera->getPhysicalId());
+    params << QnRequestParam("aspectRatio",     QString::number(aspectRatio));
+    params << QnRequestParam("viewportTop",     QString::number(viewport.top()));
+    params << QnRequestParam("viewportLeft",    QString::number(viewport.left()));
+    params << QnRequestParam("viewportBottom",  QString::number(viewport.bottom()));
+    params << QnRequestParam("viewportRight",   QString::number(viewport.right()));
+    params << QnRequestParam("sequenceId",      sequenceId.toString());
+    params << QnRequestParam("sequenceNumber",  QString::number(sequenceNumber));
+
+    return sendAsyncGetRequest(PtzRelativeMoveObject, params, NULL, target, slot);
+}
+
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);

@@ -45,7 +45,8 @@ protected:
     virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) override;
 
 private:
-    QnRequestParams processParams(const QnRequestParamList &params);
+    QnRequestParams processParams(const QnRequestParamList &params) const;
+    QString processPath(const QString &path) const;
 
 private:
     QByteArray m_contentType;

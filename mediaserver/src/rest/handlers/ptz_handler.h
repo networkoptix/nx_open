@@ -21,6 +21,7 @@ protected:
 
 private:
     int executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+    int executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
