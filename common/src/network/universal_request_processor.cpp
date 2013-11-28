@@ -49,7 +49,7 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = path != lit("api/ping");
+        bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event"));
 
         QElapsedTimer t;
         t.restart();
