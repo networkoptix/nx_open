@@ -110,8 +110,19 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
 }
 
 int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio;
+    qreal viewportTop = 0.0, viewportLeft = 0.0, viewportBottom = 1.0, viewportRight = 1.0, aspectRatio = 1.0;
     
+    QnLexical::deserialize(params.value("viewportTop"),     &viewportTop);
+    QnLexical::deserialize(params.value("viewportLeft"),    &viewportLeft);
+    QnLexical::deserialize(params.value("viewportBottom"),  &viewportBottom);
+    QnLexical::deserialize(params.value("viewportRight"),   &viewportRight);
+    QnLexical::deserialize(params.value("aspectRatio"),     &aspectRatio);
+
+    if(controller->relativeMove(aspectRatio, QRectF(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom))) == 0) {
+        return CODE_OK;
+    } else {
+        return CODE_INTERNAL_ERROR;
+    }
 }
 
 #if 0
