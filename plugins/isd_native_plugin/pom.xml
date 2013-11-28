@@ -28,7 +28,8 @@
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib common.lib ssleay32.lib libeay32.lib Iphlpapi.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>        
+        <windows.oslibs.debug></windows.oslibs.debug>
+        <linux.oslibs>-lvmux</linux.oslibs>
         <!--Global defines-->
         <global.defines/>
         <linux.defines/>

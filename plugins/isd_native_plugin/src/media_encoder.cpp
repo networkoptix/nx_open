@@ -174,7 +174,7 @@ int MediaEncoder::setCameraParam( const QString& request )
     CLHttpStatus status = http.doPOST( QByteArray("/api/param.cgi"), request );
 
     return status == CL_HTTP_SUCCESS
-        ? nxcip::NX_IO_ERROR
+        ? nxcip::NX_NO_ERROR
         : nxcip::NX_NETWORK_ERROR;
 }
 
@@ -188,7 +188,7 @@ int MediaEncoder::getSupportedFps() const
     CLHttpStatus status = CL_HTTP_SUCCESS;
     const QByteArray& fpses = downloadFile(
         status,
-        QString::fromLatin1("api/param.cgi?req=VideoInput.1.h264.$1.FrameRateList").arg(m_encoderNum+1),
+        QString::fromLatin1("api/param.cgi?req=VideoInput.1.h264.%1.FrameRateList").arg(m_encoderNum+1),
         localhost,
         DEFAULT_ISD_PORT,
         ISD_HTTP_REQUEST_TIMEOUT,
