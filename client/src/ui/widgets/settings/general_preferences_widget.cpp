@@ -130,7 +130,7 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->autoStartCheckBox->setChecked(qnSettings->autoStart());
 
     ui->pauseOnInactivityCheckBox->setChecked(qnSettings->userInactivityTimeout() > 0);
-    ui->idleTimeoutSpinBox->setValue(qnSettings->userInactivityTimeout());
+    ui->idleTimeoutSpinBox->setValue(qnSettings->userInactivityTimeout() > 0 ? qnSettings->userInactivityTimeout() : 15); // 15 minutes by default
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, qnSettings->extraMediaFolders())
