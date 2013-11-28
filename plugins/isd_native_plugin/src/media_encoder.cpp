@@ -47,7 +47,8 @@ MediaEncoder::MediaEncoder(
     m_cameraManager( cameraManager ),
     m_encoderNum( encoderNum ),
     m_fpsListRead( false ),
-    m_resolutionListRead( false )
+    m_resolutionListRead( false ),
+    m_motionMask(0)
 {
 }
 
@@ -147,7 +148,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
         m_streamReader.reset( new StreamReader(
         &m_refManager,
         m_encoderNum) );
-        m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+        if (m_motionMask)
+            m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
     }
     m_streamReader->addRef();
     return m_streamReader.get();

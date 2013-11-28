@@ -24,13 +24,12 @@ public:
 private:
     void analizeMotionAmount(uint8_t* frame);
     void reallocateMask(int width, int height);
-    void scaleMask(uint8_t* mask, uint8_t* scaledMask);
-    void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer);
+    void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer, uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
 private:
     Mutex m_mutex;
-    int m_scaledWidth;
     uint32_t* m_resultMotion;
     uint8_t* m_scaledMask; 
+    uint8_t* m_frameDeltaBuffer;
     uint8_t* m_frameBuffer[FRAMES_BUFFER_SIZE];
     uint8_t* m_filteredFrame;
     int m_linkedMap[MD_WIDTH*MD_HEIGHT];
@@ -40,11 +39,10 @@ private:
     int m_totalFrames;
     uint8_t* m_motionMask;
     uint8_t* m_motionSensMask;
-    int m_xAggregateCoeff;
     
-    int m_yStep;
-    int m_yStepFrac;
-
+    int m_scaleXStep;
+    int m_scaleYStep;
+    
     int m_lastImgWidth;
     int m_lastImgHeight;
     bool m_isNewMask;
