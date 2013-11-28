@@ -10,7 +10,7 @@
 #include "motion_data_picture.h"
 #include "limits.h"
 
-static int sensitivityToMask[10] = 
+static const int sensitivityToMask[10] = 
 {
     255, //  0
     26,
@@ -61,7 +61,7 @@ ISDMotionEstimation::ISDMotionEstimation():
     m_motionMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
     m_motionSensMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
     memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
-    memset(sensitivityToMask, 0, MD_WIDTH * MD_HEIGHT);
+    memset(m_motionSensMask, 0, MD_WIDTH * MD_HEIGHT);
 }
 
 #define min(a,b) (a < b ? a : b)
