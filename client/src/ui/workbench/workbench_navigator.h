@@ -152,6 +152,8 @@ protected slots:
     
     void updateCurrentWidgetFlags();
 
+    void updateUserInactivityState(bool userIsInactive);
+
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -218,6 +220,7 @@ private:
     bool m_lastPlayingSupported;
     bool m_pausedOverride;
     bool m_preciseNextSeek;
+    bool m_autoPaused;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;

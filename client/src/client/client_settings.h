@@ -104,6 +104,8 @@ public:
         /** Last used aspect ratio for resource item in grid layout. */
         RESOURCE_ASPECT_RATIOS,
 
+        USER_INACTIVITY_TIMEOUT,
+
         VARIABLE_COUNT
     };
 
@@ -185,6 +187,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           resourceAspectRatios,   setResourceAspectRatios,    RESOURCE_ASPECT_RATIOS,     QnAspectRatioHash())
+        QN_DECLARE_RW_PROPERTY(int,                         userInactivityTimeout,  setUserInactivityTimeout,   USER_INACTIVITY_TIMEOUT,    -1)
 
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
 

@@ -40,6 +40,7 @@ extern "C"
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
+#include "watchers/workbench_user_inactivity_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -75,6 +76,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastPlayingSupported(false),
     m_pausedOverride(false),
     m_preciseNextSeek(false),
+    m_autoPaused(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
@@ -241,6 +243,8 @@ void QnWorkbenchNavigator::initialize() {
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
+    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(userInactivityStatusChanged(bool)),  this,   SLOT(updateUserInactivityState(bool)));
+
     updateLines();
     updateCalendar();
     updateScrollBarFromSlider();
@@ -331,7 +335,11 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     if(!isPlayingSupported())
         return false;
 
+    if (playing && m_autoPaused)
+        return false;
+
     m_pausedOverride = false;
+    m_autoPaused = false;
 
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
@@ -637,6 +645,17 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
     m_currentMediaWidget->display()->camDisplay()->playAudio(playing);
 }
 
+void QnWorkbenchNavigator::updateUserInactivityState(bool userIsInactive) {
+    if (userIsInactive != isPlaying())
+        return;
+
+    if (userIsInactive)
+        setPlayingTemporary(false);
+    else if (m_autoPaused)
+        setPlayingTemporary(true);
+
+    m_autoPaused = userIsInactive;
+}
 
 // -------------------------------------------------------------------------- //
 // Updaters
