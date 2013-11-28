@@ -15,7 +15,7 @@
 
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
-#include "vmux_iface.h"
+#include <isd/vmux/vmux_iface.h>
 #include "isd_motion_estimation.h"
 
 class MotionDataPicture;

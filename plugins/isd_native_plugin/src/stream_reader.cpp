@@ -21,7 +21,7 @@
 
 #include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
-#include "motion_data_picture.h"
+#include <plugins/resources/third_party/motion_data_picture.h>
 #include <iostream>
 
 #define GENERATE_RANDOM_MOTION
