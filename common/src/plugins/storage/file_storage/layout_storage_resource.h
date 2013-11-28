@@ -12,19 +12,19 @@ extern "C"
 
 class QnLayoutFile;
 
-enum StorageFlags {
-    ReadOnly        = 0x1,
-    ContainsCameras = 0x2,
-
-    Count
-};
-
 /*
 * QnLayoutFileStorageResource uses for layout export
 */
 class QnLayoutFileStorageResource: public QnStorageResource
 {
 public:
+    enum StorageFlags {
+        ReadOnly        = 0x1,
+        ContainsCameras = 0x2,
+
+        Count
+    };
+
     QnLayoutFileStorageResource();
     virtual ~QnLayoutFileStorageResource();
 
