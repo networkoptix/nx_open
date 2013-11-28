@@ -38,21 +38,22 @@ static const int MIN_SQUARE_BY_SENS[10] =
 };
 
 ISDMotionEstimation::ISDMotionEstimation():
-    m_scaledWidth(0),
     m_resultMotion(0),
     m_scaledMask(0),
     m_filteredFrame(0),
     m_linkedNums(0),
     m_motionSensScaledMask(0),
-    m_totalFrames(0),
+    m_totalFrames(1),
     m_motionMask(0),
     m_motionSensMask(0),
 
     m_lastImgWidth(0),
     m_lastImgHeight(0),
     m_isNewMask(false),
-    m_xAggregateCoeff(0)
+    m_scaleXStep(0),
+    m_scaleYStep(0)
 {
+    m_frameDeltaBuffer = 0;
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         m_frameBuffer[i] = 0;
 
@@ -68,6 +69,7 @@ ISDMotionEstimation::~ISDMotionEstimation()
 {
     nxpt::freeAligned(m_scaledMask);
     nxpt::freeAligned(m_motionSensScaledMask);
+    nxpt::freeAligned(m_frameDeltaBuffer);
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         nxpt::freeAligned(m_frameBuffer[i]);
     nxpt::freeAligned(m_filteredFrame);
@@ -76,40 +78,11 @@ ISDMotionEstimation::~ISDMotionEstimation()
     nxpt::freeAligned(m_linkedNums);
 }
 
-
-// rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
-void ISDMotionEstimation::scaleMask(uint8_t* mask, uint8_t* scaledMask)
-{
-    float lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
-    float scaledLineNum = 0;
-    int prevILineNum = -1;
-    for (int y = 0; y < MD_WIDTH; ++y)
-    {
-        int iLineNum = (int) (scaledLineNum+0.5);
-        assert(iLineNum < m_scaledWidth);
-        //simd128i* dst = (simd128i*) (scaledMask + MD_HEIGHT*iLineNum);
-        //simd128i* src = (simd128i*) (mask + MD_HEIGHT*y);
-
-        uint8_t* dst = scaledMask + MD_HEIGHT*iLineNum;
-        uint8_t* src = mask + MD_HEIGHT*y;
-        if (iLineNum > prevILineNum) 
-        {
-            for (int i = 0; i < iLineNum - prevILineNum; ++i) 
-                memcpy(dst - i*MD_HEIGHT , src, MD_HEIGHT);
-        }
-        else {
-            for (int i = 0; i < 32; ++i)
-                dst[i] = min(dst[i], src[i]); // SSE2
-        }
-        prevILineNum = iLineNum;
-        scaledLineNum += lineStep;
-    }
-}
-
 void ISDMotionEstimation::reallocateMask(int width, int height)
 {
     nxpt::freeAligned(m_scaledMask);
     nxpt::freeAligned(m_motionSensScaledMask);
+    nxpt::freeAligned(m_frameDeltaBuffer);
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         nxpt::freeAligned(m_frameBuffer[i]);
     nxpt::freeAligned(m_filteredFrame);
@@ -119,78 +92,68 @@ void ISDMotionEstimation::reallocateMask(int width, int height)
     m_lastImgWidth = width;
     m_lastImgHeight = height;
     
-    m_scaledWidth = width;
-    m_xAggregateCoeff = 1;
-    while (m_xAggregateCoeff < 16) {
-        if (width % m_xAggregateCoeff == 0 && m_scaledWidth/(float)m_xAggregateCoeff <MD_WIDTH * 1.5)
-            break;
-        m_xAggregateCoeff++;
+    m_scaledMask = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+    m_linkedNums = (int*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH * sizeof(int), 32);
+    m_motionSensScaledMask = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+    m_frameDeltaBuffer = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+    for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i) {
+        m_frameBuffer[i] = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+        memset(m_frameBuffer[i], 0, MD_HEIGHT * MD_WIDTH);
     }
-    m_scaledWidth = width / m_xAggregateCoeff;
-
-    int swUp = m_scaledWidth+1; // reserve one extra column because of analize_frame function for x8 width can write 1 extra byte
-    m_scaledMask = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * swUp, 32);
-    m_linkedNums = (int*) nxpt::mallocAligned(MD_HEIGHT * swUp * sizeof(int), 32);
-    m_motionSensScaledMask = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * swUp, 32);
-    m_frameBuffer[0] = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * swUp, 32);
-    m_frameBuffer[1] = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * swUp, 32);
-    m_filteredFrame = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * swUp, 32);
-    m_resultMotion = new uint32_t[MD_HEIGHT/4 * swUp];
-    memset(m_resultMotion, 0, MD_HEIGHT * swUp);
+    m_filteredFrame = (uint8_t*) nxpt::mallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+    m_resultMotion = new uint32_t[MD_HEIGHT/4 * MD_WIDTH];
+    memset(m_resultMotion, 0, MD_HEIGHT * MD_WIDTH);
 
     // scale motion mask to scaled 
-    if (m_scaledWidth != MD_WIDTH) {
-        scaleMask(m_motionMask, m_scaledMask);
-        scaleMask(m_motionSensMask, m_motionSensScaledMask);
-    }
-    else {
-        memcpy(m_scaledMask, m_motionMask, MD_WIDTH * MD_HEIGHT);
-        memcpy(m_motionSensScaledMask, m_motionSensMask, MD_WIDTH * MD_HEIGHT);
-    }
+    memcpy(m_scaledMask, m_motionMask, MD_WIDTH * MD_HEIGHT);
+    memcpy(m_motionSensScaledMask, m_motionSensMask, MD_WIDTH * MD_HEIGHT);
     m_isNewMask = false;
     
-    float yCoeff = height / (float)MD_HEIGHT;
-    m_yStep = (int) yCoeff;
-    m_yStepFrac = (yCoeff - m_yStep) * 65536;
+    m_scaleXStep = width * 65536 / MD_WIDTH;
+    m_scaleYStep = height * 65536 / MD_HEIGHT;
 }
 
-void ISDMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer)
+void ISDMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,
+                                     uint8_t* prevFrameBuffer, uint8_t* deltaBuffer)
 {
     // scale frame to m_scaledWidth* MD_HEIGHT and rotate it to 90 degree
     uint8_t* dst = frameBuffer;
     const uint8_t* src = data;
-    int xMax = width / m_xAggregateCoeff;
-    
-    int curLine = 0;
-    int curLineFrac = 0;
-    while (curLine < height)
+    int offset = 0;
+    int curLine = 32768;
+    while ((curLine >> 16) < height)
     {
-        int nextLine = curLine + m_yStep;
-        curLineFrac += m_yStepFrac;
-        if (curLineFrac >= 32768) {
-            curLineFrac -= 65536; // fixed point arithmetic
-            nextLine++;
-        }
-        int lines = nextLine - curLine;
+        int nextLine = curLine + m_scaleYStep;
+        int lines = (nextLine >> 16) - (curLine >> 16);
         uint8_t* curDst = dst;
-        for (int x = 0; x < xMax; ++x)
+        int curX = 32768;
+        //for (int x = 0; x < xMax; ++x)
+        while ((curX >> 16) < width)
         {
+            int nextX = curX + m_scaleXStep;
+            int xPixels = (nextX >> 16) - (curX >> 16);
             // aggregate pixel
             uint16_t pixel = 0;
             const uint8_t* srcPtr = src;
             for (int y = 0; y < lines; ++y) 
             {
-                for (int rep = 0; rep < m_xAggregateCoeff; ++rep)
+                for (int rep = 0; rep < xPixels; ++rep)
                     pixel += *srcPtr++;
-                srcPtr += stride - m_xAggregateCoeff; // go to next src line
+                srcPtr += stride - xPixels; // go to next src line
             }
-            pixel /= (lines*m_xAggregateCoeff); // get avg value
+            pixel /= (lines*xPixels); // get avg value
             *curDst = pixel;
-            src += m_xAggregateCoeff;
+            uint8_t pixelDelta = abs(pixel - prevFrameBuffer[offset]);
+            deltaBuffer[offset] = pixelDelta;
+
+            src += xPixels;
             curDst += MD_HEIGHT;
+            offset += MD_HEIGHT;
+            curX = nextX;
         }
         src += lines * stride - width;
         dst++;
+        offset = offset - (MD_HEIGHT*MD_WIDTH) + 1;
         curLine = nextLine;
     }
 }
@@ -205,10 +168,8 @@ bool ISDMotionEstimation::analizeFrame(const uint8_t* data, int width, int heigh
 
     if (width != m_lastImgWidth || height != m_lastImgHeight || m_isNewMask)
         reallocateMask(width, height);
-    scaleFrame(data, width, height, stride, m_frameBuffer[idx]);
-    analizeMotionAmount(m_frameBuffer[idx]);
-    if (m_totalFrames == 0)
-        m_totalFrames++;
+    scaleFrame(data, width, height, stride, m_frameBuffer[idx], m_frameBuffer[prevIdx], m_frameDeltaBuffer);
+    analizeMotionAmount(m_frameDeltaBuffer);
 
     return true;
 }
@@ -228,7 +189,7 @@ void ISDMotionEstimation::analizeMotionAmount(uint8_t* frame)
         dstPtr++;
     }
 
-    for (int x = 1; x < m_scaledWidth-1; ++x)
+    for (int x = 1; x < MD_WIDTH-1; ++x)
     {
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
@@ -274,9 +235,9 @@ void ISDMotionEstimation::analizeMotionAmount(uint8_t* frame)
 
     // 2. Determine linked areas
     int currentLinkIndex = 1;
-    memset(m_linkedNums, 0, sizeof(int) * MD_HEIGHT * m_scaledWidth);
+    memset(m_linkedNums, 0, sizeof(int) * MD_HEIGHT * MD_WIDTH);
     memset(m_linkedSquare, 0, sizeof(m_linkedSquare));
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth/2;++i)
+    for (int i = 0; i < MD_HEIGHT*MD_WIDTH/2;++i)
         m_linkedMap[i] = i;
 
     int idx = 0;
@@ -294,7 +255,7 @@ void ISDMotionEstimation::analizeMotionAmount(uint8_t* frame)
         }
     }
 
-    for (int x = 1; x < m_scaledWidth; ++x)
+    for (int x = 1; x < MD_WIDTH; ++x)
     {
         // 2.3 top pixel
         if (m_filteredFrame[idx])
@@ -344,17 +305,17 @@ void ISDMotionEstimation::analizeMotionAmount(uint8_t* frame)
     }
 
     // 4. merge linked areas
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
+    for (int i = 0; i < MD_HEIGHT*MD_WIDTH; ++i)
         m_linkedNums[i] = m_linkedMap[m_linkedNums[i]];
 
     // 5. calculate square of each area
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth; ++i)
+    for (int i = 0; i < MD_HEIGHT*MD_WIDTH; ++i)
     {
         m_linkedSquare[m_linkedNums[i]] += m_filteredFrame[i];
     }
 
     // 6. remove motion if motion square is not enough and write result to bitarray
-    for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
+    for (int i = 0; i < MD_HEIGHT*MD_WIDTH;)
     {
         uint32_t data = 0;
         for (int k = 0; k < 32; ++k, ++i) 
@@ -390,32 +351,8 @@ void ISDMotionEstimation::setMotionMask(const uint8_t* mask)
 MotionDataPicture* ISDMotionEstimation::getMotion()
 {
     MotionDataPicture* motionData = new MotionDataPicture();
-
-    // scale result motion (height already valid, scale width ony. Data rotates, so actually duplicate or remove some lines
-    int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
-    int scaledLineNum = 0;
-    int prevILineNum = -1;
-    uint32_t* dst = (uint32_t*) motionData->data();
-
-    //postFiltering();
-
-    for (int y = 0; y < MD_WIDTH; ++y)
-    {
-        int iLineNum = (scaledLineNum+32768) >> 16;
-        if (iLineNum > prevILineNum) 
-        {
-            dst[y] = m_resultMotion[iLineNum];
-            for (int i = 1; i < iLineNum - prevILineNum; ++i)
-                dst[y] |= m_resultMotion[iLineNum+i];
-        }
-        else {
-            dst[y] |= m_resultMotion[iLineNum];
-        }
-        prevILineNum = iLineNum;
-        scaledLineNum += lineStep;
-    }
-
-    memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
+    memcpy(motionData->data(), m_resultMotion, MD_WIDTH * MD_HEIGHT / 8);
+    memset(m_resultMotion, 0, MD_HEIGHT * MD_WIDTH / 8);
     m_totalFrames++;
     return motionData;
 }
