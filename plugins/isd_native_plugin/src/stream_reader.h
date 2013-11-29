@@ -59,6 +59,7 @@ private:
     Vmux* vmux_motion;
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
+    int64_t m_firstFrameTime;
 };
 
 #endif  //ILP_STREAM_READER_H

@@ -165,6 +165,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 	    vmux = 0;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
+	m_firstFrameTime = 0;
     }
 
     rv = vmux->GetFrame (&frame);
@@ -180,12 +181,14 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
     //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
-
-    int64_t currentTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
+    if (m_firstFrameTime == 0) {
+	m_firstFrameTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
+	m_firstFrameTime -= (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000;
+    }
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel
-        //(int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000,
-	currentTime,
+        (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
+	//currentTime,
         (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0),
         0, // cseq
         m_codec)); 
