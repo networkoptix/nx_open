@@ -11,16 +11,13 @@
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
-namespace {
-    QN_DEFINE_NAME_MAPPED_ENUM(PtzAction,
-        ((PtzContinousMoveAction,   "continuousMove"))
-        ((PtzRelativeMoveAction,    "relativeMove"))
-    );
-
-} // anonymous namespace
+QN_DEFINE_NAME_MAPPED_ENUM(PtzAction,
+    ((PtzContinousMoveAction,   "continuousMove"))
+    ((PtzRelativeMoveAction,    "relativeMove"))
+);
 
 QnPtzHandler::QnPtzHandler() {
-    m_actionNameMapper = createEnumNameMapper<PtzAction>();
+    m_actionNameMapper = QnEnumNameMapper::create<PtzAction>();
 }
 
 void QnPtzHandler::cleanupOldSequence()
