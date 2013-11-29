@@ -18,6 +18,8 @@
 static const QLatin1String localhost( "127.0.0.1" );
 static const int DEFAULT_ISD_PORT = 80;
 static const int ISD_HTTP_REQUEST_TIMEOUT = 3000;
+static const int PRIMARY_ENCODER_NUMBER = 0;
+static const int SECONDARY_ENCODER_NUMBER = 1;
 
 static QStringList getValues(const QString& line)
 {
@@ -120,8 +122,12 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
-    //TODO/IMPL
-    *maxBitrate = 10*1024*1024;
+    if( m_encoderNum == PRIMARY_ENCODER_NUMBER )
+        *maxBitrate = 6*1024;
+    else if( m_encoderNum == SECONDARY_ENCODER_NUMBER )
+        *maxBitrate = 1*1024;
+    else
+        *maxBitrate = 0;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -138,6 +144,10 @@ int MediaEncoder::setFps( const float& fps, float* selectedFps )
 
 int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 {
+    int maxBitrate = 0;
+    getMaxBitrate( &maxBitrate );
+    if( bitrateKbps > maxBitrate )
+        bitrateKbps = maxBitrate;
     *selectedBitrateKbps = bitrateKbps;
     return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
 }
