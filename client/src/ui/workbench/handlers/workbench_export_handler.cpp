@@ -401,7 +401,7 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success) {
         if (tool->mode() == Qn::LayoutExport) {
             QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
         }
-    } else {
+    } else if (!tool->errorMessage().isEmpty()) {
         QMessageBox::warning(mainWindow(), tr("Could not export layout"), tool->errorMessage(), QMessageBox::Ok);
     }
 }

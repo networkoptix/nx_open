@@ -70,9 +70,6 @@ public slots:
     virtual void stopDisplay();
 
     void stopExport();
-    void onExportFinished(QString fileName);
-    void onExportFailed(QString fileName);
-
 private:
     mutable QMutex m_exportMutex;
     QnMediaResourcePtr m_resource;

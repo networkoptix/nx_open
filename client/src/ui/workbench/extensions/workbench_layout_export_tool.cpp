@@ -46,7 +46,8 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_realFilename(m_targetFilename),
     m_mode(mode),
     m_readOnly(readOnly),
-    m_offset(-1)
+    m_offset(-1),
+    m_stopped(false)
 {
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId());
@@ -191,7 +192,9 @@ bool QnLayoutExportTool::start() {
 }
 
 void QnLayoutExportTool::stop() {
+    m_stopped = true;
     m_resources.clear();
+    m_errorMessage = QString(); //supress error by manual cancelling
     emit stopped();
     finishExport(false);
 }
@@ -205,6 +208,9 @@ QString QnLayoutExportTool::errorMessage() const {
 }
 
 bool QnLayoutExportTool::exportNextCamera() {
+    if (m_stopped)
+        return false;
+
     if (m_resources.isEmpty()) {
         finishExport(true);
         return false;
@@ -250,7 +256,6 @@ void QnLayoutExportTool::finishExport(bool success) {
     } else {
         QFile::remove(m_realFilename);
     }
-
     emit finished(success);
 }
 
@@ -259,12 +264,12 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     connect(camera,   SIGNAL(exportProgress(int)),        this, SLOT(at_camera_progressChanged(int)));
 
     connect(camera,   SIGNAL(exportFailed(QString)),      this, SLOT(at_camera_exportFailed(QString)));
-    connect(camera,   SIGNAL(exportFinished(QString)),    this, SLOT(finishCameraExport()));
-    connect(camera,   SIGNAL(exportFinished(QString)),    this, SLOT(exportNextCamera()));
+    connect(camera,   SIGNAL(exportFinished(QString)),    this, SLOT(at_camera_exportFinished()));
     connect(camera,   SIGNAL(exportFailed(QString)),      camera, SLOT(deleteLater()));
     connect(camera,   SIGNAL(exportFinished(QString)),    camera, SLOT(deleteLater()));
 
     connect(this,     SIGNAL(stopped()),                  camera, SLOT(stopExport()));
+    connect(this,     SIGNAL(stopped()),                  camera, SLOT(deleteLater()));
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
@@ -303,15 +308,19 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     return true;
 }
 
-void QnLayoutExportTool::finishCameraExport() {
+void QnLayoutExportTool::at_camera_exportFinished() {
     QnClientVideoCamera* camera = dynamic_cast<QnClientVideoCamera*>(sender());
     if (!camera)
         return;
 
     int numberOfChannels = camera->resource()->getVideoLayout()->channelCount();
+    bool error = false;
+
     for (int i = 0; i < numberOfChannels; ++i) {
         if (QSharedPointer<QBuffer> motionFileBuffer = camera->motionIODevice(i)) {
             motionFileBuffer->close();
+            if (error)
+                continue;
 
             QString uniqId = camera->resource()->toResource()->getUniqueId();
             uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
@@ -329,19 +338,25 @@ void QnLayoutExportTool::finishCameraExport() {
             }
 
             if (!device) {
-                m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
-                stop();
-                break;
+                error = true;
+                continue; //need to close other buffers
             }
 
             device->write(motionFileBuffer->buffer());
             device->close();
         }
     }
+
+    if (error) {
+        m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
+        finishExport(false);
+    }
+    else {
+        exportNextCamera();
+    }
 }
 
 void QnLayoutExportTool::at_camera_progressChanged(int progress) {
-    qDebug() << "at_camera_progresschanged" << progress << m_offset * 100 + progress;
     emit valueChanged(m_offset * 100 + progress);
 }
 

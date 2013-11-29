@@ -160,9 +160,13 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         m_exportRecorder->setSrcRect(srcRect);
         m_exportRecorder->setContrastParams(contrastParams);
         m_exportRecorder->setDewarpingParams(dewarpingParams);
-        connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
-        connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
-        connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SIGNAL(exportProgress(int)));
+        connect(m_exportRecorder,   SIGNAL(recordingFailed(QString)),   this,   SLOT(stopExport()));
+        connect(m_exportRecorder,   SIGNAL(recordingFinished(QString)), this,   SLOT(stopExport()));
+
+        connect(m_exportRecorder,   SIGNAL(recordingFailed(QString)),   this,   SIGNAL(exportFailed(QString)));
+        connect(m_exportRecorder,   SIGNAL(recordingFinished(QString)), this,   SIGNAL(exportFinished(QString)));
+        connect(m_exportRecorder,   SIGNAL(recordingProgress(int)),     this,   SIGNAL(exportProgress(int)));
+
         if (fileName.toLower().endsWith(QLatin1String(".avi")))
         {
             m_exportRecorder->setAudioCodec(CODEC_ID_MP3); // transcode audio to MP3
@@ -195,25 +199,18 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     m_exportRecorder->start();
 }
 
-void QnClientVideoCamera::onExportFinished(QString fileName)
-{
-    stopExport();
-    emit exportFinished(fileName);
-}
-
-void QnClientVideoCamera::onExportFailed(QString fileName)
-{
-    stopExport();
-    emit exportFailed(fileName);
-}
-
-void QnClientVideoCamera::stopExport()
-{
+void QnClientVideoCamera::stopExport() {
     if (m_exportReader) {
+        if (m_exportRecorder)
+            m_exportReader->removeDataProcessor(m_exportRecorder);
         connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));
         m_exportReader->pleaseStop();
     }
     if (m_exportRecorder) {
+        // clean signature flag; in other case file will be recreated on writing finish
+        //TODO: #vasilenko get rid of this magic
+        m_exportRecorder->setNeedCalcSignature(false);
+
         connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
         m_exportRecorder->pleaseStop();
     }

@@ -36,13 +36,13 @@ signals:
     void stopped();
     void finished(bool success);
 private slots:
-    bool exportNextCamera();
     bool exportMediaResource(const QnMediaResourcePtr& resource);
-    void finishCameraExport();
 
     void at_camera_progressChanged(int progress);
+    void at_camera_exportFinished();
     void at_camera_exportFailed(QString errorMessage);
 private:
+    bool exportNextCamera();
     void finishExport(bool success);
 
 private:
@@ -57,6 +57,7 @@ private:
 
     int m_offset;
     QString m_errorMessage;
+    bool m_stopped;
 };
 
 #endif // WORKBENCH_LAYOUT_EXPORT_TOOL_H
