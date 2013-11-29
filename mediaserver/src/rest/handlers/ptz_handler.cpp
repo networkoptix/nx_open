@@ -53,7 +53,7 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
 int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     int action = m_actionNameMapper.value(path, -1);
     if(action == -1) {
-        result.setError(-1, lit("Unknown action '%1'.").arg(actionName));
+        result.setError(-1, lit("Unknown action '%1'.").arg(path));
         return CODE_INVALID_PARAMETER;
     }
     

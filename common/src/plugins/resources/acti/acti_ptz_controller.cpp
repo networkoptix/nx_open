@@ -282,6 +282,10 @@ int QnActiPtzController::getPosition(QVector3D *position)
     return 0;
 }
 
+int QnActiPtzController::getFlip(Qt::Orientations *flip) {
+    return 1;
+}
+
 int QnActiPtzController::getLimits(QnPtzLimits *limits) {
     return 1; // TODO: #Elric
 }

@@ -63,7 +63,7 @@ int QnDwZoomPtzController::getFlip(Qt::Orientations *) {
     return 1;
 }
 
-int relativeMove(qreal, const QRectF &) {
+int QnDwZoomPtzController::relativeMove(qreal, const QRectF &) {
     return 1;
 }
 
