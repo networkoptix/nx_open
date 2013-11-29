@@ -51,11 +51,10 @@ private:
 private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNum;
-    bool m_initialized;
     nxcip::CompressionType m_codec;
     nxcip::UsecUTCTimestamp m_lastVideoTime;
     nxcip::UsecUTCTimestamp m_lastMotionTime;
-    Vmux vmux;
+    Vmux* vmux;
     
     Vmux* vmux_motion;
     vmux_stream_info_t motion_stream_info;

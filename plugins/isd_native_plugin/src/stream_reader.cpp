@@ -37,17 +37,18 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int e
 :
     m_refManager( parentRefManager ),
     m_encoderNum( encoderNum ),
-    m_initialized(false),
     m_codec(nxcip::CODEC_ID_NONE),
     m_lastVideoTime(0),
     m_lastMotionTime(0),
-    vmux_motion(0)
+    vmux_motion(0),
+    vmux(0)
 {
 }
 
 StreamReader::~StreamReader()
 {
     delete vmux_motion;
+    delete vmux;
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -98,15 +99,20 @@ MotionDataPicture* StreamReader::getMotionData()
         int info_size = sizeof(motion_stream_info);
         int rv = vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
         if (rv) {
-        std::cout << "can't get stream info for motion stream" << std::endl;
+    	    std::cout << "can't get stream info for motion stream" << std::endl;
+	    delete vmux_motion;
+	    vmux_motion = 0;
             return 0; // error
-    }
+	}
 
-        std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
+	std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
 
-        rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
-        if (rv)
-            return 0; // error
+	rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
+	if (rv) {
+	    delete vmux_motion;
+	    vmux_motion = 0;
+    	    return 0; // error
+	}
     }
 
     vmux_frame_t frame;
@@ -130,37 +136,42 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
 
-    //Vmux vmux;
     vmux_frame_t frame;
     vmux_stream_info_t stream_info;
     int rv = 0;
 
-    if (!m_initialized)
+    if (!vmux)
     {
+	vmux = new Vmux();
         int info_size = sizeof(stream_info);
-        rv = vmux.GetStreamInfo (m_encoderNum, &stream_info, &info_size);
+        rv = vmux->GetStreamInfo (m_encoderNum, &stream_info, &info_size);
         if (rv) {
             std::cout << "ISD plugin: can't get stream info" << std::endl;
+	    delete vmux;
+	    vmux = 0;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
-    if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
-        m_codec = nxcip::CODEC_ID_H264;
-    else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
-        m_codec = nxcip::CODEC_ID_MJPEG;
-    else
-        return nxcip::NX_INVALID_ENCODER_NUMBER;
+	if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
+    	    m_codec = nxcip::CODEC_ID_H264;
+	else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
+    	    m_codec = nxcip::CODEC_ID_MJPEG;
+	else
+    	    return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-        rv = vmux.StartVideo (m_encoderNum);
+        rv = vmux->StartVideo (m_encoderNum);
         if (rv) {
             std::cout << "ISD plugin: can't start video" << std::endl;
+	    delete vmux;
+	    vmux = 0;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
-        m_initialized = true;
     }
 
-    rv = vmux.GetFrame (&frame);
+    rv = vmux->GetFrame (&frame);
     if (rv) {
-    std::cout << "Can't read video frame" << std::endl;
+	std::cout << "Can't read video frame" << std::endl;
+	delete vmux;
+	vmux = 0;
         return nxcip::NX_IO_ERROR; // error
     }
 
