@@ -187,6 +187,8 @@ protected slots:
     void at_dayTimeWidget_destroyed();
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
+    void at_userInactivityWatcher_stateChanged(bool userIsInactive);
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -218,6 +220,11 @@ private:
     bool m_lastPlayingSupported;
     bool m_pausedOverride;
     bool m_preciseNextSeek;
+
+    /** This flag says that video was paused automatically due to user inactivity.
+     *  It's used to make it possible to unpause video only in the user inactivity state handler.
+     */
+    bool m_autoPaused;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
