@@ -72,7 +72,6 @@ private:
 #ifndef Q_OS_MACX
     QnRebuildArchiveReply m_lastRebuildReply;
 #endif
-	QTimer m_timer;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

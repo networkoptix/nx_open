@@ -364,8 +364,7 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
 }
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
-    if (isVideoWallReviewMode())
-        return Qn::InvisibleAction;
+    Q_UNUSED(parameters)
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
