@@ -50,11 +50,11 @@ quint64 QnWorkbenchUserInactivityWatcher::idlePeriodMSecs() const {
         if (entry)  {
             CFMutableDictionaryRef dict = 0;
             if (IORegistryEntryCreateCFProperties(entry, &dict, kCFAllocatorDefault, 0) == KERN_SUCCESS) {
-                CFNumberRef obj = reinterpret_cast<CFNumberRef>(CFDictionaryGetValue(dict, CFSTR("HIDIdleTime")));
+                CFNumberRef obj = static_cast<CFNumberRef>(CFDictionaryGetValue(dict, CFSTR("HIDIdleTime")));
                 if (obj) {
                     qint64 nanoseconds = 0;
                     if (CFNumberGetValue(obj, kCFNumberSInt64Type, &nanoseconds))
-                        idle = (nanoseconds / 1000000); // nanoseconds to milliseconds
+                        idle = static_cast<quint64>(nanoseconds / 1000000); // nanoseconds to milliseconds
                 }
                 CFRelease(dict);
             }
