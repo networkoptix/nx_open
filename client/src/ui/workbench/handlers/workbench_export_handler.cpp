@@ -97,7 +97,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     if (!validateItemTypes(layout))
         return false;
 
-    QnProgressDialog* exportProgressDialog = new QnProgressDialog(mainWindow());
+    QnProgressDialog* exportProgressDialog = new QnProgressDialog(mainWindow(), Qt::Window);
 
     if(!cancellable) {
         exportProgressDialog->setCancelButton(NULL);
