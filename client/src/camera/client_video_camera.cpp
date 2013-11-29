@@ -14,7 +14,6 @@ QnClientVideoCamera::QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstract
     m_isVisible(true),
     m_exportRecorder(0),
     m_exportReader(0),
-    m_progressOffset(0),
     m_displayStarted(false)
 {
     if (m_resource)
@@ -156,7 +155,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
-        m_exportRecorder->disconnect(this);
         if (storage)
             m_exportRecorder->setStorage(storage);
         m_exportRecorder->setSrcRect(srcRect);
@@ -164,7 +162,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         m_exportRecorder->setDewarpingParams(dewarpingParams);
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
-        connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
+        connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SIGNAL(exportProgress(int)));
         if (fileName.toLower().endsWith(QLatin1String(".avi")))
         {
             m_exportRecorder->setAudioCodec(CODEC_ID_MP3); // transcode audio to MP3
@@ -193,14 +191,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
 
     m_exportReader->addDataProcessor(m_exportRecorder);
     m_exportReader->jumpTo(startTime, startTime);
-
     m_exportReader->start();
     m_exportRecorder->start();
-}
-
-void QnClientVideoCamera::at_exportProgress(int value)
-{
-    emit exportProgress(value + m_progressOffset);
 }
 
 void QnClientVideoCamera::onExportFinished(QString fileName)
@@ -233,16 +225,6 @@ void QnClientVideoCamera::stopExport()
 void QnClientVideoCamera::setResource(QnMediaResourcePtr resource)
 {
     m_resource = resource;
-}
-
-void QnClientVideoCamera::setExportProgressOffset(int value)
-{
-    m_progressOffset = value;
-}
-
-int QnClientVideoCamera::getExportProgressOffset() const
-{
-    return m_progressOffset;
 }
 
 void QnClientVideoCamera::setMotionIODevice(QSharedPointer<QBuffer> value, int channel)

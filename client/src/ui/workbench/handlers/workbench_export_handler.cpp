@@ -335,59 +335,60 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
+        return;
     }
-    else
 #endif
-    {
-        QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
-        exportProgressDialog->setWindowTitle(tr("Exporting Video"));
-        exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-        exportProgressDialog->setRange(0, 100);
-        exportProgressDialog->setMinimumDuration(1000);
-        exportProgressDialog->setModal(false);
 
-        QnMediaResourcePtr resource = widget->resource();
-        QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
+    QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
+    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+    exportProgressDialog->setRange(0, 100);
+    exportProgressDialog->setValue(0);
+    exportProgressDialog->setMinimumDuration(1000);
+    exportProgressDialog->setModal(false);
 
-        connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
-        connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(deleteLater()));
-        connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
+    QnMediaResourcePtr resource = widget->resource();
+    QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
-        connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(deleteLater()));
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
 
-        connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      camera,                 SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(hide()));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
 
-        connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    camera,                 SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(hide()));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      camera,                 SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(hide()));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
 
-        QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
+    connect(camera,                 SIGNAL(exportFinished(QString)),    camera,                 SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(hide()));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+    connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
-        int timeOffset = 0;
-        if(qnSettings->timeMode() == Qn::ServerTimeMode) {
-            // time difference between client and server
-            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
-        }
-        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-        camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll,
-                                        (period.startTimeMs + period.durationMs) * 1000ll,
-                                        fileName,
-                                        selectedExtension.mid(1),
-                                        QnStorageResourcePtr(),
-                                        role,
-                                        timestampPos,
-                                        timeOffset,
-                                        serverTimeZone,
-                                        itemData.zoomRect,
-                                        contrastParams,
-                                        dewarpingParams);
+    QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
 
-        exportProgressDialog->show();
+    int timeOffset = 0;
+    if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+        // time difference between client and server
+        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
+    qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
+    camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll,
+                                    (period.startTimeMs + period.durationMs) * 1000ll,
+                                    fileName,
+                                    selectedExtension.mid(1),
+                                    QnStorageResourcePtr(),
+                                    role,
+                                    timestampPos,
+                                    timeOffset,
+                                    serverTimeZone,
+                                    itemData.zoomRect,
+                                    contrastParams,
+                                    dewarpingParams);
+
+    exportProgressDialog->show();
+
 }
 
 void QnWorkbenchExportHandler::at_layout_exportFinished(bool success) {

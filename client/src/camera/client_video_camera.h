@@ -55,8 +55,6 @@ public:
                                  const DewarpingParams& dewarpingParams = DewarpingParams());
 
     void setResource(QnMediaResourcePtr resource);
-    void setExportProgressOffset(int value);
-    int getExportProgressOffset() const;
     QString exportedFileName() const;
 
     bool isDisplayStarted() const { return m_displayStarted; }
@@ -75,9 +73,6 @@ public slots:
     void onExportFinished(QString fileName);
     void onExportFailed(QString fileName);
 
-protected slots:
-    void at_exportProgress(int value);
-
 private:
     mutable QMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
@@ -88,7 +83,6 @@ private:
     bool m_isVisible;
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
-    int m_progressOffset;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };
