@@ -257,6 +257,17 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 }
 #endif
 
+inline bool metadataIsEmpty_cpu(const quint8* data)
+{
+    const quint32* curPtr = (const quint32*) data;
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32); ++i)
+    {
+	if (*curPtr++)
+            return false;
+    }
+    return true;
+}
+
 bool QnMetaDataV1::isEmpty() const
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
@@ -265,11 +276,9 @@ bool QnMetaDataV1::isEmpty() const
     else 
         return metadataIsEmpty_sse2((__m128i*) data.data());
 #elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-    return true;
+    return metadataIsEmpty_cpu(data.data());
 #else
-    //TODO: C fallback routine
-    return true;
+    return metadataIsEmpty_cpu(data.data());
 #endif
 }
 

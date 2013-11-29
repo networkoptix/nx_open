@@ -24,6 +24,8 @@
 #include <plugins/resources/third_party/motion_data_picture.h>
 #include <iostream>
 
+#include <QDateTime>
+
 #define GENERATE_RANDOM_MOTION
 #ifdef GENERATE_RANDOM_MOTION
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
@@ -92,7 +94,7 @@ MotionDataPicture* StreamReader::getMotionData()
 {
     if (!vmux_motion)
     {
-    vmux_motion = new Vmux();
+	vmux_motion = new Vmux();
         int info_size = sizeof(motion_stream_info);
         int rv = vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
         if (rv) {
@@ -168,9 +170,11 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
     //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
 
+    int64_t currentTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel
-        (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000,
+        //(int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000,
+	currentTime,
         (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0),
         0, // cseq
         m_codec)); 

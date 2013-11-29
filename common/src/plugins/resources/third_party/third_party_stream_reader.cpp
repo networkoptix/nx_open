@@ -365,7 +365,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
             if( srcMotionData )
             {
-                static const int DEFAULT_MOTION_DURATION = 35*1000; //~ 30 fps
+                static const int DEFAULT_MOTION_DURATION = 1000*1000;
 
                 if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
                 {
@@ -374,6 +374,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                     motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
                     motion->timestamp = srcVideoPacket->timestamp();
                     motion->channelNumber = packet->channelNumber();
+		    if( packet->flags() & nxcip::MediaDataPacket::fLowQuality )
+    			motion->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
+		    motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     static_cast<QnCompressedVideoData*>(mediaPacket.data())->motion = motion;
                 }
                 srcMotionData->releaseRef();
