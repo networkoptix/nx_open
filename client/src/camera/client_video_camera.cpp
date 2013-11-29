@@ -200,33 +200,32 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
 
 void QnClientVideoCamera::at_exportProgress(int value)
 {
-    qDebug() << "export progress" << value;
     emit exportProgress(value + m_progressOffset);
 }
 
 void QnClientVideoCamera::onExportFinished(QString fileName)
 {
-    qDebug() << "export finished";
     stopExport();
     emit exportFinished(fileName);
 }
 
 void QnClientVideoCamera::onExportFailed(QString fileName)
 {
-    qDebug() << "export failed";
     stopExport();
     emit exportFailed(fileName);
 }
 
 void QnClientVideoCamera::stopExport()
 {
-    if (m_exportReader)
-        m_exportReader->stop();
-    if (m_exportRecorder)
-        m_exportRecorder->stop();
+    if (m_exportReader) {
+        connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));
+        m_exportReader->pleaseStop();
+    }
+    if (m_exportRecorder) {
+        connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
+        m_exportRecorder->pleaseStop();
+    }
     QMutexLocker lock(&m_exportMutex);
-    delete m_exportReader;
-    delete m_exportRecorder;
     m_exportReader = 0;
     m_exportRecorder = 0;
 }
