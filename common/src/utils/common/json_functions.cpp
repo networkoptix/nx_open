@@ -60,7 +60,7 @@ bool deserialize(const QJsonValue &value, QRegion *target) {
 }
 
 void serialize(const QUuid &value, QJsonValue *target) {
-    *target = value.toString();
+    *target = QnLexical::serialized(value);
 }
 
 bool deserialize(const QJsonValue &value, QUuid *target) {
@@ -75,12 +75,7 @@ bool deserialize(const QJsonValue &value, QUuid *target) {
     if(!QJson::deserialize(value, &jsonString))
         return false;
 
-    QUuid result(jsonString);
-    if(result.isNull() && jsonString != QLatin1String("00000000-0000-0000-0000-000000000000") && jsonString != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
-        return false;
-
-    *target = result;
-    return true;
+    return QnLexical::deserialize(jsonString, target);
 }
 
 void serialize(const QColor &value, QJsonValue *target) {

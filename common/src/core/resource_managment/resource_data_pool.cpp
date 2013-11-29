@@ -36,12 +36,12 @@ QnResourceDataPool::~QnResourceDataPool() {
 QnResourceData QnResourceDataPool::data(const QString &key) const {
     QMutexLocker locker(&m_mutex);
 
-    return m_dataByKey.value(key);
+    return m_dataByKey.value(key.toLower());
 }
 
 QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera) const {
     /* No need to lock here. */
-    return data(camera->getVendorName() + lit('.') + camera->getModel());
+    return data(/*camera->getVendorName() + lit('.') +*/ camera->getModel()); // TODO: #Elric use vendor here!
 }
 
 bool QnResourceDataPool::load(const QString &fileName) {
@@ -87,7 +87,7 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     QMutexLocker locker(&m_mutex);
     foreach(const QnResourceDataPoolChunk &chunk, chunks)
         foreach(const QString &key, chunk.keys)
-            m_dataByKey[key].addData(chunk.data);
+            m_dataByKey[key.toLower()].addData(chunk.data);
 
     return true;
 }

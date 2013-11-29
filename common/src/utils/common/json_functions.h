@@ -6,7 +6,6 @@
 #include <QtCore/QMap>
 #include <QtCore/QHash>
 #include <QtCore/QVarLengthArray>
-
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
 #include <QtCore/QRect>

@@ -3,12 +3,10 @@
 #include <utils/common/json.h>
 #include <utils/common/enum_name_mapper.h>
 
-namespace {
-    Q_GLOBAL_STATIC_WITH_ARGS(QnEnumNameMapper, qn_extrapolationMode_enumNameMapper, (&Qn::staticMetaObject, "ExtrapolationMode"));
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
+QN_DEFINE_ENUM_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
 
-    typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
-
-} // anonymous namespace
+typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
 QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &logicalToDevice, const QnSpaceMapperPtr<QVector3D> &deviceToLogical):
     m_deviceToLogical(deviceToLogical),
@@ -38,11 +36,11 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
 
     /* Note: source == device space, target == logical space. */
 
-    QString extrapolationModeName;
+    Qn::ExtrapolationMode extrapolationMode;
     QList<qreal> device, logical;
     qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0; 
     if(
-        !QJson::deserialize(map, "extrapolationMode", &extrapolationModeName) || 
+        !QJson::deserialize(map, "extrapolationMode", &extrapolationMode) || 
         !QJson::deserialize(map, "device", &device) ||
         !QJson::deserialize(map, "logical", &logical) ||
         !QJson::deserialize(map, "deviceMultiplier", &deviceMultiplier, true) ||
@@ -51,10 +49,6 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
         return false;
     }
     if(device.size() != logical.size())
-        return false;
-
-    int extrapolationMode = qn_extrapolationMode_enumNameMapper()->value(extrapolationModeName, -1);
-    if(extrapolationMode == -1)
         return false;
 
     QVector<QPair<qreal, qreal> > sourceToTarget;

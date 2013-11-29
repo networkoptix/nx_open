@@ -246,4 +246,3 @@ int QnOnvifPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport
 
 
 #endif //ENABLE_ONVIF
-

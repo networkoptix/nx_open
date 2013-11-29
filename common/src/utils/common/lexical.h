@@ -82,6 +82,32 @@ __VA_ARGS__ void serialize(const TYPE &value, QString *target);                 
 __VA_ARGS__ bool deserialize(const QString &value, TYPE *target);
 
 
+
+#define QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+    QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_typedEnumNameMapper_instance, __LINE__), ##__VA_ARGS__)
+
+#define QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */)  \
+template<class T> void QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_macro_cannot_be_used_in_header_files(); \
+template<> void QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_macro_cannot_be_used_in_header_files<TYPE>() {}; \
+                                                                                \
+Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<TYPE>, STATIC_NAME, (QnEnumNameMapper::create<TYPE>())) \
+                                                                                \
+__VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
+    *target = STATIC_NAME()->name(value);                                       \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
+    bool ok;                                                                    \
+    TYPE result = STATIC_NAME()->value(value, &ok);                             \
+    if(!ok) {                                                                   \
+        return false;                                                           \
+    } else {                                                                    \
+        *target = result;                                                       \
+        return true;                                                            \
+    }                                                                           \
+}
+
+
 #include "lexical_functions.h"
 
 #endif // QN_LEXICAL_H

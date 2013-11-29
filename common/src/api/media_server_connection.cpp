@@ -371,7 +371,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     m_proxyPort(0)
 {
     setUrl(mserver->getApiUrl());
-    setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+    setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     QnRequestHeaderList extraHeaders;
     extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());

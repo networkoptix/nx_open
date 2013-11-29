@@ -321,7 +321,7 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory 
     m_serializer(serializer)
 {
     setUrl(url);
-    setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+    setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     m_requestParams.append(QnRequestParam("format", m_serializer.format()));
     m_requestParams.append(QnRequestParam("guid", guid));

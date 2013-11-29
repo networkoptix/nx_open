@@ -1,6 +1,8 @@
 #ifndef QN_LEXICAL_FUNCTIONS_H
 #define QN_LEXICAL_FUNCTIONS_H
 
+#include <QtCore/QUuid>
+
 #include "lexical.h"
 
 namespace QnLexicalDetail {
@@ -78,22 +80,9 @@ QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned short)
 #undef QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS
 
 
-inline void serialize(const bool &value, QString *target) {
-    *target = value ? QLatin1String("true") : QLatin1String("false");
-}
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(bool)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(QUuid)
 
-inline bool deserialize(const QString &value, bool *target) {
-    /* Also support "0" & "1" during deserialization. */
 
-    if(value == QLatin1String("0") || value == QLatin1String("false")) {
-        *target = false;
-        return true;
-    } else if(value == QLatin1String("1") || value == QLatin1String("true")) {
-        *target = true;
-        return true;
-    } else {
-        return false;
-    }
-}
 
 #endif // QN_LEXICAL_FUNCTIONS_H
