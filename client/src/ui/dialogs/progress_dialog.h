@@ -74,8 +74,8 @@ class QnProgressDialog : public QDialog {
     Q_PROPERTY(bool isEventProcessor READ isEventProcessor WRITE setEventProcessor)
 
 public:
-    explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
+    QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
     virtual ~QnProgressDialog();
 
     void setLabel(QLabel *label);

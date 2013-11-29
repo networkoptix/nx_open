@@ -24,9 +24,10 @@ extern "C"
 #include <core/resource_managment/resource_pool.h>
 
 #include <camera/caching_time_period_loader.h>
+#include <camera/cam_display.h>
+#include <camera/client_video_camera.h>
 #include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>

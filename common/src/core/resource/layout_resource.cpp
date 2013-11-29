@@ -69,7 +69,7 @@ void QnLayoutResource::setUrl(const QString& value)
         for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
         {
             QnLayoutItemData& item = itr.value();
-            item.resource.path = updateNovParent(value, item.resource.path);
+            item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
         }
     }
 }
@@ -194,15 +194,6 @@ QnTimePeriod QnLayoutResource::getLocalRange() const
 void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
 {
     m_localRange = value;
-}
-
-QString QnLayoutResource::updateNovParent(const QString& novName, const QString& itemName)
-{
-    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
-    QString normNovName = novName;
-    if (!normNovName.startsWith(QLatin1String("layout://")))
-        normNovName = QLatin1String("layout://") + normNovName;
-    return normNovName + QLatin1String("?") + normItemName;
 }
 
 void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {

@@ -19,8 +19,6 @@ class QGraphicsProxyWidget;
 class QGraphicsWidget;
 class QGraphicsLinearLayout;
 
-class QnVideoCamera;
-
 class InstrumentManager;
 class ActivityListenerInstrument;
 class FpsCountingInstrument;

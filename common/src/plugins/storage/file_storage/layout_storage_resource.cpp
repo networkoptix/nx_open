@@ -506,3 +506,16 @@ QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
 
     return chunks;
 }
+
+QString QnLayoutFileStorageResource::updateNovParent(const QString& novName, const QString& itemName) {
+    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
+    QString normNovName = novName;
+    if (!normNovName.startsWith(layoutPrefix()))
+        normNovName = layoutPrefix() + normNovName;
+    return normNovName + QLatin1String("?") + normItemName;
+}
+
+QString QnLayoutFileStorageResource::layoutPrefix() {
+    static QLatin1String prefix("layout://");
+    return prefix;
+}
