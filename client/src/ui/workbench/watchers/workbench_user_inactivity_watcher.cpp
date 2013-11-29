@@ -23,17 +23,17 @@ QnWorkbenchUserInactivityWatcher::QnWorkbenchUserInactivityWatcher(QObject *pare
     m_userIsInactive(false),
     m_idleTimeout(0)
 {
-    connect(qnSettings->notifier(QnClientSettings::USER_INACTIVITY_TIMEOUT),    SIGNAL(valueChanged(int)),  this,   SLOT(updateTimeout()));
+    connect(qnSettings->notifier(QnClientSettings::USER_IDLE_TIMEOUT_MSECS),    SIGNAL(valueChanged(int)),  this,   SLOT(updateTimeout()));
     updateTimeout();
 }
 
 QnWorkbenchUserInactivityWatcher::~QnWorkbenchUserInactivityWatcher() {
-    if (m_timerId)
+    if (m_timerId != -1)
         killTimer(m_timerId);
 }
 
-quint32 QnWorkbenchUserInactivityWatcher::idlePeriod() const {
-    int idle = 0;
+quint64 QnWorkbenchUserInactivityWatcher::idlePeriodMSecs() const {
+    quint64 idle = 0;
 
 #if defined(Q_OS_WIN)
 
@@ -106,18 +106,18 @@ void QnWorkbenchUserInactivityWatcher::setEnabled(bool enable) {
     }
 }
 
-quint32 QnWorkbenchUserInactivityWatcher::idleTimeout() const {
+quint64 QnWorkbenchUserInactivityWatcher::idleTimeoutMSecs() const {
     return m_idleTimeout;
 }
 
-void QnWorkbenchUserInactivityWatcher::setIdleTimeout(quint32 timeout) {
-    m_idleTimeout = timeout;
+void QnWorkbenchUserInactivityWatcher::setIdleTimeoutMSecs(quint64 msecs) {
+    m_idleTimeout = msecs;
     if (isEnabled())
         checkInactivity();
 }
 
 void QnWorkbenchUserInactivityWatcher::checkInactivity() {
-    setState(idlePeriod() >= idleTimeout());
+    setState(idlePeriodMSecs() >= m_idleTimeout);
 }
 
 void QnWorkbenchUserInactivityWatcher::timerEvent(QTimerEvent *event) {
@@ -126,8 +126,6 @@ void QnWorkbenchUserInactivityWatcher::timerEvent(QTimerEvent *event) {
 }
 
 void QnWorkbenchUserInactivityWatcher::updateTimeout() {
-    int timeout = qnSettings->userInactivityTimeout();
-    if (timeout > 0)
-        setIdleTimeout(static_cast<quint32>(timeout) * 60 * 1000); // convert from minutes to milliseconds
-    setEnabled(timeout > 0);
+    m_idleTimeout = qnSettings->userIdleTimeoutMSecs();
+    setEnabled(m_idleTimeout > 0);
 }

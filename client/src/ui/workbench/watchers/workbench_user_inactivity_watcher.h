@@ -9,7 +9,7 @@
 /**
  * The QnWorkbenchUserInactivityWatcher class implements the watcher of
  * the user activity. The user is considered as inactive when he idle
- * for a period specified by idleTimeout().
+ * for a period specified by idleTimeoutMSecs().
  * When the user state changes the signal stateChanged() is emmited.
  */
 class QnWorkbenchUserInactivityWatcher : public QObject, public QnWorkbenchContextAware
@@ -20,10 +20,10 @@ public:
     virtual ~QnWorkbenchUserInactivityWatcher();
 
     /** Time period in milliseconds since the latest user activity */
-    quint32 idlePeriod() const;
+    quint64 idlePeriodMSecs() const;
 
     /** Current user activity state.
-     *  \note It's true when idlePeriod() > idleTimeout() */
+     *  @return true if idlePeriodMSecs() > idleTimeoutMSecs() */
     bool state() const;
 
     bool isEnabled() const;
@@ -31,8 +31,8 @@ public:
 
     /** Time period in milliseconds which specifies an idle period after wich the user
      *  is considered as inactive. */
-    quint32 idleTimeout() const;
-    void setIdleTimeout(quint32 timeout);
+    quint64 idleTimeoutMSecs() const;
+    void setIdleTimeoutMSecs(quint64 msecs);
 
 signals:
     /** This signal is emmited when user activity state has been changed. */

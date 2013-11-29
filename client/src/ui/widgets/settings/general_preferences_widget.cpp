@@ -61,8 +61,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->hwAccelerationWarningLabel->setVisible(false);
     ui->languageWarningLabel->setVisible(false);
     ui->downmixWarningLabel->setVisible(false);
-    ui->idleTimeoutWidget->setVisible(false);
-    ui->pauseOnInactivityLabel->setMinimumHeight(ui->idleTimeoutWidget->minimumSizeHint().height());
+    ui->idleTimeoutWidget->setEnabled(false);
 
     connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_pluginManager_pluginLoaded()) );
 
@@ -78,7 +77,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
     connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
     connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
-    connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setVisible(bool)));
+    connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setEnabled(bool)));
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -93,7 +92,9 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setUseHardwareDecoding(ui->hardwareDecodingCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
-    qnSettings->setUserInactivityTimeout(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() : -1);
+    qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked()
+                                         ? ui->idleTimeoutSpinBox->value() * 60 * 1000 // convert to milliseconds
+                                         : 0);
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -129,9 +130,9 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
     ui->autoStartCheckBox->setChecked(qnSettings->autoStart());
 
-    ui->pauseOnInactivityCheckBox->setChecked(qnSettings->userInactivityTimeout() > 0);
-    if (qnSettings->userInactivityTimeout() > 0)
-        ui->idleTimeoutSpinBox->setValue(qnSettings->userInactivityTimeout());
+    ui->pauseOnInactivityCheckBox->setChecked(qnSettings->userIdleTimeoutMSecs() > 0);
+    if (qnSettings->userIdleTimeoutMSecs() > 0)
+        ui->idleTimeoutSpinBox->setValue(qnSettings->userIdleTimeoutMSecs() / (60 * 1000)); // convert to minutes
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, qnSettings->extraMediaFolders())
