@@ -151,6 +151,7 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     layout->addWidget(label);
     layout->addWidget(bar);
     layout->addWidget(buttonBox);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     q->setLayout(layout);
 
     forceTimer = new QTimer(q);
@@ -161,6 +162,9 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     } else {
         q->setCancelButtonText(cancelText);
     }
+
+    q->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
     QObject::connect(q, SIGNAL(canceled()), q, SLOT(cancel()));
 }
 

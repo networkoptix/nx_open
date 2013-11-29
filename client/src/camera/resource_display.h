@@ -12,7 +12,7 @@ class QnResourceVideoLayout;
 class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
-class QnVideoCamera;
+class QnClientVideoCamera;
 class QnCounter;
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
@@ -74,7 +74,7 @@ public:
     /**
      * \returns                         Video camera associated with this display, if any.
      */
-    QnVideoCamera *camera() const {
+    QnClientVideoCamera *camera() const {
         return m_camera;
     }
 
@@ -142,7 +142,7 @@ private:
     QnAbstractArchiveReader *m_archiveReader;
 
     /** Video camera. */
-    QnVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.
+    QnClientVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;

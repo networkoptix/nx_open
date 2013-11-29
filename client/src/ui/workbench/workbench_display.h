@@ -52,7 +52,7 @@ class QnToggle;
 class QnThumbnailsLoader;
 class QnThumbnail;
 
-class QnVideoCamera;
+class QnClientVideoCamera;
 class QnCamDisplay;
 
 /**
@@ -197,7 +197,7 @@ public:
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
-    QnVideoCamera *camera(QnWorkbenchItem *item) const;
+    QnClientVideoCamera *camera(QnWorkbenchItem *item) const;
 
     QnCamDisplay *camDisplay(QnWorkbenchItem *item) const;
 

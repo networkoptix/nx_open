@@ -64,7 +64,9 @@ public:
     */
     void setNeedCalcSignature(bool value);
 
+#ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
+#endif
 
     /*
     * Return hash value 
@@ -164,7 +166,9 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
     QnCryptographicHash m_mdctx;
+#ifdef SIGN_FRAME_ENABLED
     QImage m_logo;
+#endif
     QString m_container;
     int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;
