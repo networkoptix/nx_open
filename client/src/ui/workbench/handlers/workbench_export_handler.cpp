@@ -324,7 +324,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 #ifdef Q_OS_WIN
     if (selectedFilter.contains(binaryFilterName()))
     {
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QQnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
             existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
         if (existingLayout)
