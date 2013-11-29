@@ -1,4 +1,4 @@
-#include "layout_export_tool.h"
+#include "workbench_layout_export_tool.h"
 
 #include <QtCore/QBuffer>
 
@@ -8,7 +8,7 @@
 #include <client/client_settings.h>
 
 #include <camera/caching_time_period_loader.h>
-#include <camera/video_camera.h>
+#include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
@@ -32,10 +32,6 @@
 #ifdef Q_OS_WIN
 #include <launcher/nov_launcher_win.h>
 #endif
-
-namespace {
-    static const QLatin1String layoutPrefix("layout://");
-}
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
@@ -84,8 +80,9 @@ bool QnLayoutExportTool::start() {
         QFile::remove(m_realFilename);
     }
 
-    QString fullName = layoutPrefix + m_realFilename;
-    m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fullName));
+    QString fullName = QnLayoutFileStorageResource::layoutPrefix() + m_realFilename;
+
+    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
     m_storage->setUrl(fullName);
 
     QIODevice* itemNamesIO = m_storage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
@@ -195,6 +192,7 @@ bool QnLayoutExportTool::start() {
 
 void QnLayoutExportTool::stop() {
     m_resources.clear();
+    emit stopped();
     finishExport(false);
 }
 
@@ -221,7 +219,7 @@ void QnLayoutExportTool::finishExport(bool success) {
     if (success) {
         if (m_realFilename != m_targetFilename)
         {
-            m_storage->renameFile(m_storage->getUrl(), layoutPrefix + m_targetFilename);
+            m_storage->renameFile(m_storage->getUrl(), QnLayoutFileStorageResource::layoutPrefix() + m_targetFilename);
             snapshotManager()->store(m_layout);
         }
         else if (m_mode == Qn::LayoutLocalSaveAs)
@@ -232,7 +230,7 @@ void QnLayoutExportTool::finishExport(bool success) {
             foreach (const QnLayoutItemData &item, m_layout->getItems()) {
                 QnAviResourcePtr aviRes = qnResPool->getResourceByUniqId(item.resource.path).dynamicCast<QnAviResource>();
                 if (aviRes)
-                    qnResPool->updateUniqId(aviRes, QnLayoutResource::updateNovParent(newUrl, item.resource.path));
+                    qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.path));
             }
             m_layout->setUrl(newUrl);
             m_layout->setName(QFileInfo(newUrl).fileName());
@@ -257,13 +255,16 @@ void QnLayoutExportTool::finishExport(bool success) {
 }
 
 bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
-    QnVideoCamera* camera = new QnVideoCamera(resource);
+    QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
     connect(camera,   SIGNAL(exportProgress(int)),        this, SLOT(at_camera_progressChanged(int)));
+
     connect(camera,   SIGNAL(exportFailed(QString)),      this, SLOT(at_camera_exportFailed(QString)));
     connect(camera,   SIGNAL(exportFinished(QString)),    this, SLOT(finishCameraExport()));
     connect(camera,   SIGNAL(exportFinished(QString)),    this, SLOT(exportNextCamera()));
     connect(camera,   SIGNAL(exportFailed(QString)),      camera, SLOT(deleteLater()));
     connect(camera,   SIGNAL(exportFinished(QString)),    camera, SLOT(deleteLater()));
+
+    connect(this,     SIGNAL(stopped()),                  camera, SLOT(stopExport()));
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
@@ -298,12 +299,12 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.contrastParams,
                                     itemData.dewarpingParams);
 
-    emit stageChanged(tr("Exporting %1...").arg(resource->toResource()->getUrl()));
+    emit stageChanged(tr("Exporting %1 to \"%2\"...").arg(resource->toResource()->getUrl()).arg(m_targetFilename));
     return true;
 }
 
 void QnLayoutExportTool::finishCameraExport() {
-    QnVideoCamera* camera = dynamic_cast<QnVideoCamera*>(sender());
+    QnClientVideoCamera* camera = dynamic_cast<QnClientVideoCamera*>(sender());
     if (!camera)
         return;
 
@@ -340,6 +341,7 @@ void QnLayoutExportTool::finishCameraExport() {
 }
 
 void QnLayoutExportTool::at_camera_progressChanged(int progress) {
+    qDebug() << "at_camera_progresschanged" << progress << m_offset * 100 + progress;
     emit valueChanged(m_offset * 100 + progress);
 }
 

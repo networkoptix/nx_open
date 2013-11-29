@@ -33,7 +33,6 @@ class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
 class QnLoginDialog;
-class QnVideoCamera;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;

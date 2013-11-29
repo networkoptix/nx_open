@@ -19,7 +19,6 @@
 #include <core/resource/layout_resource.h>
 
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>

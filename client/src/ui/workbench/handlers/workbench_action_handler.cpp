@@ -21,7 +21,6 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
-#include <camera/video_camera.h>
 #include <camera/caching_time_period_loader.h>
 
 #include <client/client_connection_data.h>
@@ -395,7 +394,8 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
-        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+                && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
 
         bool allowed = isServer || isMediaResource;
@@ -1437,7 +1437,8 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
                     //TODO: #GDM refactor duplicated code
-                    hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+                    hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+                            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
                     if (hasLocal)
                         break;
                 }

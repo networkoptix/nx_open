@@ -7,7 +7,7 @@
 #include <common/common_globals.h>
 
 #include <camera/caching_time_period_loader.h>
-#include <camera/video_camera.h>
+#include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -31,7 +31,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/extensions/layout_export_tool.h>
+#include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/common/event_processors.h>
@@ -116,7 +116,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
 
     QnLayoutExportTool* tool = new QnLayoutExportTool(layout, exportPeriod, layoutFileName, mode, readOnly, this);
     connect(tool,                   SIGNAL(rangeChanged(int, int)), exportProgressDialog,   SLOT(setRange(int,int)));
-    connect(tool,                   SIGNAL(progressChanged(int)),   exportProgressDialog,   SLOT(setValue(int)));
+    connect(tool,                   SIGNAL(valueChanged(int)),      exportProgressDialog,   SLOT(setValue(int)));
     connect(tool,                   SIGNAL(stageChanged(QString)),  exportProgressDialog,   SLOT(setLabelText(QString)));
     connect(tool,                   SIGNAL(finished(bool)),         exportProgressDialog,   SLOT(hide()));
     connect(tool,                   SIGNAL(finished(bool)),         exportProgressDialog,   SLOT(deleteLater()));
@@ -324,7 +324,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 #ifdef Q_OS_WIN
     if (selectedFilter.contains(binaryFilterName()))
     {
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QQnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
             existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
         if (existingLayout)
@@ -347,7 +347,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         exportProgressDialog->setModal(false);
 
         QnMediaResourcePtr resource = widget->resource();
-        QnVideoCamera* camera = new QnVideoCamera(resource);
+        QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
         connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
         connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(deleteLater()));
@@ -420,7 +420,8 @@ bool QnWorkbenchExportHandler::validateItemTypes(QnLayoutResourcePtr layout)
         if (layoutItemRes)
         {
             imageExists |= layoutItemRes->hasFlags(QnResource::still_image);
-            bool isLocalItem = layoutItemRes->hasFlags(QnResource::local) || layoutItemRes->getUrl().startsWith(QLatin1String("layout://")); // layout item remove 'local' flag.
+            bool isLocalItem = layoutItemRes->hasFlags(QnResource::local)
+                    || layoutItemRes->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
             if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
                 continue; // skip unaccessible local resources because is not possible to check utc flag
             if (layoutItemRes->hasFlags(QnResource::utc))
@@ -551,7 +552,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     }
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
-    QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
+    QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
     if (!existingLayout)
         existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
     if (existingLayout)

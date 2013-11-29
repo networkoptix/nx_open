@@ -25,7 +25,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
+#include <camera/client_video_camera.h>
 
 #include <ui/common/notification_levels.h>
 
@@ -689,7 +689,7 @@ QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     return NULL;
 }
 
-QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
+QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     QnResourceDisplay *display = this->display(item);
     if(display == NULL)
         return NULL;
@@ -698,7 +698,7 @@ QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
 }
 
 QnCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
-    QnVideoCamera *camera = this->camera(item);
+    QnClientVideoCamera *camera = this->camera(item);
     if(camera == NULL)
         return NULL;
 

@@ -51,6 +51,10 @@ public:
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 
     QnTimePeriodList getTimePeriods(QnResourcePtr res);
+
+    static QString updateNovParent(const QString& novName, const QString& itemName);
+
+    static QString layoutPrefix();
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 

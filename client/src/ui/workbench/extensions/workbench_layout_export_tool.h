@@ -1,5 +1,5 @@
-#ifndef LAYOUT_EXPORT_TOOL_H
-#define LAYOUT_EXPORT_TOOL_H
+#ifndef WORKBENCH_LAYOUT_EXPORT_TOOL_H
+#define WORKBENCH_LAYOUT_EXPORT_TOOL_H
 
 #include <QtCore/QObject>
 
@@ -10,8 +10,6 @@
 #include <recording/time_period.h>
 
 #include <ui/workbench/workbench_context_aware.h>
-
-class QnVideoCamera;
 
 class QnLayoutExportTool : public QObject, protected QnWorkbenchContextAware
 {
@@ -35,6 +33,7 @@ signals:
     void valueChanged(int value);
     void stageChanged(QString title);
 
+    void stopped();
     void finished(bool success);
 private slots:
     bool exportNextCamera();
@@ -60,4 +59,4 @@ private:
     QString m_errorMessage;
 };
 
-#endif // LAYOUT_EXPORT_TOOL_H
+#endif // WORKBENCH_LAYOUT_EXPORT_TOOL_H
