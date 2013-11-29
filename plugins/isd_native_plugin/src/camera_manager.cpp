@@ -104,9 +104,9 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 void CameraManager::setCredentials( const char* username, const char* password )
 {
     if( username )
-	strcpy( m_info.defaultLogin, username );
+    strcpy( m_info.defaultLogin, username );
     if( password )
-	strcpy( m_info.defaultPassword, password );
+    strcpy( m_info.defaultPassword, password );
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled

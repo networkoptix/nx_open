@@ -220,10 +220,10 @@ void QnVirtualCameraResource::setFirmware(QString firmware)
 
 QString QnVirtualCameraResource::getUniqueId() const
 {
-	if (hasFlags(foreigner))
-		return getPhysicalId() + getParentId().toString();
-	else 
-		return getPhysicalId();
+    if (hasFlags(foreigner))
+        return getPhysicalId() + getParentId().toString();
+    else 
+        return getPhysicalId();
 
 }
 
