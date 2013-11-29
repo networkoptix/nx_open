@@ -154,11 +154,10 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
 }
 
 QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() {
-    if(m_hasZoom) {
-        return new QnDwZoomPtzController(toSharedPointer(this));
-    } else {
-        return base_type::createPtzControllerInternal();
-    }
+    QScopedPointer<QnAbstractPtzController> result(base_type::createPtzControllerInternal());
+    if(!result)
+        result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+    return result.take();
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()

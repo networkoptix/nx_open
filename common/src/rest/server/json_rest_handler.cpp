@@ -60,7 +60,7 @@ QnJsonRestHandler::~QnJsonRestHandler() {
 
 int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
     QnJsonRestResult jsonResult;
-    int returnCode = executeGet(processPath(path), processParams(params), jsonResult);
+    int returnCode = executeGet(path, processParams(params), jsonResult);
 
     result = jsonResult.serialize();
     contentType = m_contentType;
@@ -70,7 +70,7 @@ int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParamList 
 
 int QnJsonRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) {
     QnJsonRestResult jsonResult;
-    int returnCode = executePost(processPath(path), processParams(params), body, jsonResult);
+    int returnCode = executePost(path, processParams(params), body, jsonResult);
 
     result = jsonResult.serialize();
     contentType = m_contentType;
@@ -89,12 +89,6 @@ QnRequestParams QnJsonRestHandler::processParams(const QnRequestParamList &param
     return result;
 }
 
-QString QnJsonRestHandler::processPath(const QString &path) const {
-    QString result = path;
-    while(result.endsWith(L'/'))
-        result.chop(1);
-    return result;
-}
 
 
 

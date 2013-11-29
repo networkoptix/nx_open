@@ -165,6 +165,12 @@ public:
     QString getPtzfUrl() const;
     void setPtzfUrl(const QString& src);
 
+    QString getPtzConfigurationToken() const;
+    void setPtzConfigurationToken(const QString &src);
+
+    QString QnPlOnvifResource::getPtzProfileToken() const;
+    void setPtzProfileToken(const QString& src); 
+
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
@@ -401,10 +407,11 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    QScopedPointer<QnOnvifPtzController> m_ptzController;
 
     QString m_imagingUrl;
     QString m_ptzUrl;
+    QString m_ptzProfileToken;
+    QString m_ptzConfigurationToken;
     int m_timeDrift;
     int m_prevSoapCallResult;
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
@@ -434,6 +441,7 @@ private:
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
+    bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
     bool setRelayOutputStateNonSafe(

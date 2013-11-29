@@ -46,7 +46,6 @@ protected:
 
 private:
     QnRequestParams processParams(const QnRequestParamList &params) const;
-    QString processPath(const QString &path) const;
 
 private:
     QByteArray m_contentType;

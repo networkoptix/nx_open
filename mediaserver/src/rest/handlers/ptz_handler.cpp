@@ -13,8 +13,8 @@ static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(PtzAction,
-        ((PtzContinousMoveAction,   "ptz/continuousMove"))
-        ((PtzRelativeMoveAction,    "ptz/relativeMove"))
+        ((PtzContinousMoveAction,   "continuousMove"))
+        ((PtzRelativeMoveAction,    "relativeMove"))
     );
 
 } // anonymous namespace
@@ -51,9 +51,10 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
 }
 
 int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
-    int action = m_actionNameMapper.value(path, -1);
+    QString actionName = extractAction(path);
+    int action = m_actionNameMapper.value(actionName, -1);
     if(action == -1) {
-        result.setError(-1, lit("Unknown action '%1'.").arg(path));
+        result.setError(-1, lit("Unknown action '%1'.").arg(actionName));
         return CODE_INVALID_PARAMETER;
     }
     

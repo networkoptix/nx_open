@@ -105,6 +105,7 @@
 #include "utils/network/ssl_socket.h"
 #include "network/authenticate_helper.h"
 #include "rest/handlers/rebuild_archive_handler.h"
+#include "ptz/ptz_controller_pool.h"
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
@@ -947,6 +948,8 @@ void QnMain::run()
     std::auto_ptr<QThread> connectorThread( new QThread() );
     connectorThread->start();
     qnBusinessRuleConnector->moveToThread(connectorThread.get());
+
+    QnPtzControllerPool ptzControllerPool;
 
     CameraDriverRestrictionList cameraDriverRestrictionList;
 

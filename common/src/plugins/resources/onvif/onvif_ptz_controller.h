@@ -17,34 +17,26 @@ class QnOnvifPtzController: public QnAbstractPtzController {
 public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
+    virtual Qn::PtzCapabilities getCapabilities() override;
     virtual int continuousMove(const QVector3D &speed) override;
     virtual int absoluteMove(const QVector3D &position) override;
     virtual int getPosition(QVector3D *position) override;
-    virtual Qn::PtzCapabilities getCapabilities() override;
-    //virtual const QnPtzSpaceMapper *getSpaceMapper() override;
-
-    // TODO: #Elric need to implement this one properly.
-    void setFlipped(bool horizontal, bool vertical);
-    void getFlipped(bool *horizontal, bool *vertical);
-
-    QString getPtzConfigurationToken();
-    void setMediaProfileToken(const QString& value);
+    virtual int getLimits(QnPtzLimits *limits) override;
+    virtual int getFlip(Qt::Orientations *flip) override;
+    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
     int stopMoveInternal();
 
 private:
+    mutable QMutex m_mutex;
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_ptzCapabilities;
-    QString m_mediaProfile;
-    QString m_ptzConfigurationToken;
+
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
     QPair<qreal, qreal> m_yNativeVelocityCoeff;
     QPair<qreal, qreal> m_zoomNativeVelocityCoeff;
-    mutable QMutex m_mutex;
-
-    bool m_verticalFlipped, m_horizontalFlipped;
 };
 
 #endif //ENABLE_ONVIF
