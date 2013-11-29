@@ -32,6 +32,8 @@ public:
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
     virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData) override;
+    //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
+    virtual void updateSoftwareMotion() override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;

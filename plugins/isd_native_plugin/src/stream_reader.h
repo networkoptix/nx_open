@@ -15,7 +15,8 @@
 
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
-#include "vmux_iface.h"
+#include <isd/vmux/vmux_iface.h>
+#include "isd_motion_estimation.h"
 
 class MotionDataPicture;
 
@@ -42,6 +43,8 @@ public:
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
+
+    void setMotionMask(const uint8_t* data);
 private:
     bool StreamReader::needMetaData();
     MotionDataPicture* getMotionData();
@@ -56,6 +59,7 @@ private:
     
     Vmux* vmux_motion;
     vmux_stream_info_t motion_stream_info;
+    ISDMotionEstimation m_motionEstimation;
 };
 
 #endif  //ILP_STREAM_READER_H

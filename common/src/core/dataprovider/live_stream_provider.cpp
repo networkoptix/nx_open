@@ -34,9 +34,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
     QnAbstractMediaStreamDataProvider::setRole(role);
     {
         QMutexLocker mtx(&m_livemutex);
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         updateSoftwareMotion();
-#endif
 
         if (role == QnResource::Role_SecondaryLiveVideo)
         {
@@ -137,9 +135,9 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 {
 }
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_layout->channelCount(); ++i)
@@ -148,8 +146,8 @@ void QnLiveStreamProvider::updateSoftwareMotion()
             m_motionEstimation[i].setMotionMask(region);
         }
     }
-}
 #endif
+}
 
 bool QnLiveStreamProvider::canChangeStatus() const
 {

@@ -19,12 +19,16 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_capabilities( 
         //nxcip::BaseCameraManager::dtsArchiveCapability | 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::shareFpsCapability)
+        nxcip::BaseCameraManager::shareFpsCapability),
+    m_motionMask( nullptr )
 {
 }
 
 CameraManager::~CameraManager()
 {
+    if (m_motionMask)
+        m_motionMask->releaseRef();
+
 }
 
 void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -75,6 +79,8 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
     if( !m_encoder[encoderIndex].get() )
         m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex) );
     m_encoder[encoderIndex]->addRef();
+    if (m_motionMask)
+        m_encoder[encoderIndex]->setMotionMask(m_motionMask);
     *encoderPtr = m_encoder[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
@@ -95,9 +101,12 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
-void CameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
+void CameraManager::setCredentials( const char* username, const char* password )
 {
-    //TODO/IMPL
+    if( username )
+	strcpy( m_info.defaultLogin, username );
+    if( password )
+	strcpy( m_info.defaultPassword, password );
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
@@ -134,7 +143,7 @@ void CameraManager::getLastErrorString( char* errorString ) const
 int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
 {
     *dtsArchiveReader = 0;
-    return nxcip::NX_NO_ERROR;
+    return nxcip::NX_NOT_IMPLEMENTED;
 }
 
 int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
@@ -144,6 +153,21 @@ int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::Time
     resTimePeriods->timePeriods.push_back( std::make_pair( m_dirContentsManager.minTimestamp(), m_dirContentsManager.maxTimestamp() ) );
     *timePeriods = resTimePeriods.release();
     */
+    return 0;
+}
+
+int CameraManager::setMotionMask( nxcip::Picture* motionMask )
+{
+    //TODO/IMPL
+    if (m_motionMask)
+        m_motionMask->releaseRef();
+    m_motionMask = motionMask;
+    motionMask->addRef();
+    if (m_encoder[0].get())
+        m_encoder[0]->setMotionMask(m_motionMask);
+    if (m_encoder[1].get())
+        m_encoder[1]->setMotionMask(m_motionMask);
+
     return nxcip::NX_NO_ERROR;
 }
 
@@ -156,4 +180,3 @@ nxpt::CommonRefManager* CameraManager::refManager()
 {
     return &m_refManager;
 }
-

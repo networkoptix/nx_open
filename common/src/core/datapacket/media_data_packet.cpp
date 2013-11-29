@@ -278,6 +278,14 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
     if( motionPicture.pixelFormat() != nxcip::PIX_FMT_MONOBLACK )
         return;
 
+#if 1
+    assert( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
+
+    if( motionPicture.xStride(0)*CHAR_BIT == motionPicture.width() )
+        memcpy( data.data(), motionPicture.data(), MD_WIDTH*MD_HEIGHT/CHAR_BIT );
+    else
+        assert( false );
+#else
     memset( data.data(), 0, data.size() );
 
     //TODO/IMPL some optimization would be appropriate, but is difficult, 
@@ -288,7 +296,7 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
 
     for( int y = 0; y < std::min<int>(motionPicture.height(), MD_HEIGHT); ++y )
     {
-        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( y );
+        const quint8* srcMotionDataLine = (quint8*)motionPicture.scanLine( 0, y );
         for( int x = 0; x < std::min<int>(motionPicture.width(), MD_WIDTH); ++x )
         {
             int pixel = *(srcMotionDataLine + x/CHAR_BIT) & (1 << (x%CHAR_BIT));
@@ -296,6 +304,7 @@ void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp
                 setMotionAt( x, y );
         }
     }
+#endif
 
     m_firstTimestamp = timestamp;
     m_duration = duration;
