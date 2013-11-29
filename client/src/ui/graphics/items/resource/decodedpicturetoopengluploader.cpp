@@ -1971,6 +1971,7 @@ ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const
     return m_imageCorrection;
 }
 
+/*
 static QString toString( PixelFormat format )
 {
     switch( format )
@@ -1985,6 +1986,7 @@ static QString toString( PixelFormat format )
             return QString::fromLatin1("unknown");
     }
 }
+*/
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,

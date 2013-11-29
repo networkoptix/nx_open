@@ -160,6 +160,7 @@ QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEvent
 
 QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) 
 {
+    Q_UNUSED(aggregationCount)
     QString result;
 
     BusinessEventType::Value eventType = params.getEventType();

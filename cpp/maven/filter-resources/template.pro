@@ -118,7 +118,7 @@ unix:!mac {
   } else {
     LIBS -= -lssl
   } 
-  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers -Wno-unused-local-typedefs
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 }

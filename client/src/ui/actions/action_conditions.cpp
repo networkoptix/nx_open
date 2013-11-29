@@ -363,7 +363,8 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
