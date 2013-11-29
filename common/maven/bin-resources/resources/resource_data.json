@@ -31,7 +31,8 @@
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [    0,     1],
-                        "logical": [35.25, 711.1]
+                        "logical": [35.25, 711.1],
+                        "space": "35MmEquiv"
                     }
                 },
                 "toCamera": {
@@ -62,7 +63,8 @@
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0.004167, 0.083333],
-                        "logical": [   35.25,    705.0]
+                        "logical": [   35.25,    705.0],
+                        "space": "35MmEquiv"
                     }
                 }
             }
@@ -88,7 +90,8 @@
                         "comment": "L = 1 - 1/t, P = 32.0 * t",
                         "device":  [0, 0.333333, 0.5, 0.6, 0.666667, 0.714286, 0.75, 0.777778, 0.8, 0.818182, 0.833333, 0.846154, 0.857143, 0.866667, 0.875, 0.882353, 0.888889, 0.894737, 0.9, 0.904762, 0.909091, 0.913043, 0.916667, 0.92, 0.923077, 0.925926, 0.928571, 0.931034, 0.933333, 0.935484, 0.9375, 0.939394, 0.941176, 0.942857, 0.944444, 0.945946, 0.947368, 0.948718, 0.95],
                         "logical": [1,      1.5,   2, 2.5,        3,      3.5,    4,      4.5,   5,      5.5,        6,      6.5,        7,      7.5,     8,      8.5,        9,      9.5,  10,     10.5,       11,     11.5,       12, 12.5,       13,     13.5,       14,     14.5,       15,     15.5,     16,     16.5,       17,     17.5,       18,     18.5,       19,     19.5,   20],
-                        "logicalMultiplier": 32.0
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
                     }
                 }
             }
@@ -113,7 +116,8 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55, 0.6, 0.65,  0.7, 0.75,  0.8,  0.85,   0.9,  0.95,  1],
                         "logical": [1, 1.11, 1.22, 1.36, 1.48, 1.64, 1.81, 2.03, 2.29, 2.63, 3.05, 3.49, 4.18, 5.05, 6.27, 7.93, 10.24, 13.22, 17.02, 21.97, 31.55],
-                        "logicalMultiplier": 35.0
+                        "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
                     }
                 }
             }
@@ -138,7 +142,8 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25,  0.3, 0.35,  0.4, 0.45,  0.5, 0.55,  0.6, 0.65,  0.7, 0.75,  0.8, 0.85,   0.9,  0.95,    1],
                         "logical": [1, 1.08, 1.16, 1.27, 1.39, 1.52, 1.68, 1.86, 2.08, 2.34, 2.65, 3.01, 3.48, 4.06, 4.76, 5.68, 6.86, 8.38, 10.82, 13.16, 18.0],
-                        "logicalMultiplier": 35.0
+                        "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
                     }
                 }
             }
@@ -163,7 +168,8 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 0.05,  0.1, 0.15,  0.2, 0.25, 0.35,  0.4, 0.45,  0.5, 0.52],
                         "logical": [1, 1.15, 1.33, 1.57, 1.88, 2.28,  3.6, 4.66, 6.03, 7.64, 8.14],
-                        "physicalMultiplier": 38.5
+                        "logicalMultiplier": 38.5,
+                        "space": "35MmEquiv"
                     }
                 },
                 "toCamera": {
@@ -194,7 +200,8 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
                         "logical": [1, 18],
-                        "physicalMultiplier": 35.25
+                        "logicalMultiplier": 35.25,
+                        "space": "35MmEquiv"
                     }
                 }
             }

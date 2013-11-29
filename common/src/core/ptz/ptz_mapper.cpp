@@ -6,7 +6,22 @@
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
 QN_DEFINE_ENUM_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
 
+QN_DEFINE_NAME_MAPPED_ENUM(AngleSpace,
+    ((DegreesSpace,     "Degrees"))
+    ((Mm35EquivSpace,   "35MmEquiv"))
+)
+QN_DEFINE_ENUM_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
+
+/**
+ * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
+ * \returns                         Width-based FOV in degrees.
+ */
+static qreal mm35EquivToFov(qreal mm35Equiv) {
+    return std::atan((36.0 / 2.0) / mm35Equiv) * 2.0;
+}
+
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
+
 
 QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &logicalToDevice, const QnSpaceMapperPtr<QVector3D> &deviceToLogical):
     m_deviceToLogical(deviceToLogical),
@@ -39,20 +54,31 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
     Qn::ExtrapolationMode extrapolationMode;
     QList<qreal> device, logical;
     qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0; 
+    AngleSpace space = DegreesSpace;
     if(
         !QJson::deserialize(map, "extrapolationMode", &extrapolationMode) || 
         !QJson::deserialize(map, "device", &device) ||
         !QJson::deserialize(map, "logical", &logical) ||
         !QJson::deserialize(map, "deviceMultiplier", &deviceMultiplier, true) ||
-        !QJson::deserialize(map, "logicalMultiplier", &logicalMultiplier, true)
+        !QJson::deserialize(map, "logicalMultiplier", &logicalMultiplier, true) ||
+        !QJson::deserialize(map, "space", &space, true)
     ) {
         return false;
     }
     if(device.size() != logical.size())
         return false;
 
+    for(int i = 0; i < logical.size(); i++) {
+        logical[i] = logicalMultiplier * logical[i];
+        device[i] = deviceMultiplier * device[i];
+    }
+
+    if(space == Mm35EquivSpace)
+        for(int i = 0; i < logical.size(); i++)
+            logical[i] = mm35EquivToFov(logical[i]);
+
     QVector<QPair<qreal, qreal> > sourceToTarget;
-    for(int i = 0; i < device.size(); i++)
+    for(int i = 0; i < logical.size(); i++)
         sourceToTarget.push_back(qMakePair(device[i] * deviceMultiplier, logical[i] * logicalMultiplier));
 
     *target = QnSpaceMapperPtr<qreal>(new QnScalarInterpolationSpaceMapper<qreal>(sourceToTarget, static_cast<Qn::ExtrapolationMode>(extrapolationMode)));
