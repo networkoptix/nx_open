@@ -16,6 +16,7 @@ extern "C"
 #include <smmintrin.h>
 #endif
 #include "utils/math/math.h"
+#include "utils/media/sse_helper.h"
 
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
@@ -178,7 +179,7 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
 }
 #endif	//__i386
 
-inline bool mathImage_cpu(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
     uint64_t* curPtr = (uint64_t*) data;
     curPtr += maskStart*2;
@@ -278,7 +279,7 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 }
 #endif
 
-inline bool metadataIsEmpty_cpu(const quint8* data)
+inline bool metadataIsEmpty_cpu(const char* data)
 {
     const quint32* curPtr = (const quint32*) data;
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32); ++i)
