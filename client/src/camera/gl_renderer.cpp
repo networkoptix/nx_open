@@ -292,9 +292,6 @@ ImageCorrectionResult QnGLRenderer::calcImageCorrection()
     return m_imageCorrector;
 }
 
-static qint64 gggCnt = 0;
-static qint64 gggTime = 0;
-
 void QnGLRenderer::drawYV12VideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
