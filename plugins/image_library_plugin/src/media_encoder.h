@@ -9,8 +9,8 @@
 #include <memory>
 
 #include <plugins/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
+
 #include "stream_reader.h"
 
 
@@ -31,9 +31,9 @@ public:
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
