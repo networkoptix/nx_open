@@ -65,7 +65,7 @@ private:
     int m_timerId;
     bool m_userIsInactive;
     quint32 m_idleTimeout;
-    QObject *m_mainWindow;
+    QPointer<QObject> m_mainWindow;
     QDateTime m_mainWindowMinimizedTime;
 };
 
