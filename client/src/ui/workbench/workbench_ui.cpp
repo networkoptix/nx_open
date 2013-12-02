@@ -390,7 +390,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_treeShowingProcessor,     SIGNAL(hoverEntered()),                                                                     this,                           SLOT(at_treeShowingProcessor_hoverEntered()));
     connect(m_treeItem,                 SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_treeItem_paintGeometryChanged()));
     connect(m_treeItem,                 SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeItem_paintGeometryChanged()));
-    connect(m_treeResizerWidget,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeResizerWidget_geometryChanged()));
+    connect(m_treeResizerWidget,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_treeResizerWidget_geometryChanged()), Qt::QueuedConnection);
     connect(action(Qn::ToggleTreeAction), SIGNAL(toggled(bool)),                                                                    this,                           SLOT(at_toggleTreeAction_toggled(bool)));
     connect(action(Qn::PinTreeAction),  SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_pinTreeAction_toggled(bool)));
     connect(action(Qn::PinNotificationsAction),  SIGNAL(toggled(bool)),                                                             this,                           SLOT(at_pinNotificationsAction_toggled(bool)));
@@ -1333,8 +1333,9 @@ void QnWorkbenchUi::updateTreeResizerGeometry() {
         m_controlsWidget->mapFromItem(m_treeItem, treeRect.topRight()),
         m_controlsWidget->mapFromItem(m_treeItem, treeRect.bottomRight())
     );
-    treeResizerGeometry.moveTo(treeResizerGeometry.topRight() - QPointF(8, 0));
-    treeResizerGeometry.setWidth(16);
+
+    treeResizerGeometry.moveTo(treeResizerGeometry.topRight());
+    treeResizerGeometry.setWidth(8);
 
     if(!qFuzzyCompare(treeResizerGeometry, m_treeResizerWidget->geometry())) {
         QN_SCOPED_VALUE_ROLLBACK(&m_ignoreTreeResizerGeometryChanges2, true);
@@ -2006,9 +2007,15 @@ void QnWorkbenchUi::at_treeResizerWidget_geometryChanged() {
     if(m_ignoreTreeResizerGeometryChanges)
         return;
 
+    QRectF resizerGeometry = m_treeResizerWidget->geometry();
+    if (!resizerGeometry.isValid()) {
+        updateTreeResizerGeometry();
+        return;
+    }
+
     QRectF treeGeometry = m_treeItem->geometry();
 
-    qreal targetWidth = m_treeResizerWidget->geometry().center().x() - treeGeometry.left();
+    qreal targetWidth = m_treeResizerWidget->geometry().left() - treeGeometry.left();
     qreal minWidth = m_treeItem->effectiveSizeHint(Qt::MinimumSize).width();
     qreal maxWidth = m_controlsWidget->geometry().width() / 2;
 
