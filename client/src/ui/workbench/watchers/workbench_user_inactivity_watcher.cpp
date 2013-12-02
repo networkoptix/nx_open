@@ -12,9 +12,6 @@
 #include <X11/extensions/scrnsaver.h>
 #endif
 
-#include <QtGui/QWindowStateChangeEvent>
-#include <QtWidgets/QWidget>
-
 namespace {
     const int checkInterval = 1000; // check user inactivity every second
 }
@@ -132,8 +129,8 @@ void QnWorkbenchUserInactivityWatcher::setMainWindow(QWidget *widget) {
         m_mainWindow->removeEventFilter(this);
 
     m_mainWindowMinimizedTime = widget->windowState().testFlag(Qt::WindowMinimized)
-                                ? QDateTime()
-                                : QDateTime::currentDateTime();
+                                ? QDateTime::currentDateTime()
+                                : QDateTime();
 
     m_mainWindow = widget;
     m_mainWindow->installEventFilter(this);
@@ -146,10 +143,9 @@ bool QnWorkbenchUserInactivityWatcher::eventFilter(QObject *object, QEvent *even
     if (event->type() != QEvent::WindowStateChange)
         return false;
 
-    QWindowStateChangeEvent *stateChangeEvent = static_cast<QWindowStateChangeEvent*>(event);
-    m_mainWindowMinimizedTime = stateChangeEvent->oldState().testFlag(Qt::WindowMinimized)
-                                ? QDateTime()
-                                : QDateTime::currentDateTime();
+    m_mainWindowMinimizedTime = m_mainWindow->windowState().testFlag(Qt::WindowMinimized)
+                                ? QDateTime::currentDateTime()
+                                : QDateTime();
 
     return false;
 }

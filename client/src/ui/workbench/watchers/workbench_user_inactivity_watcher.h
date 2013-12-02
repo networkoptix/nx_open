@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtCore/QDateTime>
+#include <QtWidgets/QWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -65,7 +66,7 @@ private:
     int m_timerId;
     bool m_userIsInactive;
     quint32 m_idleTimeout;
-    QPointer<QObject> m_mainWindow;
+    QPointer<QWidget> m_mainWindow;
     QDateTime m_mainWindowMinimizedTime;
 };
 
