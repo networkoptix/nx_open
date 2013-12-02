@@ -7,6 +7,7 @@
 #include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
+#include <camera/resource_display.h>
 
 #include <ui/actions/action_target_provider.h>
 
@@ -225,6 +226,7 @@ private:
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
     bool m_autoPaused;
+    QList<QnResourceDisplayPtr> m_autoPausedResources;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;

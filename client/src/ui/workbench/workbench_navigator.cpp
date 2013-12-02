@@ -1432,13 +1432,30 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
 }
 
 void QnWorkbenchNavigator::at_userInactivityWatcher_stateChanged(bool userIsInactive) {
-    if (userIsInactive != isPlaying())
+    if (userIsInactive == m_autoPaused)
         return;
 
-    if (userIsInactive)
-        setPlayingTemporary(false);
-    else if (m_autoPaused)
-        setPlayingTemporary(true);
+    if (userIsInactive) {
+        /* Collect all playing resources */
+        foreach (QnResourceWidget *widget, display()->widgets()) {
+            QnMediaResourceWidget *mediaResourceWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+            if (!mediaResourceWidget)
+                continue;
+
+            QnResourceDisplayPtr resourceDisplay = mediaResourceWidget->display();
+            if (resourceDisplay->isPaused())
+                continue;
+
+            resourceDisplay->pause();
+            m_autoPausedResources.append(resourceDisplay);
+        }
+    } else if (m_autoPaused) {
+        foreach (const QnResourceDisplayPtr &resourceDisplay, m_autoPausedResources)
+            resourceDisplay->play();
+
+        m_autoPausedResources.clear();
+    }
 
     m_autoPaused = userIsInactive;
+    action(Qn::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
 }
