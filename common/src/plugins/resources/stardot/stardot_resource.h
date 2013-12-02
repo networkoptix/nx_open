@@ -30,7 +30,7 @@ public:
     virtual bool shoudResolveConflicts() const override;
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
-    virtual bool hasDualStreaming() override;
+    virtual bool hasDualStreaming() const override;
     virtual int getMaxFps() override;
 
     QString getRtspUrl() const;

@@ -113,7 +113,7 @@ public:
 
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-    virtual bool hasDualStreaming() override;
+    virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;

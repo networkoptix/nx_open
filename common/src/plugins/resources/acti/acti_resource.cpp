@@ -526,7 +526,7 @@ bool QnActiResource::isAudioSupported() const
     return m_hasAudio;
 }
 
-bool QnActiResource::hasDualStreaming()
+bool QnActiResource::hasDualStreaming() const
 {
     QVariant mediaVariant;
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
