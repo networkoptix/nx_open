@@ -26,6 +26,7 @@ class MediaEncoder
 public:
     MediaEncoder(
         CameraManager* const cameraManager,
+        int encoderNumber,
         unsigned int frameDurationUsec );
     virtual ~MediaEncoder();
 
@@ -57,6 +58,7 @@ private:
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
     unsigned int m_frameDurationUsec;
+    int m_encoderNumber;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

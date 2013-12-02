@@ -21,7 +21,8 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_info( info ),
     m_capabilities( 
         nxcip::BaseCameraManager::dtsArchiveCapability | 
-        nxcip::BaseCameraManager::nativeMediaStreamCapability ),
+        nxcip::BaseCameraManager::nativeMediaStreamCapability |
+        nxcip::BaseCameraManager::hardwareMotionCapability ),
     m_dirContentsManager(
         info.url,
         FRAME_DURATION_USEC )
@@ -65,20 +66,20 @@ unsigned int CameraManager::releaseRef()
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = 1;
+    *encoderCount = 2;
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoder
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if( encoderIndex != 0 )
+    if( encoderIndex > 1 )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this, FRAME_DURATION_USEC) );
-    m_encoder->addRef();
-    *encoderPtr = m_encoder.get();
+    if( !m_encoder[encoderIndex].get() )
+        m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex, FRAME_DURATION_USEC) );
+    m_encoder[encoderIndex]->addRef();
+    *encoderPtr = m_encoder[encoderIndex].get();
 
     return nxcip::NX_NO_ERROR;
 }
