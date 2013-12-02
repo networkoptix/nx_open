@@ -352,7 +352,7 @@ QString QnPlOnvifResource::getVendorInternal() const
     return m_vendorName;
 }
 
-bool QnPlOnvifResource::hasDualStreaming() const
+bool QnPlOnvifResource::hasDualStreaming()
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);

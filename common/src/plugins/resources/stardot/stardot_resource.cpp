@@ -216,7 +216,7 @@ bool QnStardotResource::isAudioSupported() const
     return m_hasAudio;
 }
 
-bool QnStardotResource::hasDualStreaming() const
+bool QnStardotResource::hasDualStreaming()
 {
     return false;
 }

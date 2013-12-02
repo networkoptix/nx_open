@@ -28,13 +28,13 @@ public:
     };
     Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
 
-    Qn::MotionTypes supportedMotionType() const;
-    bool isAudioSupported() const;
-    Qn::MotionType getCameraBasedMotionType() const;
-    Qn::MotionType getDefaultMotionType() const;
-    int motionWindowCount() const;
-    int motionMaskWindowCount() const;
-    int motionSensWindowCount() const;
+    Qn::MotionTypes supportedMotionType();
+    bool isAudioSupported();
+    Qn::MotionType getCameraBasedMotionType();
+    Qn::MotionType getDefaultMotionType();
+    int motionWindowCount();
+    int motionMaskWindowCount();
+    int motionSensWindowCount();
 
 
     Qn::MotionType getMotionType();
@@ -49,11 +49,11 @@ public:
     */
     virtual QString getDriverName() const = 0;
 
-    virtual int getMaxFps() const;
+    virtual int getMaxFps();
 
-    virtual int reservedSecondStreamFps() const;
+    virtual int reservedSecondStreamFps();
 
-    virtual QSize getMaxSensorSize() const;
+    virtual QSize getMaxSensorSize();
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
@@ -75,24 +75,24 @@ public:
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
 
-    virtual bool hasDualStreaming() const;
+    virtual bool hasDualStreaming();
 
     /** Return true if dual streaming supported and don't blocked by user */
-    bool hasDualStreaming2() const;
+    bool hasDualStreaming2();
 
     /** Returns true if camera stores archive on a external system */
-    bool isDtsBased() const;
+    bool isDtsBased();
 
     /** Returns true if it is a analog camera */
-    bool isAnalog() const;
+    bool isAnalog();
 
-    virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
+    virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod();
 
     virtual QStringList getRelayOutputList() const;
     virtual QStringList getInputPortList() const;
 
 
-    Qn::CameraCapabilities getCameraCapabilities() const;
+    Qn::CameraCapabilities getCameraCapabilities();
     bool hasCameraCapabilities(Qn::CameraCapabilities capabilities) const;
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
