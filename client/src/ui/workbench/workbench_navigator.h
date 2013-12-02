@@ -153,6 +153,8 @@ protected slots:
     
     void updateCurrentWidgetFlags();
 
+    void setAutoPaused(bool autoPaused);
+
 protected slots:
     void at_display_widgetChanged(Qn::ItemRole role);
     void at_display_widgetAdded(QnResourceWidget *widget);
@@ -187,8 +189,6 @@ protected slots:
 
     void at_dayTimeWidget_destroyed();
     void at_dayTimeWidget_timeClicked(const QTime &time);
-
-    void at_userInactivityWatcher_stateChanged(bool userIsInactive);
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -226,7 +226,7 @@ private:
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
     bool m_autoPaused;
-    QList<QnResourceDisplayPtr> m_autoPausedResources;
+    QList<QnResourceDisplayPtr> m_autoPausedResourceDisplays;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
