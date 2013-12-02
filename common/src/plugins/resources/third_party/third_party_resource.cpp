@@ -347,6 +347,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setAudioEnabled( true );
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
         setParam( lit("dts"), 1, QnDomainMemory );
+    if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
+        setMotionType( Qn::MT_HardwareGrid );
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
