@@ -352,7 +352,7 @@ QString QnPlOnvifResource::getVendorInternal() const
     return m_vendorName;
 }
 
-bool QnPlOnvifResource::hasDualStreaming() const
+bool QnPlOnvifResource::hasDualStreaming()
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
@@ -661,7 +661,7 @@ void QnPlOnvifResource::setMaxFps(int f)
     setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
-int QnPlOnvifResource::getMaxFps() const
+int QnPlOnvifResource::getMaxFps()
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);

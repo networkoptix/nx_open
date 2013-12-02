@@ -201,7 +201,7 @@ QString QnStardotResource::getRtspUrl() const
     return url.toString();
 }
 
-int QnStardotResource::getMaxFps() const
+int QnStardotResource::getMaxFps()
 {
     return m_maxFps;
 }
@@ -216,7 +216,7 @@ bool QnStardotResource::isAudioSupported() const
     return m_hasAudio;
 }
 
-bool QnStardotResource::hasDualStreaming() const
+bool QnStardotResource::hasDualStreaming()
 {
     return false;
 }

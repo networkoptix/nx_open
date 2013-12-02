@@ -8,7 +8,7 @@ QnDroidResource::QnDroidResource()
 {
 }
 
-int QnDroidResource::getMaxFps() const
+int QnDroidResource::getMaxFps()
 {
     return 30;
 }

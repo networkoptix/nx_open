@@ -30,7 +30,7 @@ QnPlVmax480Resource::~QnPlVmax480Resource()
     }
 }
 
-int QnPlVmax480Resource::getMaxFps() const
+int QnPlVmax480Resource::getMaxFps() 
 {
     return 30;
 }
