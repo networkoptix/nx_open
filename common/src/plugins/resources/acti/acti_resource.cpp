@@ -478,7 +478,7 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
-int QnActiResource::getMaxFps() const
+int QnActiResource::getMaxFps()
 {
     return m_availFps[0].last();
 }

@@ -18,7 +18,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual int getMaxFps() const override;
+    virtual int getMaxFps() override;
 
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;
