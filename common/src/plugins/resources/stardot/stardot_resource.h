@@ -31,7 +31,7 @@ public:
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
     virtual bool hasDualStreaming() const override;
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
 
     QString getRtspUrl() const;
 

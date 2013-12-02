@@ -8,7 +8,7 @@ QnTestCameraResource::QnTestCameraResource()
 {
 }
 
-int QnTestCameraResource::getMaxFps()
+int QnTestCameraResource::getMaxFps() const
 {
     return 30;
 }
