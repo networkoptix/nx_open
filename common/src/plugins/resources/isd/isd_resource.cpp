@@ -232,7 +232,7 @@ void QnPlIsdResource::setMaxFps(int f)
     setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
-int QnPlIsdResource::getMaxFps()
+int QnPlIsdResource::getMaxFps() const
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlIsdResource*>(this);

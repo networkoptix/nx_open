@@ -201,7 +201,7 @@ QString QnStardotResource::getRtspUrl() const
     return url.toString();
 }
 
-int QnStardotResource::getMaxFps()
+int QnStardotResource::getMaxFps() const
 {
     return m_maxFps;
 }
