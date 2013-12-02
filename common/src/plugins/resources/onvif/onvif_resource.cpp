@@ -347,7 +347,7 @@ QString QnPlOnvifResource::getDriverName() const
     return QLatin1String(MANUFACTURE);
 }
 
-QString QnPlOnvifResource::getVendorName() const
+QString QnPlOnvifResource::getVendorInternal() const
 {
     return m_vendorName;
 }
@@ -408,13 +408,14 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     return new QnOnvifStreamReader(toSharedPointer());
 }
 
-void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
+void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     setCodec(H264, true);
     setCodec(H264, false);
 

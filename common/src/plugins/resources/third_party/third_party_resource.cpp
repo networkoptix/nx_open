@@ -70,7 +70,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     return new ThirdPartyStreamReader( toSharedPointer(), m_camManager.getRef() );
 }
 
-void QnThirdPartyResource::setCropingPhysical(QRect /*croping*/)
+void QnThirdPartyResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -283,6 +283,7 @@ const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( 
 
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
     int result = m_camManager.getCameraInfo( &m_camInfo );

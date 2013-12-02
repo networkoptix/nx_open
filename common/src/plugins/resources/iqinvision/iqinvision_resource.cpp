@@ -53,13 +53,14 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
     return new MJPEGtreamreader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
 }
 
-void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
+void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
 
 CameraDiagnostics::Result QnPlIqResource::initInternal() 
 {
+    QnPhysicalCameraResource::initInternal();
     CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
     //return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT);
     return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT)

@@ -382,7 +382,7 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
     return false;
 }
 
-bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
+bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
     getResourceParamList();
     if (!m_resourceParamList.contains(name))

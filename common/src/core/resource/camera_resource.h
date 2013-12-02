@@ -17,35 +17,10 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
 public:
     QnVirtualCameraResource();
 
-    virtual void updateInner(QnResourcePtr other) override;
-
-    // TODO: #Elric move to QnSecurityCamResource
-    void setScheduleDisabled(bool blocked);
-    bool isScheduleDisabled() const;
-
-    // TODO: #Elric move to QnSecurityCamResource
-    bool isAudioEnabled() const;
-    void setAudioEnabled(bool value);
-
-    bool isManuallyAdded() const;
-    void setManuallyAdded(bool value);
-
-    // TODO: #Elric move to QnSecurityCamResource
-    bool isAdvancedWorking() const;
-    void setAdvancedWorking(bool value);
-
     QnAbstractDTSFactory* getDTSFactory();
     void setDTSFactory(QnAbstractDTSFactory* factory);
     void lockDTSFactory();
     void unLockDTSFactory();
-
-    // TODO: #Elric move to QnSecurityCamResource
-    QString getModel() const;
-    void setModel(QString model);
-
-    // TODO: #Elric move to QnSecurityCamResource
-    QString getFirmware() const;
-    void setFirmware(QString firmware);
 
     virtual QString getUniqueId() const override;
 
@@ -62,18 +37,7 @@ protected:
     void save();
     int saveAsync(QObject *target, const char *slot);
 
-signals:
-    void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
-
 private:
-    bool m_scheduleDisabled;
-    bool m_audioEnabled;
-    bool m_manuallyAdded;
-    bool m_advancedWorking;
-
-    QString m_model;
-    QString m_firmware;
-
     QnAbstractDTSFactory* m_dtsFactory;
     std::deque<qint64> m_issueTimes;
 };
@@ -98,6 +62,8 @@ public:
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
+protected:
+    virtual CameraDiagnostics::Result initInternal() override;
 private:
     int m_channelNumber; // video/audio source number
 };

@@ -77,7 +77,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;

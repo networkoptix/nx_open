@@ -24,7 +24,7 @@ public:
     virtual bool setHostAddress(const QString &ip, QnDomain domain) override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override;
+    virtual void setCroppingPhysical(QRect cropping) override;
 
 private:
 };

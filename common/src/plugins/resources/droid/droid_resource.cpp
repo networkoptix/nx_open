@@ -33,7 +33,7 @@ QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
     return new PlDroidStreamReader(toSharedPointer());
 }
 
-void QnDroidResource::setCropingPhysical(QRect /*croping*/)
+void QnDroidResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }

@@ -33,7 +33,7 @@ QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
     return new QnTestCameraStreamReader(toSharedPointer());
 }
 
-void QnTestCameraResource::setCropingPhysical(QRect /*croping*/)
+void QnTestCameraResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }

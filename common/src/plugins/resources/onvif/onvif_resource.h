@@ -110,7 +110,6 @@ public:
 
     virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
-    virtual QString getVendorName() const override;
 
     virtual int getMaxFps() override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
@@ -205,6 +204,8 @@ public:
 
     bool isPTZDisabled() const;
 protected:
+    virtual QString getVendorInternal() const override;
+
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -212,7 +213,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 

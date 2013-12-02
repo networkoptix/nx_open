@@ -52,6 +52,7 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
     QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
 
@@ -208,7 +209,7 @@ QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
     return new QnISDStreamReader(toSharedPointer());
 }
 
-void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
+void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
 

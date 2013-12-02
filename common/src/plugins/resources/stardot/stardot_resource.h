@@ -47,7 +47,7 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override;
+    virtual void setCroppingPhysical(QRect cropping) override;
     virtual bool isResourceAccessible() override;
     virtual void setMotionMaskPhysical(int channel) override;
 private:

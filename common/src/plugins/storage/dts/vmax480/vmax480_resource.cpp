@@ -139,14 +139,14 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
 }
 
 
-void QnPlVmax480Resource::setCropingPhysical(QRect croping)
+void QnPlVmax480Resource::setCroppingPhysical(QRect cropping)
 {
-    Q_UNUSED(croping)
+    Q_UNUSED(cropping)
 }
 
 CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
-
+    QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();

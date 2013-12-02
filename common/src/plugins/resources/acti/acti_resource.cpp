@@ -79,7 +79,7 @@ bool QnActiResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnActiResource::setCropingPhysical(QRect /*croping*/)
+void QnActiResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -239,6 +239,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
 CameraDiagnostics::Result QnActiResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
+
     CLHttpStatus status;
         
     QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);

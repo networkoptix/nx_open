@@ -64,7 +64,7 @@ bool QnStardotResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnStardotResource::setCropingPhysical(QRect /*croping*/)
+void QnStardotResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -143,6 +143,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
 
 CameraDiagnostics::Result QnStardotResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
        
     QByteArray resList = makeStardotRequest(lit("info.cgi?resolutions&api=2"), status);

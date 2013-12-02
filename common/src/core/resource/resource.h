@@ -207,7 +207,7 @@ public:
     bool hasParam(const QString &name) const;
 
     // return true if no error
-    bool getParam(const QString &name, QVariant &val, QnDomain domain);
+    bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted

@@ -32,7 +32,7 @@ public:
     QnServerCameraPtr findEnabledSubling();
 protected:
     virtual QString getUniqueId() const override;
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 private:
     QnServerCameraPtr m_activeCamera;

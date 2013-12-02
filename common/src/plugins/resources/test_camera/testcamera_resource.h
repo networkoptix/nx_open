@@ -25,7 +25,7 @@ public:
     virtual bool shoudResolveConflicts() const override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override;
+    virtual void setCroppingPhysical(QRect cropping) override;
 
 private:
 };

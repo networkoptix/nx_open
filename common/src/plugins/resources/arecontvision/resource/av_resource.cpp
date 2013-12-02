@@ -206,8 +206,9 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
-    QRect rect = getCroping(QnDomainMemory);
-    setCropingPhysical(rect);
+    QnPhysicalCameraResource::initInternal();
+    QRect rect = getCropping(QnDomainMemory);
+    setCroppingPhysical(rect);
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
@@ -297,7 +298,7 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
+void QnPlAreconVisionResource::setCroppingPhysical(QRect /*cropping*/)
 {
     QVariant maxSensorWidth;
     QVariant maxSensorHight;
