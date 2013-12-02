@@ -47,7 +47,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
             if (!media2 || media2->timestamp == DATETIME_NOW)
                 break;
             QnCompressedVideoDataPtr video2 = media2.dynamicCast<QnCompressedVideoData>();
-            if (video2->flags & AV_PKT_FLAG_KEY)
+            if (video2 && (video2->flags & AV_PKT_FLAG_KEY))
                 return video2;
         }
     }
