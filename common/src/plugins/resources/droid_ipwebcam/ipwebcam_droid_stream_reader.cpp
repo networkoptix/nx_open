@@ -10,6 +10,10 @@
 char jpeg_start[2] = {'\xff', '\xd8'};
 char jpeg_end[2] = {'\xff', '\xd9'};
 
+#endif //ENABLE_DROID
+
+//eto polnaya hyunya
+
 int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 {
     if (!data || !subdata || datalen<=0 || subdatalen <= 0 )
@@ -48,6 +52,7 @@ int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int
     return result+start_index;
 }
 
+#ifdef ENABLE_DROID
 
 QnPlDroidIpWebCamReader::QnPlDroidIpWebCamReader(QnResourcePtr res)
 :CLServerPushStreamReader(res),
