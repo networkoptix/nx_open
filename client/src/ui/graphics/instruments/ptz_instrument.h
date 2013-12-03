@@ -107,9 +107,6 @@ private:
     void processPtzDrag(const QRectF &rect);
     void processPtzDoubleClick();
 
-    QVector3D physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect);
-    QVector3D physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos);
-
 private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}

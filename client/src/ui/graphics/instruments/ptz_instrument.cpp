@@ -627,25 +627,20 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
-    QVector3D newPhysicalPosition = physicalPositionForRect(widget, rect);
-    if(qIsNaN(newPhysicalPosition)) {
+    qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
+    QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
+    widget->ptzController()->relativeMove(aspectRatio, viewport);
+
+    //QVector3D newPhysicalPosition = physicalPositionForRect(widget, rect);
+    /*if(qIsNaN(newPhysicalPosition)) {
         //m_ptzController->setMovement(widget, QVector3D());
         PtzData &data = m_dataByWidget[widget];
         data.pendingAbsoluteMove = rect;
         return; 
-    }
+    }*/
 
-    TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
+    //TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
     //m_ptzController->setPhysicalPosition(widget, newPhysicalPosition);
-}
-
-QVector3D PtzInstrument::physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos) {
-    return physicalPositionForRect(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
-}
-
-QVector3D PtzInstrument::physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect) 
-{
-    return QVector3D();
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
@@ -681,15 +676,16 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
 
-    /*if (!target()->virtualPtzController()) {
+    //if (!target()->virtualPtzController()) {
         // built in virtual PTZ execute command too fast. animation looks bad
         QnSplashItem *splashItem = newSplashItem(target());
         splashItem->setSplashType(QnSplashItem::Circular);
         splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
         splashItem->setPos(pos);
         m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
-    } else {
-        target()->virtualPtzController()->setAnimationEnabled(true);
+    //} 
+        /* {
+        target()->ptzController()->setAnimationEnabled(true);
     }*/
 
     ptzMoveTo(target(), pos);

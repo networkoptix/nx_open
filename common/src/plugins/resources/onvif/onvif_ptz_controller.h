@@ -27,12 +27,15 @@ public:
 
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
-    int stopMoveInternal();
+    
+    int stopInternal();
+    int moveInternal(const QVector3D &speed);
 
 private:
     mutable QMutex m_mutex;
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_ptzCapabilities;
+    bool m_stopBroken;
 
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
     QPair<qreal, qreal> m_yNativeVelocityCoeff;

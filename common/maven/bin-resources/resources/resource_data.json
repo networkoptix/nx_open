@@ -14,6 +14,12 @@
     "data": [
         {
             "keys": [
+                "SD8362", "SD83X3", "SD81X1", "SD83X1"
+            ],
+            "onvifPtzStopBroken": true
+        }
+        {
+            "keys": [
                 "AXIS Q6035-E"
             ],
             "ptzMapper": {

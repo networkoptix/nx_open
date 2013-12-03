@@ -16,22 +16,30 @@ QN_DEFINE_ENUM_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
  * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
  * \returns                         Width-based FOV in degrees.
  */
-static qreal mm35EquivToFov(qreal mm35Equiv) {
-    return std::atan((36.0 / 2.0) / mm35Equiv) * 2.0;
+static qreal mm35EquivToDegrees(qreal mm35Equiv) {
+    return qRadiansToDegrees(std::atan((36.0 / 2.0) / mm35Equiv) * 2.0);
 }
 
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
 
-QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &logicalToDevice, const QnSpaceMapperPtr<QVector3D> &deviceToLogical):
-    m_deviceToLogical(deviceToLogical),
-    m_logicalToDevice(logicalToDevice)
+QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const QnSpaceMapperPtr<QVector3D> &outputMapper):
+    m_inputMapper(inputMapper),
+    m_outputMapper(outputMapper)
 {
-    QVector3D lo = m_logicalToDevice->targetToSource(m_logicalToDevice->sourceToTarget(QVector3D(-180, -90, 0)));
-    QVector3D hi = m_logicalToDevice->targetToSource(m_logicalToDevice->sourceToTarget(QVector3D(180, 90, 360)));
+    QVector3D lo = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(-360 * 10, -90, 0)));
+    QVector3D mi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(90, 0, 180)));
+    QVector3D hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(360 * 10, 90, 360)));
 
-    m_logicalLimits.minPan = lo.x();
-    m_logicalLimits.maxPan = hi.x();
+    if(qFuzzyCompare(lo.x(), hi.x()) && !qFuzzyCompare(lo.x(), mi.x())) {
+        /* This means that there are no limits for pan. */
+        m_logicalLimits.minPan = -360 * 10;
+        m_logicalLimits.maxPan = 360 * 10;
+    } else {
+        m_logicalLimits.minPan = lo.x();
+        m_logicalLimits.minPan = hi.x();
+    }
+
     m_logicalLimits.minTilt = lo.y();
     m_logicalLimits.maxTilt = hi.y();
     m_logicalLimits.minFov = lo.z();
@@ -75,7 +83,7 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
 
     if(space == Mm35EquivSpace)
         for(int i = 0; i < logical.size(); i++)
-            logical[i] = mm35EquivToFov(logical[i]);
+            logical[i] = mm35EquivToDegrees(logical[i]);
 
     QVector<QPair<qreal, qreal> > sourceToTarget;
     for(int i = 0; i < logical.size(); i++)
@@ -119,29 +127,29 @@ bool deserialize(const QJsonValue &value, QnPtzMapperPtr *target) {
     if(!QJson::deserialize(value, &map))
         return false;
 
-    PtzMapperPart toCamera, fromCamera;
+    PtzMapperPart input, output;
     if(
-        !QJson::deserialize(map, "fromCamera", &fromCamera, true) ||
-        !QJson::deserialize(map, "toCamera", &toCamera, true)
+        !QJson::deserialize(map, "fromCamera", &output, true) ||
+        !QJson::deserialize(map, "toCamera", &input, true)
     ) {
         return false;
     }
 
     /* Null means "take this one from the other mapper". */
     for(int i = 0; i < 3; i++) {
-        if(!toCamera[0]) {
-            if(!fromCamera[0])
+        if(!input[i]) {
+            if(!output[i])
                 return false;
 
-            toCamera[0] = fromCamera[0];
-        } else if(!fromCamera[0]) {
-            fromCamera[0] = toCamera[0];
+            input[i] = output[i];
+        } else if(!output[i]) {
+            output[i] = input[i];
         }
     }
 
     *target = QnPtzMapperPtr(new QnPtzMapper(
-        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(fromCamera[0], fromCamera[1], fromCamera[2])),
-        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(toCamera[0], toCamera[1], toCamera[2]))
+        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(input[0], input[1], input[2])),
+        QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(output[0], output[1], output[2]))
     ));
     return true;
 }

@@ -23,6 +23,7 @@ public:
 
 private slots:
     void at_continuousMove_replyReceived(int status, int handle);
+    void at_relativeMove_replyReceived(int status, int handle);
 
 private:
     QnNetworkResourcePtr m_resource;

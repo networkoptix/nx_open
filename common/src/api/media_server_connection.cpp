@@ -44,7 +44,7 @@ namespace {
         ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
         ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
-        ((rebuildArchiveObject,     "rebuildArchive"))
+        ((RebuildArchiveObject,     "rebuildArchive"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -319,6 +319,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnTimeReply>(this, response, handle);
         break;
     case PtzContinuousMoveObject:
+    case PtzRelativeMoveObject:
     case CameraAddObject:
         //TODO: #GDM processJsonReply if needed
         emitFinished(this, response.status, handle);
@@ -347,7 +348,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
         break;
-    case rebuildArchiveObject: {
+    case RebuildArchiveObject: {
         QnRebuildArchiveReply info;
         if (response.status == 0)
             info.deserialize(response.data);
@@ -555,7 +556,7 @@ int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject
         params << QnRequestParam("action",  lit("start"));
     else if (action == RebuildAction_Cancel)
         params << QnRequestParam("action",  lit("stop"));
-    return sendAsyncGetRequest(rebuildArchiveObject, params, QN_REPLY_TYPE(QnRebuildArchiveReply), target, slot);
+    return sendAsyncGetRequest(RebuildArchiveObject, params, QN_REPLY_TYPE(QnRebuildArchiveReply), target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {
