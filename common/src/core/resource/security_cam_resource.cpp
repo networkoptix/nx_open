@@ -128,16 +128,6 @@ QSize QnSecurityCamResource::getMaxSensorSize() const {
     return QSize(val_w.toInt(), val_h.toInt());
 }
 
-QRect QnSecurityCamResource::getCropping(QnDomain domain) const {
-    Q_UNUSED(domain)
-    return QRect(0, 0, 100, 100);
-}
-
-void QnSecurityCamResource::setCropping(QRect cropping, QnDomain domain) {
-    Q_UNUSED(domain)
-    setCroppingPhysical(cropping);
-}
-
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role) {
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
     {
