@@ -33,7 +33,6 @@ namespace QJsonDetail {
         const T &m_value;
     };
 
-
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
 

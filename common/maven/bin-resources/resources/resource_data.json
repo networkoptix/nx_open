@@ -26,7 +26,7 @@
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [-0.5, 0.1111111111111],
-                        "physical": [ -90,              20]
+                        "logical": [ -90,              20]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
