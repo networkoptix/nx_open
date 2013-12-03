@@ -1,3 +1,4 @@
+#ifdef ENABLE_PULSE_CAMERA
 
 #include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "pulse_resource.h"
@@ -36,3 +37,5 @@ void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
+
+#endif // #ifdef ENABLE_PULSE_CAMERA

@@ -1,3 +1,4 @@
+#ifdef ENABLE_DROID
 
 #include "ipwebcam_droid_stream_reader.h"
 
@@ -192,3 +193,5 @@ bool QnPlDroidIpWebCamReader::isStreamOpened() const
 {
     return ( mHttpClient && mHttpClient->isOpened() );
 }
+
+#endif // #ifdef ENABLE_DROID

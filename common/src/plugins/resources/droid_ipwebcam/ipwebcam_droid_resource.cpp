@@ -1,3 +1,5 @@
+#ifdef ENABLE_DROID
+
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "ipwebcam_droid_resource.h"
 #include "ipwebcam_droid_stream_reader.h"
@@ -39,3 +41,5 @@ int QnPlDriodIpWebCamResource::httpPort() const
 {
     return 8080;
 }
+
+#endif // #ifdef ENABLE_DROID

@@ -1,3 +1,4 @@
+#ifdef ENABLE_AXIS
 
 #include "axis_resource.h"
 
@@ -943,3 +944,5 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
     return m_ptzController.data();
 }
+
+#endif // #ifdef ENABLE_AXIS

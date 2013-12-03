@@ -1,3 +1,5 @@
+#ifdef ENABLE_ISD
+
 #include <QtCore/QTextStream>
 #include "isd_resource.h"
 #include "isd_stream_reader.h"
@@ -182,3 +184,5 @@ const QnResourceAudioLayout* QnISDStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }
+
+#endif // #ifdef ENABLE_ISD

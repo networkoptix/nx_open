@@ -1,3 +1,5 @@
+#ifdef ENABLE_ACTI
+
 #include <QtCore/QTextStream>
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
@@ -149,3 +151,5 @@ const QnResourceAudioLayout* QnActiStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }
+
+#endif // #ifdef ENABLE_ACTI

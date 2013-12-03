@@ -1,3 +1,5 @@
+#ifdef ENABLE_DLINK
+
 #include "dlink_resource.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "dlink_stream_reader.h"
@@ -423,3 +425,5 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     }
 
 }
+
+#endif

@@ -1,6 +1,8 @@
 #ifndef __ACTI_RESOURCE_H__
 #define __ACTI_RESOURCE_H__
 
+#ifdef ENABLE_ACTI
+
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
@@ -148,4 +150,5 @@ private:
     bool m_inputMonitored;
 };
 
+#endif // #ifdef ENABLE_ACTI
 #endif // __ACTI_RESOURCE_H__

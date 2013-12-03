@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_resource_searcher.h"
 
 #include <QtCore/QCoreApplication>
@@ -262,3 +264,5 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     resList << res;
     return resList;
 }
+
+#endif

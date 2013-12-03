@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_singesensor.h"
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
@@ -37,3 +39,4 @@ QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createLiveDataProvi
     return new AVClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
+#endif

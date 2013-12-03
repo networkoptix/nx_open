@@ -1,6 +1,8 @@
 #ifndef axis_resource_h_2215
 #define axis_resource_h_2215
 
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
@@ -130,4 +132,5 @@ private:
     friend class QnAxisPtzController;
 };
 
+#endif // #ifdef ENABLE_AXIS
 #endif //axis_resource_h_2215

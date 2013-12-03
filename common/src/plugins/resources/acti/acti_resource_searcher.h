@@ -1,6 +1,8 @@
 #ifndef _ACTI_RESOURCE_SEARCHER_H__
 #define _ACTI_RESOURCE_SEARCHER_H__
 
+#ifdef ENABLE_ACTI
+
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtCore/QElapsedTimer>
@@ -59,4 +61,5 @@ private slots:
     void at_httpConnectionDone(nx_http::AsyncHttpClient* reply);
 };
 
+#endif // #ifdef ENABLE_ACTI
 #endif // _ACTI_RESOURCE_SEARCHER_H__

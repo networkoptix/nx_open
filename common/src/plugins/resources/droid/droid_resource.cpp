@@ -1,3 +1,6 @@
+#ifdef ENABLE_DROID
+
+
 #include "droid_resource.h"
 #include "droid_stream_reader.h"
 
@@ -48,3 +51,5 @@ bool QnDroidResource::setHostAddress(const QString &/*ip*/, QnDomain /*domain*/)
 {
     return false;
 }
+
+#endif //#ifdef ENABLE_DROID

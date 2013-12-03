@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_client_pull.h"
 
 #include "../resource/av_resource.h"
@@ -138,3 +140,5 @@ bool QnPlAVClinetPullStreamReader::isH264() const
     getResource()->getParam(QLatin1String("Codec"), val, QnDomainMemory);
     return val==QLatin1String("H.264");
 }
+
+#endif

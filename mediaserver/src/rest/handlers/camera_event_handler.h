@@ -6,6 +6,8 @@
 #ifndef CAMERA_EVENT_HANDLER_H
 #define CAMERA_EVENT_HANDLER_H
 
+#ifdef ENABLE_ACTI
+
 #include "rest/server/request_handler.h"
 
 
@@ -30,4 +32,5 @@ public:
         QByteArray& contentType );
 };
 
+#endif // #ifdef ENABLE_ACTI
 #endif  //CAMERA_EVENT_HANDLER_H

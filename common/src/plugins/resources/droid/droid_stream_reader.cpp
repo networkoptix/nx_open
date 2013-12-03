@@ -1,3 +1,5 @@
+#ifdef ENABLE_DROID
+
 #include "droid_stream_reader.h"
 #include "droid_resource.h"
 #include "droid_controlport_listener.h"
@@ -179,3 +181,5 @@ void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
     m_h264Parser->setSDPInfo(sdpInfo.split('\n'));
     m_gotSDP = true;
 }
+
+#endif // #ifdef ENABLE_DROID

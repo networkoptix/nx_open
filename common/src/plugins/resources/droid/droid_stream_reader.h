@@ -1,6 +1,8 @@
 #ifndef droid_stream_reader_h_1756
 #define droid_stream_reader_h_1756
 
+#ifdef ENABLE_DROID
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "droid_resource.h"
@@ -48,4 +50,5 @@ private:
     bool m_gotSDP;
 };
 
+#endif // #ifdef ENABLE_DROID
 #endif //dlink_stream_reader_h_0251

@@ -1,3 +1,5 @@
+#ifdef ENABLE_AXIS
+
 #include "axis_ptz_controller.h"
 
 #include <utils/math/math.h>
@@ -226,3 +228,5 @@ Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
 const QnPtzSpaceMapper *QnAxisPtzController::getSpaceMapper() {
     return m_spaceMapper;
 }
+
+#endif // #ifdef ENABLE_AXIS
