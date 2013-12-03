@@ -98,7 +98,7 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
     QnLexical::deserialize(params.value("zSpeed"), &zSpeed);
     QVector3D speed(xSpeed, ySpeed, zSpeed);
 
-    if (controller->continuousMove(speed) != 0)
+    if(!controller->continuousMove(speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -106,14 +106,14 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
 
 int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal viewportTop = 0.0, viewportLeft = 0.0, viewportBottom = 1.0, viewportRight = 1.0, aspectRatio = 1.0;
-    
     QnLexical::deserialize(params.value("viewportTop"),     &viewportTop);
     QnLexical::deserialize(params.value("viewportLeft"),    &viewportLeft);
     QnLexical::deserialize(params.value("viewportBottom"),  &viewportBottom);
     QnLexical::deserialize(params.value("viewportRight"),   &viewportRight);
     QnLexical::deserialize(params.value("aspectRatio"),     &aspectRatio);
+    QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
 
-    if(controller->relativeMove(aspectRatio, QRectF(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom))) != 0)
+    if(!controller->relativeMove(aspectRatio, viewport))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
