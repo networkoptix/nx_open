@@ -130,7 +130,7 @@ int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &param
 
         QnManualCameraInfo info(url, auth, manufacturer);
         if(info.resType.isNull()) {
-            result.setError(-1, lit("Invalid camera manufacturer '%1'.").arg(manufacturer));
+            result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid camera manufacturer '%1'.").arg(manufacturer));
             return CODE_INVALID_PARAMETER;
         }
 
@@ -143,10 +143,7 @@ int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &param
 }
 
 int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
-    QString localPath = path;
-    while(localPath.endsWith('/'))
-        localPath.chop(1);
-    QString action = localPath.mid(localPath.lastIndexOf('/') + 1);
+    QString action = extractAction(path);
     if (action == "search")
         return searchStartAction(params, result);
     else if (action == "status")

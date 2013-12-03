@@ -12,11 +12,9 @@
 
 int QnFileSystemHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result)
 {
-    QString storageUrl = params.value("path");
-    if (storageUrl.isEmpty()) {
-        result.setErrorText("Parameter 'path' is absent or empty.");
+    QString storageUrl;
+    if(!requireParameter(params, lit("path"), result, &storageUrl))
         return CODE_INVALID_PARAMETER;
-    }
 
     QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(storageUrl);
     bool exists = storage;

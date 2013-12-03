@@ -29,6 +29,8 @@ const QJsonValue &QnJsonRestResult::reply() const {
     return m_reply;
 }
 
+QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult::Error)
+
 QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult, 
     ((&QnJsonRestResult::m_error,       &QnJsonRestResult::m_error,         "error"))
     ((&QnJsonRestResult::m_errorString, &QnJsonRestResult::m_errorString,   "errorString"))

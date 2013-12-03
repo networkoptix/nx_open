@@ -82,11 +82,25 @@ __VA_ARGS__ void serialize(const TYPE &value, QString *target);                 
 __VA_ARGS__ bool deserialize(const QString &value, TYPE *target);
 
 
+#define QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
+__VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
+    QnLexical::serialize(static_cast<int>(value), target);                      \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
+    int intValue;                                                               \
+    if(!QnLexical::deserialize(value, &intValue))                               \
+        return false;                                                           \
+                                                                                \
+    *target = static_cast<TYPE>(intValue);                                      \
+    return true;                                                                \
+}
 
-#define QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
-    QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_typedEnumNameMapper_instance, __LINE__), ##__VA_ARGS__)
 
-#define QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */)  \
+#define QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+    QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_typedEnumNameMapper_instance, __LINE__), ##__VA_ARGS__)
+
+#define QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */)  \
 template<class T> void QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_macro_cannot_be_used_in_header_files(); \
 template<> void QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_macro_cannot_be_used_in_header_files<TYPE>() {}; \
                                                                                 \

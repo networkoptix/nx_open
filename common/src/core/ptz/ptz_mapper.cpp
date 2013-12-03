@@ -4,13 +4,14 @@
 #include <utils/common/enum_name_mapper.h>
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
-QN_DEFINE_ENUM_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
 
 QN_DEFINE_NAME_MAPPED_ENUM(AngleSpace,
     ((DegreesSpace,     "Degrees"))
     ((Mm35EquivSpace,   "35MmEquiv"))
 )
-QN_DEFINE_ENUM_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
+
 
 /**
  * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
