@@ -27,12 +27,18 @@ QnPtzControllerPool::~QnPtzControllerPool() {
 	return;
 }
 
-QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const {
+QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource, ControllerRole role) const {
 	auto pos = m_dataByResource.find(resource);
 	if(pos == m_dataByResource.end())
 		return QnPtzControllerPtr();
 
-	return pos->defaultController;
+    switch(role) {
+    case DefaultController: return  pos->defaultController;
+    case DeviceController: return   pos->deviceController;
+    default:
+        qnWarning("Invalid controller role '%1'.", static_cast<int>(role));
+        return QnPtzControllerPtr();
+    }
 }
 
 void QnPtzControllerPool::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {

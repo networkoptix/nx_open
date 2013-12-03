@@ -15,10 +15,15 @@ class QnPtzControllerPool: public Connective<QObject>, public Singleton<QnPtzCon
     typedef Connective<QObject> base_type;
 
 public:
+    enum ControllerRole {
+        DefaultController,
+        DeviceController
+    };
+
     QnPtzControllerPool(QObject *parent = NULL);
     virtual ~QnPtzControllerPool();
 
-    QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
+    QnPtzControllerPtr controller(const QnResourcePtr &resource, ControllerRole role = DefaultController) const;
 
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);

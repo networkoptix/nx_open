@@ -92,19 +92,16 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
 
 
 int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    qreal xSpeed = 0.0;
-    qreal ySpeed = 0.0;
-    qreal zSpeed = 0.0;
-    
+    qreal xSpeed = 0.0, ySpeed = 0.0, zSpeed = 0.0;
     QnLexical::deserialize(params.value("xSpeed"), &xSpeed);
     QnLexical::deserialize(params.value("ySpeed"), &ySpeed);
     QnLexical::deserialize(params.value("zSpeed"), &zSpeed);
+    QVector3D speed(xSpeed, ySpeed, zSpeed);
 
-    if (controller->continuousMove(QVector3D(xSpeed, ySpeed, zSpeed)) == 0) {
-        return CODE_OK;
-    } else {
+    if (controller->continuousMove(speed) != 0)
         return CODE_INTERNAL_ERROR;
-    }
+
+    return CODE_OK;
 }
 
 int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
@@ -116,11 +113,10 @@ int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, cons
     QnLexical::deserialize(params.value("viewportRight"),   &viewportRight);
     QnLexical::deserialize(params.value("aspectRatio"),     &aspectRatio);
 
-    if(controller->relativeMove(aspectRatio, QRectF(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom))) == 0) {
-        return CODE_OK;
-    } else {
+    if(controller->relativeMove(aspectRatio, QRectF(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom))) != 0)
         return CODE_INTERNAL_ERROR;
-    }
+
+    return CODE_OK;
 }
 
 #if 0
