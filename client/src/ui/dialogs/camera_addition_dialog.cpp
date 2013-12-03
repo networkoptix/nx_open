@@ -766,5 +766,12 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     }
     ui->progressBar->setMaximum(result.status.total);
     ui->progressBar->setValue(result.status.current);
-    m_server->apiConnection()->searchCameraAsyncStatus(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
+
+    static const int PROGRESS_CHECK_PERIOD_MS = 1000;
+    QTimer::singleShot(PROGRESS_CHECK_PERIOD_MS, this, SLOT(updateStatus()));
+}
+
+void QnCameraAdditionDialog::updateStatus() {
+    if (m_state == Searching)
+        m_server->apiConnection()->searchCameraAsyncStatus(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
 }

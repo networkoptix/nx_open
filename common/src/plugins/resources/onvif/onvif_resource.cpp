@@ -347,7 +347,7 @@ QString QnPlOnvifResource::getDriverName() const
     return QLatin1String(MANUFACTURE);
 }
 
-QString QnPlOnvifResource::getVendorName() const
+QString QnPlOnvifResource::getVendorInternal() const
 {
     return m_vendorName;
 }
@@ -408,13 +408,14 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     return new QnOnvifStreamReader(toSharedPointer());
 }
 
-void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
+void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     setCodec(H264, true);
     setCodec(H264, false);
 
@@ -665,7 +666,7 @@ void QnPlOnvifResource::setMaxFps(int f)
     setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
-int QnPlOnvifResource::getMaxFps()
+int QnPlOnvifResource::getMaxFps() const
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);

@@ -60,7 +60,7 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override; // does a lot of physical work 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     
 

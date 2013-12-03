@@ -207,7 +207,7 @@ public:
     bool hasParam(const QString &name) const;
 
     // return true if no error
-    bool getParam(const QString &name, QVariant &val, QnDomain domain);
+    bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
@@ -264,7 +264,7 @@ public:
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
 signals:
-    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
+    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
     void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
@@ -278,7 +278,7 @@ signals:
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
-    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
+    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result) const;
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!

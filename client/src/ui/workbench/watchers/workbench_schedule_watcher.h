@@ -9,7 +9,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchScheduleWatcher: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchScheduleWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchScheduleWatcher();
@@ -25,11 +25,11 @@ private:
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resource_scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
+    void at_resource_scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
 
 private:
     bool m_scheduleEnabled;
-    QSet<QnVirtualCameraResourcePtr> m_scheduleEnabledCameras;
+    QSet<QnSecurityCamResourcePtr> m_scheduleEnabledCameras;
 };
 
 

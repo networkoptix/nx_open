@@ -101,6 +101,11 @@ public:
 
         TIMESTAMP_CORNER,
 
+        /** Last used aspect ratio for resource item in grid layout. */
+        RESOURCE_ASPECT_RATIOS,
+
+        USER_IDLE_TIMEOUT_MSECS,
+
         VARIABLE_COUNT
     };
 
@@ -181,14 +186,16 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
+        QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           resourceAspectRatios,   setResourceAspectRatios,    RESOURCE_ASPECT_RATIOS,     QnAspectRatioHash())
+        QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
 
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
 
     QN_END_PROPERTY_STORAGE()
 
 private:
-    QSettings *m_settings;
     QNetworkAccessManager *m_accessManager;
+    QSettings *m_settings;
     bool m_loading;
 };
 

@@ -30,7 +30,7 @@ QnAbstractStreamDataProvider* QnPlDriodIpWebCamResource::createLiveDataProvider(
     return new QnPlDroidIpWebCamReader(toSharedPointer());
 }
 
-void QnPlDriodIpWebCamResource::setCropingPhysical(QRect /*croping*/)
+void QnPlDriodIpWebCamResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }

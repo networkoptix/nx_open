@@ -573,8 +573,10 @@ void QnServerSettingsDialog::sendNextArchiveRequest()
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
 
-void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int)
+void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
 {
+    Q_UNUSED(status)
+    Q_UNUSED(handle)
     m_lastRebuildReply = reply;
     ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
     bool inProgress = reply.state() == QnRebuildArchiveReply::Started;

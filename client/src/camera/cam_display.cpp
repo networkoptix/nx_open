@@ -946,7 +946,7 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
 {
     
     qint64 aTime = m_audioDisplay->startBufferingTime();
-    if (aTime == AV_NOPTS_VALUE)
+    if (aTime == (qint64)AV_NOPTS_VALUE)
         return false;
 
     return vTime > aTime;

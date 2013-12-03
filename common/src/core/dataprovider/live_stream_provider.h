@@ -43,9 +43,7 @@ public:
 
     void setUseSoftwareMotion(bool value);
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-    void updateSoftwareMotion();
-#endif
+    virtual void updateSoftwareMotion();
     bool canChangeStatus() const;
 
     virtual bool secondaryResolutionIsLarge() const { return false; }

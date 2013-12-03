@@ -70,11 +70,6 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     return new ThirdPartyStreamReader( toSharedPointer(), m_camManager.getRef() );
 }
 
-void QnThirdPartyResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
 void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
 {
     //TODO/IMPL
@@ -183,7 +178,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !regions.isEmpty() )
     {
         //filling in motion mask
-        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture() );
+        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::PIX_FMT_MONOBLACK ) );
 
         QRegion unitedRegion;
         for( QList<QRegion>::const_iterator
@@ -283,6 +278,7 @@ const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( 
 
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
     int result = m_camManager.getCameraInfo( &m_camInfo );
@@ -346,6 +342,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setAudioEnabled( true );
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
         setParam( lit("dts"), 1, QnDomainMemory );
+    if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
+        setMotionType( Qn::MT_HardwareGrid );
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )

@@ -79,11 +79,6 @@ bool QnActiResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnActiResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
 {
     QList<QByteArray> params = resolutionStr.split('x');
@@ -239,6 +234,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
 CameraDiagnostics::Result QnActiResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
+
     CLHttpStatus status;
         
     QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);
@@ -477,7 +474,7 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
-int QnActiResource::getMaxFps()
+int QnActiResource::getMaxFps() const
 {
     return m_availFps[0].last();
 }

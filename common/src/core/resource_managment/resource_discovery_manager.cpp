@@ -9,6 +9,7 @@
 
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/network_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_managment/camera_driver_restriction_list.h>
 #include <core/resource_managment/resource_searcher.h>
@@ -260,7 +261,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     {
         QList<QnResourcePtr> foundResources = itr.value().checkHostAddr();
         for (int i = 0; i < foundResources.size(); ++i) {
-            QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(foundResources.at(i));
+            QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(foundResources.at(i));
             if (camera)
                 camera->setManuallyAdded(true);
             resources << camera;
@@ -290,11 +291,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 it != lst.end();
                  )
             {
-                QnVirtualCameraResourcePtr virtCamRes = it->dynamicCast<QnVirtualCameraResource>();
+                QnSecurityCamResourcePtr camRes = it->dynamicCast<QnSecurityCamResource>();
                 //checking, if found resource is reserved by some other searcher
-                if( virtCamRes &&
+                if( camRes &&
                     m_cameraDriverRestrictionList &&
-                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), virtCamRes->getVendorName(), virtCamRes->getModel() ) )
+                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
                     continue;   //resource with such unique id is already present

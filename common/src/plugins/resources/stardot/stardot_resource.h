@@ -31,7 +31,7 @@ public:
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
     virtual bool hasDualStreaming() const override;
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
 
     QString getRtspUrl() const;
 
@@ -47,7 +47,6 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override;
     virtual bool isResourceAccessible() override;
     virtual void setMotionMaskPhysical(int channel) override;
 private:

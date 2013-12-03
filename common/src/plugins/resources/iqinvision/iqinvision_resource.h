@@ -24,7 +24,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     CLHttpStatus readOID(const QString& oid, QString& result);
     CLHttpStatus readOID(const QString& oid, int& result);

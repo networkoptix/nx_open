@@ -8,7 +8,7 @@ QnTestCameraResource::QnTestCameraResource()
 {
 }
 
-int QnTestCameraResource::getMaxFps()
+int QnTestCameraResource::getMaxFps() const
 {
     return 30;
 }
@@ -32,12 +32,6 @@ QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 {
     return new QnTestCameraStreamReader(toSharedPointer());
 }
-
-void QnTestCameraResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
 
 QString QnTestCameraResource::getHostAddress() const
 {

@@ -25,7 +25,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 };
 
 #endif //pulse_resource_h_1947

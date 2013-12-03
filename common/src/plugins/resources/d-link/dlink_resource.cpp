@@ -132,7 +132,7 @@ QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
     return new PlDlinkStreamReader(toSharedPointer());
 }
 
-void QnPlDlinkResource::setCropingPhysical(QRect /*croping*/)
+void QnPlDlinkResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -167,6 +167,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
 
     CLHttpStatus status;
     QByteArray cam_info_file = downloadFile(status, QLatin1String("config/stream_info.cgi"),  getHostAddress(), 80, 1000, getAuth());

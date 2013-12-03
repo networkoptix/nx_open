@@ -67,4 +67,5 @@ message Camera {
     optional bool              controlDisabled  = 16;
     optional int32             statusFlags      = 17;
     optional string            dewarpingParams  = 18;
+    optional string            vendor           = 19;
 }

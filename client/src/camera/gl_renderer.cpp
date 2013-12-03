@@ -25,7 +25,7 @@
 #include <ui/common/geometry.h>
 #include "ui/fisheye/fisheye_ptz_controller.h"
 
-#include "video_camera.h"
+#include <camera/client_video_camera.h>
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
@@ -291,9 +291,6 @@ ImageCorrectionResult QnGLRenderer::calcImageCorrection()
 
     return m_imageCorrector;
 }
-
-static qint64 gggCnt = 0;
-static qint64 gggTime = 0;
 
 void QnGLRenderer::drawYV12VideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,

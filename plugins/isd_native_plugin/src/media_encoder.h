@@ -7,6 +7,9 @@
 #define ILP_MEDIA_ENCODER_H
 
 #include <memory>
+#include <vector>
+
+#include <QString>
 
 #include <plugins/camera_plugin.h>
 
@@ -52,11 +55,22 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual nxcip::StreamReader* getLiveStreamReader() override;
 
+    void setMotionMask( nxcip::Picture* motionMask );
+
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
     unsigned int m_encoderNum;
+    nxcip::Picture* m_motionMask;
+    mutable bool m_fpsListRead;
+    mutable std::vector<float> m_supportedFpsList;
+    mutable bool m_resolutionListRead;
+    mutable std::vector<nxcip::ResolutionInfo> m_supportedResolutions;
+
+    int setCameraParam( const QString& request );
+    int getSupportedFps() const;
+    int getSupportedResolution() const;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

@@ -91,6 +91,8 @@ private slots:
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_searchRequestReply(int status, const QVariant &reply, int handle);
+
+    void updateStatus();
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 

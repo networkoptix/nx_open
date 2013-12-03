@@ -210,6 +210,14 @@ namespace Qn {
         LevelCount
     };
 
+    /**
+     * Modes of layout export.
+     */
+    enum LayoutExportMode {
+        LayoutLocalSave,
+        LayoutLocalSaveAs,
+        LayoutExport
+    };
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);

@@ -66,11 +66,9 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             case NameColumn:
                 result = camera->getName();
                 break;
-            case VendorColumn: {
-                QnResourceTypePtr resourceType = qnResTypePool->getResourceType(camera->getTypeId());
-                result = resourceType ? QVariant(resourceType->getManufacture()) : QVariant();
+            case VendorColumn:
+                result = camera->getVendor();
                 break;
-            }
             case ModelColumn:
                 result = camera->getModel();
                 break;

@@ -781,10 +781,12 @@ void QnStreamRecorder::setTimestampCorner(Qn::Corner pos)
     m_timestampCorner = pos;
 }
 
+#ifdef SIGN_FRAME_ENABLED
 void QnStreamRecorder::setSignLogo(const QImage& logo)
 {
     m_logo = logo;
 }
+#endif
 
 void QnStreamRecorder::setStorage(QnStorageResourcePtr storage)
 {

@@ -43,7 +43,7 @@ QString QnEnvironment::searchInPath(QString executable) {
 }
 
 void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
-    QString layoutPrefix = QLatin1String("layout://"); //hack
+    QString layoutPrefix = QLatin1String("layout://"); //hack //TODO: #Elric think where to place this magic const to be available from here
     QString checkedPath(path);
     if (checkedPath.startsWith(layoutPrefix))
         checkedPath = checkedPath.remove(0, layoutPrefix.length());

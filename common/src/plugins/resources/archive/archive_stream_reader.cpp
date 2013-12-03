@@ -1241,5 +1241,5 @@ void QnArchiveStreamReader::resume()
 
 bool QnArchiveStreamReader::isRealTimeSource() const
 {
-    return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
+    return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == (qint64)AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
 }

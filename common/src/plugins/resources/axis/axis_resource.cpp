@@ -56,7 +56,7 @@ bool QnPlAxisResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
+void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -268,6 +268,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 
 CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
 
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
     {

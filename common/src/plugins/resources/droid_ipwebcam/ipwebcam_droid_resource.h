@@ -33,7 +33,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 };
 
 #endif //ipwebcam_droid_resource_h_1517

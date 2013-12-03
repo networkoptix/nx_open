@@ -425,16 +425,18 @@ namespace nxcip
 
         //!Returns pixel format
         virtual PixelFormat pixelFormat() const = 0;
+        //!Returns number of planes in picture (this depends on format)
+        virtual int planeCount() const = 0;
         //!Width (pixels)
         virtual int width() const = 0;
         //!Height (pixels)
         virtual int height() const = 0;
-        //!Length of horizontal line in bytes
-        virtual int xStride() const = 0;
-        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-        virtual const void* scanLine( int lineNumber ) const = 0;
-        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-        virtual void* scanLine( int lineNumber ) = 0;
+        //!Length of horizontal line (in bytes) of plane \a planeNumber
+        virtual int xStride( int planeNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0) of plane \a planeNumber
+        virtual const void* scanLine( int planeNumber, int lineNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0) of plane \a planeNumber
+        virtual void* scanLine( int planeNumber, int lineNumber ) = 0;
         /*!
             \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
@@ -543,7 +545,8 @@ namespace nxcip
         //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability2
         { 
-            searchByMotionMaskCapability = 0x1000   //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            searchByMotionMaskCapability = 0x1000,  //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            motionRegionCapability = 0x2000         //!<if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
         };
 
         virtual ~BaseCameraManager2() {}
@@ -564,6 +567,16 @@ namespace nxcip
             \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
         */
         virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
+        //!If camera plugin implements this method, it MUST report motion only on for region specified (\a motionMask)
+        /*!
+            \param motionMask 8bpp (format \a nxcip::PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                pixel value designates motion sensitivity for pixel position.
+                255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
+                For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
+                If difference is less then value in a mask, motion is not detected.
+            \return \b NX_NO_ERROR on success, otherwise - error code
+        */
+        virtual int setMotionMask( Picture* motionMask ) = 0;
     };
 
 

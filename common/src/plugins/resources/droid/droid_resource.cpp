@@ -8,7 +8,7 @@ QnDroidResource::QnDroidResource()
 {
 }
 
-int QnDroidResource::getMaxFps()
+int QnDroidResource::getMaxFps() const
 {
     return 30;
 }
@@ -32,12 +32,6 @@ QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
 {
     return new PlDroidStreamReader(toSharedPointer());
 }
-
-void QnDroidResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
 
 QString QnDroidResource::getHostAddress() const
 {

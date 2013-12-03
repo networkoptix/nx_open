@@ -32,6 +32,8 @@ public:
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
     virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData) override;
+    //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
+    virtual void updateSoftwareMotion() override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -66,6 +68,7 @@ private:
     //!Returns resolution with pixel count equal or less than \a desiredResolution
     nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     QnAbstractMediaDataPtr readLiveStreamReader();
+    nxcip::Resolution getSecondStreamResolution( const nxcip_qt::CameraMediaEncoder& cameraEncoder );
 };
 
 #endif // THIRD_PARTY_STREAM_READER_H

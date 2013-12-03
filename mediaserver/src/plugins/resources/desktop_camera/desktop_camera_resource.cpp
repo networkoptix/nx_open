@@ -58,9 +58,4 @@ const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbs
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-CameraDiagnostics::Result QnDesktopCameraResource::initInternal()
-{
-    return CameraDiagnostics::NoErrorResult();
-}
-
 #endif //ENABLE_DESKTOP_CAMERA

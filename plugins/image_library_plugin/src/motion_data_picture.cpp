@@ -15,9 +15,9 @@ MotionDataPicture::MotionDataPicture()
 :
     m_refManager( this ),
     m_data( NULL ),
-    m_width( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
-    m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT ),
-    m_stride( nxpt::alignUp( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, CHAR_BIT ) / CHAR_BIT )
+    m_width( nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT ),
+    m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
+    m_stride( nxpt::alignUp( m_width, CHAR_BIT ) / CHAR_BIT )
 {
     m_data = static_cast<uint8_t*>(nxpt::mallocAligned( m_stride*m_height, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT ));
     memset( m_data, 0, m_stride*m_height );
@@ -63,31 +63,36 @@ nxcip::PixelFormat MotionDataPicture::pixelFormat() const
     return nxcip::PIX_FMT_MONOBLACK;
 }
 
+int MotionDataPicture::planeCount() const
+{
+    return 1;
+}
+
 //!Width (pixels)
 int MotionDataPicture::width() const
 {
-    return nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH;
+    return m_width;
 }
 
 //!Height (pixels)
 int MotionDataPicture::height() const
 {
-    return nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT;
+    return m_height;
 }
 
 //!Length of horizontal line in bytes
-int MotionDataPicture::xStride() const
+int MotionDataPicture::xStride( int /*planeNumber*/ ) const
 {
     return m_stride;
 }
 
 //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-const void* MotionDataPicture::scanLine( int lineNumber ) const
+const void* MotionDataPicture::scanLine( int /*planeNumber*/, int lineNumber ) const
 {
     return m_data + m_stride*lineNumber;
 }
 
-void* MotionDataPicture::scanLine( int lineNumber )
+void* MotionDataPicture::scanLine( int /*planeNumber*/, int lineNumber )
 {
     return m_data + m_stride*lineNumber;
 }

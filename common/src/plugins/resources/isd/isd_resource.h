@@ -18,7 +18,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
 
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;
@@ -34,7 +34,7 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
 private:
     void setMaxFps(int f);

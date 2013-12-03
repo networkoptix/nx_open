@@ -104,7 +104,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     result->setTypeId(resourceTypeId);
     result->setPhysicalId(QString::fromUtf8(cameraInfo.uid));
 
-    unsigned int caps;
+    unsigned int caps = 0;
     if (camManager->getCameraCapabilities(&caps) == 0) 
     {
         if( caps & nxcip::BaseCameraManager::shareIpCapability )
@@ -130,7 +130,7 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url,
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        QString addressStr;
+        QString addressStr = url.scheme();
         if( url.scheme().isEmpty() )
         {
             //url is a host
@@ -139,8 +139,8 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url,
         }
         else
         {
-            //url is an URL!
-            addressStr = url.toString();
+            //url is an URL! or mswin path
+            addressStr = QUrl::fromPercentEncoding(url.toString().toLatin1());
         }
         const QString& userName = auth.user();
         const QString& password = auth.password();

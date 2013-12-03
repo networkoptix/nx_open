@@ -262,7 +262,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
         else
         {
             result = (buf && (bufSize > 0))
-                ? dest->write( buf, bufSize ) == bufSize
+                ? dest->write( buf, bufSize ) == (qint64)bufSize
                 : false;
             if( buf )
                 free( buf );
