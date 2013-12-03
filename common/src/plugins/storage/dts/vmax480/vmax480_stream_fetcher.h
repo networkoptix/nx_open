@@ -1,6 +1,8 @@
 #ifndef __VMAX480_STREAM_FETCHER_H__
 #define __VMAX480_STREAM_FETCHER_H__
 
+#ifdef ENABLE_VMAX
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QProcess>
 #include <QtCore/QSet>
@@ -119,4 +121,5 @@ private:
     bool m_needStop;
 };
 
+#endif #ifdef ENABLE_VMAX
 #endif // __VMAX480_STREAM_FETCHER_H__

@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_tcp_server.h"
 
 #include <QtCore/QElapsedTimer>
@@ -399,3 +401,5 @@ QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer
 {
     return new QnVMax480ConnectionProcessor(clientSocket, owner);
 }
+
+#endif // #ifdef ENABLE_VMAX

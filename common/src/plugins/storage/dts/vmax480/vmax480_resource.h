@@ -1,6 +1,8 @@
 #ifndef vmax480_resource_2047_h
 #define vmax480_resource_2047_h
 
+#ifdef ENABLE_VMAX
+
 #include "core/resource/camera_resource.h"
 #include "recording/time_period_list.h"
 
@@ -70,4 +72,5 @@ private:
 
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
 
+#endif // #ifdef ENABLE_VMAX
 #endif //vmax480_resource_2047_h

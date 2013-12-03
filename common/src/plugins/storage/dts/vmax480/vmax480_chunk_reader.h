@@ -1,6 +1,8 @@
 #ifndef __VMAX480_CHUNK_READER_H__
 #define __VMAX480_CHUNK_READER_H__
 
+#ifdef ENABLE_VMAX
+
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "vmax480_stream_fetcher.h"
 #include "utils/common/long_runnable.h"
@@ -44,4 +46,5 @@ private:
     bool m_gotAllData;
 };
 
+#endif // #ifdef ENABLE_VMAX
 #endif // __VMAX480_CHUNK_READER_H__
