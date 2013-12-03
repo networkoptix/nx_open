@@ -178,6 +178,23 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
 }
 #endif	//__i386
 
+inline bool mathImage_cpu(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+{
+    uint64_t* curPtr = (uint64_t*) data;
+    curPtr += maskStart*2;
+    uint64_t* maskHi = (uint64_t*) mask; 
+    uint64_t* maskLo = maskHi + 1; 
+
+    for (int i = maskStart; i <= maskEnd; ++i)
+    {
+        if (*curPtr++ & *maskHi)
+            return true;
+        if (*curPtr++ & *maskLo)
+            return true;
+    }
+    return false;
+}
+
 bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
@@ -187,10 +204,9 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
         return mathImage_sse2(data, mask, maskStart, maskEnd);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
-    return false;
+    return mathImage_cpu(data, mask, maskStart, maskEnd);
 #else
-    //TODO: C fallback routine
-    return false;
+    return mathImage_cpu(data, mask, maskStart, maskEnd);
 #endif
 }
 
@@ -226,10 +242,15 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
         src++;
 
     }
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
 #else
-    //TODO: C fallback routine
+    // remove without SIMD
+    int64_t* dst = (int64_t*) data.data();
+    int64_t* src = (int64_t*) image;
+    for (int i = startIndex; i <= endIndex; ++i)
+    {
+        *dst++ &= *src++;
+        *dst++ &= *src++;
+    }
 #endif
 }
 
@@ -336,10 +357,15 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
         src++;
 
     }
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
 #else
-    //TODO: C fallback routine
+    // remove without SIMD
+    int64_t* dst = (int64_t*) data.data();
+    int64_t* src = (int64_t*) image;
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    {
+        *dst++ |= *src++;
+        *dst++ |= *src++;
+    }
 #endif
 }
 
