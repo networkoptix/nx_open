@@ -244,7 +244,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
-    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(stateChanged(bool)), this,   SLOT(at_userInactivityWatcher_stateChanged(bool)));
+    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(stateChanged(bool)), this,   SLOT(setAutoPaused(bool)));
 
     updateLines();
     updateCalendar();
@@ -1113,6 +1113,38 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy() {
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());
 }
 
+void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
+    if (autoPaused == m_autoPaused)
+        return;
+
+    if (autoPaused) {
+        /* Collect all playing resources */
+        foreach (QnResourceWidget *widget, display()->widgets()) {
+            QnMediaResourceWidget *mediaResourceWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+            if (!mediaResourceWidget)
+                continue;
+
+            QnResourceDisplayPtr resourceDisplay = mediaResourceWidget->display();
+            if (resourceDisplay->isPaused())
+                continue;
+
+            bool isLive = resourceDisplay->archiveReader()->isRealTimeSource();
+            resourceDisplay->pause();
+            m_autoPausedResourceDisplays.insert(resourceDisplay, isLive);
+        }
+    } else if (m_autoPaused) {
+        for (QHash<QnResourceDisplayPtr, bool>::iterator itr = m_autoPausedResourceDisplays.begin(); itr != m_autoPausedResourceDisplays.end(); ++itr) {
+            itr.key()->play();
+            if (itr.value())
+                itr.key()->archiveReader()->jumpTo(DATETIME_NOW, 0);
+        }
+
+        m_autoPausedResourceDisplays.clear();
+    }
+
+    m_autoPaused = autoPaused;
+    action(Qn::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1429,16 +1461,4 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
     } else {
         m_timeSlider->setWindow(startMSec, endMSec, true);
     }
-}
-
-void QnWorkbenchNavigator::at_userInactivityWatcher_stateChanged(bool userIsInactive) {
-    if (userIsInactive != isPlaying())
-        return;
-
-    if (userIsInactive)
-        setPlayingTemporary(false);
-    else if (m_autoPaused)
-        setPlayingTemporary(true);
-
-    m_autoPaused = userIsInactive;
 }
