@@ -114,6 +114,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStrea
     const QnSecurityCamResourcePtr& cameraRes,
     QnVideoCamera* videoCamera )
 {
+    Q_UNUSED(cameraRes)
     QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
     if( !streamReader )
         return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown, "no stream reader" ); //NOTE we should never get here 

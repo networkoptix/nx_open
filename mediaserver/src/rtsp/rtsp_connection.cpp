@@ -201,6 +201,7 @@ public:
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
+    Q_UNUSED(_owner)
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()

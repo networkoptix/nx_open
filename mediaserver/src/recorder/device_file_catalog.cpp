@@ -371,7 +371,7 @@ bool DeviceFileCatalog::doRebuildArchive()
     qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
 
     QMap<qint64, Chunk> allChunks;
-    bool canceled = false;
+//    bool canceled = false;
     foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages()) {
         if (m_rebuildArchive == Rebuild_None) {
             return false;
@@ -527,9 +527,6 @@ void DeviceFileCatalog::rewriteCatalog(bool isLastRecordRecording)
 
         if (m_file.remove())
             newFile.rename(m_file.fileName());
-        else {
-            int gg = 4;
-        }
         m_file.open(QFile::ReadWrite);
         m_file.seek(m_file.size());
     }
@@ -580,7 +577,6 @@ void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
 void DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
-    qint64 rez = 0;
     for (int i = 0; i < count; ++i)
         deleteFirstRecord();
 }

@@ -543,7 +543,7 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 
             if (!i->buffering)
                 d->bufferingCnt++;
             i->buffering = true;
-            if (bufferingTime != AV_NOPTS_VALUE)
+            if (bufferingTime != (qint64)AV_NOPTS_VALUE)
                 d->bufferingTime = bufferingTime;
             break;
             break;

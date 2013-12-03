@@ -31,6 +31,9 @@ void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStre
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 

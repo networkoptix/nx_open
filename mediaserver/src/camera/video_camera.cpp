@@ -165,7 +165,7 @@ QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bo
         return result;
     }
 
-    for (int i = 0; i < m_lastKeyFrames.size(); ++i)
+    for (int i = 0; i < (int)m_lastKeyFrames.size(); ++i)
     {
         if (m_lastKeyFrames[i]->timestamp >= time) {
             if (iFrameAfterTime || m_lastKeyFrames[i]->timestamp == time || i == 0)

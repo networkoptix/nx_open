@@ -79,7 +79,7 @@ void PredefinedUsageCalculator::updateTree()
     if( !newTree )
         return;
 
-    std::auto_ptr<stree::AbstractNode> oldTree;
+    std::auto_ptr<stree::AbstractNode> oldTree; //TODO: #ak auto_ptr is deprecated
     {
         QMutexLocker lk( &m_treeMutex );
         oldTree = m_currentTree;
