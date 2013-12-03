@@ -82,7 +82,7 @@ QnServerCameraPtr QnServerCamera::findEnabledSubling()
     QMutexLocker lock(&m_mutex);
 
     if (!isDisabled())
-        return toSharedPointer().dynamicCast<QnServerCamera>();
+        return ::toSharedPointer(this);
 
     if (m_activeCamera && !m_activeCamera->isDisabled())
         return m_activeCamera;

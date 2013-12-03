@@ -2,6 +2,8 @@
 
 #include <common/common_module.h>
 
+#include <api/app_server_connection.h>
+
 // TODO: #Elric managment? rename to managEment
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource_managment/resource_data_pool.h>
@@ -9,6 +11,7 @@
 
 #include <core/ptz/mapped_ptz_controller.h>
 #include <core/ptz/relative_ptz_controller.h>
+
 
 QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
 	base_type(parent)
@@ -78,6 +81,10 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
 
 	if(data.relativeController)
 		data.defaultController = data.relativeController;
+
+    resource->setPtzCapabilities(data.defaultController->getCapabilities());
+    QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
+
 
 	m_dataByResource.insert(resource, data);
 }

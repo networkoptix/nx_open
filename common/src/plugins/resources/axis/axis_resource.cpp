@@ -379,7 +379,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
     {
         QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 
