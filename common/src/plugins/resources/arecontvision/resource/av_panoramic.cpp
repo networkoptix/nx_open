@@ -137,6 +137,7 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
 
 CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     const CameraDiagnostics::Result result = QnPlAreconVisionResource::initInternal();
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;

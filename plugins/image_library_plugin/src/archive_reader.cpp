@@ -24,7 +24,8 @@ ArchiveReader::ArchiveReader(
         &m_refManager,
         m_dirContentsManager,
         frameDurationUsec,
-        false ) );
+        false,
+        0 ) );  //TODO
 }
 
 ArchiveReader::~ArchiveReader()

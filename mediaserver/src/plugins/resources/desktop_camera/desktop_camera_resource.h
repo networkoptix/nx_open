@@ -26,16 +26,13 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int frames, int timems) {}
-
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual void setIframeDistance(int frames, int timems) { Q_UNUSED(frames) Q_UNUSED(timems) }
 
     virtual bool shoudResolveConflicts() const override { return false; }
 
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override {}
 
     virtual bool isResourceAccessible() override;
 

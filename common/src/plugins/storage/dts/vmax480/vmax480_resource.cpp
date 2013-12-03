@@ -30,7 +30,7 @@ QnPlVmax480Resource::~QnPlVmax480Resource()
     }
 }
 
-int QnPlVmax480Resource::getMaxFps() 
+int QnPlVmax480Resource::getMaxFps() const
 {
     return 30;
 }
@@ -138,15 +138,9 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-
-void QnPlVmax480Resource::setCropingPhysical(QRect croping)
-{
-    Q_UNUSED(croping)
-}
-
 CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
-
+    QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();

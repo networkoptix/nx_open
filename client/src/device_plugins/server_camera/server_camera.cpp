@@ -38,9 +38,9 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-void QnServerCamera::setCropingPhysical(QRect croping)
+void QnServerCamera::setCroppingPhysical(QRect cropping)
 {
-    Q_UNUSED(croping)
+    Q_UNUSED(cropping)
 }
 
 const QnResourceVideoLayout* QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)

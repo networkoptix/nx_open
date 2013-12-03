@@ -1,7 +1,7 @@
 #include "workbench_schedule_watcher.h"
 
 #include <core/resource_managment/resource_pool.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/security_cam_resource.h>
 
 QnWorkbenchScheduleWatcher::QnWorkbenchScheduleWatcher(QObject *parent):
     QObject(parent),
@@ -36,11 +36,11 @@ void QnWorkbenchScheduleWatcher::updateScheduleEnabled() {
 }
 
 void QnWorkbenchScheduleWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if(!camera)
         return;
 
-    connect(camera.data(), SIGNAL(scheduleDisabledChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_resource_scheduleDisabledChanged(const QnVirtualCameraResourcePtr &)));
+    connect(camera.data(), SIGNAL(scheduleDisabledChanged(const QnSecurityCamResourcePtr &)), this, SLOT(at_resource_scheduleDisabledChanged(const QnSecurityCamResourcePtr &)));
 
     if(!camera->isScheduleDisabled())
         m_scheduleEnabledCameras.insert(camera);
@@ -49,7 +49,7 @@ void QnWorkbenchScheduleWatcher::at_resourcePool_resourceAdded(const QnResourceP
 }
 
 void QnWorkbenchScheduleWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if(!camera)
         return;
 
@@ -60,7 +60,7 @@ void QnWorkbenchScheduleWatcher::at_resourcePool_resourceRemoved(const QnResourc
     updateScheduleEnabled();
 }
 
-void QnWorkbenchScheduleWatcher::at_resource_scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource) {
+void QnWorkbenchScheduleWatcher::at_resource_scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource) {
     if(resource->isScheduleDisabled()) {
         m_scheduleEnabledCameras.remove(resource);
     } else {

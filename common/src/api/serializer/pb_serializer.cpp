@@ -120,6 +120,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setModel(QString::fromUtf8(pb_camera.model().c_str()));
     vCamera->setFirmware(QString::fromUtf8(pb_camera.firmware().c_str()));
+    vCamera->setVendor(QString::fromUtf8(pb_camera.vendor().c_str()));
 
     vCamera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
@@ -426,6 +427,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
     pb_camera.set_groupid(cameraPtr->getGroupId().toUtf8().constData());
     pb_camera.set_groupname(cameraPtr->getGroupName().toUtf8().constData());
+    pb_camera.set_vendor(cameraPtr->getVendor().toUtf8().constData());
 
     pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
     pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());

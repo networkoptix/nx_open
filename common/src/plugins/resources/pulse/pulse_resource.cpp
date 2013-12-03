@@ -32,7 +32,7 @@ QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
     return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
-void QnPlPulseResource::setCropingPhysical(QRect /*croping*/)
+void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
