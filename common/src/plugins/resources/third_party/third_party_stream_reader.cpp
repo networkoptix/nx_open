@@ -202,7 +202,7 @@ QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 
 void ThirdPartyStreamReader::pleaseStop()
 {
-    QnLongRunnable::pleaseStop();
+    CLServerPushStreamReader::pleaseStop();
     if( m_liveStreamReader )
         m_liveStreamReader->interrupt();
     else
