@@ -226,7 +226,7 @@ private:
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
     bool m_autoPaused;
-    QList<QnResourceDisplayPtr> m_autoPausedResourceDisplays;
+    QHash<QnResourceDisplayPtr, bool> m_autoPausedResourceDisplays;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;

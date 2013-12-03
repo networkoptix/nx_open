@@ -1128,12 +1128,16 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
             if (resourceDisplay->isPaused())
                 continue;
 
+            bool isLive = resourceDisplay->archiveReader()->isRealTimeSource();
             resourceDisplay->pause();
-            m_autoPausedResourceDisplays.append(resourceDisplay);
+            m_autoPausedResourceDisplays.insert(resourceDisplay, isLive);
         }
     } else if (m_autoPaused) {
-        foreach (const QnResourceDisplayPtr &resourceDisplay, m_autoPausedResourceDisplays)
-            resourceDisplay->play();
+        for (QHash<QnResourceDisplayPtr, bool>::iterator itr = m_autoPausedResourceDisplays.begin(); itr != m_autoPausedResourceDisplays.end(); ++itr) {
+            itr.key()->play();
+            if (itr.value())
+                itr.key()->archiveReader()->jumpTo(DATETIME_NOW, 0);
+        }
 
         m_autoPausedResourceDisplays.clear();
     }
