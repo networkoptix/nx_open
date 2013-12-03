@@ -78,7 +78,7 @@ public:
     {
         setAcceptedMouseButtons(0);
 
-        setPen(ptzArrowBorderColor);
+        setPen(QPen(ptzArrowBorderColor, 0.0));
         setBrush(ptzArrowBaseColor);
     }
 
@@ -155,7 +155,7 @@ public:
 
         setSize(QSizeF(32, 32));
         setBrush(Qt::NoBrush);
-        setPen(ptzItemBorderColor);
+        setPen(QPen(ptzItemBorderColor, 0.0));
     }
 
     const QSizeF &size() const {
@@ -403,7 +403,7 @@ public:
         }
 #endif
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor));
+        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor, 0.0));
         painter->drawLines(crosshairLines);
         Q_UNUSED(penRollback)
     }
@@ -560,7 +560,7 @@ void PtzInstrument::ensureSelectionItem() {
 
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(ptzItemBorderColor);
+    selectionItem()->setPen(QPen(ptzItemBorderColor, 0.0));
     selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);

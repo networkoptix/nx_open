@@ -58,8 +58,8 @@ class FixedArSelectionItem: public SelectionItem {
 
 public:
     enum Option {
-        DrawCentralElement,
-        DrawSideElements
+        DrawCentralElement = 0x1,
+        DrawSideElements   = 0x2
     };
     Q_DECLARE_FLAGS(Options, Option)
 
