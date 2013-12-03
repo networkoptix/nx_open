@@ -445,6 +445,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 int serverMain(int argc, char *argv[])
 {
+    Q_UNUSED(argc)
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif

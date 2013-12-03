@@ -143,7 +143,7 @@ void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
     m_archiveReader->setReverseMode(
         ++m_cSeq,
         value,
-        (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
+        (displayTime == 0 || displayTime == (qint64)AV_NOPTS_VALUE)
             ? nxcip::INVALID_TIMESTAMP_VALUE
             : displayTime,
         &actualSelectedTimestamp );

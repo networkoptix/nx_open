@@ -79,6 +79,7 @@ qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const
 
 bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed)
 {
+    Q_UNUSED(consumer)
     m_lastSpeed = speed;
 
     if (!safeOpen())

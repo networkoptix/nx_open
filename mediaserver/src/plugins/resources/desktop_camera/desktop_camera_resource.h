@@ -30,7 +30,7 @@ public:
 
     virtual bool shoudResolveConflicts() const override { return false; }
 
-    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
+    virtual bool setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

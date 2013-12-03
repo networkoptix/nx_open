@@ -78,7 +78,7 @@ void QnVMax480ConnectionProcessor::vMaxDisconnect()
         quint8 dummy[1];
         d->socket->recv(dummy, sizeof(dummy));
     }
-    int waitTime = t.elapsed();
+//    int waitTime = t.elapsed();
     d->socket->close();
 }
 

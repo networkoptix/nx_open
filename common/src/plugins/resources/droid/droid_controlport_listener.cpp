@@ -28,7 +28,7 @@ class QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessorPrivate
 QnDroidControlPortProcessor::QnDroidControlPortProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(socket)
 {
-
+    Q_UNUSED(owner)
 }
 
 QnDroidControlPortProcessor::~QnDroidControlPortProcessor()

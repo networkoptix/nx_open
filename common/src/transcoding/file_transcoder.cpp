@@ -286,7 +286,7 @@ void FileTranscoder::setDest( QIODevice* dest )
 
 bool FileTranscoder::openFiles()
 {
-    std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
+    std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() ); //TODO: #ak auto_ptr is deprecated
 
     QnResourcePtr res( new DummyResource() );
     res->setUrl( m_srcFilePath );

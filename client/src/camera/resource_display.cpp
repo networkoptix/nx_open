@@ -171,6 +171,13 @@ void QnResourceDisplay::play() {
     //    m_camera->getCamDisplay()->playAudio(m_playing);
 }
 
+void QnResourceDisplay::pause() {
+    if(m_archiveReader == NULL)
+        return;
+
+    m_archiveReader->pauseMedia();
+}
+
 bool QnResourceDisplay::isPaused() {
     if(m_archiveReader == NULL)
         return false;

@@ -70,11 +70,7 @@ AudioPlayer::ResultCode AudioPlayer::playbackResultCode() const
 
 bool AudioPlayer::playAsync( QIODevice* dataSource )
 {
-#if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#else
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#endif
     if( !audioPlayer->open( dataSource ) )
         return false;
 
@@ -87,11 +83,7 @@ bool AudioPlayer::playAsync( QIODevice* dataSource )
 
 bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const char *slot)
 {
-#if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#else
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#endif
     if( !audioPlayer->open( filePath ) )
         return false;
 
@@ -106,11 +98,7 @@ bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const
 
 bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char *slot)
 {
-#if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#else
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#endif
     if( !audioPlayer->prepareTextPlayback( text ) )
         return false;
 

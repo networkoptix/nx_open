@@ -1341,7 +1341,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         confRangeStart = confRangeEnd/m_maxChannels * getChannel();
         confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
 
-        if (confRangeEnd > confResponse.Configurations.size()) {
+        if (confRangeEnd > (int) confResponse.Configurations.size()) {
             qWarning() << "invalid channel number " << getChannel()+1 << "for camera" << getHostAddress() << "max channels=" << m_maxChannels;
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
         }
@@ -1745,7 +1745,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
         soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
         if (soapRes != SOAP_OK)
             return false;
-        if (confResponse.Configurations.size() < m_maxChannels)
+        if ( (int)confResponse.Configurations.size() < m_maxChannels)
             m_maxChannels = confResponse.Configurations.size();
     }
 
@@ -1803,7 +1803,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
         if (soapRes != SOAP_OK)
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
 
-        if (confResponse.Configurations.size() < m_maxChannels)
+        if ( (int)confResponse.Configurations.size() < m_maxChannels)
             m_maxChannels = confResponse.Configurations.size();
     }
 
@@ -2408,7 +2408,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
     QString localAddress;
-    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) ) )
     {
         cl_log.log( QString::fromLatin1("Failed to connect to %1:%2 to determine local address. %3").

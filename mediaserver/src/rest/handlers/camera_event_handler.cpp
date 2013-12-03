@@ -18,6 +18,8 @@ int QnCameraEventHandler::executeGet(
     QByteArray& responseMessageBody,
     QByteArray& contentType )
 {
+    Q_UNUSED(responseMessageBody)
+    Q_UNUSED(contentType)
     Q_ASSERT( path.indexOf("api/camera_event") != -1 );
 
     const QStringList& pathParts = path.split('/');
@@ -45,5 +47,10 @@ int QnCameraEventHandler::executePost(
     QByteArray& responseMessageBody,
     QByteArray& contentType )
 {
+    Q_UNUSED(path)
+    Q_UNUSED(params)
+    Q_UNUSED(requestBody)
+    Q_UNUSED(responseMessageBody)
+    Q_UNUSED(contentType)
     return nx_http::StatusCode::notImplemented;
 }
