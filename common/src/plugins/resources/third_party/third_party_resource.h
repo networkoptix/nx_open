@@ -82,7 +82,7 @@ public:
         unsigned long int timestamp ) override;
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
-
+    virtual bool hasDualStreaming() const override;
 protected:
     //!Implementation of QnResource::initInternal
     virtual CameraDiagnostics::Result initInternal() override;
@@ -108,6 +108,7 @@ private:
     std::auto_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
     QAtomicInt m_refCounter;
     QString m_defaultOutputID;
+    int m_encoderCount;
 
     bool initializeIOPorts();
 };

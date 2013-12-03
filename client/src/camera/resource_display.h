@@ -112,6 +112,8 @@ public:
 
     void play();
 
+    void pause();
+
     bool isStillImage() const;
 
     /**
