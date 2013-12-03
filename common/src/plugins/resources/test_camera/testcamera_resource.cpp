@@ -33,12 +33,6 @@ QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
     return new QnTestCameraStreamReader(toSharedPointer());
 }
 
-void QnTestCameraResource::setCroppingPhysical(QRect /*cropping*/)
-{
-
-}
-
-
 QString QnTestCameraResource::getHostAddress() const
 {
     QString url = getUrl();

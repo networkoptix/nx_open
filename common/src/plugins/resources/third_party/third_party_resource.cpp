@@ -70,11 +70,6 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     return new ThirdPartyStreamReader( toSharedPointer(), m_camManager.getRef() );
 }
 
-void QnThirdPartyResource::setCroppingPhysical(QRect /*cropping*/)
-{
-
-}
-
 void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
 {
     //TODO/IMPL

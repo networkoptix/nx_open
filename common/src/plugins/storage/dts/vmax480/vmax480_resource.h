@@ -48,7 +48,6 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual void setCroppingPhysical(QRect cropping) override;
     virtual CameraDiagnostics::Result initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
     QnPhysicalCameraResourcePtr getOtherResource(int channel);

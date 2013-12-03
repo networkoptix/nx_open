@@ -79,11 +79,6 @@ bool QnActiResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnActiResource::setCroppingPhysical(QRect /*cropping*/)
-{
-
-}
-
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
 {
     QList<QByteArray> params = resolutionStr.split('x');

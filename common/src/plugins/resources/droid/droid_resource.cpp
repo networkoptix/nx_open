@@ -33,12 +33,6 @@ QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
     return new PlDroidStreamReader(toSharedPointer());
 }
 
-void QnDroidResource::setCroppingPhysical(QRect /*cropping*/)
-{
-
-}
-
-
 QString QnDroidResource::getHostAddress() const
 {
     QString url = getUrl();

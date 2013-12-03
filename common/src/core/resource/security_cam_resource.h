@@ -57,11 +57,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
-    QRect getCropping(QnDomain domain) const;
-
-    /** Sets cropping. rect is in the percents from 0 to 100 */
-    void setCropping(QRect cropping, QnDomain domain);
-
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
     QList<QnMotionRegion> getMotionRegionList() const;
@@ -220,7 +215,6 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setCroppingPhysical(QRect cropping) = 0;
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting
     /*!

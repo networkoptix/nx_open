@@ -138,12 +138,6 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-
-void QnPlVmax480Resource::setCroppingPhysical(QRect cropping)
-{
-    Q_UNUSED(cropping)
-}
-
 CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();

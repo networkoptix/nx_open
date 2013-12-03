@@ -47,7 +47,6 @@ public:
 
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-    virtual void setCroppingPhysical(QRect cropping);
 
     //virtual QnMediaInfo getMediaInfo() const;
 

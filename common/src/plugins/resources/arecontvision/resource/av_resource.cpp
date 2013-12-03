@@ -207,8 +207,19 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
-    QRect rect = getCropping(QnDomainMemory);
-    setCroppingPhysical(rect);
+    
+    {
+        // TODO: #Elric is this needed? This was a call to setCroppingPhysical
+        QVariant maxSensorWidth;
+        QVariant maxSensorHight;
+        getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
+        getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
+
+        setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
+    }
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
@@ -296,19 +307,6 @@ QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, 
 
 void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-}
-
-void QnPlAreconVisionResource::setCroppingPhysical(QRect /*cropping*/)
-{
-    QVariant maxSensorWidth;
-    QVariant maxSensorHight;
-    getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-    getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
-
-    setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
