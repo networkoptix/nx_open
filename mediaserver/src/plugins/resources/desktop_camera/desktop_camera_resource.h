@@ -33,7 +33,6 @@ public:
     virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCroppingPhysical(QRect cropping) override { Q_UNUSED(cropping) }
 
     virtual bool isResourceAccessible() override;
 
