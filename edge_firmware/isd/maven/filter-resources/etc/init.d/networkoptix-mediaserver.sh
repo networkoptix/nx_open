@@ -2,6 +2,7 @@
 
 RETVAL=0
 
+SERVICE_NAME=mediaserver
 CUSTOMIZATION=networkoptix
 PREFIX=/usr/local/apps/$CUSTOMIZATION/mediaserver/
 BIN_NAME=mediaserver
