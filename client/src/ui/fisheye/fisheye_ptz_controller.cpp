@@ -34,15 +34,15 @@ QnFisheyePtzController::~QnFisheyePtzController()
         m_renderer->setFisheyeController(0);
 }
 
-int QnFisheyePtzController::getLimits(QnPtzLimits *limits) {
+bool QnFisheyePtzController::getLimits(QnPtzLimits *limits) {
     return 1;
 }
 
-int QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
+bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
     return 1;
 }
 
-int QnFisheyePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnFisheyePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
     return 1;
 }
 
@@ -83,12 +83,12 @@ void QnFisheyePtzController::addRenderer(QnResourceWidgetRenderer* renderer)
     m_renderer->setFisheyeController(this);
 }
 
-int QnFisheyePtzController::continuousMove(const QVector3D &speed)
+bool QnFisheyePtzController::continuousMove(const QVector3D &speed)
 {
     m_motion = speed;
     m_lastTime = getUsecTimer();
     m_moveToAnimation = false;
-    return 0;
+    return true;
 }
 
 qreal QnFisheyePtzController::boundXAngle(qreal value, qreal fov) const
@@ -112,7 +112,7 @@ qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov, qreal aspectRa
         return qBound(m_yRange.min, value, m_yRange.max - yFov);
 }
 
-int QnFisheyePtzController::absoluteMove(const QVector3D &position)
+bool QnFisheyePtzController::absoluteMove(const QVector3D &position)
 {
     m_motion = QVector3D();
 
@@ -128,16 +128,16 @@ int QnFisheyePtzController::absoluteMove(const QVector3D &position)
         m_srcPos.xAngle -= M_PI * 2.0;
 
     m_moveToAnimation = true;
-    return 0;
+    return true;
 }
 
-int QnFisheyePtzController::getPosition(QVector3D *position)
+bool QnFisheyePtzController::getPosition(QVector3D *position)
 {
     position->setX(qRadiansToDegrees(m_dewarpingParams.xAngle));
     position->setY(qRadiansToDegrees(m_dewarpingParams.yAngle));
     position->setZ(m_dewarpingParams.fov);
 
-    return 0;
+    return true;
 }
 
 

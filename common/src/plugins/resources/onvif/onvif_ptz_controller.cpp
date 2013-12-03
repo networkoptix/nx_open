@@ -94,20 +94,18 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
 
-Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() 
-{
+Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() {
     return m_ptzCapabilities;
 }
 
-double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff)
-{
+double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff) {
     inputVelocity *= inputVelocity >= 0 ? nativeCoeff.first : -nativeCoeff.second;
     inputVelocity *= userCoeff;
     double rez = qBound(nativeCoeff.second, inputVelocity, nativeCoeff.first);
     return rez;
 }
 
-int QnOnvifPtzController::stopInternal() {
+bool QnOnvifPtzController::stopInternal() {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
@@ -119,17 +117,15 @@ int QnOnvifPtzController::stopInternal() {
     request.Zoom = &stopValue;
 
     _onvifPtz__StopResponse response;
-    int result = ptz.doStop(request, response);
-    if (result != SOAP_OK) {
+    if (ptz.doStop(request, response) != SOAP_OK) {
         qCritical() << "Error executing PTZ stop command for resource " << m_resource->getUniqueId() << ". Error: " << ptz.getLastError();
-        return 1;
+        return false;
     }
     
-    return 0;
+    return true;
 }
 
-int QnOnvifPtzController::moveInternal(const QVector3D &speed)
-{
+bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
@@ -157,16 +153,15 @@ int QnOnvifPtzController::moveInternal(const QVector3D &speed)
     request.Velocity = &onvifSpeed;
 
     _onvifPtz__ContinuousMoveResponse response;
-    int result = ptz.doContinuousMove(request, response);
-    if (result != SOAP_OK) {
+    if (ptz.doContinuousMove(request, response) != SOAP_OK) {
         qCritical() << "Error executing PTZ move command for resource " << m_resource->getUniqueId() << ". Error: " << ptz.getLastError();
-        return 1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
-int QnOnvifPtzController::continuousMove(const QVector3D &speed) {
+bool QnOnvifPtzController::continuousMove(const QVector3D &speed) {
     if(qFuzzyIsNull(speed) && !m_stopBroken) {
         return stopInternal();
     } else {
@@ -174,8 +169,7 @@ int QnOnvifPtzController::continuousMove(const QVector3D &speed) {
     }
 }
 
-int QnOnvifPtzController::absoluteMove(const QVector3D &position)
-{
+bool QnOnvifPtzController::absoluteMove(const QVector3D &position) {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     
@@ -207,17 +201,15 @@ int QnOnvifPtzController::absoluteMove(const QVector3D &position)
     request.Speed = &onvifSpeed;
 
     _onvifPtz__AbsoluteMoveResponse response;
-    int result = ptz.doAbsoluteMove(request, response);
-    if (result != SOAP_OK) {
+    if (ptz.doAbsoluteMove(request, response) != SOAP_OK) {
         qCritical() << "Error executing PTZ absolute move command for resource " << m_resource->getUniqueId() << ". Error: " << ptz.getLastError();
-        return 1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
-int QnOnvifPtzController::getPosition(QVector3D *position)
-{
+bool QnOnvifPtzController::getPosition(QVector3D *position) {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     
@@ -225,10 +217,9 @@ int QnOnvifPtzController::getPosition(QVector3D *position)
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
 
     _onvifPtz__GetStatusResponse response;
-    int result = ptz.doGetStatus(request, response);
-    if (result != SOAP_OK) {
+    if (ptz.doGetStatus(request, response) != SOAP_OK) {
         qCritical() << "Error executing PTZ move command for resource " << m_resource->getUniqueId() << ". Error: " << ptz.getLastError();
-        return 1;
+        return false;
     }
 
     *position = QVector3D();
@@ -243,19 +234,19 @@ int QnOnvifPtzController::getPosition(QVector3D *position)
         }
     }
 
-    return 0;
+    return true;
 }
 
-int QnOnvifPtzController::getLimits(QnPtzLimits *limits) {
-    return 1;
+bool QnOnvifPtzController::getLimits(QnPtzLimits *) {
+    return false;
 }
 
-int QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
-    return 1;
+bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
+    return false; // TODO: #PTZ #Elric
 }
 
-int QnOnvifPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
-    return 1;
+bool QnOnvifPtzController::relativeMove(qreal, const QRectF &) {
+    return false;
 }
 
 

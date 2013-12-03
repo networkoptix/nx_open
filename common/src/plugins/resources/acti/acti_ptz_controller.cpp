@@ -11,18 +11,16 @@ static const qreal ANALOG_ZOOM = 16.0;
 static const QString ENCODER_STR(lit("encoder"));
 
 namespace {
-    int sign2(qreal value)
-    {
+
+    int sign2(qreal value) {
         return value >= 0 ? 1 : -1;
     }
 
-    int sign3(qreal value)
-    {
+    int sign3(qreal value) {
         return value > 0 ? 1 : (value < 0 ? -1 : 0);
     }
 
-    int scaleValue(qreal value, int min, int max)
-    {
+    int scaleValue(qreal value, int min, int max) {
         if (value == 0)
             return 0;
 
@@ -50,8 +48,7 @@ namespace {
         {1000, 16.0},
     };
 
-    qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax)
-    {
+    qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax) {
         return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
     }
 
@@ -66,7 +63,7 @@ QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
     m_moveVelocity(0, 0),
     m_minAngle(0.0),
     m_maxAngle(0.0),
-    m_isFliped(false),
+    m_isFlipped(false),
     m_isMirrored(false)
 {
     init();
@@ -76,15 +73,14 @@ QnActiPtzController::~QnActiPtzController() {
     return;
 }
 
-void QnActiPtzController::init() 
-{
+void QnActiPtzController::init() {
     CLHttpStatus status;
     QByteArray zoomString = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_CAP_GET"), status, true);
     if (status != CL_HTTP_SUCCESS || !zoomString.startsWith("ZOOM_CAP_GET="))
         return;
 
     QByteArray flipMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_FLIP_MODE"), status);
-    m_isFliped = flipMode.toInt() == 1;
+    m_isFlipped = flipMode.toInt() == 1;
 
     QByteArray mirrorMode = m_resource->makeActiRequest(ENCODER_STR, lit("VIDEO_MIRROR_MODE"), status);
     m_isMirrored = mirrorMode.toInt() == 1;
@@ -99,7 +95,7 @@ void QnActiPtzController::init()
     qreal minTiltLogical = 0, maxTiltLogical = 9000; //  // todo: move to camera XML
     
     qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
-    if (!m_isFliped) {
+    if (!m_isFlipped) {
         qSwap(minTiltPhysical, maxTiltPhysical);
         m_capabilities &= ~Qn::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
     }
@@ -132,30 +128,29 @@ void QnActiPtzController::init()
 #endif
 }
 
-int QnActiPtzController::stopZoomInternal()
-{
+bool QnActiPtzController::stopZoomInternal() {
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM=STOP"), status);
-    int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
-    if (result == 0)
+    
+    bool result = status == CL_HTTP_SUCCESS;
+    if (result)
         m_zoomVelocity = 0.0;
     return result;
 }
 
-int QnActiPtzController::stopMoveInternal()
-{
+bool QnActiPtzController::stopMoveInternal() {
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("MOVE=STOP"), status);
-    int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
-    if (result == 0)
+    
+    bool result = status == CL_HTTP_SUCCESS;
+    if (result)
         m_moveVelocity = QPair<int, int>(0, 0);
     return result;
 }
 
-int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
-{
+bool QnActiPtzController::startZoomInternal(qreal zoomVelocity) {
     if (m_zoomVelocity == zoomVelocity)
-        return 0;
+        return true;
 
     stopZoomInternal();
 
@@ -164,25 +159,21 @@ int QnActiPtzController::startZoomInternal(qreal zoomVelocity)
 
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(ENCODER_STR, QString(lit("ZOOM=%1,%2")).arg(direction).arg(zoomVelocityI), status);
-    int result = (status == CL_HTTP_SUCCESS ? 0 : -1);
     
-    if (result == 0)
+    bool result = status == CL_HTTP_SUCCESS;
+    if (result)
         m_zoomVelocity = zoomVelocity;
-
     return result;
 }
 
-int QnActiPtzController::startMoveInternal(qreal xVelocityR, qreal yVelocityR)
-{
+bool QnActiPtzController::startMoveInternal(qreal xVelocityR, qreal yVelocityR) {
     stopMoveInternal();
 
-    if (!m_isFliped) {
+    if (!m_isFlipped)
         yVelocityR *= -1;
-    }
 
-
-    int xVelocity = qRound(xVelocityR*5.0);
-    int yVelocity = qRound(yVelocityR*5.0);
+    int xVelocity = qRound(xVelocityR * 5.0);
+    int yVelocity = qRound(yVelocityR * 5.0);
 
     if (m_moveVelocity.first == xVelocity && m_moveVelocity.second == yVelocity)
         return 0;
@@ -195,20 +186,19 @@ int QnActiPtzController::startMoveInternal(qreal xVelocityR, qreal yVelocityR)
     };
 
     QString direction = directions[1-sign3(yVelocity)][sign3(xVelocity)+1];
-    QString requestStr = QString(lit("MOVE=%1")).arg(direction);
+    QString requestStr = lit("MOVE=%1").arg(direction);
 
     if (xVelocity)
-        requestStr += QString(lit(",%1")).arg(qAbs(xVelocity));
+        requestStr += lit(",%1").arg(qAbs(xVelocity));
     if (yVelocity)
-        requestStr += QString(lit(",%1")).arg(qAbs(yVelocity));
+        requestStr += lit(",%1").arg(qAbs(yVelocity));
 
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(ENCODER_STR, requestStr, status);
-    int result =  (status == CL_HTTP_SUCCESS ? 0 : -1);
-
-    if (result == 0)
+    
+    bool result = status == CL_HTTP_SUCCESS;
+    if (result)
         m_moveVelocity = QPair<int, int>(xVelocity, yVelocity);
-
     return result;
 }
 
@@ -216,80 +206,75 @@ Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
     return m_capabilities;
 }
 
-int QnActiPtzController::continuousMove(const QVector3D &speed) 
-{
+bool QnActiPtzController::continuousMove(const QVector3D &speed) {
     QMutexLocker lock(&m_mutex);
 
-    int errCode1 = 0, errCode2 = 0;
-
+    bool status0;
     if (qFuzzyIsNull(speed.z())) {
-        errCode1 = stopZoomInternal();
+        status0 = stopZoomInternal();
     } else {
-        errCode1 = startZoomInternal(speed.z());
+        status0 = startZoomInternal(speed.z());
     }
 
+    bool status1;
     if (qFuzzyIsNull(speed.x()) && qFuzzyIsNull(speed.y())) {
-        errCode2 = stopMoveInternal();
+        status1 = stopMoveInternal();
     } else {
-        errCode2 = startMoveInternal(speed.x(), speed.y());
+        status1 = startMoveInternal(speed.x(), speed.y());
     }
 
-    return errCode1 ? errCode1 : (errCode2 ? errCode2 : 0);
+    return status0 && status1;
 }
 
-int QnActiPtzController::absoluteMove(const QVector3D &position) 
-{
+bool QnActiPtzController::absoluteMove(const QVector3D &position) {
     QMutexLocker lock(&m_mutex);
 
-    qreal zoomPos = qMax(0.0, (double) (position.z()-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
+    qreal zoomPos = qMax(0.0, (double) (position.z() - m_minAngle) / (m_maxAngle - m_minAngle) * 1000);
 
     CLHttpStatus status;
-
-    QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION=ABSOLUTE,%1,%2,5,5").arg(int(position.x())).arg(int(position.y())), status);
+    QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION=ABSOLUTE,%1,%2,5,5").arg(int(position.x())).arg(int(position.y())), status);
     if (status != CL_HTTP_SUCCESS)
-        return -1;
+        return false;
 
-    result = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM=DIRECT,%1").arg(zoomPos), status);
+    data = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM=DIRECT,%1").arg(zoomPos), status);
     if (status != CL_HTTP_SUCCESS)
-        return -1;
+        return false;
 
-    return 0;
+    return true;
 }
 
-int QnActiPtzController::getPosition(QVector3D *position) 
-{
+bool QnActiPtzController::getPosition(QVector3D *position) {
     QMutexLocker lock(&m_mutex);
-
-    CLHttpStatus status;
 
     *position = QVector3D();
 
-    QByteArray result = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION_GET"), status);
+    CLHttpStatus status;
+    QByteArray data = m_resource->makeActiRequest(ENCODER_STR, lit("POSITION_GET"), status);
     if (status != CL_HTTP_SUCCESS)
-        return -1;
-    QList<QByteArray> params = result.split(',');
+        return false;
+
+    QList<QByteArray> params = data.split(',');
     if (params.size() != 2)
-        return -2;
+        return false;
     position->setX(params[0].toInt());
     position->setY(params[1].toInt());
 
-    result = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_POSITION"), status);
+    data = m_resource->makeActiRequest(ENCODER_STR, lit("ZOOM_POSITION"), status);
     if (status != CL_HTTP_SUCCESS)
-        return -1;
+        return false;
 
-    position->setZ(result.toInt());
-
-    return 0;
+    position->setZ(data.toInt());
+    return true;
 }
 
-int QnActiPtzController::getFlip(Qt::Orientations *flip) {
-    return 1;
+bool QnActiPtzController::getFlip(Qt::Orientations *flip) {
+    return false; // TODO: #PTZ
 }
 
-int QnActiPtzController::getLimits(QnPtzLimits *limits) {
-    return 1; // TODO: #Elric
+bool QnActiPtzController::getLimits(QnPtzLimits *limits) {
+    return false; // TODO: #Elric #PTZ
 }
 
-int QnActiPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
-    return 1;
+bool QnActiPtzController::relativeMove(qreal, const QRectF &) {
+    return false;
 }

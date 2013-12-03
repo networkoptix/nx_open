@@ -13,22 +13,21 @@ Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::LogicalPositionSpaceCapability;
 }
 
-int QnMappedPtzController::absoluteMove(const QVector3D &position) {
+bool QnMappedPtzController::absoluteMove(const QVector3D &position) {
     return base_type::absoluteMove(m_mapper->logicalToDevice(position));
 }
 
-int QnMappedPtzController::getPosition(QVector3D *position) {
+bool QnMappedPtzController::getPosition(QVector3D *position) {
     QVector3D devicePosition;
-    int result = base_type::getPosition(&devicePosition);
-    if(result != 0)
-        return result;
+    if(!base_type::getPosition(&devicePosition))
+        return false;
     
     *position = m_mapper->deviceToLogical(devicePosition);
-    return result;
+    return true;
 }
 
-int QnMappedPtzController::getLimits(QnPtzLimits *limits) {
+bool QnMappedPtzController::getLimits(QnPtzLimits *limits) {
     *limits = m_mapper->logicalLimits();
-    return 0;
+    return true;
 }
 

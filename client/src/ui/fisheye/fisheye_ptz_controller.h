@@ -32,14 +32,14 @@ public:
     QnFisheyePtzController(const QnMediaResourcePtr &resource);
     virtual ~QnFisheyePtzController();
 
-    virtual int continuousMove(const QVector3D &speed) override;
-    virtual int absoluteMove(const QVector3D &position) override;
-    virtual int getPosition(QVector3D *position) override;
+    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool absoluteMove(const QVector3D &position) override;
+    virtual bool getPosition(QVector3D *position) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
 
-    virtual int getLimits(QnPtzLimits *limits) override;
-    virtual int getFlip(Qt::Orientations *flip) override;
-    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
+    virtual bool getLimits(QnPtzLimits *limits) override;
+    virtual bool getFlip(Qt::Orientations *flip) override;
+    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
     void addRenderer(QnResourceWidgetRenderer* renderer);
     //void setAspectRatio(float aspectRatio);

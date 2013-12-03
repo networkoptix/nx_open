@@ -18,16 +18,16 @@ Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::ScreenSpaceMovementCapability;
 }
 
-int QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
     // TODO: #Elric cache it!
     QnPtzLimits limits;
-    if(getLimits(&limits) != 0)
-        return 1;
+    if(!getLimits(&limits))
+        return false;
 
     // TODO: #Elric cache it!
     QVector3D oldPosition;
-    if(getPosition(&oldPosition) != 0)
-        return 1;
+    if(!getPosition(&oldPosition))
+        return false;
 
     // TODO: #Elric also take flip into account.
 

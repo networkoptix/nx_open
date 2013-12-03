@@ -15,10 +15,7 @@
 /**
  * A thread-safe interface for accessing camera's PTZ functions.
  * 
- * Note that most of the functions of this interface return integer status codes,
- * with 0 for success and non-zero for failure.
- * 
- * Also note that standard PTZ space refers to degrees for pan, tilt and fov.
+ * Note that standard PTZ space refers to degrees for pan, tilt and fov.
  */
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
@@ -54,9 +51,9 @@ public:
      * the video stream. 
      * 
      * \param speed                     Movement speed. 
-     * \returns                         Status code.
+     * \returns                         Whether the operation was successful.
      */
-    virtual int continuousMove(const QVector3D &speed) = 0;
+    virtual bool continuousMove(const QVector3D &speed) = 0;
 
     /**
      * Sets camera PTZ position. If this controller has 
@@ -66,9 +63,9 @@ public:
      * can be safely used.
      *
      * \param position                  Position to move to.
-     * \returns                         Status code.
+     * \returns                         Whether the operation was successful.
      */
-    virtual int absoluteMove(const QVector3D &position) = 0;
+    virtual bool absoluteMove(const QVector3D &position) = 0;
 
     /**
      * Gets PTZ position from camera. If this controller has 
@@ -76,9 +73,9 @@ public:
      * standard PTZ space. Otherwise it's returned in device-specific coordinates.
      *
      * \param[out] position             Current ptz position. 
-     * \returns                         Status code.
+     * \returns                         Whether the operation was successful.
      */
-    virtual int getPosition(QVector3D *position) = 0;
+    virtual bool getPosition(QVector3D *position) = 0;
 
     /**
      * Gets PTZ limits of the camera in standard PTZ space. 
@@ -87,15 +84,15 @@ public:
      * <tt>Qn::LogicalPositionSpaceCapability<tt>.
      * 
      * \param[out] limits               Ptz limits.
-     * \returns                         Status code.
+     * \returns                         Whether the operation was successful.
      */
-    virtual int getLimits(QnPtzLimits *limits) = 0;
+    virtual bool getLimits(QnPtzLimits *limits) = 0;
 
     /**
      * \param[out] flip                 Flipped state of the camera's video stream.
-     * \returns                         Status code.
+     * \returns                         Whether the operation was successful.
      */
-    virtual int getFlip(Qt::Orientations *flip) = 0;
+    virtual bool getFlip(Qt::Orientations *flip) = 0;
 
     /**
      * Moves camera's viewport relative to current viewport. New viewport 
@@ -107,9 +104,9 @@ public:
      * 
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
-     * \returns                         Status code.
+     * \returns                         Whether the operation was successful.
      */
-    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
+    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
 protected:
     QnResourcePtr m_resource;

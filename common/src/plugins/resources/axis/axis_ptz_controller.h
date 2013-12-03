@@ -17,12 +17,12 @@ public:
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 
-    virtual int continuousMove(const QVector3D &speed) override;
-    virtual int getFlip(Qt::Orientations *flip) override;
-    virtual int absoluteMove(const QVector3D &position) override;
-    virtual int getPosition(QVector3D *position) override;
-    virtual int getLimits(QnPtzLimits *limits) override;
-    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
+    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool getFlip(Qt::Orientations *flip) override;
+    virtual bool absoluteMove(const QVector3D &position) override;
+    virtual bool getPosition(QVector3D *position) override;
+    virtual bool getLimits(QnPtzLimits *limits) override;
+    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
 private:
     void updateState();

@@ -28,36 +28,36 @@ Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
     return m_resource->getPtzCapabilities();
 }
 
-int QnRemotePtzController::continuousMove(const QVector3D &speed) {
+bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
     if(!m_server)
-        return 1;
+        return false;
 
     m_server->apiConnection()->ptzContinuousMoveAsync(m_resource, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_continuousMove_replyReceived(int, int)));
-    return 0;
+    return true;
 }
 
-int QnRemotePtzController::absoluteMove(const QVector3D &position) {
-    return 1;
+bool QnRemotePtzController::absoluteMove(const QVector3D &position) {
+    return false;
 }
 
-int QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
     if(!m_server)
-        return 1;
+        return false;
 
     m_server->apiConnection()->ptzRelativeMoveAsync(m_resource, aspectRatio, viewport, m_sequenceId, m_sequenceNumber++, this, SLOT(at_relativeMove_replyReceived(int, int)));
-    return 0;
+    return true;
 }
 
-int QnRemotePtzController::getPosition(QVector3D *) {
-    return 1;
+bool QnRemotePtzController::getPosition(QVector3D *) {
+    return false;
 }
 
-int QnRemotePtzController::getLimits(QnPtzLimits *) {
-    return 1;
+bool QnRemotePtzController::getLimits(QnPtzLimits *) {
+    return false;
 }
 
-int QnRemotePtzController::getFlip(Qt::Orientations *) {
-    return 1;
+bool QnRemotePtzController::getFlip(Qt::Orientations *) {
+    return false;
 }
 
 void QnRemotePtzController::at_continuousMove_replyReceived(int status, int handle) {

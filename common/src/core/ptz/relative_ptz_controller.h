@@ -11,7 +11,7 @@ public:
     QnRelativePtzController(const QnPtzControllerPtr &baseController);
     
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual int relativeMove(qreal aspectRatio, const QRectF &viewport) override;
+    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 };
 
 

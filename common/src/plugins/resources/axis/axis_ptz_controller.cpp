@@ -82,25 +82,25 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     if(ptzEnabled != lit("yes"))
         return;
 
-    if(params.value<bool>("root.PTZ.Various.V1.Locked"))
+    if(params.value<bool>("root.PTZ.Various.V1.Locked", false))
         return;
 
-    if(params.value<bool>("root.PTZ.Support.S1.ContinuousPan"))
+    if(params.value<bool>("root.PTZ.Support.S1.ContinuousPan", false))
         m_capabilities |= Qn::ContinuousPanCapability;
 
-    if(params.value<bool>("root.PTZ.Support.S1.ContinuousTilt"))
+    if(params.value<bool>("root.PTZ.Support.S1.ContinuousTilt", false))
         m_capabilities |= Qn::ContinuousTiltCapability;
 
-    if(params.value<bool>("root.PTZ.Support.S1.ContinuousZoom"))
+    if(params.value<bool>("root.PTZ.Support.S1.ContinuousZoom", false))
         m_capabilities |= Qn::ContinuousZoomCapability;
 
-    if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan"))
+    if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan", false))
         m_capabilities |= Qn::AbsolutePanCapability;
         
-    if(params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt"))
+    if(params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt", false))
         m_capabilities |= Qn::AbsoluteTiltCapability;
         
-    if(params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom"))
+    if(params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom", false))
         m_capabilities |= Qn::AbsoluteZoomCapability;
 
     if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled", true))
@@ -201,47 +201,45 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-int QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
+bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
+    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
 }
 
-int QnAxisPtzController::getFlip(Qt::Orientations *flip) {
+bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     *flip = m_flip;
-    return 0;
+    return true;
 }
 
-int QnAxisPtzController::absoluteMove(const QVector3D &position) {
-    return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())));
+bool QnAxisPtzController::absoluteMove(const QVector3D &position) {
+    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())));
 }
 
-int QnAxisPtzController::getPosition(QVector3D *position) {
+bool QnAxisPtzController::getPosition(QVector3D *position) {
     QnAxisParameterMap params;
-    int status = !query(lit("com/ptz.cgi?query=position"), &params);
-    if(status != 0)
-        return status;
+    if(!query(lit("com/ptz.cgi?query=position"), &params))
+        return false;
 
     qreal pan, tilt, zoom;
     if(params.value("pan", &pan) && params.value("tilt", &tilt) && params.value("zoom", &zoom)) {
         position->setX(pan);
         position->setY(tilt);
         position->setZ(m_cameraToLogicalZoom(zoom));
+        return true;
     } else {
         qnWarning("Failed to get PTZ position from camera %1. Malformed response.", m_resource->getName());
-        return 1;
+        return false;
     }
-
-    return 0;
 }
 
 Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
     return m_capabilities;
 }
 
-int QnAxisPtzController::getLimits(QnPtzLimits *limits) {
+bool QnAxisPtzController::getLimits(QnPtzLimits *limits) {
     *limits = m_limits;
-    return 0;
+    return true;
 }
 
-int QnAxisPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
-    return 1;
+bool QnAxisPtzController::relativeMove(qreal, const QRectF &) {
+    return false;
 }

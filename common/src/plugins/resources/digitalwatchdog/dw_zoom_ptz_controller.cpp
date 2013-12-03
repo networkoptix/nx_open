@@ -20,7 +20,7 @@ Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
     return Qn::ContinuousZoomCapability;
 }
 
-int QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
+bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
     CameraSetting setting(
         QLatin1String("%%Lens%%Zoom"),
         QLatin1String("Zoom"),
@@ -44,27 +44,27 @@ int QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
 
     m_resource->setParam(setting.getId(), setting.serializeToStr(), QnDomainPhysical);
 
-    return 0;
+    return true;
 }
 
-int QnDwZoomPtzController::absoluteMove(const QVector3D &) {
-    return 1;
+bool QnDwZoomPtzController::absoluteMove(const QVector3D &) {
+    return false;
 }
 
-int QnDwZoomPtzController::getPosition(QVector3D *) {
-    return 1;
+bool QnDwZoomPtzController::getPosition(QVector3D *) {
+    return false;
 }
 
-int QnDwZoomPtzController::getLimits(QnPtzLimits *) {
-    return 1;
+bool QnDwZoomPtzController::getLimits(QnPtzLimits *) {
+    return false;
 }
 
-int QnDwZoomPtzController::getFlip(Qt::Orientations *) {
-    return 1;
+bool QnDwZoomPtzController::getFlip(Qt::Orientations *) {
+    return false;
 }
 
-int QnDwZoomPtzController::relativeMove(qreal, const QRectF &) {
-    return 1;
+bool QnDwZoomPtzController::relativeMove(qreal, const QRectF &) {
+    return false;
 }
 
 #endif //ENABLE_ONVIF
