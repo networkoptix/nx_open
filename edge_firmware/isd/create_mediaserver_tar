@@ -76,8 +76,8 @@ cp $SRC_DIR/edge_firmware/isd/maven/filter-resources/usr/local/apps/networkoptix
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-cp $SRC_DIR/edge_firmware/isd/maven/filter-resources/etc/init.d/networkoptix-$MODULE_NAME.sh $BUILD_DIR/etc/init.d/
-chmod u+x,g+x $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME.sh
+cp $SRC_DIR/edge_firmware/isd/maven/filter-resources/etc/init.d/S99networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/
+chmod u+x,g+x $BUILD_DIR/etc/init.d/S99networkoptix-$MODULE_NAME
 
 
 #building package
