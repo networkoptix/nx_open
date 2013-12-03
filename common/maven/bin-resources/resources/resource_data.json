@@ -17,7 +17,7 @@
                 "SD8362", "SD83X3", "SD81X1", "SD83X1"
             ],
             "onvifPtzStopBroken": true
-        }
+        },
         {
             "keys": [
                 "AXIS Q6035-E"
@@ -68,8 +68,8 @@
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0.004167, 0.083333],
-                        "logical": [   35.25,    705.0],
+                        "device":  [    0,        1],
+                        "logical": [35.25,    705.0],
                         "space": "35MmEquiv"
                     }
                 }

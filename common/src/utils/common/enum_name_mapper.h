@@ -47,9 +47,8 @@ public:
     }
 
     void addValue(int value, const QString &name) {
-        assert(m_valueByName.contains(name) ? m_valueByName.value(name) == value : true);
-        
-        m_valueByName[name] = value;
+        if(!m_valueByName.contains(name))
+            m_valueByName[name] = value;
         if(!m_nameByValue.contains(value))
             m_nameByValue[value] = name;
     }

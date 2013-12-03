@@ -16,6 +16,8 @@
 #include <utils/common/connective.h>
 #include <utils/common/enum_name_mapper.h>
 
+#include <rest/server/json_rest_handler.h>
+
 namespace detail {
     template<class T>
     const char *check_type() { return NULL; }
@@ -85,8 +87,8 @@ protected:
 
         T reply;
         if(status == 0) {
-            QJsonObject object;
-            if(!QJson::deserialize(response.data, &object) || !QJson::deserialize(object, "reply", &reply)) {
+            QnJsonRestResult result;
+            if(!QJson::deserialize(response.data, &result) || !QJson::deserialize(result.reply(), &reply)) {
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
                 status = 1;
             }

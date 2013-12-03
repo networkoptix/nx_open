@@ -306,17 +306,16 @@ public:
         m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
         updateLayout();
+        showCursor();
     }
 
-    void hideCursor()
-    {
+    void hideCursor() {
         manipulatorWidget()->setCursor(Qt::BlankCursor);
         zoomInButton()->setCursor(Qt::BlankCursor);
         zoomOutButton()->setCursor(Qt::BlankCursor);
     }
 
-    void showCursor()
-    {
+    void showCursor() {
         manipulatorWidget()->setCursor(Qt::SizeAllCursor);
         zoomInButton()->setCursor(Qt::ArrowCursor);
         zoomOutButton()->setCursor(Qt::ArrowCursor);
@@ -1026,23 +1025,6 @@ void PtzInstrument::at_display_resourceAdded(const QnResourcePtr &resource) {
 
 void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource) {
     disconnect(resource, NULL, this, NULL);
-}
-
-void PtzInstrument::at_ptzController_positionChanged(const QnMediaResourceWidget* widget) {
-    if(!target() || target() != widget)
-        return;
-
-    PtzData &data = m_dataByWidget[target()];
-    QRectF rect = data.pendingAbsoluteMove;
-    if(rect.isNull())
-        return;
-
-    data.pendingAbsoluteMove = QRectF();
-    ptzMoveTo(target(), rect);
-}
-
-void PtzInstrument::at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource) {
-    updateCapabilities(resource);
 }
 
 void PtzInstrument::at_splashItem_destroyed() {

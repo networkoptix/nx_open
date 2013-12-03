@@ -21,7 +21,9 @@ protected:
 
 private:
     int executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+    int executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+    int executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
@@ -34,7 +36,6 @@ private:
         int sequence;
     };
 
-    QnEnumNameMapper m_actionNameMapper;
     bool m_detectAvailableOnly;
     
     QMap<QString, SequenceInfo> m_sequencedRequests;

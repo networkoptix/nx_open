@@ -65,33 +65,6 @@ namespace {
 } // anonymous namespace
 
 
-// TODO: #Elric move out
-inline void serialize(const QVector3D &value, QJsonValue *target) {
-    QJsonObject result;
-    QJson::serialize(value.x(), "x", &result);
-    QJson::serialize(value.y(), "y", &result);
-    QJson::serialize(value.z(), "z", &result);
-    *target = result;
-}
-
-inline bool deserialize(const QJsonValue &value, QVector3D *target) {
-    QJsonObject map;
-    if(!QJson::deserialize(value, &map))
-        return false;
-
-    qreal x, y, z;
-    if(
-        !QJson::deserialize(map, "x", &x) ||
-        !QJson::deserialize(map, "y", &y) ||
-        !QJson::deserialize(map, "z", &z)
-    ) {
-        return false;
-    }
-
-    *target = QVector3D(x, y, z);
-    return true;
-}
-
 inline void serialize(const PtzPresetData &value, QJsonValue *target) {
     QJsonObject result;
     QJson::serialize(value.cameraPhysicalId, "cameraPhysicalId", &result);

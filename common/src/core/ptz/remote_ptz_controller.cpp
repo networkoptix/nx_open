@@ -37,7 +37,11 @@ bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnRemotePtzController::absoluteMove(const QVector3D &position) {
-    return false;
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzAbsoluteMoveAsync(m_resource, position, m_sequenceId, m_sequenceNumber++, this, SLOT(at_absoluteMove_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
@@ -61,6 +65,10 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
 }
 
 void QnRemotePtzController::at_continuousMove_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_absoluteMove_replyReceived(int status, int handle) {
     return;
 }
 

@@ -166,13 +166,13 @@ namespace QJson {
      * Serializes the given value into a JSON string and returns it in the utf-8 format.
      *
      * \param value                     Value to serialize.
-     * \returns                         Result JSON string.
+     * \returns                         Result JSON data.
      */
     template<class T>
-    QString serialized(const T &value) {
+    QByteArray serialized(const T &value) {
         QByteArray result;
         QJson::serialize(value, &result);
-        return QString::fromUtf8(result);
+        return result;
     }
 
     /**
