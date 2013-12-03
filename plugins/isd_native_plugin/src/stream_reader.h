@@ -45,9 +45,11 @@ public:
     virtual void interrupt() override;
 
     void setMotionMask(const uint8_t* data);
+
 private:
-    bool StreamReader::needMetaData();
+    bool needMetaData();
     MotionDataPicture* getMotionData();
+
 private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNum;
