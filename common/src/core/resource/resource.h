@@ -272,6 +272,7 @@ signals:
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
+    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -289,7 +290,7 @@ signals:
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove bool param
 
-    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
+
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -324,6 +325,8 @@ protected:
         Inherited class implementation MUST call base class method first
     */
     virtual void initializationDone();
+
+    virtual void parameterValueChangedNotify(const QnParam &param);
 
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.

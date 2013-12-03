@@ -415,7 +415,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) c
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                emit parameterValueChanged(::toSharedPointer(const_cast<QnResource*>(this)), param);
+                const_cast<QnResource *>(this)->parameterValueChangedNotify(param); // TODO: wtf???
             }
             emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, newValue, true);
             return true;
@@ -432,6 +432,13 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) c
 
     emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
     return false;
+}
+
+void QnResource::parameterValueChangedNotify(const QnParam &param) {
+    if(param.name() == lit("ptzCapabilities"))
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+
+    emit parameterValueChanged(::toSharedPointer(this), param);
 }
 
 bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
@@ -487,7 +494,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        emit parameterValueChanged(::toSharedPointer(this), param);
+        parameterValueChangedNotify(param);
 
     emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;
@@ -980,7 +987,6 @@ bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
 void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
     if (hasParam(lit("ptzCapabilities")))
         setParam(lit("ptzCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
-    emit ptzCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
 }
 
 void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {

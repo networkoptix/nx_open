@@ -1,4 +1,3 @@
-
 #ifdef ENABLE_DESKTOP_CAMERA
 
 #include "desktop_camera_resource.h"
