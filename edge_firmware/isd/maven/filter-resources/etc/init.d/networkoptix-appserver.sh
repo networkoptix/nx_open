@@ -11,6 +11,7 @@ PYTHON_BIN_PATH=/usr/local/python-2.7-arm-2011.09/bin/$BIN_NAME
 
 start() {
     echo -n "Starting $SERVICE_NAME...... "
+    cd $PREFIX
     $PYTHON_BIN_PATH $PREFIX/runserver.py --protocols=http,https 2>/dev/null 1>&2&
     if [ `/bin/pidof $BIN_NAME` ]
     then

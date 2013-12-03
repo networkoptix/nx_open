@@ -13,7 +13,7 @@ export VMS_PLUGIN_DIR=$PREFIX/plugins
 
 start() {
     echo -n "Starting $BIN_NAME..... "
-    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf 2>/dev/null 1>&2&
+    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=none 2>/dev/null 1>&2&
     if [ `/bin/pidof $BIN_NAME` ]
     then
         echo "OK"
