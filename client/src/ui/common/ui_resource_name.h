@@ -5,4 +5,6 @@
 
 QString getResourceName(const QnResourcePtr& resource);
 
+QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &baseName);
+
 #endif // RESOURCE_NAME_UI_H
