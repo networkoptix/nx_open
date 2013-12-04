@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QEventLoop>
 #include <QtNetwork/QNetworkAccessManager>
 
 #include <utils/common/request_param.h>
@@ -120,6 +121,19 @@ public:
     const QVariant &reply() const { return m_reply; }
     template<class T>
     T reply() const { return m_reply.value<T>(); }
+
+    /**
+     * Starts an event loop waiting for the reply.
+     * 
+     * \returns                         Received request status.
+     */
+    int exec() {
+        QEventLoop loop;
+        connect(this, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
+        loop.exec();
+
+        return m_status;
+    }
 
 signals:
     void replyProcessed();

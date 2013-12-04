@@ -1844,12 +1844,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
         QnConnectionRequestResult result;
         connection->connectAsync(&result, SLOT(processReply(int, const QVariant &, int)));
-
-        QEventLoop loop;
-        connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
-        loop.exec();
-
-        if(result.status() != 0)
+        if(result.exec() != 0)
             return;
 
         connectionInfo = result.reply<QnConnectInfoPtr>();

@@ -1,6 +1,6 @@
 #include "remote_ptz_controller.h"
 
-#include <cassert>
+#include <QtCore/QEventLoop>
 
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -53,7 +53,26 @@ bool QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewpo
 }
 
 bool QnRemotePtzController::getPosition(QVector3D *) {
-    return false;
+    if(!m_server)
+        return false;
+
+    QnConnectionRequestResult result;
+    QEventLoop loop;
+    connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
+
+    m_server->apiConnection()->ptzGetPosition(&result, SLOT(processReply(int, const QVariant &, int)));
+
+    loop.exec();
+
+    if(result.status() != 0)
+        return;
+
+    connectionInfo = result.reply<QnConnectInfoPtr>();
+
+
+    //QnConnectionRequestResult
+
+    m_server->apiConnection()->ptzGetPosition(m_resource, this, SLOT());
 }
 
 bool QnRemotePtzController::getLimits(QnPtzLimits *) {
