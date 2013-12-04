@@ -280,7 +280,7 @@ QnStorageResourcePtr createStorage(const QString& path)
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
-    storage->setSpaceLimit(5ll * 1000000000);
+    storage->setSpaceLimit( QnStorageManager::DEFAULT_SPACE_LIMIT );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
 
     return storage;
