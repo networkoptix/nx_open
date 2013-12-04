@@ -1,6 +1,8 @@
 #ifndef pulse_resource_h_1947
 #define pulse_resource_h_1947
 
+#ifdef ENABLE_PULSE_CAMERA
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -28,4 +30,5 @@ protected:
     virtual void setCroppingPhysical(QRect cropping);
 };
 
+#endif // #ifdef ENABLE_PULSE_CAMERA
 #endif //pulse_resource_h_1947

@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_stream_fetcher.h"
 
 #include <QtCore/QCoreApplication>
@@ -574,3 +576,5 @@ void VMaxStreamFetcher::pleaseStopAll()
     foreach(VMaxStreamFetcher* fetcher, m_instances.values())
         fetcher->pleaseStop();
 }
+
+#endif // #ifdef ENABLE_VMAX

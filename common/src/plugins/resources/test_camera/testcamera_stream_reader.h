@@ -1,6 +1,8 @@
 #ifndef __TEST_CAMERA_STREAM_READER_H__
 #define __TEST_CAMERA_STREAM_READER_H__
 
+#ifdef ENABLE_TEST_CAMERA
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "testcamera_resource.h"
@@ -28,4 +30,5 @@ private:
     QnMediaContextPtr m_context;
 };
 
+#endif // #ifdef ENABLE_TEST_CAMERA
 #endif // __TEST_CAMERA_STREAM_READER_H__

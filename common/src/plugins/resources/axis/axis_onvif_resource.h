@@ -1,6 +1,7 @@
 #ifndef __AXIS_ONVIF_RESOURCE_H__
 #define __AXIS_ONVIF_RESOURCE_H__
 
+#ifdef ENABLE_AXIS
 #ifdef ENABLE_ONVIF
 
 #include <map>
@@ -32,5 +33,5 @@ public:
 typedef QnSharedResourcePointer<QnAxisOnvifResource> QnAxisOnvifResourcePtr;
 
 #endif  //ENABLE_ONVIF
-
+#endif // ENABLE_AXIS
 #endif //__AXIS_ONVIF_RESOURCE_H__

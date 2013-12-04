@@ -1,3 +1,5 @@
+#ifdef ENABLE_TEST_CAMERA
+
 #include "testcamera_resource.h"
 #include "testcamera_stream_reader.h"
 
@@ -57,3 +59,4 @@ bool QnTestCameraResource::shoudResolveConflicts() const
     return false;
 }
 
+#endif // #ifdef ENABLE_TEST_CAMERA

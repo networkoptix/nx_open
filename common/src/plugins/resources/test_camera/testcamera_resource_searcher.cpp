@@ -1,3 +1,5 @@
+#ifdef ENABLE_TEST_CAMERA
+
 #include "testcamera_resource_searcher.h"
 #include "testcamera_resource.h"
 #include "utils/network/nettools.h"
@@ -164,3 +166,4 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url
     return QList<QnResourcePtr>();
 }
 
+#endif // #ifdef ENABLE_TEST_CAMERA

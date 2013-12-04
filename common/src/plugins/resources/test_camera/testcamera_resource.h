@@ -1,6 +1,8 @@
 #ifndef __TEST_CAMERA_RESOURCE_H__
 #define __TEST_CAMERA_RESOURCE_H__
 
+#ifdef ENABLE_TEST_CAMERA
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 
@@ -31,4 +33,5 @@ private:
 
 typedef QnSharedResourcePointer<QnTestCameraResource> QnTestCameraResourcePtr;
 
+#endif // #ifdef ENABLE_TEST_CAMERA
 #endif //__TEST_CAMERA_RESOURCE_H__

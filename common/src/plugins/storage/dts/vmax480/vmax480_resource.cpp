@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_resource.h"
 #include "vmax480_live_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -260,3 +262,6 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 
     return m_chunks.intersected(period);
 }
+
+#endif // #ifdef ENABLE_VMAX
+

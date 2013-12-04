@@ -1,3 +1,5 @@
+#ifdef ENABLE_IQE
+
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource_searcher.h"
 #include "iqinvision_resource.h"
@@ -266,3 +268,4 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 
 }
 
+#endif // #ifdef ENABLE_IQE

@@ -1,3 +1,4 @@
+#ifdef ENABLE_PULSE_CAMERA
 
 #include "pulse_searcher_helper.h"
 #include "utils/network/nettools.h"
@@ -106,3 +107,5 @@ QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(const QByt
 
     return result;
 }
+
+#endif // #ifdef ENABLE_PULSE_CAMERA

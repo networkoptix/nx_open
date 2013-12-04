@@ -1,3 +1,4 @@
+#ifdef ENABLE_VMAX
 
 #include "vmax480_archive_delegate.h"
 
@@ -290,3 +291,5 @@ bool QnVMax480ArchiveDelegate::isStopping() const
 {
     return m_needStop;
 }
+
+#endif // #ifdef ENABLE_VMAX

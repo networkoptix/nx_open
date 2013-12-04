@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
@@ -388,4 +390,4 @@ QString QnPlVmax480ResourceSearcher::manufacture() const
     return QLatin1String(QnPlVmax480Resource::MANUFACTURE);
 }
 
-
+#endif // #ifdef ENABLE_VMAX

@@ -1,4 +1,4 @@
-
+#ifdef ENABLE_AXIS
 #ifdef ENABLE_ONVIF
 
 #include "axis_onvif_resource.h"
@@ -21,3 +21,4 @@ int QnAxisOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolutio
 }
 
 #endif  //ENABLE_ONVIF
+#endif // #ifdef ENABLE_AXIS

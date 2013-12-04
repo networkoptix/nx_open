@@ -1,3 +1,5 @@
+#ifdef ENABLE_STARDOT
+
 #include "stardot_resource_searcher.h"
 
 #include <QtCore/QCoreApplication>
@@ -250,3 +252,5 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     resList << res;
     return resList;
 }
+
+#endif // #ifdef ENABLE_STARDOT

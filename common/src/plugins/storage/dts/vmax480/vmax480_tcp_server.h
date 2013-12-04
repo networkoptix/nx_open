@@ -1,6 +1,8 @@
 #ifndef __VMAX480_TCP_SERVER_H__
 #define __VMAX480_TCP_SERVER_H__
 
+#ifdef ENABLE_VMAX
+
 #include <QtCore/QMutex>
 #include <QtCore/QMap>
 #include "utils/network/tcp_listener.h"
@@ -57,4 +59,5 @@ private:
     Q_DECLARE_PRIVATE(QnVMax480ConnectionProcessor);
 };
 
+#endif // #ifdef ENABLE_VMAX
 #endif // __VMAX480_TCP_SERVER_H__

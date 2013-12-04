@@ -1,3 +1,6 @@
+#ifdef ENABLE_ACTI
+
+
 /**********************************************************
 * 15 jul 2013
 * a.kolesnikov
@@ -54,3 +57,6 @@ int QnCameraEventHandler::executePost(
     Q_UNUSED(contentType)
     return nx_http::StatusCode::notImplemented;
 }
+
+#endif // #ifdef ENABLE_ACTI
+

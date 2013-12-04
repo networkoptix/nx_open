@@ -1,3 +1,5 @@
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QTextStream>
 #include "axis_resource.h"
 #include "axis_stream_reader.h"
@@ -386,3 +388,5 @@ const QnResourceAudioLayout* QnAxisStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }
+
+#endif // #ifdef ENABLE_AXIS

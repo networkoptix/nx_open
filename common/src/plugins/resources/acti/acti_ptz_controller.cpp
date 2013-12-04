@@ -1,3 +1,5 @@
+#ifdef ENABLE_ACTI
+
 #include "acti_ptz_controller.h"
 
 #include <utils/math/math.h>
@@ -289,3 +291,5 @@ Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
 const QnPtzSpaceMapper *QnActiPtzController::getSpaceMapper() {
     return m_spaceMapper;
 }
+
+#endif // #ifdef ENABLE_ACTI

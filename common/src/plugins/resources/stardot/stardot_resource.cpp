@@ -1,3 +1,4 @@
+#ifdef ENABLE_STARDOT
 
 #include "stardot_resource.h"
 
@@ -250,3 +251,5 @@ simd128i* QnStardotResource::getMotionMaskBinData() const
 {
     return m_motionMaskBinData;
 }
+
+#endif // #ifdef ENABLE_STARDOT

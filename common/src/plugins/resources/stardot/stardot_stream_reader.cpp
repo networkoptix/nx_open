@@ -1,3 +1,5 @@
+#ifdef ENABLE_STARDOT
+
 #include <QtCore/QTextStream>
 #include "stardot_resource.h"
 #include "stardot_stream_reader.h"
@@ -210,3 +212,5 @@ QnMetaDataV1Ptr QnStardotStreamReader::getCameraMetadata()
     //m_lastMetadata.clear();
     //return rez;
 }
+
+#endif // #ifdef ENABLE_STARDOT

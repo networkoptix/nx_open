@@ -1,3 +1,5 @@
+#ifdef ENABLE_ISD
+
 #include "isd_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "utils/math/math.h"
@@ -245,3 +247,5 @@ int QnPlIsdResource::getMaxFps() const
     this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toInt();
 }
+
+#endif // #ifdef ENABLE_ISD

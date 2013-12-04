@@ -1,3 +1,6 @@
+#ifdef ENABLE_DROID
+
+
 #include "droid_controlport_listener.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "droid_stream_reader.h"
@@ -53,3 +56,5 @@ void QnDroidControlPortProcessor::run()
         }
     }
 }
+
+#endif // #ifdef ENABLE_DROID

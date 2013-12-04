@@ -1,6 +1,8 @@
 #ifndef iq_resource_h_1547
 #define iq_resource_h_1547
 
+#ifdef ENABLE_IQE
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -34,4 +36,5 @@ protected:
     QSize getMaxResolution() const;
 };
 
+#endif // #ifdef ENABLE_IQE
 #endif //iq_resource_h_1547
