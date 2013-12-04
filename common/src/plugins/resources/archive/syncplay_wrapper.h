@@ -59,6 +59,7 @@ public:
     void setLiveModeEnabled(bool value);
 
 public slots:
+    void jumpToLive();
     void onEofReached(QnlTimeSource* src, bool value);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 

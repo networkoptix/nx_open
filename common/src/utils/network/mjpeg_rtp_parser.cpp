@@ -336,6 +336,18 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
 
+    if (rtpHeader->extension)
+    {
+        if (readed < RtpHeader::RTP_HEADER_SIZE + 4) {
+            m_videoData.clear();
+            return false;
+        }
+
+        int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
+        curPtr += extWords*4 + 4;
+        bytesLeft -= extWords*4 + 4;
+    }
+
     if (rtpHeader->padding)
         bytesLeft -= ntohl(rtpHeader->padding);
 

@@ -19,7 +19,8 @@ static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
     {"vivo_ironman", "VS8801"},
-    {"VIVOTEK", "VS8801"}
+    {"VIVOTEK", "VS8801"},
+    {"*", "DW-CP04"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
@@ -34,7 +35,8 @@ bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendo
 {
     for (uint i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
     {
-        if (vendor.compare(QString(lit(ANALOG_CAMERAS[i][0])), Qt::CaseInsensitive) == 0 && 
+        QString vendorAnalog = lit(ANALOG_CAMERAS[i][0]);
+        if ((vendor.compare(vendorAnalog, Qt::CaseInsensitive) == 0 || vendorAnalog == lit("*")) && 
             model.compare(QString(lit(ANALOG_CAMERAS[i][1])), Qt::CaseInsensitive) == 0)
             return true;
     }

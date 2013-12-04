@@ -52,11 +52,15 @@
     </dependencies>
 
     <build>
+        <finalName>${finalName}</finalName>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
         <finalName>${finalName}</finalName>    
         <plugins>
             <plugin>
+                <property>
+                    <name>!installer-skip</name>
+                </property>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
@@ -206,5 +210,28 @@
                 <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
             </properties>
         </profile>	          
-    </profiles>
+        <profile>
+            <id>beta</id>
+            <activation>
+                <property>
+                    <name>!beta</name>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>    
+            </properties>
+        </profile>	      
+        <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}</finalName>    
+            </properties>
+        </profile>	  
+    </profiles>        
 </project>
