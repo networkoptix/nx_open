@@ -57,7 +57,7 @@ bool QnRemotePtzController::getPosition(QVector3D *position) {
         return false;
 
     QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzGetPosition(&result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->ptzGetPosition(m_resource, &result, SLOT(processReply(int, const QVariant &, int)));
     if(result.exec() != 0)
         return false;
 

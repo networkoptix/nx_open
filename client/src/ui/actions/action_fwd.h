@@ -8,6 +8,8 @@ class QnActionCondition;
 class QnActionManager;
 class QnActionTargetProvider;
 class QnResourceWidget;
+class QnMediaResourceWidget;
+class QnServerResourceWidget;
 class QnWorkbenchLayout;
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

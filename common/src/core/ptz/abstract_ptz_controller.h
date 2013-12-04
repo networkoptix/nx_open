@@ -109,20 +109,20 @@ public:
     virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
 
-    virtual bool addPreset() {}
-    virtual bool removePreset() {}
-    virtual bool activatePreset() {}
-    virtual bool getPresets() {}
+    virtual bool addPreset() {return false;}
+    virtual bool removePreset() {return false;}
+    virtual bool activatePreset() {return false;}
+    virtual bool getPresets() {return false;}
 
     struct Preset {
         QString id;
         QString name;
     };
 
-    virtual bool addTour() {}
-    virtual bool removeTour() {}
-    virtual bool activateTour() {}
-    virtual bool getTours() {}
+    virtual bool addTour() {return false;}
+    virtual bool removeTour() {return false;}
+    virtual bool activateTour() {return false;}
+    virtual bool getTours() {return false;}
 
     struct TourSpot {
         QString presetId;

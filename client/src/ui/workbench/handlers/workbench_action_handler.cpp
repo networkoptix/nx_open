@@ -998,21 +998,22 @@ void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).mediaWidget();
     if(!widget)
         return;
     QPointer<QnResourceWidget> guard(widget);
 
-    
-#if 0
-    QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
-    QVector3D position = ptzController->position(widget);
+    QnPtzControllerPtr controller = widget->ptzController();
+    if(!controller)
+        return;
+
+    QVector3D position;
+    if(!controller->getPosition(&position))
+        return;
 
     for(int i = 0; i <= 20; i++) {
-        qreal zoom = i / 20.0;
-
-        position.setZ(zoom);
-        ptzController->setPosition(widget, position);
+        position.setZ(i / 20.0);
+        controller->absoluteMove(position);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -1021,9 +1022,8 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
         if(!guard)
             break;
 
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
+        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 2)));
     }
-#endif
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
