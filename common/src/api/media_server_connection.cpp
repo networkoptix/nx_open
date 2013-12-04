@@ -554,6 +554,13 @@ int QnMediaServerConnection::ptzRelativeMoveAsync(const QnNetworkResourcePtr &ca
     return sendAsyncGetRequest(PtzRelativeMoveObject, params, NULL, target, slot);
 }
 
+int QnMediaServerConnection::ptzGetPosition(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetPositionAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncGetRequest(PtzGetPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
+}
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_REPLY_TYPE(QnTimeReply), target, slot);

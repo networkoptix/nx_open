@@ -52,27 +52,17 @@ bool QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewpo
     return true;
 }
 
-bool QnRemotePtzController::getPosition(QVector3D *) {
+bool QnRemotePtzController::getPosition(QVector3D *position) {
     if(!m_server)
         return false;
 
     QnConnectionRequestResult result;
-    QEventLoop loop;
-    connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
-
     m_server->apiConnection()->ptzGetPosition(&result, SLOT(processReply(int, const QVariant &, int)));
+    if(result.exec() != 0)
+        return false;
 
-    loop.exec();
-
-    if(result.status() != 0)
-        return;
-
-    connectionInfo = result.reply<QnConnectInfoPtr>();
-
-
-    //QnConnectionRequestResult
-
-    m_server->apiConnection()->ptzGetPosition(m_resource, this, SLOT());
+    *position = result.reply<QVector3D>();
+    return true;
 }
 
 bool QnRemotePtzController::getLimits(QnPtzLimits *) {
