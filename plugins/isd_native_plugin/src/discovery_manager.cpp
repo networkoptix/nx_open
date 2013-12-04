@@ -73,13 +73,14 @@ void mac_eth0(char  MAC_str[13], char** host)
     s = socket(AF_INET, SOCK_DGRAM, 0);
     strcpy(ifr.ifr_name, "eth0");
     if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
-    for (i=0; i<HWADDR_len; i++)
-        sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+        for (i=0; i<HWADDR_len; i++)
+            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
     }
     if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
-    const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
-    *host = inet_ntoa(ip->sin_addr);
+        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+        *host = inet_ntoa(ip->sin_addr);
     }
+    close(s);
 }
 #endif
 
