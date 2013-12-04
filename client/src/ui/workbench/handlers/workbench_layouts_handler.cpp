@@ -112,6 +112,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         return;
     }
 
+    const QnResourcePtr layoutOwnerUser = layout->getParentResource();
+
     QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
@@ -128,7 +130,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             name = dialog->name();
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
-            if (name == layout->getName()) {
+            if (name == layout->getName() && user == layoutOwnerUser) {
                 switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
                 case QMessageBox::Cancel:
                     return;
@@ -209,7 +211,6 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             (name == layout->getName() || isCurrent);
 
     /* If it is current layout, close it and open the new one instead. */
-    const QnResourcePtr layoutOwnerUser = layout->getParentResource();
     if( isCurrent &&
         user == layoutOwnerUser )   //making current only new layout of current user
     {

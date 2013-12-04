@@ -927,7 +927,7 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    layout->setName(generateUniqueLayoutName(QnUserResourcePtr(), tr("New Layout")));
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
