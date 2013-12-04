@@ -32,13 +32,9 @@ private slots:
     void at_closeAllButThisLayoutAction_triggered();
 
     void at_layouts_saved(int status, const QnResourceList &resources, int handle);
-
-    //!Checks if need to close layout
-    void checkForClosurePending();
 private:
     void saveLayout(const QnLayoutResourcePtr &layout);
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
-
 
     /**
      * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
@@ -61,14 +57,9 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
+    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
-
-private:
-    int m_exportsToFinishBeforeClosure;
-    QObject* m_objectToSignalWhenDone;
-    QByteArray m_methodToInvokeWhenDone;
 };
 
 #endif // WORKBENCH_LAYOUTS_HANDLER_H

@@ -24,14 +24,13 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
 
+#include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
 
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_exportsToFinishBeforeClosure(0),
-    m_objectToSignalWhenDone(nullptr)
+    QnWorkbenchContextAware(parent)
 {
     connect(action(Qn::NewUserLayoutAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
     connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
@@ -371,7 +370,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
     }
 }
 
-void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot) {
+void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot) {
     if(!saveResources.empty()) {
         QnLayoutResourceList fileResources, normalResources;
         foreach(const QnLayoutResourcePtr &resource, saveResources) {
@@ -382,11 +381,14 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             }
         }
 
-        m_exportsToFinishBeforeClosure = 0;
-        if(!normalResources.isEmpty())
-        {
-            ++m_exportsToFinishBeforeClosure;
-            snapshotManager()->save(normalResources, this, SLOT(checkForClosurePending()));
+        QnCounter* counter = new QnCounter(0, this);
+        if (target && slot)
+            connect(counter, SIGNAL(reachedZero()), target, slot);
+        connect(counter, SIGNAL(reachedZero()), counter, SLOT(deleteLater()));
+
+        if(!normalResources.isEmpty()) {
+            counter->increment();
+            snapshotManager()->save(normalResources, counter, SLOT(decrement()));
         }
 
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
@@ -399,32 +401,14 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
                                                     Qn::LayoutLocalSave,  // overwrite layout file
                                                     isReadOnly,
                                                     false,
-                                                    this,
-                                                    SLOT(checkForClosurePending())))
-                ++m_exportsToFinishBeforeClosure;
+                                                    counter,
+                                                    SLOT(decrement())))
+                counter->increment();
         }
 
-        QByteArray method(slot && *slot ? slot + 1 : slot);
-        int index = method.indexOf('(');
-        if(index != -1)
-            method.truncate(index);
-
-        if( m_exportsToFinishBeforeClosure > 0 )
-        {
-            m_objectToSignalWhenDone = object;
-            m_methodToInvokeWhenDone = method;
-        }
-        else
-        {
-            QMetaObject::invokeMethod(
-                object,
-                method.constData(),
-                Qt::QueuedConnection,
-                Q_ARG(int, 0),
-                Q_ARG(QVariant, QVariant()),
-                Q_ARG(int, 0)
-            );
-        }
+        // magic that will invoke slot if counter is empty and delete it afterwards
+        counter->increment();
+        counter->decrement();
     }
 
     foreach(const QnLayoutResourcePtr &resource, rollbackResources)
@@ -577,21 +561,4 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
                 resourcePool()->removeResource(layoutResource);
         }
     }
-}
-
-void QnWorkbenchLayoutsHandler::checkForClosurePending()
-{
-    if( m_exportsToFinishBeforeClosure == 0 )
-        return;
-    --m_exportsToFinishBeforeClosure;
-    if( m_exportsToFinishBeforeClosure > 0 )
-        return; //waiting futher...
-
-    QMetaObject::invokeMethod(
-        m_objectToSignalWhenDone,
-        m_methodToInvokeWhenDone.constData(),
-        Qt::QueuedConnection,
-        Q_ARG(int, 0),
-        Q_ARG(QVariant, QVariant()),
-        Q_ARG(int, 0) );
 }
