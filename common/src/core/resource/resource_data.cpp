@@ -27,7 +27,7 @@ bool deserialize(const QJsonValue &value, QnResourceData *target) {
 
             result.setValue(pos.key(), mapper);
         } else {
-            result.setValue(pos.key(), pos.value().toString());
+            result.setValue(pos.key(), pos.value().toVariant());
         }
     }
     

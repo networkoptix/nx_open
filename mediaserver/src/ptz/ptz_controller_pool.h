@@ -35,6 +35,7 @@ private:
         QnPtzControllerPtr deviceController;
         QnPtzControllerPtr logicalController;
         QnPtzControllerPtr relativeController;
+        QnPtzControllerPtr workaroundController;
 
         QnPtzControllerPtr defaultController;
     };

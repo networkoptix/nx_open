@@ -20,6 +20,12 @@
         },
         {
             "keys": [
+                "FW3471-PS-E", "DWC-MPTZ20X"
+            ],
+            "octagonalPtz": true
+        },
+        {
+            "keys": [
                 "AXIS Q6035-E"
             ],
             "ptzMapper": {
