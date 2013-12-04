@@ -1,3 +1,6 @@
+#ifndef QN_USER_PERMISSIONS_H
+#define QN_USER_PERMISSIONS_H
+
     /**
      * Flags describing the actions permitted for the user to do with the 
      * selected resource.
@@ -55,3 +58,5 @@
             
         AllPermissions                          = 0xFFFFFFFF
     };
+
+#endif //QN_USER_PERMISSIONS_H
