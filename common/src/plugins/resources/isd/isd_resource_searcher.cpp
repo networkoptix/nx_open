@@ -1,7 +1,5 @@
 #ifdef ENABLE_ISD
 
-her;
-
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"

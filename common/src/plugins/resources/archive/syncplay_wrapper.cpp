@@ -632,7 +632,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
 
         if (d->enabled) {
             if (allReady)
-                jumpTo(DATETIME_NOW, 0);         // all items at EOF position
+                QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
         }
         else {
             if (reader)
@@ -828,4 +828,9 @@ void QnArchiveSyncPlayWrapper::setLiveModeEnabled(bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     d->liveModeEnabled = value;    
+}
+    
+void QnArchiveSyncPlayWrapper::jumpToLive()
+{
+    jumpTo(DATETIME_NOW, 0);
 }

@@ -10,6 +10,7 @@
 #include "business/business_action_factory.h"
 #include "core/resource_managment/resource_pool.h"
 #include "recorder/storage_manager.h"
+#include "settings.h"
 
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
@@ -21,8 +22,7 @@ QnEventsDB::QnEventsDB():
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD)
 {
     m_sdb = QSqlDatabase::addDatabase("QSQLITE");
-    m_sdb.setDatabaseName(closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")));
-
+    m_sdb.setDatabaseName( MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")) ).toString() );
     if (m_sdb.open())
     {
         if (!createDatabase()) // create tables is DB is empty

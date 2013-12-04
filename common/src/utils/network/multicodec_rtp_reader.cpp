@@ -133,7 +133,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     // int readed;
     int audioRetryCount = 0;
     int videoRetryCount = 0;
-    int channelNum = 0;
+    int channelNum = -1;
 
     QElapsedTimer dataTimer;
     dataTimer.restart();
@@ -204,7 +204,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastVideoData;
         m_lastVideoData.clear();
-        m_demuxedData[channelNum]->clear();
+        if (channelNum >= 0)
+            m_demuxedData[channelNum]->clear();
         m_gotSomeFrame = true;
         return result;
     }
@@ -212,7 +213,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastAudioData[0];
         m_lastAudioData.removeAt(0);
-        m_demuxedData[channelNum]->clear();
+        if (channelNum >= 0)
+            m_demuxedData[channelNum]->clear();
         result->channelNumber += m_numberOfVideoChannels;
 
         m_gotSomeFrame = true;

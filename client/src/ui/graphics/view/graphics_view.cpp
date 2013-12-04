@@ -128,6 +128,31 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
 #endif
 }
 
+void QnGraphicsView::wheelEvent(QWheelEvent *event) {
+    if(m_behaviorFlags & InvokeInheritedMouseWheel) {
+        base_type::wheelEvent(event);
+    } else {
+        /* Copied from QGraphicsView implementation.
+         * The only difference: we don't invoke QAbstractScrollArea implementation. */
+        if (!scene() || !isInteractive())
+            return;
+
+        event->ignore();
+
+        QGraphicsSceneWheelEvent wheelEvent(QEvent::GraphicsSceneWheel);
+        wheelEvent.setWidget(viewport());
+        wheelEvent.setScenePos(mapToScene(event->pos()));
+        wheelEvent.setScreenPos(event->globalPos());
+        wheelEvent.setButtons(event->buttons());
+        wheelEvent.setModifiers(event->modifiers());
+        wheelEvent.setDelta(event->delta());
+        wheelEvent.setOrientation(event->orientation());
+        wheelEvent.setAccepted(false);
+        QApplication::sendEvent(scene(), &wheelEvent);
+        event->setAccepted(wheelEvent.isAccepted());
+    }
+}
+
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {
     if(m_paintFlags & PaintInheritedBackround)
         base_type::drawBackground(painter, rect);
