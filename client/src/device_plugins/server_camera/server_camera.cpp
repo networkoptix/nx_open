@@ -79,13 +79,14 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
 
 QnServerCameraPtr QnServerCamera::findEnabledSubling()
 {
-    QMutexLocker lock(&m_mutex);
-
     if (!isDisabled())
-        return toSharedPointer().dynamicCast<QnServerCamera>();
+        return toSharedPointer(this);
 
-    if (m_activeCamera && !m_activeCamera->isDisabled())
-        return m_activeCamera;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_activeCamera && !m_activeCamera->isDisabled())
+            return m_activeCamera;
+    }
 
     QnNetworkResourceList resList = qnResPool->getAllNetResourceByPhysicalId(getPhysicalId());
     foreach(const QnNetworkResourcePtr& netRes, resList)
@@ -93,6 +94,7 @@ QnServerCameraPtr QnServerCamera::findEnabledSubling()
         if (!netRes->isDisabled()) {
             QnServerCameraPtr cam = netRes.dynamicCast<QnServerCamera>();
             if (cam) {
+                QMutexLocker lock(&m_mutex);
                 m_activeCamera = cam;
                 return m_activeCamera;
             }

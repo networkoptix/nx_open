@@ -2,14 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="zh_CN" sourcelanguage="en">
 <context>
-    <name>QnScheduleGridWidget</name>
-    <message>
-        <source></source>
-        <comment>SCHEDULE_GRID_CORNER_TEXT</comment>
-        <translation>全选</translation>
-   </message>
-</context>
-<context>
     <name>AVSettingsDlg</name>
     <message>
         <source>Suggestions...</source>
@@ -578,38 +570,6 @@
     <message>
         <source>Apply changes before copying schedule</source>
         <translation>复制日程前執行修改</translation>
-    </message>
-</context>
-<context>
-    <name>CompatibilityVersionInstallationDialog</name>
-    <message>
-        <source>Dialog</source>
-        <translation>对话框</translation>
-    </message>
-    <message>
-        <source>Installing version %1</source>
-        <translatorcomment>安装版本 %1</translatorcomment>
-        <translation>安装版本 %1</translation>
-    </message>
-    <message>
-        <source>Installation failed</source>
-        <translatorcomment>安装失败</translatorcomment>
-        <translation>安装失败</translation>
-    </message>
-    <message>
-        <source>Could not cancel installation</source>
-        <translatorcomment>无法取消安装</translatorcomment>
-        <translation>无法取消安装</translation>
-    </message>
-    <message>
-        <source>Installation completed</source>
-        <translatorcomment>安装完成</translatorcomment>
-        <translation>安装完成</translation>
-    </message>
-    <message>
-        <source>Installation has been cancelled</source>
-        <translatorcomment>安装已取消</translatorcomment>
-        <translation>安装已取消</translation>
     </message>
 </context>
 <context>
@@ -1310,7 +1270,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Main Media Folder</source>
-        <translation>是指本地录像存储路径</translation>
+        <translation>主要媒体文件夹</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
@@ -1330,7 +1290,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation>基本设置</translation>
+        <translation>看和感觉</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -1342,7 +1302,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Misc</source>
-        <translation>高级设置</translation>
+        <translation>杂项</translation>
     </message>
     <message>
         <source>Downmix the Audio from 5.1 to 2.1 channels (restart required)</source>
@@ -1479,7 +1439,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation type="obsolete">*最后使用的连接*</translation>
+        <translation>*最后使用的连接*</translation>
     </message>
     <message>
         <source>While %1</source>
@@ -1555,19 +1515,19 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Not recording</source>
-        <translation type="obsolete">不录像</translation>
+        <translation>不录像</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation type="obsolete">录像全部</translation>
+        <translation>录像全部</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation type="obsolete">仅移动侦测录像</translation>
+        <translation>仅移动侦测录像</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation type="obsolete">移动侦测和低分辨率录像</translation>
+        <translation>移动侦测和低分辨率录像</translation>
     </message>
     <message>
         <source>Everything</source>
@@ -1575,11 +1535,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Motion only</source>
-        <translation type="obsolete">仅移动</translation>
+        <translation>仅移动</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation type="obsolete">移动+低分辨率</translation>
+        <translation>移动+低分辨率</translation>
     </message>
     <message>
         <source>b/s</source>
@@ -1599,11 +1559,19 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Continuous</source>
-        <translation type="obsolete">连续</translation>
+        <translation>连续</translation>
     </message>
     <message>
         <source>Export selected cameras to file</source>
         <translation>输出选取的摄像机至档案</translation>
+    </message>
+    <message>
+        <source>Beta version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2727,8 +2695,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>解说视频及常见问题</translation>
     </message>
     <message>
-        <source>Change Camera Aspect Ratio...</source>
-        <translation>改变摄像机宽高比</translation>
+        <source>Show Beta Version Warning Message</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4161,17 +4129,6 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
 </context>
 <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find video encoder </source>
-        <translation>无法找到视频编码器</translation>
-    </message>
-</context>
-<context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -4386,19 +4343,19 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="obsolete">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation type="obsolete">重要性能提示</translation>
+        <translation>重要性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="obsolete">我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation type="obsolete">关键性能提示</translation>
+        <translation>关键性能提示</translation>
     </message>
 </context>
 <context>
@@ -4693,6 +4650,26 @@ Archive Streams Allowed: %4</source>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
     </message>
+    <message>
+        <source>Database error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The license key is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
@@ -4857,35 +4834,10 @@ Please close the application and start it again using the shortcut in the start 
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation type="obsolete">您连接到了不同版本的系统控制器:
-  - 客户端版本n: %1。
-  -系统控制器版本: %2。
-客户端版本 %2必须连接到此系统控制器。请下载版本 %2 並升级系统。</translation>
-    </message>
-    <message>
-        <source>* Last used connection *</source>
-        <translation>*最后使用的连接*</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Unable to connect to applauncher to enable client compatibility mode</source>
-        <translation>您正在连接到不同版本的系统控制器：
- - 客户端版本：%1
- - 系统控制器版本：%2
-无法连接到应用程序以启用客户端兼容性模式</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Client Version %3 is required to connect to this Enterprise Controller.
-Download version %3?</source>
         <translation>您连接到了不同版本的系统控制器:
   - 客户端版本n: %1。
   -系统控制器版本: %2。
-必须使用客户端版本 %3 以连接到此系统控制器。下载版本 %3?</translation>
+客户端版本 %2必须连接到此系统控制器。请下载版本 %2 並升级系统。</translation>
     </message>
 </context>
 <context>
@@ -5719,37 +5671,6 @@ Please close the application and start it again using the shortcut in the start 
     </message>
 </context>
 <context>
-    <name>QnRecordingStatusHelper</name>
-    <message>
-        <source>Not recording</source>
-        <translation>不录像</translation>
-    </message>
-    <message>
-        <source>Recording everything</source>
-        <translation>录像全部</translation>
-    </message>
-    <message>
-        <source>Recording motion only</source>
-        <translation>仅移动侦测录像</translation>
-    </message>
-    <message>
-        <source>Recording motion and low quality</source>
-        <translation>移动侦测和低分辨率录像</translation>
-    </message>
-    <message>
-        <source>Continuous</source>
-        <translation>连续</translation>
-    </message>
-    <message>
-        <source>Motion only</source>
-        <translation>仅移动侦测录像</translation>
-    </message>
-    <message>
-        <source>Motion + Lo-Res</source>
-        <translation>移动+低分辨率</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
@@ -5881,13 +5802,6 @@ Please close the application and start it again using the shortcut in the start 
     </message>
 </context>
 <context>
-    <name>QnScreenRecorder</name>
-    <message>
-        <source>Screen capturing subsystem is not initialized yet. Please try latter</source>
-        <translation>屏幕捕捉子系统尚未初始化。请稍后再试</translation>
-    </message>
-</context>
-<context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
@@ -5914,7 +5828,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="obsolete">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -5927,14 +5841,6 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>Check Issues</source>
         <translation>检查问题</translation>
-    </message>
-    <message>
-        <source>%1 %2 </source>
-        <translation>%1% {1 %2 ?}</translation>
-    </message>
-    <message>
-        <source>(up %1 days, %2)</source>
-        <translation>(在线 %1 天, %2)</translation>
     </message>
 </context>
 <context>
@@ -6020,14 +5926,6 @@ You have only %2Gb left for video archive.</source>
     <message>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;添加外部存储空间...&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>警告</translation>
-    </message>
-    <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. Depending on the total size of archive it can take several hours. This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation>您将启动存档重新同步例程。注意！在此过程中，将停止所有的记录。根据归档文件的总大小，它可能需要几个小时。如果您的存档文件夹已移动重命名或更换，这个过程是必要的。您可以在任何时候取消重建操作并保留原数据。要继续吗？</translation>
     </message>
 </context>
 <context>
@@ -6343,66 +6241,117 @@ AVAILABLE</source>
         <translation>没有可用的缩图</translation>
     </message>
     <message>
+        <source>hh:mm:ss</source>
+        <comment>DEFAULT_TOOL_TIP_FORMAT</comment>
+        <translation type="obsolete">时:分:秒</translation>
+    </message>
+    <message>
         <source>ms</source>
         <translation>毫秒</translation>
+    </message>
+    <message>
+        <source>10ms</source>
+        <translation type="obsolete">10毫秒</translation>
+    </message>
+    <message>
+        <source>50ms</source>
+        <translation type="obsolete">50毫秒</translation>
+    </message>
+    <message>
+        <source>100ms</source>
+        <translation type="obsolete">100毫秒</translation>
+    </message>
+    <message>
+        <source>500ms</source>
+        <translation type="obsolete">500毫秒</translation>
     </message>
     <message>
         <source>s</source>
         <translation>秒</translation>
     </message>
     <message>
+        <source>59s</source>
+        <translation type="obsolete">59秒</translation>
+    </message>
+    <message>
         <source>m</source>
         <translation>分</translation>
+    </message>
+    <message>
+        <source>59m</source>
+        <translation type="obsolete">59分</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <translation type="obsolete">日 月 年 时:分</translation>
     </message>
     <message>
         <source>h</source>
         <translation>时</translation>
     </message>
     <message>
+        <source>23h</source>
+        <translation type="obsolete">23时</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <translation type="obsolete">日 月 年 时</translation>
+    </message>
+    <message>
+        <source>dd MMM</source>
+        <translation type="obsolete">日 月</translation>
+    </message>
+    <message>
+        <source>29 Mar</source>
+        <translation type="obsolete">3月29日</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <translation type="obsolete">日 月 年</translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <translation type="obsolete">月</translation>
+    </message>
+    <message>
+        <source>September</source>
+        <translation type="obsolete">9月</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <translation type="obsolete">月 年</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <translation type="obsolete">年</translation>
+    </message>
+    <message>
+        <source>2000</source>
+        <translation type="obsolete">2000</translation>
+    </message>
+    <message>
         <source>d</source>
         <translation>日</translation>
+    </message>
+    <message>
+        <source>29d</source>
+        <translation type="obsolete">29日</translation>
     </message>
     <message>
         <source>M</source>
         <translation>月</translation>
     </message>
     <message>
+        <source>11M</source>
+        <translation type="obsolete">11月</translation>
+    </message>
+    <message>
         <source>y</source>
         <translation>年</translation>
     </message>
     <message>
-        <source>dd MMMM</source>
-        <translation>d日</translation>
-    </message>
-    <message>
-        <source>MMMM</source>
-        <translation>M月</translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <translation>yyyy年</translation>
-    </message>
-    <message>
-        <source>auto</source>
-        <translation>none</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm</source>
-        <comment>MINUTES</comment>
-        <translation>yyyy年MM月dd日 hh:mm</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm</source>
-        <comment>HOURS</comment>
-        <translation>yyyy年MM月dd日 h时</translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy</source>
-        <translation>yyyy年MM月dd日</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <translation>yyyy年MM月</translation>
+        <source>2000y</source>
+        <translation type="obsolete">2000年</translation>
     </message>
 </context>
 <context>
@@ -7299,16 +7248,19 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>yyyy MMM dd
 hh:mm:ss</source>
-        <translation>yyyy年MM月dd日
-hh:mm:ss</translation>
+        <comment>CAMERA_TOOL_TIP_FORMAT</comment>
+        <translation type="obsolete">年 月 日
+时:分:秒</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <translation>hh:mm:ss</translation>
+        <comment>LONG_TOOL_TIP_FORMAT</comment>
+        <translation type="obsolete">时:分:秒</translation>
     </message>
     <message>
         <source>mm:ss</source>
-        <translation>mm:ss</translation>
+        <comment>SHORT_TOOL_TIP_FORMAT</comment>
+        <translation type="obsolete">分:秒</translation>
     </message>
 </context>
 <context>
@@ -7638,22 +7590,6 @@ hh:mm:ss</translation>
     <message>
         <source>Ping</source>
         <translation>Ping</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation>重建归档索引</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation>开始</translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation>重建进度</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>取消</translation>
     </message>
 </context>
 <context>

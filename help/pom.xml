@@ -21,7 +21,6 @@
 	<name>HD Witness Help</name>
 
 	<properties>
-        <arch>x86</arch>
         <root.dir>${basedir}/..</root.dir>
 	</properties>
 

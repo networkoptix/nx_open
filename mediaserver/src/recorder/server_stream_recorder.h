@@ -59,6 +59,7 @@ protected:
 
     virtual void endOfRun() override;
     virtual bool saveData(QnAbstractMediaDataPtr md) override;
+    virtual void writeData(QnAbstractMediaDataPtr md, int streamIndex) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
@@ -93,6 +94,7 @@ private:
     QMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnAbstractMediaDataPtr> m_recentlyMotion;
+    bool m_diskErrorWarned;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

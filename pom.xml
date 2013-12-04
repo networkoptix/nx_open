@@ -273,7 +273,7 @@
                 <python.dir>${environment.dir}/python/${arch}</python.dir>				
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
-                <arch>x86</arch>
+                <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <qt.spec>win32-msvc2012</qt.spec>
                 <profile.classifier>${platform}</profile.classifier>                
