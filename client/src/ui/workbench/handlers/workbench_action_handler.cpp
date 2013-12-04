@@ -1205,21 +1205,29 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
             if (name == layout->getName()) {
-                at_saveLayoutAction_triggered(layout);
-                return;
+                switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
+                case QMessageBox::Cancel:
+                    return;
+                case QMessageBox::Yes:
+                    at_saveLayoutAction_triggered(layout);
+                    return;
+                default:
+                    continue;
+                }
             }
 
-            button = QMessageBox::Yes;
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
             if (!canRemoveLayouts(existing)) {
                 QMessageBox::warning(
                     mainWindow(),
                     tr("Layout already exists"),
-                    tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+                    tr("Layout with the same name already exists\n"\
+                       "and you do not have the rights to overwrite it.")
                 );
                 return;
             }
 
+            button = QMessageBox::Yes;
             if (!existing.isEmpty()) {
                 button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
                 if (button == QMessageBox::Cancel)
