@@ -97,24 +97,24 @@ MotionDataPicture* StreamReader::getMotionData()
 {
     if (!vmux_motion)
     {
-    vmux_motion = new Vmux();
+        vmux_motion = new Vmux();
         int info_size = sizeof(motion_stream_info);
         int rv = vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
         if (rv) {
             std::cout << "can't get stream info for motion stream" << std::endl;
-        delete vmux_motion;
-        vmux_motion = 0;
+            delete vmux_motion;
+            vmux_motion = 0;
             return 0; // error
-    }
+        }
 
-    std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
+        std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
 
-    rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
-    if (rv) {
-        delete vmux_motion;
-        vmux_motion = 0;
+        rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
+        if (rv) {
+            delete vmux_motion;
+            vmux_motion = 0;
             return 0; // error
-    }
+        }
     }
 
     vmux_frame_t frame;
@@ -144,59 +144,63 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
     if (!vmux)
     {
-    vmux = new Vmux();
+        vmux = new Vmux();
         int info_size = sizeof(stream_info);
         rv = vmux->GetStreamInfo (m_encoderNum, &stream_info, &info_size);
         if (rv) {
             std::cout << "ISD plugin: can't get stream info" << std::endl;
-        delete vmux;
-        vmux = 0;
+            delete vmux;
+            vmux = 0;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
-    if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
+        if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
             m_codec = nxcip::CODEC_ID_H264;
-    else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
+        else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
             m_codec = nxcip::CODEC_ID_MJPEG;
-    else
+        else
+        {
+            std::cerr<<"ISD plugin: unsupported video format "<<stream_info.enc_type<<"\n";
+            delete vmux;
+            vmux = 0;
             return nxcip::NX_INVALID_ENCODER_NUMBER;
+        }
 
         rv = vmux->StartVideo (m_encoderNum);
         if (rv) {
             std::cout << "ISD plugin: can't start video" << std::endl;
-        delete vmux;
-        vmux = 0;
+            delete vmux;
+            vmux = 0;
             return nxcip::NX_INVALID_ENCODER_NUMBER; // error
         }
-    m_firstFrameTime = 0;
+        m_firstFrameTime = 0;
     }
 
     rv = vmux->GetFrame (&frame);
     if (rv) {
-    std::cout << "Can't read video frame" << std::endl;
-    delete vmux;
-    vmux = 0;
+        std::cout << "Can't read video frame" << std::endl;
+        delete vmux;
+        vmux = 0;
         return nxcip::NX_IO_ERROR; // error
     }
 
-
     if (frame.vmux_info.pic_type == 1) {
-    //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
+        //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
     //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
     if (m_firstFrameTime == 0) {
-    m_firstFrameTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
-    m_firstFrameTime -= (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000;
+        m_firstFrameTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
+        m_firstFrameTime -= (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000;
     }
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel
         (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
-    //currentTime,
+        //currentTime,
         (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0),
         0, // cseq
         m_codec)); 
-    videoPacket->resizeBuffer( frame.frame_size );
-    memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
-    m_lastVideoTime = videoPacket->timestamp();
+        videoPacket->resizeBuffer( frame.frame_size );
+        memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
+        m_lastVideoTime = videoPacket->timestamp();
     if (needMetaData()) {
         MotionDataPicture* motionData = getMotionData();
         if (motionData) {
