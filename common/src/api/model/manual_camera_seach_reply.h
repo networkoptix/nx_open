@@ -68,11 +68,11 @@ struct QnManualCameraSearchProcessStatus {
 /**
  * Manual camera search process request reply: process uuid, state and results by the time.
  */
-struct QnManualCameraSearchProcessReply {
+struct QnManualCameraSearchReply {
 
-    QnManualCameraSearchProcessReply() {}
+    QnManualCameraSearchReply() {}
 
-    QnManualCameraSearchProcessReply(const QUuid &uuid, const QnManualCameraSearchProcessStatus &processStatus):
+    QnManualCameraSearchReply(const QUuid &uuid, const QnManualCameraSearchProcessStatus &processStatus):
         processUuid(uuid), status(processStatus.status), cameras(processStatus.cameras) {}
 
     QUuid processUuid;
@@ -80,8 +80,8 @@ struct QnManualCameraSearchProcessReply {
     QnManualCameraSearchCameraList cameras;
 };
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchProcessReply, (status)(processUuid)(cameras), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply, (status)(processUuid)(cameras), inline)
 
-Q_DECLARE_METATYPE(QnManualCameraSearchProcessReply)
+Q_DECLARE_METATYPE(QnManualCameraSearchReply)
 
 #endif // VIDEO_SERVER_CAMERAS_DATA_H

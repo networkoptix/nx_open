@@ -7,13 +7,13 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
-#include <api/media_server_cameras_data.h>
-
-#include <core/resource/resource.h>
-
 #include <utils/common/long_runnable.h>
 #include <utils/network/netstate.h>
 #include <utils/network/nettools.h>
+
+#include <api/model/manual_camera_seach_reply.h>
+
+#include <core/resource/resource.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;

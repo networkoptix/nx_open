@@ -19,13 +19,13 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
 #include <api/model/rebuild_archive_reply.h>
+#include <api/model/manual_camera_seach_reply.h>
 
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
 
 #include "abstract_connection.h"
-#include "media_server_cameras_data.h"
 
 class QnMediaServerResource;
 
@@ -55,7 +55,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnManualCameraSearchProcessReply &reply, int handle);
+    void finished(int status, const QnManualCameraSearchReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
 

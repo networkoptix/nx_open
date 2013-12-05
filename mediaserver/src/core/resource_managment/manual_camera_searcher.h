@@ -5,7 +5,7 @@
 
 #include <QtNetwork/QAuthenticator>
 
-#include <api/media_server_cameras_data.h>
+#include <api/model/manual_camera_seach_reply.h>
 
 #include <core/resource/resource_fwd.h>
 

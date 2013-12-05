@@ -13,9 +13,8 @@
 #include <api/model/statistics_reply.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/kvpair.h>
+#include <api/model/manual_camera_seach_reply.h>
 #include <api/message.h>
-#include <api/media_server_cameras_data.h>
-#include <api/media_server_connection.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -95,7 +94,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnManualCameraSearchProcessReply>();
+    qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();

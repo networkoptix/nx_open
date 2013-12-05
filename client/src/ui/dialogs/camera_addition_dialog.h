@@ -5,7 +5,8 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHeaderView>
 
-#include <api/media_server_cameras_data.h>
+#include <api/model/manual_camera_seach_reply.h>
+
 #include <core/resource/resource_fwd.h>
 
 namespace Ui {
@@ -73,6 +74,7 @@ private:
 
     bool serverOnline() const;
     bool ensureServerOnline();
+
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();

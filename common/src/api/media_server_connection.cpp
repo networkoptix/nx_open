@@ -334,7 +334,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
     case CameraSearchStopObject:
-        processJsonReply<QnManualCameraSearchProcessReply>(this, response, handle);
+        processJsonReply<QnManualCameraSearchReply>(this, response, handle);
         break;
     case EventLogObject: {
         QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
@@ -486,19 +486,19 @@ int QnMediaServerConnection::searchCameraAsyncStart(const QString &startAddr, co
     params << QnRequestParam("password", password);
     params << QnRequestParam("port" ,QString::number(port));
 
-    return sendAsyncGetRequest(CameraSearchStartObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
+    return sendAsyncGetRequest(CameraSearchStartObject, params, QN_REPLY_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
 int QnMediaServerConnection::searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("uuid", processUuid.toString());
-    return sendAsyncGetRequest(CameraSearchStatusObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
+    return sendAsyncGetRequest(CameraSearchStatusObject, params, QN_REPLY_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
 int QnMediaServerConnection::searchCameraAsyncStop(const QUuid &processUuid, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("uuid", processUuid.toString());
-    return sendAsyncGetRequest(CameraSearchStopObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
+    return sendAsyncGetRequest(CameraSearchStopObject, params, QN_REPLY_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
 int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot) {
