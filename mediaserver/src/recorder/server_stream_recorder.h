@@ -49,7 +49,7 @@ protected:
 
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
     void beforeProcessData(QnAbstractMediaDataPtr media);
-    virtual bool saveMotion(QnMetaDataV1Ptr motion) override;
+    virtual bool saveMotion(QnConstMetaDataV1Ptr motion) override;
 
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
@@ -59,7 +59,7 @@ protected:
 
     virtual void endOfRun() override;
     virtual bool saveData(QnAbstractMediaDataPtr md) override;
-    virtual void writeData(QnAbstractMediaDataPtr md, int streamIndex) override;
+    virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();

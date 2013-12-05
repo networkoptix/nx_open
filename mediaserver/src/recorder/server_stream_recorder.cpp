@@ -111,7 +111,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
     }
 
     
-    QnAbstractMediaDataPtr media = data.dynamicCast<QnAbstractMediaData>();
+    QnConstAbstractMediaDataPtr media = data.dynamicCast<const QnAbstractMediaData>();
     if (media) {
         QMutexLocker lock(&m_queueSizeMutex);
         m_queuedSize += media->data.size();
@@ -119,7 +119,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
     QnStreamRecorder::putData(data);
 }
 
-bool QnServerStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
+bool QnServerStreamRecorder::saveMotion(QnConstMetaDataV1Ptr motion)
 {
     if (motion)
         QnMotionHelper::instance()->saveToArchive(motion);
@@ -518,7 +518,7 @@ bool QnServerStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     return QnStreamRecorder::saveData(md);
 }
 
-void QnServerStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
+void QnServerStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex)
 {
     QnStreamRecorder::writeData(md, streamIndex);
     m_diskErrorWarned = false;

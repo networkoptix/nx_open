@@ -260,7 +260,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(md.dynamicCast<QnMetaDataV1>());
+        return saveMotion(md.dynamicCast<const QnMetaDataV1>());
 
     if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
@@ -281,7 +281,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
     {
-        QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(md);
+        QnConstCompressedAudioDataPtr ad = qSharedPointerDynamicCast<const QnCompressedAudioData>(md);
         QnCodecAudioFormat audioFormat(ad->context);
         if (!m_firstTime && audioFormat != m_prevAudioFormat) {
             close(); // restart recording file if audio format is changed
@@ -366,7 +366,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     return true;
 }
 
-void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
+void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex)
 {
     AVRational srcRate = {1, 1000000};
     AVStream* stream = m_formatCtx->streams[streamIndex];
@@ -382,7 +382,7 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
         avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
     else
         avPkt.dts = dts;
-    QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
+    QnConstCompressedVideoDataPtr video = md.dynamicCast<const QnCompressedVideoData>();
     if (video && (quint64)video->pts != AV_NOPTS_VALUE)
         avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
     else
@@ -401,7 +401,7 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
         if (m_needCalcSignature) 
         {
             if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
-                m_lastIFrame = md.dynamicCast<QnCompressedVideoData>();
+                m_lastIFrame = md.dynamicCast<const QnCompressedVideoData>();
             AVCodecContext* srcCodec = m_formatCtx->streams[streamIndex]->codec;
             QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
@@ -693,7 +693,7 @@ bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     return true;
 }
 
-bool QnStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
+bool QnStreamRecorder::saveMotion(QnConstMetaDataV1Ptr motion)
 {
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
         motion->serialize(m_motionFileList[motion->channelNumber].data());

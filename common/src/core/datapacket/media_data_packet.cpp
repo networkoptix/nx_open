@@ -86,7 +86,7 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
 }
 
 
-void QnAbstractMediaData::assign(QnAbstractMediaData* other)
+void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
     timestamp = other->timestamp;
@@ -102,7 +102,7 @@ void QnAbstractMediaData::assign(QnAbstractMediaData* other)
 
 // ----------------------------------- QnAbstractMediaData -----------------------------------------
 
-QnAbstractMediaData* QnAbstractMediaData::clone()
+QnAbstractMediaData* QnAbstractMediaData::clone() const
 {
     QnAbstractMediaData* rez = new QnAbstractMediaData(data.getAlignment(), data.size());
     rez->assign(this);
@@ -110,7 +110,7 @@ QnAbstractMediaData* QnAbstractMediaData::clone()
 }
 
 // ----------------------------------- QnCompressedVideoData -----------------------------------------
-void QnCompressedVideoData::assign(QnCompressedVideoData* other)
+void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
 {
     QnAbstractMediaData::assign(other);
     width = other->width;
@@ -119,7 +119,7 @@ void QnCompressedVideoData::assign(QnCompressedVideoData* other)
     pts = other->pts;
 }
 
-QnCompressedVideoData* QnCompressedVideoData::clone()
+QnCompressedVideoData* QnCompressedVideoData::clone() const
 {
     QnCompressedVideoData* rez = new QnCompressedVideoData(data.getAlignment(), data.size());
     rez->assign(this);
@@ -212,18 +212,24 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
 }
 
 
-void QnMetaDataV1::assign(QnMetaDataV1* other)
+void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
     m_input = other->m_input;
     m_duration = other->m_duration;
+    m_firstTimestamp = other->m_firstTimestamp;
 }
 
-QnMetaDataV1* QnMetaDataV1::clone()
+QnMetaDataV1* QnMetaDataV1::clone() const
 {
     QnMetaDataV1* rez = new QnMetaDataV1();
     rez->assign(this);
     return rez;
+}
+
+void QnMetaDataV1::addMotion(QnConstMetaDataV1Ptr data)
+{
+    addMotion((const quint8*) data->data.data(), data->timestamp);
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
@@ -284,7 +290,7 @@ inline bool metadataIsEmpty_cpu(const char* data)
     const quint32* curPtr = (const quint32*) data;
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32); ++i)
     {
-	if (*curPtr++)
+    if (*curPtr++)
             return false;
     }
     return true;
@@ -430,8 +436,10 @@ bool QnMetaDataV1::containTime(const qint64 timeUsec) const
 {
     if (m_duration == 0)
         return timestamp == timeUsec;
+    else if( timestamp <= timeUsec && timestamp + m_duration > timeUsec )
+        return true;
     else
-        return timestamp <= timeUsec && timestamp + m_duration > timeUsec;
+        return false;
 }
 
 inline void setBit(quint8* data, int x, int y)
@@ -474,7 +482,7 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
 
 }
 
-void QnMetaDataV1::serialize(QIODevice* ioDevice)
+void QnMetaDataV1::serialize(QIODevice* ioDevice) const
 {
     Q_ASSERT(channelNumber <= 255);
     qint64 timeStampMs = htonll(timestamp/1000);
@@ -517,13 +525,13 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 
 // ----------------------------------- QnCompressedAudioData -----------------------------------------
 
-void QnCompressedAudioData::assign(QnCompressedAudioData* other)
+void QnCompressedAudioData::assign(const QnCompressedAudioData* other)
 {
     QnAbstractMediaData::assign(other);
     duration = other->duration;
 }
 
-QnCompressedAudioData* QnCompressedAudioData::clone()
+QnCompressedAudioData* QnCompressedAudioData::clone() const
 {
     QnCompressedAudioData* rez = new QnCompressedAudioData(data.getAlignment(), data.size());
     rez->assign(this);
