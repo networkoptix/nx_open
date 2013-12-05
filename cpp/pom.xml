@@ -18,6 +18,7 @@
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/..</root.dir>
         <buildLib/>
+        <libtype/>
         <!--<product.title>${project.name}</product.title>		-->
         <postfix.libs/>
     </properties>
