@@ -277,6 +277,8 @@
                 <force_x86>false</force_x86>
                 <qt.spec>win32-msvc2012</qt.spec>
                 <profile.classifier>${platform}</profile.classifier>                
+                <windows>true</windows>
+                <unix>false</unix>
             </properties>
         </profile>
         <profile>
@@ -293,6 +295,8 @@
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
+                <unix>true</unix>
+                <windows>false</windows>
             </properties>
         </profile>        
         <profile>
