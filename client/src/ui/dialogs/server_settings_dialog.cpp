@@ -380,7 +380,7 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 
 void QnServerSettingsDialog::updateFromResources() 
 {
-      m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
 #ifndef Q_OS_MACX
     at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
 
