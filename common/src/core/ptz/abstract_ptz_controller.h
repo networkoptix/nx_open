@@ -110,9 +110,52 @@ public:
      */
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
 
+    /**
+     * Saves current PTZ position as a preset, either as a new one or 
+     * replacing an existing one. 
+     * 
+     * If <tt>id</tt> of the provided preset is set, replaces an existing preset.
+     * If it is not set, then creates a new preset and sets the <tt>id</tt>.
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::PtzPresetCapability<tt>.
+     *
+     * \param[in, out]                  Preset to create.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool createPreset(QnPtzPreset *preset) = 0;
+
+    /**
+     * Removes the given preset.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::PtzPresetCapability<tt>.
+     * 
+     * \param preset                    Preset to remove.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool removePreset(const QnPtzPreset &preset) = 0;
+
+    /**
+     * Activates the given preset.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::PtzPresetCapability<tt>.
+     * 
+     * \param preset                    Preset to activate.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool activatePreset(const QnPtzPreset &preset) = 0;
+
+    /**
+     * Gets a list of all PTZ presets for the camera.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::PtzPresetCapability<tt>.
+     * 
+     * \param[out] presets              PTZ presets.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
     virtual bool addTour() {return false;}
