@@ -16,7 +16,7 @@
 // QnOnvifPtzController
 // -------------------------------------------------------------------------- //
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
-    QnAbstractPtzController(resource),
+    base_type(resource),
     m_resource(resource),
     m_capabilities(0)
 {

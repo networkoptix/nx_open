@@ -3,14 +3,16 @@
 
 #include <QtCore/QHash>
 
-#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/basic_ptz_controller.h>
 #include <utils/math/functors.h>
 
 class CLSimpleHTTPClient;
 class QnAxisParameterMap;
 
-class QnAxisPtzController: public QnAbstractPtzController {
-    Q_OBJECT;
+class QnAxisPtzController: public QnBasicPtzController {
+    Q_OBJECT
+    typedef QnBasicPtzController base_type;
+
 public:
     QnAxisPtzController(const QnPlAxisResourcePtr &resource);
     virtual ~QnAxisPtzController();
@@ -22,7 +24,6 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(QnPtzLimits *limits) override;
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
 private:
     void updateState();

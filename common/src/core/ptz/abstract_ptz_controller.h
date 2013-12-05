@@ -69,34 +69,6 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) = 0;
 
     /**
-     * Gets PTZ position from camera. If this controller has 
-     * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is returned in 
-     * standard PTZ space. Otherwise it's returned in device-specific coordinates.
-     *
-     * \param space                     Coordinate space to get position in.
-     * \param[out] position             Current ptz position. 
-     * \returns                         Whether the operation was successful.
-     */
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
-
-    /**
-     * Gets PTZ limits of the camera in standard PTZ space. 
-     * 
-     * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::LogicalPositionSpaceCapability<tt>.
-     * 
-     * \param[out] limits               Ptz limits.
-     * \returns                         Whether the operation was successful.
-     */
-    virtual bool getLimits(QnPtzLimits *limits) = 0;
-
-    /**
-     * \param[out] flip                 Flipped state of the camera's video stream.
-     * \returns                         Whether the operation was successful.
-     */
-    virtual bool getFlip(Qt::Orientations *flip) = 0;
-
-    /**
      * Moves camera's viewport relative to current viewport. New viewport 
      * coordinates are provided in a coordinate space where current viewport
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
@@ -110,16 +82,38 @@ public:
      */
     virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
+    /**
+     * \param[out] flip                 Flipped state of the camera's video stream.
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool getFlip(Qt::Orientations *flip) = 0;
 
-    virtual bool addPreset() {return false;}
-    virtual bool removePreset() {return false;}
-    virtual bool activatePreset() {return false;}
-    virtual bool getPresets() {return false;}
+    /**
+     * Gets PTZ limits of the camera in standard PTZ space. 
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::LogicalPositionSpaceCapability<tt>.
+     * 
+     * \param[out] limits               Ptz limits.
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool getLimits(QnPtzLimits *limits) = 0;
 
-    struct Preset {
-        QString id;
-        QString name;
-    };
+    /**
+     * Gets PTZ position from camera. If this controller has 
+     * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is returned in 
+     * standard PTZ space. Otherwise it's returned in device-specific coordinates.
+     *
+     * \param space                     Coordinate space to get position in.
+     * \param[out] position             Current ptz position. 
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
+
+    virtual bool addPreset(const QnPtzPreset &preset) = 0;
+    virtual bool removePreset(const QnPtzPreset &preset) = 0;
+    virtual bool activatePreset(const QnPtzPreset &preset) = 0;
+    virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
     virtual bool addTour() {return false;}
     virtual bool removeTour() {return false;}

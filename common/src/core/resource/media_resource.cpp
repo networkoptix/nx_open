@@ -153,7 +153,7 @@ void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
     m_dewarpingParams = params;
     if (capsChanged) {
         if (params.enabled)
-            toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
+            ;//toResource()->setPtzCapabilities(Qn::AllPtzCapabilities); // TODO: #PTZ
         else
             toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
     }

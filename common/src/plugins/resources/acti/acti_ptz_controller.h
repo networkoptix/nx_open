@@ -4,13 +4,15 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 
-#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/basic_ptz_controller.h>
 
 class CLSimpleHTTPClient;
 class QnActiParameterMap;
 
-class QnActiPtzController: public QnAbstractPtzController {
-    Q_OBJECT;
+class QnActiPtzController: public QnBasicPtzController {
+    Q_OBJECT
+    typedef QnBasicPtzController base_type;
+
 public:
     QnActiPtzController(const QnActiResourcePtr &resource);
     virtual ~QnActiPtzController();
@@ -21,8 +23,7 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(QnPtzLimits *limits) override;
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
-
+    
 private:
     void init();
     bool startZoomInternal(qreal zoomVelocity);

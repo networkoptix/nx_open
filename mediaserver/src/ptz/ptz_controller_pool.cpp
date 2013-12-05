@@ -69,7 +69,7 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
 	if(data.deviceController) {
 		data.defaultController = data.deviceController;
 
-        if(data.deviceController->hasCapabilities(Qn::LogicalPositionSpaceCapability)) {
+        if(data.deviceController->hasCapabilities(Qn::LogicalCoordinateSpaceCapability)) {
             data.logicalController = data.deviceController;
         } else if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper()) {
             data.logicalController.reset(new QnMappedPtzController(mapper, data.deviceController));
@@ -79,7 +79,7 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
 	if(data.logicalController) {
 		data.defaultController = data.logicalController;
 
-        if(data.logicalController->hasCapabilities(Qn::ScreenSpaceMovementCapability)) {
+        if(data.logicalController->hasCapabilities(Qn::ViewportCoordinateSpaceCapability)) {
             data.relativeController = data.logicalController;
         } else {
             data.relativeController.reset(new QnRelativePtzController(data.logicalController));

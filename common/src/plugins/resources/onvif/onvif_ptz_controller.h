@@ -5,15 +5,15 @@
 
 #include <QtCore/QMutex>
 #include <QtCore/QPair>
-#include <QtGui/QMatrix4x4>
 
-#include "core/resource/resource_fwd.h"
-#include "core/ptz/abstract_ptz_controller.h"
+#include <core/ptz/basic_ptz_controller.h>
 
 class QnPtzSpaceMapper;
 
-class QnOnvifPtzController: public QnAbstractPtzController {
+class QnOnvifPtzController: public QnBasicPtzController {
     Q_OBJECT
+    typedef QnBasicPtzController base_type;
+
 public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
@@ -32,7 +32,6 @@ private:
     bool moveInternal(const QVector3D &speed);
 
 private:
-    mutable QMutex m_mutex;
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     bool m_stopBroken;

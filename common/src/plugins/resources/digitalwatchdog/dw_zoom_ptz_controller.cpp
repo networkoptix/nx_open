@@ -8,7 +8,7 @@
 #include "digital_watchdog_resource.h"
 
 QnDwZoomPtzController::QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource):
-    QnAbstractPtzController(resource),
+    base_type(resource),
     m_resource(resource)
 {}
 
@@ -45,26 +45,6 @@ bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
     m_resource->setParam(setting.getId(), setting.serializeToStr(), QnDomainPhysical);
 
     return true;
-}
-
-bool QnDwZoomPtzController::absoluteMove(Qn::PtzCoordinateSpace, const QVector3D &) {
-    return false;
-}
-
-bool QnDwZoomPtzController::getPosition(Qn::PtzCoordinateSpace, QVector3D *) {
-    return false;
-}
-
-bool QnDwZoomPtzController::getLimits(QnPtzLimits *) {
-    return false;
-}
-
-bool QnDwZoomPtzController::getFlip(Qt::Orientations *) {
-    return false;
-}
-
-bool QnDwZoomPtzController::relativeMove(qreal, const QRectF &) {
-    return false;
 }
 
 #endif //ENABLE_ONVIF

@@ -7,19 +7,23 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <common/common_serialization.h>
+
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/id.h>
+
+#include <api/api_fwd.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
-#include "api/model/rebuild_archive_reply.h"
-#include <utils/camera/camera_diagnostics.h>
-#include <utils/common/id.h>
+#include <api/model/rebuild_archive_reply.h>
+
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
 
-#include "api_fwd.h"
 #include "abstract_connection.h"
 #include "media_server_cameras_data.h"
 

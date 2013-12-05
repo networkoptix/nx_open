@@ -56,7 +56,7 @@ namespace {
 
 
 QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
-    QnAbstractPtzController(resource),
+    base_type(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities),
     m_zoomVelocity(0.0),
@@ -281,6 +281,3 @@ bool QnActiPtzController::getLimits(QnPtzLimits *limits) {
     return false; // TODO: #Elric #PTZ
 }
 
-bool QnActiPtzController::relativeMove(qreal, const QRectF &) {
-    return false;
-}

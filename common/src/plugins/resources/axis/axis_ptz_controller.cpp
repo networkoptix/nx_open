@@ -56,7 +56,7 @@ private:
 // QnAxisPtzController
 // -------------------------------------------------------------------------- //
 QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
-    QnAbstractPtzController(resource),
+    base_type(resource),
     m_resource(resource),
     m_capabilities(Qn::NoCapabilities)
 {
@@ -248,6 +248,3 @@ bool QnAxisPtzController::getLimits(QnPtzLimits *limits) {
     return true;
 }
 
-bool QnAxisPtzController::relativeMove(qreal, const QRectF &) {
-    return false;
-}
