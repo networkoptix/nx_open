@@ -28,6 +28,7 @@
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
 #include "soapStub.h"
+#include "onvif_ptz_controller.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE

@@ -13,6 +13,7 @@
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resource_managment/resource_pool.h"
+#include "core/ptz/abstract_ptz_controller.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"

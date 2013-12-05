@@ -21,8 +21,6 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "core/ptz/abstract_ptz_controller.h"
-#include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;

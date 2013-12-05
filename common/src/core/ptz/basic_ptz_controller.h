@@ -20,12 +20,12 @@ public:
     virtual bool getLimits(QnPtzLimits *) override                                  { return false; }
     virtual bool getPosition(Qn::PtzCoordinateSpace, QVector3D *) override          { return false; }
 
-    virtual bool createPreset(QnPtzPreset *) override                               { return false; }
+    virtual bool createPreset(const QnPtzPreset &, QString *) override              { return false; }
     virtual bool removePreset(const QString &) override                             { return false; }
     virtual bool activatePreset(const QString &) override                           { return false; }
     virtual bool getPresets(QnPtzPresetList *) override                             { return false; }
 
-    virtual bool createTour(QnPtzTour *) override                                   { return false; }
+    virtual bool createTour(const QnPtzTour &, QString *) override                  { return false; }
     virtual bool removeTour(const QString &) override                               { return false; }
     virtual bool activateTour(const QString &) override                             { return false; }
     virtual bool getTours(QnPtzTourList *) override                                 { return false; }

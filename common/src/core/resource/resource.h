@@ -1,7 +1,6 @@
 #ifndef QN_RESOURCE_H
 #define QN_RESOURCE_H
 
-#include <cassert>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
 #include <QtCore/QMetaType>
@@ -9,15 +8,18 @@
 #include <QtCore/QStringList>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QThreadPool>
-#include "utils/camera/camera_diagnostics.h"
-#include "utils/common/from_this_to_shared.h"
-#include "utils/common/id.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "resource_fwd.h"
-#include "param.h"
-#include "resource_type.h"
+
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/from_this_to_shared.h>
+#include <utils/common/id.h>
+
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/ptz/ptz_fwd.h>
+
 #include "shared_resource_pointer.h"
-#include <core/ptz/abstract_ptz_controller.h>
+#include "resource_fwd.h"
+#include "resource_type.h"
+#include "param.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;

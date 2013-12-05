@@ -57,7 +57,7 @@ signals:
     void finished(int status, const QnManualCameraSearchReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
-    void finished(int status, const QnPtzPreset &reply, int handle);
+    void finished(int status, const QString &reply, int handle);
     void finished(int status, const QnPtzPresetList &reply, int handle);
 
 private:

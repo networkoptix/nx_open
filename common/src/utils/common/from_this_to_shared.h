@@ -1,8 +1,9 @@
 #ifndef FROM_THIS_TO_SHARED_H
 #define FROM_THIS_TO_SHARED_H
 
-#include "core/resource/shared_resource_pointer.h"
+#include <cassert>
 
+#include "core/resource/shared_resource_pointer.h"
 
 //!Enables conversion from \a this to shared pointer to class
 /*!
