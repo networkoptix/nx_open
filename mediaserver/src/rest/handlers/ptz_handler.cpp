@@ -166,18 +166,23 @@ int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, cons
         return CODE_INVALID_PARAMETER;
 
     QnPtzPreset preset(id, name);
+
+    return 1;
 }
 
 int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
 
+    return 1;
 }
 
 int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
 
+    return 1;
 }
 
 int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
 
+    return 1;
 }
 
 QString QnPtzHandler::description() const
