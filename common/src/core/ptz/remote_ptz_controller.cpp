@@ -57,7 +57,7 @@ bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D 
         return false;
 
     QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzGetPosition(m_resource, space, &result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->ptzGetPositionAsync(m_resource, space, &result, SLOT(processReply(int, const QVariant &, int)));
     if(result.exec() != 0)
         return false;
 
@@ -74,19 +74,45 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
 }
 
 bool QnRemotePtzController::createPreset(QnPtzPreset *preset) {
-    return false;
+    if(!m_server)
+        return false;
+
+    QnConnectionRequestResult result;
+    m_server->apiConnection()->ptzCreatePresetAsync(m_resource, *preset, &result, SLOT(processReply(int, const QVariant &, int)));
+    if(result.exec() != 0)
+        return false;
+
+    *preset = result.reply<QnPtzPreset>();
+    return true;
 }
 
 bool QnRemotePtzController::removePreset(const QnPtzPreset &preset) {
-    return false;
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzRemovePresetAsync(m_resource, preset, this, SLOT(at_removePreset_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::activatePreset(const QnPtzPreset &preset) {
-    return false;
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzActivatePresetAsync(m_resource, preset, this, SLOT(at_activatePreset_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
-    return false;
+    if(!m_server)
+        return false;
+
+    QnConnectionRequestResult result;
+    m_server->apiConnection()->ptzGetPresetsAsync(m_resource, &result, SLOT(processReply(int, const QVariant &, int)));
+    if(result.exec() != 0)
+        return false;
+
+    *presets = result.reply<QnPtzPresetList>();
+    return true;
 }
 
 
@@ -105,3 +131,10 @@ void QnRemotePtzController::at_relativeMove_replyReceived(int status, int handle
     return;
 }
 
+void QnRemotePtzController::at_removePreset_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_activatePreset_replyReceived(int status, int handle) {
+    return;
+}

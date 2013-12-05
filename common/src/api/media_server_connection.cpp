@@ -604,7 +604,7 @@ int QnMediaServerConnection::ptzGetPresetsAsync(const QnNetworkResourcePtr &came
     return sendAsyncGetRequest(PtzGetPresetsObject, params, QN_REPLY_TYPE(QnPtzPresetList), target, slot);
 }
 
-int QnMediaServerConnection::ptzGetPosition(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetPositionAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));

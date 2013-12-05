@@ -31,6 +31,9 @@ private slots:
     void at_absoluteMove_replyReceived(int status, int handle);
     void at_relativeMove_replyReceived(int status, int handle);
 
+    void at_removePreset_replyReceived(int status, int handle);
+    void at_activatePreset_replyReceived(int status, int handle);
+
 private:
     QnNetworkResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;
