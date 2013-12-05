@@ -846,6 +846,9 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
+    if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
+        m_universalTcpListener->disableAuth();
+
 #ifdef ENABLE_DESKTOP_CAMERA
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
 #endif   //ENABLE_DESKTOP_CAMERA
