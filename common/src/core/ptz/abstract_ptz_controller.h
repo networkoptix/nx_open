@@ -163,18 +163,6 @@ public:
     virtual bool activateTour() {return false;}
     virtual bool getTours() {return false;}
 
-    struct TourSpot {
-        QString presetId;
-        int stayTime;
-        QVector3D speed;
-    };
-
-    struct Tour {
-        QString id;
-        QString name;
-        QList<TourSpot> spots;
-    };
-
 protected:
     QnResourcePtr m_resource;
 };
