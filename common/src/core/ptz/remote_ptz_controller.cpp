@@ -73,32 +73,32 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
     return false;
 }
 
-bool QnRemotePtzController::createPreset(QnPtzPreset *preset) {
+bool QnRemotePtzController::createPreset(const QnPtzPreset &preset, QString *presetId) {
     if(!m_server)
         return false;
 
     QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzCreatePresetAsync(m_resource, *preset, &result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->ptzCreatePresetAsync(m_resource, preset, &result, SLOT(processReply(int, const QVariant &, int)));
     if(result.exec() != 0)
         return false;
 
-    *preset = result.reply<QnPtzPreset>();
+    *presetId = result.reply<QString>();
     return true;
 }
 
-bool QnRemotePtzController::removePreset(const QnPtzPreset &preset) {
+bool QnRemotePtzController::removePreset(const QString &presetId) {
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzRemovePresetAsync(m_resource, preset, this, SLOT(at_removePreset_replyReceived(int, int)));
+    m_server->apiConnection()->ptzRemovePresetAsync(m_resource, presetId, this, SLOT(at_removePreset_replyReceived(int, int)));
     return true;
 }
 
-bool QnRemotePtzController::activatePreset(const QnPtzPreset &preset) {
+bool QnRemotePtzController::activatePreset(const QString &presetId) {
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzActivatePresetAsync(m_resource, preset, this, SLOT(at_activatePreset_replyReceived(int, int)));
+    m_server->apiConnection()->ptzActivatePresetAsync(m_resource, presetId, this, SLOT(at_activatePreset_replyReceived(int, int)));
     return true;
 }
 

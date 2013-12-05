@@ -112,6 +112,7 @@ public:
         ViewportCoordinateSpaceCapability   = 0x00040000,
 
         PtzPresetCapability                 = 0x00100000,
+        PtzTourCapability                   = 0x00200000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,

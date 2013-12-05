@@ -337,7 +337,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QVector3D>(this, response, handle);
         break;
     case PtzCreatePresetObject:
-        processJsonReply<QnPtzPreset>(this, response, handle);
+        processJsonReply<QString>(this, response, handle);
         break;
     case PtzGetPresetsObject:
         processJsonReply<QnPtzPresetList>(this, response, handle);
@@ -573,23 +573,23 @@ int QnMediaServerConnection::ptzCreatePresetAsync(const QnNetworkResourcePtr &ca
     params << QnRequestParam("presetName",      QnLexical::serialized(preset.name));
     params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
 
-    return sendAsyncGetRequest(PtzCreatePresetObject, params, QN_REPLY_TYPE(QnPtzPreset), target, slot);
+    return sendAsyncGetRequest(PtzCreatePresetObject, params, QN_REPLY_TYPE(QString), target, slot);
 }
 
-int QnMediaServerConnection::ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzRemovePresetAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
+    params << QnRequestParam("presetId",        QnLexical::serialized(presetId));
 
     return sendAsyncGetRequest(PtzRemovePresetObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzActivatePresetAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
+    params << QnRequestParam("presetId",        QnLexical::serialized(presetId));
 
     return sendAsyncGetRequest(PtzActivatePresetObject, params, NULL, target, slot);
 }

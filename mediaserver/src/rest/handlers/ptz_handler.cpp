@@ -164,10 +164,10 @@ int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, cons
         return CODE_INVALID_PARAMETER;
 
     QnPtzPreset preset(presetId, presetName);
-    if(!controller->createPreset(&preset))
+    if(!controller->createPreset(preset, &presetId))
         return CODE_INTERNAL_ERROR;
 
-    result.setReply(preset);
+    result.setReply(presetId);
     return CODE_OK;
 }
 

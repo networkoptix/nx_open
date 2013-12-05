@@ -179,8 +179,8 @@ public:
     int ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
 
     int ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
-    int ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
-    int ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
+    int ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, QObject *target, const char *slot);
+    int ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, QObject *target, const char *slot);
     int ptzGetPresetsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int getStorageSpaceAsync(QObject *target, const char *slot);

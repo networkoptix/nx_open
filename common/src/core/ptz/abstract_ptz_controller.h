@@ -114,16 +114,17 @@ public:
      * Saves current PTZ position as a preset, either as a new one or 
      * replacing an existing one. 
      * 
-     * If <tt>id</tt> of the provided preset is set, replaces an existing preset.
-     * If it is not set, then creates a new preset and sets the <tt>id</tt>.
+     * If <tt>id</tt> of the provided preset is not set, a new <tt>id</tt> 
+     * will be generated.
      * 
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::PtzPresetCapability<tt>.
      *
-     * \param[in, out]                  Preset to create.
+     * \param preset                    Preset to create.
+     * \param[out] presetId             Id of the created preset.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool createPreset(QnPtzPreset *preset) = 0;
+    virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) = 0;
 
     /**
      * Removes the given preset.
@@ -158,7 +159,7 @@ public:
      */
     virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
-    virtual bool createTour(QnPtzTour *tour) = 0;
+    virtual bool createTour(const QnPtzTour &tour, QString *tourId) = 0;
     virtual bool removeTour(const QString &tourId) = 0;
     virtual bool activateTour(const QString &tourId) = 0;
     virtual bool getTours(QnPtzTourList *tours) = 0;
