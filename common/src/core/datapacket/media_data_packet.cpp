@@ -282,9 +282,9 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 inline bool metadataIsEmpty_cpu(const char* data)
 {
     const quint32* curPtr = (const quint32*) data;
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32); ++i)
+    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32)/CHAR_BIT; ++i)
     {
-	if (*curPtr++)
+    	if (*curPtr++)
             return false;
     }
     return true;
