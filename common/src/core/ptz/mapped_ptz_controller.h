@@ -23,7 +23,6 @@ public:
     virtual bool getLimits(QnPtzLimits *limits) override;
 
 private:
-    QnPtzControllerPtr m_controller;
     QnPtzMapperPtr m_mapper;
     QnPtzLimits m_limits;
 };

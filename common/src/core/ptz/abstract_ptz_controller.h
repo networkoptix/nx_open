@@ -6,11 +6,11 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/math/math.h>
 
 #include "ptz_fwd.h"
 #include "ptz_limits.h"
 #include "ptz_preset.h"
+#include "ptz_tour.h"
 
 /**
  * A thread-safe interface for accessing camera's PTZ functions.

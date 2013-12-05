@@ -7,23 +7,13 @@
 
 #include "ptz_fwd.h"
 
-#include <utils/common/json.h>
-
-class QnPtzPreset {
+struct QnPtzPreset {
 public:
     QnPtzPreset() {}
-    QnPtzPreset(const QString &id, const QString &name): m_id(id), m_name(name) {}
+    QnPtzPreset(const QString &id, const QString &name): id(id), name(name) {}
 
-    bool isNull() const { return m_id.isNull(); }
-
-    const QString &id() const { return m_id; }
-    void setId(const QString &id) { m_id = id; }
-
-    const QString &name() const { return m_name; }
-    void setName(const QString &name) { m_name = name; }
-
-private:
-    QString m_id, m_name;
+    QString id;
+    QString name;
 };
 
 Q_DECLARE_METATYPE(QnPtzPreset)

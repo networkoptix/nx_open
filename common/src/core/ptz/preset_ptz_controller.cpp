@@ -33,7 +33,7 @@ public:
     using base_type::indexOf;
     int indexOf(const QString &id) {
         for(int i = 0; i < size(); i++)
-            if(this->operator[](i).preset.id() == id)
+            if(this->operator[](i).preset.id == id)
                 return i;
         return -1;
     }
@@ -98,10 +98,11 @@ Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
 bool QnPresetPtzController::createPreset(QnPtzPreset *preset) {
     d->loadRecords();
 
-    if(preset->id().isEmpty())
-        preset->setId(QUuid::createUuid().toString());
+    // TODO: dont modify it on failure
+    if(preset->id.isEmpty())
+        preset->id = QUuid::createUuid().toString();
 
-    int index = d->records.indexOf(preset->id());
+    int index = d->records.indexOf(preset->id);
     if(index == -1) {
         d->records.push_back(QnPtzPresetRecord());
         index = d->records.size() - 1;
@@ -120,7 +121,7 @@ bool QnPresetPtzController::createPreset(QnPtzPreset *preset) {
 bool QnPresetPtzController::removePreset(const QnPtzPreset &preset) {
     d->loadRecords();
 
-    int index = d->records.indexOf(preset.id());
+    int index = d->records.indexOf(preset.id);
     if(index == -1)
         return false;
     d->records.removeAt(index);
@@ -132,7 +133,7 @@ bool QnPresetPtzController::removePreset(const QnPtzPreset &preset) {
 bool QnPresetPtzController::activatePreset(const QnPtzPreset &preset) {
     d->loadRecords();
 
-    int index = d->records.indexOf(preset.id());
+    int index = d->records.indexOf(preset.id);
     if(index == -1)
         return false;
     const QnPtzPresetRecord &record = d->records[index];

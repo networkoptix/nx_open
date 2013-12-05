@@ -570,8 +570,8 @@ int QnMediaServerConnection::ptzCreatePresetAsync(const QnNetworkResourcePtr &ca
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreatePresetAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("presetName",      QnLexical::serialized(preset.name()));
-    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id()));
+    params << QnRequestParam("presetName",      QnLexical::serialized(preset.name));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
 
     return sendAsyncGetRequest(PtzCreatePresetObject, params, QN_REPLY_TYPE(QnPtzPreset), target, slot);
 }
@@ -580,7 +580,7 @@ int QnMediaServerConnection::ptzRemovePresetAsync(const QnNetworkResourcePtr &ca
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzRemovePresetAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id()));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
 
     return sendAsyncGetRequest(PtzRemovePresetObject, params, NULL, target, slot);
 }
@@ -589,7 +589,7 @@ int QnMediaServerConnection::ptzActivatePresetAsync(const QnNetworkResourcePtr &
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzActivatePresetAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id()));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
 
     return sendAsyncGetRequest(PtzActivatePresetObject, params, NULL, target, slot);
 }

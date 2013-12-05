@@ -12,14 +12,17 @@ typedef QSharedPointer<QnPtzMapper> QnPtzMapperPtr;
 class QnAbstractPtzController;
 typedef QSharedPointer<QnAbstractPtzController> QnPtzControllerPtr;
 
-class QnPtzPreset;
+struct QnPtzPreset;
 typedef QList<QnPtzPreset> QnPtzPresetList;
 
-class QnPtzTourSpot;
+struct QnPtzTourSpot;
 typedef QList<QnPtzTourSpot> QnPtzTourSpotList;
 
-class QnPtzTour;
+struct QnPtzTour;
 
+struct QnPtzLimits;
+
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzMapperPtr)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzPreset)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzTourSpot)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzTour)
