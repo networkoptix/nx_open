@@ -27,7 +27,7 @@ private:
     CLSimpleHTTPClient *newHttpClient() const;
     bool query(const QString &request, QByteArray *body = NULL) const;
     bool query(const QString &request, QnAxisParameterMap *params) const;
-
+    QString getCameraNum();
 private:
     QnPlAxisResource* m_resource;
     Qn::PtzCapabilities m_capabilities;
