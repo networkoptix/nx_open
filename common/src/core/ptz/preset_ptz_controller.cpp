@@ -55,7 +55,7 @@ public:
         if(helper->value().isEmpty()) {
             records.clear();
         } else {
-            QJson::deserialize<QnPtzPresetRecordList>(helper->value().toUtf8(), &m_records);
+            QJson::deserialize<QnPtzPresetRecordList>(helper->value().toUtf8(), &records);
         }
 
     }
