@@ -47,11 +47,11 @@ bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
     return true;
 }
 
-bool QnDwZoomPtzController::absoluteMove(const QVector3D &) {
+bool QnDwZoomPtzController::absoluteMove(Qn::PtzCoordinateSpace, const QVector3D &) {
     return false;
 }
 
-bool QnDwZoomPtzController::getPosition(QVector3D *) {
+bool QnDwZoomPtzController::getPosition(Qn::PtzCoordinateSpace, QVector3D *) {
     return false;
 }
 

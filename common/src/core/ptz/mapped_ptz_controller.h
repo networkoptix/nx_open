@@ -16,8 +16,8 @@ public:
     QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual bool absoluteMove(const QVector3D &position) override;
-    virtual bool getPosition(QVector3D *position) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(QnPtzLimits *limits) override;
 
 private:

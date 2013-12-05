@@ -138,10 +138,12 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         limits.minTilt = qMax<qreal>(limits.minTilt, -90.0);
 
         /* Logical space should work now that we know logical limits. */
-        m_capabilities |= Qn::LogicalPositionSpaceCapability;
+        m_capabilities |= Qn::LogicalCoordinateSpaceCapability;
         m_limits = limits;
         m_logicalToCameraZoom = QnLinearFunction(limits.minFov, 9999, limits.maxFov, 1);
         m_cameraToLogicalZoom = m_logicalToCameraZoom.inversed();
+    } else {
+        m_capabilities &= ~Qn::AbsolutePtzCapabilities;
     }
 }
 
@@ -210,11 +212,17 @@ bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
-bool QnAxisPtzController::absoluteMove(const QVector3D &position) {
+bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+    if(space != Qn::LogicalCoordinateSpace)
+        return false;
+
     return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())));
 }
 
-bool QnAxisPtzController::getPosition(QVector3D *position) {
+bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+    if(space != Qn::LogicalCoordinateSpace)
+        return false;
+
     QnAxisParameterMap params;
     if(!query(lit("com/ptz.cgi?query=position"), &params))
         return false;

@@ -1,6 +1,6 @@
 #include "ptz_handler.h"
 
-#include <api/model/model_globals.h>
+#include <common/common_serialization.h>
 
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
@@ -107,16 +107,18 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
 
 int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal xPos, yPos, zPos;
+    Qn::PtzCoordinateSpace space;
     if(
         !requireParameter(params, lit("xPos"), result, &xPos) || 
         !requireParameter(params, lit("yPos"), result, &yPos) || 
-        !requireParameter(params, lit("zPos"), result, &zPos)
+        !requireParameter(params, lit("zPos"), result, &zPos) ||
+        !requireParameter(params, lit("space"), result, &space)
     ) {
         return CODE_INVALID_PARAMETER;
     }
     
     QVector3D position(xPos, yPos, zPos);
-    if(!controller->absoluteMove(position))
+    if(!controller->absoluteMove(space, position))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -142,8 +144,12 @@ int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, cons
 }
 
 int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Qn::PtzCoordinateSpace space;
+    if(!requireParameter(params, lit("space"), result, &space))
+        return CODE_INVALID_PARAMETER;
+
     QVector3D position;
-    if(!controller->getPosition(&position))
+    if(!controller->getPosition(space, &position))
         return CODE_INTERNAL_ERROR;
 
     result.setReply(position);

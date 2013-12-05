@@ -62,20 +62,22 @@ public:
      * coordinates and thus only positions returned from a call to <tt>getPosition</tt>
      * can be safely used.
      *
+     * \param space                     Coordinate space of the provided position.
      * \param position                  Position to move to.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool absoluteMove(const QVector3D &position) = 0;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) = 0;
 
     /**
      * Gets PTZ position from camera. If this controller has 
      * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is returned in 
      * standard PTZ space. Otherwise it's returned in device-specific coordinates.
      *
+     * \param space                     Coordinate space to get position in.
      * \param[out] position             Current ptz position. 
      * \returns                         Whether the operation was successful.
      */
-    virtual bool getPosition(QVector3D *position) = 0;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
 
     /**
      * Gets PTZ limits of the camera in standard PTZ space. 

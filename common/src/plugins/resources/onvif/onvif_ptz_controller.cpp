@@ -18,9 +18,9 @@
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
     QnAbstractPtzController(resource),
     m_resource(resource),
-    m_ptzCapabilities(0)
+    m_capabilities(0)
 {
-    m_ptzCapabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities;
+    m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DeviceCoordinateSpaceCapability;
     m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
 
     QAuthenticator auth(m_resource->getAuth());
@@ -95,7 +95,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
 }
 
 Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() {
-    return m_ptzCapabilities;
+    return m_capabilities;
 }
 
 double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff) {
@@ -169,7 +169,10 @@ bool QnOnvifPtzController::continuousMove(const QVector3D &speed) {
     }
 }
 
-bool QnOnvifPtzController::absoluteMove(const QVector3D &position) {
+bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+    if(space != Qn::DeviceCoordinateSpace)
+        return false;
+
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     
@@ -209,7 +212,10 @@ bool QnOnvifPtzController::absoluteMove(const QVector3D &position) {
     return true;
 }
 
-bool QnOnvifPtzController::getPosition(QVector3D *position) {
+bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+    if(space != Qn::DeviceCoordinateSpace)
+        return false;
+
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
     

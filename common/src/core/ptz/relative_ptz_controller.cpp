@@ -11,11 +11,11 @@
 QnRelativePtzController::QnRelativePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController) 
 {
-    assert(baseController->hasCapabilities(Qn::LogicalPositionSpaceCapability));
+    assert(baseController->hasCapabilities(Qn::LogicalCoordinateSpaceCapability));
 }
 
 Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
-    return base_type::getCapabilities() | Qn::ScreenSpaceMovementCapability;
+    return base_type::getCapabilities() | Qn::ViewportCoordinateSpaceCapability;
 }
 
 bool QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
@@ -26,7 +26,7 @@ bool QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &view
 
     // TODO: #Elric cache it!
     QVector3D oldPosition;
-    if(!getPosition(&oldPosition))
+    if(!getPosition(Qn::LogicalCoordinateSpace, &oldPosition))
         return false;
 
     // TODO: #Elric also take flip into account.
@@ -74,5 +74,5 @@ bool QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &view
     newPosition.setZ(qBound<float>(limits.minFov, newPosition.z(), limits.maxFov));
 
     /* Send it to the camera. */
-    return absoluteMove(newPosition);
+    return absoluteMove(Qn::LogicalCoordinateSpace, newPosition);
 }

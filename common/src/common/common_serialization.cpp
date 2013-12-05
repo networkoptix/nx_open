@@ -1,0 +1,10 @@
+#include "common_serialization.h"
+
+#include <utils/common/enum_name_mapper.h>
+
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzAction)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzCoordinateSpace)
+
+QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzAction)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
+

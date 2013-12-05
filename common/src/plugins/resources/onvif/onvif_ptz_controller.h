@@ -19,11 +19,11 @@ public:
 
     virtual Qn::PtzCapabilities getCapabilities() override;
     virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool absoluteMove(const QVector3D &position) override;
-    virtual bool getPosition(QVector3D *position) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
+    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
@@ -34,7 +34,7 @@ private:
 private:
     mutable QMutex m_mutex;
     QnPlOnvifResourcePtr m_resource;
-    Qn::PtzCapabilities m_ptzCapabilities;
+    Qn::PtzCapabilities m_capabilities;
     bool m_stopBroken;
 
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative

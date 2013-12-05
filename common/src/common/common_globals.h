@@ -77,6 +77,17 @@ public:
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
 
+    enum PtzAction {
+        PtzContinousMoveAction,
+        PtzAbsoluteMoveAction,
+        PtzRelativeMoveAction,
+        PtzGetPositionAction
+    };
+
+    enum PtzCoordinateSpace {
+        LogicalCoordinateSpace,
+        DeviceCoordinateSpace
+    };
 
     enum PtzCapability {
         NoPtzCapabilities                   = 0x00000000,
@@ -89,14 +100,14 @@ public:
         AbsoluteTiltCapability              = 0x00008000,
         AbsoluteZoomCapability              = 0x00010000,
 
-        LogicalPositionSpaceCapability      = 0x00020000,
-        ScreenSpaceMovementCapability       = 0x00040000,
+        DeviceCoordinateSpaceCapability     = 0x00080000,
+        LogicalCoordinateSpaceCapability    = 0x00020000,
+        ViewportCoordinateSpaceCapability   = 0x00040000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        AllPtzCapabilities                  = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositionSpaceCapability | ScreenSpaceMovementCapability,
 
         /* Deprecated capabilities. */
         DeprecatedContinuousPtzCapability   = 0x001,

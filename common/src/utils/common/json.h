@@ -313,7 +313,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
     }
 
 
-#define QN_DEFINE_ENUM_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)     \
+#define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
 __VA_ARGS__ void serialize(const TYPE &value, QJsonValue *target) {             \
     *target = QnLexical::serialized(value);                                     \
 }                                                                               \
@@ -326,11 +326,11 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 
 #define QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
     QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)    \
-    QN_DEFINE_ENUM_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
+    QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
 
 #define QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
     QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)  \
-    QN_DEFINE_ENUM_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
+    QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
 
 #else // Q_MOC_RUN
 
@@ -338,7 +338,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 #define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
-#define QN_DEFINE_ENUM_JSON_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(...)
 
 #endif // Q_MOC_RUN
 

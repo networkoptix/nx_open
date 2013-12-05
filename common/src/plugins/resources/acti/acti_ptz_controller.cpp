@@ -101,7 +101,7 @@ void QnActiPtzController::init() {
     }
 
     if(m_capabilities & Qn::AbsolutePtzCapabilities)
-        m_capabilities |= Qn::LogicalPositionSpaceCapability;
+        m_capabilities |= Qn::LogicalCoordinateSpaceCapability;
 
     QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
     m_minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
@@ -226,7 +226,10 @@ bool QnActiPtzController::continuousMove(const QVector3D &speed) {
     return status0 && status1;
 }
 
-bool QnActiPtzController::absoluteMove(const QVector3D &position) {
+bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+    if(space != Qn::LogicalCoordinateSpace)
+        return false;
+
     QMutexLocker lock(&m_mutex);
 
     qreal zoomPos = qMax(0.0, (double) (position.z() - m_minAngle) / (m_maxAngle - m_minAngle) * 1000);
@@ -243,7 +246,10 @@ bool QnActiPtzController::absoluteMove(const QVector3D &position) {
     return true;
 }
 
-bool QnActiPtzController::getPosition(QVector3D *position) {
+bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+    if(space != Qn::LogicalCoordinateSpace)
+        return false;
+
     QMutexLocker lock(&m_mutex);
 
     *position = QVector3D();

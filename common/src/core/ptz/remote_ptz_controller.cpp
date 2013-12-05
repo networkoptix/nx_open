@@ -36,11 +36,11 @@ bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
     return true;
 }
 
-bool QnRemotePtzController::absoluteMove(const QVector3D &position) {
+bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzAbsoluteMoveAsync(m_resource, position, m_sequenceId, m_sequenceNumber++, this, SLOT(at_absoluteMove_replyReceived(int, int)));
+    m_server->apiConnection()->ptzAbsoluteMoveAsync(m_resource, space, position, m_sequenceId, m_sequenceNumber++, this, SLOT(at_absoluteMove_replyReceived(int, int)));
     return true;
 }
 
@@ -52,12 +52,12 @@ bool QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewpo
     return true;
 }
 
-bool QnRemotePtzController::getPosition(QVector3D *position) {
+bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
     if(!m_server)
         return false;
 
     QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzGetPosition(m_resource, &result, SLOT(processReply(int, const QVariant &, int)));
+    m_server->apiConnection()->ptzGetPosition(m_resource, space, &result, SLOT(processReply(int, const QVariant &, int)));
     if(result.exec() != 0)
         return false;
 

@@ -88,7 +88,7 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
 
     QVector<QPair<qreal, qreal> > sourceToTarget;
     for(int i = 0; i < logical.size(); i++)
-        sourceToTarget.push_back(qMakePair(device[i], logical[i]));
+        sourceToTarget.push_back(qMakePair(device[i], logical[i] * logicalMultiplier));
 
     *target = QnSpaceMapperPtr<qreal>(new QnScalarInterpolationSpaceMapper<qreal>(sourceToTarget, static_cast<Qn::ExtrapolationMode>(extrapolationMode)));
     return true;

@@ -112,7 +112,7 @@ qreal QnFisheyePtzController::boundYAngle(qreal value, qreal fov, qreal aspectRa
         return qBound(m_yRange.min, value, m_yRange.max - yFov);
 }
 
-bool QnFisheyePtzController::absoluteMove(const QVector3D &position)
+bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position)
 {
     m_motion = QVector3D();
 
@@ -131,7 +131,7 @@ bool QnFisheyePtzController::absoluteMove(const QVector3D &position)
     return true;
 }
 
-bool QnFisheyePtzController::getPosition(QVector3D *position)
+bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position)
 {
     position->setX(qRadiansToDegrees(m_dewarpingParams.xAngle));
     position->setY(qRadiansToDegrees(m_dewarpingParams.yAngle));

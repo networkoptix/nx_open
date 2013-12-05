@@ -789,7 +789,7 @@ QnAbstractPtzController *QnResource::createPtzController() {
 
     /* Do some sanity checking. */
     Qn::PtzCapabilities capabilities = result->getCapabilities();
-    if((capabilities & Qn::LogicalPositionSpaceCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
+    if((capabilities & Qn::LogicalCoordinateSpaceCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
         qnCritical("Logical position space capability is defined for a PTZ controller that does not support absolute movement.");
     
     return result;

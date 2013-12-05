@@ -12,7 +12,7 @@
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
 
-#include <api/model/model_globals.h>
+#include <common/common_serialization.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -526,10 +526,11 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &
     return sendAsyncGetRequest(PtzContinuousMoveObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &position, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzAbsoluteMoveAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("space",           QnLexical::serialized(space));
     params << QnRequestParam("xPos",            QnLexical::serialized(position.x()));
     params << QnRequestParam("yPos",            QnLexical::serialized(position.y()));
     params << QnRequestParam("zPos",            QnLexical::serialized(position.z()));
@@ -554,10 +555,11 @@ int QnMediaServerConnection::ptzRelativeMoveAsync(const QnNetworkResourcePtr &ca
     return sendAsyncGetRequest(PtzRelativeMoveObject, params, NULL, target, slot);
 }
 
-int QnMediaServerConnection::ptzGetPosition(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzGetPosition(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetPositionAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("space",           QnLexical::serialized(space));
 
     return sendAsyncGetRequest(PtzGetPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
 }
