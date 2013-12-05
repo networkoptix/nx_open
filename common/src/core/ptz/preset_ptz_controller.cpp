@@ -118,10 +118,10 @@ bool QnPresetPtzController::createPreset(QnPtzPreset *preset) {
     return true;
 }
 
-bool QnPresetPtzController::removePreset(const QnPtzPreset &preset) {
+bool QnPresetPtzController::removePreset(const QString &presetId) {
     d->loadRecords();
 
-    int index = d->records.indexOf(preset.id);
+    int index = d->records.indexOf(presetId);
     if(index == -1)
         return false;
     d->records.removeAt(index);
@@ -130,10 +130,10 @@ bool QnPresetPtzController::removePreset(const QnPtzPreset &preset) {
     return true;
 }
 
-bool QnPresetPtzController::activatePreset(const QnPtzPreset &preset) {
+bool QnPresetPtzController::activatePreset(const QString &presetId) {
     d->loadRecords();
 
-    int index = d->records.indexOf(preset.id);
+    int index = d->records.indexOf(presetId);
     if(index == -1)
         return false;
     const QnPtzPresetRecord &record = d->records[index];

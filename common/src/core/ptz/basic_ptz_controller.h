@@ -21,8 +21,8 @@ public:
     virtual bool getPosition(Qn::PtzCoordinateSpace, QVector3D *) override          { return false; }
 
     virtual bool createPreset(QnPtzPreset *) override                               { return false; }
-    virtual bool removePreset(const QnPtzPreset &) override                         { return false; }
-    virtual bool activatePreset(const QnPtzPreset &) override                       { return false; }
+    virtual bool removePreset(const QString &) override                             { return false; }
+    virtual bool activatePreset(const QString &) override                           { return false; }
     virtual bool getPresets(QnPtzPresetList *) override                             { return false; }
 };
 

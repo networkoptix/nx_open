@@ -19,6 +19,7 @@ struct QnPtzTourSpot;
 typedef QList<QnPtzTourSpot> QnPtzTourSpotList;
 
 struct QnPtzTour;
+typedef QList<QnPtzTour> QnPtzTourList;
 
 struct QnPtzLimits;
 

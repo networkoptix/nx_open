@@ -20,8 +20,8 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override;
 
     virtual bool createPreset(QnPtzPreset *preset) override;
-    virtual bool removePreset(const QnPtzPreset &preset) override;
-    virtual bool activatePreset(const QnPtzPreset &preset) override;
+    virtual bool removePreset(const QString &presetId) override;
+    virtual bool activatePreset(const QString &presetId) override;
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:

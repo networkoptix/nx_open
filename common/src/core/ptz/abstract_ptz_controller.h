@@ -131,10 +131,10 @@ public:
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::PtzPresetCapability<tt>.
      * 
-     * \param preset                    Preset to remove.
+     * \param presetId                  Id of the preset to remove.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool removePreset(const QnPtzPreset &preset) = 0;
+    virtual bool removePreset(const QString &presetId) = 0;
 
     /**
      * Activates the given preset.
@@ -142,10 +142,10 @@ public:
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::PtzPresetCapability<tt>.
      * 
-     * \param preset                    Preset to activate.
+     * \param presetId                  Id of the preset to activate.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool activatePreset(const QnPtzPreset &preset) = 0;
+    virtual bool activatePreset(const QString &presetId) = 0;
 
     /**
      * Gets a list of all PTZ presets for the camera.
@@ -158,10 +158,10 @@ public:
      */
     virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
-    virtual bool addTour() {return false;}
-    virtual bool removeTour() {return false;}
-    virtual bool activateTour() {return false;}
-    virtual bool getTours() {return false;}
+    virtual bool createTour(QnPtzTour *tour) = 0;
+    virtual bool removeTour(const QString &tourId) = 0;
+    virtual bool activateTour(const QString &tourId) = 0;
+    virtual bool getTours(QnPtzTourList *tours) = 0;
 
 protected:
     QnResourcePtr m_resource;

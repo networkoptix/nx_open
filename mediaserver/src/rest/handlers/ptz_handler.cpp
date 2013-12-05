@@ -159,11 +159,11 @@ int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const
 }
 
 int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    QString id, name;
-    if(!requireParameter(params, lit("presetId"), result, &id) || !requireParameter(params, lit("presetName"), result, &name))
+    QString presetId, presetName;
+    if(!requireParameter(params, lit("presetId"), result, &presetId, true) || !requireParameter(params, lit("presetName"), result, &presetName))
         return CODE_INVALID_PARAMETER;
 
-    QnPtzPreset preset(id, name);
+    QnPtzPreset preset(presetId, presetName);
     if(!controller->createPreset(&preset))
         return CODE_INTERNAL_ERROR;
 
@@ -172,24 +172,22 @@ int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, cons
 }
 
 int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    QString id;
-    if(!requireParameter(params, lit("presetId"), result, &id))
+    QString presetId;
+    if(!requireParameter(params, lit("presetId"), result, &presetId))
         return CODE_INVALID_PARAMETER;
 
-    QnPtzPreset preset(id, QString());
-    if(!controller->removePreset(preset))
+    if(!controller->removePreset(presetId))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
 }
 
 int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    QString id;
-    if(!requireParameter(params, lit("presetId"), result, &id))
+    QString presetId;
+    if(!requireParameter(params, lit("presetId"), result, &presetId))
         return CODE_INVALID_PARAMETER;
 
-    QnPtzPreset preset(id, QString());
-    if(!controller->activatePreset(preset))
+    if(!controller->activatePreset(presetId))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
