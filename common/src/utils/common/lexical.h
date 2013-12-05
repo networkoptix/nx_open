@@ -5,20 +5,9 @@
 
 #include <QtCore/QString>
 
+#include "adl_wrapper.h"
+
 namespace QnLexicalDetail {
-    template<class T>
-    class ValueWrapper {
-    public:
-        ValueWrapper(const T &value): m_value(value) {}
-
-        operator const T &() const {
-            return m_value;
-        }
-
-    private:
-        const T &m_value;
-    };
-
     template<class T>
     void serialize_value(const T &value, QString *target) {
         serialize(value, target); /* That's the place where ADL kicks in. */
@@ -31,7 +20,7 @@ namespace QnLexicalDetail {
          * Note that we wrap a string into a wrapper so that
          * ADL would find only overloads with QString as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(ValueWrapper<QString>(value), target);
+        return deserialize(adlWrap(value), target);
     }
 
 } // namespace QnLexicalDetail

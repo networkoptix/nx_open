@@ -20,20 +20,9 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
+#include "adl_wrapper.h"
+
 namespace QJsonDetail {
-    template<class T>
-    class ValueWrapper {
-    public:
-        ValueWrapper(const T &value): m_value(value) {}
-
-        operator const T &() const {
-            return m_value;
-        }
-
-    private:
-        const T &m_value;
-    };
-
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
 
@@ -49,7 +38,7 @@ namespace QJsonDetail {
          * Note that we wrap a json value into a wrapper so that
          * ADL would find only overloads with QJsonValue as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(ValueWrapper<QJsonValue>(value), target); /* That's the place where ADL kicks in. */
+        return deserialize(adlWrap(value), target); /* That's the place where ADL kicks in. */
     }
 
 } // namespace QJsonDetail

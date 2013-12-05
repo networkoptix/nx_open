@@ -15,21 +15,11 @@
 #include <utils/common/warnings.h>
 #include <utils/common/forward.h>
 
+#include "adl_wrapper.h"
+
+
 template<class Enum>
 class QnTypedEnumNameMapper;
-
-template<class T>
-class ValueWrapper {
-public:
-    ValueWrapper(const T &value): m_value(value) {}
-
-    operator const T &() const {
-        return m_value;
-    }
-
-private:
-    const T &m_value;
-};
 
 
 /**
@@ -90,7 +80,7 @@ public:
 
     template<class Enum>
     static QnTypedEnumNameMapper<Enum> create() {
-        return createEnumNameMapper(ValueWrapper<Enum *>(NULL));
+        return createEnumNameMapper(adlWrap<Enum *>(NULL));
     }
 
 private:
