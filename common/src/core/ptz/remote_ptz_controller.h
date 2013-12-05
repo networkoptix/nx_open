@@ -26,6 +26,11 @@ public:
     virtual bool activatePreset(const QString &presetId) override;
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
+    virtual bool createTour(const QnPtzTour &tour, QString *tourId) override;
+    virtual bool removeTour(const QString &tourId) override;
+    virtual bool activateTour(const QString &tourId) override;
+    virtual bool getTours(QnPtzTourList *tours) override;
+
 private slots:
     void at_continuousMove_replyReceived(int status, int handle);
     void at_absoluteMove_replyReceived(int status, int handle);

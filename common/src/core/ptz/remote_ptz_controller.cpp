@@ -115,6 +115,22 @@ bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
     return true;
 }
 
+bool QnRemotePtzController::createTour(const QnPtzTour &tour, QString *tourId) {
+    return false;
+}
+
+bool QnRemotePtzController::removeTour(const QString &tourId) {
+    return false;
+}
+
+bool QnRemotePtzController::activateTour(const QString &tourId) {
+    return false;
+}
+
+bool QnRemotePtzController::getTours(QnPtzTourList *tours) {
+    return false;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

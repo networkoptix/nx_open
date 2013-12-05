@@ -3,15 +3,17 @@
 
 #include <QVector3D>
 
-#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/basic_ptz_controller.h>
 #include <core/resource/dewarping_params.h>
 
 class QnResourceWidgetRenderer;
 
-class QnVirtualPtzController: public QnAbstractPtzController {
+class QnVirtualPtzController: public QnBasicPtzController {
     Q_OBJECT
+    typedef QnBasicPtzController base_type;
+
 public:
-    QnVirtualPtzController(const QnResourcePtr &resource): QnAbstractPtzController(resource), m_animationEnabled(false) {}
+    QnVirtualPtzController(const QnResourcePtr &resource): base_type(resource), m_animationEnabled(false) {}
 
     bool isAnimationEnabled() const { return m_animationEnabled; }
     void setAnimationEnabled(bool animationEnabled) { m_animationEnabled = animationEnabled; }
@@ -40,12 +42,6 @@ public:
     virtual bool getLimits(QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) override;
-
-    virtual bool createPreset(QnPtzPreset *preset) { return false; }
-    virtual bool removePreset(const QnPtzPreset &preset) { return false; }
-    virtual bool activatePreset(const QnPtzPreset &preset) { return false; }
-    virtual bool getPresets(QnPtzPresetList *presets) { return false; }
-
 
     void addRenderer(QnResourceWidgetRenderer* renderer);
     //void setAspectRatio(float aspectRatio);

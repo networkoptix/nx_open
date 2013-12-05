@@ -30,6 +30,11 @@ public:
     virtual bool activatePreset(const QString &presetId) override                               { return m_baseController->activatePreset(presetId); }
     virtual bool getPresets(QnPtzPresetList *presets) override                                  { return m_baseController->getPresets(presets); }
 
+    virtual bool createTour(const QnPtzTour &tour, QString *tourId) override                    { return m_baseController->createTour(tour, tourId); }
+    virtual bool removeTour(const QString &tourId) override                                     { return m_baseController->removeTour(tourId); }
+    virtual bool activateTour(const QString &tourId) override                                   { return m_baseController->activateTour(tourId); }
+    virtual bool getTours(QnPtzTourList *tours) override                                        { return m_baseController->getTours(tours); }
+
 private:
     QnPtzControllerPtr m_baseController;
 };

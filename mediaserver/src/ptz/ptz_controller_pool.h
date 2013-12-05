@@ -9,7 +9,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
 
-
 class QnPtzControllerPool: public Connective<QObject>, public Singleton<QnPtzControllerPool> {
     Q_OBJECT
     typedef Connective<QObject> base_type;

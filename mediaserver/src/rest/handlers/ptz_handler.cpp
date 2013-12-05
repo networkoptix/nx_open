@@ -6,6 +6,7 @@
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/ptz/abstract_ptz_controller.h>
 
 #include <ptz/ptz_controller_pool.h>
 
