@@ -87,10 +87,10 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
     if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan") && params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt") && params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom"))
         m_capabilities |= Qn::AbsolutePtzCapability;
 
-    if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled") || !params.value<bool>("root.PTZ.Various.V1.TiltEnabled"))
+    if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled", true) || !params.value<bool>("root.PTZ.Various.V1.TiltEnabled", true))
         m_capabilities &= ~(Qn::AbsolutePtzCapability | Qn::ContinuousPanTiltCapability);
 
-    if(!params.value<bool>("root.PTZ.Various.V1.ZoomEnabled"))
+    if(!params.value<bool>("root.PTZ.Various.V1.ZoomEnabled", true))
         m_capabilities &= ~(Qn::AbsolutePtzCapability | Qn::ContinuousZoomCapability);
 
     qreal minPan, maxPan, minTilt, maxTilt, minAngle, maxAngle;
