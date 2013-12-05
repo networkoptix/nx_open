@@ -4,14 +4,13 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <api/model/kvpair.h>
-
 #include <core/resource/resource_fwd.h>
+
+#include <api/model/kvpair.h>
 
 struct QnKvPairUsageHelperPrivate;
 
-class QnAbstractKvPairUsageHelper: public QObject
-{
+class QnAbstractKvPairUsageHelper: public QObject {
     Q_OBJECT
 public:
     ~QnAbstractKvPairUsageHelper();
@@ -59,7 +58,7 @@ signals:
     void valueChanged(const QString &value);
 
 protected:
-   virtual void innerValueChanged(const QString &value) override;
+    virtual void innerValueChanged(const QString &value) override;
 };
 
 class QnUint64KvPairUsageHelper: public QnAbstractKvPairUsageHelper {

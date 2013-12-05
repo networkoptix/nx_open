@@ -21,7 +21,7 @@ public:
     virtual bool getLimits(QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    virtual bool addPreset(const QnPtzPreset &preset) override;
+    virtual bool createPreset(QnPtzPreset *preset) override;
     virtual bool removePreset(const QnPtzPreset &preset) override;
     virtual bool activatePreset(const QnPtzPreset &preset) override;
     virtual bool getPresets(QnPtzPresetList *presets) override;

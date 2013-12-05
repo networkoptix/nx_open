@@ -110,7 +110,7 @@ public:
      */
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
 
-    virtual bool addPreset(const QnPtzPreset &preset) = 0;
+    virtual bool createPreset(QnPtzPreset *preset) = 0;
     virtual bool removePreset(const QnPtzPreset &preset) = 0;
     virtual bool activatePreset(const QnPtzPreset &preset) = 0;
     virtual bool getPresets(QnPtzPresetList *presets) = 0;

@@ -104,6 +104,8 @@ public:
         LogicalCoordinateSpaceCapability    = 0x00020000,
         ViewportCoordinateSpaceCapability   = 0x00040000,
 
+        PtzPresetCapability                 = 0x00100000,
+
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,

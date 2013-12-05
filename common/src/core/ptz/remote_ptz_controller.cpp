@@ -73,7 +73,7 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
     return false;
 }
 
-bool QnRemotePtzController::addPreset(const QnPtzPreset &preset) {
+bool QnRemotePtzController::createPreset(QnPtzPreset *preset) {
     return false;
 }
 

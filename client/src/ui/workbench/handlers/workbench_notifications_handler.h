@@ -8,7 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/kvpair_usage_helper.h>
+#include <api/kvpair_usage_helper.h>
 
 class QnWorkbenchUserEmailWatcher;
 
