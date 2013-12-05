@@ -11,9 +11,11 @@ public:
     QnBasicPtzController(const QnResourcePtr &resource): base_type(resource) {}
 
     virtual Qn::PtzCapabilities getCapabilities() override                          { return Qn::NoPtzCapabilities; }
+
     virtual bool continuousMove(const QVector3D &) override                         { return false; }
     virtual bool absoluteMove(Qn::PtzCoordinateSpace, const QVector3D &) override   { return false; }
     virtual bool relativeMove(qreal, const QRectF &) override                       { return false; }
+
     virtual bool getFlip(Qt::Orientations *) override                               { return false; }
     virtual bool getLimits(QnPtzLimits *) override                                  { return false; }
     virtual bool getPosition(Qn::PtzCoordinateSpace, QVector3D *) override          { return false; }

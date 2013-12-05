@@ -17,8 +17,8 @@ public:
     QnPtzPresetDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetDialog();
 
-    QnPtzPreset preset() const;
-    void setPreset(const QnPtzPreset &preset);
+    /*QnPtzPreset preset() const;
+    void setPreset(const QnPtzPreset &preset);*/
 
     const QList<int> &forbiddenHotkeys() const;
     void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys);
@@ -32,7 +32,7 @@ protected:
 
 private:
     QScopedPointer<Ui::PtzPresetDialog> ui;
-    QnPtzPreset m_preset;
+    //QnPtzPreset m_preset;
     QList<int> m_forbiddenHotkeys;
 };
 

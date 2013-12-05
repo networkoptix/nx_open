@@ -41,6 +41,12 @@ public:
     virtual bool getFlip(Qt::Orientations *flip) override;
     virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 
+    virtual bool addPreset(const QnPtzPreset &preset) { return false; }
+    virtual bool removePreset(const QnPtzPreset &preset) { return false; }
+    virtual bool activatePreset(const QnPtzPreset &preset) { return false; }
+    virtual bool getPresets(QnPtzPresetList *presets) { return false; }
+
+
     void addRenderer(QnResourceWidgetRenderer* renderer);
     //void setAspectRatio(float aspectRatio);
     DewarpingParams updateDewarpingParams(float ar);

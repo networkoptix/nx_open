@@ -3,8 +3,8 @@
 
 #include <QAbstractTableModel>
 
-#include <ui/workbench/workbench_ptz_preset_manager.h>
-
+//#include <ui/workbench/workbench_ptz_preset_manager.h>
+#if 0
 class QnPtzPresetListModel: public QAbstractTableModel {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -51,7 +51,7 @@ private:
     QList<QnPtzPreset> m_presets;
     QList<Column> m_columns;
 };
-
+#endif
 
 #endif // QN_PTZ_PRESET_LIST_MODEL_H
 

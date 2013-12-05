@@ -2,6 +2,7 @@
 
 #include <common/common_globals.h>
 
+#if 0
 QnPtzPresetListModel::QnPtzPresetListModel(QObject *parent):
     base_type(parent),
     m_readOnly(false),
@@ -214,3 +215,4 @@ QString QnPtzPresetListModel::columnTitle(Column column) const {
     default: return QString();
     }
 }
+#endif

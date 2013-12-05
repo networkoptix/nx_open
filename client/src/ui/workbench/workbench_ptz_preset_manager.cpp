@@ -1,5 +1,7 @@
 #include "workbench_ptz_preset_manager.h"
 
+#if 0
+
 #include <iterator> /* For std::back_inserter. */
 
 #include <boost/range/algorithm/find_if.hpp>
@@ -233,3 +235,5 @@ void QnWorkbenchPtzPresetManager::at_presetsLoaded(const QString &value) {
         qnWarning("Invalid ptz preset format.");
     }
 }
+
+#endif

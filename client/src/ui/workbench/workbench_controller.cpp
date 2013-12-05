@@ -769,11 +769,12 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
             break;
 
         int hotkey = e->key() - Qt::Key_0;
-        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
+        /*QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
         if(preset.isNull())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));*/
+        break;
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */

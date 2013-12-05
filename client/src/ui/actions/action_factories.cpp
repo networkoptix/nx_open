@@ -60,7 +60,7 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
         return result;
-
+    /*
     QList<QnPtzPreset> presets = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera);
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
@@ -75,7 +75,7 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 
         result.push_back(action);
-    }
+    }*/
     return result;
 }
 

@@ -21,6 +21,11 @@ public:
     virtual bool getLimits(QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
+    virtual bool addPreset(const QnPtzPreset &preset) override;
+    virtual bool removePreset(const QnPtzPreset &preset) override;
+    virtual bool activatePreset(const QnPtzPreset &preset) override;
+    virtual bool getPresets(QnPtzPresetList *presets) override;
+
 private slots:
     void at_continuousMove_replyReceived(int status, int handle);
     void at_absoluteMove_replyReceived(int status, int handle);

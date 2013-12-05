@@ -26,7 +26,7 @@ QnPtzPresetDialog::~QnPtzPresetDialog() {
     return;
 }
 
-QnPtzPreset QnPtzPresetDialog::preset() const {
+/*QnPtzPreset QnPtzPresetDialog::preset() const {
     QnPtzPreset result = m_preset;
     result.name = ui->nameEdit->text();
     result.hotkey = currentHotkey();
@@ -37,7 +37,7 @@ void QnPtzPresetDialog::setPreset(const QnPtzPreset &preset) {
     m_preset = preset;
     ui->nameEdit->setText(preset.name);
     setCurrentHotkey(preset.hotkey);
-}
+}*/
 
 const QList<int> &QnPtzPresetDialog::forbiddenHotkeys() const {
     return m_forbiddenHotkeys;

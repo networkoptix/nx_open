@@ -143,7 +143,8 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 
 Qn::PtzCapabilities QnFisheyePtzController::getCapabilities()
 {
-    return Qn::AllPtzCapabilities;
+    //return Qn::AllPtzCapabilities;
+    return 0;
 }
 
 void QnFisheyePtzController::at_timer()
@@ -263,7 +264,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
     if (m_resource->getDewarpingParams().viewMode == DewarpingParams::Horizontal) {
         qreal x = c.x() * M_PI;
         qreal y = -c.y() * M_PI;
-        absoluteMove(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
+        absoluteMove(Qn::LogicalCoordinateSpace, QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
     }
     else {
         qreal x = -(::atan2(c.y(), c.x()) - M_PI/2.0);
@@ -282,7 +283,7 @@ void QnFisheyePtzController::moveToRect(const QRectF& r)
                 y = r.top() * M_PI;
         }
 
-        absoluteMove(QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
+        absoluteMove(Qn::LogicalCoordinateSpace, QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), fov));
     }
 }
 

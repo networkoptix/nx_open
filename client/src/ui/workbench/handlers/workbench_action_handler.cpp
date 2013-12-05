@@ -310,7 +310,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
-    context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
+    //context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
     context()->instance<QnAppServerNotificationCache>();
 
     /* Run handlers that update state. */
@@ -1008,12 +1008,12 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
         return;
 
     QVector3D position;
-    if(!controller->getPosition(&position))
+    if(!controller->getPosition(Qn::DeviceCoordinateSpace, &position))
         return;
 
     for(int i = 0; i <= 20; i++) {
         position.setZ(i / 20.0);
-        controller->absoluteMove(position);
+        controller->absoluteMove(Qn::DeviceCoordinateSpace, position);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -2917,7 +2917,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     if(name.isEmpty())
         return;
 
-    QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
+    /*QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
     if(preset.isNull())
         return;
 
@@ -2928,7 +2928,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
             tr("An error has occurred while trying to set current position for camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
         );
         return;
-    }
+    }*/
 
 #if 0
     action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?

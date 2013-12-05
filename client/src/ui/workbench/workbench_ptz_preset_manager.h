@@ -10,6 +10,7 @@
 
 #include "workbench_context_aware.h"
 
+#if 0
 // TODO: move to client model types?
 struct QnPtzPreset {
     QnPtzPreset(): hotkey(-1) {};
@@ -51,7 +52,7 @@ private slots:
 private:
     QScopedPointer<QnWorkbenchPtzPresetManagerPrivate> d;
 };
-
+#endif
 
 
 #endif // QN_WORKBENCH_PTZ_PRESET_MANAGER_H

@@ -73,6 +73,26 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
     return false;
 }
 
+bool QnRemotePtzController::addPreset(const QnPtzPreset &preset) {
+    return false;
+}
+
+bool QnRemotePtzController::removePreset(const QnPtzPreset &preset) {
+    return false;
+}
+
+bool QnRemotePtzController::activatePreset(const QnPtzPreset &preset) {
+    return false;
+}
+
+bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
+    return false;
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
 void QnRemotePtzController::at_continuousMove_replyReceived(int status, int handle) {
     return;
 }
@@ -84,3 +104,4 @@ void QnRemotePtzController::at_absoluteMove_replyReceived(int status, int handle
 void QnRemotePtzController::at_relativeMove_replyReceived(int status, int handle) {
     return;
 }
+

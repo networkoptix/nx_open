@@ -47,7 +47,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<ImageCorrectionParams>();
-    qRegisterMetaType<QnPtzPreset>();
+    //qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();

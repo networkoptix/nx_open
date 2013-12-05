@@ -48,7 +48,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QPushButton *m_removeButton;
     QPushButton *m_activateButton;
-    QnPtzPresetListModel *m_model;
+    //QnPtzPresetListModel *m_model;
 };
 
 #endif // QN_PTZ_PRESETS_DIALOG_H
