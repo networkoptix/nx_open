@@ -629,22 +629,10 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
     QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
     widget->ptzController()->relativeMove(aspectRatio, viewport);
-
-    //QVector3D newPhysicalPosition = physicalPositionForRect(widget, rect);
-    /*if(qIsNaN(newPhysicalPosition)) {
-        //m_ptzController->setMovement(widget, QVector3D());
-        PtzData &data = m_dataByWidget[widget];
-        data.pendingAbsoluteMove = rect;
-        return; 
-    }*/
-
-    //TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
-    //m_ptzController->setPhysicalPosition(widget, newPhysicalPosition);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     QSizeF size = widget->size() * 100;
-
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
 }
 
@@ -707,8 +695,7 @@ void PtzInstrument::processPtzDoubleClick() {
     if(!target() || m_skipNextAction)
         return;
 
-#if 0
-    if (!target()->virtualPtzController()) {
+    //if (!target()->virtualPtzController()) {
         QnSplashItem *splashItem = newSplashItem(target());
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(target()->rect().center());
@@ -722,10 +709,9 @@ void PtzInstrument::processPtzDoubleClick() {
         QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
         if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold)
             emit doubleClicked(target());
-    } else {
-        emit doubleClicked(target());
-    }
-#endif
+    //} else {
+        //emit doubleClicked(target());
+    //}
 }
 
 
@@ -930,19 +916,6 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
         /* Adjust speed in case we're dealing with octagonal ptz. */
         const PtzData &data = m_dataByWidget[target()];
-
-#if 0
-        if(data.capabilities & Qn::OctagonalPtzCapability) {
-            QnPolarPoint<double> polarSpeed = cartesianToPolar(speed);
-            polarSpeed.alpha = qRound(polarSpeed.alpha, M_PI / 4.0); /* Rounded to 45 degrees. */
-            speed = polarToCartesian<QPointF>(polarSpeed.r, polarSpeed.alpha);
-            if(qFuzzyIsNull(speed.x())) // TODO: #Elric use lower null threshold
-                speed.setX(0.0);
-            if(qFuzzyIsNull(speed.y()))
-                speed.setY(0.0);
-            // TODO: #Elric rebound to 1.0
-        }
-#endif
 
         qreal speedMagnitude = length(speed);
         qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
