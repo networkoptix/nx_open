@@ -173,7 +173,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/bin/python</executable>
+                            <executable>${python.dir}/python</executable>
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>
