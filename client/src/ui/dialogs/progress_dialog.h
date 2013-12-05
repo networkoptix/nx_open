@@ -46,6 +46,7 @@
 #define QN_PROGRESS_DIALOG_H
 
 #include <QtCore/QScopedPointer>
+#include <QtGui/QtEvents>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
@@ -73,6 +74,7 @@ class QnProgressDialog : public QDialog {
     Q_PROPERTY(QString labelText READ labelText WRITE setLabelText)
     Q_PROPERTY(bool isEventProcessor READ isEventProcessor WRITE setEventProcessor)
 
+    typedef QDialog base_type;
 public:
     explicit QnProgressDialog(QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
     QnProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = 0, Qt::WindowFlags flags = Qt::Dialog);
@@ -122,9 +124,9 @@ private Q_SLOTS:
     void _q_disconnectOnClose();
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    void changeEvent(QEvent *event);
-    void showEvent(QShowEvent *event);
+    virtual void closeEvent(QCloseEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
+    virtual void showEvent(QShowEvent *event) override;
 
 protected Q_SLOTS:
     void forceShow();
