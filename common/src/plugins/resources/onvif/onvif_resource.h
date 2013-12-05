@@ -167,7 +167,7 @@ public:
     QString getPtzConfigurationToken() const;
     void setPtzConfigurationToken(const QString &src);
 
-    QString QnPlOnvifResource::getPtzProfileToken() const;
+    QString getPtzProfileToken() const;
     void setPtzProfileToken(const QString& src); 
 
     QString getDeviceOnvifUrl() const;

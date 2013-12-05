@@ -18,6 +18,20 @@
 template<class Enum>
 class QnTypedEnumNameMapper;
 
+template<class T>
+class ValueWrapper {
+public:
+    ValueWrapper(const T &value): m_value(value) {}
+
+    operator const T &() const {
+        return m_value;
+    }
+
+private:
+    const T &m_value;
+};
+
+
 /**
  * <tt>QnEnumNameMapper</tt> supplies routines for fast <tt>QString</tt>-<tt>enum</tt> conversion.
  * 
@@ -76,7 +90,7 @@ public:
 
     template<class Enum>
     static QnTypedEnumNameMapper<Enum> create() {
-        return createEnumNameMapper(static_cast<Enum *>(NULL));
+        return createEnumNameMapper(ValueWrapper<Enum *>(NULL));
     }
 
 private:
