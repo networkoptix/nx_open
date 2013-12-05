@@ -107,25 +107,30 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
+  arm {
+    QMAKE_CXXFLAGS += -std=c++0x
+  } else {
+    QMAKE_CXXFLAGS += -std=c++11
+  }
 }
 
 ## LINUX
 unix:!mac {
-  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
   LIBS += ${linux.oslibs}
   !arm {
     QMAKE_CXXFLAGS += -msse2
+    QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl
   } 
-  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers -Wno-unused-local-typedefs
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 }
 
 ## MAC OS
 mac {
-  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -std=c++11 -stdlib=libc++
+  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}

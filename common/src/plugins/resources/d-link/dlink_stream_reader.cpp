@@ -1,3 +1,5 @@
+#ifdef ENABLE_DLINK
+
 #include "dlink_stream_reader.h"
 #include <QtCore/QTextStream>
 #include "dlink_resource.h"
@@ -536,3 +538,5 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
     motion->m_duration = 1000*1000*1000; // 1000 sec 
     return motion;
 }
+
+#endif // #ifdef ENABLE_DLINK

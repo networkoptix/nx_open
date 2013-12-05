@@ -103,7 +103,6 @@ public:
 protected:
     QnAppServerConnectionPtr connection() const;
 
-    QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
 
     struct AddToLayoutParams {
@@ -133,11 +132,6 @@ protected:
 
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
-
-    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
-    bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
-    bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
-    bool closeAllLayouts(bool waitForReply = false);
 
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
@@ -206,15 +200,6 @@ protected slots:
     void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
-    void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
-    void at_saveLayoutAction_triggered();
-    void at_saveCurrentLayoutAction_triggered();
-    void at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
-    void at_saveLayoutAsAction_triggered();
-    void at_saveLayoutForCurrentUserAsAction_triggered();
-    void at_saveCurrentLayoutAsAction_triggered();
-    void at_closeLayoutAction_triggered();
-    void at_closeAllButThisLayoutAction_triggered();
 
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
@@ -271,7 +256,6 @@ protected slots:
     void at_removeFromServerAction_triggered();
 
     void at_newUserAction_triggered();
-    void at_newUserLayoutAction_triggered();
 
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
@@ -343,34 +327,9 @@ private:
 
     void notifyAboutUpdate(bool alwaysNotify);
 
-    /**
-     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
-     * @param name                      Suggested new name.
-     * @param user                      User that will own the layout.
-     * @param layout                    Layout that we want to rename (if any).
-     * @return                          List of existing layouts with same name.
-     */
-    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
-
-    /**
-     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
-     * @param buttons               Messagebox buttons.
-     * @param defaultButton         Default button.
-     * @return                      Selected button.
-     */
-    QMessageBox::StandardButton askOverrideLayout(QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton);
-
-    bool canRemoveLayouts(const QnLayoutResourceList &layouts);
-
-    void removeLayouts(const QnLayoutResourceList &layouts);
-
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
     QnAdjustVideoDialog* adjustVideoDialog();
-
-private slots:
-    //!Checks if need to close layout
-    void checkForClosurePending();
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -409,10 +368,6 @@ private:
 
 
     QTimer *m_tourTimer;
-
-    int m_exportsToFinishBeforeClosure;
-    QObject* m_objectToSignalWhenDone;
-    QByteArray m_methodToInvokeWhenDone;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

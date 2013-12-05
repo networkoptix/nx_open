@@ -222,7 +222,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 
     bool someRecordingIsPresent = false;
 
-    QnStorageManager* storageMan = QnStorageManager::instance();
+    //QnStorageManager* storageMan = QnStorageManager::instance();
     if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != QnResource::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
     {
         someRecordingIsPresent = true;

@@ -1,6 +1,8 @@
 #ifndef _STARDOT_RESOURCE_SEARCHER_H__
 #define _STARDOT_RESOURCE_SEARCHER_H__
 
+#ifdef ENABLE_STARDOT
+
 #include "core/resource_managment/resource_searcher.h"
 
 
@@ -23,4 +25,5 @@ protected:
 
 };
 
+#endif // #ifdef ENABLE_STARDOT
 #endif // _STARDOT_RESOURCE_SEARCHER_H__

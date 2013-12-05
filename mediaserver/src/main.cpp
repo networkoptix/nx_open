@@ -281,7 +281,7 @@ QnStorageResourcePtr createStorage(const QString& path)
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
-    storage->setSpaceLimit(5ll * 1000000000);
+    storage->setSpaceLimit( QnStorageManager::DEFAULT_SPACE_LIMIT );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
 
     return storage;
@@ -446,6 +446,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 int serverMain(int argc, char *argv[])
 {
+    Q_UNUSED(argc)
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
@@ -834,7 +835,9 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
+#ifdef ENABLE_ACTI
     QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
+#endif
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
@@ -843,6 +846,9 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+
+    if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
+        m_universalTcpListener->disableAuth();
 
 #ifdef ENABLE_DESKTOP_CAMERA
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
@@ -1160,19 +1166,37 @@ void QnMain::run()
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
-
+#ifdef ENABLE_ARECONT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
+#endif
+#ifdef ENABLE_DLINK
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+#endif
+#ifdef ENABLE_DROID
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
+#endif
+#ifdef ENABLE_TEST_CAMERA
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnTestCameraResourceSearcher::instance());
+#endif
+#ifdef ENABLE_PULSE_CAMERA
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
+#endif
+#ifdef ENABLE_AXIS
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
+#endif
+#ifdef ENABLE_ACTI
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+#endif
+#ifdef ENABLE_STARDOT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
+#endif
+#ifdef ENABLE_IQE
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+#endif
+#ifdef ENABLE_ISD
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
+#endif
 #ifdef ENABLE_DESKTOP_CAMERA
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopCameraResourceSearcher::instance());
 #endif  //ENABLE_DESKTOP_CAMERA

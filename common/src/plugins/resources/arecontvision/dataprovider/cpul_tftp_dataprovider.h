@@ -1,6 +1,8 @@
 #ifndef cpull_httpreader_1119
 #define cpull_httpreader_1119
 
+#ifdef ENABLE_ARECONT
+
 #include "av_client_pull.h"
 #include "../tools/simple_tftp_client.h"
 
@@ -47,4 +49,5 @@ protected:
     CameraDiagnostics::Result m_prevDataReadResult;
 };
 
+#endif // ENABLE_ARECONT
 #endif //cpull_httpreader_1119

@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_stream_fetcher.h"
 
 #include <QtCore/QCoreApplication>
@@ -79,6 +81,7 @@ qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const
 
 bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed)
 {
+    Q_UNUSED(consumer)
     m_lastSpeed = speed;
 
     if (!safeOpen())
@@ -573,3 +576,5 @@ void VMaxStreamFetcher::pleaseStopAll()
     foreach(VMaxStreamFetcher* fetcher, m_instances.values())
         fetcher->pleaseStop();
 }
+
+#endif // #ifdef ENABLE_VMAX

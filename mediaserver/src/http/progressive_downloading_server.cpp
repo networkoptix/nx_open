@@ -325,6 +325,7 @@ static const int MS_PER_SEC = 1000;
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
+    Q_UNUSED(_owner)
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
     d->streamingFormat = "webm";

@@ -1,6 +1,8 @@
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
 
+#ifdef ENABLE_DROID
+
 static const int DROID_CONTROL_TCP_SERVER_PORT = 5690;
 
 class QnDroidControlPortListener: public QnTcpListener
@@ -24,3 +26,5 @@ protected:
 
     Q_DECLARE_PRIVATE(QnDroidControlPortProcessor);
 };
+
+#endif // ENABLE_DROID

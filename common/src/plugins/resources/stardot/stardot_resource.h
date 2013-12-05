@@ -1,6 +1,8 @@
 #ifndef __STARDOT_RESOURCE_H__
 #define __STARDOT_RESOURCE_H__
 
+#ifdef ENABLE_STARDOT
+
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
@@ -63,4 +65,5 @@ private:
     simd128i *m_motionMaskBinData;
 };
 
+#endif // #ifdef ENABLE_STARDOT
 #endif // __STARDOT_RESOURCE_H__

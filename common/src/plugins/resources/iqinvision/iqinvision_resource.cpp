@@ -1,3 +1,5 @@
+#ifdef ENABLE_IQE
+
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "iqinvision_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
@@ -117,3 +119,5 @@ QSize QnPlIqResource::getMaxResolution() const
     QSize s;
     return s;
 }
+
+#endif // #ifdef ENABLE_IQE

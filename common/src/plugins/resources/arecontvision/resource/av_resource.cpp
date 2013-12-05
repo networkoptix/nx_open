@@ -1,3 +1,4 @@
+#ifdef ENABLE_ARECONT
 
 #ifdef _WIN32
 #  include <winsock2.h>
@@ -457,3 +458,4 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
+#endif

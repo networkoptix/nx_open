@@ -7,12 +7,12 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
     m_livemutex(QMutex::Recursive),
     m_quality(Qn::QualityNormal),
     m_qualityUpdatedAtLeastOnce(false),
+    m_canTouchCameraSettings(true),
     m_fps(-1.0),
     m_framesSinceLastMetaData(0),
     m_softMotionRole(QnResource::Role_Default),
     m_softMotionLastChannel(0),
-    m_secondaryQuality(Qn::SSQualityNotDefined),
-    m_canTouchCameraSettings(true)
+    m_secondaryQuality(Qn::SSQualityNotDefined)
 {
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
@@ -227,7 +227,8 @@ bool QnLiveStreamProvider::needMetaData()
     }
     else if (getRole() == QnResource::Role_LiveVideo && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid || m_cameraRes->getMotionType() == Qn::MT_MotionWindow))
     {
-        bool result = (m_framesSinceLastMetaData > 10 || m_framesSinceLastMetaData > 0 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
+        bool result = (m_framesSinceLastMetaData > 10 ||
+                       (m_framesSinceLastMetaData > 0 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS));
         if (result)
         {
             m_framesSinceLastMetaData = 0;

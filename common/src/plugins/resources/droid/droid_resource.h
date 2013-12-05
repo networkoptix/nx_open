@@ -1,6 +1,8 @@
 #ifndef droid_resource_h_18_04
 #define droid_resource_h_18_04
 
+#ifdef ENABLE_DROID
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 
@@ -30,4 +32,5 @@ private:
 
 typedef QnSharedResourcePointer<QnDroidResource> QnDroidResourcePtr;
 
+#endif // #ifdef ENABLE_DROID
 #endif //droid_resource_h_18_04

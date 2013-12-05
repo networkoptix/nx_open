@@ -1,3 +1,5 @@
+#ifdef ENABLE_ACTI
+
 #include "acti_ptz_controller.h"
 
 #include <utils/math/math.h>
@@ -281,3 +283,4 @@ bool QnActiPtzController::getLimits(QnPtzLimits *limits) {
     return false; // TODO: #Elric #PTZ
 }
 
+#endif // #ifdef ENABLE_ACTI

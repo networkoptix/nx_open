@@ -1,6 +1,8 @@
 #ifndef isd_resource_h_1934
 #define isd_resource_h_1934
 
+#ifdef ENABLE_ISD
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -46,4 +48,5 @@ protected:
 
 };
 
+#endif // #ifdef ENABLE_ISD
 #endif //isd_resource_h_1934

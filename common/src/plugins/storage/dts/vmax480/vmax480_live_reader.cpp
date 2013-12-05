@@ -1,3 +1,4 @@
+#ifdef ENABLE_VMAX
 
 #include "vmax480_live_reader.h"
 
@@ -146,3 +147,5 @@ int QnVMax480LiveProvider::getChannel() const
 {
     return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();
 }
+
+#endif // #ifdef ENABLE_VMAX

@@ -39,7 +39,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     }
 
     // if ceilTime specified try frame with time > requested time (round time to ceil)
-    if (ceilTime != AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
+    if (ceilTime != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
     {
         for (int i = 0; i < MAX_GOP_LEN; ++i) 
         {
@@ -47,7 +47,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
             if (!media2 || media2->timestamp == DATETIME_NOW)
                 break;
             QnCompressedVideoDataPtr video2 = media2.dynamicCast<QnCompressedVideoData>();
-            if (video2->flags & AV_PKT_FLAG_KEY)
+            if (video2 && (video2->flags & AV_PKT_FLAG_KEY))
                 return video2;
         }
     }

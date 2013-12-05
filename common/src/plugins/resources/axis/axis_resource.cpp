@@ -1,3 +1,4 @@
+#ifdef ENABLE_AXIS
 
 #include "axis_resource.h"
 
@@ -944,3 +945,5 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
         return new QnAxisPtzController(toSharedPointer(this));
     }
 }
+
+#endif // #ifdef ENABLE_AXIS

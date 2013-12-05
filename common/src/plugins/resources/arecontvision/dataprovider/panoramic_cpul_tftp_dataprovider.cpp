@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_client_pull.h"
 #include "panoramic_cpul_tftp_dataprovider.h"
 #include "../resource/av_resource.h"
@@ -403,3 +405,5 @@ void AVPanoramicClientPullSSTFTPStreamreader::beforeRun()
             avPanoResource->updateFlipState();
     }
 }
+
+#endif

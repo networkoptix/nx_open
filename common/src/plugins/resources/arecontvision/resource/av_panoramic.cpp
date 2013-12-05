@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
@@ -209,3 +211,5 @@ const QnResourceVideoLayout* QnArecontPanoramicResource::getVideoLayout(const Qn
 
     return layout;
 }
+
+#endif

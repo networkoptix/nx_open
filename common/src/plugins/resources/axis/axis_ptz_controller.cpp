@@ -1,3 +1,5 @@
+#ifdef ENABLE_AXIS
+
 #include "axis_ptz_controller.h"
 
 #include <utils/math/math.h>
@@ -248,3 +250,4 @@ bool QnAxisPtzController::getLimits(QnPtzLimits *limits) {
     return true;
 }
 
+#endif // #ifdef ENABLE_AXIS

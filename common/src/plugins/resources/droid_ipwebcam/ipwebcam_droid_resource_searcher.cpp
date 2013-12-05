@@ -1,3 +1,5 @@
+#ifdef ENABLE_DROID
+
 #include "core/resource/camera_resource.h"
 #include "ipwebcam_droid_resource_searcher.h"
 #include "ipwebcam_droid_resource.h"
@@ -196,3 +198,5 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
     return result;
 }
+
+#endif // #ifdef ENABLE_DROID

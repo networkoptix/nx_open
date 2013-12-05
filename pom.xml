@@ -45,7 +45,7 @@
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
-        <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
+        <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
@@ -273,7 +273,7 @@
                 <python.dir>${environment.dir}/python/${arch}</python.dir>				
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
-                <arch>x86</arch>
+                <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <qt.spec>win32-msvc2012</qt.spec>
                 <profile.classifier>${platform}</profile.classifier>                
@@ -356,7 +356,7 @@
 		<compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <additional.defines>DISABLE_ALL_VENDORS ENABLE_ISD DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
             </properties>
         </profile>	
         <profile>

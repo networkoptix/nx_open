@@ -21,7 +21,8 @@ QnWorkbenchUserInactivityWatcher::QnWorkbenchUserInactivityWatcher(QObject *pare
     QnWorkbenchContextAware(parent),
     m_timerId(-1),
     m_userIsInactive(false),
-    m_idleTimeout(0)
+    m_idleTimeout(0),
+    m_mainWindow(0)
 {
     connect(qnSettings->notifier(QnClientSettings::USER_IDLE_TIMEOUT_MSECS),    SIGNAL(valueChanged(int)),  this,   SLOT(updateTimeout()));
     updateTimeout();
@@ -30,6 +31,9 @@ QnWorkbenchUserInactivityWatcher::QnWorkbenchUserInactivityWatcher(QObject *pare
 QnWorkbenchUserInactivityWatcher::~QnWorkbenchUserInactivityWatcher() {
     if (m_timerId != -1)
         killTimer(m_timerId);
+
+    if (m_mainWindow)
+        m_mainWindow->removeEventFilter(this);
 }
 
 quint64 QnWorkbenchUserInactivityWatcher::idlePeriodMSecs() const {
@@ -75,7 +79,11 @@ quint64 QnWorkbenchUserInactivityWatcher::idlePeriodMSecs() const {
 
 #endif
 
-    return idle;
+    quint64 msecsSinceMainWindowMinimized = 0;
+    if (!m_mainWindowMinimizedTime.isNull())
+        msecsSinceMainWindowMinimized = m_mainWindowMinimizedTime.msecsTo(QDateTime::currentDateTime());
+
+    return qMax(idle, msecsSinceMainWindowMinimized);
 }
 
 bool QnWorkbenchUserInactivityWatcher::state() const {
@@ -114,6 +122,32 @@ void QnWorkbenchUserInactivityWatcher::setIdleTimeoutMSecs(quint64 msecs) {
     m_idleTimeout = msecs;
     if (isEnabled())
         checkInactivity();
+}
+
+void QnWorkbenchUserInactivityWatcher::setMainWindow(QWidget *widget) {
+    if (m_mainWindow)
+        m_mainWindow->removeEventFilter(this);
+
+    m_mainWindowMinimizedTime = widget->windowState().testFlag(Qt::WindowMinimized)
+                                ? QDateTime::currentDateTime()
+                                : QDateTime();
+
+    m_mainWindow = widget;
+    m_mainWindow->installEventFilter(this);
+}
+
+bool QnWorkbenchUserInactivityWatcher::eventFilter(QObject *object, QEvent *event) {
+    if (!m_mainWindow || m_mainWindow != object)
+        return false;
+
+    if (event->type() != QEvent::WindowStateChange)
+        return false;
+
+    m_mainWindowMinimizedTime = m_mainWindow->windowState().testFlag(Qt::WindowMinimized)
+                                ? QDateTime::currentDateTime()
+                                : QDateTime();
+
+    return false;
 }
 
 void QnWorkbenchUserInactivityWatcher::checkInactivity() {

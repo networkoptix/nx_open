@@ -1,3 +1,4 @@
+#ifdef ENABLE_ACTI
 
 #include "acti_resource.h"
 
@@ -618,3 +619,5 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
 }
+
+#endif // #ifdef ENABLE_ACTI

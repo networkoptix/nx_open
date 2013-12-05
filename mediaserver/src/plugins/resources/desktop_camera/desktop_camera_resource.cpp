@@ -23,8 +23,11 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS)
+bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)
 {
+    Q_UNUSED(outputID)
+    Q_UNUSED(activate)
+    Q_UNUSED(autoResetTimeoutMS)
     return false;
 }
 

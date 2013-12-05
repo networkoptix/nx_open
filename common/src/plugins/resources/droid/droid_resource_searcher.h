@@ -1,6 +1,8 @@
 #ifndef droid_device_server_h_1755
 #define droid_device_server_h_1755
 
+#ifdef ENABLE_DROID
+
 #include <QtCore/QList>
 
 #include "core/resource_managment/resource_searcher.h"
@@ -27,4 +29,5 @@ private:
     qint64 m_lastReadSocketTime;
 };
 
+#endif // #ifdef ENABLE_DROID
 #endif // droid_device_server_h_1755

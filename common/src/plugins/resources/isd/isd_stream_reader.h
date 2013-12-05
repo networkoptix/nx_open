@@ -1,6 +1,8 @@
 #ifndef isd_STREAM_REDER_H__1914
 #define isd_STREAM_REDER_H__1914
 
+#ifdef ENABLE_ISD
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
@@ -34,4 +36,5 @@ private:
     QnMulticodecRtpReader m_rtpStreamParser;
 };
 
+#endif // #ifdef ENABLE_ISD
 #endif // isd_STREAM_REDER_H__1914

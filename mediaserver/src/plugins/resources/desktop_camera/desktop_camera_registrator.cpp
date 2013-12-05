@@ -14,7 +14,7 @@ public:
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket)
 {
-
+    Q_UNUSED(_owner)
 }
 
 void QnDesktopCameraRegistrator::run()

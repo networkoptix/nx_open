@@ -1,6 +1,8 @@
 #ifndef cpull_httpreader_1119
 #define cpull_httpreader_1119
 
+#ifdef ENABLE_ARECONT
+
 #include <QtNetwork/QAuthenticator>
 
 #include "av_client_pull.h"
@@ -29,5 +31,7 @@ protected:
     bool m_dualsensor;
     QString m_name;
 };
+
+#endif
 
 #endif //cpull_httpreader_1119

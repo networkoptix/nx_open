@@ -1,6 +1,8 @@
 #ifndef QN_AXIS_PTZ_CONTROLLER_H
 #define QN_AXIS_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QHash>
 
 #include <core/ptz/basic_ptz_controller.h>
@@ -41,5 +43,5 @@ private:
     QnLinearFunction m_logicalToCameraZoom, m_cameraToLogicalZoom;
 };
 
-
+#endif // #ifdef ENABLE_AXIS
 #endif // QN_AXIS_PTZ_CONTROLLER_H

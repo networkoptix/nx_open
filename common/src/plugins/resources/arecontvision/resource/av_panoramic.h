@@ -1,6 +1,8 @@
 #ifndef av_panoramic_device_1820
 #define av_panoramic_device_1820
 
+#ifdef ENABLE_ARECONT
+
 #include "av_resource.h"
 
 
@@ -34,5 +36,7 @@ protected:
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;
+
+#endif
 
 #endif //av_panoramic_device_1820

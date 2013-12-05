@@ -1,6 +1,8 @@
 #ifndef QnPlAreconVisionResource_h_1252
 #define QnPlAreconVisionResource_h_1252
 
+#ifdef ENABLE_ARECONT
+
 #include <QtGui/QImage>
 
 #include "core/resource/security_cam_resource.h"
@@ -76,5 +78,7 @@ private:
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
+
+#endif
 
 #endif // QnPlAreconVisionResource_h_1252
