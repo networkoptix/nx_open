@@ -12,6 +12,7 @@
 #include <core/ptz/mapped_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/workaround_ptz_controller.h>
+#include <core/ptz/preset_ptz_controller.h>
 
 
 QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
@@ -65,6 +66,9 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
 	
     if(QnViewportPtzController::extends(controller))
         controller.reset(new QnViewportPtzController(controller));
+
+    if(QnPresetPtzController::extends(controller))
+        controller.reset(new QnPresetPtzController(controller));
 
     controller.reset(new QnWorkaroundPtzController(controller));
 
