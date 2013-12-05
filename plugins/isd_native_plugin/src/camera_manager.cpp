@@ -17,9 +17,9 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_pluginRef( IsdNativePlugin::instance() ),
     m_info( info ),
     m_capabilities( 
-        //nxcip::BaseCameraManager::dtsArchiveCapability | 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::shareFpsCapability),
+        nxcip::BaseCameraManager::shareFpsCapability |
+        nxcip::BaseCameraManager::hardwareMotionCapability),
     m_motionMask( nullptr )
 {
 }
