@@ -148,6 +148,7 @@
                                 <argument>install_packages.py</argument>
                             </arguments>
                             <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${unix}</skip>
                         </configuration>
                     </execution>
                     <execution>
@@ -162,8 +163,25 @@
                                 <argument>install_packages.py</argument>
                             </arguments>
                             <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${unix}</skip>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>install-packages-unix</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/bin/python</executable>
+                            <arguments>
+                                <argument>install_packages.py</argument>
+                            </arguments>
+                            <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${windows}</skip>
+                        </configuration>
+
+                    </execution>                    
                 </executions>
             </plugin>	
         </plugins>		
@@ -231,7 +249,6 @@
                 </property>
             </activation>            
             <dependencies>
-
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>help</artifactId>
@@ -302,6 +319,5 @@
                 </dependency>      
             </dependencies>	            
         </profile>
-
     </profiles>	
 </project>
