@@ -475,7 +475,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMouseDoubleClick, QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
         parent
     ),
     QnWorkbenchContextAware(parent),
@@ -820,10 +820,6 @@ bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
     m_viewport = viewport;
 
     return false;
-}
-
-bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    return mousePressEvent(item, event);
 }
 
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {

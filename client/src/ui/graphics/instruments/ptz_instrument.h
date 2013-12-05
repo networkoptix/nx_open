@@ -52,7 +52,6 @@ protected:
     virtual bool animationEvent(AnimationEvent *event) override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
