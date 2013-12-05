@@ -44,7 +44,7 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzAction action;
@@ -87,6 +87,10 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
     case Qn::PtzRemovePresetAction:     return executeRemovePreset(controller, params, result);
     case Qn::PtzActivatePresetAction:   return executeActivatePreset(controller, params, result);
     case Qn::PtzGetPresetsAction:       return executeGetPresets(controller, params, result);
+    case Qn::PtzCreateTourAction:       return executeCreateTour(controller, params, body, result);
+    case Qn::PtzRemoveTourAction:       return executeRemoveTour(controller, params, result);
+    case Qn::PtzActivateTourAction:     return executeActivateTour(controller, params, result);
+    case Qn::PtzGetToursAction:         return executeGetTours(controller, params, result);
     default:                            return CODE_INVALID_PARAMETER;
     }
 }
@@ -200,6 +204,50 @@ int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const 
         return CODE_INTERNAL_ERROR;
 
     result.setReply(presets);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+    QnPtzTour tour;
+    if(!QJson::deserialize(body, &tour))
+        return CODE_INVALID_PARAMETER;
+
+    QString tourId;
+    if(!controller->createTour(tour, &tourId))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(tourId);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeRemoveTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString tourId;
+    if(!requireParameter(params, lit("tourId"), result, &tourId))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->removeTour(tourId))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString tourId;
+    if(!requireParameter(params, lit("tourId"), result, &tourId))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->activateTour(tourId))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzTourList tours;
+    if(!controller->getTours(&tours))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(tours);
     return CODE_OK;
 }
 

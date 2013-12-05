@@ -566,6 +566,15 @@ int QnMediaServerConnection::ptzRelativeMoveAsync(const QnNetworkResourcePtr &ca
     return sendAsyncGetRequest(PtzRelativeMoveObject, params, NULL, target, slot);
 }
 
+int QnMediaServerConnection::ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetPositionAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("space",           QnLexical::serialized(space));
+
+    return sendAsyncGetRequest(PtzGetPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
+}
+
 int QnMediaServerConnection::ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreatePresetAction));
@@ -602,13 +611,24 @@ int QnMediaServerConnection::ptzGetPresetsAsync(const QnNetworkResourcePtr &came
     return sendAsyncGetRequest(PtzGetPresetsObject, params, QN_REPLY_TYPE(QnPtzPresetList), target, slot);
 }
 
-int QnMediaServerConnection::ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot) {
+int QnMediaServerConnection::ptzCreateTourAsync(const QnNetworkResourcePtr &camera, const QnPtzTour &tour, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetPositionAction));
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreateTourAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("space",           QnLexical::serialized(space));
 
-    return sendAsyncGetRequest(PtzGetPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
+    return sendAsyncPostRequest();
+}
+
+int QnMediaServerConnection::ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
+
+}
+
+int QnMediaServerConnection::ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
+
+}
+
+int QnMediaServerConnection::ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {

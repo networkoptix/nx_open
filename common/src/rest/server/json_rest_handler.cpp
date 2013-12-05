@@ -32,6 +32,10 @@ int QnJsonRestHandler::executePost(const QString &path, const QnRequestParams &p
     return executeGet(path, params, result);
 }
 
+int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+    return executePost(path, params, QByteArray(), result);
+}
+
 QnRequestParams QnJsonRestHandler::processParams(const QnRequestParamList &params) const {
     QnRequestParams result;
     foreach(const QnRequestParam &param, params)

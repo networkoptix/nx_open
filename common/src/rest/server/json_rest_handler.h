@@ -13,7 +13,7 @@ public:
     QnJsonRestHandler();
     virtual ~QnJsonRestHandler();
 
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) = 0;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
 
 protected:

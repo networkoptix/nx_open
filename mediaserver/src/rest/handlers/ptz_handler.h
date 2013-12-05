@@ -16,7 +16,7 @@ public:
     QnPtzHandler();
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
     virtual QString description() const;
 
 private:
@@ -29,6 +29,11 @@ private:
     int executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+
+    int executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
+    int executeRemoveTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+    int executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+    int executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();

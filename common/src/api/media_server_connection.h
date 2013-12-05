@@ -183,6 +183,11 @@ public:
     int ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, QObject *target, const char *slot);
     int ptzGetPresetsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
+    int ptzCreateTourAsync(const QnNetworkResourcePtr &camera, const QnPtzTour &tour, QObject *target, const char *slot);
+    int ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
+    int ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
+    int ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
     int getStorageSpaceAsync(QObject *target, const char *slot);
 
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);

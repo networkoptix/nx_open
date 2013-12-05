@@ -173,13 +173,20 @@ protected:
     QnEnumNameMapper *nameMapper() const;
     void setNameMapper(QnEnumNameMapper *nameMapper);
 
+    const QnRequestHeaderList &extraHeaders() const;
+    void setExtraHeaders(const QnRequestHeaderList &extraHeaders);
+
     int sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
 
     int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
     int sendSyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, QVariant *reply);
     int sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply);
+    int sendSyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
+    int sendSyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
 
     template<class T>
     int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, T *reply) {
@@ -208,14 +215,14 @@ protected:
     int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply) {
         return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
-    void setExtraHeaders(const QnRequestHeaderList& headers);
+
 private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
     QUrl m_url;
     QScopedPointer<QnEnumNameMapper> m_nameMapper;
-    QnRequestHeaderList m_headers;
+    QnRequestHeaderList m_extraHeaders;
 };
 
 

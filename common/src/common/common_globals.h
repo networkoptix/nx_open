@@ -88,7 +88,12 @@ public:
         PtzCreatePresetAction,
         PtzRemovePresetAction,
         PtzActivatePresetAction,
-        PtzGetPresetsAction
+        PtzGetPresetsAction,
+
+        PtzCreateTourAction,
+        PtzRemoveTourAction,
+        PtzActivateTourAction,
+        PtzGetToursAction
     };
 
     enum PtzCoordinateSpace {
