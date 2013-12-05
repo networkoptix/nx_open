@@ -41,6 +41,8 @@
 #include "utils/common/synctime.h"
 #include "utils/network/tcp_listener.h"
 #include "network/authenticate_helper.h"
+#include "../settings.h"
+
 
 class QnTcpListener;
 
@@ -1424,25 +1426,32 @@ void QnRtspConnectionProcessor::run()
     
     parseRequest();
     bool authOK = false;
-    for (int i = 0; i < 3 && !m_needStop; ++i)
+    if( MSSettings::roSettings()->value("authenticationEnabled").toBool() )
     {
-        if(!qnAuthHelper->authenticate(d->request, d->response))
+        for (int i = 0; i < 3 && !m_needStop; ++i)
         {
-            sendResponse(CODE_AUTH_REQUIRED);
-            if (readRequest()) 
-                parseRequest();
+            if(!qnAuthHelper->authenticate(d->request, d->response))
+            {
+                sendResponse(CODE_AUTH_REQUIRED);
+                if (readRequest()) 
+                    parseRequest();
+                else {
+                    authOK = false;
+                    break;
+                }
+            }
             else {
-                authOK = false;
+                authOK = true;
                 break;
             }
         }
-        else {
-            authOK = true;
-            break;
-        }
+        if (!authOK)
+            return;
     }
-    if (!authOK)
-        return;
+    else
+    {
+        authOK = true;
+    }
 
     processRequest();
 
