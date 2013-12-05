@@ -28,24 +28,19 @@ QCursor QnLinuxImages::bitmapCursor(Qt::CursorShape shape) const {
         freeCursorData = false;
     } else {
         int i, j;
-        quint32 *cursorWords;
-        ulong *p;
-        quint32 *q;
-
-        cursorWords = new quint32[xImage->width * xImage->height];
+        quint32 *cursorWords = new quint32[xImage->width * xImage->height];
         cursorData = (uchar *)cursorWords;
 
-        p = xImage->pixels;
-        q = cursorWords;
+        ulong *p = xImage->pixels;
+        quint32 *q = cursorWords;
         for (j = 0; j < xImage->height; j++)
             for (i = 0; i < xImage->width; i++)
                 *(q++) = *(p++);
-
         freeCursorData = true;
     }
 
     QCursor result(
-        QPixmap::fromImage(QImage(cursorData, xImage->width, xImage->height, QImage::Format_ARGB32_Premultiplied)),
+        QPixmap::fromImage(QImage(cursorData, xImage->width, xImage->height, QImage::Format_ARGB32)),
         xImage->xhot,
         xImage->yhot
     );

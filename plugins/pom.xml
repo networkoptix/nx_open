@@ -15,5 +15,6 @@
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
+        <libtype>plugin</libtype>
     </properties>
 </project>
