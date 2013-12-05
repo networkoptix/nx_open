@@ -4,6 +4,8 @@
 #include "proxy_ptz_controller.h"
 
 class QnStringKvPairUsageHelper;
+class QnPtzPresetRecordList;
+class QnPresetPtzControllerPrivate;
 
 class QnPresetPtzController: public QnProxyPtzController {
     Q_OBJECT
@@ -11,6 +13,7 @@ class QnPresetPtzController: public QnProxyPtzController {
 
 public:
     QnPresetPtzController(const QnPtzControllerPtr &baseController);
+    virtual ~QnPresetPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 
@@ -20,7 +23,7 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
-    QnStringKvPairUsageHelper *m_helper;
+    QScopedPointer<QnPresetPtzControllerPrivate> d;
 };
 
 #endif // QN_PRESET_PTZ_CONTROLLER_H

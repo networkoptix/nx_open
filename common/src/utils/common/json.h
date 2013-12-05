@@ -11,6 +11,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #endif
 
@@ -183,9 +184,9 @@ namespace QJson {
      * \returns                         Deserialization target.
      */
     template<class T>
-    T deserialized(const QString &value, bool *success = NULL) {
+    T deserialized(const QByteArray &value, bool *success = NULL) {
         T target;
-        bool result = QJson::deserialize(value.toUtf8(), &target);
+        bool result = QJson::deserialize(value, &target);
         if (success)
             *success = result;
         return target;
@@ -307,7 +308,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 
 #define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II(GETTER, SETTER, NAME)      \
     {                                                                           \
-        typedef decltype(getMember(result, GETTER)) member_type;                \
+        typedef boost::remove_reference<decltype(getMember(result, GETTER))>::type member_type; \
         if(!QJsonDetail::deserializeMember(object, QStringLiteral(NAME), result, SETTER, static_cast<const member_type *>(NULL))) \
             return false;                                                       \
     }
