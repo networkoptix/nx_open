@@ -10,7 +10,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <core/ptz/mapped_ptz_controller.h>
-#include <core/ptz/relative_ptz_controller.h>
+#include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/workaround_ptz_controller.h>
 
 

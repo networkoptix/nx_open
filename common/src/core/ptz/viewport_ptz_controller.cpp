@@ -1,4 +1,4 @@
-#include "relative_ptz_controller.h"
+#include "viewport_ptz_controller.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QVector3D>
