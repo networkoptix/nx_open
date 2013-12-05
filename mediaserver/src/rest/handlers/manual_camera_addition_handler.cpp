@@ -3,7 +3,7 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <api/media_server_cameras_data.h>
+#include <api/model/manual_camera_seach_reply.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 
 #include <utils/common/json.h>
@@ -54,11 +54,9 @@ int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &para
         m_searchProcesses.insert(processUuid, searcher);
     }
 
-    m_searchProcessRuns.insert(processUuid,
-        QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port)
-                               );
+    m_searchProcessRuns.insert(processUuid, QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port));
 
-    QnManualCameraSearchProcessReply reply(processUuid, getSearchStatus(processUuid));
+    QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
 
     return CODE_OK;
@@ -73,7 +71,7 @@ int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &par
     if (!isSearchActive(processUuid))
         return CODE_NOT_FOUND;
 
-    QnManualCameraSearchProcessReply reply(processUuid, getSearchStatus(processUuid));
+    QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
 
     return CODE_OK;
@@ -97,7 +95,7 @@ int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &param
     m_searchProcessRuns[processUuid].waitForFinished();
     m_searchProcessRuns.remove(processUuid);
 
-    QnManualCameraSearchProcessReply reply;
+    QnManualCameraSearchReply reply;
     reply.processUuid = processUuid;
     if (process) {
         QnManualCameraSearchProcessStatus processStatus = process->status();
