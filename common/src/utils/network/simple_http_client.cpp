@@ -322,7 +322,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             {
                 return CL_HTTP_NOT_FOUND;
             }
-            else if (m_responseLine.contains("302 moved"))
+            else if (m_responseLine.contains("302 moved") || m_responseLine.contains("302 found"))
             {
                 return CL_HTTP_REDIRECT;
             }

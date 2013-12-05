@@ -220,6 +220,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     if (channesl > 1) //
     {
+        resource->setGroupName(resource->getPhysicalId());
+        resource->setGroupId(resource->getPhysicalId());
 
         resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
 
@@ -235,6 +237,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(smac);
+            resource->setGroupName(resource->getPhysicalId());
+            resource->setGroupId(resource->getPhysicalId());
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
 

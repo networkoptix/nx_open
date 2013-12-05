@@ -144,6 +144,8 @@ bool QnAxisPtzController::query(const QString &request, QByteArray *body) const 
     QScopedPointer<CLSimpleHTTPClient> http(newHttpClient());
 
     CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
+    QByteArray ptz_ctl_id;
+repeat:
     if(status == CL_HTTP_SUCCESS) {
         if(body) {
             QByteArray localBody;
@@ -156,7 +158,17 @@ bool QnAxisPtzController::query(const QString &request, QByteArray *body) const 
                 return false;
             }
         }
-    } else {
+    } 
+    else if (status == CL_HTTP_REDIRECT && ptz_ctl_id.isEmpty())
+    {
+        ptz_ctl_id = http->header().value("Set-Cookie");
+        if (ptz_ctl_id.isEmpty())
+            return false;
+        http->addHeader("Cookie", ptz_ctl_id);
+        status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
+        goto repeat;
+    }
+    else {
         qnWarning("Failed to execute request '%1' for camera %2. Result: %3.", request, m_resource->getName(), ::toString(status));
         return false;
     }
@@ -201,7 +213,7 @@ QString QnAxisPtzController::getCameraNum()
     QVariant val;
     m_resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
     if (val.toInt() > 1)
-        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNum());
+        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNumAxis());
     return camNum;
 }
 

@@ -74,7 +74,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     if (channels > 1)
     {
         // multiple channel encoder
-        profileSufix = QByteArray::number(res->getChannelNum());
+        profileSufix = QByteArray::number(res->getChannelNumAxis());
     }
 
     if (role == QnResource::Role_LiveVideo)
@@ -193,7 +193,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     if (channels > 1)
     {
-        stream << "&camera=" << res->getChannelNum();
+        stream << "&camera=" << res->getChannelNumAxis();
     }
 
     
