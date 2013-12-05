@@ -42,7 +42,7 @@ bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
     return 1;
 }
 
-bool QnFisheyePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnFisheyePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport) {
     return 1;
 }
 

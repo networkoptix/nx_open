@@ -19,7 +19,7 @@ Qn::PtzCapabilities QnViewportPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::ViewportCoordinateSpaceCapability;
 }
 
-bool QnViewportPtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport) {
     // TODO: #Elric cache it!
     QnPtzLimits limits;
     if(!getLimits(&limits))

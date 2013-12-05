@@ -80,7 +80,7 @@ public:
      * \param viewport                  New viewport position.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
     /**
      * \param[out] flip                 Flipped state of the camera's video stream.

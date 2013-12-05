@@ -628,7 +628,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
     QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
-    widget->ptzController()->relativeMove(aspectRatio, viewport);
+    widget->ptzController()->viewportMove(aspectRatio, viewport);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {

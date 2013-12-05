@@ -13,7 +13,7 @@ public:
     static bool extends(const QnPtzControllerPtr &baseController);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) override;
 };
 
 

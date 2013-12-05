@@ -141,7 +141,7 @@ int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, cons
     }
     
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
-    if(!controller->relativeMove(aspectRatio, viewport))
+    if(!controller->viewportMove(aspectRatio, viewport))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;

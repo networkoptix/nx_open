@@ -44,7 +44,7 @@ bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVe
     return true;
 }
 
-bool QnRemotePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport) {
     if(!m_server)
         return false;
 
