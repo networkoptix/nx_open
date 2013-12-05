@@ -21,8 +21,8 @@
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
-    QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0): 
-        QGLWidget(format, parent, shareWidget, windowFlags)
+    QnSignDialogGlWidget(QGLContext *context, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0):
+        QGLWidget(context, parent, shareWidget, windowFlags)
     {
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
