@@ -9,6 +9,7 @@ ARCHITECTURE=${os.arch}
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
+LIBPLUGINTARGET=$LIBTARGET/plugins
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
@@ -17,6 +18,7 @@ STAGEBASE=deb
 STAGE=$STAGEBASE/${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
+LIBPLUGINSTAGE=$STAGE$LIBPLUGINTARGET
 ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
@@ -24,21 +26,30 @@ INITDSTAGE=$STAGE$INITDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
+SERVER_LIB_PLUGIN_PATH=$SERVER_LIB_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
 
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
+mkdir -p $LIBPLUGINSTAGE
 mkdir -p $ETCSTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
+for f in `find $LIBPLUGINSTAGE -type f`
+do
+    strip $f
+    chrpath -d $f
+done
+
 for f in `find $LIBSTAGE -type f`
 do
     strip $f
