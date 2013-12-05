@@ -78,6 +78,8 @@ void QnPtzPresetsDialog::submitToResource() {
     if(!m_camera)
         return;
 
+    
+
     //context()->instance<QnWorkbenchPtzPresetManager>()->setPtzPresets(m_camera, m_model->presets());
 }
 

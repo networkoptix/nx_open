@@ -21,6 +21,7 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 
+#include <core/ptz/ptz_preset.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
@@ -58,6 +59,8 @@ signals:
     void finished(int status, const QnManualCameraSearchReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
+    void finished(int status, const QnPtzPreset &reply, int handle);
+    void finished(int status, const QnPtzPresetList &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -170,13 +173,17 @@ public:
     int searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot);
     int searchCameraAsyncStop(const QUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
 
-
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzRelativeMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzGetPosition(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
+
+    int ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
+    int ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
+    int ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
+    int ptzGetPresetsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int getStorageSpaceAsync(QObject *target, const char *slot);
 

@@ -3,6 +3,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QList>
+#include <QtCore/QMetaType>
 
 #include "ptz_fwd.h"
 
@@ -24,6 +25,9 @@ public:
 private:
     QString m_id, m_name;
 };
+
+Q_DECLARE_METATYPE(QnPtzPreset)
+Q_DECLARE_METATYPE(QnPtzPresetList)
 
 QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QnPtzPreset,
     ((&QnPtzPreset::id,   &QnPtzPreset::setId,     "id"))

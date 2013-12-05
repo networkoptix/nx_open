@@ -81,7 +81,12 @@ public:
         PtzContinousMoveAction,
         PtzAbsoluteMoveAction,
         PtzRelativeMoveAction,
-        PtzGetPositionAction
+        PtzGetPositionAction,
+        
+        PtzCreatePresetAction,
+        PtzRemovePresetAction,
+        PtzActivatePresetAction,
+        PtzGetPresetsAction
     };
 
     enum PtzCoordinateSpace {

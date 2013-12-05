@@ -3,6 +3,12 @@
 
 #include <QAbstractTableModel>
 
+struct QnClientPtzPreset {
+    QnPtzPreset preset;
+    int hotkey;
+};
+
+
 //#include <ui/workbench/workbench_ptz_preset_manager.h>
 #if 0
 class QnPtzPresetListModel: public QAbstractTableModel {

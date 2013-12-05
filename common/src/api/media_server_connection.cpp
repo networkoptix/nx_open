@@ -37,6 +37,10 @@ namespace {
         ((PtzAbsoluteMoveObject,    "ptz"))
         ((PtzRelativeMoveObject,    "ptz"))
         ((PtzGetPositionObject,     "ptz"))
+        ((PtzCreatePresetObject,    "ptz"))
+        ((PtzRemovePresetObject,    "ptz"))
+        ((PtzActivatePresetObject,  "ptz"))
+        ((PtzGetPresetsObject,      "ptz"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
         ((TimeObject,               "gettime"))
@@ -321,15 +325,24 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case TimeObject:
         processJsonReply<QnTimeReply>(this, response, handle);
         break;
+    case CameraAddObject:
+        emitFinished(this, response.status, handle);
+        break;
     case PtzContinuousMoveObject:
     case PtzAbsoluteMoveObject:
     case PtzRelativeMoveObject:
-    case CameraAddObject:
-        //TODO: #GDM processJsonReply if needed
+    case PtzRemovePresetObject:
+    case PtzActivatePresetObject:
         emitFinished(this, response.status, handle);
         break;
     case PtzGetPositionObject:
         processJsonReply<QVector3D>(this, response, handle);
+        break;
+    case PtzCreatePresetObject:
+        processJsonReply<QnPtzPreset>(this, response, handle);
+        break;
+    case PtzGetPresetsObject:
+        processJsonReply<QnPtzPresetList>(this, response, handle);
         break;
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
@@ -553,6 +566,42 @@ int QnMediaServerConnection::ptzRelativeMoveAsync(const QnNetworkResourcePtr &ca
     params << QnRequestParam("sequenceNumber",  QnLexical::serialized(sequenceNumber));
 
     return sendAsyncGetRequest(PtzRelativeMoveObject, params, NULL, target, slot);
+}
+
+int QnMediaServerConnection::ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreatePresetAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("presetName",      QnLexical::serialized(preset.name()));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id()));
+
+    return sendAsyncGetRequest(PtzCreatePresetObject, params, QN_REPLY_TYPE(QnPtzPreset), target, slot);
+}
+
+int QnMediaServerConnection::ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzRemovePresetAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id()));
+
+    return sendAsyncGetRequest(PtzRemovePresetObject, params, NULL, target, slot);
+}
+
+int QnMediaServerConnection::ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzActivatePresetAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id()));
+
+    return sendAsyncGetRequest(PtzActivatePresetObject, params, NULL, target, slot);
+}
+
+int QnMediaServerConnection::ptzGetPresetsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetPresetsAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncGetRequest(PtzGetPresetsObject, params, QN_REPLY_TYPE(QnPtzPresetList), target, slot);
 }
 
 int QnMediaServerConnection::ptzGetPosition(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot) {

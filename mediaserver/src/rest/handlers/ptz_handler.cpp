@@ -84,6 +84,10 @@ int QnPtzHandler::executeGet(const QString &path, const QnRequestParams &params,
     case Qn::PtzAbsoluteMoveAction:     return executeAbsoluteMove(controller, params, result);
     case Qn::PtzRelativeMoveAction:     return executeRelativeMove(controller, params, result);
     case Qn::PtzGetPositionAction:      return executeGetPosition(controller, params, result);
+    case Qn::PtzCreatePresetAction:     return executeCreatePreset(controller, params, result);
+    case Qn::PtzRemovePresetAction:     return executeRemovePreset(controller, params, result);
+    case Qn::PtzActivatePresetAction:   return executeActivatePreset(controller, params, result);
+    case Qn::PtzGetPresetsAction:       return executeGetPresets(controller, params, result);
     default:                            return CODE_INVALID_PARAMETER;
     }
 }
@@ -154,6 +158,26 @@ int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const
 
     result.setReply(position);
     return CODE_OK;
+}
+
+int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString id, name;
+    if(!requireParameter(params, lit("presetId"), result, &id) || !requireParameter(params, lit("presetName"), result, &name))
+        return CODE_INVALID_PARAMETER;
+
+    QnPtzPreset preset(id, name);
+}
+
+int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+
+}
+
+int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+
+}
+
+int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+
 }
 
 QString QnPtzHandler::description() const

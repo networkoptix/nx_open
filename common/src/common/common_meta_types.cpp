@@ -127,6 +127,9 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnRebuildArchiveReply>();
 
+    qRegisterMetaType<QnPtzPreset>();
+    qRegisterMetaType<QnPtzPresetList>();
+
     qRegisterMetaType<DewarpingParams>();
 
     qRegisterMetaType<Qn::Corner>();
