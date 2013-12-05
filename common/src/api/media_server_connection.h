@@ -7,8 +7,6 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
-#include <common/common_serialization.h>
-
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 

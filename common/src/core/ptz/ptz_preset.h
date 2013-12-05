@@ -29,10 +29,4 @@ private:
 Q_DECLARE_METATYPE(QnPtzPreset)
 Q_DECLARE_METATYPE(QnPtzPresetList)
 
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QnPtzPreset,
-    ((&QnPtzPreset::id,   &QnPtzPreset::setId,     "id"))
-    ((&QnPtzPreset::name, &QnPtzPreset::setName,   "name")),
-inline)
-
-
 #endif // QN_PTZ_PRESET_H

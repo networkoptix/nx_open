@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 
 #include "adl_wrapper.h"
+#include "lexical_fwd.h"
 
 namespace QnLexicalDetail {
     template<class T>
@@ -58,17 +59,6 @@ namespace QnLexical {
     }
 
 } // namespace QnLexical
-
-
-/**
- * \param TYPE                          Type to declare lexical (de)serialization functions for.
- * \param PREFIX                        Optional function declaration prefix, e.g. <tt>inline</tt>.
- * \note                                This macro generates function declarations only.
- *                                      Definitions still have to be supplied.
- */
-#define QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)      \
-__VA_ARGS__ void serialize(const TYPE &value, QString *target);                 \
-__VA_ARGS__ bool deserialize(const QString &value, TYPE *target);
 
 
 #define QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \

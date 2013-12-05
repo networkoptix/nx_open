@@ -4,7 +4,6 @@
 
 #include <boost/range/algorithm/find_if.hpp>
 
-#include <common/common_serialization.h>
 #include <api/kvpair_usage_helper.h>
 #include <utils/common/json.h>
 

@@ -1,7 +1,5 @@
 #include "ptz_handler.h"
 
-#include <common/common_serialization.h>
-
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
 #include <utils/network/tcp_connection_priv.h>

@@ -6,6 +6,8 @@
 #include <QtCore/QString>
 
 #include <utils/math/limits.h> /* For INT64_MAX. */
+#include <utils/common/lexical_fwd.h>
+#include <utils/common/json_fwd.h>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -25,8 +27,8 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(ExtrapolationMode MotionType StreamFpsSharingMethod)
-    Q_FLAGS(CameraCapabilities PtzCapabilities)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzAction PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else
     Q_NAMESPACE
@@ -337,6 +339,12 @@ Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodContent);
 Q_DECLARE_METATYPE(Qn::Corner);
+
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzAction)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
+
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzAction)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
 
 
 #endif // QN_COMMON_GLOBALS_H

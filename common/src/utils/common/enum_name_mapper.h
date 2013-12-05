@@ -144,7 +144,7 @@ QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ##__VA_ARGS__)
 
 
 #define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ... /* PREFIX */)  \
-__VA_ARGS__ inline QnTypedEnumNameMapper<ENUM> createEnumNameMapper(ENUM *) {   \
+__VA_ARGS__ QnTypedEnumNameMapper<ENUM> createEnumNameMapper(ENUM *) {          \
     QnTypedEnumNameMapper<ENUM> result;                                         \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
     return result;                                                              \
@@ -167,8 +167,8 @@ __VA_ARGS__ inline QnTypedEnumNameMapper<ENUM> createEnumNameMapper(ENUM *) {   
  * \param SCOPE                         Enumeration's scope.
  * \param ENUM                          Name of the enumeration.
  */
-#define QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(SCOPE, ENUM, ... /* PREFIX */)          \
-__VA_ARGS__ inline QnTypedEnumNameMapper<SCOPE::ENUM> createEnumNameMapper(SCOPE::ENUM *) { \
+#define QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(SCOPE, ENUM, ... /* PREFIX */)   \
+__VA_ARGS__ QnTypedEnumNameMapper<SCOPE::ENUM> createEnumNameMapper(SCOPE::ENUM *) { \
     return QnTypedEnumNameMapper<SCOPE::ENUM>(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM)); \
 }
 

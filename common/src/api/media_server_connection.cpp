@@ -12,8 +12,6 @@
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
 
-#include <common/common_serialization.h>
-
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
