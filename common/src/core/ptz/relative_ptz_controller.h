@@ -1,19 +1,20 @@
-#ifndef QN_RELATIVE_PTZ_CONTROLLER_H
-#define QN_RELATIVE_PTZ_CONTROLLER_H
+#ifndef QN_VIEWPORT_PTZ_CONTROLLER_H
+#define QN_VIEWPORT_PTZ_CONTROLLER_H
 
 #include "proxy_ptz_controller.h"
 
-class QnRelativePtzController: public QnProxyPtzController {
+class QnViewportPtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:
-    QnRelativePtzController(const QnPtzControllerPtr &baseController);
+    QnViewportPtzController(const QnPtzControllerPtr &baseController);
     
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    static bool extends(const QnPtzControllerPtr &baseController);
 
+    virtual Qn::PtzCapabilities getCapabilities() override;
     virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override;
 };
 
 
-#endif // QN_RELATIVE_PTZ_CONTROLLER_H
+#endif // QN_VIEWPORT_PTZ_CONTROLLER_H

@@ -33,6 +33,7 @@ protected:
 
 private slots:
    void at_connection_replyReceived(int status, const QnKvPairs &kvPairs, int handle);
+
 private:
     void load();
     void save();

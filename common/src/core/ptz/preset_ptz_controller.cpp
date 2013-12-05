@@ -78,6 +78,9 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
 {
     assert(baseController->hasCapabilities(Qn::AbsolutePtzCapabilities));
 
+    // TODO: don't use usage helper, use sync api
+    // TODO: mutex
+
     d->helper = new QnStringKvPairUsageHelper(baseController->resource(), lit(""), QString(), this);
 }
 
