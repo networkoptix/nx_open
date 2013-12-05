@@ -15,15 +15,10 @@ class QnPtzControllerPool: public Connective<QObject>, public Singleton<QnPtzCon
     typedef Connective<QObject> base_type;
 
 public:
-    enum ControllerRole {
-        DefaultController,
-        DeviceController
-    };
-
     QnPtzControllerPool(QObject *parent = NULL);
     virtual ~QnPtzControllerPool();
 
-    QnPtzControllerPtr controller(const QnResourcePtr &resource, ControllerRole role = DefaultController) const;
+    QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
 
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -32,12 +27,7 @@ private slots:
 
 private:
     struct PtzData {
-        QnPtzControllerPtr deviceController;
-        QnPtzControllerPtr logicalController;
-        QnPtzControllerPtr relativeController;
-        QnPtzControllerPtr workaroundController;
-
-        QnPtzControllerPtr defaultController;
+        QnPtzControllerPtr controller;
     };
 
     QHash<QnResourcePtr, PtzData> m_dataByResource;

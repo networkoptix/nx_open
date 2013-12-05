@@ -10,8 +10,9 @@
 #include <core/resource/camera_resource.h>
 
 #include <core/ptz/mapped_ptz_controller.h>
-#include <core/ptz/relative_ptz_controller.h>
+#include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/workaround_ptz_controller.h>
+#include <core/ptz/preset_ptz_controller.h>
 
 
 QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
@@ -28,18 +29,12 @@ QnPtzControllerPool::~QnPtzControllerPool() {
 	return;
 }
 
-QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource, ControllerRole role) const {
+QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const {
 	auto pos = m_dataByResource.find(resource);
 	if(pos == m_dataByResource.end())
 		return QnPtzControllerPtr();
 
-    switch(role) {
-    case DefaultController: return  pos->defaultController;
-    case DeviceController: return   pos->deviceController;
-    default:
-        qnWarning("Invalid controller role '%1'.", static_cast<int>(role));
-        return QnPtzControllerPtr();
-    }
+    return pos->controller;
 }
 
 void QnPtzControllerPool::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -61,41 +56,27 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
 	if(!camera)
 		return;
 
-	PtzData data;
-    data.deviceController.reset(camera->createPtzController());
-    if(!data.deviceController)
+	QnPtzControllerPtr controller(camera->createPtzController());
+    if(!controller)
         return;
 
-	if(data.deviceController) {
-		data.defaultController = data.deviceController;
+	if(QnMappedPtzController::extends(controller))
+        if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper())
+            controller.reset(new QnMappedPtzController(mapper, controller));
+	
+    if(QnViewportPtzController::extends(controller))
+        controller.reset(new QnViewportPtzController(controller));
 
-        if(data.deviceController->hasCapabilities(Qn::LogicalCoordinateSpaceCapability)) {
-            data.logicalController = data.deviceController;
-        } else if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper()) {
-            data.logicalController.reset(new QnMappedPtzController(mapper, data.deviceController));
-        }
-    }
+    if(QnPresetPtzController::extends(controller))
+        controller.reset(new QnPresetPtzController(controller));
 
-	if(data.logicalController) {
-		data.defaultController = data.logicalController;
+    controller.reset(new QnWorkaroundPtzController(controller));
 
-        if(data.logicalController->hasCapabilities(Qn::ViewportCoordinateSpaceCapability)) {
-            data.relativeController = data.logicalController;
-        } else {
-            data.relativeController.reset(new QnRelativePtzController(data.logicalController));
-        }
-    }
-
-	if(data.relativeController)
-		data.defaultController = data.relativeController;
-
-    data.workaroundController.reset(new QnWorkaroundPtzController(data.defaultController));
-    data.defaultController = data.workaroundController;
-
-    resource->setPtzCapabilities(data.defaultController->getCapabilities());
+    resource->setPtzCapabilities(controller->getCapabilities());
     QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
 
-
+    PtzData data;
+    data.controller = controller;
 	m_dataByResource.insert(resource, data);
 }
 

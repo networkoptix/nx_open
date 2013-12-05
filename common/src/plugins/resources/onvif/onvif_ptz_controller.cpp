@@ -251,7 +251,7 @@ bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
     return false; // TODO: #PTZ #Elric
 }
 
-bool QnOnvifPtzController::relativeMove(qreal, const QRectF &) {
+bool QnOnvifPtzController::viewportMove(qreal, const QRectF &) {
     return false;
 }
 

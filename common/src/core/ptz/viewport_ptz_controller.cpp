@@ -1,24 +1,25 @@
-#include "relative_ptz_controller.h"
-
-#include <cassert>
+#include "viewport_ptz_controller.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QVector3D>
 
 #include <utils/math/coordinate_transformations.h>
 
-
-QnRelativePtzController::QnRelativePtzController(const QnPtzControllerPtr &baseController):
+QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController) 
-{
-    assert(baseController->hasCapabilities(Qn::LogicalCoordinateSpaceCapability));
+{}
+
+bool QnViewportPtzController::extends(const QnPtzControllerPtr &baseController) {
+    return 
+        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities | Qn::LogicalCoordinateSpaceCapability) &&
+        !baseController->hasCapabilities(Qn::ViewportCoordinateSpaceCapability);
 }
 
-Qn::PtzCapabilities QnRelativePtzController::getCapabilities() {
+Qn::PtzCapabilities QnViewportPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::ViewportCoordinateSpaceCapability;
 }
 
-bool QnRelativePtzController::relativeMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport) {
     // TODO: #Elric cache it!
     QnPtzLimits limits;
     if(!getLimits(&limits))

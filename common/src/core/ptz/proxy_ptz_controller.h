@@ -19,7 +19,7 @@ public:
 
     virtual bool continuousMove(const QVector3D &speed) override                                { return m_baseController->continuousMove(speed); }
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override { return m_baseController->absoluteMove(space, position); }
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) override               { return m_baseController->relativeMove(aspectRatio, viewport); }
+    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) override               { return m_baseController->viewportMove(aspectRatio, viewport); }
 
     virtual bool getFlip(Qt::Orientations *flip) override                                       { return m_baseController->getFlip(flip); }
     virtual bool getLimits(QnPtzLimits *limits) override                                        { return m_baseController->getLimits(limits); }

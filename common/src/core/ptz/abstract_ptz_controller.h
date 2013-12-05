@@ -57,7 +57,7 @@ public:
 
     /**
      * Sets camera PTZ position. If this controller has 
-     * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is expected to
+     * <tt>Qn::LogicalCoordinateSpaceCapability<tt>, then position is expected to
      * be in standard PTZ space. Otherwise it is expected to be in device-specific
      * coordinates and thus only positions returned from a call to <tt>getPosition</tt>
      * can be safely used.
@@ -74,13 +74,13 @@ public:
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
      * 
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ScreenSpaceMovementCapability</tt>.
+     * <tt>Qn::ViewportCoordinateSpaceCapability</tt>.
      * 
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool relativeMove(qreal aspectRatio, const QRectF &viewport) = 0;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
     /**
      * \param[out] flip                 Flipped state of the camera's video stream.
@@ -92,7 +92,7 @@ public:
      * Gets PTZ limits of the camera in standard PTZ space. 
      * 
      * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::LogicalPositionSpaceCapability<tt>.
+     * <tt>Qn::LogicalCoordinateSpaceCapability<tt>.
      * 
      * \param[out] limits               Ptz limits.
      * \returns                         Whether the operation was successful.
@@ -101,7 +101,7 @@ public:
 
     /**
      * Gets PTZ position from camera. If this controller has 
-     * <tt>Qn::LogicalPositionSpaceCapability<tt>, then position is returned in 
+     * <tt>Qn::LogicalCoordinateSpaceCapability<tt>, then position is returned in 
      * standard PTZ space. Otherwise it's returned in device-specific coordinates.
      *
      * \param space                     Coordinate space to get position in.

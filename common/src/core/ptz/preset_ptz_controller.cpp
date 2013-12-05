@@ -76,13 +76,20 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     base_type(baseController),
     d(new QnPresetPtzControllerPrivate())
 {
-    assert(baseController->hasCapabilities(Qn::AbsolutePtzCapabilities));
+    // TODO: don't use usage helper, use sync api
+    // TODO: mutex
 
     d->helper = new QnStringKvPairUsageHelper(baseController->resource(), lit(""), QString(), this);
 }
 
 QnPresetPtzController::~QnPresetPtzController() {
     return;
+}
+
+bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
+    return 
+        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
+        !baseController->hasCapabilities(Qn::PtzPresetCapability);
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {

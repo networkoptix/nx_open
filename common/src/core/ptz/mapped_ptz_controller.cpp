@@ -1,12 +1,14 @@
 #include "mapped_ptz_controller.h"
 
-#include <cassert>
-
 QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController):
     QnProxyPtzController(baseController),
     m_mapper(mapper)
-{
-    assert(baseController->hasCapabilities(Qn::AbsolutePtzCapabilities | Qn::DeviceCoordinateSpaceCapability));
+{}
+
+bool QnMappedPtzController::extends(const QnPtzControllerPtr &baseController) {
+    return 
+        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities | Qn::DeviceCoordinateSpaceCapability) &&
+        !baseController->hasCapabilities(Qn::LogicalCoordinateSpaceCapability);
 }
 
 Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
