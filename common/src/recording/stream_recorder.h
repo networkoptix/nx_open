@@ -117,7 +117,7 @@ protected:
     int getPrebufferingUsec() const;
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
 
-    virtual bool saveMotion(QnMetaDataV1Ptr media);
+    virtual bool saveMotion(QnConstMetaDataV1Ptr media);
 
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
@@ -130,7 +130,7 @@ protected:
     bool addSignatureFrame(QString& errorString);
     void markNeedKeyData();
     virtual bool saveData(QnAbstractMediaDataPtr md);
-    virtual void writeData(QnAbstractMediaDataPtr md, int streamIndex);
+    virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
 private:
     void updateSignatureAttr();
     qint64 findNextIFrame(qint64 baseTime);
@@ -175,7 +175,7 @@ private:
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
-    QnCompressedVideoDataPtr m_lastIFrame;
+    QnConstCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
     QnFfmpegVideoTranscoder* m_videoTranscoder;

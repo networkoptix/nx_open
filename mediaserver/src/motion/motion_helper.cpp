@@ -34,7 +34,7 @@ QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res, int channel)
     return writer;
 }
 
-void QnMotionHelper::saveToArchive(QnMetaDataV1Ptr data)
+void QnMotionHelper::saveToArchive(QnConstMetaDataV1Ptr data)
 {
     QnMotionArchive* archive = getArchive(data->dataProvider->getResource(), data->channelNumber);
     if (archive)

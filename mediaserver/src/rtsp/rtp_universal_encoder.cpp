@@ -644,7 +644,7 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_outputPos >= (int) m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || packetIndex >= packets.size())
         return false;
 
-	/*
+    /*
     if (packets[packetIndex] >= 12) {
         quint32* srcBuffer = (quint32*) (m_outputBuffer.data() + m_outputPos);
         RtpHeader* rtpHeader = (RtpHeader*) srcBuffer;
@@ -654,7 +654,7 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
         else
             srcBuffer[1] = htonl(getSSRC());
     }
-	*/
+    */
 
     sendBuffer.write(m_outputBuffer.data() + m_outputPos, packets[packetIndex]);
     m_outputPos += packets[packetIndex];

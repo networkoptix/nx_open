@@ -27,6 +27,8 @@ struct QnAbstractDataPacket
 
 typedef QSharedPointer<QnAbstractDataPacket> QnAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnAbstractDataPacketPtr);
+typedef QSharedPointer<const QnAbstractDataPacket> QnConstAbstractDataPacketPtr;
+Q_DECLARE_METATYPE(QnConstAbstractDataPacketPtr);
 
 class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
 {

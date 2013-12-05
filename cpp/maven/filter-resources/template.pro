@@ -2,6 +2,7 @@ cache()
 
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
+LIBTYPE = ${libtype}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QT += ${qt.libs}
@@ -10,7 +11,7 @@ ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 ## GLOBAL CONFIGURATIONS
 QMAKE_INFO_PLIST = Info.plist
-CONFIG += precompile_header $$BUILDLIB
+CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${additional.defines}
@@ -46,7 +47,17 @@ win* {
 isEmpty(BUILDLIB) {
 DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
-  DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+  plugin {
+    win* {
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+    }
+    else {
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+    }
+  }
+  else {
+    DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+  }
 }  
 
 OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION

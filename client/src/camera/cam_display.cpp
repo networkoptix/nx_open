@@ -200,7 +200,7 @@ void QnCamDisplay::resume()
         QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->resume();
     }
-	m_firstAfterJumpTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = AV_NOPTS_VALUE;
     QnAbstractDataConsumer::resume();
 }
 
@@ -252,33 +252,33 @@ void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 
 void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 {
-	bool isVideoCamera = media->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+    bool isVideoCamera = media->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
     if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return;
 
-	if (isVideoCamera)
-	{
+    if (isVideoCamera)
+    {
         //bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
         //bool isPrebuffer = media->flags & QnAbstractMediaData::MediaFlags_FCZ;
-		if (m_speed < 1.0 || m_singleShotMode)
-			return;
+        if (m_speed < 1.0 || m_singleShotMode)
+            return;
         if ((quint64)m_firstAfterJumpTime == AV_NOPTS_VALUE) {
-			m_firstAfterJumpTime = media->timestamp;
-			m_receivedInterval = 0;
-			m_afterJumpTimer.restart();
-			return;
-		}
+            m_firstAfterJumpTime = media->timestamp;
+            m_receivedInterval = 0;
+            m_afterJumpTimer.restart();
+            return;
+        }
 
-		m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
-		if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
-		{
-			if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
-			{
-				QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
+        m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
+        if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
+        {
+            if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
+            {
+                QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
                 qnRedAssController->onSlowStream(reader);
-			}
-		}
-	}
+            }
+        }
+    }
 }
 
 QnArchiveStreamReader* QnCamDisplay::getArchiveReader() const {
@@ -791,7 +791,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
         }
     }
     m_audioDisplay->clearAudioBuffer();
-	m_firstAfterJumpTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = AV_NOPTS_VALUE;
     m_prevLQ = -1;
 }
 
@@ -928,8 +928,8 @@ void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
         m_delay.breakSleep();
     }
     QnAbstractDataConsumer::putData(data);
-	if (video && m_dataQueue.size() < 2)
-		hurryUpCkeckForCamera2(video); // check if slow network
+    if (video && m_dataQueue.size() < 2)
+        hurryUpCkeckForCamera2(video); // check if slow network
 }
 
 bool QnCamDisplay::canAcceptData() const
