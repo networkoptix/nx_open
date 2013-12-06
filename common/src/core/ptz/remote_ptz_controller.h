@@ -37,6 +37,7 @@ private slots:
     void at_absoluteMove_replyReceived(int status, int handle);
     void at_relativeMove_replyReceived(int status, int handle);
 
+    void at_updatePreset_replyReceived(int status, int handle);
     void at_removePreset_replyReceived(int status, int handle);
     void at_activatePreset_replyReceived(int status, int handle);
 

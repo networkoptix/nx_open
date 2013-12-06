@@ -86,6 +86,7 @@ public:
         PtzGetPositionAction,
         
         PtzCreatePresetAction,
+        PtzUpdatePresetAction,
         PtzRemovePresetAction,
         PtzActivatePresetAction,
         PtzGetPresetsAction,
