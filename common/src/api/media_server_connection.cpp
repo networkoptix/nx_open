@@ -36,9 +36,14 @@ namespace {
         ((PtzRelativeMoveObject,    "ptz"))
         ((PtzGetPositionObject,     "ptz"))
         ((PtzCreatePresetObject,    "ptz"))
+        ((PtzUpdatePresetObject,    "ptz"))
         ((PtzRemovePresetObject,    "ptz"))
         ((PtzActivatePresetObject,  "ptz"))
         ((PtzGetPresetsObject,      "ptz"))
+        ((PtzCreateTourObject,      "ptz"))
+        ((PtzRemoveTourObject,      "ptz"))
+        ((PtzActivateTourObject,    "ptz"))
+        ((PtzGetToursObject,        "ptz"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
         ((TimeObject,               "gettime"))
@@ -329,18 +334,25 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzContinuousMoveObject:
     case PtzAbsoluteMoveObject:
     case PtzRelativeMoveObject:
+    case PtzUpdatePresetObject:
     case PtzRemovePresetObject:
     case PtzActivatePresetObject:
+    case PtzRemoveTourObject:
+    case PtzActivateTourObject:
         emitFinished(this, response.status, handle);
         break;
     case PtzGetPositionObject:
         processJsonReply<QVector3D>(this, response, handle);
         break;
     case PtzCreatePresetObject:
+    case PtzCreateTourObject:
         processJsonReply<QString>(this, response, handle);
         break;
     case PtzGetPresetsObject:
         processJsonReply<QnPtzPresetList>(this, response, handle);
+        break;
+    case PtzGetToursObject:
+        processJsonReply<QnPtzTourList>(this, response, handle);
         break;
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
@@ -616,20 +628,33 @@ int QnMediaServerConnection::ptzCreateTourAsync(const QnNetworkResourcePtr &came
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreateTourAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
-    return 1;
-//    return sendAsyncPostRequest();
+    return sendAsyncPostRequest(PtzCreateTourObject, params, QJson::serialized(tour), QN_REPLY_TYPE(QString), target, slot);
 }
 
 int QnMediaServerConnection::ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
-    return 1;
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzRemoveTourAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("tourId",          QnLexical::serialized(tourId));
+
+    return sendAsyncGetRequest(PtzRemoveTourObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
-    return 1;
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzActivateTourAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("tourId",          QnLexical::serialized(tourId));
+
+    return sendAsyncGetRequest(PtzActivateTourObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-    return 1;
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzActivateTourAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncGetRequest(PtzGetToursObject, params, QN_REPLY_TYPE(QnPtzTourList), target, slot);
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
