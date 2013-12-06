@@ -35,7 +35,7 @@ QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType(
 }
 
 //!Implementation of QnAbstractVideoDecoder::decode
-bool VideoDecoderSwitcher::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
+bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     QMutexLocker lk( &m_mutex );
 
@@ -112,7 +112,7 @@ const AVFrame* VideoDecoderSwitcher::lastFrame() const
 }
 
 //!Implementation of QnAbstractVideoDecoder::resetDecoder
-void VideoDecoderSwitcher::resetDecoder( QnCompressedVideoDataPtr data )
+void VideoDecoderSwitcher::resetDecoder( QnConstCompressedVideoDataPtr data )
 {
     return m_decoder->resetDecoder( data );
 }

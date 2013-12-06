@@ -83,7 +83,7 @@ public:
     virtual PixelFormat GetPixelFormat() const override;
 
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
+    virtual bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
 #ifndef XVBA_TEST
     //!Not implemented yet
     virtual void setLightCpuMode( DecodeMode val ) override;
@@ -98,7 +98,7 @@ public:
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const override;
     //!Reset decoder. Used for seek
-    virtual void resetDecoder( QnCompressedVideoDataPtr data ) override;
+    virtual void resetDecoder( QnConstCompressedVideoDataPtr data ) override;
 #endif
     //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
     virtual const AVFrame* lastFrame() const override;
@@ -387,11 +387,11 @@ private:
     void initializeScaleSurfacePool();
     mfxStatus scaleFrame( const mfxFrameSurface1& from, mfxFrameSurface1* const to );
 #endif
-    bool isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const;
+    bool isH264SeqHeaderInExtraData( const QnConstCompressedVideoDataPtr data ) const;
     /*!
         On return, \a seqHeader contains NALUs, reader from \a data->context->ctx()->extradata
     */
-    bool readH264SeqHeaderFromExtraData( const QnCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
+    bool readH264SeqHeaderFromExtraData( const QnConstCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
 
     mfxStatus doDecodingStep( mfxBitstream* const inputStream, mfxFrameSurface1** decodedFrame );
     mfxStatus doProcessingStep( QSharedPointer<SurfaceContext> decodedFrameCtx, QSharedPointer<SurfaceContext>* const scaledFrameCtx );
