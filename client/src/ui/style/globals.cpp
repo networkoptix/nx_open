@@ -15,6 +15,7 @@
 
 #include <utils/common/color.h>
 #include <utils/common/module_resources.h>
+#include <utils/common/json.h>
 
 
 Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
