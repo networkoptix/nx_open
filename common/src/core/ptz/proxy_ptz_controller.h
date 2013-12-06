@@ -26,6 +26,7 @@ public:
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override        { return m_baseController->getPosition(space, position); }
 
     virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) override            { return m_baseController->createPreset(preset, presetId); }
+    virtual bool updatePreset(const QnPtzPreset &preset) override                               { return m_baseController->updatePreset(preset); }
     virtual bool removePreset(const QString &presetId) override                                 { return m_baseController->removePreset(presetId); }
     virtual bool activatePreset(const QString &presetId) override                               { return m_baseController->activatePreset(presetId); }
     virtual bool getPresets(QnPtzPresetList *presets) override                                  { return m_baseController->getPresets(presets); }

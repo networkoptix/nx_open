@@ -126,6 +126,10 @@ public:
      */
     virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) = 0;
 
+
+    virtual bool updatePreset(const QnPtzPreset &preset) = 0;
+
+
     /**
      * Removes the given preset.
      *

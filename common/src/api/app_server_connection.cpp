@@ -3,6 +3,14 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
+#include "core/resource/resource_type.h"
+#include "core/resource/resource.h"
+#include "core/resource/network_resource.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource/camera_resource.h"
+#include "core/resource/layout_resource.h"
+#include "core/resource/user_resource.h"
+
 #include "utils/common/sleep.h"
 #include "utils/common/enum_name_mapper.h"
 #include "utils/common/synctime.h"
@@ -491,7 +499,14 @@ int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *sl
     return sendAsyncGetRequest(BusinessRuleObject, m_requestParams, QN_STRINGIZE_TYPE(QnBusinessEventRuleList), target, slot);
 }
 
-int QnAppServerConnection::getKvPairsAsync(QObject *target, const char *slot) 
+int QnAppServerConnection::getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot)
+{
+    QnRequestParamList params(m_requestParams);
+    params.append(QnRequestParam("resource_id", resource->getId().toString()));
+    return sendAsyncGetRequest(KvPairObject, params, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
+}
+
+int QnAppServerConnection::getAllKvPairsAsync(QObject *target, const char *slot)
 {
     return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
 }

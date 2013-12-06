@@ -2417,12 +2417,12 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
-    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).mediaWidget();
+    if(!widget)
         return;
 
     QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
-    dialog->setCamera(camera);
+    dialog->setPtzController(widget->ptzController());
     dialog->exec();
 }
 
