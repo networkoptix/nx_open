@@ -181,12 +181,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr nonConstData)
     QnConstAbstractMediaDataPtr media = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
     //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
 
-    {
-        QnConstMetaDataV1Ptr meta = data.dynamicCast<const QnMetaDataV1>();
-        if( meta )
-            std::cout<<"QnRtspDataConsumer. "<<(meta->isEmpty() ? "empty" : "non empty")<<" motion\n";
-    }
-
     // quality control
 
     if (/*(media->flags & AV_PKT_FLAG_KEY) &&*/ m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)

@@ -82,7 +82,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
             {
                 foreach( const QRect& rect, region.getRectsBySens(sens) )
                 {
-                    std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
+                    //std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
 
                     for( int y = rect.top(); y <= rect.bottom(); ++y )
                         for( int x = rect.left(); x <= rect.right(); ++x )
