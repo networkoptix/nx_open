@@ -100,5 +100,4 @@ inline bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target
 Q_DECLARE_METATYPE(QnEmail::SmtpServerPreset)
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port), inline)
 
-
 #endif // EMAIL_H

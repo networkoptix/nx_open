@@ -1,7 +1,7 @@
 #ifndef QN_LEXICAL_FWD_H
 #define QN_LEXICAL_FWD_H
 
-#include <QtCore/QString>
+class QString;
 
 /**
  * \param TYPE                          Type to declare lexical (de)serialization functions for.

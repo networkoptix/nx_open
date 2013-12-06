@@ -20,6 +20,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 
 #include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
@@ -59,6 +60,7 @@ signals:
     void finished(int status, const QImage &reply, int handle);
     void finished(int status, const QString &reply, int handle);
     void finished(int status, const QnPtzPresetList &reply, int handle);
+    void finished(int status, const QnPtzTourList &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -175,7 +177,7 @@ public:
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int ptzRelativeMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
 
     int ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);

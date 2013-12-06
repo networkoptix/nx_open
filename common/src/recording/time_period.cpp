@@ -4,6 +4,7 @@
 #include <QtCore/QDateTime>
 
 #include <utils/common/util.h>
+#include <utils/common/json.h>
 
 #include "time_period_list.h"
 

@@ -126,9 +126,15 @@ public:
      */
     virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) = 0;
 
-
+    /**
+     * Updates the given preset without changing its associated position.
+     *
+     * Currently this function can only be used to change preset's name.
+     * 
+     * \param preset                    Preset to update.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool updatePreset(const QnPtzPreset &preset) = 0;
-
 
     /**
      * Removes the given preset.

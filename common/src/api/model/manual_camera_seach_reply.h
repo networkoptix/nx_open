@@ -1,11 +1,12 @@
-#ifndef VIDEO_SERVER_CAMERAS_DATA_H
-#define VIDEO_SERVER_CAMERAS_DATA_H
+#ifndef QN_MANUAL_CAMERA_SEARCH_REPLY_H
+#define QN_MANUAL_CAMERA_SEARCH_REPLY_H
 
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QList>
+#include <QtCore/QUuid>
 
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 /**
  * State of the running manual camera search process.
@@ -35,7 +36,7 @@ struct QnManualCameraSearchStatus {
     int total;
 };
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchStatus, (state)(current)(total), inline)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchStatus)
 
 struct QnManualCameraSearchSingleCamera {
     QString name;
@@ -55,7 +56,7 @@ struct QnManualCameraSearchSingleCamera {
 
 typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera, (name)(url)(manufacturer)(existsInPool), inline)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera)
 
 /**
  * Status of the manual camera search process: state and results by the time.
@@ -80,8 +81,8 @@ struct QnManualCameraSearchReply {
     QnManualCameraSearchCameraList cameras;
 };
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply, (status)(processUuid)(cameras), inline)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply)
 
 Q_DECLARE_METATYPE(QnManualCameraSearchReply)
 
-#endif // VIDEO_SERVER_CAMERAS_DATA_H
+#endif // QN_MANUAL_CAMERA_SEARCH_REPLY_H

@@ -1,6 +1,7 @@
 #include "statistics_colors.h"
 
 #include <utils/math/math.h>
+#include <utils/common/json.h>
 
 namespace {
     int asciisum(const QString &value) {

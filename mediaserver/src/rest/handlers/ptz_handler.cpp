@@ -81,7 +81,7 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     switch(action) {
     case Qn::PtzContinousMoveAction:    return executeContinuousMove(controller, params, result);
     case Qn::PtzAbsoluteMoveAction:     return executeAbsoluteMove(controller, params, result);
-    case Qn::PtzRelativeMoveAction:     return executeRelativeMove(controller, params, result);
+    case Qn::PtzViewportMoveAction:     return executeViewportMove(controller, params, result);
     case Qn::PtzGetPositionAction:      return executeGetPosition(controller, params, result);
     case Qn::PtzCreatePresetAction:     return executeCreatePreset(controller, params, result);
     case Qn::PtzRemovePresetAction:     return executeRemovePreset(controller, params, result);
@@ -131,7 +131,7 @@ int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeRelativeMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio;
     if(
         !requireParameter(params, lit("viewportTop"),       result, &viewportTop) || 

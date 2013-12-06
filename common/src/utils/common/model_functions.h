@@ -1,5 +1,5 @@
-#ifndef QN_STRUCT_FUNCTIONS_H
-#define QN_STRUCT_FUNCTIONS_H
+#ifndef QN_MODEL_FUNCTIONS_H
+#define QN_MODEL_FUNCTIONS_H
 
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/to_list.hpp>
@@ -14,7 +14,7 @@
 #ifdef Q_MOC_RUN
 /* Qt5 moc chokes on these macros, so we provide dummy definitions. */
 #define QN_DEFINE_STRUCT_FUNCTIONS(...)
-#define QN_DEFINE_STRUCT_QHASH_FUNCTION(...)
+#define QN_DEFINE_STRUCT_HASH_FUNCTION(...)
 #define QN_DEFINE_STRUCT_OPERATOR_EQ(...)
 #define QN_DEFINE_STRUCT_DATA_STREAM_FUNCTIONS(...)
 #else // Q_MOC_RUN
@@ -24,10 +24,10 @@
  * the functions to generate are passed in FUNCTION_SEQ parameter. Accepted
  * tokens are:
  * <ul>
- * <li> <tt>qhash</tt>          --- <tt>qHash</tt> function. </li>
- * <li> <tt>qdatastream</tt>    --- <tt>QDataStream</tt> (de)serialization functions. </li>
+ * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
+ * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
  * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
- * <li> <tt>qjson</tt>          --- json (de)serialization functions. </li>
+ * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
  * </ul>
  * 
  * \param TYPE                          Struct type to define functions for.
@@ -43,10 +43,10 @@
 #define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I(R, DATA, FUNCTION)                    \
     BOOST_PP_CAT(QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_, FUNCTION) DATA
 
-#define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_qhash         QN_DEFINE_STRUCT_QHASH_FUNCTION
-#define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_qdatastream   QN_DEFINE_STRUCT_DATA_STREAM_FUNCTIONS
+#define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_hash          QN_DEFINE_STRUCT_HASH_FUNCTION
+#define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_datastream    QN_DEFINE_STRUCT_DATA_STREAM_FUNCTIONS
 #define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_eq            QN_DEFINE_STRUCT_OPERATOR_EQ
-#define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_qjson         QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS
+#define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_json          QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS
 
 
 /**
@@ -58,7 +58,7 @@
  *                                      calculation.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
-#define QN_DEFINE_STRUCT_QHASH_FUNCTION(TYPE, FIELD_SEQ, ... /* PREFIX */)      \
+#define QN_DEFINE_STRUCT_HASH_FUNCTION(TYPE, FIELD_SEQ, ... /* PREFIX */)       \
 __VA_ARGS__ uint qHash(const TYPE &value) {                                     \
     return 0 BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_QHASH_STEP_I, ~, FIELD_SEQ); \
 }
@@ -109,4 +109,4 @@ __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         
 
 #endif // Q_MOC_RUN
 
-#endif // QN_STRUCT_FUNCTIONS_H
+#endif // QN_MODEL_FUNCTIONS_H

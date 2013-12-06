@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 class QnStatisticsColors {
 public:
