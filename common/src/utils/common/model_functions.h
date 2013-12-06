@@ -1,5 +1,5 @@
-#ifndef QN_STRUCT_FUNCTIONS_H
-#define QN_STRUCT_FUNCTIONS_H
+#ifndef QN_MODEL_FUNCTIONS_H
+#define QN_MODEL_FUNCTIONS_H
 
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/to_list.hpp>
@@ -109,4 +109,4 @@ __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         
 
 #endif // Q_MOC_RUN
 
-#endif // QN_STRUCT_FUNCTIONS_H
+#endif // QN_MODEL_FUNCTIONS_H

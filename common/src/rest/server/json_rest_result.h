@@ -1,7 +1,10 @@
 #ifndef QN_JSON_REST_RESULT_H
 #define QN_JSON_REST_RESULT_H
 
-#include <utils/common/json.h>
+#include <QtCore/QJsonValue>
+#include <QtCore/QString>
+
+#include <utils/common/json.h> // TODO: use fwd here
 
 class QnJsonRestResult {
 public:

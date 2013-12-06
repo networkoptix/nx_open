@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 
 #include <utils/camera/camera_diagnostics.h>
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 
 struct QnCameraDiagnosticsReply
@@ -24,8 +24,7 @@ struct QnCameraDiagnosticsReply
     }
 };
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnCameraDiagnosticsReply, (performedStep)(errorCode)(errorParams), inline)
-
 Q_DECLARE_METATYPE(QnCameraDiagnosticsReply)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnCameraDiagnosticsReply)
 
 #endif // QN_TIME_REPLY_H

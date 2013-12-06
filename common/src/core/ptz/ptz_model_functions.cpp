@@ -1,5 +1,4 @@
-#include <utils/common/json.h>
-#include <utils/common/struct_functions.h>
+#include <utils/common/model_functions.h>
 
 #include "ptz_tour.h"
 #include "ptz_preset.h"

@@ -1,7 +1,7 @@
 #ifndef QN_JSON_FWD_H
 #define QN_JSON_FWD_H
 
-#include <QtCore/QJsonValue>
+class QJsonValue;
 
 /**
  * \param TYPE                          Type to declare json (de)serialization functions for.
