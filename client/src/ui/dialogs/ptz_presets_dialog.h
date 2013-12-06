@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QDialog>
 
-#include <core/resource/resource_fwd.h>
+#include <core/ptz/ptz_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_ptz_preset_manager.h>
@@ -12,6 +12,7 @@
 
 class QPushButton;
 class QnPtzPresetListModel;
+class QnStringKvPairUsageHelper;
 
 namespace Ui {
     class PtzPresetsDialog;
@@ -26,8 +27,8 @@ public:
     QnPtzPresetsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetsDialog();
 
-    const QnVirtualCameraResourcePtr &camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    const QnPtzControllerPtr &ptzController() const;
+    void setPtzController(const QnPtzControllerPtr &controller);
 
     virtual void accept() override;
 
@@ -45,10 +46,11 @@ private slots:
 
 private:
     QScopedPointer<Ui::PtzPresetsDialog> ui;
-    QnVirtualCameraResourcePtr m_camera;
+    QnPtzControllerPtr m_controller;
     QPushButton *m_removeButton;
     QPushButton *m_activateButton;
-    //QnPtzPresetListModel *m_model;
+    QnPtzPresetListModel *m_model;
+    QnStringKvPairUsageHelper* m_helper;
 };
 
 #endif // QN_PTZ_PRESETS_DIALOG_H

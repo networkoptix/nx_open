@@ -89,6 +89,7 @@ void QnAbstractKvPairUsageHelper::setInnerValue(const QString &value) {
 
 void QnAbstractKvPairUsageHelper::load() {
     d->loadHandle = QnAppServerConnectionFactory::createConnection()->getKvPairsAsync(
+                d->resource,
                 this,
                 SLOT(at_connection_replyReceived(int, const QnKvPairs &, int)));
 }

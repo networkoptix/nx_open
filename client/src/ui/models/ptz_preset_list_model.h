@@ -3,8 +3,8 @@
 
 #include <QAbstractTableModel>
 
-//#include <ui/workbench/workbench_ptz_preset_manager.h>
-#if 0
+#include <core/ptz/ptz_fwd.h>
+
 class QnPtzPresetListModel: public QAbstractTableModel {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
@@ -25,8 +25,11 @@ public:
     bool isDuplicateHotkeysEnabled();
     void setDuplicateHotkeysEnabled(bool duplicateHotkeysEnabled);
 
-    const QList<QnPtzPreset> &presets() const;
-    void setPresets(const QList<QnPtzPreset> &presets);
+    const QnPtzPresetList &presets() const;
+    void setPresets(const QnPtzPresetList &presets);
+
+    QString serializedHotkeys() const;
+    Q_SLOT void setSerializedHotkeys(const QString &value);
 
     int column(Column column) const;
     const QList<Column> &columns() const;
@@ -48,10 +51,10 @@ private:
 private:
     bool m_readOnly;
     bool m_duplicateHotkeysEnabled;
-    QList<QnPtzPreset> m_presets;
+    QnPtzPresetList m_presets;
     QList<Column> m_columns;
 };
-#endif
+
 
 #endif // QN_PTZ_PRESET_LIST_MODEL_H
 

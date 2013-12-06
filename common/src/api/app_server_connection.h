@@ -4,15 +4,9 @@
 #include <QtCore/QMutex>
 
 #include "utils/common/request_param.h"
-#include "core/resource/resource_type.h"
-#include "core/resource/resource.h"
-#include "core/resource/network_resource.h"
-#include "core/resource/media_server_resource.h"
+#include <core/resource/resource_fwd.h>
 #include "core/misc/schedule_task.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/layout_resource.h"
 #include "core/misc/schedule_task.h"
-#include "core/resource/user_resource.h"
 #include "licensing/license.h"
 #include "connectinfo.h"
 
@@ -148,7 +142,8 @@ public:
     int connectAsync(QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int getBusinessRulesAsync(QObject *target, const char *slot);
-    int getKvPairsAsync(QObject *target, const char *slot);
+    int getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
+    int getAllKvPairsAsync(QObject *target, const char *slot);
     int getSettingsAsync(QObject *target, const char *slot);
 
     int setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot);

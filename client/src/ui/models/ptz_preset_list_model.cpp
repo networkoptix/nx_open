@@ -2,7 +2,8 @@
 
 #include <common/common_globals.h>
 
-#if 0
+#include <core/ptz/ptz_preset.h>
+
 QnPtzPresetListModel::QnPtzPresetListModel(QObject *parent):
     base_type(parent),
     m_readOnly(false),
@@ -33,11 +34,11 @@ void QnPtzPresetListModel::setDuplicateHotkeysEnabled(bool duplicateHotkeysEnabl
     m_duplicateHotkeysEnabled = duplicateHotkeysEnabled;
 }
 
-const QList<QnPtzPreset> &QnPtzPresetListModel::presets() const {
+const QnPtzPresetList &QnPtzPresetListModel::presets() const {
     return m_presets;
 }
 
-void QnPtzPresetListModel::setPresets(const QList<QnPtzPreset> &presets) {
+void QnPtzPresetListModel::setPresets(const QnPtzPresetList &presets) {
     beginResetModel();
     m_presets = presets;
     endResetModel();
@@ -215,4 +216,3 @@ QString QnPtzPresetListModel::columnTitle(Column column) const {
     default: return QString();
     }
 }
-#endif
