@@ -87,7 +87,11 @@ bool QnRemotePtzController::createPreset(const QnPtzPreset &preset, QString *pre
 }
 
 bool QnRemotePtzController::updatePreset(const QnPtzPreset &preset) {
-    return false; // TODO
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzUpdatePresetAsync(m_resource, preset, this, SLOT(at_updatePreset_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::removePreset(const QString &presetId) {
@@ -148,6 +152,10 @@ void QnRemotePtzController::at_absoluteMove_replyReceived(int status, int handle
 }
 
 void QnRemotePtzController::at_relativeMove_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_updatePreset_replyReceived(int status, int handle) {
     return;
 }
 
