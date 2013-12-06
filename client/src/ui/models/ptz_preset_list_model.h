@@ -16,14 +16,16 @@ public:
         HotkeyColumn
     };
 
+    struct PresetHotkey {
+        QString id;
+        int hotkey;
+    };
+
     QnPtzPresetListModel(QObject *parent = NULL);
     virtual ~QnPtzPresetListModel();
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
-
-    bool isDuplicateHotkeysEnabled();
-    void setDuplicateHotkeysEnabled(bool duplicateHotkeysEnabled);
 
     const QnPtzPresetList &presets() const;
     void setPresets(const QnPtzPresetList &presets);
@@ -47,11 +49,12 @@ public:
 
 private:
     QString columnTitle(Column column) const;
+    int presetHotkey(const QString &id) const;
 
 private:
     bool m_readOnly;
-    bool m_duplicateHotkeysEnabled;
     QnPtzPresetList m_presets;
+    QList<PresetHotkey> m_hotkeys;
     QList<Column> m_columns;
 };
 
