@@ -616,19 +616,20 @@ int QnMediaServerConnection::ptzCreateTourAsync(const QnNetworkResourcePtr &came
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreateTourAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
+    return 1;
 //    return sendAsyncPostRequest();
 }
 
 int QnMediaServerConnection::ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
-
+    return 1;
 }
 
 int QnMediaServerConnection::ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
-
+    return 1;
 }
 
 int QnMediaServerConnection::ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-
+    return 1;
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {

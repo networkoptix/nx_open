@@ -34,8 +34,8 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const Q
 
     if(qFuzzyCompare(lo.x(), hi.x()) && !qFuzzyCompare(lo.x(), mi.x())) {
         /* This means that there are no limits for pan. */
-        m_logicalLimits.minPan = -360 * 10;
-        m_logicalLimits.maxPan = 360 * 10;
+        m_logicalLimits.minPan = -36000.0;
+        m_logicalLimits.maxPan = 36000.0;
     } else {
         m_logicalLimits.minPan = lo.x();
         m_logicalLimits.minPan = hi.x();

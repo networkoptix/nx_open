@@ -133,10 +133,10 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
-
+    return sendSyncRequest(QNetworkAccessManager::PostOperation, object, headers, params, data, reply);
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
-
+    return sendSyncPostRequest(object, QnRequestHeaderList(), params, data, reply);
 }
 

@@ -6,9 +6,11 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QList>
 
-//#include <boost/operators.hpp>
+#include <utils/math/math.h>
 
-struct DewarpingParams/*: public boost::equality_comparable1<DewarpingParams> */{
+#include <boost/operators.hpp>
+
+struct DewarpingParams: public boost::equality_comparable1<DewarpingParams> {
 public:
     enum ViewMode {
         Horizontal,
@@ -34,14 +36,25 @@ public:
     static DewarpingParams deserialize(const QByteArray &data);
 
 public:
+    /** Whether dewarping is currently enabled. */
     bool enabled;
+
+    /** Camera mounting mode. */
     ViewMode viewMode;
-    // view angle and FOV at radians
+    
+    /** Pan in radians. */
     qreal xAngle;
+
+    /** Tilt in radians. */
     qreal yAngle;
+
+    /** Fov in radians. */
     qreal fov;
-    // perspective correction angle
+
+    /** View correction angle, in radians. */
     qreal fovRot;
+
+    /** Aspect ratio correction? */ // TODO
     qreal panoFactor;
 };
 

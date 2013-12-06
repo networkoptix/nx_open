@@ -327,10 +327,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     QnFisheyeShaderProgram* fisheyeShader = 0;
     DewarpingParams params;
     float ar = 1.0;
-    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
+    if (m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoPtzCapabilities) 
     {
         ar = picLock->width()/(float)picLock->height();
-        params = m_fisheyeController->updateDewarpingParams(ar);
+        //params = m_fisheyeController->updateDewarpingParams(ar);
         if (params.panoFactor > 1.0)
         {
             if (params.viewMode == DewarpingParams::Horizontal)
@@ -578,13 +578,13 @@ void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 bool QnGLRenderer::isFisheyeEnabled() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_fisheyeController && m_fisheyeController->isEnabled();
+    return m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities;
 }
 
 int QnGLRenderer::panoFactor() const
 {
-    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
-        return (int) m_fisheyeController->getDewarpingParams().panoFactor;
+    if (m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities) 
+        return (int) m_fisheyeController->dewarpingParams().panoFactor;
     else
         return 1;
 }
