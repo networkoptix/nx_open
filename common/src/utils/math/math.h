@@ -169,6 +169,15 @@ inline double qMod(double l, double r) {
     return result;
 }
 
+inline double qMod(double l, float r) {
+    return qMod(l, static_cast<double>(r));
+}
+
+inline double qMod(float l, double r) {
+    return qMod(static_cast<double>(l), r);
+}
+
+
 /**
  * \param value                         Value to round up.
  * \param step                          Rounding step, must be positive.
