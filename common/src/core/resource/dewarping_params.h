@@ -6,6 +6,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QList>
 
+#include <utils/math/math.h>
+
 #include <boost/operators.hpp>
 
 struct DewarpingParams: public boost::equality_comparable1<DewarpingParams> {
