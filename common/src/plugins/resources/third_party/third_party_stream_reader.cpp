@@ -67,37 +67,37 @@ static int sensitivityToMask[10] =
 
 void ThirdPartyStreamReader::updateSoftwareMotion()
 {
+    if( m_thirdPartyRes->getMotionType() != Qn::MT_HardwareGrid )
+        return parent_type::updateSoftwareMotion();
+
+    if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
+        return;
+
     nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager.getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
     if( !camManager2 )
         return;
 
-    if( m_thirdPartyRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation() )
+    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::PIX_FMT_GRAY8 );
+    const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
+    //converting region
+    for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
     {
-        if( m_thirdPartyRes->getVideoLayout()->channelCount() > 0 )
+        foreach( const QRect& rect, region.getRectsBySens(sens) )
         {
-            MotionDataPicture* motionMask = new MotionDataPicture( nxcip::PIX_FMT_GRAY8 );
-            const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
-            //converting region
-            for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
-            {
-                foreach( const QRect& rect, region.getRectsBySens(sens) )
-                {
-                    //std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
+            //std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
 
-                    for( int y = rect.top(); y <= rect.bottom(); ++y )
-                        for( int x = rect.left(); x <= rect.right(); ++x )
-                        {
-                            assert( y < motionMask->width() && x < motionMask->height() );
-                            motionMask->setPixel( y, x, sensitivityToMask[sens] );
-                            //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
-                            //m_motionSensMask[x * MD_HEIGHT + y] = sens;
-                        }
+            for( int y = rect.top(); y <= rect.bottom(); ++y )
+                for( int x = rect.left(); x <= rect.right(); ++x )
+                {
+                    assert( y < motionMask->width() && x < motionMask->height() );
+                    motionMask->setPixel( y, x, sensitivityToMask[sens] );
+                    //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
+                    //m_motionSensMask[x * MD_HEIGHT + y] = sens;
                 }
-            }
-            camManager2->setMotionMask( motionMask );
-            motionMask->releaseRef();
         }
     }
+    camManager2->setMotionMask( motionMask );
+    motionMask->releaseRef();
 
     camManager2->releaseRef();
 }
