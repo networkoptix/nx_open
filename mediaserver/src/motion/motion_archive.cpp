@@ -406,7 +406,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     return true;
 }
 
-bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
+bool QnMotionArchive::saveToArchive(QnConstMetaDataV1Ptr data)
 {
     bool rez = true;
 
@@ -435,7 +435,7 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
         // save to disk
         if (!m_lastDetailedData->isEmpty())
             rez = saveToArchiveInternal(m_lastDetailedData);
-        m_lastDetailedData = data;
+        m_lastDetailedData = QnMetaDataV1Ptr(data->clone());
         m_lastDetailedData->m_duration = 0;
         //qDebug() << "start new Motion" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz");
     }

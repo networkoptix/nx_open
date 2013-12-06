@@ -59,6 +59,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, 
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
+        if( data.totalSpace < QnStorageManager::DEFAULT_SPACE_LIMIT )
+            continue;
+
         // TODO: #Elric remove once UnknownSize is dropped.
         if(data.totalSpace == QnStorageResource::UnknownSize)
             data.totalSpace = -1;
@@ -88,6 +91,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, 
         data.reservedSpace = -1;
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
+
+        if( data.totalSpace < QnStorageManager::DEFAULT_SPACE_LIMIT )
+            continue;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
         if (storage) {

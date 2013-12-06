@@ -20,6 +20,7 @@
 
 #include <fstream>
 #include <memory>
+#include <mutex>
 
 #include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
@@ -43,7 +44,9 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int e
     m_lastVideoTime(0),
     m_lastMotionTime(0),
     vmux_motion(0),
-    vmux(0)
+    vmux(0),
+    m_prevPts(0),
+    m_ptsDelta(0)
 {
 }
 
@@ -134,6 +137,24 @@ void StreamReader::setMotionMask(const uint8_t* data)
     m_motionEstimation.setMotionMask(data);
 }
 
+#define USE_SYSTEM_CLOCK
+
+struct SharedStreamData
+{
+    std::mutex mutex;
+    int64_t ptsBase;
+    int64_t baseClock;
+
+    SharedStreamData()
+    :
+        ptsBase( -1 ),
+        baseClock( -1 )
+    {
+    }
+};
+
+static SharedStreamData m_sharedStreamData;
+
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
@@ -187,20 +208,48 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
     //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
+    //    std::cout<<"encoder "<<m_encoderNum<<" frame pts "<<frame.vmux_info.PTS<<"\n";
+
+    if( m_firstFrameTime == 0 )
+    {
+        std::unique_lock<std::mutex> lk( m_sharedStreamData.mutex );
+        if( m_sharedStreamData.ptsBase == -1 )
+        {
+            m_sharedStreamData.ptsBase = frame.vmux_info.PTS;
+            m_sharedStreamData.baseClock = QDateTime::currentMSecsSinceEpoch() * 1000ll;
+            //std::cout<<"1: m_sharedStreamData.ptsBase = "<<m_sharedStreamData.ptsBase<<", "<<m_sharedStreamData.baseClock<<"\n";
+        }
+        else
+        {
+            m_ptsDelta = ((frame.vmux_info.PTS - m_sharedStreamData.ptsBase) * 1000000ll) / 90000 +
+                ((QDateTime::currentMSecsSinceEpoch() * 1000ll) - m_sharedStreamData.baseClock);
+            //std::cout<<"2: PTS = "<<frame.vmux_info.PTS<<", delta "<<m_ptsDelta<<"\n";
+        }
+    }
+
     if (m_firstFrameTime == 0) {
         m_firstFrameTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
-        m_firstFrameTime -= (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000;
+        //m_firstFrameTime -= (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000;
+        m_prevPts = frame.vmux_info.PTS;
     }
+    m_firstFrameTime += (int64_t(frame.vmux_info.PTS - m_prevPts) * 1000000ll) / 90000; //TODO dword wrap
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel
-        (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
+        //(int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
+#ifdef USE_SYSTEM_CLOCK
+        QDateTime::currentMSecsSinceEpoch() * 1000ll,
+#else
+        m_firstFrameTime + m_ptsDelta,
+#endif
         //currentTime,
-        (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0),
+        (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0) | 
+            (m_encoderNum > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
         0, // cseq
         m_codec)); 
-        videoPacket->resizeBuffer( frame.frame_size );
-        memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
-        m_lastVideoTime = videoPacket->timestamp();
+    m_prevPts = frame.vmux_info.PTS;
+    videoPacket->resizeBuffer( frame.frame_size );
+    memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
+    m_lastVideoTime = videoPacket->timestamp();
     if (needMetaData()) {
         MotionDataPicture* motionData = getMotionData();
         if (motionData) {

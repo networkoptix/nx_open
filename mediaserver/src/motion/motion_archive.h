@@ -67,7 +67,7 @@ class QnMotionArchive: public QObject
 public:
     QnMotionArchive(QnNetworkResourcePtr resource, int channel);
     virtual ~QnMotionArchive();
-    bool saveToArchive(QnMetaDataV1Ptr data);
+    bool saveToArchive(QnConstMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection();
 

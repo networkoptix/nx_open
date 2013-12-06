@@ -62,6 +62,8 @@ ISDMotionEstimation::ISDMotionEstimation():
     m_motionSensMask = (uint8_t*) nxpt::mallocAligned(MD_WIDTH * MD_HEIGHT, 32);
     memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
     memset(m_motionSensMask, 0, MD_WIDTH * MD_HEIGHT);
+    //memset(m_motionMask, sensitivityToMask[6], MD_WIDTH * MD_HEIGHT);
+    //memset(m_motionSensMask, 6, MD_WIDTH * MD_HEIGHT);
 }
 
 #define min(a,b) (a < b ? a : b)

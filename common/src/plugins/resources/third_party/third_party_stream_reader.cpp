@@ -82,6 +82,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
             {
                 foreach( const QRect& rect, region.getRectsBySens(sens) )
                 {
+                    std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
+
                     for( int y = rect.top(); y <= rect.bottom(); ++y )
                         for( int x = rect.left(); x <= rect.right(); ++x )
                         {
@@ -235,9 +237,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         if( !isStreamOpened() )
             return QnAbstractMediaDataPtr(0);
     }
-
-    if( needMetaData() )
-        return getMetaData();
 
     QnAbstractMediaDataPtr rez;
     static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;

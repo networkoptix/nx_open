@@ -19,7 +19,7 @@ public:
     virtual ~QnMotionHelper();
 
     // write motion data to file
-    void saveToArchive(QnMetaDataV1Ptr data);
+    void saveToArchive(QnConstMetaDataV1Ptr data);
 
     QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
