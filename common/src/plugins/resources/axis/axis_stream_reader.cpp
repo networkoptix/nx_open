@@ -221,6 +221,8 @@ QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 {
     QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
     m_lastMetadata.clear();
+    if (rez)
+        filterMotionByMask(rez);
     return rez;
 }
 
