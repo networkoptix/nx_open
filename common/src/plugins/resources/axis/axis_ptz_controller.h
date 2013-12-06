@@ -32,6 +32,7 @@ private:
     QnPlAxisResource* m_resource;
     Qn::PtzCapabilities m_capabilities;
     QnPtzSpaceMapper *m_spaceMapper;
+    mutable QByteArray ptz_ctl_id;
 };
 
 

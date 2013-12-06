@@ -143,9 +143,11 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
 bool QnAxisPtzController::query(const QString &request, QByteArray *body) const {
     QScopedPointer<CLSimpleHTTPClient> http(newHttpClient());
 
-    CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
-    QByteArray ptz_ctl_id;
 repeat:
+    if (!ptz_ctl_id.isEmpty())
+        http->addHeader("Cookie", ptz_ctl_id);
+    CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
+
     if(status == CL_HTTP_SUCCESS) {
         if(body) {
             QByteArray localBody;
@@ -165,8 +167,6 @@ repeat:
         ptz_ctl_id = ptz_ctl_id.split(';')[0];
         if (ptz_ctl_id.isEmpty())
             return false;
-        http->addHeader("Cookie", ptz_ctl_id);
-        status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
         goto repeat;
     }
     else {
