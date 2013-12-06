@@ -145,10 +145,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
         name += QLatin1Char(responseData[i]);
     }
 
-    int macpos2 = responseData.indexOf("axis-00", macpos);
-    if (macpos2 > 0)
-        macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
-
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
