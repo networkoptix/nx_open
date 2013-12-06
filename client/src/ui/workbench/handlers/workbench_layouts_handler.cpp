@@ -356,15 +356,10 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             eventEater->addEventType(QEvent::Close);
             dialog->installEventFilter(eventEater.data());
 
-            QnConnectionRequestResult result;
-            connect(&result, SIGNAL(replyProcessed()), dialog.data(), SLOT(accept()));
-
-            closeLayouts(resources, rollbackResources, saveableResources, &result, SLOT(processReply(int, const QVariant &, int)));
+            closeLayouts(resources, rollbackResources, saveableResources, dialog.data(), SLOT(accept()));
             dialog->exec();
 
-            QnWorkbenchLayoutList currentLayouts = workbench()->layouts();
-            at_layouts_saved(result.status(), result.reply<QnResourceList>(), result.handle());
-            return workbench()->layouts() == currentLayouts; // TODO: #Elric This is an ugly hack, think of a better solution.
+            return true;
         }
     } else {
         return false;
