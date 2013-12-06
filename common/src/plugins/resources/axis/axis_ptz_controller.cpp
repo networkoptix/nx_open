@@ -162,6 +162,7 @@ repeat:
     else if (status == CL_HTTP_REDIRECT && ptz_ctl_id.isEmpty())
     {
         ptz_ctl_id = http->header().value("Set-Cookie");
+        ptz_ctl_id = ptz_ctl_id.split(';')[0];
         if (ptz_ctl_id.isEmpty())
             return false;
         http->addHeader("Cookie", ptz_ctl_id);
