@@ -53,7 +53,7 @@ protected:
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 
 private:
-    virtual bool needMetaData() const override;
+    //virtual bool needMetaData() const override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 private:
