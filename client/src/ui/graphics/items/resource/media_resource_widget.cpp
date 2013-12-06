@@ -94,7 +94,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(m_camera) {
         m_ptzController.reset(new QnRemotePtzController(m_camera));
     } else {
-        m_ptzController.reset(new QnFisheyePtzController(m_resource));
+        m_ptzController.reset(new QnFisheyePtzController(this));
     }
 
     /* Set up info updates. */
