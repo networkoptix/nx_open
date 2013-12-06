@@ -307,7 +307,7 @@ int QnMotionArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
     return indexIterator - m_index.begin();
 }
 
-bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
+bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
 {
     qint64 timestamp = data->timestamp/1000;
     if (timestamp > m_lastDateForCurrentFile || timestamp < m_firstTime)

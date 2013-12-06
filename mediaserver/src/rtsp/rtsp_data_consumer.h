@@ -67,7 +67,7 @@ protected:
     void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
 
     // delay streaming. Used for realtime mode streaming
-    void doRealtimeDelay(QnAbstractMediaDataPtr media);
+    void doRealtimeDelay(QnConstAbstractMediaDataPtr media);
 
     bool isMediaTimingsSlow() const;
     void setLiveQualityInternal(MediaQuality quality);

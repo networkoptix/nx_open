@@ -39,7 +39,7 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
     return _instance;
 }
 
-void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata)
+void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? Qn::OnState : Qn::OffState, timeStamp, metadata)); 
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);

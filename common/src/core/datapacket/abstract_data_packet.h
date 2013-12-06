@@ -36,5 +36,10 @@ public:
     CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
 };
 
+class CLConstDataQueue: public CLThreadQueue<QnConstAbstractDataPacketPtr> 
+{
+public:
+    CLConstDataQueue(int size): CLThreadQueue<QnConstAbstractDataPacketPtr> (size) {}
+};
 
 #endif //abstract_data_h_1112

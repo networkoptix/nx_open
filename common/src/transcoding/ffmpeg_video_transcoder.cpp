@@ -111,7 +111,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
     return 0;
 }
 
-bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
+bool QnFfmpegVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
 {
     close();
 
@@ -178,7 +178,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     return true;
 }
 
-int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
+int QnFfmpegVideoTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
         result->clear();
@@ -189,7 +189,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         return -3;
 
 
-    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
     CLFFmpegVideoDecoder* decoder = m_videoDecoders[m_layout ? video->channelNumber : 0];
     QRectF dstRectF(0,0, 1,1);
 

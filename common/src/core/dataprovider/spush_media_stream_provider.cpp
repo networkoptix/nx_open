@@ -179,6 +179,10 @@ void CLServerPushStreamReader::run()
         // check queue sizes
         if (dataCanBeAccepted())
         {
+            QnMetaDataV1Ptr meta = data.dynamicCast<QnMetaDataV1>();
+            if( meta )
+                std::cout<<"CLServerPushStreamReader. "<<(meta->isEmpty() ? "empty" : "non empty")<<" motion\n";
+
             putData(data);
         }
         else

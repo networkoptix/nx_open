@@ -150,7 +150,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     if (!camera)
         return result;
 
-    QnCompressedVideoDataPtr video = camera->getLastVideoFrame(true);
+    QnConstCompressedVideoDataPtr video = camera->getLastVideoFrame(true);
     if (!video)
         video = camera->getLastVideoFrame(false);
 

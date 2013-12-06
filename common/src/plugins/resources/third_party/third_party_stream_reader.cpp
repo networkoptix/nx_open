@@ -193,6 +193,11 @@ int ThirdPartyStreamReader::getLastResponseCode() const
         : m_rtpStreamParser.getLastResponseCode();
 }
 
+bool ThirdPartyStreamReader::needMetaData() const
+{
+    return false;
+}
+
 QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 {
     //TODO/IMPL

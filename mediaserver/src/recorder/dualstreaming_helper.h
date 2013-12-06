@@ -15,7 +15,7 @@ public:
 
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
     qint64 getLastMotionTime();
-    void onMotion(QnMetaDataV1Ptr motion);
+    void onMotion(QnConstMetaDataV1Ptr motion);
 private:
     QMutex m_mutex;
     qint64 m_lastMotionTime;

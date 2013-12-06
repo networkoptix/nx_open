@@ -110,12 +110,12 @@ signals:
     void recordingProgress(int progress);
 protected:
     virtual void endOfRun();
-    bool initFfmpegContainer(QnCompressedVideoDataPtr mediaData);
+    bool initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData);
 
     void setPrebufferingUsec(int value);
     void flushPrebuffer();
     int getPrebufferingUsec() const;
-    virtual bool needSaveData(QnAbstractMediaDataPtr media);
+    virtual bool needSaveData(QnConstAbstractMediaDataPtr media);
 
     virtual bool saveMotion(QnConstMetaDataV1Ptr media);
 
@@ -129,7 +129,7 @@ protected:
 
     bool addSignatureFrame(QString& errorString);
     void markNeedKeyData();
-    virtual bool saveData(QnAbstractMediaDataPtr md);
+    virtual bool saveData(QnConstAbstractMediaDataPtr md);
     virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
 private:
     void updateSignatureAttr();
@@ -157,7 +157,7 @@ private:
     QString m_fileName;
     qint64 m_startOffset;
     int m_prebufferingUsec;
-    QnUnsafeQueue<QnAbstractMediaDataPtr> m_prebuffer;
+    QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
     qint64 m_EofDateTime;
     bool m_endOfData;

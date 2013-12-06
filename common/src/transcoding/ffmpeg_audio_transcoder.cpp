@@ -35,7 +35,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
 }
 
-bool QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
+bool QnFfmpegAudioTranscoder::open(QnConstCompressedAudioDataPtr audio)
 {
     if (!audio->context)
     {
@@ -99,7 +99,7 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     return true;
 }
 
-int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
+int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
         result->clear();
@@ -115,7 +115,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         }
 
         m_lastTimestamp = media->timestamp;
-        QnCompressedAudioDataPtr audio = qSharedPointerDynamicCast<QnCompressedAudioData>(media);
+        QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(media);
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = (quint8*)media->data.data();

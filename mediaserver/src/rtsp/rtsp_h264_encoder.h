@@ -16,7 +16,7 @@ public:
 
     virtual QByteArray getAdditionSDP() override;
 
-    virtual void setDataPacket(QnAbstractMediaDataPtr media) override;
+    virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 
@@ -31,7 +31,7 @@ private:
     void goNextNal();
     bool isLastPacket();
 private:
-    QnAbstractMediaDataPtr m_media;
+    QnConstAbstractMediaDataPtr m_media;
     const quint8* m_currentData;
     const quint8* m_nalEnd;
     bool m_nalStarted;

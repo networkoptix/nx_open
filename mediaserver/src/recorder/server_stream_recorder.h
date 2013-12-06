@@ -41,14 +41,14 @@ public:
     int getFRAfterThreshold() const;
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
-    void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnAbstractDataPacketPtr motion);
+    void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
 
     void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
-    virtual bool needSaveData(QnAbstractMediaDataPtr media);
-    void beforeProcessData(QnAbstractMediaDataPtr media);
+    virtual bool needSaveData(QnConstAbstractMediaDataPtr media) override;
+    void beforeProcessData(QnConstAbstractMediaDataPtr media);
     virtual bool saveMotion(QnConstMetaDataV1Ptr motion) override;
 
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
@@ -58,17 +58,17 @@ protected:
     virtual void putData(QnAbstractDataPacketPtr data) override;
 
     virtual void endOfRun() override;
-    virtual bool saveData(QnAbstractMediaDataPtr md) override;
+    virtual bool saveData(QnConstAbstractMediaDataPtr md) override;
     virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex) override;
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
     bool isMotionRec(Qn::RecordingType recType) const;
-    void updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData);
+    void updateMotionStateInternal(bool value, qint64 timestamp, QnConstMetaDataV1Ptr metaData);
     void setSpecialRecordingMode(QnScheduleTask& task);
     int getFpsForValue(int fps);
     void writeRecentlyMotion(qint64 writeAfterTime);
-    void keepRecentlyMotion(QnAbstractMediaDataPtr md);
+    void keepRecentlyMotion(QnConstAbstractMediaDataPtr md);
 private slots:
     void at_recordingFailed(QString msg);
 private:
@@ -93,7 +93,7 @@ private:
     qint64 m_queuedSize;
     QMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
-    QQueue<QnAbstractMediaDataPtr> m_recentlyMotion;
+    QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
 };
 

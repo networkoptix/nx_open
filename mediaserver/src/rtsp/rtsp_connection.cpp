@@ -525,7 +525,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
 {
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -576,11 +576,11 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
     return QnRtspEncoderPtr();
 }
 
-QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaData::DataType dataType)
+QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaData::DataType dataType)
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QnAbstractMediaDataPtr rez;
+    QnConstAbstractMediaDataPtr rez;
     
     bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_ForceHigh;
  
@@ -613,7 +613,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
 
     for (int i = 0; i < 20; ++i)
     {
-        QnAbstractMediaDataPtr media = archive.getNextData();
+        QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
             return rez;
         if (media->dataType == dataType)
@@ -677,14 +677,14 @@ int QnRtspConnectionProcessor::composeDescribe()
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
             if (i >= numVideo) 
             {
-                QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
+                QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
                 if (media)
                     ffmpegEncoder->setCodecContext(media->context);
             }
 
         }
         else {
-            QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
+            QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) 
             {
                 encoder = createEncoderByMediaData(media, d->transcodedVideoSize, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));

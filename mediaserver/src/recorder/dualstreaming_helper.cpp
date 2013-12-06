@@ -22,10 +22,10 @@ qint64 QnDualStreamingHelper::getLastMotionTime()
     return m_lastMotionTime;
 }
 
-void QnDualStreamingHelper::onMotion(QnMetaDataV1Ptr motion)
+void QnDualStreamingHelper::onMotion(QnConstMetaDataV1Ptr motion)
 {
     QMutexLocker lock(&m_mutex);
-    motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
+    //motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
     if(!motion->isEmpty())
         m_lastMotionTime = motion->timestamp;
     else
