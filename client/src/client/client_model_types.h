@@ -44,7 +44,7 @@ public:
     QList<QString> layoutUuids;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnWorkbenchState, (qdatastream), (currentLayoutIndex)(layoutUuids), inline);
+QN_DEFINE_STRUCT_FUNCTIONS(QnWorkbenchState, (datastream), (currentLayoutIndex)(layoutUuids), inline);
 
 /**
  * Mapping from user name to workbench state.
@@ -66,7 +66,7 @@ struct QnServerStorageKey {
     QString storagePath;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnServerStorageKey, (qdatastream)(eq)(qhash), (serverUuid)(storagePath), inline);
+QN_DEFINE_STRUCT_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash), (serverUuid)(storagePath), inline);
 
 typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
 
@@ -85,7 +85,7 @@ struct QnLicenseWarningState {
     bool ignore;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (qdatastream), (lastWarningTime)(ignore), inline);
+QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime)(ignore), inline);
 
 /**
  * Mapping from license key to license warning state.

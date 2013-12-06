@@ -86,6 +86,10 @@ bool QnRemotePtzController::createPreset(const QnPtzPreset &preset, QString *pre
     return true;
 }
 
+bool QnRemotePtzController::updatePreset(const QnPtzPreset &preset) {
+    return false; // TODO
+}
+
 bool QnRemotePtzController::removePreset(const QString &presetId) {
     if(!m_server)
         return false;

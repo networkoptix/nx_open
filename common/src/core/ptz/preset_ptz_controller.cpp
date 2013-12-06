@@ -120,6 +120,23 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset, QString *pre
     return true;
 }
 
+bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
+    d->loadRecords();
+
+    int index = d->records.indexOf(preset.id);
+    if(index == -1)
+        return false;
+
+    QnPtzPresetRecord &record = d->records[index];
+    if(record.preset == preset)
+        return true; /* No need to save it. */
+
+    record.preset = preset;
+
+    d->saveRecords();
+    return true;
+}
+
 bool QnPresetPtzController::removePreset(const QString &presetId) {
     d->loadRecords();
 
