@@ -82,7 +82,7 @@ public:
     enum PtzAction {
         PtzContinousMoveAction,
         PtzAbsoluteMoveAction,
-        PtzRelativeMoveAction,
+        PtzViewportMoveAction,
         PtzGetPositionAction,
         
         PtzCreatePresetAction,

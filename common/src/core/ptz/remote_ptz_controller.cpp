@@ -48,7 +48,7 @@ bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF &viewpo
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzRelativeMoveAsync(m_resource, aspectRatio, viewport, m_sequenceId, m_sequenceNumber++, this, SLOT(at_relativeMove_replyReceived(int, int)));
+    m_server->apiConnection()->ptzViewportMoveAsync(m_resource, aspectRatio, viewport, m_sequenceId, m_sequenceNumber++, this, SLOT(at_relativeMove_replyReceived(int, int)));
     return true;
 }
 
