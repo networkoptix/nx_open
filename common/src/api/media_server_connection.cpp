@@ -587,6 +587,16 @@ int QnMediaServerConnection::ptzGetPositionAsync(const QnNetworkResourcePtr &cam
     return sendAsyncGetRequest(PtzGetPositionObject, params, QN_REPLY_TYPE(QVector3D), target, slot);
 }
 
+int QnMediaServerConnection::ptzUpdatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzUpdatePresetAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("presetName",      QnLexical::serialized(preset.name));
+    params << QnRequestParam("presetId",        QnLexical::serialized(preset.id));
+
+    return sendAsyncGetRequest(PtzUpdatePresetObject, params, NULL, target, slot);
+}
+
 int QnMediaServerConnection::ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzCreatePresetAction));
