@@ -213,7 +213,7 @@ QString QnAxisPtzController::getCameraNum()
     QVariant val;
     m_resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
     if (val.toInt() > 1)
-        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNum());
+        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNumAxis());
     return camNum;
 }
 
