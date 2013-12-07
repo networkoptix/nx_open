@@ -40,9 +40,7 @@ public:
      * \param capabilities              Capabilities to check.
      * \returns                         Whether this controller implements the given capabilities.
      */
-    bool hasCapabilities(Qn::PtzCapabilities capabilities) {
-        return (getCapabilities() & capabilities) == capabilities;
-    }
+    bool hasCapabilities(Qn::PtzCapabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
 
     /**
      * Starts PTZ movement. Speed is specified in image-based coordinate space and
