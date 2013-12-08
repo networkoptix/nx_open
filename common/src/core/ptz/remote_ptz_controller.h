@@ -23,13 +23,13 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) override;
+    virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
     virtual bool activatePreset(const QString &presetId) override;
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
-    virtual bool createTour(const QnPtzTour &tour, QString *tourId) override;
+    virtual bool createTour(const QnPtzTour &tour) override;
     virtual bool removeTour(const QString &tourId) override;
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
@@ -39,6 +39,7 @@ private slots:
     void at_absoluteMove_replyReceived(int status, int handle);
     void at_relativeMove_replyReceived(int status, int handle);
 
+    void at_createPreset_replyReceived(int status, int handle);
     void at_updatePreset_replyReceived(int status, int handle);
     void at_removePreset_replyReceived(int status, int handle);
     void at_activatePreset_replyReceived(int status, int handle);

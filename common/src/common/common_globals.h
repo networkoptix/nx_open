@@ -124,7 +124,7 @@ public:
         ToursPtzCapability                  = 0x00020000,
 
         VirtualPtzCapability                = 0x10000000,
-        ProjectionPtzCapability             = 0x20000000,
+        NonBlockingPtzCapability            = 0x20000000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,

@@ -25,19 +25,18 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override          { return m_baseController->getLimits(space, limits); }
     virtual bool getFlip(Qt::Orientations *flip) override                                       { return m_baseController->getFlip(flip); }
 
-    virtual bool getProjection(Qn::Projection *projection) override                             { return m_baseController->getProjection(projection); }
-    virtual bool setProjection(Qn::Projection projection) override                              { return m_baseController->setProjection(projection); }
-
-    virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) override            { return m_baseController->createPreset(preset, presetId); }
+    virtual bool createPreset(const QnPtzPreset &preset) override                               { return m_baseController->createPreset(preset); }
     virtual bool updatePreset(const QnPtzPreset &preset) override                               { return m_baseController->updatePreset(preset); }
     virtual bool removePreset(const QString &presetId) override                                 { return m_baseController->removePreset(presetId); }
     virtual bool activatePreset(const QString &presetId) override                               { return m_baseController->activatePreset(presetId); }
     virtual bool getPresets(QnPtzPresetList *presets) override                                  { return m_baseController->getPresets(presets); }
 
-    virtual bool createTour(const QnPtzTour &tour, QString *tourId) override                    { return m_baseController->createTour(tour, tourId); }
+    virtual bool createTour(const QnPtzTour &tour) override                                     { return m_baseController->createTour(tour); }
     virtual bool removeTour(const QString &tourId) override                                     { return m_baseController->removeTour(tourId); }
     virtual bool activateTour(const QString &tourId) override                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                        { return m_baseController->getTours(tours); }
+
+    virtual bool synchronize() override                                                         { return m_baseController->synchronize(); }
 
 private:
     QnPtzControllerPtr m_baseController;

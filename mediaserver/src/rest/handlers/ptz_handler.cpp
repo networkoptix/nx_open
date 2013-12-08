@@ -84,6 +84,7 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     case Qn::PtzViewportMoveAction:     return executeViewportMove(controller, params, result);
     case Qn::PtzGetPositionAction:      return executeGetPosition(controller, params, result);
     case Qn::PtzCreatePresetAction:     return executeCreatePreset(controller, params, result);
+    case Qn::PtzUpdatePresetAction:     return executeUpdatePreset(controller, params, result);
     case Qn::PtzRemovePresetAction:     return executeRemovePreset(controller, params, result);
     case Qn::PtzActivatePresetAction:   return executeActivatePreset(controller, params, result);
     case Qn::PtzGetPresetsAction:       return executeGetPresets(controller, params, result);
@@ -165,14 +166,25 @@ int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const
 
 int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString presetId, presetName;
-    if(!requireParameter(params, lit("presetId"), result, &presetId, true) || !requireParameter(params, lit("presetName"), result, &presetName))
+    if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
         return CODE_INVALID_PARAMETER;
 
     QnPtzPreset preset(presetId, presetName);
-    if(!controller->createPreset(preset, &presetId))
+    if(!controller->createPreset(preset))
         return CODE_INTERNAL_ERROR;
 
-    result.setReply(presetId);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString presetId, presetName;
+    if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
+        return CODE_INVALID_PARAMETER;
+
+    QnPtzPreset preset(presetId, presetName);
+    if(!controller->updatePreset(preset))
+        return CODE_INTERNAL_ERROR;
+
     return CODE_OK;
 }
 
@@ -212,11 +224,9 @@ int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const 
     if(!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
 
-    QString tourId;
-    if(!controller->createTour(tour, &tourId))
+    if(!controller->createTour(tour))
         return CODE_INTERNAL_ERROR;
 
-    result.setReply(tourId);
     return CODE_OK;
 }
 

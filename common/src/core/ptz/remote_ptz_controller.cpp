@@ -27,7 +27,10 @@ QnRemotePtzController::~QnRemotePtzController() {
 }
 
 Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
-    return m_resource->getPtzCapabilities();
+    Qn::PtzCapabilities result = m_resource->getPtzCapabilities();
+    result |= Qn::NonBlockingPtzCapability;
+    result &= ~(Qn::FlipPtzCapability | Qn::LimitsPtzCapability);
+    return result;
 }
 
 bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
@@ -75,16 +78,11 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
     return false;
 }
 
-bool QnRemotePtzController::createPreset(const QnPtzPreset &preset, QString *presetId) {
+bool QnRemotePtzController::createPreset(const QnPtzPreset &preset) {
     if(!m_server)
         return false;
 
-    QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzCreatePresetAsync(m_resource, preset, &result, SLOT(processReply(int, const QVariant &, int)));
-    if(result.exec() != 0)
-        return false;
-
-    *presetId = result.reply<QString>();
+    m_server->apiConnection()->ptzCreatePresetAsync(m_resource, preset, this, SLOT(at_createPreset_replyReceived(int, int)));
     return true;
 }
 
@@ -125,7 +123,7 @@ bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
     return true;
 }
 
-bool QnRemotePtzController::createTour(const QnPtzTour &tour, QString *tourId) {
+bool QnRemotePtzController::createTour(const QnPtzTour &tour) {
     return false;
 }
 
@@ -154,6 +152,10 @@ void QnRemotePtzController::at_absoluteMove_replyReceived(int status, int handle
 }
 
 void QnRemotePtzController::at_relativeMove_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_createPreset_replyReceived(int status, int handle) {
     return;
 }
 

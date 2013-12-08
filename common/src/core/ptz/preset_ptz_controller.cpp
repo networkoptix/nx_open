@@ -95,28 +95,25 @@ Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::PresetsPtzCapability;
 }
 
-bool QnPresetPtzController::createPreset(const QnPtzPreset &preset, QString *presetId) {
+bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
+    if(preset.id.isEmpty())
+        return false;
+
     d->loadRecords();
 
-    QString id = preset.id;
-    if(id.isEmpty())
-        id = QUuid::createUuid().toString();
-
-    int index = d->records.indexOf(id);
+    int index = d->records.indexOf(preset.id);
     if(index == -1) {
         d->records.push_back(QnPtzPresetRecord());
         index = d->records.size() - 1;
     }
     QnPtzPresetRecord &record = d->records[index];
         
-    record.preset.id = id;
-    record.preset.name = preset.name;
+    record.preset = preset;
     record.data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
     if(!getPosition(record.data.space, &record.data.position))
         return false;
 
     d->saveRecords();
-    *presetId = id;
     return true;
 }
 

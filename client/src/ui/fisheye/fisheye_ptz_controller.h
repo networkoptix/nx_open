@@ -28,8 +28,8 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    virtual bool getProjection(Qn::Projection *projection) override;
-    virtual bool setProjection(Qn::Projection projection) override;
+    /*virtual bool getProjection(Qn::Projection *projection) override;
+    virtual bool setProjection(Qn::Projection projection) override;*/
 
     void tick();
 

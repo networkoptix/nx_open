@@ -74,7 +74,11 @@ void QnFisheyePtzController::updateLimits() {
 void QnFisheyePtzController::updateCapabilities() {
     Qn::PtzCapabilities capabilities;
     if(m_dewarpingParams.enabled) {
-        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability | Qn::VirtualPtzCapability;
+        capabilities = 
+            Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | 
+            Qn::FlipPtzCapability | Qn::LimitsPtzCapability |
+            Qn::LogicalPositioningPtzCapability | 
+            Qn::VirtualPtzCapability | Qn::NonBlockingPtzCapability;
     } else {
         capabilities = Qn::NoPtzCapabilities;
     }
@@ -253,6 +257,7 @@ bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
+#if 0
 bool QnFisheyePtzController::getProjection(Qn::Projection *projection) {
     qreal factor = m_dewarpingParams.panoFactor;
 
@@ -278,6 +283,7 @@ bool QnFisheyePtzController::setProjection(Qn::Projection projection) {
         case Qn::
     }*/
 }
+#endif
 
 bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;

@@ -118,29 +118,26 @@ public:
      */
     virtual bool getFlip(Qt::Orientations *flip) = 0;
 
-    virtual bool getProjection(Qn::Projection *projection) = 0;
-    virtual bool setProjection(Qn::Projection projection) = 0;
-
     /**
      * Saves current PTZ position as a preset, either as a new one or 
-     * replacing an existing one. 
+     * replacing an existing one. Note that id of the provided preset
+     * must be set. 
      * 
-     * If <tt>id</tt> of the provided preset is not set, a new <tt>id</tt> 
-     * will be generated.
+     * If you want to create a new preset, a good idea would be to set its id to 
+     * <tt>QUuid::createUuid().toString()</tt>.
      * 
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::PtzPresetCapability<tt>.
      *
      * \param preset                    Preset to create.
-     * \param[out] presetId             Id of the created preset.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) = 0;
+    virtual bool createPreset(const QnPtzPreset &preset) = 0;
 
     /**
      * Updates the given preset without changing its associated position.
      *
-     * Currently this function can only be used to change preset's name.
+     * Currently this function can only be used to change preset name.
      * 
      * \param preset                    Preset to update.
      * \returns                         Whether the operation was successful.
@@ -180,13 +177,23 @@ public:
      */
     virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
-    virtual bool createTour(const QnPtzTour &tour, QString *tourId) = 0;
+    virtual bool createTour(const QnPtzTour &tour) = 0;
     virtual bool removeTour(const QString &tourId) = 0;
     virtual bool activateTour(const QString &tourId) = 0;
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
+    /**
+     * Synchronizes this controller's internal caches with the actual target values.
+     * 
+     * Note that this is the only function that cannot implemented in a sane way if 
+     * this controller has a <tt>Qn::NonBlockingPtzCapability</tt>. This is why
+     * for non-blocking controllers a <tt>synchronized()</tt> signal is provided.
+     */
+    virtual bool synchronize() = 0;
+
 signals:
     void capabilitiesChanged();
+    void synchronized();
 
 protected:
     QnResourcePtr m_resource;
