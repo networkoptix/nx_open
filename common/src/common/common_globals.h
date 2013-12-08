@@ -105,69 +105,33 @@ public:
     enum PtzCapability {
         NoPtzCapabilities                   = 0x00000000,
         
-        ContinuousPanCapability             = 0x00001000,
-        ContinuousTiltCapability            = 0x00002000,
-        ContinuousZoomCapability            = 0x00000080,
+        ContinuousPanCapability             = 0x00000001,
+        ContinuousTiltCapability            = 0x00000002,
+        ContinuousZoomCapability            = 0x00000004,
 
-        AbsolutePanCapability               = 0x00004000,
-        AbsoluteTiltCapability              = 0x00008000,
-        AbsoluteZoomCapability              = 0x00010000,
+        AbsolutePanCapability               = 0x00000010,
+        AbsoluteTiltCapability              = 0x00000020,
+        AbsoluteZoomCapability              = 0x00000040,
 
-        FlipPtzCapability                   = 0x00400000,
-        LimitsPtzCapability                 = 0x00800000,
+        FlipPtzCapability                   = 0x00000100,
+        LimitsPtzCapability                 = 0x00000200,
 
-        DevicePositioningPtzCapability      = 0x00080000,
-        LogicalPositioningPtzCapability     = 0x00020000,
-        ViewportPositioningPtzCapability    = 0x00040000,
+        DevicePositioningPtzCapability      = 0x00001000,
+        LogicalPositioningPtzCapability     = 0x00002000,
+        ViewportPositioningPtzCapability    = 0x00004000,
 
-        PresetsPtzCapability                = 0x00100000,
-        ToursPtzCapability                  = 0x00200000,
+        PresetsPtzCapability                = 0x00010000,
+        ToursPtzCapability                  = 0x00020000,
+
+        VirtualPtzCapability                = 0x10000000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-
-        /* Deprecated capabilities. */
-        DeprecatedContinuousPtzCapability   = 0x001,
-        DeprecatedZoomCapability            = 0x002,
-        DeprecatedAbsolutePtzCapability     = 0x020,
-        DeprecatedContinuousPanTiltCapability = 0x040,
-        DeprecatedOctagonalPtzCapability    = 0x100,
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
-
-    /**
-     * \param capabilities              Camera capability flags containing some deprecated values.
-     * \returns                         Camera capability flags with deprecated values replaced with new ones.
-     */
-    inline Qn::PtzCapabilities undeprecatePtzCapabilities(Qn::PtzCapabilities capabilities) {
-        Qn::PtzCapabilities result = capabilities;
-
-        if(result & Qn::DeprecatedContinuousPtzCapability) {
-            result &= ~Qn::DeprecatedContinuousPtzCapability;
-            result |= Qn::ContinuousPtzCapabilities;
-        }
-
-        if(result & Qn::DeprecatedZoomCapability) {
-            result &= ~Qn::DeprecatedZoomCapability;
-            result |= Qn::ContinuousZoomCapability;
-        }
-
-        if(result & Qn::DeprecatedAbsolutePtzCapability) {
-            result &= ~Qn::DeprecatedAbsolutePtzCapability;
-            result |= Qn::AbsolutePtzCapabilities;
-        }
-
-        if(result & Qn::DeprecatedContinuousPanTiltCapability) {
-            result &= ~Qn::DeprecatedContinuousPanTiltCapability;
-            result |= Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
-        }
-
-        return result;
-    }
-
 
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps

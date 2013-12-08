@@ -76,8 +76,7 @@ private slots:
 
 private:
     QnMediaResourceWidget *target() const;
-
-    PtzManipulatorWidget *manipulator() const;
+    PtzManipulatorWidget *targetManipulator() const;
 
     QnSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
@@ -107,29 +106,9 @@ private:
         Qn::PtzCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
-        QRectF pendingAbsoluteMove;
         PtzOverlayWidget *overlayWidget;
         QMetaObject::Connection capabilitiesConnection;
     };
-
-    int m_clickDelayMSec;
-    qreal m_expansionSpeed;
-
-    QPointer<FixedArSelectionItem> m_selectionItem;
-    QPointer<PtzElementsWidget> m_elementsWidget;
-    QPointer<QWidget> m_viewport;
-    QPointer<QnMediaResourceWidget> m_target;
-    QPointer<PtzManipulatorWidget> m_manipulator;
-    QHash<QObject *, PtzData> m_dataByWidget;
-    QBasicTimer m_movementTimer;
-
-    bool m_isClick;
-    bool m_isDoubleClick;
-    bool m_ptzStartedEmitted;
-    bool m_skipNextAction;
-
-    QBasicTimer m_clickTimer;
-    QPointF m_clickPos;
 
     struct SplashItemAnimation {
         SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
@@ -143,6 +122,33 @@ private:
 
         friend bool operator==(const SplashItemAnimation &l, const SplashItemAnimation &r) { return l.item == r.item; }
     };
+
+    enum Movement {
+        NoMovement,
+        ContinuousMovement,
+        ViewportMovement,
+        VirtualMovement
+    };
+
+    int m_clickDelayMSec;
+    qreal m_expansionSpeed;
+
+    QPointer<FixedArSelectionItem> m_selectionItem;
+    QPointer<PtzElementsWidget> m_elementsWidget;
+    QPointer<QWidget> m_viewport;
+    QPointer<QnMediaResourceWidget> m_target;
+    QHash<QObject *, PtzData> m_dataByWidget;
+    QBasicTimer m_movementTimer;
+
+    Movement m_movement;
+
+    bool m_isClick;
+    bool m_isDoubleClick;
+    bool m_ptzStartedEmitted;
+    bool m_skipNextAction;
+
+    QBasicTimer m_clickTimer;
+    QPointF m_clickPos;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };

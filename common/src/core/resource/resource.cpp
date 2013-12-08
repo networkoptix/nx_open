@@ -977,7 +977,7 @@ Qn::PtzCapabilities QnResource::getPtzCapabilities() const
     QVariant mediaVariant;
     QnResource* thisCasted = const_cast<QnResource*>(this);
     thisCasted->getParam(QLatin1String("ptzCapabilities"), mediaVariant, QnDomainMemory);
-    return Qn::undeprecatePtzCapabilities(static_cast<Qn::PtzCapabilities>(mediaVariant.toInt()));
+    return static_cast<Qn::PtzCapabilities>(mediaVariant.toInt());
 }
 
 bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const

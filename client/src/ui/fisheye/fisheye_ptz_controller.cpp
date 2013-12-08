@@ -74,7 +74,7 @@ void QnFisheyePtzController::updateLimits() {
 void QnFisheyePtzController::updateCapabilities() {
     Qn::PtzCapabilities capabilities;
     if(m_dewarpingParams.enabled) {
-        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
+        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability | Qn::VirtualPtzCapability;
     } else {
         capabilities = Qn::NoPtzCapabilities;
     }

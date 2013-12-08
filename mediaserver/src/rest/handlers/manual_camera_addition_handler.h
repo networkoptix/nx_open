@@ -10,8 +10,6 @@
 
 #include <rest/server/json_rest_handler.h>
 
-#include <utils/common/request_param_wrapper.h>
-
 class QnManualCameraAdditionHandler: public QnJsonRestHandler {
 public:
     QnManualCameraAdditionHandler();
