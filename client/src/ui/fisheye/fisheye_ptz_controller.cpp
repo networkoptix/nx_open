@@ -15,7 +15,7 @@
 // -------------------------------------------------------------------------- //
 QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     base_type(widget->resource()->toResourcePtr()),
-    m_animation(NoAnimation)
+    m_animating(false)
 {
     m_widget = widget;
 
@@ -26,10 +26,13 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
 
     m_timer.start();
 
-    connect(m_widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_widget_aspectRatioChanged()));
-    connect(m_widget, SIGNAL(dewarpingParamsChanged()), this, SLOT(at_widget_dewarpingParamsChanged()));
+    connect(m_widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateAspectRatio()));
+    connect(m_widget, SIGNAL(dewarpingParamsChanged()), this, SLOT(updateDewarpingParams()));
 
+    updateAspectRatio();
     updateLimits();
+    updateCapabilities();
+    updateDewarpingParams();
 }
 
 QnFisheyePtzController::~QnFisheyePtzController() {
@@ -44,12 +47,6 @@ const DewarpingParams &QnFisheyePtzController::dewarpingParams() const {
     return m_dewarpingParams;
 }
 
-/*void QnFisheyePtzController::setDewarpingParams(const DewarpingParams &dewarpingParams) {
-    m_dewarpingParams = dewarpingParams;
-
-    updateLimits();
-}*/
-
 void QnFisheyePtzController::updateLimits() {
     m_limits.minFov = 20.0;
     m_limits.maxFov = 90.0 * m_dewarpingParams.panoFactor;
@@ -62,8 +59,8 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.maxTilt = 90.0;
     } else {
         m_unlimitedPan = true;
-        m_limits.minPan = -36000.0;
-        m_limits.maxPan = 36000.0;
+        m_limits.minPan = 0.0;
+        m_limits.maxPan = 360.0;
         if(m_dewarpingParams.viewMode == DewarpingParams::VerticalUp) {
             m_limits.minTilt = 0.0;
             m_limits.maxTilt = 90.0;
@@ -74,6 +71,32 @@ void QnFisheyePtzController::updateLimits() {
     }
 }
 
+void QnFisheyePtzController::updateCapabilities() {
+    Qn::PtzCapabilities capabilities;
+    if(m_dewarpingParams.enabled) {
+        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
+    } else {
+        capabilities = Qn::NoPtzCapabilities;
+    }
+
+    if(capabilities == m_capabilities)
+        return;
+
+    m_capabilities = capabilities;
+    emit capabilitiesChanged();
+}
+
+void QnFisheyePtzController::updateAspectRatio() {
+    m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
+}
+
+void QnFisheyePtzController::updateDewarpingParams() {
+    m_dewarpingParams = m_widget->dewarpingParams();
+
+    updateLimits();
+    updateCapabilities();
+}
+
 QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
     QVector3D result = qBound(position, m_limits);
 
@@ -82,7 +105,7 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
 
     if (!m_unlimitedPan)
         result.setX(qBound<float>(m_limits.minPan + hFov / 2.0, result.x(), m_limits.maxPan - hFov / 2.0));
-    result.setY(qBound<float>(m_limits.minPan + vFov / 2.0, result.y(), m_limits.maxPan - vFov / 2.0));
+    result.setY(qBound<float>(m_limits.minTilt + vFov / 2.0, result.y(), m_limits.maxTilt - vFov / 2.0));
 
     // Note: For non-horizontal view mode it was: return qBound(m_yRange.min, value, m_yRange.max - yFov);
 
@@ -90,30 +113,12 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
 }
 
 void QnFisheyePtzController::tick() {
-    qint64 elapsed = m_timer.restart(); // TODO: #Elric value is not used when there is no animation => don't start the timer.
-    
-    switch (m_animation) {
-    case AbsoluteMoveAnimation: {
-        break; // TODO
-    }
-    case ContinuousMoveAnimation: {
-        QVector3D speed = m_speed * QVector3D(30.0, 60.0, 60.0);
+    if(!m_animating)
+        return;
 
-        QVector3D oldPosition;
-        getPosition(Qn::LogicalCoordinateSpace, &oldPosition);
-
-        QVector3D newPosition = boundedPosition(oldPosition + speed * elapsed / 1000.0);
-
-        m_dewarpingParams.xAngle = qDegreesToRadians(newPosition.x());
-        m_dewarpingParams.yAngle = qDegreesToRadians(newPosition.y());
-        m_dewarpingParams.fov = qDegreesToRadians(newPosition.z());
-        break;
-    }
-    case NoAnimation:
-    default:
-        break;
-    }
-
+    qint64 elapsed = m_timer.restart();
+    QVector3D speed = m_speed * QVector3D(60.0, 60.0, -30.0);
+    absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * elapsed / 1000.0));
 }
 
 #if 0
@@ -213,19 +218,18 @@ QString QnFisheyePtzController::getPanoModeText() const {
 }*/
 #endif
 
-void QnFisheyePtzController::updateCapabilities() {
-    Qn::PtzCapabilities capabilities;
-    if(m_dewarpingParams.enabled) {
-        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability;
-    } else {
-        capabilities = Qn::NoPtzCapabilities;
-    }
+QVector3D QnFisheyePtzController::getPositionInternal() {
+    return QVector3D(
+        qRadiansToDegrees(m_dewarpingParams.xAngle),
+        qRadiansToDegrees(m_dewarpingParams.yAngle),
+        qRadiansToDegrees(m_dewarpingParams.fov)
+    );
+}
 
-    if(capabilities == m_capabilities)
-        return;
-
-    m_capabilities = capabilities;
-    emit capabilitiesChanged();
+void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
+    m_dewarpingParams.xAngle = qDegreesToRadians(position.x());
+    m_dewarpingParams.yAngle = qDegreesToRadians(position.y());
+    m_dewarpingParams.fov = qDegreesToRadians(position.z());
 }
 
 
@@ -253,9 +257,10 @@ bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;
 
     if(qFuzzyIsNull(speed)) {
-        m_animation = NoAnimation;
+        m_animating = false;
     } else {
-        m_animation = ContinuousMoveAnimation;
+        m_animating = true;
+        m_timer.restart();
     }
 
     return true;
@@ -266,50 +271,20 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         return false;
 
     m_speed = QVector3D();
+    m_animating = false;
 
-    m_targetPosition = boundedPosition(position);
-    getPosition(Qn::LogicalCoordinateSpace, &m_sourcePosition);
-
-    /* Bring pan positions close to each other. */
-    if(m_unlimitedPan) {
-        m_targetPosition.setX(qMod(m_targetPosition.x(), 360.0));
-        m_sourcePosition.setX(qMod(m_targetPosition.y(), 360.0));
-
-        if(m_targetPosition.x() - m_sourcePosition.x() > 180.0) {
-            m_targetPosition.setX(m_targetPosition.x() - 360.0);
-        } else if(m_targetPosition.x() - m_sourcePosition.x() < -180.0) {
-            m_sourcePosition.setX(m_sourcePosition.x() - 360.0);
-        }
-    }
-
-    m_animation = AbsoluteMoveAnimation;
+    absoluteMoveInternal(boundedPosition(position));
     return true;
 }
 
 bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
     if(space != Qn::LogicalCoordinateSpace)
         return false;
-
-    position->setX(qRadiansToDegrees(m_dewarpingParams.xAngle));
-    position->setY(qRadiansToDegrees(m_dewarpingParams.yAngle));
-    position->setZ(qRadiansToDegrees(m_dewarpingParams.fov));
+    
+    *position = getPositionInternal();
     return true;
 }
 
-
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnFisheyePtzController::at_widget_aspectRatioChanged() {
-    m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
-}
-
-void QnFisheyePtzController::at_widget_dewarpingParamsChanged() {
-    m_dewarpingParams = m_widget->dewarpingParams();
-
-    updateLimits();
-    updateCapabilities();
-}
 
 
 
