@@ -253,6 +253,32 @@ bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
+bool QnFisheyePtzController::getProjection(Qn::Projection *projection) {
+    qreal factor = m_dewarpingParams.panoFactor;
+
+    if(qFuzzyCompare(factor, 1.0)) {
+        *projection = Qn::RectilinearProjection;
+    } else if(qFuzzyCompare(factor, 2.0)) {
+        *projection = Qn::Equirectangular2xProjection;
+    } else if(qFuzzyCompare(factor, 4.0)) {
+        *projection = Qn::Equirectangular4xProjection;
+    } else {
+        *projection = Qn::RectilinearProjection;
+    }
+
+    return true;
+}
+
+bool QnFisheyePtzController::setProjection(Qn::Projection projection) {
+    return true; // TODO: #PTZ
+    /*switch(projection) {
+    case Qn::RectilinearProjection:
+        m_dewarpingParams.panoFactor = 1.0;
+        break;
+        case Qn::
+    }*/
+}
+
 bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;
 

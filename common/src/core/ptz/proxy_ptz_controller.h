@@ -25,6 +25,9 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override          { return m_baseController->getLimits(space, limits); }
     virtual bool getFlip(Qt::Orientations *flip) override                                       { return m_baseController->getFlip(flip); }
 
+    virtual bool getProjection(Qn::Projection *projection) override                             { return m_baseController->getProjection(projection); }
+    virtual bool setProjection(Qn::Projection projection) override                              { return m_baseController->setProjection(projection); }
+
     virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) override            { return m_baseController->createPreset(preset, presetId); }
     virtual bool updatePreset(const QnPtzPreset &preset) override                               { return m_baseController->updatePreset(preset); }
     virtual bool removePreset(const QString &presetId) override                                 { return m_baseController->removePreset(presetId); }

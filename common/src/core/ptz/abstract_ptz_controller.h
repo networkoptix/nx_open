@@ -118,6 +118,9 @@ public:
      */
     virtual bool getFlip(Qt::Orientations *flip) = 0;
 
+    virtual bool getProjection(Qn::Projection *projection) = 0;
+    virtual bool setProjection(Qn::Projection projection) = 0;
+
     /**
      * Saves current PTZ position as a preset, either as a new one or 
      * replacing an existing one. 

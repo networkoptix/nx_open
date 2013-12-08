@@ -20,6 +20,9 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace, QnPtzLimits *) override          { return false; }
     virtual bool getFlip(Qt::Orientations *) override                               { return false; }
 
+    virtual bool getProjection(Qn::Projection *projection) override                 { *projection = Qn::RectilinearProjection; return true; }
+    virtual bool setProjection(Qn::Projection projection) override                  { return projection == Qn::RectilinearProjection; }
+
     virtual bool createPreset(const QnPtzPreset &, QString *) override              { return false; }
     virtual bool updatePreset(const QnPtzPreset &) override                         { return false; }
     virtual bool removePreset(const QString &) override                             { return false; }
