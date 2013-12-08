@@ -90,12 +90,13 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
 }
 
 void QnFisheyePtzController::tick() {
-    qint64 elapsed = m_timer.restart();
+    qint64 elapsed = m_timer.restart(); // TODO: #Elric value is not used when there is no animation => don't start the timer.
     
     switch (m_animation) {
-    case ContinuousMoveAnimation:
-        break;
     case AbsoluteMoveAnimation: {
+        break; // TODO
+    }
+    case ContinuousMoveAnimation: {
         QVector3D speed = m_speed * QVector3D(30.0, 60.0, 60.0);
 
         QVector3D oldPosition;

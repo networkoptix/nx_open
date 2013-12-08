@@ -329,8 +329,10 @@ void QnGLRenderer::drawYV12VideoTexture(
     float ar = 1.0;
     if (m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoPtzCapabilities) 
     {
-        ar = picLock->width()/(float)picLock->height();
-        //params = m_fisheyeController->updateDewarpingParams(ar);
+        //ar = picLock->width()/(float)picLock->height();
+        m_fisheyeController->tick();
+        params = m_fisheyeController->dewarpingParams();
+
         if (params.panoFactor > 1.0)
         {
             if (params.viewMode == DewarpingParams::Horizontal)
