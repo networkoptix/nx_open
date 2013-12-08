@@ -2,12 +2,13 @@
 
 #include <cassert>
 
-#include <boost/range/algorithm/find_if.hpp>
+#include <QtCore/QMutex>
 
 #include <api/kvpair_usage_helper.h>
 #include <utils/common/json.h>
 
 #include "ptz_preset.h"
+
 
 // -------------------------------------------------------------------------- //
 // Model Data
@@ -63,6 +64,7 @@ public:
         helper->setValue(QString::fromUtf8(QJson::serialized(records)));
     }
 
+    QMutex mutex;
     QnPtzPresetRecordList records;
     QnStringKvPairUsageHelper *helper;
 };
@@ -75,8 +77,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     base_type(baseController),
     d(new QnPresetPtzControllerPrivate())
 {
-    // TODO: don't use usage helper, use sync api
-    // TODO: mutex
+    // TODO: don't use usage helper, use sync api?
 
     d->helper = new QnStringKvPairUsageHelper(baseController->resource(), lit(""), QString(), this);
 }
@@ -88,6 +89,7 @@ QnPresetPtzController::~QnPresetPtzController() {
 bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
     return 
         baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
+        (baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) || baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability)) &&
         !baseController->hasCapabilities(Qn::PresetsPtzCapability);
 }
 
@@ -99,6 +101,12 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
     if(preset.id.isEmpty())
         return false;
 
+    QnPtzPresetData data;
+    data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
+    if(!getPosition(data.space, &data.position))
+        return false;
+
+    QMutexLocker locker(&d->mutex);
     d->loadRecords();
 
     int index = d->records.indexOf(preset.id);
@@ -107,17 +115,17 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
         index = d->records.size() - 1;
     }
     QnPtzPresetRecord &record = d->records[index];
-        
+
     record.preset = preset;
-    record.data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
-    if(!getPosition(record.data.space, &record.data.position))
-        return false;
+    record.data = data;
 
     d->saveRecords();
     return true;
 }
 
 bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
+    QMutexLocker locker(&d->mutex);
+
     d->loadRecords();
 
     int index = d->records.indexOf(preset.id);
@@ -135,6 +143,8 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
 }
 
 bool QnPresetPtzController::removePreset(const QString &presetId) {
+    QMutexLocker locker(&d->mutex);
+
     d->loadRecords();
 
     int index = d->records.indexOf(presetId);
@@ -147,20 +157,26 @@ bool QnPresetPtzController::removePreset(const QString &presetId) {
 }
 
 bool QnPresetPtzController::activatePreset(const QString &presetId) {
-    d->loadRecords();
+    QnPtzPresetData data;
+    {
+        QMutexLocker locker(&d->mutex);
+        d->loadRecords();
 
-    int index = d->records.indexOf(presetId);
-    if(index == -1)
-        return false;
-    const QnPtzPresetRecord &record = d->records[index];
+        int index = d->records.indexOf(presetId);
+        if(index == -1)
+            return false;
+        data = d->records[index].data;
+    }
 
-    if(!absoluteMove(record.data.space, record.data.position))    
+    if(!absoluteMove(data.space, data.position))    
         return false;
 
     return true;
 }
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
+    QMutexLocker locker(&d->mutex);
+
     d->loadRecords();
 
     presets->clear();

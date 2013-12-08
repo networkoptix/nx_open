@@ -139,6 +139,9 @@ bool QnRemotePtzController::getTours(QnPtzTourList *tours) {
     return false;
 }
 
+bool QnRemotePtzController::synchronize() {
+    return true;
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers

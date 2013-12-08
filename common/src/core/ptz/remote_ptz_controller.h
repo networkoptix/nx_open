@@ -34,6 +34,8 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
+    virtual bool synchronize() override;
+
 private slots:
     void at_continuousMove_replyReceived(int status, int handle);
     void at_absoluteMove_replyReceived(int status, int handle);
