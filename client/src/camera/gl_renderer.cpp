@@ -582,11 +582,3 @@ bool QnGLRenderer::isFisheyeEnabled() const
     QMutexLocker lock(&m_mutex);
     return m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities;
 }
-
-int QnGLRenderer::panoFactor() const
-{
-    if (m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities) 
-        return (int) m_fisheyeController->dewarpingParams().panoFactor;
-    else
-        return 1;
-}
