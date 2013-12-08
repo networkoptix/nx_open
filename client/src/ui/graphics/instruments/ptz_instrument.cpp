@@ -592,13 +592,19 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
 
     QnResourceWidget::OverlayVisibility visibility = hasCrosshair ? QnResourceWidget::AutoVisible : QnResourceWidget::Invisible;
 
-    if(PtzOverlayWidget *staticOverlay = overlayWidget(widget)) {
-        widget->setOverlayWidgetVisibility(staticOverlay, visibility);
+    if(PtzOverlayWidget *overlayWidget = this->overlayWidget(widget)) {
+        widget->setOverlayWidgetVisibility(overlayWidget, visibility);
 
-        staticOverlay->manipulatorWidget()->setVisible((m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapabilities) == Qn::ContinuousPanTiltCapabilities);
+        const PtzData &data = m_dataByWidget[widget];
+
+        overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
+        overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         
+        overlayWidget->modeButton()->setVisible(data.hasCapabilities(Qn::VirtualPtzCapability)); // TODO: #PTZ
+        overlayWidget->setMarkersVisible(!data.hasCapabilities(Qn::VirtualPtzCapability));
+
         //if (widget->virtualPtzController())
-            //staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
+            //overlayWidget->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
     }
 }
 
@@ -844,9 +850,9 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
         m_movement = ContinuousMovement;
     } else {
         const PtzData &data = m_dataByWidget[target];
-        if(data.capabilities & Qn::VirtualPtzCapability) {
+        if(data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability)) {
             m_movement = VirtualMovement;
-        } else if(data.capabilities & Qn::ViewportPositioningPtzCapability) {
+        } else if(data.hasCapabilities(Qn::ViewportPositioningPtzCapability)) {
             m_movement = ViewportMovement;
         } else {
             m_movement = NoMovement;
@@ -936,17 +942,20 @@ void PtzInstrument::dragMove(DragInfo *info) {
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
     case VirtualMovement:
-        QCursor::setPos(info->mousePressScreenPos());
-        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
+        // TODO: #PTZ for some reason uncommenting these calls makes the movement look crappy... investigate!
+        /*if(info->mouseScreenPos() != info->mousePressScreenPos())*/ {
+            //QCursor::setPos(info->mousePressScreenPos());
+
             QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
-            QSizeF size = target()->size();
-            qreal scale = qMax(size.width(), size.height()) / 2.0;
+            qreal scale = target()->size().width() / 2.0;
             QPointF shift(delta.x() / scale, -delta.y() / scale);
 
-            //QVector3D position = m_ptzController->physicalPosition(target());
-            /*qreal speed = 10.0 * mm35EquivToFov(position.z());
+            QVector3D position;
+            target()->ptzController()->getPosition(Qn::LogicalCoordinateSpace, &position);
+            
+            qreal speed = 0.5 * position.z();
             QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
-            m_ptzController->setPhysicalPosition(target(), position + positionDelta);*/
+            target()->ptzController()->absoluteMove(Qn::LogicalCoordinateSpace, position + positionDelta);
         }
         break;
     default:

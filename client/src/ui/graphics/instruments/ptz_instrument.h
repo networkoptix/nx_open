@@ -103,6 +103,8 @@ private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
 
+        bool hasCapabilities(Qn::PtzCapabilities capabilities) const { return (this->capabilities & capabilities) == capabilities; }
+
         Qn::PtzCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
