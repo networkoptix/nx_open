@@ -27,8 +27,8 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzAction PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzCapabilities MotionTypes TimePeriodTypes)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzAction PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else
     Q_NAMESPACE
@@ -94,8 +94,24 @@ public:
         PtzCreateTourAction,
         PtzRemoveTourAction,
         PtzActivateTourAction,
-        PtzGetToursAction
+        PtzGetToursAction,
+
+        PtzGetDataAction
     };
+
+    enum PtzDataField {
+        PtzDevicePositionField  = 0x01,
+        PtzLogicalPositionField = 0x02,
+        PtzDeviceLimitsField    = 0x04,
+        PtzLogicalLimitsField   = 0x08,
+        PtzFlipField            = 0x10,
+        PtzPresetsField         = 0x20,
+        PtzToursField           = 0x40,
+        NoPtzFields             = 0x00,
+        AllPtzFields            = PtzDevicePositionField | PtzLogicalPositionField| PtzDeviceLimitsField | PtzLogicalLimitsField | PtzFlipField | PtzPresetsField | PtzToursField
+    };
+    Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
     enum PtzCoordinateSpace {
         LogicalCoordinateSpace,
@@ -316,6 +332,7 @@ inline QChar lit(char c) {
 }
 
 
+Q_DECLARE_METATYPE(Qn::PtzDataFields);
 Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodContent);

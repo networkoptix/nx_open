@@ -29,6 +29,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/misc/schedule_task.h>
+#include <core/ptz/ptz_data.h>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
@@ -134,6 +135,9 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<Qn::Corner>();
     qRegisterMetaTypeStreamOperators<Qn::Corner>();
+
+    qRegisterMetaType<Qn::PtzDataFields>();
+    qRegisterMetaType<QnPtzData>();
 
     qn_commonMetaTypes_initialized = true;
 }

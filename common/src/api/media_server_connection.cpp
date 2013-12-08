@@ -15,15 +15,14 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
-#include <utils/math/space_mapper.h>
 #include <utils/common/json.h>
 #include <utils/common/enum_name_mapper.h>
 
-#include "session_manager.h"
-
 #include <api/serializer/serializer.h>
-#include "serializer/pb_serializer.h"
-#include "event_log/events_serializer.h"
+#include <api/serializer/pb_serializer.h>
+#include <event_log/events_serializer.h>
+
+#include "session_manager.h"
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
@@ -44,6 +43,7 @@ namespace {
         ((PtzRemoveTourObject,      "ptz"))
         ((PtzActivateTourObject,    "ptz"))
         ((PtzGetToursObject,        "ptz"))
+        ((PtzGetDataObject,         "ptz"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
         ((TimeObject,               "gettime"))
@@ -351,6 +351,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case PtzGetToursObject:
         processJsonReply<QnPtzTourList>(this, response, handle);
+        break;
+    case PtzGetDataObject:
+        processJsonReply<QnPtzData>(this, response, handle);
         break;
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
@@ -666,6 +669,15 @@ int QnMediaServerConnection::ptzGetToursAsync(const QnNetworkResourcePtr &camera
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncGetRequest(PtzGetToursObject, params, QN_REPLY_TYPE(QnPtzTourList), target, slot);
+}
+
+int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields fields, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetDataAction));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("fields",          QnLexical::serialized(static_cast<int>(fields)));
+
+    return sendAsyncGetRequest(PtzGetDataObject, params, QN_REPLY_TYPE(QnPtzData), target, slot);
 }
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {

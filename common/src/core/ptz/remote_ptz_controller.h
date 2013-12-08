@@ -4,6 +4,7 @@
 #include <QtCore/QUuid>
 
 #include "abstract_ptz_controller.h"
+#include "ptz_data.h"
 
 class QnRemotePtzController: public QnAbstractPtzController {
     Q_OBJECT
@@ -34,7 +35,7 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
-    virtual bool synchronize() override;
+    virtual bool synchronize(Qn::PtzDataFields fields) override;
 
 private slots:
     void at_continuousMove_replyReceived(int status, int handle);
@@ -46,11 +47,19 @@ private slots:
     void at_removePreset_replyReceived(int status, int handle);
     void at_activatePreset_replyReceived(int status, int handle);
 
+    void at_getData_replyReceived(int status, const QnPtzData &reply, int handle);
+
+private:
+    Q_SIGNAL void synchronizedLater(Qn::PtzDataFields fields);
+
 private:
     QnNetworkResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;
     QUuid m_sequenceId;
     int m_sequenceNumber;
+    
+    QHash<int, Qn::PtzDataFields> m_fieldsByHandle;
+    QnPtzData m_data;
 };
 
 

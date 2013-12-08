@@ -188,12 +188,14 @@ public:
      * Note that this is the only function that cannot implemented in a sane way if 
      * this controller has a <tt>Qn::NonBlockingPtzCapability</tt>. This is why
      * for non-blocking controllers a <tt>synchronized()</tt> signal is provided.
+     * 
+     * \param fields                    Data fields to synchronize.
      */
-    virtual bool synchronize() = 0;
+    virtual bool synchronize(Qn::PtzDataFields fields) = 0;
 
 signals:
     void capabilitiesChanged();
-    void synchronized();
+    void synchronized(Qn::PtzDataFields fields);
 
 protected:
     QnResourcePtr m_resource;

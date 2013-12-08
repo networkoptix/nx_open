@@ -7,6 +7,7 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/ptz_data.h>
 
 #include <ptz/ptz_controller_pool.h>
 
@@ -92,6 +93,7 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     case Qn::PtzRemoveTourAction:       return executeRemoveTour(controller, params, result);
     case Qn::PtzActivateTourAction:     return executeActivateTour(controller, params, result);
     case Qn::PtzGetToursAction:         return executeGetTours(controller, params, result);
+    case Qn::PtzGetDataAction:          return executeGetData(controller, params, result);
     default:                            return CODE_INVALID_PARAMETER;
     }
 }
@@ -258,6 +260,25 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
         return CODE_INTERNAL_ERROR;
 
     result.setReply(tours);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    int fields;
+    if(!requireParameter(params, lit("fields"), result, &fields))
+        return CODE_INVALID_PARAMETER;
+
+    QnPtzData data;
+    data.capabilities = controller->getCapabilities();
+    if((fields & Qn::PtzDevicePositionField)    && controller->getPosition(Qn::DeviceCoordinateSpace, &data.devicePosition))    data.fields |= Qn::PtzDevicePositionField;
+    if((fields & Qn::PtzLogicalPositionField)   && controller->getPosition(Qn::LogicalCoordinateSpace, &data.logicalPosition))  data.fields |= Qn::PtzLogicalPositionField;
+    if((fields & Qn::PtzDeviceLimitsField)      && controller->getLimits(Qn::DeviceCoordinateSpace, &data.deviceLimits))        data.fields |= Qn::PtzDeviceLimitsField;
+    if((fields & Qn::PtzLogicalLimitsField)     && controller->getLimits(Qn::LogicalCoordinateSpace, &data.logicalLimits))      data.fields |= Qn::PtzLogicalLimitsField;
+    if((fields & Qn::PtzFlipField)              && controller->getFlip(&data.flip))                                             data.fields |= Qn::PtzFlipField;
+    if((fields & Qn::PtzPresetsField)           && controller->getPresets(&data.presets))                                       data.fields |= Qn::PtzPresetsField;
+    if((fields & Qn::PtzToursField)             && controller->getTours(&data.tours))                                           data.fields |= Qn::PtzToursField;
+
+    result.setReply(data);
     return CODE_OK;
 }
 

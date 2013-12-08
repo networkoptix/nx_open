@@ -20,6 +20,9 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
     }
 
     connect(resource.data(), SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SIGNAL(capabilitiesChanged()));
+    connect(this, SIGNAL(synchronizedLater(Qn::PtzDataFields)), this, SIGNAL(synchronized(Qn::PtzDataFields)), Qt::QueuedConnection);
+
+    synchronize(Qn::AllPtzFields);
 }
 
 QnRemotePtzController::~QnRemotePtzController() {
@@ -114,12 +117,14 @@ bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
     if(!m_server)
         return false;
 
-    QnConnectionRequestResult result;
+    *presets = m_data.presets; // TODO: #Elric implement properly =)
+
+    /*QnConnectionRequestResult result;
     m_server->apiConnection()->ptzGetPresetsAsync(m_resource, &result, SLOT(processReply(int, const QVariant &, int)));
     if(result.exec() != 0)
         return false;
 
-    *presets = result.reply<QnPtzPresetList>();
+    *presets = result.reply<QnPtzPresetList>();*/
     return true;
 }
 
@@ -139,7 +144,14 @@ bool QnRemotePtzController::getTours(QnPtzTourList *tours) {
     return false;
 }
 
-bool QnRemotePtzController::synchronize() {
+bool QnRemotePtzController::synchronize(Qn::PtzDataFields fields) {
+    if(fields == Qn::NoPtzFields) {
+        emit synchronizedLater(fields);
+        return true;
+    }
+
+    int handle = m_server->apiConnection()->ptzGetDataAsync(m_resource, fields, this, SLOT(at_getData_replyReceived(int, const QnPtzData &, int)));
+    m_fieldsByHandle.insert(handle, fields);
     return true;
 }
 
@@ -173,3 +185,16 @@ void QnRemotePtzController::at_removePreset_replyReceived(int status, int handle
 void QnRemotePtzController::at_activatePreset_replyReceived(int status, int handle) {
     return;
 }
+
+void QnRemotePtzController::at_getData_replyReceived(int status, const QnPtzData &reply, int handle) {
+    Qn::PtzDataFields fields = m_fieldsByHandle.value(handle, Qn::NoPtzFields);
+    m_fieldsByHandle.remove(handle);
+    
+    // TODO: store only valid fields!
+    m_data = reply;
+    
+    if(fields != Qn::NoPtzFields)
+        emit synchronized(fields);
+}
+
+

@@ -36,6 +36,8 @@ private:
     int executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
+    int executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+
     bool checkSequence(const QString& id, int sequence);
     void cleanupOldSequence();
 

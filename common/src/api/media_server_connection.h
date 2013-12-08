@@ -21,6 +21,7 @@
 
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_data.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
@@ -61,6 +62,7 @@ signals:
     void finished(int status, const QString &reply, int handle);
     void finished(int status, const QnPtzPresetList &reply, int handle);
     void finished(int status, const QnPtzTourList &reply, int handle);
+    void finished(int status, const QnPtzData &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -190,6 +192,8 @@ public:
     int ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
     int ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
     int ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields fields, QObject *target, const char *slot);
 
     int getStorageSpaceAsync(QObject *target, const char *slot);
 

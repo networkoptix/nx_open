@@ -36,7 +36,7 @@ public:
     virtual bool activateTour(const QString &tourId) override                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                        { return m_baseController->getTours(tours); }
 
-    virtual bool synchronize() override                                                         { return m_baseController->synchronize(); }
+    virtual bool synchronize(Qn::PtzDataFields fields) override                                 { return m_baseController->synchronize(fields); }
 
 private:
     QnPtzControllerPtr m_baseController;
