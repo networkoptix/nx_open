@@ -21,7 +21,14 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_capabilities(0)
 {
     m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability;
-    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(resource);
+    m_stopBroken = resourceData.value<bool>(lit("onvifPtzStopBroken"), false);
+
+    if(resourceData.value<bool>(lit("onvifPtzBroken"), false)) {
+        m_capabilities = Qn::NoPtzCapabilities;
+        return;
+    }
 
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -78,27 +85,6 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_limits.maxTilt = 1.0;
     m_limits.minFov = 0.0;
     m_limits.maxFov = 1.0;
-
-    // TODO: #Elric make configurable
-#if 0
-    QString model = m_resource->getModel();
-    if(model == lit("FW3471-PS-E")) {
-        m_ptzCapabilities |= Qn::OctagonalPtzCapability;
-        m_ptzCapabilities &= ~Qn::AbsolutePtzCapabilities;
-    }
-    if(model == lit("IPC-HDB3200C")) {
-        m_ptzCapabilities = Qn::NoPtzCapabilities;
-    }
-    if(model == lit("DWC-MPTZ20X")) {
-        m_ptzCapabilities |= Qn::OctagonalPtzCapability;
-    }
-    if(model == lit("DM368") || model == lit("FD8161") || model == lit("FD8362E") || model == lit("FD8361") || model == lit("FD8136") || model == lit("FD8162") || model == lit("FD8372") || model == lit("FD8135H") || model == lit("IP8151") || model == lit("IP8335H") || model == lit("IP8362") || model == lit("MD8562")) {
-        m_ptzCapabilities = Qn::NoPtzCapabilities;
-    }
-#endif // TODO: #PTZ
-
-
-    //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
 
 Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() {
