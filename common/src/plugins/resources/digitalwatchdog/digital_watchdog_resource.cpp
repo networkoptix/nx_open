@@ -1,10 +1,9 @@
-
 #ifdef ENABLE_ONVIF
 
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
-#include "utils/math/space_mapper.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -84,38 +83,6 @@ CameraDiagnostics::Result QnPlWatchDogResource::initInternal()
         
     const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
 
-    // TODO: #Elric this code is totally evil. Better write it properly as soon as possible.
-    CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
-    http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
-    QByteArray data;
-    http.readAll(data);
-
-    bool flipVertical = false, flipHorizontal = false;
-    if(data.contains("flipmode1: 1")) {
-        flipHorizontal = !flipHorizontal;
-        flipVertical = !flipVertical;
-    }
-    if(data.contains("mirrormode1: 1"))
-        flipHorizontal = !flipHorizontal;
-
-    // TODO: #Elric evil hacks here =(
-    /*if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(base_type::getPtzController())) {
-        ptzController->setFlipped(flipHorizontal, flipVertical);
-
-        if(QnPtzSpaceMapper *mapper = const_cast<QnPtzSpaceMapper *>(ptzController->getSpaceMapper())) {
-            QnVectorSpaceMapper &fromCamera = const_cast<QnVectorSpaceMapper &>(mapper->fromCamera());
-            QnVectorSpaceMapper &toCamera = const_cast<QnVectorSpaceMapper &>(mapper->toCamera());
-            if(flipHorizontal) {
-                fromCamera.setMapper(QnVectorSpaceMapper::X, fromCamera.mapper(QnVectorSpaceMapper::X).flipped(false, true, 0.0, 0.0));
-                toCamera.setMapper(QnVectorSpaceMapper::X, toCamera.mapper(QnVectorSpaceMapper::X).flipped(false, true, 0.0, 0.0));
-            }
-            if(flipVertical) {
-                fromCamera.setMapper(QnVectorSpaceMapper::Y, fromCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
-                toCamera.setMapper(QnVectorSpaceMapper::Y, toCamera.mapper(QnVectorSpaceMapper::Y).flipped(false, true, 0.0, 0.0));
-            }
-        }
-    }*/ // TODO: #PTZ
-
     return result;
 }
 
@@ -154,9 +121,12 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
 }
 
 QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() {
-    QScopedPointer<QnAbstractPtzController> result(base_type::createPtzControllerInternal());
-    if(!result)
-        result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+    QScopedPointer<QnAbstractPtzController> result(new QnDwPtzController(toSharedPointer(this)));
+    if(result->getCapabilities() == Qn::NoPtzCapabilities) {
+        result.reset();
+        if(m_hasZoom)
+            result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+    }
     return result.take();
 }
 

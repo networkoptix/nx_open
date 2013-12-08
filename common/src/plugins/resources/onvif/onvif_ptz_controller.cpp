@@ -126,12 +126,6 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
 
     QVector3D localSpeed = speed;
 
-    // TODO: #PTZ
-    /*if(m_horizontalFlipped)
-        localSpeed.setX(-localSpeed.x());
-    if(m_verticalFlipped)
-        localSpeed.setY(-localSpeed.y());*/
-
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = normalizeSpeed(speed.x(), m_xNativeVelocityCoeff, 1.0);
     onvifPanTiltSpeed.y = normalizeSpeed(speed.y(), m_yNativeVelocityCoeff, 1.0);;

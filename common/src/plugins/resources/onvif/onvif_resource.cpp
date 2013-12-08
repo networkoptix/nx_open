@@ -2235,7 +2235,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
-QnAbstractPtzController* QnPlOnvifResource::createPtzControllerInternal()
+QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 {
     if(getPtzfUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
         return NULL;
