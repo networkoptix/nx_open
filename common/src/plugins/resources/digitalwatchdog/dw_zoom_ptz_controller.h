@@ -4,7 +4,6 @@
 #ifdef ENABLE_ONVIF
 #include <core/ptz/basic_ptz_controller.h>
 
-
 class QnDwZoomPtzController: public QnBasicPtzController {
     Q_OBJECT
     typedef QnBasicPtzController base_type;

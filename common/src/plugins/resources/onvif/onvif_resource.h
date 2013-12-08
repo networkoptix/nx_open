@@ -206,7 +206,6 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    bool isPTZDisabled() const;
 protected:
     virtual QString getVendorInternal() const override;
 

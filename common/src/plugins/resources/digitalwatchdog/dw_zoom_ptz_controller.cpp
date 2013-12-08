@@ -1,4 +1,3 @@
-
 #ifdef ENABLE_ONVIF
 
 #include "dw_zoom_ptz_controller.h"

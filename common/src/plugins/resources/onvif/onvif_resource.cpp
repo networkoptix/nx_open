@@ -70,13 +70,6 @@ StrictResolution strictResolutionList[] =
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
 
-// disable PTZ for this cameras
-QString strictPTZList[] =
-{
-    lit("N53F-F")
-};
-
-
 struct StrictBitrateInfo {
     const char* model;
     int minBitrate;
@@ -573,16 +566,6 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
     }
-}
-
-bool QnPlOnvifResource::isPTZDisabled() const
-{
-    for (uint i = 0; i < sizeof(strictPTZList) / sizeof(QString); ++i)
-    {
-        if (getModel() == strictPTZList[i])
-            return true;
-    }
-    return false;
 }
 
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
@@ -2254,13 +2237,14 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
 
 QnAbstractPtzController* QnPlOnvifResource::createPtzControllerInternal()
 {
-    if(isPTZDisabled())
-        return NULL;
-
     if(getPtzfUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
         return NULL;
 
-    return new QnOnvifPtzController(toSharedPointer(this));
+    QScopedPointer<QnOnvifPtzController> result(new QnOnvifPtzController(toSharedPointer(this)));
+    if(result->getCapabilities() == Qn::NoPtzCapabilities)
+        return NULL;
+    
+    return result.take();
 }
 
 bool QnPlOnvifResource::startInputPortMonitoring()

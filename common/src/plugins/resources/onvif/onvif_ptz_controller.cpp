@@ -20,7 +20,9 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_resource(resource),
     m_capabilities(0)
 {
-    m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability;
+    m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
+
+    // TODO: #PTZ #Elric actually implement flip!
 
     QnResourceData resourceData = qnCommon->dataPool()->data(resource);
     m_stopBroken = resourceData.value<bool>(lit("onvifPtzStopBroken"), false);
@@ -245,7 +247,8 @@ bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *
 }
 
 bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
-    return false; // TODO: #PTZ #Elric
+    *flip = 0; // TODO: #PTZ #Elric
+    return true;
 }
 
 #endif //ENABLE_ONVIF
