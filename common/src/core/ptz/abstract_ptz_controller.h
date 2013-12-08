@@ -182,6 +182,9 @@ public:
     virtual bool activateTour(const QString &tourId) = 0;
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
+signals:
+    void capabilitiesChanged();
+
 protected:
     QnResourcePtr m_resource;
 };

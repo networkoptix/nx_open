@@ -6,7 +6,7 @@
 #include <core/resource/media_server_resource.h>
 
 QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resource):
-    QnAbstractPtzController(resource),
+    base_type(resource),
     m_resource(resource)
 {
     m_sequenceId = QUuid::createUuid();
@@ -18,6 +18,8 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
         qnWarning("No parent server for network resource '%1'.", resource->getName());
         return;
     }
+
+    connect(resource.data(), SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SIGNAL(capabilitiesChanged()));
 }
 
 QnRemotePtzController::~QnRemotePtzController() {

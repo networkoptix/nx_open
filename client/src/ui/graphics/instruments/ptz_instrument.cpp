@@ -8,6 +8,7 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QApplication>
 
+#include <utils/common/emitter.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/fuzzy.h>
@@ -481,10 +482,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
-{
-    connect(display(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_display_resourceAdded(const QnResourcePtr &)));
-    connect(display(), SIGNAL(resourceAboutToBeRemoved(const QnResourcePtr &)), this, SLOT(at_display_resourceAboutToBeRemoved(const QnResourcePtr &)));
-}
+{}
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
@@ -603,12 +601,6 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
         //if (widget->virtualPtzController())
             //staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
     }
-}
-
-void PtzInstrument::updateCapabilities(const QnResourcePtr &resource) {
-    foreach(QnResourceWidget *widget, display()->widgets(resource))
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-            updateCapabilities(mediaWidget);
 }
 
 void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
@@ -749,6 +741,9 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
         if(widget->resource()) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
 
+            PtzData &data = m_dataByWidget[widget];
+            data.capabilitiesConnection = QObject::connect(widget->ptzController().data(), &QnAbstractPtzController::capabilitiesChanged, [=] { this->updateCapabilities(widget); });
+
             updateCapabilities(widget);
             updateOverlayWidget(widget);
 
@@ -766,6 +761,9 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
 
+    PtzData &data = m_dataByWidget[object];
+    QObject::disconnect(data.capabilitiesConnection);
+    
     m_dataByWidget.remove(object);
 }
 
@@ -986,14 +984,6 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
     }
 
     emit ptzProcessFinished(target());
-}
-
-void PtzInstrument::at_display_resourceAdded(const QnResourcePtr &resource) {
-    connect(resource, SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(updateCapabilities(const QnResourcePtr &)));
-}
-
-void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource) {
-    disconnect(resource, NULL, this, NULL);
 }
 
 void PtzInstrument::at_splashItem_destroyed() {

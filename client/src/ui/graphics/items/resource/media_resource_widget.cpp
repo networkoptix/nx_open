@@ -91,7 +91,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     }
 
     /* Set up PTZ controller. */
-    if(m_camera) {
+    if(!m_resource->isFisheye() && m_camera && m_camera->getPtzCapabilities() != Qn::NoPtzCapabilities) {
         m_ptzController.reset(new QnRemotePtzController(m_camera));
     } else {
         m_ptzController.reset(new QnFisheyePtzController(this));
@@ -220,8 +220,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
     if (m_display)
         m_display->removeRenderer(m_renderer);
-
-    //delete m_fisheyePtz;
 
     m_renderer->destroyAsync();
 
@@ -961,18 +959,16 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
-    /*bool fishEyeEnabled = checked && m_fisheyePtz;
-
-    setOption(ControlPtz, fishEyeEnabled);
-    setOption(DisplayCrosshair, fishEyeEnabled);
+    setOption(ControlPtz, checked);
+    setOption(DisplayCrosshair, checked);
     if(checked)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
     
     //DewarpingParams params = item()->dewarpingParams();
     //params.enabled = checked;
     //item()->setDevorpingParams(params);
-    if(m_fisheyePtz)
-        m_fisheyePtz->setEnabled(checked);*/
+    //if(m_fisheyePtz)
+        //m_fisheyePtz->setEnabled(checked);*/
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {

@@ -7,6 +7,8 @@
 
 class QnRemotePtzController: public QnAbstractPtzController {
     Q_OBJECT
+    typedef QnAbstractPtzController base_type;
+
 public:
     QnRemotePtzController(const QnNetworkResourcePtr &resource);
     virtual ~QnRemotePtzController();

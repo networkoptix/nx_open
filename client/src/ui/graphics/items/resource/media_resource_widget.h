@@ -10,14 +10,13 @@
 #include <core/resource/media_resource.h>
 
 #include <client/client_globals.h>
-#include "camera/resource_display.h" // TODO: #Elric FWD!
-#include "utils/color_space/image_correction.h"
+#include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <utils/color_space/image_correction.h>
 #include <core/resource/dewarping_params.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnAbstractPtzController;
-class QnFisheyePtzController;
 class QnVirtualPtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
@@ -103,6 +102,13 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
+    /**
+     * This function returns a PTZ controller associated with this widget.
+     * Note that this function never returns NULL. Also note that several
+     * different widgets may return the same PTZ controller instance.
+     *
+     * \returns                         PTZ controller associated with this widget.
+     */
     QnPtzControllerPtr ptzController() const;
 
 signals:
@@ -206,5 +212,7 @@ private:
 
     QnPtzControllerPtr m_ptzController;
 };
+
+Q_DECLARE_METATYPE(QnMediaResourceWidget *)
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

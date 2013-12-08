@@ -61,9 +61,6 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private slots:
-    void at_display_resourceAdded(const QnResourcePtr &resource);
-    void at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource);
-
     void at_splashItem_destroyed();
 
     void at_modeButton_clicked();
@@ -75,7 +72,6 @@ private slots:
 
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
-    void updateCapabilities(const QnResourcePtr &resource);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:
@@ -113,6 +109,7 @@ private:
         QVector3D requestedSpeed;
         QRectF pendingAbsoluteMove;
         PtzOverlayWidget *overlayWidget;
+        QMetaObject::Connection capabilitiesConnection;
     };
 
     int m_clickDelayMSec;
