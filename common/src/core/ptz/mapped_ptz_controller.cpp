@@ -1,4 +1,4 @@
- #include "mapped_ptz_controller.h"
+#include "mapped_ptz_controller.h"
 
 QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController):
     QnProxyPtzController(baseController),
@@ -7,12 +7,12 @@ QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const
 
 bool QnMappedPtzController::extends(const QnPtzControllerPtr &baseController) {
     return 
-        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities | Qn::DeviceCoordinateSpaceCapability) &&
-        !baseController->hasCapabilities(Qn::LogicalCoordinateSpaceCapability);
+        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability) &&
+        !baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability);
 }
 
 Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
-    return base_type::getCapabilities() | Qn::LogicalCoordinateSpaceCapability;
+    return base_type::getCapabilities() | Qn::LogicalPositioningPtzCapability;
 }
 
 bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
@@ -36,8 +36,12 @@ bool QnMappedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D 
     }
 }
 
-bool QnMappedPtzController::getLimits(QnPtzLimits *limits) {
-    *limits = m_mapper->logicalLimits();
-    return true;
+bool QnMappedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+    if(space == Qn::DeviceCoordinateSpace) {
+        return base_type::getLimits(space, limits);
+    } else {
+        *limits = m_mapper->logicalLimits();
+        return true;
+    }
 }
 

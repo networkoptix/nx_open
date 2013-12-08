@@ -21,9 +21,9 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override { return m_baseController->absoluteMove(space, position); }
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) override               { return m_baseController->viewportMove(aspectRatio, viewport); }
 
-    virtual bool getFlip(Qt::Orientations *flip) override                                       { return m_baseController->getFlip(flip); }
-    virtual bool getLimits(QnPtzLimits *limits) override                                        { return m_baseController->getLimits(limits); }
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override        { return m_baseController->getPosition(space, position); }
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override          { return m_baseController->getLimits(space, limits); }
+    virtual bool getFlip(Qt::Orientations *flip) override                                       { return m_baseController->getFlip(flip); }
 
     virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) override            { return m_baseController->createPreset(preset, presetId); }
     virtual bool updatePreset(const QnPtzPreset &preset) override                               { return m_baseController->updatePreset(preset); }

@@ -215,10 +215,13 @@ QString QnFisheyePtzController::getPanoModeText() const {
 // QnAbstractPtzController implementation
 // -------------------------------------------------------------------------- //
 Qn::PtzCapabilities QnFisheyePtzController::getCapabilities() {
-    return Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalCoordinateSpaceCapability;
+    return Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability;
 }
 
-bool QnFisheyePtzController::getLimits(QnPtzLimits *limits) {
+bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+    if(space != Qn::LogicalCoordinateSpace)
+        return false;
+
     *limits = m_limits;
     return true;
 }

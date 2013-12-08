@@ -846,7 +846,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             manipulator = NULL;
     }
 
-    if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::ViewportCoordinateSpaceCapability))
+    if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::ViewportPositioningPtzCapability))
         return false;
 
     m_skipNextAction = false;

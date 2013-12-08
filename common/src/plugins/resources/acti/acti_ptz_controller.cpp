@@ -103,7 +103,7 @@ void QnActiPtzController::init() {
     }
 
     if(m_capabilities & Qn::AbsolutePtzCapabilities)
-        m_capabilities |= Qn::LogicalCoordinateSpaceCapability;
+        m_capabilities |= Qn::LogicalPositioningPtzCapability;
 
     QList<QByteArray> zoomParams = zoomString.split('=')[1].split(',');
     m_minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
@@ -279,7 +279,7 @@ bool QnActiPtzController::getFlip(Qt::Orientations *flip) {
     return false; // TODO: #PTZ
 }
 
-bool QnActiPtzController::getLimits(QnPtzLimits *limits) {
+bool QnActiPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
     return false; // TODO: #Elric #PTZ
 }
 

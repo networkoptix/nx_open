@@ -24,7 +24,7 @@ public:
     virtual bool getFlip(Qt::Orientations *flip) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(QnPtzLimits *limits) override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     
 private:
     void init();

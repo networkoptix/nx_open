@@ -88,11 +88,11 @@ QnPresetPtzController::~QnPresetPtzController() {
 bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
     return 
         baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
-        !baseController->hasCapabilities(Qn::PtzPresetCapability);
+        !baseController->hasCapabilities(Qn::PresetsPtzCapability);
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
-    return base_type::getCapabilities() | Qn::PtzPresetCapability;
+    return base_type::getCapabilities() | Qn::PresetsPtzCapability;
 }
 
 bool QnPresetPtzController::createPreset(const QnPtzPreset &preset, QString *presetId) {
@@ -111,7 +111,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset, QString *pre
         
     record.preset.id = id;
     record.preset.name = preset.name;
-    record.data.space = hasCapabilities(Qn::LogicalCoordinateSpaceCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
+    record.data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
     if(!getPosition(record.data.space, &record.data.position))
         return false;
 

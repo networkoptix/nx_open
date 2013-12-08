@@ -54,11 +54,15 @@ public:
     virtual bool continuousMove(const QVector3D &speed) = 0;
 
     /**
-     * Sets camera PTZ position. If this controller has 
-     * <tt>Qn::LogicalCoordinateSpaceCapability<tt>, then position is expected to
-     * be in standard PTZ space. Otherwise it is expected to be in device-specific
-     * coordinates and thus only positions returned from a call to <tt>getPosition</tt>
-     * can be safely used.
+     * Sets camera PTZ position in the given coordinate space.
+     * 
+     * If this camera has <tt>Qn::DevicePositioningPtzCapability</tt>, then
+     * device-specific coordinate space must be supported. Note that for
+     * this coordinate space only positions returned from a call to 
+     * <tt>getPosition</tt> can be safely used with this function.
+     * 
+     * If this camera has <tt>Qn::LogicalPositioningPtzCapability</tt>,
+     * then logical coordinate space must be supported.
      *
      * \param space                     Coordinate space of the provided position.
      * \param position                  Position to move to.
@@ -72,7 +76,7 @@ public:
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
      * 
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ViewportCoordinateSpaceCapability</tt>.
+     * <tt>Qn::ViewportPositioningPtzCapability</tt>.
      * 
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
@@ -81,32 +85,38 @@ public:
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) = 0;
 
     /**
-     * \param[out] flip                 Flipped state of the camera's video stream.
+     * Gets PTZ position from camera in the given coordinate space.
+     *
+     * \param space                     Coordinate space to get position in.
+     * \param[out] position             Current ptz position. 
      * \returns                         Whether the operation was successful.
+     * \see absoluteMove
      */
-    virtual bool getFlip(Qt::Orientations *flip) = 0;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
 
     /**
      * Gets PTZ limits of the camera in standard PTZ space. 
      * 
      * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::LogicalCoordinateSpaceCapability<tt>.
+     * <tt>Qn::LimitsPtzCapability<tt>.
      * 
+     * \param space                     Coordinate space to get limits in.
      * \param[out] limits               Ptz limits.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool getLimits(QnPtzLimits *limits) = 0;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) = 0;
 
     /**
-     * Gets PTZ position from camera. If this controller has 
-     * <tt>Qn::LogicalCoordinateSpaceCapability<tt>, then position is returned in 
-     * standard PTZ space. Otherwise it's returned in device-specific coordinates.
+     * Returns the camera streams's flipped state. This function can be used for
+     * implementing emulated viewport movement.
+     * 
+     * This function is expected to be implemented only if this controller has
+     * <tt>Qn::FlipPtzCapability</tt>.
      *
-     * \param space                     Coordinate space to get position in.
-     * \param[out] position             Current ptz position. 
+     * \param[out] flip                 Flipped state of the camera's video stream.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
+    virtual bool getFlip(Qt::Orientations *flip) = 0;
 
     /**
      * Saves current PTZ position as a preset, either as a new one or 

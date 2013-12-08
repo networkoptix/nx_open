@@ -101,25 +101,4 @@ private:
 };
 
 
-template<class T>
-class QnAssymetricSpaceMapper: public QnSpaceMapper<T> {
-public:
-    QnAssymetricSpaceMapper(const QnSpaceMapperPtr<T> &sourceToTarget, const QnSpaceMapperPtr<T> &targetToSource) {
-        m_sourceToTarget = sourceToTarget;
-        m_targetToSource = targetToSource;
-    }
-
-    virtual T sourceToTarget(const T &source) const override {
-        return m_sourceToTarget->sourceToTarget(source);
-    }
-
-    virtual T targetToSource(const T &target) const override {
-        return m_targetToSource->targetToSource(target);
-    }
-
-private:
-    QnSpaceMapperPtr<T> m_sourceToTarget, m_targetToSource;
-};
-
-
 #endif // QN_SPACE_MAPPER_H

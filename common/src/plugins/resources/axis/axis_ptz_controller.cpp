@@ -119,6 +119,7 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     qreal rotation = params.value("root.Image.I0.Appearance.Rotation", 0.0);
     if(qFuzzyCompare(rotation, static_cast<qreal>(180.0)))
         m_flip = Qt::Vertical | Qt::Horizontal;
+    m_capabilities |= Qn::FlipPtzCapability;
 
     QnPtzLimits limits;
     if(
@@ -136,12 +137,12 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         limits.minFov /= 10.0;
         limits.maxFov /= 10.0;
 
-        /* We implement E-Flip, so we don't want strange tilt angles. */
-        limits.maxTilt = qMin<qreal>(limits.maxTilt, 90.0);
-        limits.minTilt = qMax<qreal>(limits.minTilt, -90.0);
+        /* We don't want strange tilt angles supported by Axis's E-Flip. */
+        limits.maxTilt = qMin(limits.maxTilt, 90.0);
+        limits.minTilt = qMax(limits.minTilt, -90.0);
 
         /* Logical space should work now that we know logical limits. */
-        m_capabilities |= Qn::LogicalCoordinateSpaceCapability;
+        m_capabilities |= Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability;
         m_limits = limits;
         m_logicalToCameraZoom = QnLinearFunction(limits.minFov, 9999, limits.maxFov, 1);
         m_cameraToLogicalZoom = m_logicalToCameraZoom.inversed();
@@ -206,13 +207,12 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
+Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
+    return m_capabilities;
 }
 
-bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
-    *flip = m_flip;
-    return true;
+bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
+    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
 }
 
 bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
@@ -242,13 +242,18 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     }
 }
 
-Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
-    return m_capabilities;
-}
+bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+    if(space != Qn::LogicalCoordinateSpace)
+        return false;
 
-bool QnAxisPtzController::getLimits(QnPtzLimits *limits) {
     *limits = m_limits;
     return true;
 }
+
+bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
+    *flip = m_flip;
+    return true;
+}
+
 
 #endif // #ifdef ENABLE_AXIS

@@ -2,6 +2,7 @@
 
 #include <utils/common/json.h>
 #include <utils/common/enum_name_mapper.h>
+#include <utils/math/math.h>
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
@@ -28,19 +29,25 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const Q
     m_inputMapper(inputMapper),
     m_outputMapper(outputMapper)
 {
-    QVector3D lo = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(-360 * 10, -90, 0)));
-    QVector3D mi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(90, 0, 180)));
-    QVector3D hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(360 * 10, 90, 360)));
-
-    if(qFuzzyCompare(lo.x(), hi.x()) && !qFuzzyCompare(lo.x(), mi.x())) {
-        /* This means that there are no limits for pan. */
-        m_logicalLimits.minPan = -36000.0;
-        m_logicalLimits.maxPan = 36000.0;
+    /* OK, I know that this check sucks, but I really didn't want to
+     * extend the space mapper interface to make it simpler. */
+    qreal minPan = 36000.0, maxPan = -36000.0;
+    for(int pan = 0; pan <= 360; pan++) {
+        QVector3D pos = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(pan, 0, 0)));
+        minPan = qMin(pos.x(), minPan);
+        maxPan = qMax(pos.x(), maxPan);
+    }
+    if(qFuzzyCompare(maxPan - minPan, 360.0)) {
+        /* There are no limits for pan. */
+        m_logicalLimits.minPan = 0.0;
+        m_logicalLimits.maxPan = 360.0;
     } else {
-        m_logicalLimits.minPan = lo.x();
-        m_logicalLimits.minPan = hi.x();
+        m_logicalLimits.minPan = minPan;
+        m_logicalLimits.maxPan = maxPan;
     }
 
+    QVector3D lo = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(0, -90, 0)));
+    QVector3D hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(0, 90, 360)));
     m_logicalLimits.minTilt = lo.y();
     m_logicalLimits.maxTilt = hi.y();
     m_logicalLimits.minFov = lo.z();

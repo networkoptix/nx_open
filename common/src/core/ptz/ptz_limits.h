@@ -17,7 +17,13 @@ struct QnPtzLimits {
 
 
 inline QVector3D qBound(const QVector3D &position, const QnPtzLimits &limits) {
+    bool unlimitedPan = false;
+    qreal panRange = (limits.maxPan - limits.minPan);
+    if(qFuzzyCompare(panRange, 360) || panRange > 360)
+        unlimitedPan = true;
+
     return QVector3D(
+        unlimitedPan ? position.x() : 
         qBound<float>(limits.minPan,  position.x(), limits.maxPan),
         qBound<float>(limits.minTilt, position.y(), limits.maxTilt),
         qBound<float>(limits.minFov,  position.z(), limits.maxFov)

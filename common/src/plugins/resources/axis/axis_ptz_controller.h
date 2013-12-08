@@ -22,10 +22,11 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool getFlip(Qt::Orientations *flip) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
+    
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(QnPtzLimits *limits) override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
+    virtual bool getFlip(Qt::Orientations *flip) override;
 
 private:
     void updateState();

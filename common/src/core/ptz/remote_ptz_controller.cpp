@@ -65,7 +65,7 @@ bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D 
     return true;
 }
 
-bool QnRemotePtzController::getLimits(QnPtzLimits *) {
+bool QnRemotePtzController::getLimits(Qn::PtzCoordinateSpace, QnPtzLimits *) {
     return false;
 }
 

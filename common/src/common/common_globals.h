@@ -113,12 +113,15 @@ public:
         AbsoluteTiltCapability              = 0x00008000,
         AbsoluteZoomCapability              = 0x00010000,
 
-        DeviceCoordinateSpaceCapability     = 0x00080000,
-        LogicalCoordinateSpaceCapability    = 0x00020000,
-        ViewportCoordinateSpaceCapability   = 0x00040000,
+        FlipPtzCapability                   = 0x00400000,
+        LimitsPtzCapability                 = 0x00800000,
 
-        PtzPresetCapability                 = 0x00100000,
-        PtzTourCapability                   = 0x00200000,
+        DevicePositioningPtzCapability      = 0x00080000,
+        LogicalPositioningPtzCapability     = 0x00020000,
+        ViewportPositioningPtzCapability    = 0x00040000,
+
+        PresetsPtzCapability                = 0x00100000,
+        ToursPtzCapability                  = 0x00200000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,

@@ -18,7 +18,7 @@ public:
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) override;
 
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(QnPtzLimits *limits) override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
     virtual bool createPreset(const QnPtzPreset &preset, QString *presetId) override;

@@ -20,7 +20,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_resource(resource),
     m_capabilities(0)
 {
-    m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DeviceCoordinateSpaceCapability;
+    m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability;
     m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
 
     QAuthenticator auth(m_resource->getAuth());
@@ -71,6 +71,13 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
     }
 
+    /* Sane onvif default. */
+    m_limits.minPan = -1.0;
+    m_limits.maxPan = 1.0;
+    m_limits.minTilt = -1.0;
+    m_limits.maxTilt = 1.0;
+    m_limits.minFov = 0.0;
+    m_limits.maxFov = 1.0;
 
     // TODO: #Elric make configurable
 #if 0
@@ -243,17 +250,16 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
     return true;
 }
 
-bool QnOnvifPtzController::getLimits(QnPtzLimits *) {
-    return false;
+bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+    if(space != Qn::DeviceCoordinateSpace)
+        return false;
+
+    *limits = m_limits;
+    return true;
 }
 
 bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
     return false; // TODO: #PTZ #Elric
 }
-
-bool QnOnvifPtzController::viewportMove(qreal, const QRectF &) {
-    return false;
-}
-
 
 #endif //ENABLE_ONVIF

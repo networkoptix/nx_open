@@ -18,11 +18,12 @@ public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
+    
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
-    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) override;
+    
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(QnPtzLimits *limits) override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
 private:
@@ -39,6 +40,8 @@ private:
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
     QPair<qreal, qreal> m_yNativeVelocityCoeff;
     QPair<qreal, qreal> m_zoomNativeVelocityCoeff;
+
+    QnPtzLimits m_limits;
 };
 
 #endif //ENABLE_ONVIF

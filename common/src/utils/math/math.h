@@ -169,14 +169,6 @@ inline double qMod(double l, double r) {
     return result;
 }
 
-inline double qMod(double l, float r) {
-    return qMod(l, static_cast<double>(r));
-}
-
-inline double qMod(float l, double r) {
-    return qMod(static_cast<double>(l), r);
-}
-
 
 /**
  * \param value                         Value to round up.
@@ -258,5 +250,32 @@ inline int qIntegerLog2(quint32 value) {
     return result;
 }
 #endif
+
+/* Overloads for double-float interop. */
+
+inline double qMod(double l, float r) {
+    return qMod(l, static_cast<double>(r));
+}
+
+inline double qMod(float l, double r) {
+    return qMod(static_cast<double>(l), r);
+}
+
+inline double qMin(double l, float r) {
+    return qMin(l, static_cast<double>(r));
+}
+
+inline double qMin(float l, double r) {
+    return qMin(static_cast<double>(l), r);
+}
+
+inline double qMax(double l, float r) {
+    return qMax(l, static_cast<double>(r));
+}
+
+inline double qMax(float l, double r) {
+    return qMax(static_cast<double>(l), r);
+}
+
 
 #endif // QN_MATH_H
