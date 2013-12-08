@@ -31,21 +31,23 @@ public:
     void tick();
 
     const DewarpingParams &dewarpingParams() const;
-    void setDewarpingParams(const DewarpingParams &dewarpingParams);
+    //void setDewarpingParams(const DewarpingParams &dewarpingParams);
 
     ///virtual void changePanoMode() override;
     ///virtual QString getPanoModeText() const override;
 
-signals:
+//signals:
     //void dewarpingParamsChanged();
-    void spaceMapperChanged();
+    //void spaceMapperChanged();
 
 private:
     QVector3D boundedPosition(const QVector3D &position);
     void updateLimits();
+    void updateCapabilities();
 
 private slots:
     void at_widget_aspectRatioChanged();
+    void at_widget_dewarpingParamsChanged();
 
 private:
     enum Animation {
@@ -57,6 +59,7 @@ private:
     QnMediaResourcePtr m_resource;
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
+    Qn::PtzCapabilities m_capabilities;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;

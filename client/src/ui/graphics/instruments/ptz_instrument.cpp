@@ -8,7 +8,7 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QApplication>
 
-#include <utils/common/emitter.h>
+#include <utils/common/executor.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/fuzzy.h>
@@ -742,7 +742,13 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
-            data.capabilitiesConnection = QObject::connect(widget->ptzController().data(), &QnAbstractPtzController::capabilitiesChanged, [=] { this->updateCapabilities(widget); });
+            // TODO: #5.2 remove executor, use context in QObject::connect
+            data.capabilitiesConnection = QObject::connect(
+                widget->ptzController().data(), 
+                &QnAbstractPtzController::capabilitiesChanged, 
+                newExecutor([=] { this->updateCapabilities(widget); }, widget),
+                &QnExecutor::execute
+            );
 
             updateCapabilities(widget);
             updateOverlayWidget(widget);

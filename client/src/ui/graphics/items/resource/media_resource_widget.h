@@ -102,6 +102,9 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
+    DewarpingParams dewarpingParams() const;
+    void setDewarpingParams(const DewarpingParams &dewarpingParams);
+
     /**
      * This function returns a PTZ controller associated with this widget.
      * Note that this function never returns NULL. Also note that several
@@ -114,6 +117,7 @@ public:
 signals:
     void motionSelectionChanged();
     void displayChanged();
+    void dewarpingParamsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -160,9 +164,8 @@ private slots:
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
-    void at_dewarpingParamsChanged(DewarpingParams params);
-    void updateFisheyeController();
     void at_zoomRectChanged();
+    void updateFisheyeController();
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);

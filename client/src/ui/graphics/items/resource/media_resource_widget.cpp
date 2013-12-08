@@ -81,7 +81,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
-    connect(resource()->toResource(),      SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)),       this,   SLOT(updateButtonsVisibility()));
     updateDisplay();
 
     /* Set up static text. */
@@ -96,6 +95,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     } else {
         m_ptzController.reset(new QnFisheyePtzController(this));
     }
+    connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
 
     /* Set up info updates. */
     connect(this, SIGNAL(updateInfoTextLater()), this, SLOT(updateInfoText()), Qt::QueuedConnection);
@@ -167,7 +167,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),            this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
         connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &)),this,   SLOT(updateButtonsVisibility()));
         timer->start(1000 * 60); /* Update icon button every minute. */
 
         connect(statusOverlayWidget(), SIGNAL(diagnosticsRequested()),                                  this,   SLOT(at_statusOverlayWidget_diagnosticsRequested()));
@@ -175,6 +174,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     }
 
     connect(resource()->toResource(), SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateButtonsVisibility()));
+
     connect(this, SIGNAL(zoomRectChanged()), this, SLOT(at_zoomRectChanged()));
     connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayingChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayingChanged(QnResourceWidget *)));
 
@@ -227,12 +227,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
         qFreeAligned(data);
     m_binaryMotionMask.clear();
 
-}
-
-void QnMediaResourceWidget::at_dewarpingParamsChanged(DewarpingParams params)
-{
-    item()->setDewarpingParams(params);
-    item()->setData(Qn::ItemFlipRole, params.enabled && params.viewMode == DewarpingParams::VerticalDown);
 }
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
@@ -454,11 +448,12 @@ void QnMediaResourceWidget::updateDisplay() {
     QnMediaResourceWidget *zoomTargetWidget = dynamic_cast<QnMediaResourceWidget *>(this->zoomTargetWidget());
 
     QnResourceDisplayPtr display;
-    if (zoomTargetWidget /* && syncPlayEnabled() */) {
+    if (zoomTargetWidget) {
         display = zoomTargetWidget->display();
     } else {
         display = QnResourceDisplayPtr(new QnResourceDisplay(m_resource->toResourcePtr(), this));
     }
+
     setDisplay(display);
 }
 
@@ -500,6 +495,18 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
     buttonBar()->button(EnhancementButton)->setChecked(imageEnhancement.enabled);
     item()->setImageEnhancement(imageEnhancement);
     m_renderer->setImageCorrection(imageEnhancement);
+}
+
+DewarpingParams QnMediaResourceWidget::dewarpingParams() const {
+    return item()->dewarpingParams();
+}
+
+void QnMediaResourceWidget::setDewarpingParams(const DewarpingParams &dewarpingParams) {
+    buttonBar()->button(FishEyeButton)->setChecked(dewarpingParams.enabled);
+    item()->setDewarpingParams(dewarpingParams);
+    item()->setData(Qn::ItemFlipRole, dewarpingParams.enabled && dewarpingParams.viewMode == DewarpingParams::VerticalDown);
+
+    emit dewarpingParamsChanged();
 }
 
 
@@ -964,11 +971,9 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
     
-    //DewarpingParams params = item()->dewarpingParams();
-    //params.enabled = checked;
-    //item()->setDevorpingParams(params);
-    //if(m_fisheyePtz)
-        //m_fisheyePtz->setEnabled(checked);*/
+    DewarpingParams params = dewarpingParams();
+    params.enabled = checked;
+    setDewarpingParams(params);
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {

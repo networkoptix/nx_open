@@ -27,6 +27,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_timer.start();
 
     connect(m_widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_widget_aspectRatioChanged()));
+    connect(m_widget, SIGNAL(dewarpingParamsChanged()), this, SLOT(at_widget_dewarpingParamsChanged()));
 
     updateLimits();
 }
@@ -43,11 +44,11 @@ const DewarpingParams &QnFisheyePtzController::dewarpingParams() const {
     return m_dewarpingParams;
 }
 
-void QnFisheyePtzController::setDewarpingParams(const DewarpingParams &dewarpingParams) {
+/*void QnFisheyePtzController::setDewarpingParams(const DewarpingParams &dewarpingParams) {
     m_dewarpingParams = dewarpingParams;
 
     updateLimits();
-}
+}*/
 
 void QnFisheyePtzController::updateLimits() {
     m_limits.minFov = 20.0;
@@ -211,11 +212,27 @@ QString QnFisheyePtzController::getPanoModeText() const {
 }*/
 #endif
 
+void QnFisheyePtzController::updateCapabilities() {
+    Qn::PtzCapabilities capabilities;
+    if(m_dewarpingParams.enabled) {
+        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability;
+    } else {
+        capabilities = Qn::NoPtzCapabilities;
+    }
+
+    if(capabilities == m_capabilities)
+        return;
+
+    m_capabilities = capabilities;
+    emit capabilitiesChanged();
+}
+
+
 // -------------------------------------------------------------------------- //
 // QnAbstractPtzController implementation
 // -------------------------------------------------------------------------- //
 Qn::PtzCapabilities QnFisheyePtzController::getCapabilities() {
-    return Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability;
+    return m_capabilities;
 }
 
 bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
@@ -285,3 +302,13 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 void QnFisheyePtzController::at_widget_aspectRatioChanged() {
     m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
 }
+
+void QnFisheyePtzController::at_widget_dewarpingParamsChanged() {
+    m_dewarpingParams = m_widget->dewarpingParams();
+
+    updateLimits();
+    updateCapabilities();
+}
+
+
+
