@@ -14,20 +14,18 @@
 
 /**
  * A thread-safe interface for accessing camera's PTZ functions.
- * 
- * Note that standard PTZ space refers to degrees for pan, tilt and fov.
  */
 class QnAbstractPtzController: public QObject {
     Q_OBJECT
 public:
     /**
-     * \param resource                  Resource that this ptz controller belongs to.
+     * \param resource                  Resource that this PTZ controller belongs to.
      */
     QnAbstractPtzController(const QnResourcePtr &resource);
     virtual ~QnAbstractPtzController();
 
     /**
-     * \returns                         Resource that this ptz controller belongs to.
+     * \returns                         Resource that this PTZ controller belongs to.
      */
     const QnResourcePtr &resource() const { return m_resource; }
 
@@ -48,21 +46,24 @@ public:
      * This means that implementation must handle flipped / mirrored state of 
      * the video stream. 
      * 
+     * This function is expected to be implemented if this controller has
+     * at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
+     * 
      * \param speed                     Movement speed. 
      * \returns                         Whether the operation was successful.
      */
     virtual bool continuousMove(const QVector3D &speed) = 0;
 
     /**
-     * Sets camera PTZ position in the given coordinate space.
+     * Sets camera PTZ position in the given coordinate space. 
      * 
-     * If this camera has <tt>Qn::DevicePositioningPtzCapability</tt>, then
-     * device-specific coordinate space must be supported. Note that for
-     * this coordinate space only positions returned from a call to 
-     * <tt>getPosition</tt> can be safely used with this function.
+     * Note that for the function to succeed, this controller must have a 
+     * capability corresponding to the provided coordinate space, 
+     * that is <tt>Qn::DevicePositioningPtzCapability</tt> or 
+     * <tt>Qn::LogicalPositioningPtzCapability</tt>.
      * 
-     * If this camera has <tt>Qn::LogicalPositioningPtzCapability</tt>,
-     * then logical coordinate space must be supported.
+     * This function is expected to be implemented if this controller has
+     * at least one of the <tt>Qn::AbsolutePtzCapabilities</tt>.
      *
      * \param space                     Coordinate space of the provided position.
      * \param position                  Position to move to.
@@ -86,6 +87,9 @@ public:
 
     /**
      * Gets PTZ position from camera in the given coordinate space.
+     *
+     * This function is expected to be implemented if this controller has
+     * at least one of the <tt>Qn::AbsolutePtzCapabilities</tt>.
      *
      * \param space                     Coordinate space to get position in.
      * \param[out] position             Current ptz position. 
@@ -127,7 +131,7 @@ public:
      * <tt>QUuid::createUuid().toString()</tt>.
      * 
      * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::PtzPresetCapability<tt>.
+     * <tt>Qn::PresetsPtzCapability<tt>.
      *
      * \param preset                    Preset to create.
      * \returns                         Whether the operation was successful.
@@ -136,8 +140,10 @@ public:
 
     /**
      * Updates the given preset without changing its associated position.
-     *
      * Currently this function can only be used to change preset name.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::PresetsPtzCapability<tt>.
      * 
      * \param preset                    Preset to update.
      * \returns                         Whether the operation was successful.
@@ -148,7 +154,7 @@ public:
      * Removes the given preset.
      *
      * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::PtzPresetCapability<tt>.
+     * <tt>Qn::PresetsPtzCapability<tt>.
      * 
      * \param presetId                  Id of the preset to remove.
      * \returns                         Whether the operation was successful.
@@ -159,7 +165,7 @@ public:
      * Activates the given preset.
      *
      * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::PtzPresetCapability<tt>.
+     * <tt>Qn::PresetsPtzCapability<tt>.
      * 
      * \param presetId                  Id of the preset to activate.
      * \returns                         Whether the operation was successful.
@@ -170,25 +176,72 @@ public:
      * Gets a list of all PTZ presets for the camera.
      *
      * This function is expected to be implemented only if this controller has 
-     * <tt>Qn::PtzPresetCapability<tt>.
+     * <tt>Qn::PresetsPtzCapability<tt>.
      * 
      * \param[out] presets              PTZ presets.
      * \returns                         Whether the operation was successful.
      */
     virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
+    /**
+     * Saves the given tour either as a new one, or replacing an existing one. 
+     * Note that id of the provided preset must be set. 
+     * 
+     * If you want to create a new preset, a good idea would be to set its id to 
+     * <tt>QUuid::createUuid().toString()</tt>.
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::ToursPtzCapability<tt>.
+     *
+     * \param tour                      Tour to create.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool createTour(const QnPtzTour &tour) = 0;
+    
+    /**
+     * Removes the given tour.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::ToursPtzCapability<tt>.
+     * 
+     * \param tourId                    Id of the tour to remove.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool removeTour(const QString &tourId) = 0;
+    
+    /**
+     * Activates the given tour.
+     * 
+     * Note that after the tour has been started, any movement command issued 
+     * to the controller will stop that tour.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::ToursPtzCapability<tt>.
+     * 
+     * \param tourId                    Id of the tour to activate.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool activateTour(const QString &tourId) = 0;
+
+    /**
+     * Gets a list of all PTZ tours for the camera.
+     *
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::ToursPtzCapability<tt>.
+     * 
+     * \param[out] tours                PTZ tours.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
     /**
      * Synchronizes this controller's internal caches with the actual target values.
      * 
-     * Note that this is the only function that cannot implemented in a sane way if 
-     * this controller has a <tt>Qn::NonBlockingPtzCapability</tt>. This is why
-     * for non-blocking controllers a <tt>synchronized(Qn::PtzDataFields)</tt> 
-     * signal is provided.
+     * Note that this is the only function that cannot be implemented in a sane 
+     * way if this controller has a <tt>Qn::NonBlockingPtzCapability</tt>. 
+     * This is why for non-blocking controllers a <tt>synchronized(Qn::PtzDataFields)</tt> 
+     * signal is provided that will be emitted at the end of synchronization 
+     * operation.
      * 
      * \param fields                    Data fields to synchronize.
      */
