@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <api/model/kvpair.h>
+
 #include <core/kvpair/abstract_kvpair_watcher.h>
 
 #include <utils/common/instance_storage.h>
@@ -14,11 +16,13 @@ public:
     explicit QnKvPairWatcherPool(QObject *parent = 0);
     virtual ~QnKvPairWatcherPool();
 
-    void registerWatcher(const QString &key, QnAbstractKvPairWatcher *watcher);
+    void registerWatcher(QnAbstractKvPairWatcher *watcher);
 
 private slots:
+    void at_watcher_valueModified(int resourceId, const QString &value);
     void at_kvPair_changed(int resourceId, const QString &key, const QString &value);
 
+    void at_connection_replyReceived(int status, const QnKvPairs &kvPairs, int handle);
 private:
     QHash<QString, QnAbstractKvPairWatcher*> m_watchersByKey;
 };

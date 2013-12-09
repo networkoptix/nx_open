@@ -14,7 +14,7 @@ QnPtzHotkeyKvPairWatcher::QnPtzHotkeyKvPairWatcher(QObject *parent) :
 QnPtzHotkeyKvPairWatcher::~QnPtzHotkeyKvPairWatcher() {
 }
 
-QString QnPtzHotkeyKvPairWatcher::key() {
+QString QnPtzHotkeyKvPairWatcher::key() const {
     return QLatin1String("ptz_hotkeys");
 }
 
@@ -36,7 +36,7 @@ QnHotkeysHash QnPtzHotkeyKvPairWatcher::allHotkeysByResourceId(int resourceId) c
 
 void QnPtzHotkeyKvPairWatcher::updateHotkeys(int resourceId, const QnHotkeysHash &hotkeys) {
     m_hotkeysByResourceId[resourceId] = hotkeys;
-    //TODO: #GDM submit to EC
+    submitValue(resourceId, QString::fromUtf8(QJson::serialized(hotkeys)));
 }
 
 void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value) {
@@ -44,14 +44,10 @@ void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value)
     if(value.isEmpty()) {
         m_hotkeysByResourceId.remove(resourceId);
     } else {
-        QList<PtzPresetHotkey> hotkeys;
-        if (!QJson::deserialize<QList<PtzPresetHotkey> >(value.toUtf8(), &hotkeys))
+        QnHotkeysHash hotkeys;
+        if (!QJson::deserialize<QnHotkeysHash >(value.toUtf8(), &hotkeys))
             return;
-
-        QnHotkeysHash hash;
-        foreach(PtzPresetHotkey hotkey, hotkeys)
-            hash[hotkey.id] = hotkey.hotkey;
-        m_hotkeysByResourceId[resourceId] = hash;
+        m_hotkeysByResourceId[resourceId] = hotkeys;
     }
 }
 

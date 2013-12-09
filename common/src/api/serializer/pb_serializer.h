@@ -39,7 +39,7 @@ public:
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
     void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) override;
     void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data);
-    void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data);
+    void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data);
     void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data);
 
 private:

@@ -17,7 +17,7 @@ public:
     explicit QnPtzHotkeyKvPairWatcher(QObject *parent = 0);
     virtual ~QnPtzHotkeyKvPairWatcher();
 
-    static QString key();
+    virtual QString key() const override;
 
     /**
      * @brief presetByHotkey

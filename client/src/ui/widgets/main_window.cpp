@@ -193,7 +193,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     QnKvPairWatcherPool* kvPairWatchers = context->instance<QnKvPairWatcherPool>();
-    kvPairWatchers->registerWatcher(QnPtzHotkeyKvPairWatcher::key(), context->instance<QnPtzHotkeyKvPairWatcher>());
+    kvPairWatchers->registerWatcher(context->instance<QnPtzHotkeyKvPairWatcher>());
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));
