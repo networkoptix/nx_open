@@ -183,14 +183,14 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
 {
     uint64_t* curPtr = (uint64_t*) data;
     curPtr += maskStart*2;
-    uint64_t* maskHi = (uint64_t*) mask; 
-    uint64_t* maskLo = maskHi + 1; 
+    uint64_t* maskPtr = (uint64_t*) mask; 
+    maskPtr += maskStart*2;
 
     for (int i = maskStart; i <= maskEnd; ++i)
     {
-        if (*curPtr++ & *maskHi)
+        if (*curPtr++ & *maskPtr++)
             return true;
-        if (*curPtr++ & *maskLo)
+        if (*curPtr++ & *maskPtr++)
             return true;
     }
     return false;
