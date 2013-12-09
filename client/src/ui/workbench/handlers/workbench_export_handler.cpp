@@ -49,16 +49,17 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnTimestampsCheckboxControlDelegate
 // -------------------------------------------------------------------------- //
-class QnTimestampsCheckboxControlDelegate: public QnCheckboxControlAbstractDelegate {
+class QnTimestampsCheckboxControlDelegate: public QnWidgetControlAbstractDelegate {
 public:
     QnTimestampsCheckboxControlDelegate(const QString &target, QObject *parent = NULL):
-        QnCheckboxControlAbstractDelegate(parent),
+        QnWidgetControlAbstractDelegate(parent),
         m_target(target){ }
 
     ~QnTimestampsCheckboxControlDelegate() {}
 
     void at_filterSelected(const QString &value) override {
-        checkbox()->setEnabled(value != m_target);
+        foreach(QWidget* widget, widgets())
+            widget->setEnabled(value != m_target);
     }
 private:
     QString m_target;
@@ -218,7 +219,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        QnCheckboxControlAbstractDelegate* delegate = NULL;
+        QnWidgetControlAbstractDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
@@ -229,8 +230,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         comboBox->addItem(tr("Bottom left corner (required transcoding)"), Qn::BottomLeftCorner);
         comboBox->addItem(tr("Bottom right corner (required transcoding)"), Qn::BottomRightCorner);
 
-        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()));
-        dialog->addWidget(comboBox, false);
+        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()), true, delegate);
+        dialog->addWidget(comboBox, false, delegate);
 
 
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
