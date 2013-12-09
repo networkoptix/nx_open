@@ -22,23 +22,13 @@ struct QnPtzPresetData {
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetData, (position)(space))
 
 struct QnPtzPresetRecord {
+    QnPtzPresetRecord() {}
+    QnPtzPresetRecord(const QnPtzPreset &preset, const QnPtzPresetData &data): preset(preset), data(data) {}
+
     QnPtzPreset preset;
     QnPtzPresetData data;
 };
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetRecord, (preset)(data))
-
-class QnPtzPresetRecordList: public QList<QnPtzPresetRecord> {
-    typedef QList<QnPtzPresetRecord> base_type;
-public:
-
-    using base_type::indexOf;
-    int indexOf(const QString &id) {
-        for(int i = 0; i < size(); i++)
-            if(this->operator[](i).preset.id == id)
-                return i;
-        return -1;
-    }
-};
 
 
 // -------------------------------------------------------------------------- //
@@ -55,9 +45,8 @@ public:
         if(helper->value().isEmpty()) {
             records.clear();
         } else {
-            QJson::deserialize<QnPtzPresetRecordList>(helper->value().toUtf8(), &records);
+            QJson::deserialize(helper->value().toUtf8(), &records);
         }
-
     }
 
     void saveRecords() {
@@ -65,8 +54,8 @@ public:
     }
 
     QMutex mutex;
-    QnPtzPresetRecordList records;
     QnStringKvPairUsageHelper *helper;
+    QHash<QString, QnPtzPresetRecord> records;
 };
 
 
@@ -79,7 +68,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
 {
     // TODO: don't use usage helper, use sync api?
 
-    d->helper = new QnStringKvPairUsageHelper(baseController->resource(), lit(""), QString(), this);
+    d->helper = new QnStringKvPairUsageHelper(resource(), lit("ptzPresets"), QString(), this);
 }
 
 QnPresetPtzController::~QnPresetPtzController() {
@@ -94,6 +83,7 @@ bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
+    /* Note that this controller preserves the Qn::NonBlockingPtzCapability. */
     return base_type::getCapabilities() | Qn::PresetsPtzCapability;
 }
 
@@ -108,17 +98,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
 
     QMutexLocker locker(&d->mutex);
     d->loadRecords();
-
-    int index = d->records.indexOf(preset.id);
-    if(index == -1) {
-        d->records.push_back(QnPtzPresetRecord());
-        index = d->records.size() - 1;
-    }
-    QnPtzPresetRecord &record = d->records[index];
-
-    record.preset = preset;
-    record.data = data;
-
+    d->records->insert(QnPtzPresetRecord(preset, data));
     d->saveRecords();
     return true;
 }
@@ -128,14 +108,12 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
 
     d->loadRecords();
 
-    int index = d->records.indexOf(preset.id);
-    if(index == -1)
+    if(!d->records.contains(preset.id))
         return false;
 
-    QnPtzPresetRecord &record = d->records[index];
+    QnPtzPresetRecord &record = d->records[preset.id];
     if(record.preset == preset)
         return true; /* No need to save it. */
-
     record.preset = preset;
 
     d->saveRecords();
@@ -146,12 +124,8 @@ bool QnPresetPtzController::removePreset(const QString &presetId) {
     QMutexLocker locker(&d->mutex);
 
     d->loadRecords();
-
-    int index = d->records.indexOf(presetId);
-    if(index == -1)
+    if(d->records.remove(presetId) == 0)
         return false;
-    d->records.removeAt(index);
-
     d->saveRecords();
     return true;
 }
@@ -162,10 +136,9 @@ bool QnPresetPtzController::activatePreset(const QString &presetId) {
         QMutexLocker locker(&d->mutex);
         d->loadRecords();
 
-        int index = d->records.indexOf(presetId);
-        if(index == -1)
+        if(!d->records.contains(presetId))
             return false;
-        data = d->records[index].data;
+        data = d->records[presetId].data;
     }
 
     if(!absoluteMove(data.space, data.position))    
@@ -178,7 +151,6 @@ bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
     QMutexLocker locker(&d->mutex);
 
     d->loadRecords();
-
     presets->clear();
     foreach(const QnPtzPresetRecord &record, d->records)
         presets->push_back(record.preset);

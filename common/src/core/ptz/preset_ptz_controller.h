@@ -3,8 +3,6 @@
 
 #include "proxy_ptz_controller.h"
 
-class QnStringKvPairUsageHelper;
-class QnPtzPresetRecordList;
 class QnPresetPtzControllerPrivate;
 
 class QnPresetPtzController: public QnProxyPtzController {
