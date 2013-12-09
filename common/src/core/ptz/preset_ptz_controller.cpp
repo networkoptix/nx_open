@@ -98,7 +98,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
 
     QMutexLocker locker(&d->mutex);
     d->loadRecords();
-    d->records->insert(QnPtzPresetRecord(preset, data));
+    d->records.insert(preset.id, QnPtzPresetRecord(preset, data));
     d->saveRecords();
     return true;
 }

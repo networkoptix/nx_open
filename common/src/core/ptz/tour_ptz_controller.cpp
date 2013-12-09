@@ -67,6 +67,9 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     if(tour.id.isEmpty())
         return false;
 
+    if(tour.spots.size() < 2)
+        return false;
+
     /* We need to check validity of the tour first. */
     QnPtzPresetList presets;
     if(!getPresets(&presets))

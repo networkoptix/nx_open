@@ -34,7 +34,7 @@ int qnIndexOf(const List &list, int from, const Pred &pred) {
     if(from < 0)
         from = qMax(from + list.size(), 0);
     if(from < list.size()) {
-        for(auto pos = list.begin(), end = pos.end(); pos != end; pos++)
+        for(auto pos = list.begin(), end = list.end(); pos != end; pos++)
             if(pred(*pos))
                 return pos - list.begin();
     }
