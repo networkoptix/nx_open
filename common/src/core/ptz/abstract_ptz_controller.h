@@ -187,7 +187,8 @@ public:
      * 
      * Note that this is the only function that cannot implemented in a sane way if 
      * this controller has a <tt>Qn::NonBlockingPtzCapability</tt>. This is why
-     * for non-blocking controllers a <tt>synchronized()</tt> signal is provided.
+     * for non-blocking controllers a <tt>synchronized(Qn::PtzDataFields)</tt> 
+     * signal is provided.
      * 
      * \param fields                    Data fields to synchronize.
      */
