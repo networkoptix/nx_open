@@ -25,6 +25,8 @@
 
 #include <client/client_connection_data.h>
 
+#include <core/kvpair/kvpair_watcher_pool.h>
+#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
@@ -2339,81 +2341,83 @@ void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
-    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(menu()->currentParameters(sender()).widget());
-    if(!camera || !widget)
+    QnMediaResourceWidget* widget = menu()->currentParameters(sender()).mediaWidget();
+    if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
-    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+    if(widget->camera()->getStatus() == QnResource::Offline || widget->camera()->getStatus() == QnResource::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
+            tr("An error has occurred while trying to get current position from camera %1.\n\n"\
+               "Please wait for the camera to go online.").arg(widget->camera()->getName())
         );
         return;
     }
 
+    QnPtzPresetList existing;
+    int n = widget->ptzController()->getPresets(&existing)
+            ? existing.size() + 1
+            : 1;
+
+    QnHotkeysHash hotkeys = context()
+            ->instance<QnKvPairWatcherPool>()
+            ->instance<QnPtzHotkeyKvPairWatcher>()
+            ->allHotkeysByResourceId(widget->camera()->getId());
+
+    QList<int> forbiddenHotkeys;
+    foreach(int hotkey, hotkeys)
+        forbiddenHotkeys.push_back(hotkey);
+
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    dialog->setForbiddenHotkeys(forbiddenHotkeys);
+    dialog->setName(tr("Saved Position %1").arg(n));
+    dialog->setWindowTitle(tr("Save Position"));
+    if(dialog->exec() != QDialog::Accepted)
+        return;
+
+    if (!widget->ptzController()->createPreset(QnPtzPreset(QUuid::createUuid().toString(), dialog->name())))
+        return;
+
+    //TODO: #GDM save hotkey
+
 #if 0
-    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(widget);
-    if(qIsNaN(position)) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not get position from camera"),
             tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
         );
-        return;
-    }
-
-    QList<int> forbiddenHotkeys;
-    foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera))
-        forbiddenHotkeys.push_back(preset.hotkey);
-
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
-    dialog->setForbiddenHotkeys(forbiddenHotkeys);
-    dialog->setPreset(QnPtzPreset(-1, QString(), position));
-    dialog->setWindowTitle(tr("Save Position"));
-    if(dialog->exec() != QDialog::Accepted)
-        return;
-
-    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, dialog->preset());
 #endif
 }
 
 void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *widget = parameters.mediaWidget();
 
-    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
-    
-    QList<QnResourceWidget *> widgets = display()->widgets(camera);
-    if(widgets.empty())
-        return;
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
-    if(!widget)
+    if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
-    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
-    if(name.isEmpty())
+    QString id = parameters.argument<QString>(Qn::PtzPresetIdRole).trimmed();
+    if(id.isEmpty())
         return;
 
-    /*QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
-    if(preset.isNull())
-        return;
+    qDebug() << "goToPreset activated" << widget->camera()->getId() << id;
 
-    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not set position from camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
-        );
-        return;
-    }*/
-
-#if 0
-    action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
-    context()->instance<QnWorkbenchPtzController>()->setPosition(widget, preset.logicalPosition);
-#endif
+    if (widget->ptzController()->activatePreset(id)) {
+        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
+    } else {
+        if(widget->camera()->getStatus() == QnResource::Offline ||
+                widget->camera()->getStatus() == QnResource::Unauthorized) {
+            QMessageBox::critical(
+                mainWindow(),
+                tr("Could not set position from camera"),
+                tr("An error has occurred while trying to set current position for camera %1.\n\n"\
+                   "Please wait for the camera to go online.").arg(widget->camera()->getName())
+            );
+            return;
+        }
+        //TODO: #GDM check other cases
+    }
 }
 
 void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {

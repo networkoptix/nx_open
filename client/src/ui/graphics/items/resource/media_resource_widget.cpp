@@ -233,6 +233,10 @@ QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
 }
 
+QnVirtualCameraResourcePtr QnMediaResourceWidget::camera() const {
+    return m_camera;
+}
+
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
     QPointF gridPosF(cwiseDiv(itemPos, cwiseDiv(size(), motionGridSize())));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));

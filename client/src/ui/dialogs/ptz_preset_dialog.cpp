@@ -26,18 +26,24 @@ QnPtzPresetDialog::~QnPtzPresetDialog() {
     return;
 }
 
-/*QnPtzPreset QnPtzPresetDialog::preset() const {
-    QnPtzPreset result = m_preset;
-    result.name = ui->nameEdit->text();
-    result.hotkey = currentHotkey();
-    return result;
+QString QnPtzPresetDialog::name() const {
+    return ui->nameEdit->text();
 }
 
-void QnPtzPresetDialog::setPreset(const QnPtzPreset &preset) {
-    m_preset = preset;
-    ui->nameEdit->setText(preset.name);
-    setCurrentHotkey(preset.hotkey);
-}*/
+void QnPtzPresetDialog::setName(const QString &name) {
+    ui->nameEdit->setText(name);
+}
+
+int QnPtzPresetDialog::hotkey() const {
+    return qvariant_cast<int>(ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()), -1);
+}
+
+void QnPtzPresetDialog::setHotkey(int hotkey) {
+    int index = ui->hotkeyComboBox->findData(hotkey);
+    if(index < 0)
+        index = ui->hotkeyComboBox->findData(-1);
+    ui->hotkeyComboBox->setCurrentIndex(index);
+}
 
 const QList<int> &QnPtzPresetDialog::forbiddenHotkeys() const {
     return m_forbiddenHotkeys;
@@ -65,25 +71,14 @@ void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, 
     if(!haveHotkeys)
         return;
 
-    int currentHotkey = this->currentHotkey();
+    int currentHotkey = this->hotkey();
 
     ui->hotkeyComboBox->clear();
     ui->hotkeyComboBox->addItem(tr("None"), -1);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
 
-    setCurrentHotkey(currentHotkey);
-}
-
-int QnPtzPresetDialog::currentHotkey() const {
-    return qvariant_cast<int>(ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()), -1);
-}
-
-void QnPtzPresetDialog::setCurrentHotkey(int hotkey) {
-    int index = ui->hotkeyComboBox->findData(hotkey);
-    if(index < 0)
-        index = ui->hotkeyComboBox->findData(-1);
-    ui->hotkeyComboBox->setCurrentIndex(index);
+    setHotkey(currentHotkey);
 }
 
 void QnPtzPresetDialog::updateOkButtonEnabled() {
