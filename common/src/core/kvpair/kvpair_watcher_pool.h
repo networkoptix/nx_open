@@ -14,6 +14,8 @@ public:
     explicit QnKvPairWatcherPool(QObject *parent = 0);
     virtual ~QnKvPairWatcherPool();
 
+    void registerWatcher(const QString &key, QnAbstractKvPairWatcher *watcher);
+
 private slots:
     void at_kvPair_changed(int resourceId, const QString &key, const QString &value);
 

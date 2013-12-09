@@ -2,12 +2,9 @@
 
 #include <QtCore/QList>
 
-namespace {
-    static const int noHotkey = -1;
-}
+#include <core/ptz/ptz_hotkey.h>
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzHotkeyKvPairWatcher::PresetHotkey, (id)(hotkey), static)
-
+#include <utils/common/json.h>
 
 QnPtzHotkeyKvPairWatcher::QnPtzHotkeyKvPairWatcher(QObject *parent) :
     base_type(parent)
@@ -15,6 +12,10 @@ QnPtzHotkeyKvPairWatcher::QnPtzHotkeyKvPairWatcher(QObject *parent) :
 }
 
 QnPtzHotkeyKvPairWatcher::~QnPtzHotkeyKvPairWatcher() {
+}
+
+QString QnPtzHotkeyKvPairWatcher::key() {
+    return QLatin1String("ptz_hotkeys");
 }
 
 QString QnPtzHotkeyKvPairWatcher::presetIdByHotkey(int resourceId, int hotkey) const {
@@ -25,8 +26,8 @@ QString QnPtzHotkeyKvPairWatcher::presetIdByHotkey(int resourceId, int hotkey) c
 
 int QnPtzHotkeyKvPairWatcher::hotkeyByPresetId(int resourceId, const QString &presetId) const {
     if (!m_hotkeysByResourceId.contains(resourceId))
-        return noHotkey;
-    return m_hotkeysByResourceId[resourceId].value(presetId, noHotkey);
+        return Qn::NoHotkey;
+    return m_hotkeysByResourceId[resourceId].value(presetId, Qn::NoHotkey);
 }
 
 QnHotkeysHash QnPtzHotkeyKvPairWatcher::allHotkeysByResourceId(int resourceId) const {
@@ -43,12 +44,12 @@ void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value)
     if(value.isEmpty()) {
         m_hotkeysByResourceId.remove(resourceId);
     } else {
-        QList<PresetHotkey> hotkeys;
-        if (!QJson::deserialize<QList<PresetHotkey> >(value.toUtf8(), &hotkeys))
+        QList<PtzPresetHotkey> hotkeys;
+        if (!QJson::deserialize<QList<PtzPresetHotkey> >(value.toUtf8(), &hotkeys))
             return;
 
         QnHotkeysHash hash;
-        foreach(PresetHotkey hotkey, hotkeys)
+        foreach(PtzPresetHotkey hotkey, hotkeys)
             hash[hotkey.id] = hotkey.hotkey;
         m_hotkeysByResourceId[resourceId] = hash;
     }

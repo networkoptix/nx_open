@@ -25,7 +25,6 @@
 
 #include <client/client_connection_data.h>
 
-#include <core/kvpair/kvpair_watcher_pool.h>
 #include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
@@ -2361,7 +2360,6 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
             : 1;
 
     QnHotkeysHash hotkeys = context()
-            ->instance<QnKvPairWatcherPool>()
             ->instance<QnPtzHotkeyKvPairWatcher>()
             ->allHotkeysByResourceId(widget->camera()->getId());
 

@@ -6,9 +6,7 @@
 
 #include <core/kvpair/abstract_kvpair_watcher.h>
 
-#include <utils/common/json.h>
-
-typedef QHash<QString, int> QnHotkeysHash;
+#include <core/ptz/ptz_hotkey.h>
 
 class QnPtzHotkeyKvPairWatcher : public QnAbstractKvPairWatcher
 {
@@ -16,13 +14,10 @@ class QnPtzHotkeyKvPairWatcher : public QnAbstractKvPairWatcher
 
     typedef QnAbstractKvPairWatcher base_type;
 public:
-    struct PresetHotkey {
-        QString id;
-        int hotkey;
-    };
-
     explicit QnPtzHotkeyKvPairWatcher(QObject *parent = 0);
     virtual ~QnPtzHotkeyKvPairWatcher();
+
+    static QString key();
 
     /**
      * @brief presetByHotkey

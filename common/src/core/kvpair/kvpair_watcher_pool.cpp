@@ -1,16 +1,16 @@
 #include "kvpair_watcher_pool.h"
 
-#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
-
 QnKvPairWatcherPool::QnKvPairWatcherPool(QObject *parent) :
     QObject(parent)
 {
-    m_watchersByKey.insert(QLatin1String("ptz_hotkey"), instance<QnPtzHotkeyKvPairWatcher>());
-
 }
 
 QnKvPairWatcherPool::~QnKvPairWatcherPool() {
 
+}
+
+void QnKvPairWatcherPool::registerWatcher(const QString &key, QnAbstractKvPairWatcher *watcher) {
+    m_watchersByKey.insert(key, watcher);
 }
 
 void QnKvPairWatcherPool::at_kvPair_changed(int resourceId, const QString &key, const QString &value) {
