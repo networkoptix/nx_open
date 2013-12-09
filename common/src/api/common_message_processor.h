@@ -6,6 +6,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <api/message_source.h>
+#include <business/business_event_rule.h>
 
 #include <utils/common/singleton.h>
 
@@ -19,6 +20,18 @@ public:
     virtual void stop();
 
     virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT);
+
+signals:
+    void connectionReset();
+
+    void businessRuleChanged(const QnBusinessEventRulePtr &rule);
+    void businessRuleDeleted(int id);
+    void businessRuleReset(QnBusinessEventRuleList rules);
+
+    void businessActionReceived(const QnAbstractBusinessActionPtr& action);
+
+protected:
+    virtual void handleMessage(const QnMessage &message);
 
 protected:
     QSharedPointer<QnMessageSource> m_source;

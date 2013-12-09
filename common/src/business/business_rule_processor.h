@@ -117,9 +117,6 @@ public slots:
     static void init(QnBusinessRuleProcessor* instance);
     static void fini();
 
-    void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
-    void at_businessRuleDeleted(int id);
-    void at_businessRuleReset(QnBusinessEventRuleList rules);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
@@ -130,6 +127,10 @@ private slots:
     void at_sendEmailFinished(int status, bool result, int handle);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
+
+    void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
+    void at_businessRuleDeleted(int id);
+    void at_businessRuleReset(QnBusinessEventRuleList rules);
 
     void at_timer();
 

@@ -128,14 +128,12 @@ void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
+    base_type::handleMessage(message);
+
     switch(message.messageType) {
     case Qn::Message_Type_Initial:
         {
             QnAppServerConnectionFactory::setPublicIp(message.publicIp);
-            break;
-        }
-    case Qn::Message_Type_Ping:
-        {
             break;
         }
     case Qn::Message_Type_License:
@@ -188,26 +186,6 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             qnResPool->removeResource(ownResource);
             break;
         }
-    case Qn::Message_Type_BusinessRuleInsertOrUpdate:
-        {
-            emit businessRuleChanged(message.businessRule);
-            break;
-        }
-    case Qn::Message_Type_BusinessRuleReset:
-        {
-            emit businessRuleReset(message.businessRules);
-            break;
-        }
-    case Qn::Message_Type_BusinessRuleDelete:
-        {
-            emit businessRuleDeleted(message.resourceId.toInt());
-            break;
-        }
-    case Qn::Message_Type_BroadcastBusinessAction:
-        {
-            emit businessActionReceived(message.businessAction);
-            break;
-        }
     case Qn::Message_Type_FileAdd:
         {
             emit fileAdded(message.filename);
@@ -225,9 +203,9 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
         }
     case Qn::Message_Type_RuntimeInfoChange:
         break; //TODO: #ivigasin what means this message for the client?
+    default:
+        break;
     }
-    // default-case is not used for a reason
-
 }
 
 void QnClientMessageProcessor::at_connectionClosed(QString errorString)

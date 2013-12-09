@@ -3,7 +3,6 @@
 
 #include <QSharedPointer>
 
-#include "api/message_source.h"
 #include "api/app_server_connection.h"
 #include "core/resource/resource.h"
 
@@ -23,12 +22,6 @@ public:
 signals:
     void connectionOpened();
     void connectionClosed();
-
-    void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(int id);
-    void businessRuleReset(QnBusinessEventRuleList rules);
-
-    void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 
     void fileAdded(const QString &filename);
     void fileUpdated(const QString &filename);

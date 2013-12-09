@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 
 #include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
 
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
@@ -47,6 +48,13 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
     connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
+
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
+            this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(int)),
+            this, SLOT(at_businessRuleDeleted(int)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
+            this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()));
     m_timer.start(1000);

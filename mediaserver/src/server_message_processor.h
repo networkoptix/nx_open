@@ -17,17 +17,11 @@ public:
     virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT) override;
 signals:
     void connectionOpened();
-    void connectionReset();
-    void businessRuleChanged(QnBusinessEventRulePtr bEvent);
-    void businessRuleDeleted(int id);
-    void businessRuleReset(QnBusinessEventRuleList rules);
-    void businessActionReceived(QnAbstractBusinessActionPtr bAction);
 
 private slots:
     void at_messageReceived(QnMessage message);
     void at_connectionOpened(QnMessage message);
     void at_connectionClosed(QString errorString);
-    void at_connectionReset();
 
 private:
     bool m_tryDirectConnect;
