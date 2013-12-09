@@ -29,5 +29,22 @@ void qnRemoveValues(QHash<Key, T> &hash, const T &value) {
     }
 }
 
+template<class List, class Pred>
+int qnIndexOf(const List &list, int from, const Pred &pred) {
+    if(from < 0)
+        from = qMax(from + list.size(), 0);
+    if(from < list.size()) {
+        for(auto pos = list.begin(), end = pos.end(); pos != end; pos++)
+            if(pred(*pos))
+                return pos - list.begin();
+    }
+    return -1;
+}
+
+template<class List, class Pred>
+int qnIndexOf(const List &list, const Pred &pred) {
+    return qnIndexOf(list, 0, pred);
+}
+
 
 #endif // QN_CONTAINER
