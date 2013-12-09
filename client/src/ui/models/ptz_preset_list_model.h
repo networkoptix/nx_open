@@ -19,6 +19,9 @@ public:
     struct PresetHotkey {
         QString id;
         int hotkey;
+
+        PresetHotkey():hotkey(-1) {}
+        PresetHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
     };
 
     QnPtzPresetListModel(QObject *parent = NULL);
@@ -30,8 +33,8 @@ public:
     const QnPtzPresetList &presets() const;
     void setPresets(const QnPtzPresetList &presets);
 
-    QString serializedHotkeys() const;
-    Q_SLOT void setSerializedHotkeys(const QString &value);
+    QList<QnPtzPresetListModel::PresetHotkey> hotkeys() const;
+    Q_SLOT void setHotkeys(const QList<QnPtzPresetListModel::PresetHotkey> &value);
 
     int column(Column column) const;
     const QList<Column> &columns() const;

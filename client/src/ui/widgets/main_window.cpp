@@ -15,6 +15,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 
+#include <core/kvpair/kvpair_watcher_pool.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 
@@ -189,6 +190,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
+    context->instance<QnKvPairWatcherPool>();
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));

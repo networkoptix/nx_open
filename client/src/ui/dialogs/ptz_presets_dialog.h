@@ -12,7 +12,6 @@
 
 class QPushButton;
 class QnPtzPresetListModel;
-class QnStringKvPairUsageHelper;
 
 namespace Ui {
     class PtzPresetsDialog;
@@ -50,7 +49,6 @@ private:
     QPushButton *m_removeButton;
     QPushButton *m_activateButton;
     QnPtzPresetListModel *m_model;
-    QnStringKvPairUsageHelper* m_helper;
 };
 
 #endif // QN_PTZ_PRESETS_DIALOG_H

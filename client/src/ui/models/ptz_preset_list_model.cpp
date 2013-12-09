@@ -4,10 +4,6 @@
 
 #include <core/ptz/ptz_preset.h>
 
-#include <utils/common/json.h>
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetListModel::PresetHotkey, (id)(hotkey), static)
-
 QnPtzPresetListModel::QnPtzPresetListModel(QObject *parent):
     base_type(parent),
     m_readOnly(false)
@@ -39,16 +35,12 @@ void QnPtzPresetListModel::setPresets(const QnPtzPresetList &presets) {
     endResetModel();
 }
 
-QString QnPtzPresetListModel::serializedHotkeys() const {
-    return QString::fromUtf8(QJson::serialized(m_hotkeys));
+QList<QnPtzPresetListModel::PresetHotkey> QnPtzPresetListModel::hotkeys() const {
+    return m_hotkeys;
 }
 
-void QnPtzPresetListModel::setSerializedHotkeys(const QString &value) {
-    if(value.isEmpty()) {
-        m_hotkeys.clear();
-    } else {
-        QJson::deserialize<QList<QnPtzPresetListModel::PresetHotkey> >(value.toUtf8(), &m_hotkeys);
-    }
+void QnPtzPresetListModel::setHotkeys(const QList<QnPtzPresetListModel::PresetHotkey> &value) {
+    m_hotkeys = value;
 }
 
 int QnPtzPresetListModel::column(Column column) const {
