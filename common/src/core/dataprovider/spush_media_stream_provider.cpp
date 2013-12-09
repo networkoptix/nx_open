@@ -178,13 +178,9 @@ void CLServerPushStreamReader::run()
 
         // check queue sizes
         if (dataCanBeAccepted())
-        {
             putData(data);
-        }
         else
-        {
             setNeedKeyData();
-        }
 
 
     }

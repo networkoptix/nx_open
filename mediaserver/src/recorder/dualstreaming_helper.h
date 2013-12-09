@@ -13,13 +13,11 @@ public:
     QnDualStreamingHelper();
     virtual ~QnDualStreamingHelper();
 
-    void updateCamera(QnSecurityCamResourcePtr cameraRes);
     qint64 getLastMotionTime();
-    void onMotion(QnMetaDataV1Ptr motion);
+    void onMotion(QnConstMetaDataV1Ptr motion);
 private:
     QMutex m_mutex;
     qint64 m_lastMotionTime;
-    simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 };
 
 typedef QSharedPointer<QnDualStreamingHelper> QnDualStreamingHelperPtr;

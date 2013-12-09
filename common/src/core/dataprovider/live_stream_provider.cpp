@@ -14,6 +14,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
     m_softMotionLastChannel(0),
     m_secondaryQuality(Qn::SSQualityNotDefined)
 {
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
+        memset(m_motionMaskBinData[i], 0, MD_WIDTH * MD_HEIGHT/8);
+    }
+
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
     m_layout = 0;
@@ -25,7 +30,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
-    //if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
+        qFreeAligned(m_motionMaskBinData[i]);
 }
 
 void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
@@ -147,6 +153,8 @@ void QnLiveStreamProvider::updateSoftwareMotion()
         }
     }
 #endif
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        QnMetaDataV1::createMask(m_cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
 }
 
 bool QnLiveStreamProvider::canChangeStatus() const
@@ -348,4 +356,9 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
     QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
     return (camRes && camRes->isCameraControlDisabled()) || !m_canTouchCameraSettings;
+}
+
+void QnLiveStreamProvider::filterMotionByMask(QnMetaDataV1Ptr motion)
+{
+    motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
 }

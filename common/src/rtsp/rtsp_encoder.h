@@ -13,14 +13,14 @@ class QnRtspEncoder
 public:
     QnRtspEncoder();
     virtual ~QnRtspEncoder() {}
-    void setMediaData(QnAbstractMediaDataPtr ctx);
+    void setMediaData(QnConstAbstractMediaDataPtr ctx);
     
     virtual QByteArray getAdditionSDP() = 0;
 
     /*
     * Set media packet to encode
     */
-    virtual void setDataPacket(QnAbstractMediaDataPtr media) = 0;
+    virtual void setDataPacket(QnConstAbstractMediaDataPtr media) = 0;
 
     /*
     * Function MUST write encoded data packet to sendBuffer. sendBuffer may contain some data before function call (TCP RTSP header)
@@ -48,7 +48,7 @@ public:
     static void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
 
 protected:
-    QnAbstractMediaDataPtr m_sdpMediaPacket;
+    QnConstAbstractMediaDataPtr m_sdpMediaPacket;
 };
 
 typedef QSharedPointer<QnRtspEncoder> QnRtspEncoderPtr;

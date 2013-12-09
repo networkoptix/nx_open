@@ -344,7 +344,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
         setParam( lit("dts"), 1, QnDomainMemory );
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
+    {
         setMotionType( Qn::MT_HardwareGrid );
+        setParam( lit("motionWindowCnt"), 100, QnDomainDatabase );
+        setParam( lit("motionMaskWindowCnt"), 100, QnDomainDatabase );
+        setParam( lit("motionSensWindowCnt"), 100, QnDomainDatabase );
+    }
+    else
+        setMotionType( Qn::MT_SoftwareGrid );
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )

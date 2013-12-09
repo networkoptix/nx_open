@@ -115,7 +115,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000*1000*1000; // 1000 sec 
     motion->channelNumber = m_motionData;
-
+    filterMotionByMask(motion);
     return motion;
 }
 

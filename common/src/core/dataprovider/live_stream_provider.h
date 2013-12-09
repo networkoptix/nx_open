@@ -57,6 +57,7 @@ public:
     void startIfNotRunning(bool canTouchCameraSettings);
 
     bool isCameraControlDisabled() const;
+    void filterMotionByMask(QnMetaDataV1Ptr motion);
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -94,6 +95,7 @@ private:
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
     Qn::SecondStreamQuality  m_secondaryQuality;
+    simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

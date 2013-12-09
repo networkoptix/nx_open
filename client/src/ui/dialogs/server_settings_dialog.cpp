@@ -39,8 +39,9 @@
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
 namespace {
-    const qint64 defaultReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
-    const qint64 minimalReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
+    //setting free space to zero, since now client does not change this value, so it must keep current value
+    const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
+    const qint64 minimalReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
     const qint64 bytesInMiB = 1024 * 1024;
 

@@ -139,7 +139,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     if (!useHQ)
         serverDelegate.setQuality(MEDIA_Quality_Low, true);
 
-    QnCompressedVideoDataPtr video;
+    QnConstCompressedVideoDataPtr video;
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
 

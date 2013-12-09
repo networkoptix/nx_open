@@ -355,7 +355,7 @@ static const AVRational INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION = {1, 90000};
 #endif
 static const int MICROS_IN_SECOND = 1000*1000;
 
-bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
+bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const DWORD currentClock = GetTickCount();
 
@@ -417,7 +417,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
         //m_prevTimestamp = inputStream.TimeStamp;
 
     #ifndef XVBA_TEST
-        inputStream.Data = reinterpret_cast<mfxU8*>(data->data.data());
+        inputStream.Data = const_cast<mfxU8*>(reinterpret_cast<const mfxU8*>(data->data.data()));   //todo: #ak const_cast is really required?
     #else
         inputStream.Data = reinterpret_cast<mfxU8*>(const_cast<char*>(data->data.data()));
     #endif
@@ -932,7 +932,7 @@ double QuickSyncVideoDecoder::getSampleAspectRatio() const
 }
 
 //!Reset decoder. Used for seek
-void QuickSyncVideoDecoder::resetDecoder( QnCompressedVideoDataPtr data )
+void QuickSyncVideoDecoder::resetDecoder( QnConstCompressedVideoDataPtr /*data*/ )
 {
     if( m_decodingInitialized )
         m_decoder->Reset( &m_srcStreamParam );
@@ -2763,13 +2763,13 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
 #endif
 #endif
 
-bool QuickSyncVideoDecoder::isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const
+bool QuickSyncVideoDecoder::isH264SeqHeaderInExtraData( const QnConstCompressedVideoDataPtr data ) const
 {
     return data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1;
 }
 
 bool QuickSyncVideoDecoder::readH264SeqHeaderFromExtraData(
-    const QnCompressedVideoDataPtr data,
+    const QnConstCompressedVideoDataPtr data,
     std::basic_string<mfxU8>* const seqHeader )
 {
     const unsigned char* p = data->context->ctx()->extradata;
