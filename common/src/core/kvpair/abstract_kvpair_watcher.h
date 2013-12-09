@@ -9,7 +9,7 @@ public:
     QnAbstractKvPairWatcher(QObject *parent = 0): QObject(parent) {}
     virtual ~QnAbstractKvPairWatcher() {}
 
-    virtual QString key() const;
+    virtual QString key() const = 0;
 
     virtual void updateValue(int resourceId, const QString &value) = 0;
     virtual void removeValue(int resourceId) = 0;

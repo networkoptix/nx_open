@@ -26,19 +26,19 @@ void QnClientMessageProcessor::init()
 
     appServerEventsUrl.setQuery(query);
 
-    init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+    init(appServerEventsUrl, QString());
 }
 
-void QnClientMessageProcessor::init(const QUrl& url, int timeout)
-{
-    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
+void QnClientMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
+    base_type::init(url, authKey, reconnectTimeout);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
 }
 
-QnClientMessageProcessor::QnClientMessageProcessor()
+QnClientMessageProcessor::QnClientMessageProcessor():
+    base_type()
 {
     QThread *thread = new QThread(); // TODO: #Elric leaking thread here.
     thread->start();
@@ -46,17 +46,9 @@ QnClientMessageProcessor::QnClientMessageProcessor()
     moveToThread(thread);
 }
 
-void QnClientMessageProcessor::run()
-{
+void QnClientMessageProcessor::run() {
     init();
-
-    m_source->startRequest();
-}
-
-void QnClientMessageProcessor::stop()
-{
-    if (m_source)
-        m_source->stop();
+    base_type::run();
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)

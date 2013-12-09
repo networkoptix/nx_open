@@ -4,19 +4,17 @@
 #include <QSharedPointer>
 
 #include "api/message_source.h"
+#include <api/common_message_processor.h>
 
-class QnServerMessageProcessor : public QObject
+class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
 
+    typedef QnCommonMessageProcessor base_type;
 public:
-    static QnServerMessageProcessor* instance();
-
     QnServerMessageProcessor();
 
-    void init(const QUrl& url, const QByteArray& authKey, int reconnectTimeout);
-    void stop();
-
+    virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT) override;
 signals:
     void connectionOpened();
     void connectionReset();
@@ -24,8 +22,6 @@ signals:
     void businessRuleDeleted(int id);
     void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(QnAbstractBusinessActionPtr bAction);
-public slots:
-    void run();
 
 private slots:
     void at_messageReceived(QnMessage message);
@@ -34,7 +30,6 @@ private slots:
     void at_connectionReset();
 
 private:
-    QSharedPointer<QnMessageSource> m_source;
     bool m_tryDirectConnect;
 };
 

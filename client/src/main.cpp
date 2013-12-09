@@ -557,7 +557,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         out << autoTester.message();
     }
 
-    QnClientMessageProcessor::instance()->stop();
+    QnCommonMessageProcessor::instance()->stop();
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();

@@ -13,17 +13,8 @@
 #include "business/business_event_connector.h"
 #include "utils/network/simple_http_client.h"
 
-Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
-
-QnServerMessageProcessor* QnServerMessageProcessor::instance()
-{
-    return QnServerMessageProcessor_instance();
-}
-
-void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)
-{
-    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
-    m_source->setAuthKey(authKey);
+void QnServerMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
+    base_type::init(url, authKey, reconnectTimeout);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
@@ -35,19 +26,10 @@ void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, 
     connect(this, SIGNAL(businessRuleReset(QnBusinessEventRuleList)), qnBusinessRuleProcessor, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 }
 
-QnServerMessageProcessor::QnServerMessageProcessor()
+QnServerMessageProcessor::QnServerMessageProcessor():
+    base_type()
 {
     m_tryDirectConnect = true;
-}
-
-void QnServerMessageProcessor::run()
-{
-    m_source->startRequest();
-}
-
-void QnServerMessageProcessor::stop()
-{
-    m_source->stop();
 }
 
 void QnServerMessageProcessor::at_connectionReset()
