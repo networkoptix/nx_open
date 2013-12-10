@@ -331,7 +331,7 @@ void QnAxisStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
-    if (getRole() == QnResource::Role_LiveVideo) 
+    if (getRole() == QnResource::Role_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
         m_axisRes->readMotionInfo();
 
     if (!isStreamOpened()) {
