@@ -117,12 +117,11 @@ QnLongRunnable::QnLongRunnable():
         m_pool = pool->d;
         m_pool->createdNotify(this);
     } else {
-        // todo: #Roman add QnLongRunnable initialization to mediaServer and mediaProxy
-        //qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
     }
 
-    connect(this, SIGNAL(started()), this, SLOT(at_started()), Qt::DirectConnection);
-    connect(this, SIGNAL(finished()), this, SLOT(at_finished()), Qt::DirectConnection);
+    connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
+    connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 }
 
 QnLongRunnable::~QnLongRunnable() {
