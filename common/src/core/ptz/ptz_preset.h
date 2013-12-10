@@ -13,14 +13,12 @@
 struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset> {
 public:
     QnPtzPreset() {}
-    QnPtzPreset(const QString &id, const QString &name): id(id), name(name), space(Qn::DeviceCoordinateSpace), position(qQNaN<QVector3D>()) {}
+    QnPtzPreset(const QString &id, const QString &name): id(id), name(name) {}
 
     friend bool operator==(const QnPtzPreset &l, const QnPtzPreset &r);
 
     QString id;
     QString name;
-    Qn::PtzCoordinateSpace space;
-    QVector3D position;
 };
 
 Q_DECLARE_METATYPE(QnPtzPreset)
