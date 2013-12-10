@@ -328,6 +328,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    
+    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
+    textToWaveServer->start();
 
 #ifdef Q_WS_X11
     //   QnX11LauncherWorkaround x11LauncherWorkaround;
@@ -593,16 +596,10 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
-    TextToWaveServer::initStaticInstance( new TextToWaveServer() );
-    TextToWaveServer::instance()->start();
-
     int result = runApplication(application.data(), argc, argv);
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
-
-    delete TextToWaveServer::instance();
-    TextToWaveServer::initStaticInstance( NULL );
 
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );
