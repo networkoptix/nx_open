@@ -1,10 +1,10 @@
 #include "message.h"
 #include "message.pb.h"
 
-#include "api/serializer/pb_serializer.h"
-#include "api/app_server_connection.h"
+#include <api/serializer/pb_serializer.h>
+#include <api/app_server_connection.h>
 
-#include <core/resource/resource_type.h>
+#include <core/resource/resource.h>
 
 namespace {
     typedef google::protobuf::RepeatedPtrField<pb::Resource>            PbResourceList;

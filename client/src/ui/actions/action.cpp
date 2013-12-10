@@ -6,6 +6,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/workbench/workbench_context.h>

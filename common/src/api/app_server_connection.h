@@ -72,7 +72,7 @@ public:
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
     int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
-    bool setPanicMode(QnMediaServerResource::PanicMode value);
+    bool setPanicMode(int value);
     void disconnectSync();
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
@@ -205,7 +205,6 @@ private:
     QnRequestHeaderList m_requestHeaders;
 
     QnResourceFactory &m_resourceFactory;
-    QnMediaServerResourceFactory m_serverFactory;
 
     QnApiSerializer& m_serializer;
 };

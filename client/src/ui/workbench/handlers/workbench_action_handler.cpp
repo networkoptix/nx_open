@@ -26,6 +26,8 @@
 #include <client/client_connection_data.h>
 
 #include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>

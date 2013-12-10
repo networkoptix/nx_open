@@ -3,6 +3,8 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
+#include <business/business_event_rule.h>
+
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
@@ -855,7 +857,7 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", response);
 }
 
-bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
+bool QnAppServerConnection::setPanicMode(int value)
 {
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);

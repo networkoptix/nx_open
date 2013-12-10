@@ -1,5 +1,7 @@
 #include "workbench_notifications_handler.h"
 
+#include <api/app_server_connection.h>
+
 #include <client/client_settings.h>
 #include <client_message_processor.h>
 

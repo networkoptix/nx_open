@@ -5,12 +5,14 @@
 
 #include <QtCore/QSharedPointer>
 
-#include <api/message_source.h> // TODO: #GDM fwd!!!!
 #include <api/model/kvpair.h>
 
-#include <business/business_event_rule.h> // TODO: #GDM fwd?
+#include <business/business_fwd.h>
 
 #include <utils/common/singleton.h>
+
+class QnMessage;
+class QnMessageSource;
 
 class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
 {

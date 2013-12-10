@@ -17,6 +17,7 @@
 
 #include <core/kvpair/kvpair_watcher_pool.h>
 #include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 

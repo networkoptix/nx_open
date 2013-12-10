@@ -8,7 +8,7 @@
 #include <api/model/kvpair.h>
 
 #include <core/resource/resource_type.h>
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <core/resource/camera_history.h>
 
 #include <business/business_event_rule.h>

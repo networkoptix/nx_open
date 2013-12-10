@@ -1,3 +1,5 @@
+#include "client_message_processor.h"
+
 #include <QtCore/QTimer>
 #include <QtCore/QDebug>
 #include <QtCore/QtGlobal>
@@ -5,15 +7,17 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include "core/resource_managment/resource_discovery_manager.h"
-#include "core/resource_managment/resource_pool.h"
+#include <api/message_source.h>
+#include <api/app_server_connection.h>
+
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+
 #include "device_plugins/server_camera/server_camera.h"
 
 #include <utils/common/synctime.h>
-
-#include "licensing/license.h"
-
-#include "client_message_processor.h"
 
 void QnClientMessageProcessor::init()
 {
@@ -150,7 +154,7 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
             result = true;
         }
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
-            determineOptimalIF(mediaServer.data());
+            determineOptimalIF(mediaServer);
     }
     else {
         bool mserverStatusChanged = false;
@@ -161,7 +165,7 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
         ownResource->update(resource);
 
         if (mserverStatusChanged && mediaServer)
-            determineOptimalIF(mediaServer.data());
+            determineOptimalIF(mediaServer);
 
         result = true;
     }
@@ -173,17 +177,17 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
     return result;
 }
 
-void QnClientMessageProcessor::determineOptimalIF(QnMediaServerResource* mediaServer)
+void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
     // set proxy. If some media server IF will be found, proxy address will be cleared
     QString url = QnAppServerConnectionFactory::defaultUrl().host();
     if (url.isEmpty())
         url = QLatin1String("127.0.0.1");
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    mediaServer->apiConnection()->setProxyAddr(mediaServer->getApiUrl(), url, port);
-    disconnect(mediaServer, NULL, this, NULL);
-    connect(mediaServer, SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
-    mediaServer->determineOptimalNetIF();
+    resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
+    disconnect(resource.data(), NULL, this, NULL);
+    connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
+    resource->determineOptimalNetIF();
 }
 
 void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl)

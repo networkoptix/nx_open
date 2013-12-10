@@ -12,6 +12,8 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include "mustache/mustache_helper.h"
@@ -503,7 +505,7 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int 
     cl_log.log(QString::fromLatin1("Error processing action SendMail."), cl_logWARNING);
 }
 
-void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle)
+void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle)
 {
     if (response.status == 0)
         return;

@@ -3,17 +3,20 @@
 
 #include <QtCore/QByteArray>
 
+#include <api/model/kvpair.h>
+#include <api/model/email_attachment.h>
+
+#include <business/business_fwd.h>
+
+#include <core/resource/resource_fwd.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/layout_item_data.h>
+#include <core/resource/motion_window.h>
+
+#include <licensing/license.h>
+
 #include <utils/common/exception.h>
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/camera_history.h"
-#include <business/business_event_rule.h>
-#include "api/model/kvpair.h"
-#include "api/model/email_attachment.h"
-#include "licensing/license.h"
+
 #include "connectinfo.h"
 
 /*

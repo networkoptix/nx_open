@@ -4,14 +4,20 @@
 #include <QtCore/QDebug>
 #include <qglobal.h>
 
-#include "api/app_server_connection.h"
-#include "core/resource_managment/resource_discovery_manager.h"
-#include "core/resource_managment/resource_pool.h"
-#include "recorder/recording_manager.h"
+#include <api/message_source.h>
+#include <api/app_server_connection.h>
+
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <recorder/recording_manager.h>
+
 #include "serverutil.h"
 #include "settings.h"
-#include "business/business_rule_processor.h"
-#include "business/business_event_connector.h"
+
 #include "utils/network/simple_http_client.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor():

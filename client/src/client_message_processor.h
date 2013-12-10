@@ -1,12 +1,12 @@
 #ifndef QN_CLIENT_MESSAGE_PROCESSOR_H
 #define QN_CLIENT_MESSAGE_PROCESSOR_H
 
-#include <QSharedPointer>
-
-#include "api/app_server_connection.h"
-#include "core/resource/resource.h"
-
 #include <api/common_message_processor.h>
+
+#include <core/resource/camera_history.h>
+#include <core/resource/resource_fwd.h>
+
+#include <licensing/license.h>
 
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
@@ -28,7 +28,7 @@ private slots:
 
 private:
     void init();
-    void determineOptimalIF(QnMediaServerResource* mediaServer);
+    void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     bool updateResource(QnResourcePtr resource, bool insert = true);
     void processResources(const QnResourceList& resources);
     void processLicenses(const QnLicenseList& licenses);

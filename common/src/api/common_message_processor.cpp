@@ -1,6 +1,9 @@
 #include "common_message_processor.h"
 
+#include <api/message_source.h>
 #include <api/app_server_connection.h>
+
+#include <business/business_event_rule.h>
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
