@@ -4,17 +4,20 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
-
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
-#include <ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
+
+#include <core/resource/user_resource.h>
+
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include "ui/dialogs/event_log_dialog.h"
-#include "ui/dialogs/camera_list_dialog.h"
+
+#include <ui/actions/actions.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/event_log_dialog.h>
+#include <ui/dialogs/camera_list_dialog.h>
 
 class QAction;
 class QMenu;

@@ -48,8 +48,9 @@ namespace Qn {
     QString toString( Message_Type val );
 }
 
-struct QnMessage
+class QnMessage
 {
+public:
     QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(true) {}
 
     Qn::Message_Type messageType;
