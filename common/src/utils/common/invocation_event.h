@@ -4,6 +4,11 @@
 #include <QtCore/QEvent>
 #include <QtCore/QVariant>
 
+namespace QnEvent {
+    /** Event type for invocation. */
+    static const QEvent::Type Invocation = static_cast<QEvent::Type>(QEvent::User + 0x3896);
+}
+
 /**
  * Universal custom event.
  * 
@@ -11,11 +16,8 @@
  */
 class QnInvocationEvent: public QEvent {
 public:
-    /** Event type for invocation. */
-    static const QEvent::Type Invocation = static_cast<QEvent::Type>(QEvent::User + 0x3896);
-
     QnInvocationEvent(int id = 0, const QVariant &data = QVariant()): 
-        QEvent(Invocation),
+        QEvent(QnEvent::Invocation),
         m_id(id),
         m_data(data)
     {}

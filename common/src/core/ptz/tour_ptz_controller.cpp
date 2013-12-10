@@ -1,9 +1,32 @@
 #include "tour_ptz_controller.h"
 
+#include <QtCore/QMetaObject>
+
 #include <utils/common/json.h>
 #include <utils/common/container.h>
+#include <utils/common/long_runnable.h>
 
 #include <api/kvpair_usage_helper.h>
+
+#include "ptz_tour_executor.h"
+
+
+// -------------------------------------------------------------------------- //
+// QnPtzTourExecutorThread
+// -------------------------------------------------------------------------- //
+class QnPtzTourExecutorThread: public QnLongRunnable {
+    typedef QnLongRunnable base_type;
+public:
+    virtual void pleaseStop() {
+        base_type::pleaseStop();
+
+        QMetaObject::invokeMethod(this, "quit", Qt::QueuedConnection);
+    }
+
+    /* Default run implementation is OK as we don't need anything besides an event loop. */
+};
+
+Q_GLOBAL_STATIC(QnPtzTourExecutorThread, qn_ptzTourExecutorThread_instance);
 
 
 // -------------------------------------------------------------------------- //
@@ -11,7 +34,18 @@
 // -------------------------------------------------------------------------- //
 class QnTourPtzControllerPrivate {
 public:
-    QnTourPtzControllerPrivate(): helper(NULL) {}
+    QnTourPtzControllerPrivate(): helper(NULL), executor(NULL) {}
+
+    ~QnTourPtzControllerPrivate() {
+        executor->deleteLater();
+    }
+
+    void init() {
+        helper = new QnStringKvPairUsageHelper(q->resource(), lit("ptzTours"), QString(), q);
+        
+        executor = new QnPtzTourExecutor(q->baseController());
+        executor->moveToThread(qn_ptzTourExecutorThread_instance());
+    }
 
     void loadRecords() {
         if(!records.isEmpty())
@@ -28,9 +62,11 @@ public:
         helper->setValue(QString::fromUtf8(QJson::serialized(records)));
     }
 
+    QnTourPtzController *q;
     QMutex mutex;
     QnStringKvPairUsageHelper *helper;
     QHash<QString, QnPtzTour> records;
+    QnPtzTourExecutor *executor;
 };
 
 
@@ -41,7 +77,8 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     base_type(baseController),
     d(new QnTourPtzControllerPrivate())
 {
-    d->helper = new QnStringKvPairUsageHelper(resource(), lit("ptzTours"), QString(), this);
+    d->q = this;
+    d->init();
 }
 
 QnTourPtzController::~QnTourPtzController() {
