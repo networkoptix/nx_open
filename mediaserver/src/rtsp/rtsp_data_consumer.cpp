@@ -68,7 +68,7 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
     stop();
 }
 
-  void QnRtspDataConsumer::pauseNetwork()
+void QnRtspDataConsumer::pauseNetwork()
 {
     m_pauseNetwork = true;
     m_fastChannelZappingSize = 0;
