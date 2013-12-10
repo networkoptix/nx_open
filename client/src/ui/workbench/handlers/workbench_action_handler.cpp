@@ -2375,10 +2375,14 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     if(dialog->exec() != QDialog::Accepted)
         return;
 
-    if (!widget->ptzController()->createPreset(QnPtzPreset(QUuid::createUuid().toString(), dialog->name())))
+    QString presetId = QUuid::createUuid().toString();
+    if (!widget->ptzController()->createPreset(QnPtzPreset(presetId, dialog->name())))
         return;
 
-    //TODO: #GDM save hotkey
+    if (dialog->hotkey() >= 0) {
+        hotkeys[presetId] = dialog->hotkey();
+        context()->instance<QnPtzHotkeyKvPairWatcher>()->updateHotkeys(widget->camera()->getId(), hotkeys);
+    }
 
 #if 0
         QMessageBox::critical(
