@@ -22,7 +22,7 @@ public:
         currentState = Moving;
         controller->getPosition(defaultSpace, &currentPosition);
         controller->activatePreset(currentTour.spots[currentIndex].presetId);
-        controller->syn
+        //controller->syn
 
     }
 
