@@ -16,6 +16,8 @@
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/ptz/ptz_fwd.h>
 
+#include <common/common_globals.h>
+
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
