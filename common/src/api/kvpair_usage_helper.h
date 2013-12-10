@@ -62,25 +62,5 @@ protected:
     virtual void innerValueChanged(const QString &value) override;
 };
 
-class QnUint64KvPairUsageHelper: public QnAbstractKvPairUsageHelper {
-    Q_OBJECT
-
-    typedef QnAbstractKvPairUsageHelper base_type;
-public:
-    explicit QnUint64KvPairUsageHelper(const QnResourcePtr &resource,
-                                 const QString &key,
-                                 quint64 defaultValue,
-                                 QObject *parent = 0);
-    ~QnUint64KvPairUsageHelper();
-
-    quint64 value() const;
-    void setValue(quint64 value);
-
-signals:
-    void valueChanged(quint64 value);
-
-protected:
-    virtual void innerValueChanged(const QString &value) override;
-};
 
 #endif // KVPAIR_USAGE_HELPER_H

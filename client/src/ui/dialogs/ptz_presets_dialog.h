@@ -6,7 +6,6 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_ptz_preset_manager.h>
 
 #include "button_box_dialog.h"
 

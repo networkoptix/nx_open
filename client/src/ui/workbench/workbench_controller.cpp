@@ -91,8 +91,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
-#include "workbench_ptz_preset_manager.h"
-
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 

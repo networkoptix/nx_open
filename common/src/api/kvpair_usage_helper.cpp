@@ -151,28 +151,3 @@ void QnStringKvPairUsageHelper::setValue(const QString &value) {
 void QnStringKvPairUsageHelper::innerValueChanged(const QString &value) {
     emit valueChanged(value);
 }
-
-//---------------------------------------------------------------------------//
-//------------------QnUint64KvPairUsageHelper--------------------------------//
-//---------------------------------------------------------------------------//
-
-QnUint64KvPairUsageHelper::QnUint64KvPairUsageHelper(
-        const QnResourcePtr &resource,
-        const QString &key,
-        quint64 defaultValue,
-        QObject *parent) :
-    base_type(resource, key, QString::number(defaultValue, 16), parent){}
-
-QnUint64KvPairUsageHelper::~QnUint64KvPairUsageHelper(){}
-
-quint64 QnUint64KvPairUsageHelper::value() const {
-    return innerValue().toULongLong(0, 16);
-}
-
-void QnUint64KvPairUsageHelper::setValue(quint64 value) {
-    setInnerValue(QString::number(value, 16));
-}
-
-void QnUint64KvPairUsageHelper::innerValueChanged(const QString &value) {
-    emit valueChanged(value.toULongLong(0, 16));
-}

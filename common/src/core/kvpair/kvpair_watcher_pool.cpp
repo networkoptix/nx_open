@@ -2,9 +2,13 @@
 
 #include <api/app_server_connection.h>
 
+#include <api/common_message_processor.h>
+
 QnKvPairWatcherPool::QnKvPairWatcherPool(QObject *parent) :
     QObject(parent)
 {
+    connect(QnCommonMessageProcessor::instance(), SIGNAL(kvPairsChanged(QnKvPairs)), this, SLOT(at_kvPairsChanged(QnKvPairs)));
+    connect(QnCommonMessageProcessor::instance(), SIGNAL(kvPairsDeleted(QnKvPairs)), this, SLOT(at_kvPairsDeleted(QnKvPairs)));
 }
 
 QnKvPairWatcherPool::~QnKvPairWatcherPool() {
@@ -41,10 +45,17 @@ void QnKvPairWatcherPool::at_kvPair_changed(int resourceId, const QString &key, 
 void QnKvPairWatcherPool::at_connection_replyReceived(int status, const QnKvPairs &kvPairs, int handle) {
     if (status != 0)
         return;  // TODO: #GDM notify user about unsuccessful saving?
+    at_kvPairsChanged(kvPairs);
+}
 
-    foreach (int resourceId, kvPairs.keys()) {
-        foreach(const QnKvPair &pair, kvPairs[resourceId]) {
-            at_kvPair_changed(resourceId, pair.name(), pair.value());
-        }
-    }
+void QnKvPairWatcherPool::at_kvPairsChanged(const QnKvPairs &kvPairs) {
+    foreach (int resourceId, kvPairs.keys())
+        foreach (const QnKvPair &kvPair, kvPairs[resourceId])
+            at_kvPair_changed(resourceId, kvPair.name(), kvPair.value());
+}
+
+void QnKvPairWatcherPool::at_kvPairsDeleted(const QnKvPairs &kvPairs) {
+    foreach (int resourceId, kvPairs.keys())
+        foreach (const QnKvPair &kvPair, kvPairs[resourceId])
+            at_kvPair_changed(resourceId, kvPair.name(), QString());
 }

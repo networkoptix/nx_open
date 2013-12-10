@@ -14,7 +14,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_ptz_preset_manager.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
 

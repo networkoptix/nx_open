@@ -92,7 +92,6 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_ptz_preset_manager.h>
 
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>

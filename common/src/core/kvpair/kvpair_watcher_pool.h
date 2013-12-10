@@ -23,6 +23,9 @@ private slots:
     void at_kvPair_changed(int resourceId, const QString &key, const QString &value);
 
     void at_connection_replyReceived(int status, const QnKvPairs &kvPairs, int handle);
+
+    void at_kvPairsChanged(const QnKvPairs &kvPairs);
+    void at_kvPairsDeleted(const QnKvPairs &kvPairs);
 private:
     QHash<QString, QnAbstractKvPairWatcher*> m_watchersByKey;
 };

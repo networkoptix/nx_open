@@ -19,6 +19,10 @@ public:
 
     virtual QString key() const override;
 
+    virtual void updateValue(int resourceId, const QString &value) override;
+
+    virtual void removeValue(int resourceId) override;
+
     /**
      * @brief presetByHotkey
      * @param resourceId
@@ -39,9 +43,7 @@ public:
 
     void updateHotkeys(int resourceId, const QnHotkeysHash &hotkeys);
 
-    virtual void updateValue(int resourceId, const QString &value) override;
 
-    virtual void removeValue(int resourceId) override;
 private:
     QHash<int, QnHotkeysHash> m_hotkeysByResourceId;
 };

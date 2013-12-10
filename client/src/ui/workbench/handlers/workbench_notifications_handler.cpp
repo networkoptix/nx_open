@@ -7,6 +7,7 @@
 
 #include <business/business_strings_helper.h>
 
+#include <core/kvpair/business_events_filter_kvpair_watcher.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -19,24 +20,10 @@
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
-QnShowBusinessEventsHelper::QnShowBusinessEventsHelper(QObject *parent) :
-    base_type(QnResourcePtr(),
-              QLatin1String("showBusinessEvents"),
-              0xFFFFFFFFFFFFFFFFull,
-              parent)
-{
-}
-
-QnShowBusinessEventsHelper::~QnShowBusinessEventsHelper(){}
-
-
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    m_showBusinessEventsHelper = context()->instance<QnShowBusinessEventsHelper>();
-    m_showBusinessEventsHelper->setResource(context()->user());
-
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, SIGNAL(userEmailValidityChanged(const QnUserResourcePtr &, bool)),
             this,               SLOT(at_userEmailValidityChanged(const QnUserResourcePtr &, bool)));
@@ -87,9 +74,12 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
     }
 
-    if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
+    if (!context()->user())
         return;
-    }
+
+    if (!context()->instance<QnBusinessEventsFilterKvPairWatcher>()->eventAllowed(context()->user()->getId(), eventType))
+        return;
+
 
     emit businessActionAdded(businessAction);
 }
@@ -171,8 +161,6 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    m_showBusinessEventsHelper->setResource(context()->user());
-
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));

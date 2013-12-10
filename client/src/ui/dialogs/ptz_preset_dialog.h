@@ -3,8 +3,6 @@
 
 #include <ui/dialogs/button_box_dialog.h>
 
-#include <ui/workbench/workbench_ptz_preset_manager.h>
-
 namespace Ui {
     class PtzPresetDialog;
 }

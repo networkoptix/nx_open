@@ -7,7 +7,6 @@
 #include "client_globals.h"
 #include "client_model_types.h"
 #include "utils/color_space/image_correction.h"
-#include "ui/workbench/workbench_ptz_preset_manager.h"
 #include "ui/actions/actions.h"
 #include "ui/actions/action_parameters.h"
 

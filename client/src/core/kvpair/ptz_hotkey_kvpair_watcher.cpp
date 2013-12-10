@@ -6,6 +6,10 @@
 
 #include <utils/common/json.h>
 
+namespace {
+    static const QLatin1String watcherId("ptz_hotkeys");
+}
+
 QnPtzHotkeyKvPairWatcher::QnPtzHotkeyKvPairWatcher(QObject *parent) :
     base_type(parent)
 {
@@ -15,8 +19,26 @@ QnPtzHotkeyKvPairWatcher::~QnPtzHotkeyKvPairWatcher() {
 }
 
 QString QnPtzHotkeyKvPairWatcher::key() const {
-    return QLatin1String("ptz_hotkeys");
+    return watcherId;
 }
+
+void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value) {
+    //TODO: #GDM signals
+    if(value.isEmpty()) {
+        m_hotkeysByResourceId.remove(resourceId);
+    } else {
+        QnHotkeysHash hotkeys;
+        if (!QJson::deserialize<QnHotkeysHash >(value.toUtf8(), &hotkeys))
+            return;
+        m_hotkeysByResourceId[resourceId] = hotkeys;
+    }
+}
+
+void QnPtzHotkeyKvPairWatcher::removeValue(int resourceId) {
+    //TODO: #GDM signals
+    m_hotkeysByResourceId.remove(resourceId);
+}
+
 
 QString QnPtzHotkeyKvPairWatcher::presetIdByHotkey(int resourceId, int hotkey) const {
     if (!m_hotkeysByResourceId.contains(resourceId))
@@ -39,19 +61,3 @@ void QnPtzHotkeyKvPairWatcher::updateHotkeys(int resourceId, const QnHotkeysHash
     submitValue(resourceId, QString::fromUtf8(QJson::serialized(hotkeys)));
 }
 
-void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value) {
-    //TODO: #GDM signals
-    if(value.isEmpty()) {
-        m_hotkeysByResourceId.remove(resourceId);
-    } else {
-        QnHotkeysHash hotkeys;
-        if (!QJson::deserialize<QnHotkeysHash >(value.toUtf8(), &hotkeys))
-            return;
-        m_hotkeysByResourceId[resourceId] = hotkeys;
-    }
-}
-
-void QnPtzHotkeyKvPairWatcher::removeValue(int resourceId) {
-    //TODO: #GDM signals
-    m_hotkeysByResourceId.remove(resourceId);
-}
