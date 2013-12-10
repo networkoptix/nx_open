@@ -120,6 +120,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnBusinessEventRuleList>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
+    qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
