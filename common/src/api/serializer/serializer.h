@@ -79,7 +79,7 @@ public:
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
     virtual void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) = 0;
     virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;
-    virtual void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data) = 0;
+    virtual void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data) = 0;
     virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
 
 protected:

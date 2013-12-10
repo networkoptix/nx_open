@@ -167,7 +167,7 @@ public:
     int saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
     int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
 
-    int saveAsync(const QnResourcePtr &resource, const QnKvPairList &kvPairs, QObject *target, const char *slot);
+    int saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot);
     int saveSettingsAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
 
     int deleteAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);

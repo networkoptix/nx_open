@@ -2,12 +2,9 @@
 
 #include <QtCore/QList>
 
-namespace {
-    static const int noHotkey = -1;
-}
+#include <core/ptz/ptz_hotkey.h>
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzHotkeyKvPairWatcher::PresetHotkey, (id)(hotkey), static)
-
+#include <utils/common/json.h>
 
 QnPtzHotkeyKvPairWatcher::QnPtzHotkeyKvPairWatcher(QObject *parent) :
     base_type(parent)
@@ -15,6 +12,10 @@ QnPtzHotkeyKvPairWatcher::QnPtzHotkeyKvPairWatcher(QObject *parent) :
 }
 
 QnPtzHotkeyKvPairWatcher::~QnPtzHotkeyKvPairWatcher() {
+}
+
+QString QnPtzHotkeyKvPairWatcher::key() const {
+    return QLatin1String("ptz_hotkeys");
 }
 
 QString QnPtzHotkeyKvPairWatcher::presetIdByHotkey(int resourceId, int hotkey) const {
@@ -25,8 +26,8 @@ QString QnPtzHotkeyKvPairWatcher::presetIdByHotkey(int resourceId, int hotkey) c
 
 int QnPtzHotkeyKvPairWatcher::hotkeyByPresetId(int resourceId, const QString &presetId) const {
     if (!m_hotkeysByResourceId.contains(resourceId))
-        return noHotkey;
-    return m_hotkeysByResourceId[resourceId].value(presetId, noHotkey);
+        return Qn::NoHotkey;
+    return m_hotkeysByResourceId[resourceId].value(presetId, Qn::NoHotkey);
 }
 
 QnHotkeysHash QnPtzHotkeyKvPairWatcher::allHotkeysByResourceId(int resourceId) const {
@@ -35,7 +36,7 @@ QnHotkeysHash QnPtzHotkeyKvPairWatcher::allHotkeysByResourceId(int resourceId) c
 
 void QnPtzHotkeyKvPairWatcher::updateHotkeys(int resourceId, const QnHotkeysHash &hotkeys) {
     m_hotkeysByResourceId[resourceId] = hotkeys;
-    //TODO: #GDM submit to EC
+    submitValue(resourceId, QString::fromUtf8(QJson::serialized(hotkeys)));
 }
 
 void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value) {
@@ -43,14 +44,10 @@ void QnPtzHotkeyKvPairWatcher::updateValue(int resourceId, const QString &value)
     if(value.isEmpty()) {
         m_hotkeysByResourceId.remove(resourceId);
     } else {
-        QList<PresetHotkey> hotkeys;
-        if (!QJson::deserialize<QList<PresetHotkey> >(value.toUtf8(), &hotkeys))
+        QnHotkeysHash hotkeys;
+        if (!QJson::deserialize<QnHotkeysHash >(value.toUtf8(), &hotkeys))
             return;
-
-        QnHotkeysHash hash;
-        foreach(PresetHotkey hotkey, hotkeys)
-            hash[hotkey.id] = hotkey.hotkey;
-        m_hotkeysByResourceId[resourceId] = hash;
+        m_hotkeysByResourceId[resourceId] = hotkeys;
     }
 }
 

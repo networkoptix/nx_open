@@ -16,6 +16,7 @@
 #include <utils/common/environment.h>
 
 #include <core/kvpair/kvpair_watcher_pool.h>
+#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 
@@ -190,7 +191,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
-    context->instance<QnKvPairWatcherPool>();
+
+    QnKvPairWatcherPool* kvPairWatchers = context->instance<QnKvPairWatcherPool>();
+    kvPairWatchers->registerWatcher(context->instance<QnPtzHotkeyKvPairWatcher>());
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));

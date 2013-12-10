@@ -99,7 +99,7 @@ void QnAbstractKvPairUsageHelper::save() {
     kvPairs.push_back(QnKvPair(d->key, d->value));
 
     d->saveHandle = QnAppServerConnectionFactory::createConnection()->saveAsync(
-                d->resource,
+                d->resource->getId(),
                 kvPairs,
                 this,
                 SLOT(at_connection_replyReceived(int, const QnKvPairs &, int)));

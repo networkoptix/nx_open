@@ -13,46 +13,18 @@
 #include "business/business_event_connector.h"
 #include "utils/network/simple_http_client.h"
 
-Q_GLOBAL_STATIC(QnServerMessageProcessor, QnServerMessageProcessor_instance)
-
-QnServerMessageProcessor* QnServerMessageProcessor::instance()
-{
-    return QnServerMessageProcessor_instance();
-}
-
-void QnServerMessageProcessor::init(const QUrl& url, const QByteArray& authKey, int timeout)
-{
-    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
-    m_source->setAuthKey(authKey);
+void QnServerMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
+    base_type::init(url, authKey, reconnectTimeout);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
-    connect(m_source.data(), SIGNAL(connectionReset()), this, SLOT(at_connectionReset()));
-
-    connect(this, SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)), qnBusinessRuleProcessor, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
-    connect(this, SIGNAL(businessRuleDeleted(int)), qnBusinessRuleProcessor, SLOT(at_businessRuleDeleted(int)));
-    connect(this, SIGNAL(businessRuleReset(QnBusinessEventRuleList)), qnBusinessRuleProcessor, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 }
 
-QnServerMessageProcessor::QnServerMessageProcessor()
+QnServerMessageProcessor::QnServerMessageProcessor():
+    base_type()
 {
     m_tryDirectConnect = true;
-}
-
-void QnServerMessageProcessor::run()
-{
-    m_source->startRequest();
-}
-
-void QnServerMessageProcessor::stop()
-{
-    m_source->stop();
-}
-
-void QnServerMessageProcessor::at_connectionReset()
-{
-    emit connectionReset();
 }
 
 void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
@@ -66,6 +38,8 @@ void QnServerMessageProcessor::at_connectionOpened(QnMessage message)
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage message)
 {
+    base_type::handleMessage(message);
+
     NX_LOG( QString::fromLatin1("Received message %1, resourceId %2, resource %3").
         arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
 
@@ -149,20 +123,6 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage message)
         {
             qnResPool->removeResource(resource);
         }
-    } else if (message.messageType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
-    {
-       emit businessRuleChanged(message.businessRule);
-
-    } else if (message.messageType == Qn::Message_Type_BusinessRuleDelete)
-    {
-        emit businessRuleDeleted(message.resourceId.toInt());
-    } else if (message.messageType == Qn::Message_Type_BusinessRuleReset)
-    {
-       emit businessRuleReset(message.businessRules);
-
-    } else if (message.messageType == Qn::Message_Type_BroadcastBusinessAction)
-    {
-        emit businessActionReceived(message.businessAction);
     }
 }
 

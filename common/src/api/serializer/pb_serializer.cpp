@@ -1055,12 +1055,12 @@ void QnApiPbSerializer::serializeKvPair(const QnResourcePtr& resource, const QnK
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data)
+void QnApiPbSerializer::serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
 
     foreach(const QnKvPair &kvPair, kvPairs)
-        serializeKvPair_i(resource->getId(), *pb_kvPairs.add_kvpair(), kvPair);
+        serializeKvPair_i(resourceId, *pb_kvPairs.add_kvpair(), kvPair);
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);

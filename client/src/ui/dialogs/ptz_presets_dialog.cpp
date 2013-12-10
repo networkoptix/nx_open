@@ -4,7 +4,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtGui/QStandardItem>
 
-#include <core/kvpair/kvpair_watcher_pool.h>
 #include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -26,7 +25,7 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
     m_removeButton = new QPushButton(tr("Remove"));
     m_activateButton = new QPushButton(tr("Activate"));
 
-    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnKvPairWatcherPool>()->instance<QnPtzHotkeyKvPairWatcher>();
+    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
     connect(watcher, SIGNAL(hotkeyChanged(int, QString, int)), this, SLOT(at_hotkeyChanged(int, QString, int)));
 
     ui->treeView->setModel(m_model);
@@ -101,14 +100,9 @@ void QnPtzPresetsDialog::submitToResource() {
     if (!m_controller->resource())
         return;
 
-    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnKvPairWatcherPool>()->instance<QnPtzHotkeyKvPairWatcher>();
+    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
 
-    QList<QnPtzPresetListModel::PresetHotkey> hotkeys = m_model->hotkeys();
-    QnHotkeysHash hash;
-    foreach(QnPtzPresetListModel::PresetHotkey hotkey, hotkeys)
-        hash[hotkey.id] = hotkey.hotkey;
-
-    watcher->updateHotkeys(m_controller->resource()->getId(), hash);
+    watcher->updateHotkeys(m_controller->resource()->getId(), m_model->hotkeys());
 }
 
 void QnPtzPresetsDialog::updateLabel() {
@@ -124,12 +118,10 @@ void QnPtzPresetsDialog::updateModel() {
     else
         m_model->setPresets(QnPtzPresetList());
 
-    QList<QnPtzPresetListModel::PresetHotkey> hotkeys;
+    QnHotkeysHash hotkeys;
     if (m_controller && m_controller->resource()) {
-        QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnKvPairWatcherPool>()->instance<QnPtzHotkeyKvPairWatcher>();
-        QnHotkeysHash hash = watcher->allHotkeysByResourceId(m_controller->resource()->getId());
-        foreach (QString presetId, hash.keys())
-            hotkeys << QnPtzPresetListModel::PresetHotkey(presetId, hash[presetId]);
+        QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
+        hotkeys = watcher->allHotkeysByResourceId(m_controller->resource()->getId());
     }
     m_model->setHotkeys(hotkeys);
 }

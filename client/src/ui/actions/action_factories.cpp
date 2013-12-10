@@ -4,7 +4,6 @@
 
 #include <utils/common/string.h>
 
-#include <core/kvpair/kvpair_watcher_pool.h>
 #include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/user_resource.h>
@@ -74,7 +73,7 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
 
-    QnPtzHotkeyKvPairWatcher* hotkeysWatcher = context()->instance<QnKvPairWatcherPool>()->instance<QnPtzHotkeyKvPairWatcher>();
+    QnPtzHotkeyKvPairWatcher* hotkeysWatcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
     int resourceId = widget->camera()->getId();
 
     foreach(const QnPtzPreset &preset, presets) {

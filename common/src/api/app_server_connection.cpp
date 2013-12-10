@@ -473,10 +473,10 @@ int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses,
     return addObjectAsync(LicenseObject, data, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
 }
 
-int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, const QnKvPairList &kvPairs, QObject *target, const char *slot)
+int QnAppServerConnection::saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot)
 {
     QByteArray data;
-    m_serializer.serializeKvPairs(resource, kvPairs, data);
+    m_serializer.serializeKvPairs(resourceId, kvPairs, data);
 
     return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
 }

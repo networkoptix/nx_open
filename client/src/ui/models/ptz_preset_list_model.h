@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 
 #include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_hotkey.h>
 
 class QnPtzPresetListModel: public QAbstractTableModel {
     Q_OBJECT
@@ -16,14 +17,6 @@ public:
         HotkeyColumn
     };
 
-    struct PresetHotkey {
-        QString id;
-        int hotkey;
-
-        PresetHotkey():hotkey(-1) {}
-        PresetHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
-    };
-
     QnPtzPresetListModel(QObject *parent = NULL);
     virtual ~QnPtzPresetListModel();
 
@@ -33,8 +26,8 @@ public:
     const QnPtzPresetList &presets() const;
     void setPresets(const QnPtzPresetList &presets);
 
-    QList<QnPtzPresetListModel::PresetHotkey> hotkeys() const;
-    Q_SLOT void setHotkeys(const QList<QnPtzPresetListModel::PresetHotkey> &value);
+    QnHotkeysHash hotkeys() const;
+    void setHotkeys(const QnHotkeysHash &value);
 
     int column(Column column) const;
     const QList<Column> &columns() const;
@@ -52,12 +45,11 @@ public:
 
 private:
     QString columnTitle(Column column) const;
-    int presetHotkey(const QString &id) const;
 
 private:
     bool m_readOnly;
     QnPtzPresetList m_presets;
-    QList<PresetHotkey> m_hotkeys;
+    QnHotkeysHash m_hotkeys;
     QList<Column> m_columns;
 };
 

@@ -26,19 +26,19 @@ void QnClientMessageProcessor::init()
 
     appServerEventsUrl.setQuery(query);
 
-    init(appServerEventsUrl, EVENT_RECONNECT_TIMEOUT);
+    init(appServerEventsUrl, QString());
 }
 
-void QnClientMessageProcessor::init(const QUrl& url, int timeout)
-{
-    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, timeout));
+void QnClientMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
+    base_type::init(url, authKey, reconnectTimeout);
 
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
 }
 
-QnClientMessageProcessor::QnClientMessageProcessor()
+QnClientMessageProcessor::QnClientMessageProcessor():
+    base_type()
 {
     QThread *thread = new QThread(); // TODO: #Elric leaking thread here.
     thread->start();
@@ -46,17 +46,9 @@ QnClientMessageProcessor::QnClientMessageProcessor()
     moveToThread(thread);
 }
 
-void QnClientMessageProcessor::run()
-{
+void QnClientMessageProcessor::run() {
     init();
-
-    m_source->startRequest();
-}
-
-void QnClientMessageProcessor::stop()
-{
-    if (m_source)
-        m_source->stop();
+    base_type::run();
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
@@ -136,14 +128,12 @@ void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
+    base_type::handleMessage(message);
+
     switch(message.messageType) {
     case Qn::Message_Type_Initial:
         {
             QnAppServerConnectionFactory::setPublicIp(message.publicIp);
-            break;
-        }
-    case Qn::Message_Type_Ping:
-        {
             break;
         }
     case Qn::Message_Type_License:
@@ -196,26 +186,6 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             qnResPool->removeResource(ownResource);
             break;
         }
-    case Qn::Message_Type_BusinessRuleInsertOrUpdate:
-        {
-            emit businessRuleChanged(message.businessRule);
-            break;
-        }
-    case Qn::Message_Type_BusinessRuleReset:
-        {
-            emit businessRuleReset(message.businessRules);
-            break;
-        }
-    case Qn::Message_Type_BusinessRuleDelete:
-        {
-            emit businessRuleDeleted(message.resourceId.toInt());
-            break;
-        }
-    case Qn::Message_Type_BroadcastBusinessAction:
-        {
-            emit businessActionReceived(message.businessAction);
-            break;
-        }
     case Qn::Message_Type_FileAdd:
         {
             emit fileAdded(message.filename);
@@ -233,9 +203,9 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
         }
     case Qn::Message_Type_RuntimeInfoChange:
         break; //TODO: #ivigasin what means this message for the client?
+    default:
+        break;
     }
-    // default-case is not used for a reason
-
 }
 
 void QnClientMessageProcessor::at_connectionClosed(QString errorString)

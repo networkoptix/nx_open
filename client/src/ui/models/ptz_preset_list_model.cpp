@@ -35,12 +35,14 @@ void QnPtzPresetListModel::setPresets(const QnPtzPresetList &presets) {
     endResetModel();
 }
 
-QList<QnPtzPresetListModel::PresetHotkey> QnPtzPresetListModel::hotkeys() const {
+QnHotkeysHash QnPtzPresetListModel::hotkeys() const {
     return m_hotkeys;
 }
 
-void QnPtzPresetListModel::setHotkeys(const QList<QnPtzPresetListModel::PresetHotkey> &value) {
+void QnPtzPresetListModel::setHotkeys(const QnHotkeysHash &value) {
+    beginResetModel();
     m_hotkeys = value;
+    endResetModel();
 }
 
 int QnPtzPresetListModel::column(Column column) const {
@@ -93,7 +95,7 @@ QVariant QnPtzPresetListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     const QnPtzPreset &preset = m_presets[index.row()];
-    int hotkey = presetHotkey(preset.id);
+    int hotkey = m_hotkeys.value(preset.id, Qn::NoHotkey);
 
     Column column = m_columns[index.column()];
 
@@ -165,22 +167,18 @@ bool QnPtzPresetListModel::setData(const QModelIndex &index, const QVariant &val
             return false;
 
         if(hotkey >= 0) {
-            int oldHotkey = presetHotkey(preset.id);
-            QStringList modified;
-            for (int i = 0; i < m_hotkeys.size(); i++) {
-                if (m_hotkeys[i].id == preset.id) {
-                    m_hotkeys[i].hotkey = hotkey;
-                } else if (m_hotkeys[i].hotkey == hotkey) {
-                    m_hotkeys[i].hotkey = oldHotkey;
-                    modified << m_hotkeys[i].id;
-                }
-            }
+            int oldHotkey = m_hotkeys.value(preset.id, Qn::NoHotkey);
+            QString existing = m_hotkeys.key(hotkey, QString());
+            m_hotkeys[preset.id] = hotkey;
 
-            for(int i = 0; i < m_presets.size(); i++) {
-                if (!modified.contains(m_presets[i].id))
-                    continue;
-                QModelIndex siblingIndex = index.sibling(i, index.column());
-                emit dataChanged(siblingIndex, siblingIndex);
+            if (!existing.isEmpty()) {
+                for(int i = 0; i < m_presets.size(); i++) {
+                    if (m_presets[i].id != existing)
+                        continue;
+                    m_hotkeys[existing] = oldHotkey;
+                    QModelIndex siblingIndex = index.sibling(i, index.column());
+                    emit dataChanged(siblingIndex, siblingIndex);
+                }
             }
             emit dataChanged(index, index);
         }
@@ -224,13 +222,4 @@ QString QnPtzPresetListModel::columnTitle(Column column) const {
     case HotkeyColumn: return tr("Hotkey");
     default: return QString();
     }
-}
-
-int QnPtzPresetListModel::presetHotkey(const QString &id) const {
-    foreach (PresetHotkey h, m_hotkeys) {
-        if (h.id != id)
-            continue;
-        return h.hotkey;
-    }
-    return -1;
 }

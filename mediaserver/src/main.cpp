@@ -576,10 +576,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("format", "pb");
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
-    static const int EVENT_RECONNECT_TIMEOUT = 3000;
-
-    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toLatin1(), EVENT_RECONNECT_TIMEOUT);
+    QnServerMessageProcessor::instance()->init(appServerEventsUrl, settings.value("authKey").toString());
 }
 
 
@@ -930,6 +927,8 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine(certData);
     }
 
+    QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
+
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -1128,8 +1127,7 @@ void QnMain::run()
     qnStorageMan->loadFullFileCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
-    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->run();
+    QnServerMessageProcessor::instance()->run();
 
     std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
 
@@ -1226,7 +1224,7 @@ void QnMain::run()
 
     loadResourcesFromECS();
 
-    connect(eventManager, SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 
     /*
     QnScheduleTaskList scheduleTasks;
@@ -1324,7 +1322,7 @@ void QnMain::run()
     av_lockmgr_register(NULL);
 
     // First disconnect eventManager from all slots, to not try to reconnect on connection close
-    disconnect(eventManager);
+    disconnect(QnServerMessageProcessor::instance());
 
     // This method will set flag on message channel to threat next connection close as normal
     appServerConnection->disconnectSync();
