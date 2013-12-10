@@ -6,6 +6,8 @@
 #include <QtCore/QSharedPointer>
 
 #include <api/message_source.h>
+#include <api/model/kvpair.h>
+
 #include <business/business_event_rule.h>
 
 #include <utils/common/singleton.h>
@@ -22,7 +24,13 @@ public:
     virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT);
 
 signals:
+    void connectionOpened();
+    void connectionClosed();
     void connectionReset();
+
+    void fileAdded(const QString &filename);
+    void fileUpdated(const QString &filename);
+    void fileRemoved(const QString &filename);
 
     void businessRuleChanged(const QnBusinessEventRulePtr &rule);
     void businessRuleDeleted(int id);
@@ -30,8 +38,18 @@ signals:
 
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 
+    void kvPairsChanged(const QnKvPairs &kvPairs);
+    void kvPairsDeleted(const QnKvPairs &kvPairs);
 protected:
+    virtual void loadRuntimeInfo(const QnMessage &message);
+    virtual void handleConnectionOpened(const QnMessage &message);
+    virtual void handleConnectionClosed(const QString &errorString);
     virtual void handleMessage(const QnMessage &message);
+
+private slots:
+    void at_connectionOpened(const QnMessage &message);
+    void at_connectionClosed(const QString &errorString);
+    void at_messageReceived(const QnMessage &message);
 
 protected:
     QSharedPointer<QnMessageSource> m_source;

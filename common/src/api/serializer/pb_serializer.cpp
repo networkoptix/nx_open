@@ -51,6 +51,7 @@ void parseResources(QnResourceList& resources, const PbResourceList& pb_resource
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
+void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs);
 
 namespace {
 
@@ -373,18 +374,6 @@ void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
             users.append(user);
         else
             cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
-    }
-}
-
-void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs)
-{
-    for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
-    {
-        QnKvPair kvPair;
-        kvPair.setName(QString::fromUtf8(ci->name().c_str()));
-        kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
-
-        kvPairs[ci->resourceid()].append(kvPair);
     }
 }
 
@@ -1449,3 +1438,14 @@ void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCame
     }
 }
 
+void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs)
+{
+    for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
+    {
+        QnKvPair kvPair;
+        kvPair.setName(QString::fromUtf8(ci->name().c_str()));
+        kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
+
+        kvPairs[ci->resourceid()].append(kvPair);
+    }
+}

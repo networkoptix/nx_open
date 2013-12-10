@@ -5,6 +5,8 @@
 
 #include <utils/common/id.h>
 
+#include <api/model/kvpair.h>
+
 #include <core/resource/resource_type.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_history.h>
@@ -35,7 +37,12 @@ namespace Qn {
         Message_Type_FileRemove = 12,
         Message_Type_FileUpdate = 13,
         Message_Type_RuntimeInfoChange = 14,
-        Message_Type_BusinessRuleReset = 15
+        Message_Type_BusinessRuleReset = 15,
+        Message_Type_KvPairChange = 16,
+        Message_Type_KvPairDelete = 17,
+
+
+        Message_Type_Count
     };
 
     QString toString( Message_Type val );
@@ -79,6 +86,8 @@ struct QnMessage
     QString filename;
     QString publicIp;
     bool allowCameraChanges;
+
+    QnKvPairs kvPairs;
 
     bool load(const pb::Message& message);
 
