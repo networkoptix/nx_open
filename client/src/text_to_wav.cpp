@@ -327,7 +327,7 @@ TextToWaveServer* TextToWaveServer::instance()
 
 void TextToWaveServer::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
 
     FestivalInitializer festivalInitializer;
 

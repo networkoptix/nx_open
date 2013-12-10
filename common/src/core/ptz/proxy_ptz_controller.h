@@ -11,9 +11,7 @@ public:
         m_baseController(baseController)
     {}
 
-    QnPtzControllerPtr baseController() const {
-        return m_baseController;
-    }
+    QnPtzControllerPtr baseController() const                                                   { return m_baseController; }
 
     virtual Qn::PtzCapabilities getCapabilities() override                                      { return m_baseController->getCapabilities(); }
 

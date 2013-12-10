@@ -1337,7 +1337,6 @@ class QnVideoService : public QtService<QtSingleCoreApplication>
 public:
     QnVideoService(int argc, char **argv): 
         QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
-        m_main(argc, argv),
         m_argc(argc),
         m_argv(argv)
     {
@@ -1346,9 +1345,11 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-
         QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
+        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+        
+        m_main.reset(new QnMain(m_argc, m_argv));
 
         return application()->exec();
     }
@@ -1388,7 +1389,7 @@ protected:
         }
 
         serverMain(m_argc, m_argv);
-        m_main.start();
+        m_main->start();
     }
 
     virtual void stop() override
@@ -1398,9 +1399,9 @@ protected:
     }
 
 private:
-    QnMain m_main;
     int m_argc;
     char **m_argv;
+    QScopedPointer<QnMain> m_main;
 };
 
 void stopServer(int signal)

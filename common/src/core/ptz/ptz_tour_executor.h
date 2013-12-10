@@ -15,6 +15,15 @@ public:
     void startTour(const QnPtzTour &tour);
     void stopTour();
 
+protected:
+    virtual void timerEvent(QTimerEvent *event) override;
+
+private:
+    void startMoving();
+
+private slots:
+    void at_controller_synchronized(Qn::PtzDataFields fields);
+
 private:
     QScopedPointer<QnPtzTourExecutorPrivate> d;
 };

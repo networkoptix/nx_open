@@ -78,7 +78,7 @@ void QnUniversalRequestProcessor::run()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     if (!readRequest()) 
         return;

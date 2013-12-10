@@ -5,10 +5,10 @@
 
 #include <QtCore/QSharedPointer>
 
-#include <api/message_source.h>
+#include <api/message_source.h> // TODO: #GDM fwd!!!!
 #include <api/model/kvpair.h>
 
-#include <business/business_event_rule.h>
+#include <business/business_event_rule.h> // TODO: #GDM fwd?
 
 #include <utils/common/singleton.h>
 
