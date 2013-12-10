@@ -43,7 +43,7 @@ bool QnColdStoreWriter::write(const QByteArray& ba, const QString& fn)
 
 void QnColdStoreWriter::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     if (!isConnectedToTheResource())
         return;
 

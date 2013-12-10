@@ -1414,7 +1414,7 @@ void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);

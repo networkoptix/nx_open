@@ -11,7 +11,7 @@ QnDefaultTcpConnectionProcessor::QnDefaultTcpConnectionProcessor(QSharedPointer<
 void QnDefaultTcpConnectionProcessor::run()
 {
     Q_D(QnTCPConnectionProcessor);
-    saveSysThreadID();
+    initSystemThreadId();
 
     d->responseBody.clear();
     d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
