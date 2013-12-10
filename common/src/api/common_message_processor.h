@@ -6,7 +6,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <api/message_source.h> // TODO: #GDM fwd!!!!
-#include <business/business_event_rule.h> // TODO: #GDM fwd
+#include <business/business_event_rule.h> // TODO: #GDM fwd?
 
 #include <utils/common/singleton.h>
 

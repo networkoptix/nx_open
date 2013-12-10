@@ -39,14 +39,15 @@ private slots:
     void at_finished();
 
 protected:
+    void saveSysThreadID();
+
+protected:
     volatile bool m_needStop;
     volatile bool m_onPause;
     QnSemaphore m_semaphore;
     size_t m_sysThreadID;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     DEBUG_CODE(const std::type_info *m_type;)
-
-    void saveSysThreadID();
 };
 
 
