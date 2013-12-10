@@ -167,7 +167,7 @@ void QnLongRunnable::initSystemThreadId() {
     /* This one is purely for debugging purposes. 
      * QThread::currentThreadId is implemented via pthread_self, 
      * which is not an identifier you see in GDB. */
-    m_systemThreadId = reinterpret_cast<std::uintptr_t>(gettid());
+    m_systemThreadId = gettid();
 #else
     m_systemThreadId = reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
 #endif
