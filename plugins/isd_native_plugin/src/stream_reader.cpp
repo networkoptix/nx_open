@@ -14,46 +14,73 @@
 #include <unistd.h>
 #endif
 
+#include <sys/epoll.h>
 #include <sys/timeb.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <fstream>
-#include <memory>
-#include <mutex>
-
-#include "ilp_video_packet.h"
-#include "ilp_empty_packet.h"
-#include <plugins/resources/third_party/motion_data_picture.h>
+#include <cassert>
 #include <iostream>
+#include <fstream>
 
 #include <QDateTime>
 
-#define GENERATE_RANDOM_MOTION
-#ifdef GENERATE_RANDOM_MOTION
-static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
-#endif
+#include <plugins/resources/third_party/motion_data_picture.h>
 
+#include "ilp_video_packet.h"
+#include "ilp_empty_packet.h"
+#include "isd_audio_packet.h"
+
+
+//if defined, video frames receive curernt system time as pts
+//#define USE_SYSTEM_CLOCK
+
+
+static const int HIGH_QUALITY_ENCODER = 0;
 static const int64_t MOTION_TIMEOUT_USEC = 1000ll * 300;
 
 StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int encoderNum)
 :
     m_refManager( parentRefManager ),
     m_encoderNum( encoderNum ),
-    m_codec(nxcip::CODEC_ID_NONE),
+    m_videoCodec(nxcip::CODEC_ID_NONE),
     m_lastVideoTime(0),
     m_lastMotionTime(0),
-    vmux_motion(0),
-    vmux(0),
+    m_vmux(0),
+    m_vmux_motion(0),
+    m_amux(0),
+    m_audioCodec(nxcip::CODEC_ID_NONE),
     m_prevPts(0),
-    m_ptsDelta(0)
+    m_ptsDelta(0),
+    m_audioEnabled(false),
+    m_epollFD(-1)
 {
 }
 
 StreamReader::~StreamReader()
 {
-    delete vmux_motion;
-    delete vmux;
+    if( m_vmux )
+    {
+        unregisterFD( m_vmux->GetFD() );
+        delete m_vmux;
+        m_vmux = 0;
+    }
+
+    delete m_vmux_motion;
+    m_vmux_motion = 0;
+
+    if( m_amux )
+    {
+        unregisterFD( m_amux->GetFD() );
+        delete m_amux;
+        m_amux = 0;
+    }
+
+    if( m_epollFD )
+    {
+        close( m_epollFD );
+        m_epollFD = 0;
+    }
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -98,33 +125,33 @@ bool StreamReader::needMetaData()
 
 MotionDataPicture* StreamReader::getMotionData()
 {
-    if (!vmux_motion)
+    if (!m_vmux_motion)
     {
-        vmux_motion = new Vmux();
+        m_vmux_motion = new Vmux();
         int info_size = sizeof(motion_stream_info);
-        int rv = vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
+        int rv = m_vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
         if (rv) {
-            std::cout << "can't get stream info for motion stream" << std::endl;
-            delete vmux_motion;
-            vmux_motion = 0;
+            std::cerr << "can't get stream info for motion stream" << std::endl;
+            delete m_vmux_motion;
+            m_vmux_motion = 0;
             return 0; // error
         }
 
         std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
 
-        rv = vmux_motion->StartVideo (Y_STREAM_SMALL);
+        rv = m_vmux_motion->StartVideo (Y_STREAM_SMALL);
         if (rv) {
-            delete vmux_motion;
-            vmux_motion = 0;
+            delete m_vmux_motion;
+            m_vmux_motion = 0;
             return 0; // error
         }
     }
 
     vmux_frame_t frame;
-    int rv = vmux_motion->GetFrame (&frame);
+    int rv = m_vmux_motion->GetFrame (&frame);
     if (rv) {
-        delete vmux_motion;
-        vmux_motion = 0; // close motion stream
+        delete m_vmux_motion;
+        m_vmux_motion = 0; // close motion stream
         return 0; // return error
     }
 
@@ -137,7 +164,21 @@ void StreamReader::setMotionMask(const uint8_t* data)
     m_motionEstimation.setMotionMask(data);
 }
 
-#define USE_SYSTEM_CLOCK
+void StreamReader::setAudioEnabled( bool audioEnabled )
+{
+    m_audioEnabled = audioEnabled;
+}
+
+int StreamReader::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    if( !m_audioFormat.get() )
+        return nxcip::NX_TRY_AGAIN;
+
+    *audioFormat = *m_audioFormat.get();
+    return nxcip::NX_NO_ERROR;
+}
 
 struct SharedStreamData
 {
@@ -159,48 +200,167 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
 
-    vmux_frame_t frame;
+    if( !m_amux && (m_encoderNum == HIGH_QUALITY_ENCODER) && m_audioEnabled )
+    {
+        //audio is not required
+        int result = initializeAMux();
+        if( result == nxcip::NX_NO_ERROR )
+            if( !registerFD( m_amux->GetFD() ) )
+                return nxcip::NX_IO_ERROR;
+    }
+
+    if( !m_vmux )
+    {
+        int result = initializeVMux();
+        if( result != nxcip::NX_NO_ERROR )
+            return result;
+        if( m_amux )    //using epoll only if receiving 2 streams
+            if( !registerFD( m_vmux->GetFD() ) )
+                return nxcip::NX_IO_ERROR;
+    }
+
+    if( !m_amux )
+    {
+        //not using epoll to maximize performance
+        return getVideoPacket( lpPacket );
+    }
+
+    assert( m_epollFD != -1 );
+    //polling audio and video streams
+    for( ;; )
+    {
+        static const int EVENTS_ARRAY_CAPACITY = 2;
+        epoll_event eventsArray[EVENTS_ARRAY_CAPACITY];
+
+        int result = epoll_wait( m_epollFD, eventsArray, EVENTS_ARRAY_CAPACITY, -1 );
+        if( result < 0 )
+        {
+            if( errno == EINTR )
+                continue;
+            //TODO/IMPL reinitialize?
+            return nxcip::NX_IO_ERROR;
+        }
+        else if( result == 0 )
+        {
+            //timeout
+            continue;
+        }
+
+        //getting corresponding packet
+        for( int i = 0; i < result; ++i )
+        {
+            //TODO/IMPL check eventsArray[i].events
+
+            if( eventsArray[i].data.fd == m_vmux->GetFD() )
+            {
+                return getVideoPacket( lpPacket );
+            }
+            else if( eventsArray[i].data.fd == m_amux->GetFD() )
+            {
+                return getAudioPacket( lpPacket );
+            }
+            else
+            {
+                assert( false );
+                return nxcip::NX_IO_ERROR;
+            }
+        }
+    }
+}
+
+void StreamReader::interrupt()
+{
+    //TODO/IMPL
+}
+
+int StreamReader::initializeVMux()
+{
+    std::unique_ptr<Vmux> vmux( new Vmux() );
+
     vmux_stream_info_t stream_info;
     int rv = 0;
 
-    if (!vmux)
+    int info_size = sizeof(stream_info);
+    rv = vmux->GetStreamInfo (m_encoderNum, &stream_info, &info_size);
+    if (rv) {
+        std::cerr << "ISD plugin: can't get video stream info" << std::endl;
+        return nxcip::NX_INVALID_ENCODER_NUMBER; // error
+    }
+    if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
+        m_videoCodec = nxcip::CODEC_ID_H264;
+    else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
+        m_videoCodec = nxcip::CODEC_ID_MJPEG;
+    else
     {
-        vmux = new Vmux();
-        int info_size = sizeof(stream_info);
-        rv = vmux->GetStreamInfo (m_encoderNum, &stream_info, &info_size);
-        if (rv) {
-            std::cout << "ISD plugin: can't get stream info" << std::endl;
-            delete vmux;
-            vmux = 0;
-            return nxcip::NX_INVALID_ENCODER_NUMBER; // error
-        }
-        if (stream_info.enc_type == VMUX_ENC_TYPE_H264)
-            m_codec = nxcip::CODEC_ID_H264;
-        else if (stream_info.enc_type == VMUX_ENC_TYPE_MJPG)
-            m_codec = nxcip::CODEC_ID_MJPEG;
-        else
-        {
-            std::cerr<<"ISD plugin: unsupported video format "<<stream_info.enc_type<<"\n";
-            delete vmux;
-            vmux = 0;
-            return nxcip::NX_INVALID_ENCODER_NUMBER;
-        }
-
-        rv = vmux->StartVideo (m_encoderNum);
-        if (rv) {
-            std::cout << "ISD plugin: can't start video" << std::endl;
-            delete vmux;
-            vmux = 0;
-            return nxcip::NX_INVALID_ENCODER_NUMBER; // error
-        }
-        m_firstFrameTime = 0;
+        std::cerr<<"ISD plugin: unsupported video format "<<stream_info.enc_type<<"\n";
+        return nxcip::NX_INVALID_ENCODER_NUMBER;
     }
 
-    rv = vmux->GetFrame (&frame);
+    rv = vmux->StartVideo (m_encoderNum);
     if (rv) {
-        std::cout << "Can't read video frame" << std::endl;
-        delete vmux;
-        vmux = 0;
+        std::cerr << "ISD plugin: can't start video" << std::endl;
+        return nxcip::NX_INVALID_ENCODER_NUMBER; // error
+    }
+    m_firstFrameTime = 0;
+
+    m_vmux = vmux.release();
+
+    //std::cout<<"VMUX initialized. fd = "<<m_vmux->GetFD()<<"\n";
+
+    return nxcip::NX_NO_ERROR;
+}
+
+int StreamReader::initializeAMux()
+{
+    std::auto_ptr<Amux> amux( new Amux() );
+    memset( &m_audioInfo, 0, sizeof(m_audioInfo) );
+
+    if( amux->GetInfo( &m_audioInfo ) )
+    {
+        std::cerr << "ISD plugin: can't get audio stream info\n";
+        return nxcip::NX_IO_ERROR;
+    }
+
+    switch( m_audioInfo.encoding )
+    {
+        case EncPCM:
+            m_audioCodec = nxcip::CODEC_ID_PCM_S16LE;
+            break;
+        case EncUlaw:
+            m_audioCodec = nxcip::CODEC_ID_PCM_MULAW;
+            break;
+        case EncAAC:
+            m_audioCodec = nxcip::CODEC_ID_AAC;
+            break;
+        default:
+            std::cerr << "ISD plugin: unsupported audio codec: "<<m_audioInfo.encoding<<"\n";
+            return nxcip::NX_UNSUPPORTED_CODEC;
+    }
+
+    if( amux->StartAudio() )
+    {
+        std::cerr << "ISD plugin: can't start audio stream\n";
+        return nxcip::NX_IO_ERROR;
+    }
+
+    //std::cout<<"AMUX initialized. Codec type "<<m_audioCodec<<" fd = "<<amux->GetFD()<<"\n";
+
+    m_amux = amux.release();
+    return nxcip::NX_NO_ERROR;
+}
+
+int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
+{
+    vmux_frame_t frame;
+    int rv = 0;
+
+    rv = m_vmux->GetFrame (&frame);
+    if (rv) {
+        std::cerr << "Can't read video frame" << std::endl;
+        if( m_epollFD != -1 )
+            unregisterFD( m_vmux->GetFD() );
+        delete m_vmux;
+        m_vmux = 0;
         return nxcip::NX_IO_ERROR; // error
     }
 
@@ -233,19 +393,20 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         m_prevPts = frame.vmux_info.PTS;
     }
     m_firstFrameTime += (int64_t(frame.vmux_info.PTS - m_prevPts) * 1000000ll) / 90000; //TODO dword wrap
+    const int64_t currentTimestamp =
+#ifdef USE_SYSTEM_CLOCK
+        QDateTime::currentMSecsSinceEpoch() * 1000ll;
+#else
+        //(int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
+        m_firstFrameTime + m_ptsDelta;
+#endif
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel
-        //(int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
-#ifdef USE_SYSTEM_CLOCK
-        QDateTime::currentMSecsSinceEpoch() * 1000ll,
-#else
-        m_firstFrameTime + m_ptsDelta,
-#endif
-        //currentTime,
+        currentTimestamp,
         (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0) | 
             (m_encoderNum > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
         0, // cseq
-        m_codec)); 
+        m_videoCodec )); 
     m_prevPts = frame.vmux_info.PTS;
     videoPacket->resizeBuffer( frame.frame_size );
     memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
@@ -262,7 +423,69 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     return nxcip::NX_NO_ERROR;
 }
 
-void StreamReader::interrupt()
+int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
 {
-    //TODO/IMPL
+    int audioBytesAvailable = m_amux->BytesAvail();
+    if( audioBytesAvailable <= 0 )
+    {
+        std::cerr<<"ISD plugin: no audio bytes available\n";
+        return nxcip::NX_IO_ERROR;
+    }
+
+    std::auto_ptr<ISDAudioPacket> audioPacket( new ISDAudioPacket(
+        0,  //channel number
+        m_lastVideoTime,
+        m_audioCodec ) );
+    audioPacket->reserve( audioBytesAvailable );
+
+    int bytesRead = m_amux->ReadAudio( (char*)audioPacket->data(), audioPacket->capacity() );
+    if( bytesRead <= 0 )
+    {
+        std::cerr<<"ISD plugin: failed to read audio packet\n";
+        return nxcip::NX_IO_ERROR;
+    }
+
+    audioPacket->setDataSize( bytesRead );
+
+    if( !m_audioFormat.get() )
+        fillAudioFormat( *audioPacket.get() );
+
+    //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
+
+    *lpPacket = audioPacket.release();
+    return nxcip::NX_NO_ERROR;
+}
+
+bool StreamReader::registerFD( int fd )
+{
+    if( m_epollFD == -1 )
+        m_epollFD = epoll_create( 32 );
+
+    epoll_event _event;
+    memset( &_event, 0, sizeof(_event) );
+    _event.data.fd = fd;
+    _event.events = EPOLLIN | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
+    return epoll_ctl( m_epollFD, EPOLL_CTL_ADD, fd, &_event ) == 0;
+}
+
+void StreamReader::unregisterFD( int fd )
+{
+    if( m_epollFD != -1 )
+        epoll_ctl( m_epollFD, EPOLL_CTL_DEL, fd, NULL );
+}
+
+void StreamReader::fillAudioFormat( const ISDAudioPacket& audioPacket )
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    m_audioFormat.reset( new nxcip::AudioFormat() );
+
+    m_audioFormat->compressionType = m_audioCodec;
+    m_audioFormat->sampleRate = m_audioInfo.sample_rate;
+    m_audioFormat->bitrate = m_audioInfo.bit_rate;
+    m_audioFormat->channels = 2;
+
+    //std::cout<<"Audio format: sample_rate "<<m_audioInfo.sample_rate<<", bitrate "<<m_audioInfo.bit_rate<<"\n";
+
+    //TODO/IMPL parsing audio packet header and retrieving data
 }

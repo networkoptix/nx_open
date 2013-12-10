@@ -22,6 +22,9 @@ namespace nxcip
         CODEC_ID_AAC,
         CODEC_ID_AC3,
         CODEC_ID_DTS,
+        //raw 16-bit little-endian PCM
+        CODEC_ID_PCM_S16LE,
+        CODEC_ID_PCM_MULAW,
         CODEC_ID_VORBIS
     };
 

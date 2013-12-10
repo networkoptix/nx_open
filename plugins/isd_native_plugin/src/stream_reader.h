@@ -8,16 +8,19 @@
 
 #include <stdint.h>
 
-#include <map>
-#include <string>
+#include <memory>
+#include <mutex>
+
+#include <isd/amux/amux_iface.h>
+#include <isd/vmux/vmux_iface.h>
 
 #include <plugins/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
-#include "mutex.h"
-#include <isd/vmux/vmux_iface.h>
+
 #include "isd_motion_estimation.h"
 
+
+class ISDAudioPacket;
 class MotionDataPicture;
 
 //!Reads picture files from specified directory as video-stream
@@ -44,7 +47,9 @@ public:
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 
-    void setMotionMask(const uint8_t* data);
+    void setMotionMask( const uint8_t* data );
+    void setAudioEnabled( bool audioEnabled );
+    int getAudioFormat( nxcip::AudioFormat* audioFormat ) const;
 
 private:
     bool needMetaData();
@@ -53,17 +58,33 @@ private:
 private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNum;
-    nxcip::CompressionType m_codec;
+    nxcip::CompressionType m_videoCodec;
     nxcip::UsecUTCTimestamp m_lastVideoTime;
     nxcip::UsecUTCTimestamp m_lastMotionTime;
-    Vmux* vmux;
+    Vmux* m_vmux;
+    Vmux* m_vmux_motion;
+    amux_info_t m_audioInfo;
+    Amux* m_amux;
+    nxcip::CompressionType m_audioCodec;
+    mutable std::mutex m_mutex;
+    std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
     
-    Vmux* vmux_motion;
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
     int64_t m_firstFrameTime;
     int64_t m_prevPts;
     int64_t m_ptsDelta;
+    bool m_audioEnabled;
+
+    int m_epollFD;
+
+    int initializeVMux();
+    int initializeAMux();
+    int getVideoPacket( nxcip::MediaDataPacket** packet );
+    int getAudioPacket( nxcip::MediaDataPacket** packet );
+    bool registerFD( int fd );
+    void unregisterFD( int fd );
+    void fillAudioFormat( const ISDAudioPacket& audioPacket );
 };
 
 #endif  //ILP_STREAM_READER_H

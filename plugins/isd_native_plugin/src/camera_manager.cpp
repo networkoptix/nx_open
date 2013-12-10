@@ -20,7 +20,8 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::shareFpsCapability |
         nxcip::BaseCameraManager::hardwareMotionCapability),
-    m_motionMask( nullptr )
+    m_motionMask( nullptr ),
+    m_audioEnabled( false )
 {
 }
 
@@ -77,7 +78,10 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
     if( !m_encoder[encoderIndex].get() )
+    {
         m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex) );
+        m_encoder[encoderIndex]->setAudioEnabled( m_audioEnabled );
+    }
     m_encoder[encoderIndex]->addRef();
     if (m_motionMask)
         m_encoder[encoderIndex]->setMotionMask(m_motionMask);
@@ -104,14 +108,19 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 void CameraManager::setCredentials( const char* username, const char* password )
 {
     if( username )
-    strcpy( m_info.defaultLogin, username );
+        strcpy( m_info.defaultLogin, username );
     if( password )
-    strcpy( m_info.defaultPassword, password );
+        strcpy( m_info.defaultPassword, password );
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
-int CameraManager::setAudioEnabled( int /*audioEnabled*/ )
+int CameraManager::setAudioEnabled( int audioEnabled )
 {
+    m_audioEnabled = audioEnabled;
+    if (m_encoder[0].get())
+        m_encoder[0]->setAudioEnabled(m_audioEnabled);
+    if (m_encoder[1].get())
+        m_encoder[1]->setAudioEnabled(m_audioEnabled);
     return nxcip::NX_NO_ERROR;
 }
 

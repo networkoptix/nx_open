@@ -34,6 +34,7 @@ namespace nxcip
     static const int NX_NOT_AUTHORIZED = -1;
     static const int NX_INVALID_ENCODER_NUMBER = -2;
     static const int NX_UNKNOWN_PORT_NAME = -3;
+    static const int NX_UNSUPPORTED_CODEC = -8;
     static const int NX_UNSUPPORTED_RESOLUTION = -9;
     static const int NX_UNDEFINED_BEHAVOUR = -20;
     static const int NX_NOT_IMPLEMENTED = -21;
@@ -41,6 +42,8 @@ namespace nxcip
     static const int NX_MORE_DATA = -23;
     static const int NX_NO_DATA = -24;
     static const int NX_IO_ERROR = -25;
+    //!Operation could not be completed now, but it may still be available later
+    static const int NX_TRY_AGAIN = -26;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -278,6 +281,48 @@ namespace nxcip
     };
 
 
+    struct AudioFormat
+    {
+        enum SampleType
+        {
+            stU8,   ///< unsigned 8 bits
+            stS16,  ///< signed 16 bits
+            stS32,  ///< signed 32 bits
+            stFLT
+        };
+
+        enum ByteOrderType
+        {
+            boLittleEndian,
+            boBigEndian
+        };
+
+        CompressionType compressionType;
+        int sampleRate;
+        //!in bps
+        int bitrate;
+        ByteOrderType byteOrder;
+        int channels;
+        SampleType sampleFmt;
+        int channelLayout;
+        int blockAlign;
+        int bitsPerCodedSample;
+
+        AudioFormat()
+        :
+            compressionType(CODEC_ID_NONE),
+            sampleRate(0),
+            bitrate(0),
+            byteOrder(boLittleEndian),
+            channels(0),
+            sampleFmt(stU8),
+            channelLayout(0),
+            blockAlign(0),
+            bitsPerCodedSample(0)
+        {
+        }
+    };
+
         // {9A1BDA18-563C-42de-8E23-B9244FD00658}
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
@@ -296,6 +341,8 @@ namespace nxcip
             Can be used if camera uses some proprietary media stream control protocol or wants to provide motion information
         */
         virtual StreamReader* getLiveStreamReader() = 0;
+        //!Returns audio format, if audio is supported
+        virtual int getAudioFormat( AudioFormat* audioFormat ) const = 0;
     };
 
 
@@ -771,7 +818,8 @@ namespace nxcip
         virtual unsigned int flags() const = 0;
         //!Returns sequence number of command this packet belongs to
         /*!
-            Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange
+            Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange.
+            In case of live stream \a cSeq is ignored
         */
         virtual unsigned int cSeq() const = 0;
     };
