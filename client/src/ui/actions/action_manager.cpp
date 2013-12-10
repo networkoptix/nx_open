@@ -889,7 +889,7 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
         factory(Qn::PtzGoToPresetAction).
-            flags(Qn::SingleTarget | Qn::ResourceTarget).
+            flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Go To Saved Position")).
             requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
