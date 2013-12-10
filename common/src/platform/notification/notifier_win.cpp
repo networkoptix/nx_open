@@ -129,7 +129,7 @@ void QnWindowsNotifier::updateTime(bool notify) {
 }
 
 bool QnWindowsNotifier::eventFilter(QObject *watched, QEvent *event) {
-    if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == UpdateTimeInvocation) {
+    if(event->type() == QnEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == UpdateTimeInvocation) {
         updateTime(true);
         return false;
     } else {

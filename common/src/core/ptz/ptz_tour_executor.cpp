@@ -1,8 +1,11 @@
 #include "ptz_tour_executor.h"
 
+#include <cassert>
+
 #include <QtCore/QBasicTimer>
 
 #include <utils/math/math.h>
+#include <utils/common/invocation_event.h>
 
 #include "abstract_ptz_controller.h"
 
@@ -149,18 +152,22 @@ QnPtzTourExecutor::QnPtzTourExecutor(const QnPtzControllerPtr &controller):
 {
     d->q = this;
     d->init(controller);
+
+    connect(this, &QnPtzTourExecutor::startTourLater,   this, &QnPtzTourExecutor::at_startTour_requested, Qt::QueuedConnection);
+    connect(this, &QnPtzTourExecutor::stopTourLater,    this, &QnPtzTourExecutor::at_stopTour_requested, Qt::QueuedConnection);
 }
 
 QnPtzTourExecutor::~QnPtzTourExecutor() {
-    return;
+    /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
+    assert(QThread::currentThread() == thread()); 
 }
 
 void QnPtzTourExecutor::startTour(const QnPtzTour &tour) {
-    d->startTour(tour);
+    emit startTourLater(tour);
 }
 
 void QnPtzTourExecutor::stopTour() {
-    d->stopTour();
+    emit stopTourLater();
 }
 
 void QnPtzTourExecutor::timerEvent(QTimerEvent *event) {
@@ -172,3 +179,10 @@ void QnPtzTourExecutor::at_controller_synchronized(Qn::PtzDataFields fields) {
     d->handleSynchronized(fields);
 }
 
+void QnPtzTourExecutor::at_startTour_requested(const QnPtzTour &tour) {
+    d->startTour(tour);
+}
+
+void QnPtzTourExecutor::at_stopTour_requested() {
+    d->stopTour();
+}
