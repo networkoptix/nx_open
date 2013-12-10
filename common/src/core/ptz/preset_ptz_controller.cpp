@@ -139,7 +139,10 @@ bool QnPresetPtzController::activatePreset(const QString &presetId) {
         if(!d->records.contains(presetId))
             return false;
         data = d->records[presetId].data;
+
+        qDebug() << "PRESET" << d->records[presetId].preset.name << d->records[presetId].data.position;
     }
+
 
     if(!absoluteMove(data.space, data.position))    
         return false;

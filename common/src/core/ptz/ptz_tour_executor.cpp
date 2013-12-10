@@ -79,14 +79,16 @@ void QnPtzTourExecutorPrivate::startMoving() {
     if(currentState == Stopped) {
         currentIndex = 0;
     } else {
-        currentIndex = (currentIndex + 1) & currentTour.spots.size();
+        currentIndex = (currentIndex + 1) % currentTour.spots.size();
     }
     currentState = Moving;
     currentPosition = qQNaN<QVector3D>();
 
+    qDebug() << "TOUR SPOT" << currentIndex;
+
     controller->getPosition(defaultSpace, &currentPosition);
     controller->activatePreset(currentTour.spots[currentIndex].presetId);
-    moveTimer.start(100, q);
+    moveTimer.start(1000, q);
 }
 
 void QnPtzTourExecutorPrivate::processMoving() {
