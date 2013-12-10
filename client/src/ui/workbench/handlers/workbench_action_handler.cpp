@@ -2377,7 +2377,8 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
 
     // TODO: #GDM replace if there is a preset with the same name. Maybe ask to replace.
 
-    if (!widget->ptzController()->createPreset(QnPtzPreset(QUuid::createUuid().toString(), dialog->name())))
+    QString presetId = QUuid::createUuid().toString();
+    if (!widget->ptzController()->createPreset(QnPtzPreset(presetId, dialog->name())))
         return;
 
     if(n > 2) {
@@ -2400,7 +2401,10 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         widget->ptzController()->activateTour(tour.id);
     }
 
-    //TODO: #GDM save hotkey
+    if (dialog->hotkey() >= 0) {
+        hotkeys[presetId] = dialog->hotkey();
+        context()->instance<QnPtzHotkeyKvPairWatcher>()->updateHotkeys(widget->camera()->getId(), hotkeys);
+    }
 
 #if 0
         QMessageBox::critical(
