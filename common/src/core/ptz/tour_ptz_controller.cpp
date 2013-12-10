@@ -17,6 +17,14 @@
 class QnPtzTourExecutorThread: public QnLongRunnable {
     typedef QnLongRunnable base_type;
 public:
+    QnPtzTourExecutorThread() {
+        start();
+    }
+
+    virtual ~QnPtzTourExecutorThread() {
+        stop();
+    }
+
     virtual void pleaseStop() {
         base_type::pleaseStop();
 
@@ -154,9 +162,7 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
         tour = d->records[tourId];
     }
 
-    /*if(!absoluteMove(data.space, data.position))    
-        return false;*/
-
+    d->executor->startTour(tour);
     return true;
 }
 

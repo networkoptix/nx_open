@@ -2375,8 +2375,30 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     if(dialog->exec() != QDialog::Accepted)
         return;
 
+    // TODO: #GDM replace if there is a preset with the same name. Maybe ask to replace.
+
     if (!widget->ptzController()->createPreset(QnPtzPreset(QUuid::createUuid().toString(), dialog->name())))
         return;
+
+    if(n > 2) {
+        QnPtzTour tour;
+        tour.name = tr("Tour");
+        tour.id = QUuid::createUuid().toString();
+        
+        foreach(const QnPtzPreset &preset, existing) {
+            QnPtzTourSpot spot;
+            spot.presetId = preset.id;
+            spot.speed = 1.0;
+            spot.stayTime = 0;
+            tour.spots.push_back(spot);
+        }
+
+        widget->ptzController()->createTour(tour);
+
+        QnSleep::sleep(1);
+
+        widget->ptzController()->activateTour(tour.id);
+    }
 
     //TODO: #GDM save hotkey
 

@@ -237,22 +237,24 @@ public:
     /**
      * Synchronizes this controller's internal caches with the actual target values.
      * At the end of each synchronization operation, a <tt>synchronized(Qn::PtzDataFields)</tt>
-     * signal is emitted.
+     * signal is emitted with exactly the same parameters as the ones that were passed.
      * 
-     * Note that this is the only function that may not be implementable in a sane 
-     * way if this controller has a <tt>Qn::NonBlockingPtzCapability</tt>. 
-     * That's where the provided signal comes into play, effectively making this
-     * function asynchronous in this case.
+     * If this controller is blocking, then the signal will be emitted from inside 
+     * this function.
      * 
-     * Also note that this function may be used by the controller internally,
+     * If it is non-blocking, then the function will return instantly, and the signal
+     * will be emitted when the synchronization operation actually completes,
+     * effectively making this function asynchronous.
+     * 
+     * Note that this function may be used by the controller internally,
      * and thus the corresponding signal can be emitted basically anytime.
      * 
      * \param fields                    Data fields to synchronize.
      */
-    virtual bool synchronize(Qn::PtzDataFields fields) = 0;
+    virtual void synchronize(Qn::PtzDataFields fields) = 0;
 
 signals:
-    void capabilitiesChanged(); // TODO: #Elric handle in proxy
+    void capabilitiesChanged(); // TODO: #Elric handle in proxy?
     void synchronized(Qn::PtzDataFields fields);
 
 protected:

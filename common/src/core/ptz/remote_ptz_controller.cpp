@@ -129,30 +129,45 @@ bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
 }
 
 bool QnRemotePtzController::createTour(const QnPtzTour &tour) {
-    return false;
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzCreateTourAsync(m_resource, tour, this, SLOT(at_createTour_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::removeTour(const QString &tourId) {
-    return false;
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzRemoveTourAsync(m_resource, tourId, this, SLOT(at_removeTour_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::activateTour(const QString &tourId) {
-    return false;
+    if(!m_server)
+        return false;
+
+    m_server->apiConnection()->ptzActivateTourAsync(m_resource, tourId, this, SLOT(at_activateTour_replyReceived(int, int)));
+    return true;
 }
 
 bool QnRemotePtzController::getTours(QnPtzTourList *tours) {
-    return false;
+    if(!m_server)
+        return false;
+
+    *tours = m_data.tours; // TODO: #Elric implement properly =)
+    return true;
 }
 
-bool QnRemotePtzController::synchronize(Qn::PtzDataFields fields) {
+void QnRemotePtzController::synchronize(Qn::PtzDataFields fields) {
     if(fields == Qn::NoPtzFields) {
         emit synchronizedLater(fields);
-        return true;
+        return;
     }
 
     int handle = m_server->apiConnection()->ptzGetDataAsync(m_resource, fields, this, SLOT(at_getData_replyReceived(int, const QnPtzData &, int)));
     m_fieldsByHandle.insert(handle, fields);
-    return true;
 }
 
 // -------------------------------------------------------------------------- //
@@ -183,6 +198,18 @@ void QnRemotePtzController::at_removePreset_replyReceived(int status, int handle
 }
 
 void QnRemotePtzController::at_activatePreset_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_createTour_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_removeTour_replyReceived(int status, int handle) {
+    return;
+}
+
+void QnRemotePtzController::at_activateTour_replyReceived(int status, int handle) {
     return;
 }
 

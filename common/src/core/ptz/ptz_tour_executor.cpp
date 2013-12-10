@@ -153,8 +153,8 @@ QnPtzTourExecutor::QnPtzTourExecutor(const QnPtzControllerPtr &controller):
     d->q = this;
     d->init(controller);
 
-    connect(this, &QnPtzTourExecutor::startTourLater,   this, &QnPtzTourExecutor::at_startTour_requested, Qt::QueuedConnection);
-    connect(this, &QnPtzTourExecutor::stopTourLater,    this, &QnPtzTourExecutor::at_stopTour_requested, Qt::QueuedConnection);
+    connect(this, &QnPtzTourExecutor::startTourRequested,   this, &QnPtzTourExecutor::at_startTourRequested, Qt::QueuedConnection);
+    connect(this, &QnPtzTourExecutor::stopTourRequested,    this, &QnPtzTourExecutor::at_stopTourRequested, Qt::QueuedConnection);
 }
 
 QnPtzTourExecutor::~QnPtzTourExecutor() {
@@ -163,11 +163,11 @@ QnPtzTourExecutor::~QnPtzTourExecutor() {
 }
 
 void QnPtzTourExecutor::startTour(const QnPtzTour &tour) {
-    emit startTourLater(tour);
+    emit startTourRequested(tour);
 }
 
 void QnPtzTourExecutor::stopTour() {
-    emit stopTourLater();
+    emit stopTourRequested();
 }
 
 void QnPtzTourExecutor::timerEvent(QTimerEvent *event) {
@@ -179,10 +179,10 @@ void QnPtzTourExecutor::at_controller_synchronized(Qn::PtzDataFields fields) {
     d->handleSynchronized(fields);
 }
 
-void QnPtzTourExecutor::at_startTour_requested(const QnPtzTour &tour) {
+void QnPtzTourExecutor::at_startTourRequested(const QnPtzTour &tour) {
     d->startTour(tour);
 }
 
-void QnPtzTourExecutor::at_stopTour_requested() {
+void QnPtzTourExecutor::at_stopTourRequested() {
     d->stopTour();
 }

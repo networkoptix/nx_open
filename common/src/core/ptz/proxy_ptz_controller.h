@@ -8,8 +8,17 @@ class QnProxyPtzController: public QnAbstractPtzController {
 public:
     QnProxyPtzController(const QnPtzControllerPtr &baseController):
         QnAbstractPtzController(baseController->resource()),
-        m_baseController(baseController)
-    {}
+        m_baseController(baseController),
+        m_baseIsBlocking(!baseController->hasCapabilities(Qn::NonBlockingPtzCapability))
+    {
+        if(!m_baseIsBlocking)
+            connect(m_baseController.data(), &QnAbstractPtzController::synchronized, this, &QnProxyPtzController::synchronizeProxy, Qt::QueuedConnection);
+    }
+
+    virtual ~QnProxyPtzController() {
+        if(!m_baseIsBlocking)
+            disconnect(m_baseController.data(), NULL, this, NULL);
+    }
 
     QnPtzControllerPtr baseController() const                                                   { return m_baseController; }
 
@@ -34,10 +43,19 @@ public:
     virtual bool activateTour(const QString &tourId) override                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                        { return m_baseController->getTours(tours); }
 
-    virtual bool synchronize(Qn::PtzDataFields fields) override                                 { return m_baseController->synchronize(fields); }
+    virtual void synchronize(Qn::PtzDataFields fields) override { 
+        m_baseController->synchronize(fields);
+        if(m_baseIsBlocking)
+            synchronizeProxy(fields); 
+    }
+
+    Q_SLOT virtual void synchronizeProxy(Qn::PtzDataFields fields) {
+        emit synchronized(fields); 
+    }
 
 private:
     QnPtzControllerPtr m_baseController;
+    bool m_baseIsBlocking;
 };
 
 

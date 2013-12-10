@@ -25,14 +25,13 @@ public:
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
-signals:
-    void startTourLater(const QnPtzTour &tour);
-    void stopTourLater();
+private:
+    Q_SIGNAL void startTourRequested(const QnPtzTour &tour);
+    Q_SIGNAL void stopTourRequested();
 
-private slots:
-    void at_controller_synchronized(Qn::PtzDataFields fields);
-    void at_startTour_requested(const QnPtzTour &tour);
-    void at_stopTour_requested();
+    Q_SLOT void at_controller_synchronized(Qn::PtzDataFields fields);
+    Q_SLOT void at_startTourRequested(const QnPtzTour &tour);
+    Q_SLOT void at_stopTourRequested();
 
 private:
     QScopedPointer<QnPtzTourExecutorPrivate> d;
