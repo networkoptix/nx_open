@@ -13,16 +13,11 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnServerMessageProcessor();
-
-    virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT) override;
-signals:
-    void connectionOpened();
-
-private slots:
-    void at_messageReceived(QnMessage message);
-    void at_connectionOpened(QnMessage message);
-    void at_connectionClosed(QString errorString);
-
+protected:
+    virtual void loadRuntimeInfo(const QnMessage &message) override;
+    virtual void handleConnectionOpened(const QnMessage &message) override;
+    virtual void handleConnectionClosed(const QString &errorString) override;
+    virtual void handleMessage(const QnMessage &message) override;
 private:
     bool m_tryDirectConnect;
 };

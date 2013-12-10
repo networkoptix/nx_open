@@ -26,15 +26,7 @@ void QnClientMessageProcessor::init()
 
     appServerEventsUrl.setQuery(query);
 
-    init(appServerEventsUrl, QString());
-}
-
-void QnClientMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
-    base_type::init(url, authKey, reconnectTimeout);
-
-    connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
-    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
-    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
+    base_type::init(appServerEventsUrl, QString());
 }
 
 QnClientMessageProcessor::QnClientMessageProcessor():
@@ -49,6 +41,80 @@ QnClientMessageProcessor::QnClientMessageProcessor():
 void QnClientMessageProcessor::run() {
     init();
     base_type::run();
+}
+
+void QnClientMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
+    //do not call base method - we do not need session key
+    if (!message.systemName.isEmpty())
+        QnAppServerConnectionFactory::setSystemName(message.systemName);
+    if (!message.publicIp.isEmpty())
+        QnAppServerConnectionFactory::setPublicIp(message.publicIp);
+}
+
+
+void QnClientMessageProcessor::handleConnectionOpened(const QnMessage &message) {
+    updateHardwareIds(message);
+    processResources(message.resources);
+    processLicenses(message.licenses);
+    processCameraServerItems(message.cameraServerItems);
+
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    qDebug() << "Connection opened";
+
+    qnSyncTime->reset();
+    base_type::handleConnectionOpened(message);
+}
+
+void QnClientMessageProcessor::handleMessage(const QnMessage &message) {
+    base_type::handleMessage(message);
+
+    switch(message.messageType) {
+    case Qn::Message_Type_License: {
+        qnLicensePool->addLicense(message.license);
+        break;
+    }
+    case Qn::Message_Type_ResourceDisabledChange: {
+        QnResourcePtr resource;
+        if (!message.resourceGuid.isEmpty())
+            resource = qnResPool->getResourceByGuid(message.resourceGuid);
+        else
+            resource = qnResPool->getResourceById(message.resourceId);
+
+        if (resource)
+            resource->setDisabled(message.resourceDisabled);
+        break;
+    }
+    case Qn::Message_Type_ResourceStatusChange: {
+        QnResourcePtr resource;
+        if (!message.resourceGuid.isEmpty())
+            resource = qnResPool->getResourceByGuid(message.resourceGuid);
+        else
+            resource = qnResPool->getResourceById(message.resourceId);
+
+        if (resource)
+            resource->setStatus(message.resourceStatus);
+        break;
+    }
+    case Qn::Message_Type_CameraServerItem: {
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
+        break;
+    }
+    case Qn::Message_Type_ResourceChange: {
+        if (!message.resource) {
+            qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
+            return;
+        }
+        updateResource(message.resource);
+        break;
+    }
+    case Qn::Message_Type_ResourceDelete: {
+        if (QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId))
+            qnResPool->removeResource(ownResource);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
@@ -85,7 +151,7 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
         }
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             determineOptimalIF(mediaServer.data());
-    } 
+    }
     else {
         bool mserverStatusChanged = false;
         QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
@@ -126,95 +192,6 @@ void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &
         resource->apiConnection()->setProxyAddr(origApiUrl, QString(), 0);
 }
 
-void QnClientMessageProcessor::at_messageReceived(QnMessage message)
-{
-    base_type::handleMessage(message);
-
-    switch(message.messageType) {
-    case Qn::Message_Type_Initial:
-        {
-            QnAppServerConnectionFactory::setPublicIp(message.publicIp);
-            break;
-        }
-    case Qn::Message_Type_License:
-        {
-            qnLicensePool->addLicense(message.license);
-            break;
-        }
-    case Qn::Message_Type_ResourceDisabledChange:
-        {
-            QnResourcePtr resource;
-            if (!message.resourceGuid.isEmpty())
-                resource = qnResPool->getResourceByGuid(message.resourceGuid);
-            else
-                resource = qnResPool->getResourceById(message.resourceId);
-
-            if (resource)
-                resource->setDisabled(message.resourceDisabled);
-            break;
-        }
-    case Qn::Message_Type_ResourceStatusChange:
-        {
-            QnResourcePtr resource;
-            if (!message.resourceGuid.isEmpty())
-                resource = qnResPool->getResourceByGuid(message.resourceGuid);
-            else
-                resource = qnResPool->getResourceById(message.resourceId);
-
-            if (resource)
-                resource->setStatus(message.resourceStatus);
-            break;
-        }
-    case Qn::Message_Type_CameraServerItem:
-        {
-            QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
-            break;
-        }
-    case Qn::Message_Type_ResourceChange:
-        {
-            if (!message.resource)
-            {
-                qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
-                return;
-            }
-            updateResource(message.resource);
-            break;
-        }
-    case Qn::Message_Type_ResourceDelete:
-        {
-            QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);
-            qnResPool->removeResource(ownResource);
-            break;
-        }
-    case Qn::Message_Type_FileAdd:
-        {
-            emit fileAdded(message.filename);
-            break;
-        }
-    case Qn::Message_Type_FileRemove:
-        {
-            emit fileRemoved(message.filename);
-            break;
-        }
-    case Qn::Message_Type_FileUpdate:
-        {
-            emit fileUpdated(message.filename);
-            break;
-        }
-    case Qn::Message_Type_RuntimeInfoChange:
-        break; //TODO: #ivigasin what means this message for the client?
-    default:
-        break;
-    }
-}
-
-void QnClientMessageProcessor::at_connectionClosed(QString errorString)
-{
-    qDebug() << "Connection aborted:" << errorString;
-
-    emit connectionClosed();
-}
-
 void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
 {
     foreach(QnCameraHistoryPtr history, cameraHistoryList)
@@ -227,20 +204,4 @@ void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
     qnLicensePool->setHardwareId1(message.hardwareId1);
     qnLicensePool->setHardwareId2(message.hardwareId2);
     qnLicensePool->setHardwareId3(message.hardwareId3);
-}
-
-void QnClientMessageProcessor::at_connectionOpened(QnMessage message)
-{
-    QnAppServerConnectionFactory::setSystemName(message.systemName);
-
-    updateHardwareIds(message);
-    processResources(message.resources);
-    processLicenses(message.licenses);
-    processCameraServerItems(message.cameraServerItems);
-
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    qDebug() << "Connection opened";
-
-    qnSyncTime->reset();
-    emit connectionOpened();
 }

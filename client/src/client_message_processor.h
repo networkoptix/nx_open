@@ -17,20 +17,13 @@ public:
     QnClientMessageProcessor();
 
     virtual void run() override;
-
-    virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT) override;
-signals:
-    void connectionOpened();
-    void connectionClosed();
-
-    void fileAdded(const QString &filename);
-    void fileUpdated(const QString &filename);
-    void fileRemoved(const QString &filename);
+protected:
+    virtual void loadRuntimeInfo(const QnMessage &message) override;
+    virtual void handleConnectionOpened(const QnMessage &message) override;
+    virtual void handleMessage(const QnMessage &message) override;
 
 private slots:
-    void at_messageReceived(QnMessage message);
-    void at_connectionClosed(QString errorString);
-    void at_connectionOpened(QnMessage message);
+
     void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
 
 private:
