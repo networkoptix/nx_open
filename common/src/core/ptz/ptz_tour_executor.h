@@ -1,4 +1,3 @@
-#if 0
 #ifndef QN_PTZ_TOUR_EXECUTOR_H
 #define QN_PTZ_TOUR_EXECUTOR_H
 
@@ -21,4 +20,3 @@ private:
 };
 
 #endif // QN_PTZ_TOUR_EXECUTOR_H
-#endif

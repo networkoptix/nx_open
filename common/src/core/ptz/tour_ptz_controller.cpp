@@ -51,6 +51,8 @@ QnTourPtzController::~QnTourPtzController() {
 bool QnTourPtzController::extends(const QnPtzControllerPtr &baseController) {
     return 
         baseController->hasCapabilities(Qn::PresetsPtzCapability) &&
+        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
+        (baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) || baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability)) &&
         !baseController->hasCapabilities(Qn::ToursPtzCapability);
 }
 

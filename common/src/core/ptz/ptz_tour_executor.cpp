@@ -1,4 +1,3 @@
-#if 0
 #include "ptz_tour_executor.h"
 
 #include "abstract_ptz_controller.h"
@@ -65,5 +64,3 @@ void QnPtzTourExecutor::startTour(const QnPtzTour &tour) {
 void QnPtzTourExecutor::stopTour() {
 
 }
-
-#endif
