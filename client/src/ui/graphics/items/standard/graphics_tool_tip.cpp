@@ -218,6 +218,10 @@ void GraphicsToolTip::showText(const QString &text, QGraphicsView *view, QGraphi
     QPointF scenePos = view->mapToScene(pos);
     QWidget *viewport = view->childAt(pos);
 
+    //window can be in the resize animation process, so no child will be found at current coordinates --gdm
+    if (!viewport)
+        return;
+
     QRectF sceneRect(
         view->mapToScene(viewport->geometry().topLeft()),
         view->mapToScene(viewport->geometry().bottomRight())
