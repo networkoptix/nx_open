@@ -483,9 +483,21 @@ void StreamReader::fillAudioFormat( const ISDAudioPacket& audioPacket )
     m_audioFormat->compressionType = m_audioCodec;
     m_audioFormat->sampleRate = m_audioInfo.sample_rate;
     m_audioFormat->bitrate = m_audioInfo.bit_rate;
-    m_audioFormat->channels = 2;
+
+    m_audioFormat->channels = 1;
+    switch( m_audioCodec )
+    {
+        case nxcip::CODEC_ID_AAC:
+        {
+            //TODO/IMPL parsing ADTS header to get sample rate
+            break;
+        }
+
+        //case nxcip::CODEC_ID_PCM_S16LE:
+        //case nxcip::CODEC_ID_PCM_MULAW:
+        default:
+            break;
+    }
 
     //std::cout<<"Audio format: sample_rate "<<m_audioInfo.sample_rate<<", bitrate "<<m_audioInfo.bit_rate<<"\n";
-
-    //TODO/IMPL parsing audio packet header and retrieving data
 }
