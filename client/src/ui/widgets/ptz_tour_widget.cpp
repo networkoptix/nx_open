@@ -17,6 +17,6 @@ QnPtzTourWidget::~QnPtzTourWidget() {
 }
 
 
-void QnPtzTourWidget::setPtzTour(QnPtzTour *tour) {
+void QnPtzTourWidget::setPtzTour(const QnPtzTour &tour) {
     m_model->setTour(tour);
 }

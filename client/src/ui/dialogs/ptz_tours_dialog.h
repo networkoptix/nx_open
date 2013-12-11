@@ -11,6 +11,8 @@ namespace Ui {
 class QnPtzToursDialog;
 }
 
+class QnPtzTourListModel;
+
 class QnPtzToursDialog : public QnButtonBoxDialog {
     Q_OBJECT
 
@@ -27,9 +29,13 @@ public:
 private:
     void updateModel();
 
+private slots:
+    void at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+
 private:
     QScopedPointer<Ui::QnPtzToursDialog> ui;
     QnPtzControllerPtr m_controller;
+    QnPtzTourListModel *m_model;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

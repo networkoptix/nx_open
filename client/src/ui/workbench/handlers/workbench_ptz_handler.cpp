@@ -203,8 +203,9 @@ void QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->camera() || !widget->ptzController()->getTours(&tours))
         return;
 
-    QScopedPointer<QnPtzToursDialog> dlg(new QnPtzToursDialog(mainWindow()));
-    dlg->exec();
+    QScopedPointer<QnPtzToursDialog> dialog(new QnPtzToursDialog(mainWindow()));
+    dialog->setPtzController(widget->ptzController());
+    dialog->exec();
 }
 
 void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {

@@ -18,7 +18,7 @@ public:
     explicit QnPtzTourWidget(QWidget *parent = 0);
     ~QnPtzTourWidget();
 
-    void setPtzTour(QnPtzTour* tour);
+    void setPtzTour(const QnPtzTour &tour);
 private:
     QScopedPointer<Ui::QnPtzTourWidget> ui;
     QnPtzTourModel *m_model;

@@ -14,7 +14,7 @@ public:
 signals:
 
 public slots:
-    void setTour(QnPtzTour *tour);
+    void setTour(const QnPtzTour &tour);
 };
 
 #endif // PTZ_TOUR_MODEL_H

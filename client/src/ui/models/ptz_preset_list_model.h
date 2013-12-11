@@ -9,8 +9,8 @@
 class QnPtzPresetListModel: public QAbstractTableModel {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
-    typedef QAbstractTableModel base_type;
 
+    typedef QAbstractTableModel base_type;
 public:
     enum Column {
         NameColumn,

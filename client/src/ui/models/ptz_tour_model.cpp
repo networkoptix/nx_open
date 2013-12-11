@@ -8,6 +8,6 @@ QnPtzTourModel::QnPtzTourModel(QObject *parent) :
 }
 
 
-void QnPtzTourModel::setTour(QnPtzTour *tour) {
+void QnPtzTourModel::setTour(const QnPtzTour &tour) {
 
 }
