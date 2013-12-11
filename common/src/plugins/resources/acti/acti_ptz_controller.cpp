@@ -47,14 +47,11 @@ namespace {
 QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
     base_type(resource),
     m_resource(resource),
-    m_capabilities(Qn::NoCapabilities),
-    m_minAngle(0.0),
-    m_maxAngle(0.0),
     m_isFlipped(false),
     m_isMirrored(false)
 {
     init();
-
+    
     panTiltDirection(0, 0); /* Init function-local static. */
 }
 
@@ -63,12 +60,6 @@ QnActiPtzController::~QnActiPtzController() {
 }
 
 void QnActiPtzController::init() {
-    QByteArray zoomData;
-    if(!query(lit("ZOOM_CAP_GET"), &zoomData, true))
-        return;
-    if(!zoomData.startsWith("ZOOM_CAP_GET="))
-        return;
-
     QByteArray flipData;
     if(!query(lit("VIDEO_FLIP_MODE"), &flipData))
         return;
@@ -79,11 +70,19 @@ void QnActiPtzController::init() {
         return;
     m_isMirrored = mirrorData.toInt() == 1;
 
+    QByteArray zoomData;
+    if(!query(lit("ZOOM_CAP_GET"), &zoomData, true))
+        return;
+    if(!zoomData.startsWith("ZOOM_CAP_GET="))
+        return;
+
+    m_capabilities = Qn::NoPtzCapabilities;
     if(m_resource->getModel() == lit("KCM3311")) {
-        m_capabilities = Qn::ContinuousZoomCapability;
+        m_capabilities |= Qn::ContinuousZoomCapability;
     } else {
-        m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities;
+        m_capabilities |= Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability;
     }
+    m_capabilities |= Qn::FlipPtzCapability;
 
 #if 0
     qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML

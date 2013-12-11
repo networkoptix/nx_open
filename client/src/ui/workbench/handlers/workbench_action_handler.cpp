@@ -2389,7 +2389,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         foreach(const QnPtzPreset &preset, existing) {
             QnPtzTourSpot spot;
             spot.presetId = preset.id;
-            spot.speed = 1.0;
+            spot.speed = 0.1;
             spot.stayTime = 0;
             tour.spots.push_back(spot);
         }

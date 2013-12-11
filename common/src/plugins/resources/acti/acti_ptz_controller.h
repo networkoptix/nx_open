@@ -45,10 +45,7 @@ private:
     QMutex m_mutex;
     QnActiResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
-    //QnPtzSpaceMapper *m_spaceMapper;
 
-    qreal m_minAngle;
-    qreal m_maxAngle;
     bool m_isFlipped;
     bool m_isMirrored;
 };
