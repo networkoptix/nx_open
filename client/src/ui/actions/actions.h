@@ -631,7 +631,7 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          *
          * Parameters:
-         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
+         * <tt>QString PtzPresetIdRole</tt> --- id of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -639,6 +639,20 @@ namespace Qn {
          * Opens PTZ preset management dialog.
          */
         PtzManagePresetsAction,
+
+        /**
+         * Starts given PTZ tour.
+         *
+         * Parameters:
+         * <tt>QString PtzTourIdRole</tt> --- id of the PTZ tour.
+         */
+        PtzStartTourAction,
+
+        /**
+         * Opens PTZ tours management dialog.
+         */
+        PtzManageToursAction,
+
 
         /* Layout actions. */
 

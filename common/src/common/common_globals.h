@@ -281,6 +281,7 @@ public:
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
         PtzPresetIdRole,                            /**< Role for PTZ preset id. Value of type QString. */
+        PtzTourIdRole,                              /**< Role for PTZ tour id. Value of type QString. */
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */

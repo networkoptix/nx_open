@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QDialog>
 
+#include <core/ptz/ptz_fwd.h>
+
 #include <ui/dialogs/button_box_dialog.h>
 
 namespace Ui {
@@ -17,8 +19,17 @@ public:
     explicit QnPtzToursDialog(QWidget *parent = 0);
     ~QnPtzToursDialog();
 
+    const QnPtzControllerPtr &ptzController() const;
+    void setPtzController(const QnPtzControllerPtr &controller);
+
+    virtual void accept() override;
+
+private:
+    void updateModel();
+
 private:
     QScopedPointer<Ui::QnPtzToursDialog> ui;
+    QnPtzControllerPtr m_controller;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

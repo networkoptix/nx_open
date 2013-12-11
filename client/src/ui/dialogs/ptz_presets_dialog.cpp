@@ -4,12 +4,9 @@
 #include <QtWidgets/QPushButton>
 #include <QtGui/QStandardItem>
 
-#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/ptz_preset_list_model.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
@@ -17,7 +14,6 @@
 
 QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::PtzPresetsDialog),
     m_model(new QnPtzPresetListModel(this))
 {
@@ -27,9 +23,6 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
     m_removeButton->setIcon(qnSkin->icon("buttons/remove.png"));
 
     m_activateButton = new QPushButton(tr("Activate"));
-
-    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
-    connect(watcher, SIGNAL(hotkeyChanged(int, QString, int)), this, SLOT(at_hotkeyChanged(int, QString, int)));
 
     ui->treeView->setModel(m_model);
     ui->treeView->setItemDelegateForColumn(m_model->column(QnPtzPresetListModel::HotkeyColumn), new QnPtzPresetHotkeyItemDelegate(this));
@@ -49,6 +42,10 @@ QnPtzPresetsDialog::~QnPtzPresetsDialog() {
     return;
 }
 
+const QnPtzControllerPtr& QnPtzPresetsDialog::ptzController() const {
+    return m_controller;
+}
+
 void QnPtzPresetsDialog::setPtzController(const QnPtzControllerPtr &controller) {
     if(m_controller == controller)
         return;
@@ -62,6 +59,14 @@ void QnPtzPresetsDialog::setPtzController(const QnPtzControllerPtr &controller) 
         connect(m_controller->resource(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(updateLabel()));
 
     updateFromResource();
+}
+
+QnHotkeysHash QnPtzPresetsDialog::hotkeys() const {
+    return m_model->hotkeys();
+}
+
+void QnPtzPresetsDialog::setHotkeys(const QnHotkeysHash &value) {
+    m_model->setHotkeys(value);
 }
 
 void QnPtzPresetsDialog::accept() {
@@ -99,13 +104,6 @@ void QnPtzPresetsDialog::submitToResource() {
         else if (preset.name != updated.name)
             m_controller->updatePreset(updated);
     }
-
-    if (!m_controller->resource())
-        return;
-
-    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
-
-    watcher->updateHotkeys(m_controller->resource()->getId(), m_model->hotkeys());
 }
 
 void QnPtzPresetsDialog::updateLabel() {
@@ -120,13 +118,6 @@ void QnPtzPresetsDialog::updateModel() {
         m_model->setPresets(presets);
     else
         m_model->setPresets(QnPtzPresetList());
-
-    QnHotkeysHash hotkeys;
-    if (m_controller && m_controller->resource()) {
-        QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
-        hotkeys = watcher->allHotkeysByResourceId(m_controller->resource()->getId());
-    }
-    m_model->setHotkeys(hotkeys);
 }
 
 void QnPtzPresetsDialog::updateRemoveButtonEnabled() {

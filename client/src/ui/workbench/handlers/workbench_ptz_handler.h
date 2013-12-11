@@ -21,6 +21,9 @@ private slots:
     void at_ptzGoToPresetAction_triggered();
     void at_ptzManagePresetsAction_triggered();
 
+    void at_ptzStartTourAction_triggered();
+    void at_ptzManageToursAction_triggered();
+
     void at_debugCalibratePtzAction_triggered();
 };
 

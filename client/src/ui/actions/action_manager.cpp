@@ -873,9 +873,30 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Scene | Qn::SingleTarget).
         childFactory(new QnPtzGoToPresetActionFactory(this)).
-        text(tr("PTZ..."));
+        text(tr("PTZ...")).
+        requiredPermissions(Qn::WritePtzPermission).
+        condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
     factory.beginSubMenu(); {
+
+        factory().
+            flags(Qn::Scene | Qn::SingleTarget).
+            childFactory(new QnPtzStartTourActionFactory(this)).
+            text(tr("Tours...")).
+            requiredPermissions(Qn::WritePtzPermission).
+            condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+
+        factory.beginSubMenu(); {
+
+            factory(Qn::PtzManageToursAction).
+                flags(Qn::Scene | Qn::SingleTarget).
+                text(tr("Manage Tours...")).
+                requiredPermissions(Qn::WritePtzPermission).
+                condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+
+        } factory.endSubMenu();
+
+
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).

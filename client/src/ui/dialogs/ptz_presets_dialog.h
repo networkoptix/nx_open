@@ -4,8 +4,7 @@
 #include <QtWidgets/QDialog>
 
 #include <core/ptz/ptz_fwd.h>
-
-#include <ui/workbench/workbench_context_aware.h>
+#include <core/ptz/ptz_hotkey.h>
 
 #include "button_box_dialog.h"
 
@@ -16,7 +15,7 @@ namespace Ui {
     class PtzPresetsDialog;
 }
 
-class QnPtzPresetsDialog: public Connective<QnButtonBoxDialog>, public QnWorkbenchContextAware {
+class QnPtzPresetsDialog: public Connective<QnButtonBoxDialog> {
     Q_OBJECT
 
     typedef Connective<QnButtonBoxDialog> base_type;
@@ -25,8 +24,11 @@ public:
     QnPtzPresetsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetsDialog();
 
-    const QnPtzControllerPtr &ptzController() const;
+    const QnPtzControllerPtr& ptzController() const;
     void setPtzController(const QnPtzControllerPtr &controller);
+
+    QnHotkeysHash hotkeys() const;
+    void setHotkeys(const QnHotkeysHash &value);
 
     virtual void accept() override;
 
