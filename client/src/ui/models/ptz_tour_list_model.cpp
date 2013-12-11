@@ -30,7 +30,7 @@ int QnPtzTourListModel::rowCount(const QModelIndex &parent) const {
 
 int QnPtzTourListModel::columnCount(const QModelIndex &parent) const {
     if(!parent.isValid())
-        return 1;
+        return ColumnCount;
     return 0;
 }
 
@@ -80,7 +80,19 @@ QVariant QnPtzTourListModel::data(const QModelIndex &index, int role) const {
 }
 
 QVariant QnPtzTourListModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section >= 0 && section < ColumnCount)
         return tr("Name");
     return base_type::headerData(section, orientation, role);
+}
+
+void QnPtzTourListModel::updateTour(const QnPtzTour &tour) {
+    for (int i = 0; i < m_tours.size(); ++i) {
+        if (m_tours[i].id != tour.id)
+            continue;
+        m_tours[i] = tour;
+        emit dataChanged(index(i, 0), index(i, ColumnCount));
+        qDebug() << "updated tour" << i;
+        break;
+    }
+
 }

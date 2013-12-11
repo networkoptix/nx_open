@@ -12,6 +12,9 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->treeView->setModel(m_model);
+
+    connect(m_model,            SIGNAL(tourChanged(QnPtzTour)), this, SIGNAL(tourChanged(QnPtzTour)));
+    connect(ui->nameLineEdit,   SIGNAL(textChanged(QString)),   m_model, SLOT(setTourName(QString)));
 }
 
 QnPtzTourWidget::~QnPtzTourWidget() {

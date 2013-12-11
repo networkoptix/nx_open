@@ -19,6 +19,7 @@ QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     ui->tourTable->setModel(m_model);
 
     connect(ui->tourTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(at_table_currentRowChanged(QModelIndex,QModelIndex)));
+    connect(ui->tourEditWidget, SIGNAL(tourChanged(QnPtzTour)), m_model, SLOT(updateTour(QnPtzTour)));
 }
 
 QnPtzToursDialog::~QnPtzToursDialog() {

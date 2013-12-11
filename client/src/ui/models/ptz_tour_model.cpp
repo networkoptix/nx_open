@@ -5,6 +5,7 @@
 QnPtzTourModel::QnPtzTourModel(QObject *parent) :
     base_type(parent)
 {
+    connect(this, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_dataChanged(QModelIndex,QModelIndex)));
 }
 
 QnPtzTourModel::~QnPtzTourModel() {
@@ -18,6 +19,15 @@ void QnPtzTourModel::setTour(const QnPtzTour &tour) {
     beginResetModel();
     m_tour = tour;
     endResetModel();
+}
+
+const QString QnPtzTourModel::tourName() const {
+    return m_tour.name;
+}
+
+void QnPtzTourModel::setTourName(const QString &name) {
+    m_tour.name = name;
+    emit tourChanged(m_tour);
 }
 
 int QnPtzTourModel::rowCount(const QModelIndex &parent) const {
@@ -101,4 +111,10 @@ QVariant QnPtzTourModel::headerData(int section, Qt::Orientation orientation, in
         }
     }
     return base_type::headerData(section, orientation, role);
+}
+
+void QnPtzTourModel::at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
+    Q_UNUSED(topLeft)
+    Q_UNUSED(bottomRight)
+    emit tourChanged(m_tour);
 }

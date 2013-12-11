@@ -11,6 +11,12 @@ class QnPtzTourListModel : public QAbstractTableModel
 
     typedef QAbstractTableModel base_type;
 public:
+    enum Column {
+        NameColumn,
+
+        ColumnCount
+    };
+
     explicit QnPtzTourListModel(QObject *parent = 0);
     virtual ~QnPtzTourListModel();
 
@@ -25,6 +31,8 @@ public:
 
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+    Q_SLOT void updateTour(const QnPtzTour &tour);
 private:
     QnPtzTourList m_tours;
 

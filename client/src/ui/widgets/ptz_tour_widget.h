@@ -19,6 +19,9 @@ public:
     ~QnPtzTourWidget();
 
     void setPtzTour(const QnPtzTour &tour);
+
+signals:
+    void tourChanged(const QnPtzTour &tour);
 private:
     QScopedPointer<Ui::QnPtzTourWidget> ui;
     QnPtzTourModel *m_model;
