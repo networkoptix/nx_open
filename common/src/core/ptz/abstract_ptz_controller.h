@@ -11,6 +11,7 @@
 #include "ptz_limits.h"
 #include "ptz_preset.h"
 #include "ptz_tour.h"
+#include "ptz_data.h"
 
 /**
  * A thread-safe interface for accessing camera's PTZ functions.
@@ -236,6 +237,15 @@ public:
      * \returns                         Whether the operation was successful.
      */
     virtual bool getTours(QnPtzTourList *tours) = 0;
+
+    /**
+     * Gets all PTZ data associated with this controller in a single operation.
+     * Default implementation just calls all the accessor functions one by one.
+     * 
+     * \param fields                    Fields to get.
+     * \param[out] data                 PTZ data.
+     */
+    virtual void getData(Qn::PtzDataFields fields, QnPtzData *data);
 
     /**
      * Synchronizes this controller's internal caches with the actual target values.

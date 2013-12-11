@@ -8,7 +8,6 @@
 #include <boost/operators.hpp>
 
 #include "ptz_fwd.h"
-#include "utils/math/math.h"
 
 struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset> {
 public:
