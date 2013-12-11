@@ -86,8 +86,10 @@ void QnPtzTourExecutorPrivate::startMoving() {
 
     qDebug() << "TOUR SPOT" << currentIndex;
 
+    const QnPtzTourSpot &spot = currentTour.spots[currentIndex];
+
     controller->getPosition(defaultSpace, &currentPosition);
-    controller->activatePreset(currentTour.spots[currentIndex].presetId);
+    controller->activatePreset(spot.presetId, spot.speed);
     moveTimer.start(1000, q);
 }
 

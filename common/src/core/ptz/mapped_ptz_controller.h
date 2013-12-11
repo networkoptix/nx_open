@@ -18,7 +18,7 @@ public:
     static bool extends(const QnPtzControllerPtr &baseController);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
 

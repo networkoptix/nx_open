@@ -212,14 +212,14 @@ Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
 }
 
 bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 90).arg(speed.y() * 90).arg(speed.z()));
+    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 100).arg(speed.y() * 100).arg(speed.z() * 100));
 }
 
-bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(space != Qn::LogicalCoordinateSpace)
         return false;
 
-    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())));
+    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())).arg(speed * 100));
 }
 
 bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
@@ -255,5 +255,8 @@ bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
+void QnAxisPtzController::synchronize(Qn::PtzDataFields fields) {
+    base_type::synchronize(fields);
+}
 
 #endif // #ifdef ENABLE_AXIS

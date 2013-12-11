@@ -130,7 +130,7 @@ bool QnPresetPtzController::removePreset(const QString &presetId) {
     return true;
 }
 
-bool QnPresetPtzController::activatePreset(const QString &presetId) {
+bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed) {
     QnPtzPresetData data;
     {
         QMutexLocker locker(&d->mutex);
@@ -143,8 +143,7 @@ bool QnPresetPtzController::activatePreset(const QString &presetId) {
         qDebug() << "PRESET" << d->records[presetId].preset.name << d->records[presetId].data.position;
     }
 
-
-    if(!absoluteMove(data.space, data.position))    
+    if(!absoluteMove(data.space, data.position, speed))
         return false;
 
     return true;

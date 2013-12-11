@@ -116,38 +116,40 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
 }
 
 int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    qreal xPos, yPos, zPos;
+    qreal xPos, yPos, zPos, speed;
     Qn::PtzCoordinateSpace space;
     if(
         !requireParameter(params, lit("xPos"), result, &xPos) || 
         !requireParameter(params, lit("yPos"), result, &yPos) || 
         !requireParameter(params, lit("zPos"), result, &zPos) ||
-        !requireParameter(params, lit("space"), result, &space)
+        !requireParameter(params, lit("space"), result, &space) ||
+        !requireParameter(params, lit("speed"), result, &speed)
     ) {
         return CODE_INVALID_PARAMETER;
     }
     
     QVector3D position(xPos, yPos, zPos);
-    if(!controller->absoluteMove(space, position))
+    if(!controller->absoluteMove(space, position, speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
 }
 
 int QnPtzHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio;
+    qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio, speed;
     if(
         !requireParameter(params, lit("viewportTop"),       result, &viewportTop) || 
         !requireParameter(params, lit("viewportLeft"),      result, &viewportLeft) || 
         !requireParameter(params, lit("viewportBottom"),    result, &viewportBottom) ||
         !requireParameter(params, lit("viewportRight"),     result, &viewportRight) || 
-        !requireParameter(params, lit("aspectRatio"),       result, &aspectRatio)
+        !requireParameter(params, lit("aspectRatio"),       result, &aspectRatio) ||
+        !requireParameter(params, lit("speed"),             result, &speed)
     ) {
         return CODE_INVALID_PARAMETER;
     }
     
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
-    if(!controller->viewportMove(aspectRatio, viewport))
+    if(!controller->viewportMove(aspectRatio, viewport, speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -203,10 +205,11 @@ int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, cons
 
 int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString presetId;
-    if(!requireParameter(params, lit("presetId"), result, &presetId))
+    qreal speed;
+    if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("speed"), result, &speed))
         return CODE_INVALID_PARAMETER;
 
-    if(!controller->activatePreset(presetId))
+    if(!controller->activatePreset(presetId, speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;

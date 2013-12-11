@@ -44,19 +44,19 @@ bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
     return true;
 }
 
-bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzAbsoluteMoveAsync(m_resource, space, position, m_sequenceId, m_sequenceNumber++, this, SLOT(at_absoluteMove_replyReceived(int, int)));
+    m_server->apiConnection()->ptzAbsoluteMoveAsync(m_resource, space, position, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_absoluteMove_replyReceived(int, int)));
     return true;
 }
 
-bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzViewportMoveAsync(m_resource, aspectRatio, viewport, m_sequenceId, m_sequenceNumber++, this, SLOT(at_relativeMove_replyReceived(int, int)));
+    m_server->apiConnection()->ptzViewportMoveAsync(m_resource, aspectRatio, viewport, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_relativeMove_replyReceived(int, int)));
     return true;
 }
 
@@ -105,11 +105,11 @@ bool QnRemotePtzController::removePreset(const QString &presetId) {
     return true;
 }
 
-bool QnRemotePtzController::activatePreset(const QString &presetId) {
+bool QnRemotePtzController::activatePreset(const QString &presetId, qreal speed) {
     if(!m_server)
         return false;
 
-    m_server->apiConnection()->ptzActivatePresetAsync(m_resource, presetId, this, SLOT(at_activatePreset_replyReceived(int, int)));
+    m_server->apiConnection()->ptzActivatePresetAsync(m_resource, presetId, speed, this, SLOT(at_activatePreset_replyReceived(int, int)));
     return true;
 }
 

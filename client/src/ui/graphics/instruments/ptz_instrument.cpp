@@ -626,7 +626,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
     QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
-    widget->ptzController()->viewportMove(aspectRatio, viewport);
+    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
@@ -955,7 +955,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
             
             qreal speed = 0.5 * position.z();
             QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
-            target()->ptzController()->absoluteMove(Qn::LogicalCoordinateSpace, position + positionDelta);
+            target()->ptzController()->absoluteMove(Qn::LogicalCoordinateSpace, position + positionDelta, 1.0);
         }
         break;
     default:
