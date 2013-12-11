@@ -18,11 +18,11 @@ QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseC
 bool QnViewportPtzController::extends(const QnPtzControllerPtr &baseController) {
     return 
         baseController->hasCapabilities(Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability) &&
-        !baseController->hasCapabilities(Qn::ViewportPositioningPtzCapability);
+        !baseController->hasCapabilities(Qn::ViewportPtzCapability);
 }
 
 Qn::PtzCapabilities QnViewportPtzController::getCapabilities() {
-    return base_type::getCapabilities() | Qn::ViewportPositioningPtzCapability;
+    return base_type::getCapabilities() | Qn::ViewportPtzCapability;
 }
 
 bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {

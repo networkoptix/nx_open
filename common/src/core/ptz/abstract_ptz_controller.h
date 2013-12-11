@@ -78,7 +78,7 @@ public:
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
      * 
      * This function is expected to be implemented only if this controller has
-     * <tt>Qn::ViewportPositioningPtzCapability</tt>.
+     * <tt>Qn::ViewportPtzCapability</tt>.
      * 
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
