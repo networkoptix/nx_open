@@ -87,10 +87,10 @@ void QnAxisPtzController::init(const QnAxisParameterMap &params) {
     if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan") && params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt") && params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom"))
         m_capabilities |= Qn::AbsolutePtzCapability;
 
-    if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled") || !params.value<bool>("root.PTZ.Various.V1.TiltEnabled"))
+    if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled", true) || !params.value<bool>("root.PTZ.Various.V1.TiltEnabled", true))
         m_capabilities &= ~(Qn::AbsolutePtzCapability | Qn::ContinuousPanTiltCapability);
 
-    if(!params.value<bool>("root.PTZ.Various.V1.ZoomEnabled"))
+    if(!params.value<bool>("root.PTZ.Various.V1.ZoomEnabled", true))
         m_capabilities &= ~(Qn::AbsolutePtzCapability | Qn::ContinuousZoomCapability);
 
     qreal minPan, maxPan, minTilt, maxTilt, minAngle, maxAngle;
@@ -143,25 +143,40 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
 bool QnAxisPtzController::query(const QString &request, QByteArray *body) const {
     QScopedPointer<CLSimpleHTTPClient> http(newHttpClient());
 
-    CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
-    if(status == CL_HTTP_SUCCESS) {
-        if(body) {
-            QByteArray localBody;
-            http->readAll(localBody);
-            if(body)
-                *body = localBody;
+    for (int i = 0; i < 2; ++i)
+    {
+        if (!ptz_ctl_id.isEmpty())
+            http->addHeader("Cookie", ptz_ctl_id);
+        CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
 
-            if(localBody.startsWith("Error:")) {
-                qnWarning("Failed to execute request '%1' for camera %2. Camera returned: %3.", request, m_resource->getName(), localBody.mid(6));
-                return false;
+        if(status == CL_HTTP_SUCCESS) {
+            if(body) {
+                QByteArray localBody;
+                http->readAll(localBody);
+                if(body)
+                    *body = localBody;
+
+                if(localBody.startsWith("Error:")) {
+                    qnWarning("Failed to execute request '%1' for camera %2. Camera returned: %3.", request, m_resource->getName(), localBody.mid(6));
+                    return false;
+                }
             }
+            return true;
+        } 
+        else if (status == CL_HTTP_REDIRECT && ptz_ctl_id.isEmpty())
+        {
+            ptz_ctl_id = http->header().value("Set-Cookie");
+            ptz_ctl_id = ptz_ctl_id.split(';')[0];
+            if (ptz_ctl_id.isEmpty())
+                return false;
         }
-    } else {
-        qnWarning("Failed to execute request '%1' for camera %2. Result: %3.", request, m_resource->getName(), ::toString(status));
-        return false;
+        else {
+            qnWarning("Failed to execute request '%1' for camera %2. Result: %3.", request, m_resource->getName(), ::toString(status));
+            return false;
+        }
+        // if we do not returns, repeat request with cookie on the second loop step
     }
-
-    return true;
+    return false;
 }
 
 bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params) const {
@@ -180,25 +195,43 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
             if(index == -1)
                 continue;
 
-            params->insert(line.left(index), line.mid(index + 1));
+            QString key = line.left(index);
+            QString value = line.mid(index + 1);
+
+            for (int i = 2; i <= 4; ++i) {
+                key.replace(lit("root.PTZ.Support.S%1").arg(i), lit("root.PTZ.Support.S1")); // TODO: #Elric evil hardcode, implement properly
+                key.replace(lit("root.PTZ.Various.V%1").arg(i), lit("root.PTZ.Various.V1"));
+            }
+
+            params->insert(key, value);
         }
     }
 
     return true;
 }
 
+QString QnAxisPtzController::getCameraNum()
+{
+    QString camNum;
+    QVariant val;
+    m_resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+    if (val.toInt() > 1)
+        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNumAxis());
+    return camNum;
+}
+
 int QnAxisPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) {
      // TODO: #Elric *90? Just move all logical-physical transformations to mediaserver.
-    return !query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(xVelocity * 90).arg(yVelocity * 90).arg(zoomVelocity));
+    return !query(lit("com/ptz.cgi?%1continuouspantiltmove=%2,%3&continuouszoommove=%4").arg(getCameraNum()).arg(xVelocity * 90).arg(yVelocity * 90).arg(zoomVelocity));
 }
 
 int QnAxisPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos) {
-    return !query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3").arg(xPos).arg(yPos).arg(zoomPos));
+    return !query(lit("com/ptz.cgi?%1pan=%2&tilt=%3&zoom=%4").arg(getCameraNum()).arg(xPos).arg(yPos).arg(zoomPos));
 }
 
 int QnAxisPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) {
     QnAxisParameterMap params;
-    int status = !query(lit("com/ptz.cgi?query=position"), &params);
+    int status = !query(lit("com/ptz.cgi?%1query=position").arg(getCameraNum()), &params);
     if(status != 0)
         return status;
 

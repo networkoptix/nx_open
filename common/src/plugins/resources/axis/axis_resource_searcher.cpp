@@ -145,6 +145,10 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
         name += QLatin1Char(responseData[i]);
     }
 
+    int macpos2 = responseData.indexOf("axis-00", macpos);
+    if (macpos2 > 0)
+        macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
+
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
@@ -216,6 +220,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     if (channesl > 1) //
     {
+        resource->setGroupName(resource->getPhysicalId());
+        resource->setGroupId(resource->getPhysicalId());
 
         resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
 
@@ -231,6 +237,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(smac);
+            resource->setGroupName(resource->getPhysicalId());
+            resource->setGroupId(resource->getPhysicalId());
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
 

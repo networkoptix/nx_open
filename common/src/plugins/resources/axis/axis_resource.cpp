@@ -555,8 +555,7 @@ const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractSt
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-
-int QnPlAxisResource::getChannelNum() const
+int QnPlAxisResource::getChannelNumAxis() const
 {
     QString phId = getPhysicalId();
 
@@ -941,4 +940,9 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
 
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
     return m_ptzController.data();
+}
+
+int QnPlAxisResource::getChannel() const
+{
+    return getChannelNumAxis() - 1;
 }
