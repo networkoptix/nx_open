@@ -190,7 +190,6 @@ protected slots:
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
     void at_debugShowResourcePoolAction_triggered();
-    void at_debugCalibratePtzAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -284,10 +283,6 @@ protected slots:
     void at_radassAutoAction_triggered();
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
-
-    void at_ptzSavePresetAction_triggered();
-    void at_ptzGoToPresetAction_triggered();
-    void at_ptzManagePresetsAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);

@@ -25,7 +25,6 @@
 
 #include <client/client_connection_data.h>
 
-#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_discovery_manager.h>
@@ -59,14 +58,11 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
-#include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/dialogs/ptz_tours_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -202,7 +198,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
     connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
-    connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -283,9 +278,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
     connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
     connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
-    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
-    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
-    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
@@ -303,7 +295,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
-    //context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
     context()->instance<QnAppServerNotificationCache>();
 
     /* Run handlers that update state. */
@@ -792,35 +783,6 @@ void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
     QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
     dialog->setResources(resourcePool()->getResources());
     dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).mediaWidget();
-    if(!widget)
-        return;
-    QPointer<QnResourceWidget> guard(widget);
-
-    QnPtzControllerPtr controller = widget->ptzController();
-    if(!controller)
-        return;
-
-    QVector3D position;
-    if(!controller->getPosition(Qn::DeviceCoordinateSpace, &position))
-        return;
-
-    for(int i = 0; i <= 20; i++) {
-        position.setZ(i / 20.0);
-        controller->absoluteMove(Qn::DeviceCoordinateSpace, position, 1.0);
-
-        QEventLoop loop;
-        QTimer::singleShot(10000, &loop, SLOT(quit()));
-        loop.exec();
-
-        if(!guard)
-            break;
-
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 2)));
-    }
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -2338,130 +2300,6 @@ void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
     setResolutionMode(Qn::HighResolution);
-}
-
-void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
-    QnMediaResourceWidget* widget = menu()->currentParameters(sender()).mediaWidget();
-    if(!widget || !widget->ptzController() || !widget->camera())
-        return;
-
-    //TODO: #GDM PTZ DEBUG
-    QScopedPointer<QnPtzToursDialog> dlg(new QnPtzToursDialog(mainWindow()));
-    dlg->exec();
-
-    //TODO: #GDM PTZ fix the text
-    if(widget->camera()->getStatus() == QnResource::Offline || widget->camera()->getStatus() == QnResource::Unauthorized) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\n"\
-               "Please wait for the camera to go online.").arg(widget->camera()->getName())
-        );
-        return;
-    }
-
-    QnPtzPresetList existing;
-    int n = widget->ptzController()->getPresets(&existing)
-            ? existing.size() + 1
-            : 1;
-
-    QnHotkeysHash hotkeys = context()
-            ->instance<QnPtzHotkeyKvPairWatcher>()
-            ->allHotkeysByResourceId(widget->camera()->getId());
-
-    QList<int> forbiddenHotkeys;
-    foreach (const QnPtzPreset &preset, existing) {
-        if (!hotkeys.contains(preset.name))
-            continue;
-        forbiddenHotkeys.push_back(hotkeys[preset.name]);
-    }
-
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
-    dialog->setForbiddenHotkeys(forbiddenHotkeys);
-    dialog->setName(tr("Saved Position %1").arg(n));
-    dialog->setWindowTitle(tr("Save Position"));
-    if(dialog->exec() != QDialog::Accepted) {
-        return;
-    }
-
-    //TODO: #GDM PTZ replace if there is a preset with the same name. Maybe ask to replace.
-
-    QString presetId = QUuid::createUuid().toString();
-    if (!widget->ptzController()->createPreset(QnPtzPreset(presetId, dialog->name())))
-        return;
-
-   /* if(n > 2) {
-        QnPtzTour tour;
-        tour.name = tr("Tour");
-        tour.id = QUuid::createUuid().toString();
-        
-        foreach(const QnPtzPreset &preset, existing) {
-            QnPtzTourSpot spot;
-            spot.presetId = preset.id;
-            spot.speed = 0.1;
-            spot.stayTime = 0;
-            tour.spots.push_back(spot);
-        }
-
-        widget->ptzController()->createTour(tour);
-
-        QnSleep::sleep(1);
-
-        widget->ptzController()->activateTour(tour.id);
-    }*/
-
-    if (dialog->hotkey() >= 0) {
-        hotkeys[presetId] = dialog->hotkey();
-        context()->instance<QnPtzHotkeyKvPairWatcher>()->updateHotkeys(widget->camera()->getId(), hotkeys);
-    }
-
-#if 0
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
-        );
-#endif
-}
-
-void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.mediaWidget();
-
-    if(!widget || !widget->ptzController() || !widget->camera())
-        return;
-
-    QString id = parameters.argument<QString>(Qn::PtzPresetIdRole).trimmed();
-    if(id.isEmpty())
-        return;
-
-    qDebug() << "goToPreset activated" << widget->camera()->getId() << id;
-
-    if (widget->ptzController()->activatePreset(id, 1.0)) {
-        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
-    } else {
-        if(widget->camera()->getStatus() == QnResource::Offline ||
-                widget->camera()->getStatus() == QnResource::Unauthorized) {
-            QMessageBox::critical(
-                mainWindow(),
-                tr("Could not set position from camera"),
-                tr("An error has occurred while trying to set current position for camera %1.\n\n"\
-                   "Please wait for the camera to go online.").arg(widget->camera()->getName())
-            );
-            return;
-        }
-        //TODO: #GDM PTZ check other cases
-    }
-}
-
-void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).mediaWidget();
-    if(!widget)
-        return;
-
-    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
-    dialog->setPtzController(widget->ptzController());
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
