@@ -421,6 +421,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Restart application"));
 
+    factory(Qn::PtzGoToPresetAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Go To Saved Position")).
+        requiredPermissions(Qn::WritePtzPermission).
+        condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -866,6 +872,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget).
+        childFactory(new QnPtzGoToPresetActionFactory(this)).
         text(tr("PTZ..."));
 
     factory.beginSubMenu(); {
@@ -875,24 +882,12 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
-        factory(Qn::PtzGoToPresetMenu).
-            flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Go to Position...")).
-            requiredPermissions(Qn::WritePtzPermission).
-            childFactory(new QnPtzGoToPresetActionFactory(this)).
-            condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
-
         factory(Qn::PtzManagePresetsAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage Saved Positions...")).
             requiredPermissions(Qn::WritePtzPermission).
             condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
-        factory(Qn::PtzGoToPresetAction).
-            flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Go To Saved Position")).
-            requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
     } factory.endSubMenu();
 
 #if 0
@@ -1522,9 +1517,9 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 }
 
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters) {
-    if(!parent->children().isEmpty()) {
-        QMenu *result = new QMenu();
+    QMenu *result = new QMenu();
 
+    if(!parent->children().isEmpty()) {
         foreach(QnAction *action, parent->children()) {
             Qn::ActionVisibility visibility;
             if(action->flags() & Qn::HotkeyOnly) {
@@ -1574,24 +1569,28 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             if(visibility != Qn::InvisibleAction)
                 result->addAction(newAction);
         }
+    }
 
-        return result;
-    } else if(parent->childFactory()) {
+    if (!result->isEmpty())
+        result->addSeparator();
+
+    if(parent->childFactory()) {
         QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
-            QMenu *result = new QMenu();
             foreach(QAction *action, actions) {
                 action->setParent(result);
                 result->addAction(action);
             }
-            return result;
-        } else {
-            return NULL;
         }
-    } else {
+    }
+
+    if (result->isEmpty()) {
+        delete result;
         return NULL;
     }
+
+    return result;
 }
 
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {

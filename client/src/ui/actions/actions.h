@@ -615,6 +615,8 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /* PTZ Actions */
+
         /**
          * Opens preset name editing dialog and saves current position as a new PTZ preset.
          */
@@ -638,13 +640,12 @@ namespace Qn {
          */
         PtzManagePresetsAction,
 
+        /* Layout actions. */
+
         /**
          * Sets the current picture as a layout background.
          */
         SetAsBackgroundAction,
-
-
-        /* Layout actions. */
 
         /**
          * Deletes the file from disk.
