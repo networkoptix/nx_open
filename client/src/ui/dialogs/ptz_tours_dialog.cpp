@@ -39,6 +39,14 @@ void QnPtzToursDialog::setPtzController(const QnPtzControllerPtr &controller) {
 
 
 void QnPtzToursDialog::accept() {
+    if (m_controller) {
+        foreach (const QnPtzTour &tour, m_model->tours()) {
+            qDebug() <<"updating tour" << tour.name << tour.id;
+            m_controller->createTour(tour);
+        }
+        //TODO: #GDM PTZ remove deleted tours
+    }
+
     base_type::accept();
 }
 
