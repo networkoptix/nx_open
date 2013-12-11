@@ -283,6 +283,7 @@ public:
         PtzPresetIdRole,                            /**< Role for PTZ preset id. Value of type QString. */
         PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
         PtzTourIdRole,                              /**< Role for PTZ tour id. Value of type QString. */
+        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */

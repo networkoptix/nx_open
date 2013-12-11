@@ -11,6 +11,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent) :
     m_model(new QnPtzTourModel(this))
 {
     ui->setupUi(this);
+    ui->treeView->setModel(m_model);
 }
 
 QnPtzTourWidget::~QnPtzTourWidget() {
@@ -19,4 +20,5 @@ QnPtzTourWidget::~QnPtzTourWidget() {
 
 void QnPtzTourWidget::setPtzTour(const QnPtzTour &tour) {
     m_model->setTour(tour);
+    ui->nameLineEdit->setText(tour.name);
 }

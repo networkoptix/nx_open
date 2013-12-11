@@ -24,14 +24,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="nameLineEdit"/>
      </item>
     </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QTableView" name="tableView"/>
+      <widget class="QTreeView" name="treeView"/>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">

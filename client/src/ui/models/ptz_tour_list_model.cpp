@@ -5,7 +5,7 @@
 #include <core/ptz/ptz_tour.h>
 
 QnPtzTourListModel::QnPtzTourListModel(QObject *parent) :
-    QAbstractTableModel(parent)
+    base_type(parent)
 {
 }
 
@@ -78,7 +78,6 @@ QVariant QnPtzTourListModel::data(const QModelIndex &index, int role) const {
 
     return QVariant();
 }
-
 
 QVariant QnPtzTourListModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
