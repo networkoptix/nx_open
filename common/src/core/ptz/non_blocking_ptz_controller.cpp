@@ -264,3 +264,7 @@ bool QnNonBlockingPtzController::getTours(QnPtzTourList *tours) {
 void QnNonBlockingPtzController::synchronize(Qn::PtzDataFields fields) {
     
 }
+
+void QnNonBlockingPtzController::at_ptzCommand_finished(Qn::PtzDataFields fields, bool status, const QVariant &result) {
+
+}
