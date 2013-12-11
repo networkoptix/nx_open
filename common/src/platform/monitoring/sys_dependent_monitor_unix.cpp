@@ -197,6 +197,8 @@ public:
 
         diskById.clear();
         char line[MAX_LINE_LENGTH];
+        //!map<devname, pair<major, minor> >
+        std::map<QString, std::pair<unsigned int, unsigned int> > allPartitions;
         for(int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i) {
             if(i == 0)
                 continue; /* Skip header. */
@@ -207,12 +209,31 @@ public:
                 continue; /* Skip unrecognized lines. */
 
             QString devNameString = QString::fromUtf8(devName);
-            if(devNameString.isEmpty() || devNameString[devNameString.size() - 1].isDigit())
+            //if(devNameString.isEmpty() || devNameString[devNameString.size() - 1].isDigit())
+            if( devNameString.isEmpty() )
                 continue; /* Not a physical drive. */
 
-            int id = calculateId(majorNumber, minorNumber);
-            diskById[id] = Hdd(id, devNameString, devNameString);
+            allPartitions[devNameString] = std::make_pair( majorNumber, minorNumber );
         }
+
+        for( const auto& val: allPartitions )
+        {
+            const QString& devName = val.first;
+            const auto major = val.second.first;
+            const auto minor = val.second.second;
+
+            if( devName[devName.size()-1].isDigit() )
+            {
+                //checking for presense of sub-partitions
+                auto it = allPartitions.upper_bound( devName );
+                if( it == allPartitions.end() || !it->first.startsWith(devName) )
+                    continue;   //partition devName does not have sub partitions, considering it not a physical device
+            }
+
+            const int id = calculateId( major, minor );
+            diskById[id] = Hdd( id, devName, devName );
+        }
+
         fclose(file);
 
         // TODO: #Elric read network drives?
