@@ -15,11 +15,11 @@ Qn::PtzCapabilities QnMappedPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::LogicalPositioningPtzCapability;
 }
 
-bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+bool QnMappedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(space == Qn::DeviceCoordinateSpace) {
-        return base_type::absoluteMove(Qn::DeviceCoordinateSpace, position);
+        return base_type::absoluteMove(Qn::DeviceCoordinateSpace, position, speed);
     } else {
-        return base_type::absoluteMove(Qn::DeviceCoordinateSpace, m_mapper->logicalToDevice(position));
+        return base_type::absoluteMove(Qn::DeviceCoordinateSpace, m_mapper->logicalToDevice(position), speed);
     }
 }
 

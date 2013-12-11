@@ -148,7 +148,7 @@ void QnPtzPresetsDialog::at_removeButton_clicked() {
 
 void QnPtzPresetsDialog::at_activateButton_clicked() {
     QnPtzPreset preset = ui->treeView->currentIndex().data(Qn::PtzPresetRole).value<QnPtzPreset>();
-    m_controller->activatePreset(preset.id);
+    m_controller->activatePreset(preset.id, 1.0);
 }
 
 

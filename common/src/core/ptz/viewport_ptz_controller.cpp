@@ -25,7 +25,7 @@ Qn::PtzCapabilities QnViewportPtzController::getCapabilities() {
     return base_type::getCapabilities() | Qn::ViewportPositioningPtzCapability;
 }
 
-bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport) {
+bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
     QVector3D oldPosition;
     if(!getPosition(Qn::LogicalCoordinateSpace, &oldPosition))
         return false;
@@ -79,5 +79,5 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     QVector3D newPosition = qBound(QVector3D(qRadiansToDegrees(newSpherical.phi), qRadiansToDegrees(newSpherical.psi), newFov), limits);
 
     /* Send it to the camera. */
-    return absoluteMove(Qn::LogicalCoordinateSpace, newPosition);
+    return absoluteMove(Qn::LogicalCoordinateSpace, newPosition, speed);
 }

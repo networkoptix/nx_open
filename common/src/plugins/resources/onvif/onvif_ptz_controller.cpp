@@ -158,7 +158,7 @@ bool QnOnvifPtzController::continuousMove(const QVector3D &speed) {
     }
 }
 
-bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(space != Qn::DeviceCoordinateSpace)
         return false;
 
@@ -177,11 +177,11 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     onvifPosition.Zoom = &onvifZoom;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = 1.0;
-    onvifPanTiltSpeed.y = 1.0;
+    onvifPanTiltSpeed.x = speed;
+    onvifPanTiltSpeed.y = speed;
 
     onvifXsd__Vector1D onvifZoomSpeed;
-    onvifZoomSpeed.x = 1.0;
+    onvifZoomSpeed.x = speed;
 
     onvifXsd__PTZSpeed onvifSpeed;
     onvifSpeed.PanTilt = &onvifPanTiltSpeed;

@@ -298,7 +298,7 @@ bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     return true;
 }
 
-bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) {
+bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(space != Qn::LogicalCoordinateSpace)
         return false;
 

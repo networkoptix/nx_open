@@ -67,9 +67,10 @@ public:
      *
      * \param space                     Coordinate space of the provided position.
      * \param position                  Position to move to.
+     * \param speed                     Movement speed, in range [0, 1].
      * \returns                         Whether the operation was successful.
      */
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) = 0;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) = 0;
 
     /**
      * Moves camera's viewport relative to current viewport. New viewport 
@@ -81,9 +82,10 @@ public:
      * 
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
+     * \param speed                     Movement speed, in range [0, 1].
      * \returns                         Whether the operation was successful.
      */
-    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport) = 0;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) = 0;
 
     /**
      * Gets PTZ position from camera in the given coordinate space.
@@ -168,9 +170,10 @@ public:
      * <tt>Qn::PresetsPtzCapability<tt>.
      * 
      * \param presetId                  Id of the preset to activate.
+     * \param speed                     Movement speed, in range [0, 1].
      * \returns                         Whether the operation was successful.
      */
-    virtual bool activatePreset(const QString &presetId) = 0;
+    virtual bool activatePreset(const QString &presetId, qreal speed) = 0;
 
     /**
      * Gets a list of all PTZ presets for the camera.

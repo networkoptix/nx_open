@@ -810,7 +810,7 @@ void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
 
     for(int i = 0; i <= 20; i++) {
         position.setZ(i / 20.0);
-        controller->absoluteMove(Qn::DeviceCoordinateSpace, position);
+        controller->absoluteMove(Qn::DeviceCoordinateSpace, position, 1.0);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -2428,7 +2428,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
 
     qDebug() << "goToPreset activated" << widget->camera()->getId() << id;
 
-    if (widget->ptzController()->activatePreset(id)) {
+    if (widget->ptzController()->activatePreset(id, 1.0)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
         if(widget->camera()->getStatus() == QnResource::Offline ||

@@ -22,16 +22,24 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override;
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     
 private:
     void init();
-    bool startZoomInternal(qreal zoomVelocity);
-    bool startMoveInternal(qreal xVelocity, qreal yVelocity);
+    bool startZoomInternal(int deviceZoomSpeed);
+    bool startMoveInternal(int devicePanSpeed, int deviceTiltSpeed);
     bool stopZoomInternal();
     bool stopMoveInternal();
+
+    bool query(const QString &request, QByteArray *body = NULL, bool keepAllData = false) const;
+
+    int toDeviceZoomSpeed(qreal zoomSpeed) const;
+    int toDevicePanTiltSpeed(qreal panTiltSpeed) const;
+    
+    QString zoomDirection(int deviceZoomSpeed) const;
+    QString panTiltDirection(int devicePanSpeed, int deviceTiltSpeed) const;
 
 private:
     QMutex m_mutex;
@@ -39,8 +47,6 @@ private:
     Qn::PtzCapabilities m_capabilities;
     //QnPtzSpaceMapper *m_spaceMapper;
 
-    qreal m_zoomVelocity;
-    QPair<int, int> m_moveVelocity;
     qreal m_minAngle;
     qreal m_maxAngle;
     bool m_isFlipped;
