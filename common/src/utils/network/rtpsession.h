@@ -371,7 +371,10 @@ private:
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
 
-    int readSocketWithBuffering( quint8* buf, size_t bufSize );
+    /*!
+        \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
+    */
+    int readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome );
 };
 
 #endif //rtp_session_h_1935_h
