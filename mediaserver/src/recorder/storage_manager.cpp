@@ -790,10 +790,10 @@ void QnStorageManager::addDataToCatalog(DeviceFileCatalogPtr newCatalog, const Q
 
             existingCatalog = catalog[mac] = newCatalog;
         }
-		else if (existingCatalog->isEmpty())
-		{
-			existingCatalog->m_chunks = newCatalog->m_chunks;
-		}
+        else if (existingCatalog->isEmpty())
+        {
+            existingCatalog->m_chunks = newCatalog->m_chunks;
+        }
     }
     existingCatalog->rewriteCatalog(isLastRecordRecording);
 }
