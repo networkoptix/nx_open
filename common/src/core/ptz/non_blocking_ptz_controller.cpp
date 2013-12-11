@@ -226,7 +226,7 @@ bool QnNonBlockingPtzController::createPreset(const QnPtzPreset &preset) {
     if(!(capabilities & Qn::PresetsPtzCapability))
         return false;
 
-
+    return false;
 }
 
 bool QnNonBlockingPtzController::updatePreset(const QnPtzPreset &preset) {
