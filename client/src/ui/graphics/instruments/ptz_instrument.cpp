@@ -852,7 +852,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
         const PtzData &data = m_dataByWidget[target];
         if(data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability)) {
             m_movement = VirtualMovement;
-        } else if(data.hasCapabilities(Qn::ViewportPositioningPtzCapability)) {
+        } else if(data.hasCapabilities(Qn::ViewportPtzCapability)) {
             m_movement = ViewportMovement;
         } else {
             m_movement = NoMovement;

@@ -41,8 +41,8 @@ private:
 template<class Functor>
 class QnPtzCommand: public QnAbstractPtzCommand {
 public:
-    QnPtzCommand(const QnPtzControllerPtr &controller, Qn::PtzAction action, const Functor &functor):
-        QnAbstractPtzCommand(controller, action),
+    QnPtzCommand(const QnPtzControllerPtr &controller, Qn::PtzDataFields fields, const Functor &functor):
+        QnAbstractPtzCommand(controller, fields),
         m_functor(functor)
     {}
 
