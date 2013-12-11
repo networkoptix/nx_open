@@ -61,6 +61,8 @@ void QnOpenCurrentUserLayoutActionFactory::at_action_triggered() {
 
 QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
 
+    //TODO: #GDM PTZ place actions in the same submenu as "Manage" and "Save preset"
+
     QList<QAction *> result;
     QnPtzPresetList presets;
 

@@ -34,8 +34,6 @@
 
 #include <device_plugins/server_camera/appserver.h>
 
-#include <ui/dialogs/notification_sound_manager_dialog.h>
-
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -67,6 +65,8 @@
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
+#include <ui/dialogs/notification_sound_manager_dialog.h>
+#include <ui/dialogs/ptz_tours_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -2345,6 +2345,11 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
+    //TODO: #GDM PTZ DEBUG
+    QScopedPointer<QnPtzToursDialog> dlg(new QnPtzToursDialog(mainWindow()));
+    dlg->exec();
+
+    //TODO: #GDM PTZ fix the text
     if(widget->camera()->getStatus() == QnResource::Offline || widget->camera()->getStatus() == QnResource::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
@@ -2365,23 +2370,27 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
             ->allHotkeysByResourceId(widget->camera()->getId());
 
     QList<int> forbiddenHotkeys;
-    foreach(int hotkey, hotkeys)
-        forbiddenHotkeys.push_back(hotkey);
+    foreach (const QnPtzPreset &preset, existing) {
+        if (!hotkeys.contains(preset.name))
+            continue;
+        forbiddenHotkeys.push_back(hotkeys[preset.name]);
+    }
 
     QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
     dialog->setForbiddenHotkeys(forbiddenHotkeys);
     dialog->setName(tr("Saved Position %1").arg(n));
     dialog->setWindowTitle(tr("Save Position"));
-    if(dialog->exec() != QDialog::Accepted)
+    if(dialog->exec() != QDialog::Accepted) {
         return;
+    }
 
-    // TODO: #GDM replace if there is a preset with the same name. Maybe ask to replace.
+    //TODO: #GDM PTZ replace if there is a preset with the same name. Maybe ask to replace.
 
     QString presetId = QUuid::createUuid().toString();
     if (!widget->ptzController()->createPreset(QnPtzPreset(presetId, dialog->name())))
         return;
 
-    if(n > 2) {
+   /* if(n > 2) {
         QnPtzTour tour;
         tour.name = tr("Tour");
         tour.id = QUuid::createUuid().toString();
@@ -2399,7 +2408,7 @@ void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
         QnSleep::sleep(1);
 
         widget->ptzController()->activateTour(tour.id);
-    }
+    }*/
 
     if (dialog->hotkey() >= 0) {
         hotkeys[presetId] = dialog->hotkey();
@@ -2441,7 +2450,7 @@ void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
             );
             return;
         }
-        //TODO: #GDM check other cases
+        //TODO: #GDM PTZ check other cases
     }
 }
 
