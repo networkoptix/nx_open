@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
@@ -26,6 +27,7 @@ static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
 static const int MS_PER_SEC = 1000;
 //!used, if interface speed cannot be read (noticed on vmware)
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
+static const size_t MAX_LINE_LENGTH = 512;
 
 class QnSysDependentMonitorPrivate
 {
@@ -80,8 +82,6 @@ public:
     static const time_t PARTITION_LIST_EXPIRE_TIMEOUT_SEC = 60;
     //!Disk usage is evaluated as average on \a APPROXIMATION_VALUES_NUMBER prev values
     static const unsigned int APPROXIMATION_VALUES_NUMBER = 3;
-
-    static const size_t MAX_LINE_LENGTH = 256;
 
 
     QnSysDependentMonitorPrivate()
@@ -378,6 +378,63 @@ QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
 QList<QnPlatformMonitor::NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
 {
     return d_func()->totalNetworkLoad();
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSpaceInfo()
+{
+#ifdef __linux__
+    QList<QnPlatformMonitor::PartitionSpace> partitions = base_type::totalPartitionSpaceInfo();
+    //filtering driectories, mounted to the same device
+
+    //map<device, path>
+    std::map<QString, QString> deviceToPath;
+    std::set<QString> mountPointsToIgnore;
+    FILE* file = fopen("/proc/mounts", "r");
+    if( !file )
+        return partitions;
+
+    char line[MAX_LINE_LENGTH];
+    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
+    {
+        if( i == 0 )
+            continue; /* Skip header. */
+
+        char cDevName[MAX_LINE_LENGTH];
+        char cPath[MAX_LINE_LENGTH];
+        if( sscanf(line, "%s %s ", cDevName, cPath) != 2 )
+            continue; /* Skip unrecognized lines. */
+
+        const QString& devName = QString::fromUtf8(cDevName);
+        const QString& path = QString::fromUtf8(cPath);
+
+        auto p = deviceToPath.insert( std::make_pair(devName, path) );
+        if( !p.second )
+        {
+            //device has mutiple mount points
+            if( path.length() < p.first->second.length() )
+            {
+                mountPointsToIgnore.insert( p.first->second );
+                p.first->second = path; //selecting shortest mount point
+            }
+            else
+            {
+                mountPointsToIgnore.insert( path );
+            }
+        }
+    }
+
+    const auto partitionsEnd = partitions.end();
+    for( auto it = partitions.begin(); it != partitionsEnd; )
+    {
+        if( mountPointsToIgnore.find( it->path ) != mountPointsToIgnore.end() )
+            it = partitions.erase(it);
+        else
+            ++it;
+    }
+    return partitions;
+#else
+    return base_type::totalPartitionSpaceInfo();
+#endif
 }
 
 #endif
