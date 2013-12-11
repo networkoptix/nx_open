@@ -13,6 +13,7 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/ptz_preset_list_model.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
+#include <ui/style/skin.h>
 
 QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -23,6 +24,8 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
     ui->setupUi(this);
 
     m_removeButton = new QPushButton(tr("Remove"));
+    m_removeButton->setIcon(qnSkin->icon("buttons/remove.png"));
+
     m_activateButton = new QPushButton(tr("Activate"));
 
     QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
