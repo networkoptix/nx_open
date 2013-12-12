@@ -50,7 +50,9 @@ bool QnPtzTourListModel::insertRows(int row, int count, const QModelIndex &paren
 
     beginInsertRows(parent, row, row + count - 1);
     for(int i = 0; i < count; i++)
-        m_tours.insert(row, QnPtzTour());
+        m_tours.insert(row, QnPtzTour(QUuid::createUuid().toString(),
+                                      tr("New Tour %1").arg(m_tours.size() + 1),
+                                      QnPtzTourSpotList()));
     endInsertRows();
     return true;
 }

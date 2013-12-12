@@ -31,6 +31,8 @@ private:
 
 private slots:
     void at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    void at_addTourButton_clicked();
+    void at_deleteTourButton_clicked();
 
 private:
     QScopedPointer<Ui::QnPtzToursDialog> ui;

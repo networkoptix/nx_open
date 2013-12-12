@@ -71,6 +71,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="deleteTourButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Delete</string>
            </property>
@@ -93,7 +96,7 @@
         <item>
          <widget class="QStackedWidget" name="stackedWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tourPage">
            <layout class="QVBoxLayout" name="verticalLayout_2">
