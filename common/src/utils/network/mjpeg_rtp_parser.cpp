@@ -336,6 +336,18 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
 
+    if (rtpHeader->extension)
+    {
+        if (readed < RtpHeader::RTP_HEADER_SIZE + 4) {
+            m_videoData.clear();
+            return false;
+        }
+
+        int extWords = ((int(curPtr[2]) << 8) + curPtr[3]);
+        curPtr += extWords*4 + 4;
+        bytesLeft -= extWords*4 + 4;
+    }
+
     if (rtpHeader->padding)
         bytesLeft -= ntohl(rtpHeader->padding);
 
@@ -441,7 +453,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     {
         m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? PIX_FMT_YUV420P : PIX_FMT_YUV422P;
-        //m_jpegHeader.Initialize(qApp->organizationName().toAscii().constData(), qApp->applicationName().toAscii().constData(), "");
+        //m_jpegHeader.Initialize(qApp->organizationName().toLatin1().constData(), qApp->applicationName().toLatin1().constData(), "");
     }
 
 

@@ -1,7 +1,7 @@
 #include "proxy_style.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QStyleFactory>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleFactory>
 
 #include <utils/common/warnings.h>
 

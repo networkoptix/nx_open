@@ -3,7 +3,7 @@
 
 #include "drag_processing_instrument.h"
 
-#include <QtCore/QWeakPointer>
+
 
 class QnMediaResourceWidget;
 class SelectionItem;
@@ -60,13 +60,9 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
-    SelectionItem *selectionItem() const {
-        return m_selectionItem.data();
-    }
+    SelectionItem *selectionItem() const;
 
-    QnMediaResourceWidget *target() const {
-        return m_target.data();
-    }
+    QnMediaResourceWidget *target() const;
 
     Qt::KeyboardModifiers selectionModifiers(QnMediaResourceWidget *target) const;
 
@@ -75,8 +71,8 @@ protected:
 private:
     QBrush m_brush;
     QPen m_pen;
-    QWeakPointer<SelectionItem> m_selectionItem;
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<SelectionItem> m_selectionItem;
+    QPointer<QnMediaResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_isClick;
     bool m_clearingBlocked;

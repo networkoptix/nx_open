@@ -38,7 +38,7 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "audioformat.h"
 
 
@@ -235,34 +235,12 @@ void QnAudioFormat::setSampleRate(int samplerate)
 }
 
 /*!
-   \obsolete
-
-   Use setSampleRate() instead.
-*/
-
-void QnAudioFormat::setFrequency(int frequency)
-{
-    d->frequency = frequency;
-}
-
-/*!
     Returns the current sample rate in Hertz.
 
     \since 4.7
 */
 
 int QnAudioFormat::sampleRate() const
-{
-    return d->frequency;
-}
-
-/*!
-   \obsolete
-
-   Use sampleRate() instead.
-*/
-
-int QnAudioFormat::frequency() const
 {
     return d->frequency;
 }

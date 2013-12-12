@@ -1,23 +1,33 @@
 #ifndef __STORAGE_MANAGER_H__
 #define __STORAGE_MANAGER_H__
 
-#include <QString>
-#include <QMap>
-#include <QFile>
-#include <QMutex>
-#include <QTimer>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QString>
+#include <QtCore/QMap>
+#include <QtCore/QFile>
+#include <QtCore/QMutex>
+#include <QtCore/QTimer>
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
 #include "core/resource/storage_resource.h"
+#include "business/business_fwd.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
+class RebuildAsyncTask;
 
 class QnStorageManager: public QObject
 {
     Q_OBJECT
 public:
+
+    enum RebuildState {
+        RebuildState_None,
+        RebuildState_WaitForRecordersStopped,
+        RebuildState_Started
+    };
+
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
 
     QnStorageManager();
@@ -54,7 +64,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& mac, const QString& qualityPrefix);
 
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
-    void loadFullFileCatalog();
+    void loadFullFileCatalog(bool isRebuild = false);
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
     QnStorageResourceList getStorages() const;
@@ -62,13 +72,30 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+#ifdef __arm__
+    static const qint64 DEFAULT_SPACE_LIMIT = 100*1024*1024; // 100MB
+#else
+    static const qint64 DEFAULT_SPACE_LIMIT = 1000000000ll * 5; // 5gb
+#endif
+    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
     void stopAsyncTasks();
+
+    void rebuildCatalogAsync();
+    void cancelRebuildCatalogAsync();
+    double rebuildProgress() const;
+
+    void setRebuildState(RebuildState state);
+    RebuildState rebuildState() const;
+    
+    /*
+    * Return full path list from storage_index.csv (include absent in DB storages)
+    */
+    QStringList getAllStoragePathes() const;
 signals:
     void noStoragesAvailable();
-    void storageFailure(QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr storageRes, QnBusiness::EventReason reason);
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -79,12 +106,15 @@ private:
     QSet<int> getDeprecateIndexList(const QString& p);
     bool deserializeStorageFile();
     bool serializeStorageFile();
-    void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
+    void loadFullFileCatalogInternal(QnResource::ConnectionRole role, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
     void getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
     void updateStorageStatistics();
     void testOfflineStorages();
+    void rebuildCatalogIndexInternal();
+    bool isCatalogLoaded() const;
+
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);
@@ -92,6 +122,8 @@ private:
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
+    DeviceFileCatalogPtr getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role);
+    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QString& mac, QnResource::ConnectionRole role);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -112,8 +144,14 @@ private:
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     QTime m_lastTestTime;
-    QTime m_storageWarnTimer;
+    QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
+    QMap<QnId, bool> m_diskFullWarned;
+    RebuildState m_rebuildState;
+    double m_rebuildProgress;
+
+    friend class RebuildAsyncTask;
+    RebuildAsyncTask* m_asyncRebuildTask;
 };
 
 #define qnStorageMan QnStorageManager::instance()

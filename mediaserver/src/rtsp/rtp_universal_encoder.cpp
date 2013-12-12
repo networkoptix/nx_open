@@ -590,7 +590,7 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
 }
 
 
-QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize, const QnResourceVideoLayout* vLayout):
+QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize, const QnResourceVideoLayout* vLayout):
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
     packetIndex(0),
@@ -616,9 +616,9 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
         m_transcoder.setAudioCodec(m_codec, method);
     }
     if (m_isVideo)
-        m_isOpened = m_transcoder.open(media.dynamicCast<QnCompressedVideoData>(), QnCompressedAudioDataPtr()) == 0;
+        m_isOpened = m_transcoder.open(media.dynamicCast<const QnCompressedVideoData>(), QnConstCompressedAudioDataPtr()) == 0;
     else
-        m_isOpened = m_transcoder.open(QnCompressedVideoDataPtr(), media.dynamicCast<QnCompressedAudioData>()) == 0;
+        m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), media.dynamicCast<const QnCompressedAudioData>()) == 0;
 }
 
 QByteArray QnUniversalRtpEncoder::getAdditionSDP()
@@ -630,7 +630,7 @@ QByteArray QnUniversalRtpEncoder::getAdditionSDP()
     return QByteArray(buffer);
 }
 
-void QnUniversalRtpEncoder::setDataPacket(QnAbstractMediaDataPtr media)
+void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
     m_outputBuffer.clear();
     m_outputPos = 0;
@@ -644,7 +644,7 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_outputPos >= (int) m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || packetIndex >= packets.size())
         return false;
 
-	/*
+    /*
     if (packets[packetIndex] >= 12) {
         quint32* srcBuffer = (quint32*) (m_outputBuffer.data() + m_outputPos);
         RtpHeader* rtpHeader = (RtpHeader*) srcBuffer;
@@ -654,7 +654,7 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
         else
             srcBuffer[1] = htonl(getSSRC());
     }
-	*/
+    */
 
     sendBuffer.write(m_outputBuffer.data() + m_outputPos, packets[packetIndex]);
     m_outputPos += packets[packetIndex];

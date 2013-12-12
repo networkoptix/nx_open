@@ -8,18 +8,13 @@
 #include <utils/math/linear_combination.h>
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
-    QnGlFunctions(context),
+    QOpenGLFunctions(context->contextHandle()),
     m_initialized(false),
     m_sectorCount(sectorCount),
     m_shader(QnColorShaderProgram::instance(context))
 {
     if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
-        return;
-    }
-
-    if(!(features() & OpenGL2_0)) {
-        qnWarning("OpenGL version 2.0 is required.");
         return;
     }
 
@@ -61,7 +56,7 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
 }
 
 QnLoadingProgressPainter::~QnLoadingProgressPainter() {
-    if(m_initialized)
+    if(m_initialized && QOpenGLContext::currentContext())
         glDeleteBuffers(1, &m_buffer);
 }
 

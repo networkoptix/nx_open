@@ -1,10 +1,10 @@
 #ifndef QN_NOPTIX_STYLE_ANIMATOR_H
 #define QN_NOPTIX_STYLE_ANIMATOR_H
 
-#include <QObject>
-#include <QWidget>
+#include <QtCore/QObject>
+#include <QtWidgets/QWidget>
 #include <QHash>
-#include <QSet>
+#include <QtCore/QSet>
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animation_timer.h>
 

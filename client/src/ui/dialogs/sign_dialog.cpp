@@ -4,7 +4,6 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
-#include "camera/video_camera.h"
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"
 #include "camera/sync_dialog_display.h"
@@ -22,8 +21,8 @@
 class QnSignDialogGlWidget: public QGLWidget
 {
 public:
-    QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0): 
-        QGLWidget(format, parent, shareWidget, windowFlags)
+    QnSignDialogGlWidget(QGLContext *context, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0):
+        QGLWidget(context, parent, shareWidget, windowFlags)
     {
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));

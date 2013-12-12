@@ -1,10 +1,12 @@
 #ifndef onvif_helper_h
 #define onvif_helper_h
 
+#ifdef ENABLE_ONVIF
+
 #include <QHash>
-#include <QString>
-#include <QSet>
-#include <QPair>
+#include <QtCore/QString>
+#include <QtCore/QSet>
+#include <QtCore/QPair>
 
 //first - login, second - password
 typedef QSet<QPair<const char*, const char*> > PasswordList;
@@ -97,5 +99,7 @@ public:
     bool isSupported(const QString& cameraName) const;
     bool isManufacturerSupported(const QString& manufacturer) const;
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_helper_h

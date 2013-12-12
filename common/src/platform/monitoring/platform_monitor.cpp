@@ -1,11 +1,5 @@
 #include "platform_monitor.h"
 
-#include "sys_dependent_monitor.h"
-
-QnPlatformMonitor *QnPlatformMonitor::newInstance(QObject *parent) {
-    return new QnSysDependentMonitor(parent);
-}
-
 QList<QnPlatformMonitor::NetworkLoad> QnPlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types) {
     QList<NetworkLoad> result;
     foreach(const NetworkLoad &load, totalNetworkLoad())

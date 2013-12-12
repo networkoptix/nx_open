@@ -1,12 +1,14 @@
 #ifndef onvif_resource_searcher_wsdd_h
 #define onvif_resource_searcher_wsdd_h
 
+#ifdef ENABLE_ONVIF
+
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
 #include <memory>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include "onvif/soapwsddProxy.h"
 
@@ -113,5 +115,7 @@ private:
     bool sendProbe( const QnInterfaceAndAddr& iface );
     bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_resource_searcher_wsdd_h

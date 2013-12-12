@@ -169,7 +169,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attention! Moyenne Qualité peut entrainer une image de basse résolution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message utf8="true">
+    <message>
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
         <translation>Attention! Haute qualité peut surcharger le CPU du Serveur Média, causer d&apos;erreurs sur la connexion réseau et autres problèmes.</translation>
     </message>
@@ -1084,6 +1084,14 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Export selected cameras to file</source>
         <translation>Exportez les caméras sélectionnées vers un fichier</translation>
+    </message>
+    <message>
+        <source>Beta version</source>
+        <translation>Version Bêta</translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation>Vous utilisez la version bêta de %1</translation>
     </message>
 </context>
 <context>
@@ -2112,6 +2120,10 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <source>How-to Videos and FAQ...</source>
         <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
         <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
+    </message>
+    <message>
+        <source>Show Beta Version Warning Message</source>
+        <translation>Afficher le message d&apos;avertissement de Version Bêta</translation>
     </message>
 </context>
 <context>
@@ -3804,6 +3816,26 @@ Flux d&apos;archive autorisé: %4</translation>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation>Vous n&apos;avez pas de licence valide activée. S&apos;il vous plait, activez votre licence commerciale.</translation>
+    </message>
+    <message>
+        <source>Database error has occurred.</source>
+        <translation>Une erreur de base de donnée est survenue.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received.</source>
+        <translation>Des données non valides ont été reçues.</translation>
+    </message>
+    <message>
+        <source>The license key is invalid.</source>
+        <translation>La clé de licence n&apos;est pas valide.</translation>
+    </message>
+    <message>
+        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <translation>Vous tentez d&apos;activer une licence {{brand}} sur {{db_brand}}. Cela n&apos;est pas permis.</translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <translation type="unfinished">Cette clé de licence a été activée sur {{hwid}} le {{time}}.</translation>
     </message>
 </context>
 <context>

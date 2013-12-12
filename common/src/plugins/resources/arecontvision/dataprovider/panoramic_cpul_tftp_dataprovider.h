@@ -1,6 +1,8 @@
 #ifndef panoramic_cpull_httpreader_1800
 #define panoramic_cpull_httpreader_1800
 
+#ifdef ENABLE_ARECONT
+
 #include "av_client_pull.h"
 
 class CLSimpleTFTPClient;
@@ -43,5 +45,7 @@ protected:
 
     int m_motionData;
 };
+
+#endif
 
 #endif //cpull_httpreader_1119

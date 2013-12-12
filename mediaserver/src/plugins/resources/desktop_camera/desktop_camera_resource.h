@@ -1,6 +1,8 @@
 #ifndef ___DESKTOP_CAMERA_RESOURCE_SEARCHER_H__
 #define ___DESKTOP_CAMERA_RESOURCE_SEARCHER_H__
 
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include <QMap>
 #include <QMutex>
 
@@ -24,16 +26,13 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int frames, int timems) {}
-
-    bool isInitialized() const;
+    virtual void setIframeDistance(int frames, int timems) { Q_UNUSED(frames) Q_UNUSED(timems) }
 
     virtual bool shoudResolveConflicts() const override { return false; }
 
-    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
+    virtual bool setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override {}
 
     virtual bool isResourceAccessible() override;
 
@@ -42,5 +41,7 @@ public:
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 };
 typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
+
+#endif //ENABLE_DESKTOP_CAMERA
 
 #endif // _DESKTOP_CAMERA_RESOURCE_SEARCHER_H__

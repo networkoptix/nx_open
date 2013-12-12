@@ -1,8 +1,9 @@
 #ifndef __SIGN_FRAME_HELPER__
 #define __SIGN_FRAME_HELPER__
 
-#include <QPainter>
 #include <QtCore/QByteArray>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QPainter>
 
 #include <utils/common/cryptographic_hash.h>
 #include <utils/media/nalUnits.h>

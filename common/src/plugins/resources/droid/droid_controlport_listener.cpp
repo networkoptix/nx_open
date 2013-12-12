@@ -1,3 +1,6 @@
+#ifdef ENABLE_DROID
+
+
 #include "droid_controlport_listener.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "droid_stream_reader.h"
@@ -13,7 +16,7 @@ QnDroidControlPortListener::~QnDroidControlPortListener()
     stop();
 }
 
-QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnDroidControlPortListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     return new QnDroidControlPortProcessor(clientSocket, owner);
 }
@@ -25,10 +28,10 @@ class QnDroidControlPortProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 };
 
-QnDroidControlPortProcessor::QnDroidControlPortProcessor(AbstractStreamSocket* socket, QnTcpListener* owner):
+QnDroidControlPortProcessor::QnDroidControlPortProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(socket)
 {
-
+    Q_UNUSED(owner)
 }
 
 QnDroidControlPortProcessor::~QnDroidControlPortProcessor()
@@ -53,3 +56,5 @@ void QnDroidControlPortProcessor::run()
         }
     }
 }
+
+#endif // #ifdef ENABLE_DROID

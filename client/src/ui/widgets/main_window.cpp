@@ -1,13 +1,13 @@
 #include "main_window.h"
 
+#ifdef Q_OS_MACX
+#include "mac_utils.h"
+#endif
+
 #include <QtCore/QFile>
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QFileDialog>
-#include <QtGui/QToolButton>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QToolButton>
 #include <QtGui/QFileOpenEvent>
 #include <QtNetwork/QNetworkReply>
 
@@ -18,33 +18,40 @@
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
 #include "ui/common/palette.h"
 #include "ui/common/frame_section.h"
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
+#include "ui/graphics/view/graphics_scene.h"
 #include "ui/graphics/view/gradient_background_painter.h"
+#include "ui/graphics/instruments/instrument_manager.h"
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include "ui/workbench/handlers/workbench_action_handler.h"
-#include "ui/workbench/handlers/workbench_panic_handler.h"
-#include "ui/workbench/handlers/workbench_screenshot_handler.h"
-#include "ui/workbench/workbench_controller.h"
-#include "ui/workbench/workbench_grid_mapper.h"
-#include "ui/workbench/workbench_layout.h"
-#include "ui/workbench/workbench_display.h"
-#include "ui/workbench/workbench_ui.h"
-#include "ui/workbench/workbench_synchronizer.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/workbench/workbench_resource.h"
+
+#include <ui/workbench/handlers/workbench_action_handler.h>
+#include <ui/workbench/handlers/workbench_layouts_handler.h>
+#include <ui/workbench/handlers/workbench_panic_handler.h>
+#include <ui/workbench/handlers/workbench_screenshot_handler.h>
+#include <ui/workbench/handlers/workbench_export_handler.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
+#include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_ui.h>
+#include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_resource.h>
+
 #include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "ui/style/noptix_style.h"
 #include "ui/style/proxy_style.h"
-#include "ui/workaround/system_menu_event.h"
+#include "ui/workaround/qtbug_workaround.h"
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
@@ -53,10 +60,6 @@
 #include "resource_browser_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
-#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-
-#include "openal/qtvaudiodevice.h"
-#include "ui/graphics/items/controls/volume_slider.h"
 
 namespace {
 
@@ -105,6 +108,19 @@ namespace {
 
 } // anonymous namespace
 
+#ifdef Q_OS_MACX
+extern "C" {
+    void disable_animations(void *qnmainwindow) {
+        QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
+        mainwindow->setAnimationsEnabled(false);
+    }
+
+    void enable_animations(void *qnmainwindow) {
+        QnMainWindow* mainwindow = (QnMainWindow*)qnmainwindow;
+        mainwindow->setAnimationsEnabled(true);
+    }
+}
+#endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
@@ -114,10 +130,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm(NULL),
     m_drawCustomFrame(false)
 {
-    setAttribute(Qt::WA_AlwaysShowToolTips);
+#ifdef Q_OS_MACX
+    mac_initFullScreen((void*)winId(), (void*)this);
+#endif
 
-    /* We want to receive system menu event on Windows. */
-    QnSystemMenuEvent::initialize();
+    setAttribute(Qt::WA_AlwaysShowToolTips);
 
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
@@ -139,20 +156,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up scene & view. */
-    m_scene.reset(new QGraphicsScene(this));
+    m_scene.reset(new QnGraphicsScene(this));
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    {
-        /* Adjust palette so that inherited background painting is not needed. */
-        QPalette palette = m_view->palette();
-        palette.setColor(QPalette::Background, Qt::black);
-        palette.setColor(QPalette::Base, Qt::black);
-        m_view->setPalette(palette);
-    }
+    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
+    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
 
     m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -170,8 +182,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
+    context->instance<QnWorkbenchExportHandler>();
+    context->instance<QnWorkbenchLayoutsHandler>();
 
+    /* Set up watchers. */
+    context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));
@@ -198,10 +215,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::SelectAllAction));
+    addAction(action(Qn::CheckFileSignatureAction));
     addAction(action(Qn::TakeScreenshotAction));
     addAction(action(Qn::AdjustVideoAction));
     addAction(action(Qn::TogglePanicModeAction));
-    addAction(action(Qn::ToggleTourModeHotkeyAction));
+    addAction(action(Qn::ToggleTourModeAction));
     addAction(action(Qn::DebugIncrementCounterAction));
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
@@ -215,7 +233,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Tab bar. */
     m_tabBar = new QnLayoutTabBar(this);
+#ifdef Q_OS_WIN
+    // tabs are drawn in the window header on windows 7 //TODO: #Elric check on windows XP
     m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
+#endif
     connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
 
 
@@ -271,10 +292,19 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Post-initialize. */
     updateDwmState();
+#ifdef Q_OS_MACX
+    setOptions(WindowButtonsVisible);
+#else
     setOptions(TitleBarDraggable | WindowButtonsVisible);
+#endif
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
+
+#ifdef Q_OS_MACX
+    //initialize system-wide menu
+    menu()->newMenu(Qn::MainScope);
+#endif
 }
 
 QnMainWindow::~QnMainWindow() {
@@ -333,12 +363,39 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
         return;
 
     if(fullScreen) {
+#ifndef Q_OS_MACX
         m_storedGeometry = geometry();
+#endif
         showFullScreen();
     } else if(isFullScreen()) {
         showNormal();
+#ifndef Q_OS_MACX
         setGeometry(m_storedGeometry);
+#endif
     }
+}
+
+void QnMainWindow::setAnimationsEnabled(bool enabled) {
+    InstrumentManager *manager = InstrumentManager::instance(m_scene.data());
+    manager->setAnimationsEnabled(enabled);
+}
+
+void QnMainWindow::showFullScreen() {
+#if defined Q_OS_MACX
+    mac_showFullScreen((void*)winId(), true);
+    updateDecorationsState();
+#else
+    QnEmulatedFrameWidget::showFullScreen();
+#endif
+}
+
+void QnMainWindow::showNormal() {
+#if defined Q_OS_MACX
+    mac_showFullScreen((void*)winId(), false);
+    updateDecorationsState();
+#else
+    QnEmulatedFrameWidget::showNormal();
+#endif
 }
 
 void QnMainWindow::minimize() {
@@ -370,15 +427,25 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
+#ifdef Q_OS_MACX
+    bool fullScreen = mac_isFullscreen((void*)winId());
+#else
     bool fullScreen = isFullScreen();
+#endif
     bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
 
-    setTitleVisible(!(fullScreen || maximized));
-    m_ui->setTitleUsed(fullScreen || maximized);
-    m_view->setLineWidth(fullScreen || maximized ? 0 : 1);
+#ifdef Q_OS_MACX
+    bool uiTitleUsed = fullScreen;
+#else
+    bool uiTitleUsed = fullScreen || maximized;
+#endif
+
+    setTitleVisible(!uiTitleUsed);
+    m_ui->setTitleUsed(uiTitleUsed);
+    m_view->setLineWidth(uiTitleUsed ? 0 : 1);
 
     updateDwmState();
 }
@@ -389,7 +456,7 @@ void QnMainWindow::updateDwmState() {
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported()) {
+        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -408,7 +475,7 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
+    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false) { // TODO: Disable DWM for now.
         /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
         m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
@@ -431,10 +498,12 @@ void QnMainWindow::updateDwmState() {
         );
     } else {
         /* Windowed or maximized without aero glass. */
-        m_drawCustomFrame = true;
-        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
+        /*m_drawCustomFrame = true;
+        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
+        m_drawCustomFrame = false;
+        m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported()) {
+        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -445,7 +514,8 @@ void QnMainWindow::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
+        //m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
+        m_titleLayout->setContentsMargins(2, 0, 2, 0);
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
             isTitleVisible() ? 0 : m_frameMargins.top(),
@@ -462,7 +532,7 @@ void QnMainWindow::updateDwmState() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+    if(event->type() == QnEvent::WinSystemMenu) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
             
@@ -478,7 +548,8 @@ bool QnMainWindow::event(QEvent *event) {
 
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
-    Q_UNUSED(event)
+    event->ignore();
+    action(Qn::ExitAction)->trigger();
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
@@ -494,10 +565,12 @@ void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
 void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
+#ifndef Q_OS_MACX
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
         action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
+#endif
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {
@@ -513,13 +586,8 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(qnGlobals->frameColor(), 3));
-        painter.drawRect(QRect(
-            0,
-            0,
-            width() - 1,
-            height() - 1
-        ));
+        painter.setPen(QPen(Qt::black, 1));
+        painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
 }
 
@@ -578,16 +646,17 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
     menu()->trigger(Qn::ToggleTourModeAction);
 }
 
-#ifdef Q_OS_WIN
-bool QnMainWindow::winEvent(MSG *message, long *result)
-{
+void QnMainWindow::resizeEvent(QResizeEvent *event) {
+    base_type::resizeEvent(event);
+}
+
+bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     /* Note that we may get here from destructor, so check for dwm is needed. */
-    if(m_dwm && m_dwm->widgetWinEvent(message, result))
+    if(m_dwm && m_dwm->widgetNativeEvent(eventType, message, result))
         return true;
 
-    return base_type::winEvent(message, result);
+    return base_type::nativeEvent(eventType, message, result);
 }
-#endif
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
     if(isFullScreen())

@@ -1,6 +1,8 @@
 #ifndef QN_DESKTOP_RESOURCE_SEARCHER_H
 #define QN_DESKTOP_RESOURCE_SEARCHER_H
 
+#ifdef _WIN32
+
 #include "core/resource_managment/resource_searcher.h"
 
 struct IDirect3D9;
@@ -27,5 +29,7 @@ private:
     IDirect3D9 *m_pD3D;
     QGLWidget* m_mainWidget;
 };
+
+#endif
 
 #endif // QN_DESKTOP_RESOURCE_SEARCHER_H

@@ -1,8 +1,8 @@
 #ifndef STORAGE_SPACE_WIDGET_H
 #define STORAGE_SPACE_WIDGET_H
 
-#include <QWidget>
-#include <QtGui/QSlider>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QSlider>
 
 class QnStorageSpaceWidget : public QSlider
 {

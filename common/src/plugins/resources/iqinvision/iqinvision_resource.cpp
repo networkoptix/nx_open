@@ -1,3 +1,5 @@
+#ifdef ENABLE_IQE
+
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "iqinvision_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
@@ -53,13 +55,14 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
     return new MJPEGtreamreader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
 }
 
-void QnPlIqResource::setCropingPhysical(QRect /*croping*/)
+void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
 
 CameraDiagnostics::Result QnPlIqResource::initInternal() 
 {
+    QnPhysicalCameraResource::initInternal();
     CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
     //return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT);
     return (status == CL_HTTP_SUCCESS || status == CL_HTTP_REDIRECT)
@@ -116,3 +119,5 @@ QSize QnPlIqResource::getMaxResolution() const
     QSize s;
     return s;
 }
+
+#endif // #ifdef ENABLE_IQE

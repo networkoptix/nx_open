@@ -1,12 +1,15 @@
+
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
+
 #include "motion_estimation.h"
 
 #include <cmath>
 
 #include "utils/media/sse_helper.h"
 
-#include <QImage>
-#include <QTime>
-#include <QDebug>
+#include <QtGui/QImage>
+#include <QtGui/QColor>
+#include <QtCore/QDebug>
 #include "utils/network/socket.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
@@ -123,9 +126,6 @@ public:
 
 
 
-static const __m128i sse_0x80_const = _mm_setr_epi32(0x80808080, 0x80808080, 0x80808080, 0x80808080);
-static const int LARGE_FILTER_MIN_SENSETIVITY = 5;
-
 quint32 reverseBits(quint32 v)
 {
     return (BitReverseTable256[v & 0xff]) | 
@@ -163,8 +163,6 @@ void fillFrameRect(CLVideoDecoderOutput* frame, const QRect& rect, quint8 value)
 * returns matrix with avarage Y value
 */
 
-static const __m128i zerroConst = _mm_setr_epi32(0, 0, 0, 0);
-
 void saveFrame(quint8* data, int width, int height, int linesize, const QString& fileName)
 {
     QImage src(width, height, QImage::Format_Indexed8);
@@ -180,6 +178,10 @@ void saveFrame(quint8* data, int width, int height, int linesize, const QString&
     }
     src.save(fileName);
 }
+
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
+static const __m128i sse_0x80_const = _mm_setr_epi32(0x80808080, 0x80808080, 0x80808080, 0x80808080);
+static const __m128i zerroConst = _mm_setr_epi32(0, 0, 0, 0);
 
 inline __m128i advanced_sad(const __m128i src1, const __m128i src2)
 {
@@ -199,6 +201,11 @@ inline __m128i advanced_sad(const __m128i src1, const __m128i src2)
     // return sum
     return _mm_sad_epu8(pixelsAbs, zerroConst);
 }
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO: C fallback routine
+#endif
 
 void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
 {
@@ -209,8 +216,8 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
-    const __m128i* curLinePtr = (const __m128i*) frame->data[0];
-    const __m128i* curLinePtrPrev = (const __m128i*) prevFrame->data[0];
+    const simd128i* curLinePtr = (const simd128i*) frame->data[0];
+    const simd128i* curLinePtrPrev = (const simd128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)effectiveWidth,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
@@ -222,10 +229,11 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         quint8* dstCurLine = dst;
         int nextLineNum = curLineNum + linesInStep;
         int rowCnt = (nextLineNum>>16) - (curLineNum>>16);
-        const __m128i* linePtr = curLinePtr;
-        const __m128i* linePtrPrev = curLinePtrPrev;
+        const simd128i* linePtr = curLinePtr;
+        const simd128i* linePtrPrev = curLinePtrPrev;
         for (int x = 0; x < xSteps; ++x)
         {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum);
             const __m128i* src = linePtr;
@@ -247,6 +255,11 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
         }  
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
@@ -261,10 +274,10 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
-    const __m128i* curLinePtr = (const __m128i*) frame->data[0];
+    const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
@@ -276,9 +289,10 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         quint8* dstCurLine = dst;
         int nextLineNum = curLineNum + linesInStep;
         int rowCnt = (nextLineNum>>16) - (curLineNum>>16);
-        const __m128i* linePtr = curLinePtr;
+        const simd128i* linePtr = curLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -296,6 +310,11 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
         }  
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
@@ -317,11 +336,11 @@ void fillRightEdge8(const CLVideoDecoderOutput* frame)
 
 void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
 {
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
-    const __m128i* curLinePtr = (const __m128i*) frame->data[0];
-    const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
+    const simd128i* curLinePtr = (const simd128i*) frame->data[0];
+    const simd128i* prevLinePtr = (const simd128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     if (frame->width % 16)
@@ -336,11 +355,11 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
         quint8* dstCurLine = dst;
         int nextLineNum = curLineNum + linesInStep;
         int rowCnt = (nextLineNum>>16) - (curLineNum>>16);
-        const __m128i* linePtr = curLinePtr;
-        const __m128i* linePtr2 = prevLinePtr;
+        const simd128i* linePtr = curLinePtr;
+        const simd128i* linePtr2 = prevLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -360,6 +379,11 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
         }
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
@@ -370,10 +394,10 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
 
 void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
-    Q_ASSERT(frame->width % 8 == 0);
+    //Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
 
-    const __m128i* curLinePtr = (const __m128i*) frame->data[0];
+    const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
@@ -385,10 +409,10 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         quint8* dstCurLine = dst;
         int nextLineNum = curLineNum + linesInStep;
         int rowCnt = (nextLineNum>>16) - (curLineNum>>16);
-        const __m128i* linePtr = curLinePtr;
+        const simd128i* linePtr = curLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -405,6 +429,11 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
         }  
         curLineNum = nextLineNum;
         curLinePtr += lineSize*rowCnt;
@@ -447,13 +476,14 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
 }
+
     Q_ASSERT(frame->linesize[0] % 16 == 0);
     Q_ASSERT(sqWidth % 8 == 0);
     
     int sqWidthSteps = sqWidth / 8;
 
-    const __m128i* curLinePtr = (const __m128i*) frame->data[0];
-    const __m128i* prevLinePtr = (const __m128i*) prevFrame->data[0];
+    const simd128i* curLinePtr = (const simd128i*) frame->data[0];
+    const simd128i* prevLinePtr = (const simd128i*) prevFrame->data[0];
     int lineSize = frame->linesize[0] / 16;
     if (frame->width % 16)
         fillRightEdge8(frame);
@@ -470,10 +500,11 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         quint8* dstCurLine = dst;
         int nextLineNum = curLineNum + linesInStep;
         int rowCnt = (nextLineNum>>16) - (curLineNum>>16);
-        const __m128i* linePtr = curLinePtr;
-        const __m128i* linePtr2 = prevLinePtr;
+        const simd128i* linePtr = curLinePtr;
+        const simd128i* linePtr2 = prevLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -496,7 +527,11 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             if (squareStep == sqWidthSteps)
                 flushData(rowCnt * sqWidth);
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
-
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
 
             squareStep++;
             if (squareStep == sqWidthSteps) 
@@ -527,7 +562,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
     Q_ASSERT(sqWidth % 8 == 0);
     sqWidth /= 8;
 
-    const __m128i* curLinePtr = (const __m128i*) frame->data[0];
+    const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
     int xSteps = qPower2Ceil((unsigned)frame->width,16)/16;
     int linesInStep = (frame->height*65536)/ MD_HEIGHT;
@@ -541,10 +576,10 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
         quint8* dstCurLine = dst;
         int nextLineNum = curLineNum + linesInStep;
         int rowCnt = (nextLineNum>>16) - (curLineNum>>16);
-        const __m128i* linePtr = curLinePtr;
+        const simd128i* linePtr = curLinePtr;
         for (int x = 0; x < xSteps; ++x)
         {
-
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             __m128i blockSum;
             blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
             const __m128i* src = linePtr;
@@ -565,6 +600,11 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
             if (squareStep == sqWidth)
                 flushData();
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
         }
         if (squareStep)
             flushData();
@@ -639,16 +679,22 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
         Q_ASSERT(iLineNum < m_scaledWidth);
-        __m128i* dst = (__m128i*) (scaledMask + MD_HEIGHT*iLineNum);
-        __m128i* src = (__m128i*) (mask + MD_HEIGHT*y);
+        simd128i* dst = (simd128i*) (scaledMask + MD_HEIGHT*iLineNum);
+        simd128i* src = (simd128i*) (mask + MD_HEIGHT*y);
         if (iLineNum > prevILineNum) 
         {
             for (int i = 0; i < iLineNum - prevILineNum; ++i) 
-                memcpy(dst - i*MD_HEIGHT/sizeof(__m128i) , src, MD_HEIGHT);
+                memcpy(dst - i*MD_HEIGHT/sizeof(simd128i) , src, MD_HEIGHT);
         }
         else {
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
             dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
             dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO
+#endif
         }
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
@@ -868,6 +914,7 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     }
 }
 
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 {
     QMutexLocker lock(&m_mutex);
@@ -980,6 +1027,7 @@ bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
     return true;
 }
+#endif
 
 void QnMotionEstimation::postFiltering()
 {
@@ -1092,3 +1140,5 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     }
     m_lastImgWidth = m_lastImgHeight = 0;
 }
+
+#endif //ENABLE_SOFTWARE_MOTION_DETECTION

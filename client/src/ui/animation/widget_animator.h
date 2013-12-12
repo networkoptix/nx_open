@@ -1,8 +1,8 @@
 #ifndef QN_WIDGET_ANIMATOR_H
 #define QN_WIDGET_ANIMATOR_H
 
-#include <QObject>
-#include <QMetaType>
+#include <QtCore/QObject>
+#include <QtCore/QMetaType>
 #include <ui/common/geometry.h>
 #include "animator_group.h"
 

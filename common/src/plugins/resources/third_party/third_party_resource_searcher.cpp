@@ -104,7 +104,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     result->setTypeId(resourceTypeId);
     result->setPhysicalId(QString::fromUtf8(cameraInfo.uid));
 
-    unsigned int caps;
+    unsigned int caps = 0;
     if (camManager->getCameraCapabilities(&caps) == 0) 
     {
         if( caps & nxcip::BaseCameraManager::shareIpCapability )
@@ -125,12 +125,14 @@ QString ThirdPartyResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
+    QVector<nxcip::CameraInfo> cameraInfoTempArray;
+
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        QString addressStr;
+        QString addressStr = url.scheme();
         if( url.scheme().isEmpty() )
         {
             //url is a host
@@ -139,13 +141,13 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url,
         }
         else
         {
-            //url is an URL!
-            addressStr = url.toString();
+            //url is an URL! or mswin path
+            addressStr = QUrl::fromPercentEncoding(url.toString().toLatin1());
         }
         const QString& userName = auth.user();
         const QString& password = auth.password();
         int result = it->checkHostAddress(
-            &m_cameraInfoTempArray,
+            &cameraInfoTempArray,
             addressStr,
             &userName,
             &password );
@@ -153,14 +155,14 @@ QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url,
         {
             //trying one again with no login/password (so that plugin can use default ones)
             result = it->checkHostAddress(
-                &m_cameraInfoTempArray,
+                &cameraInfoTempArray,
                 addressStr,
                 NULL,
                 NULL );
         }
         if( result <= 0 )
             continue;
-        return createResListFromCameraInfoList( &*it, m_cameraInfoTempArray );
+        return createResListFromCameraInfoList( &*it, cameraInfoTempArray );
     }
     return QList<QnResourcePtr>();
 }
@@ -237,16 +239,18 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
 
 QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 {
+    QVector<nxcip::CameraInfo> cameraInfoTempArray;
+
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
         it = m_thirdPartyCamPlugins.begin();
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        int result = it->findCameras( &m_cameraInfoTempArray, QString() );
+        int result = it->findCameras( &cameraInfoTempArray, QString() );
         if( result <= 0 )
             continue;
 
-        return createResListFromCameraInfoList( &*it, m_cameraInfoTempArray );
+        return createResListFromCameraInfoList( &*it, cameraInfoTempArray );
     }
     return QnResourceList();
 }

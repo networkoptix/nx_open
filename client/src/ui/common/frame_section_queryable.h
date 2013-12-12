@@ -2,7 +2,7 @@
 #define QN_FRAME_SECTION_QUERYABLE_H
 
 #include <QtCore/QRectF>
-#include <QCursor>
+#include <QtGui/QCursor>
 
 #include "frame_section.h"
 

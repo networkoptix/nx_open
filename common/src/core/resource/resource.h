@@ -2,13 +2,13 @@
 #define QN_RESOURCE_H
 
 #include <cassert>
-#include <QDateTime>
-#include <QMap>
-#include <QMetaType>
-#include <QSet>
-#include <QStringList>
-#include <QReadWriteLock>
-#include <QThreadPool>
+#include <QtCore/QDateTime>
+#include <QtCore/QMap>
+#include <QtCore/QMetaType>
+#include <QtCore/QSet>
+#include <QtCore/QStringList>
+#include <QtCore/QReadWriteLock>
+#include <QtCore/QThreadPool>
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/common/from_this_to_shared.h"
 #include "utils/common/id.h"
@@ -104,6 +104,7 @@ public:
 
         foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
         no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
+        deprecated = 0x100000,   /**< Resource absent in EC but still used in memory for some reason */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -206,7 +207,7 @@ public:
     bool hasParam(const QString &name) const;
 
     // return true if no error
-    bool getParam(const QString &name, QVariant &val, QnDomain domain);
+    bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
@@ -263,7 +264,7 @@ public:
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
 
 signals:
-    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param);
+    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
     void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
@@ -277,7 +278,7 @@ signals:
         \param paramValue in case \a result == false, this value cannot be relied on
         \param result true, if param succesfully read, false otherwises
     */
-    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
+    void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result) const;
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!

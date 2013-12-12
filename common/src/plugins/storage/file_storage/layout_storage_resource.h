@@ -1,7 +1,7 @@
 #ifndef _LAYOUT_STORAGE_PROTOCOL_H__
 #define _LAYOUT_STORAGE_PROTOCOL_H__
 
-#include <QFile>
+#include <QtCore/QFile>
 
 extern "C"
 {
@@ -10,15 +10,21 @@ extern "C"
 #include "core/resource/storage_resource.h"
 #include "recording/time_period_list.h"
 
+class QnLayoutFile;
+
 /*
 * QnLayoutFileStorageResource uses for layout export
 */
-
-class QnLayoutFile;
-
 class QnLayoutFileStorageResource: public QnStorageResource
 {
 public:
+    enum StorageFlags {
+        ReadOnly        = 0x1,
+        ContainsCameras = 0x2,
+
+        Count
+    };
+
     QnLayoutFileStorageResource();
     virtual ~QnLayoutFileStorageResource();
 
@@ -45,6 +51,10 @@ public:
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 
     QnTimePeriodList getTimePeriods(QnResourcePtr res);
+
+    static QString updateNovParent(const QString& novName, const QString& itemName);
+
+    static QString layoutPrefix();
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 

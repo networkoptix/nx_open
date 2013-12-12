@@ -2,8 +2,10 @@
 #include "version.h"
 
 #include <QtSingleApplication>
-#include <QtGui>
-#include <QMetaType>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QMetaType>
+#include <QtCore/QDir>
+#include <QtCore/QSettings>
 
 #include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
@@ -70,6 +72,13 @@ int main(int argc, char *argv[])
     if (argument == lit("quit"))
     {
         app.sendMessage(lit("quit"));
+
+        // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
+        while (app.isRunning()) {
+            Sleep(100);
+        } 
+        Sleep(100);
+
         return 0;
     }
 

@@ -3,7 +3,7 @@
 
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
 #include <utils/common/event_processors.h>
@@ -39,7 +39,7 @@ namespace {
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint | Qt::Tool),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
@@ -66,7 +66,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->dateEditTo->setDate(dt);
 
     QHeaderView* headers = ui->gridEvents->horizontalHeader();
-    headers->setResizeMode(QHeaderView::Fixed);
+    headers->setSectionResizeMode(QHeaderView::Fixed);
 
     // init events model
     {
@@ -359,14 +359,12 @@ void QnEventLogDialog::requestFinished()
     setCursor(Qt::ArrowCursor);
     updateHeaderWidth();
     if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-        ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %3 event(s) found")
+        ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
         .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate))
-        .arg(m_model->rowCount()));
+        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     else
-        ui->statusLabel->setText(tr("Event log for %1  - %2 event(s) found")
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-        .arg(m_model->rowCount()));
+        ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
+        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
     ui->loadingProgressBar->hide();
 }
 
@@ -395,19 +393,17 @@ void QnEventLogDialog::setEventType(BusinessEventType::Value value)
                 1,
                 Qt::MatchExactly | Qt::MatchRecursive);
     if (found.isEmpty())
-        ui->eventComboBox->setCurrentIndex(0);
+        ui->eventComboBox->setCurrentIndex(QModelIndex());
     else
-        ui->eventComboBox->selectIndex(found.first());
+        ui->eventComboBox->setCurrentIndex(found.first());
 }
 
 QString QnEventLogDialog::getTextForNCameras(int n) const
 {
     if (n == 0)
-        return tr("< Any camera >");
-    else if (n == 1)
-        return tr("< 1 camera >");
-    else
-        return tr("< %1 cameras >").arg(n);
+        return tr("<Any camera>");
+    else 
+        return tr("<%n camera(s)>", "", n);
 }
 
 void QnEventLogDialog::setDateRange(const QDate& from, const QDate& to)

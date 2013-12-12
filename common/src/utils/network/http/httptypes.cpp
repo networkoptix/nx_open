@@ -17,6 +17,12 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http
 {
+    StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
+    {
+        HttpHeaders::const_iterator it = headers.find( headerName );
+        return it == headers.end() ? StringType() : it->second;
+    }
+    
     ////////////////////////////////////////////////////////////
     //// parse utils
     ////////////////////////////////////////////////////////////
@@ -159,6 +165,8 @@ namespace nx_http
                     return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
+                case moved:
+                    return StringType("Moved");
                 case badRequest:
                     return StringType("Bad Request");
                 case forbidden:
@@ -231,14 +239,10 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     //// class StatusLine
     ////////////////////////////////////////////////////////////
+    static const int MAX_DIGITS_IN_STATUS_CODE = 5;
     static size_t estimateSerializedDataSize( const StatusLine& sl )
     {
-        return sl.version.size()
-            + 1     //space
-            + 3     //http status codes have 3 digits
-            + 1     //space
-            + sl.reasonPhrase.size()
-            + 2;   //\r\n
+        return sl.version.size() + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
     }
 
     StatusLine::StatusLine()
@@ -377,6 +381,7 @@ namespace nx_http
         //estimating required buffer size
         dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
 
+        //serializing
         statusLine.serialize( dstBuffer );
         serializeHeaders( headers, dstBuffer );
         dstBuffer->append( (const BufferType::value_type*)"\r\n" );
@@ -408,6 +413,7 @@ namespace nx_http
             }
         }
     }
+
 
 
     ////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 #include "resource_type.h"
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 #include "utils/common/log.h"
 

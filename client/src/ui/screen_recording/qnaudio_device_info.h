@@ -1,7 +1,8 @@
 #ifndef __QN_AUDIO_DEVICE_INFO_H__
 #define __QN_AUDIO_DEVICE_INFO_H__
 
-#include "qaudiodeviceinfo.h"
+#include <QtMultimedia/QAudioDeviceInfo>
+
 
 class QnAudioDeviceInfo: public QAudioDeviceInfo
 {

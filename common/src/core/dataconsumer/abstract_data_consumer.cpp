@@ -14,7 +14,8 @@ bool QnAbstractDataConsumer::canAcceptData() const
 
 void QnAbstractDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
-    m_dataQueue.push(data);
+    if (!needToStop())
+        m_dataQueue.push(data);
 }
 
 void QnAbstractDataConsumer::clearUnprocessedData()

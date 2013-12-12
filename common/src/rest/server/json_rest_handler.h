@@ -43,22 +43,22 @@ public:
         }
 
         QByteArray serialize() {
-            QVariantMap map;
+            QJsonObject object;
             if(!m_errorText.isEmpty())
-                map[QLatin1String("errorText")] = m_errorText;
+                object[QLatin1String("errorText")] = m_errorText;
             if(m_errorId != -1)
-                map[QLatin1String("errorId")] = m_errorId;
-            map[QLatin1String("reply")] = m_reply;
+                object[QLatin1String("errorId")] = m_errorId;
+            object[QLatin1String("reply")] = m_reply;
 
             QByteArray result;
-            QJson::serialize(map, &result);
+            QJson::serialize(object, &result);
             return result;
         }
 
     private:
         QString m_errorText;
         int m_errorId;
-        QVariant m_reply;
+        QJsonValue m_reply;
     };
 
     QnJsonRestHandler(): m_contentType("application/json") {}

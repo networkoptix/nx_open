@@ -19,7 +19,7 @@ class QnLayoutItemData;
  * Layout item. Video, image, server, or anything else.
  */
 class QnWorkbenchItem : public QObject {
-    Q_OBJECT;
+    Q_OBJECT
     Q_PROPERTY(QString resourceUid READ resourceUid);
     Q_PROPERTY(QUuid uuid READ uuid);
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation);

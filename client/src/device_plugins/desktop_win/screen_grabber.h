@@ -12,7 +12,7 @@
 #include <commdlg.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#include <QTime>
+#include <QtCore/QTime>
 #include "ui/screen_recording/video_recorder_settings.h"
 
 struct CaptureInfo

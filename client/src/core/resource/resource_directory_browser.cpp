@@ -12,7 +12,6 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
 #include "client/client_globals.h"
-#include "ui/workbench/watchers/workbench_server_time_watcher.h"
 
 #include <utils/local_file_cache.h>
 
@@ -133,8 +132,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QByteArray layoutData = layoutFile->readAll();
     delete layoutFile;
     QnApiPbSerializer serializer;
+    QList<QnLayoutItemDataList> orderedItems;
     try {
-        serializer.deserializeLayout(layout, layoutData);
+        serializer.deserializeLayout(layout, layoutData, &orderedItems);
         if (layout == 0)
             return layout;
     } catch(...) {
@@ -145,12 +145,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
-        layout->setGuid(QUuid(data.data()));
+        layout->setGuid(QUuid(data.data()).toString());
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
     } else {
-        layout->setGuid(QUuid::createUuid());
+        layout->setGuid(QUuid::createUuid().toString());
     }
 
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
@@ -168,14 +168,13 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         if (data.size() >= (int)sizeof(quint32))
         {
             quint32 flags = *((quint32*) data.data());
-            if (flags & 1) {
+            if (flags & QnLayoutFileStorageResource::ReadOnly) {
                 Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
                 layout->setData(Qn::LayoutPermissionsRole, (int) permissions);
             }
-            if (flags & 2)
+            if (flags & QnLayoutFileStorageResource::ContainsCameras)
                 layoutWithCameras = true;
         }
-        //layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
     if (!layout->backgroundImageFilename().isEmpty()) {
@@ -197,7 +196,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
 
-    QnLayoutItemDataMap items = layout->getItems();
+    //QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
     QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
@@ -206,14 +205,15 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
-    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr) {
-        QnLayoutItemData& item = itr.value();
+    QnLayoutItemDataList& items = orderedItems[0];
+    for (int i = 0; i < items.size(); ++i)
+    {
+        QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
-        //item.resource.id = QnId::generateSpecialId();
         if (!path.endsWith(QLatin1String(".mkv")))
             item.resource.path += QLatin1String(".mkv");
-        item.resource.path = QnLayoutResource::updateNovParent(xfile,item.resource.path);
+        item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
         storage->setUrl(xfile);
@@ -222,7 +222,6 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         if (layoutWithCameras)
             aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
         aviResource->setStorage(storage);
-        //aviResource->setId(item.resource.id);
         aviResource->setParentId(layout->getId());
         QString itemName(itemNames.readLine());
         if (!itemName.isEmpty())
@@ -265,7 +264,6 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     delete itemNamesIO;
     delete itemTimeZonesIO;
     layout->setItems(updatedItems);
-    //layout->addFlags(QnResource::local_media);
     layout->addFlags(QnResource::local);
     return layout;
 }

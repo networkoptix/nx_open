@@ -2,13 +2,13 @@
 #define _DEVICE_FILE_CATALOG_H___
 
 #include <QSharedPointer>
-#include <QFile>
-#include <QVector>
-#include <QMap>
+#include <QtCore/QFile>
+#include <QtCore/QVector>
+#include <QtCore/QMap>
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period.h"
-#include <QFileInfo>
+#include <QtCore/QFileInfo>
 
 class DeviceFileCatalog: public QObject
 {
@@ -58,9 +58,10 @@ public:
     void updateDuration(int durationMs, qint64 fileSize);
 
     /** return deleted file size if calcFileSize is true and srcStorage matched with deleted file */
-    qint64 deleteFirstRecord(bool calcFileSize, QnStorageResourcePtr srcStorage); 
+    void deleteFirstRecord(); 
+    bool isEmpty() const;
     void clear();
-    qint64 deleteRecordsBefore(int idx, QnStorageResourcePtr srcStorage);
+    void deleteRecordsBefore(int idx);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);
@@ -80,23 +81,31 @@ public:
     typedef QVector<Chunk> ChunkMap;
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
+    void close();
 
     static QString prefixForRole(QnResource::ConnectionRole role);
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
     static void setRebuildArchive(RebuildMethod value);
+    static void cancelRebuildArchive();
+    void beforeRebuildArchive();
+
+    bool readCatalog();
+    bool doRebuildArchive();
+    void rewriteCatalog(bool isCatalogUsing);
+    bool isLastRecordRecording() const { return m_lastRecordRecording; }
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
-    void rewriteCatalog();
 
-    void doRebuildArchive();
     void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks);
     void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
 private:
+    friend class QnStorageManager;
+
     mutable QMutex m_mutex;
     QFile m_file;
     QVector<Chunk> m_chunks; 
@@ -121,6 +130,7 @@ private:
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
     static RebuildMethod m_rebuildArchive;
+    bool m_lastRecordRecording;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

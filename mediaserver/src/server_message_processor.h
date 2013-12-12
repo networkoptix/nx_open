@@ -18,12 +18,12 @@ public:
     void stop();
 
 signals:
+    void connectionOpened();
     void connectionReset();
     void businessRuleChanged(QnBusinessEventRulePtr bEvent);
     void businessRuleDeleted(int id);
     void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(QnAbstractBusinessActionPtr bAction);
-
 public slots:
     void run();
 
@@ -35,6 +35,7 @@ private slots:
 
 private:
     QSharedPointer<QnMessageSource> m_source;
+    bool m_tryDirectConnect;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

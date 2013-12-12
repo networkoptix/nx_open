@@ -1,0 +1,49 @@
+#!/bin/bash -e
+
+. /usr/share/debconf/confmodule
+
+if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
+${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
+
+COMPANY_NAME="${deb.customization.company.name}"
+
+if [ -e "/etc/init/$COMPANY_NAME-mediaproxy.conf" ]; then
+	invoke-rc.d $COMPANY_NAME-mediaproxy stop || exit $?
+fi
+
+if [ -e "/etc/init/$COMPANY_NAME-entcontroller.conf" ]; then
+	invoke-rc.d $COMPANY_NAME-entcontroller stop || exit $?
+fi
+
+if [ $1 = "remove" ]
+then
+    REMOVE="Remove the Database"
+    KEEP="Keep current version"
+    RESTORE="Restore version "
+
+    CHOICES="$REMOVE, $KEEP"
+    for f in $(ls /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db.* 2> /dev/null)
+    do
+        filename=$(basename $f)
+        version=${filename/ecs.db./}
+        mtime=$(stat -c " %z" $f | cut -f1 -d.)
+        CHOICES="$CHOICES, $RESTORE$version (Last used: $mtime)"
+    done
+
+    db_subst ${deb.customization.company.name}-entcontroller/removeDatabase choices $CHOICES
+    db_set ${deb.customization.company.name}-entcontroller/removeDatabase "$KEEP"
+    db_fset ${deb.customization.company.name}-entcontroller/removeDatabase seen false
+
+    db_input high ${deb.customization.company.name}-entcontroller/removeDatabase || true
+    db_go || true
+    db_get ${deb.customization.company.name}-entcontroller/removeDatabase
+
+    if [ "$RET" = "$REMOVE" ]; then
+        rm -f /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db
+    elif [ "$RET" = "$KEEP" ]; then
+        true
+    else
+         dbversion=$(echo $RET | sed "s/$RESTORE\([^ ]*\).*/\1/")
+         cp -p /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db{.$dbversion,} || true
+    fi
+fi

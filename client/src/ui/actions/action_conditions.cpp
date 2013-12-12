@@ -1,6 +1,6 @@
 #include "action_conditions.h"
 
-#include <QAction>
+#include <QtWidgets/QAction>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_criterion.h>
@@ -10,6 +10,8 @@
 #include <camera/resource_display.h>
 
 #include <client/client_settings.h>
+
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -361,7 +363,8 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
@@ -388,7 +391,8 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
         return Qn::InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
     bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
@@ -453,13 +457,14 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
 
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
-    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
-        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+                && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool allowed = isServer || isMediaResource;
         bool forbidden = isExportedLayout && (isServer || isLocalResource);
         if(allowed && !forbidden)
@@ -511,6 +516,16 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
 
 Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {
+    if  (!context()->user())
+        return Qn::InvisibleAction;
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (snapshotManager()->isFile(layout))
+        return Qn::InvisibleAction;
+    else
+        return Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {

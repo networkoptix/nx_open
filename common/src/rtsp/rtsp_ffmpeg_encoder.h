@@ -1,7 +1,8 @@
 #ifndef __RTSP_FFMPEG_ENCODER_H__
 #define __RTSP_FFMPEG_ENCODER_H__
 
-#include <QMap>
+#include "common/common_globals.h"
+#include <QtCore/QMap>
 #include "rtsp_encoder.h"
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -14,7 +15,7 @@ public:
 
     virtual QByteArray getAdditionSDP() override;
 
-    virtual void setDataPacket(QnAbstractMediaDataPtr media) override;
+    virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 
@@ -36,7 +37,7 @@ private:
     bool m_gotLivePacket;
     QnMediaContextPtr m_ctxSended;
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
-    QnAbstractMediaDataPtr m_media;
+    QnConstAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;
     int m_liveMarker;

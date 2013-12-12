@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include "abstract_decoder_event_receiver.h"
 #include "../../decoders/video/abstractdecoder.h"
@@ -39,7 +39,7 @@ public:
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
     virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    virtual bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
     //!Implementation of QnAbstractVideoDecoder::setLightCpuMode
     virtual void setLightCpuMode( DecodeMode val );
     //!Implementation of QnAbstractVideoDecoder::setMTDecoding
@@ -59,7 +59,7 @@ public:
     //!Implementation of QnAbstractVideoDecoder::lastFrame
     virtual const AVFrame* lastFrame() const;
     //!Implementation of QnAbstractVideoDecoder::resetDecoder
-    virtual void resetDecoder( QnCompressedVideoDataPtr data );
+    virtual void resetDecoder( QnConstCompressedVideoDataPtr data );
     //!Implementation of QnAbstractVideoDecoder::setOutPictureSize
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps

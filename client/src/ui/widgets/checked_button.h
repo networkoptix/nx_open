@@ -1,7 +1,7 @@
 #ifndef QN_CHECKED_BUTTON_H
 #define QN_CHECKED_BUTTON_H
 
-#include <QtGui/QToolButton>
+#include <QtWidgets/QToolButton>
 
 class QnCheckedButton: public QToolButton {
     Q_OBJECT

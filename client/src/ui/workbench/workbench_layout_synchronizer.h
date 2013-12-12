@@ -63,6 +63,7 @@ public:
 
 public slots:
     void update();
+    void reset();
     void submit();
     void submitPendingItems();
     void submitPendingItemsLater();

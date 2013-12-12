@@ -2,8 +2,8 @@
 
 #include <limits>
 
-#include <QtGui/QGraphicsSceneDragDropEvent>
-#include <QtGui/QGraphicsItem>
+#include <QtWidgets/QGraphicsSceneDragDropEvent>
+#include <QtWidgets/QGraphicsItem>
 #include <QtCore/QMimeData>
 
 #include <core/resource/media_resource.h>
@@ -167,4 +167,12 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
 
     event->acceptProposedAction();
     return true;
+}
+
+DestructionGuardItem *DropInstrument::guard() const {
+    return m_guard.data();
+}
+
+SceneEventFilterItem *DropInstrument::filterItem() const {
+    return m_filterItem.data();
 }

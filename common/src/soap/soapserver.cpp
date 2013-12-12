@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef ENABLE_ONVIF
+
 #include "soapserver.h"
 
 #include <sstream>
@@ -95,13 +97,14 @@ void QnSoapServer::run()
     strcpy( m_service.soap->path, m_path.c_str() );
 
     m_service.soap->accept_timeout = SOAP_CONNECTION_ACCEPT_TIMEOUT;
+    m_service.soap->imode |= SOAP_XML_IGNORENS;
 
     int m = soap_bind( m_service.soap, NULL, m_port, 100 ); 
     if( m < 0 )
     {
         std::ostringstream ss;
         soap_stream_fault( m_service.soap, ss );
-        cl_log.log( QString::fromAscii("Error binding soap server to port %1. %2").arg(m_port).arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+        cl_log.log( QString::fromLatin1("Error binding soap server to port %1. %2").arg(m_port).arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
         return;
     }
 
@@ -115,7 +118,7 @@ void QnSoapServer::run()
                 break;
             //std::ostringstream ss;
             //soap_stream_fault( m_service.soap, ss );
-            //cl_log.log( QString::fromAscii("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            //cl_log.log( QString::fromLatin1("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
             msleep( ERROR_SKIP_TIMEOUT_MS );
             continue;
         }
@@ -155,7 +158,7 @@ void QnSoapServer::run()
                 break;
             std::ostringstream ss;
             soap_stream_fault( m_service.soap, ss );
-            cl_log.log( QString::fromAscii("Error serving soap request %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            cl_log.log( QString::fromLatin1("Error serving soap request %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
         }
         soap_destroy( m_service.soap );
         soap_end( m_service.soap );
@@ -165,3 +168,5 @@ void QnSoapServer::run()
     soap_end( m_service.soap );
     soap_done( m_service.soap );
 }
+
+#endif //ENABLE_ONVIF

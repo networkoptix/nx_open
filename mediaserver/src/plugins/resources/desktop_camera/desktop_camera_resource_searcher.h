@@ -1,6 +1,10 @@
 #ifndef _DESKTOP_CAMERA_RESOURCE_SEARCHER_H__
 #define _DESKTOP_CAMERA_RESOURCE_SEARCHER_H__
 
+#ifdef ENABLE_DESKTOP_CAMERA
+
+#include <QtCore/QElapsedTimer>
+
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
 #include "utils/network/simple_http_client.h"
 
@@ -22,11 +26,12 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    void registerCamera(AbstractStreamSocket* connection, const QString& userName);
+    void registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName);
 
     TCPSocketPtr getConnection(const QString& userName);
     quint32 incCSeq(const TCPSocketPtr socket);
     void releaseConnection(TCPSocketPtr socket);
+
 private:
     struct ClientConnectionInfo
     {
@@ -41,7 +46,7 @@ private:
         TCPSocketPtr socket;
         int useCount;
         quint32 cSeq;
-        QTime timer;
+        QElapsedTimer timer;
         QString userName;
     };
 
@@ -50,5 +55,7 @@ private:
 private:
     void cleanupConnections();
 };
+
+#endif //ENABLE_DESKTOP_CAMERA
 
 #endif // _DESKTOP_CAMERA_RESOURCE_SEARCHER_H__

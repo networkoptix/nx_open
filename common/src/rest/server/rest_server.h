@@ -1,10 +1,10 @@
 #ifndef __REST_SERVER_H__
 #define __REST_SERVER_H__
 
-#include <QList>
-#include <QPair>
-#include <QString>
-#include <QByteArray>
+#include <QtCore/QList>
+#include <QtCore/QPair>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
 #include "request_handler.h"
 #include "utils/network/tcp_listener.h"
 
@@ -16,7 +16,7 @@ public:
     explicit QnRestServer(const QHostAddress& address, int port = DEFAULT_REST_PORT);
     virtual ~QnRestServer();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(AbstractStreamSocket* clientSocket, QnTcpListener* owner);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
 };
 
 #endif // __REST_SERVER_H__

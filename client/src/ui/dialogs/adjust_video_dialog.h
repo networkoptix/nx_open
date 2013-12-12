@@ -1,8 +1,8 @@
 #ifndef QN_ADJUST_VIDEO_DIALOG_H
 #define QN_ADJUST_VIDEO_DIALOG_H
 
-#include <QtGui/QDialog>
-#include <QAbstractButton>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QAbstractButton>
 
 #include <utils/color_space/image_correction.h>
 

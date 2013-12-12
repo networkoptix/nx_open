@@ -1,8 +1,8 @@
 #ifndef LAYOUT_SETTINGS_DIALOG_H
 #define LAYOUT_SETTINGS_DIALOG_H
 
-#include <QtGui/QDialog>
-#include <QtGui/QLabel>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QLabel>
 
 #include <core/resource/resource_fwd.h>
 

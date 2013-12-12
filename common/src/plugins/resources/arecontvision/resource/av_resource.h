@@ -1,7 +1,9 @@
 #ifndef QnPlAreconVisionResource_h_1252
 #define QnPlAreconVisionResource_h_1252
 
-#include <QImage>
+#ifdef ENABLE_ARECONT
+
+#include <QtGui/QImage>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -47,7 +49,6 @@ public:
 
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-    virtual void setCropingPhysical(QRect croping);
 
     //virtual QnMediaInfo getMediaInfo() const;
 
@@ -77,5 +78,7 @@ private:
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
+
+#endif
 
 #endif // QnPlAreconVisionResource_h_1252

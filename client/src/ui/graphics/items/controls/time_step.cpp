@@ -6,6 +6,24 @@
 #include <utils/math/math.h>
 #include <utils/common/time.h>
 
+namespace {
+    QDateTime addHours(const QDateTime &dateTime, int hours) {
+        int oldHours = dateTime.time().hour();
+        int newHours = oldHours + hours;
+
+        int deltaDays = 0;
+        if(newHours >= 24) {
+            deltaDays = newHours / 24;
+            newHours = qMod(newHours, 24);
+        } else if(newHours < 0) {
+            deltaDays = newHours / 24 - 1;
+            newHours = qMod(newHours, 24);
+        }
+
+        return QDateTime(dateTime.date().addDays(deltaDays), QTime(newHours, dateTime.time().minute(), dateTime.time().second(), dateTime.time().msec()));
+    }
+
+} // anonymous namespace
 
 qint64 roundUp(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) 
@@ -16,39 +34,34 @@ qint64 roundUp(qint64 msecs, const QnTimeStep &step) {
     case QnTimeStep::Milliseconds: {
         qint64 oldMSecs = timeToMSecs(dateTime.time());
         qint64 newMSecs = qCeil(oldMSecs, step.stepMSecs);
-        dateTime = dateTime.addMSecs(newMSecs - oldMSecs);
-        break;
+        return msecs + (newMSecs - oldMSecs);
     }
+    case QnTimeStep::Hours:
+        if(dateTime.time().msec() != 0 || dateTime.time().second() != 0 || dateTime.time().minute() != 0 || dateTime.time().hour() % step.stepUnits != 0) {
+            int oldHour = dateTime.time().hour();
+            int newHour = qCeil(oldHour + 1, step.stepUnits);
+            dateTime = addHours(QDateTime(dateTime.date(), QTime(oldHour, 0, 0, 0)), newHour - oldHour);
+        }
+        break;
     case QnTimeStep::Days:
         if(dateTime.time() != QTime(0, 0, 0, 0) || (dateTime.date().day() != 1 && dateTime.date().day() % step.stepUnits != 0)) {
-            dateTime.setTime(QTime(0, 0, 0, 0));
-
             int oldDay = dateTime.date().day();
             int newDay = qMin(qCeil(oldDay + 1, step.stepUnits), dateTime.date().daysInMonth() + 1);
-            dateTime = dateTime.addDays(newDay - oldDay);
+            dateTime = QDateTime(dateTime.date().addDays(newDay - oldDay), QTime(0, 0, 0, 0));
         }
         break;
     case QnTimeStep::Months:
         if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || ((dateTime.date().month() - 1) % step.stepUnits != 0)) {
-            dateTime.setTime(QTime(0, 0, 0, 0));
-            dateTime.setDate(QDate(dateTime.date().year(), dateTime.date().month(), 1));
-                
             int oldMonth = dateTime.date().month();
-            /* We should have added 1 to month() here we don't want to end
-             * up with the same month number, but months are numbered from 1,
-             * so the addition is not needed. */
-            int newMonth = qCeil(oldMonth, step.stepUnits) + 1;
-            dateTime = dateTime.addMonths(newMonth - oldMonth);
+            int newMonth = qCeil(oldMonth /* No +1 here as months are numbered from 1. */, step.stepUnits) + 1;
+            dateTime = QDateTime(QDate(dateTime.date().year(), dateTime.date().month(), 1).addMonths(newMonth - oldMonth), QTime(0, 0, 0, 0));
         }
         break;
     case QnTimeStep::Years:
         if(dateTime.time() != QTime(0, 0, 0, 0) || dateTime.date().day() != 1 || dateTime.date().month() != 1 || dateTime.date().year() % step.stepUnits != 0) {
-            dateTime.setTime(QTime(0, 0, 0, 0));
-            dateTime.setDate(QDate(dateTime.date().year(), 1, 1));
-                
             int oldYear = dateTime.date().year();
             int newYear = qCeil(oldYear + 1, step.stepUnits);
-            dateTime = dateTime.addYears(newYear - oldYear);
+            dateTime = QDateTime(QDate(dateTime.date().year(), 1, 1).addYears(newYear - oldYear), QTime(0, 0, 0, 0));
         }
         break;
     default:
@@ -65,8 +78,11 @@ qint64 add(qint64 msecs, const QnTimeStep &step) {
 
     switch(step.type) {
     case QnTimeStep::Milliseconds:
-    case QnTimeStep::Days:
         return msecs + step.stepMSecs;
+    case QnTimeStep::Hours:
+        return addHours(QDateTime::fromMSecsSinceEpoch(msecs), step.stepUnits).toMSecsSinceEpoch();
+    case QnTimeStep::Days:
+        return QDateTime::fromMSecsSinceEpoch(msecs).addDays(step.stepUnits).toMSecsSinceEpoch();
     case QnTimeStep::Months:
         return QDateTime::fromMSecsSinceEpoch(msecs).addMonths(step.stepUnits).toMSecsSinceEpoch();
     case QnTimeStep::Years:
@@ -83,8 +99,11 @@ qint64 sub(qint64 msecs, const QnTimeStep &step) {
 
     switch(step.type) {
     case QnTimeStep::Milliseconds:
-    case QnTimeStep::Days:
         return msecs - step.stepMSecs;
+    case QnTimeStep::Hours:
+        return addHours(QDateTime::fromMSecsSinceEpoch(msecs), -step.stepUnits).toMSecsSinceEpoch();
+    case QnTimeStep::Days:
+        return QDateTime::fromMSecsSinceEpoch(msecs).addDays(-step.stepUnits).toMSecsSinceEpoch();
     case QnTimeStep::Months:
         return QDateTime::fromMSecsSinceEpoch(msecs).addMonths(-step.stepUnits).toMSecsSinceEpoch();
     case QnTimeStep::Years:
@@ -95,21 +114,22 @@ qint64 sub(qint64 msecs, const QnTimeStep &step) {
     }
 }
 
-const QDateTime baseDateTime = QDateTime::fromMSecsSinceEpoch(0);
-
 qint64 absoluteNumber(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative)
         return msecs / step.stepMSecs;
 
+    if(step.type == QnTimeStep::Milliseconds)
+        return msecs / step.stepMSecs;
+
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
     switch(step.type) {
-    case QnTimeStep::Milliseconds:
+    case QnTimeStep::Hours:
+        return (dateTime.date().toJulianDay() * 24 + dateTime.time().hour()) / step.stepUnits;
     case QnTimeStep::Days:
-        return baseDateTime.msecsTo(dateTime) / step.stepMSecs;
+        return dateTime.date().toJulianDay() / step.stepUnits;
     case QnTimeStep::Months: {
         int year, month;
         dateTime.date().getDate(&year, &month, NULL);
-
         return (year * 12 + month) / step.stepUnits;
     }
     case QnTimeStep::Years:
@@ -129,6 +149,7 @@ qint32 shortCacheKey(qint64 msecs, int height, const QnTimeStep &step) {
         QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs);
         switch(step.type) {
         case QnTimeStep::Milliseconds:
+        case QnTimeStep::Hours:
             timeKey = timeToMSecs(dateTime.time()) / step.stepMSecs % step.wrapUnits;
             break;
         case QnTimeStep::Days:
@@ -161,10 +182,12 @@ QString toShortString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative)
         return QString::number(msecs / step.unitMSecs % step.wrapUnits) + step.format;
 
-    if(step.type == QnTimeStep::Milliseconds) {
+    switch(step.type) {
+    case QnTimeStep::Milliseconds:
+    case QnTimeStep::Hours:
         return QString::number(timeToMSecs(QDateTime::fromMSecsSinceEpoch(msecs).time()) / step.unitMSecs % step.wrapUnits) + step.format;
-    } else {
-        return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.format);
+    default:
+        return QLocale().toString(QDateTime::fromMSecsSinceEpoch(msecs), step.format);
     }
 }
 
@@ -172,9 +195,7 @@ QString toLongString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) {
         return QString();
     } else {
-        if (step.format == QLatin1String("h")) // TODO: #Elric I don't think this is necessary. 
-            msecs++; // avoid daylight bug like: 1h, 3h, 3h, 5h (3h twice, valid values are 1,3,4,5)
-        return QDateTime::fromMSecsSinceEpoch(msecs).toString(step.longFormat);
+        return QLocale().toString(QDateTime::fromMSecsSinceEpoch(msecs), step.longFormat);
     }
 }
 

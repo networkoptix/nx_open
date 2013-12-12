@@ -1,8 +1,8 @@
 #ifndef GRAPHICS_MESSAGE_BOX_H
 #define GRAPHICS_MESSAGE_BOX_H
 
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/standard/graphics_widget.h>

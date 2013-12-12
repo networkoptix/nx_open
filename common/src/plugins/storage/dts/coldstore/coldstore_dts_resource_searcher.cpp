@@ -1,7 +1,7 @@
 
-#include <QString>
-#include <QStringList>
-#include <QTime>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QElapsedTimer>
 
 #include "coldstore_dts_resource_searcher.h"
 #include "utils/network/nettools.h"
@@ -10,14 +10,11 @@
 #include "utils/common/log.h"
 #include "../../coldstore/coldstore_api/sfs-client.h"
 #include "coldstore_dts_reader_factory.h"
+#include "utils/network/socket.h"
+#include "utils/network/system_socket.h"
 
 const int coldStoreSendPort = 48102;
 const int coldStoreRecvPort = 48103;
-
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
-
 
 QString macFromString(QString str)
 {
@@ -107,43 +104,45 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
     {
         QHostAddress groupAddress(QLatin1String("239.200.200.201"));
 
-        QUdpSocket sendSocket, recvSocket;
+        UDPSocket sendSocket, recvSocket;
 
-        bool bindSucceeded = sendSocket.bind(localAddress, 0);
+        bool bindSucceeded = sendSocket.setLocalAddressAndPort(localAddress.toString(), 0);
 
         if (!bindSucceeded)
             continue;
 
-        bindSucceeded = recvSocket.bind(QHostAddress::Any, coldStoreRecvPort, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
+        recvSocket.setReuseAddrFlag(true);
+        bindSucceeded = recvSocket.setLocalPort(coldStoreRecvPort);
         if (!bindSucceeded)
             continue;
 
-        if (!multicastJoinGroup(recvSocket, groupAddress, localAddress))      
+        if (!recvSocket.joinGroup(groupAddress.toString(), localAddress.toString()))
             continue;
 
 
-        sendSocket.writeDatagram(m_request->data(), m_request->size(), groupAddress, coldStoreSendPort);
+        sendSocket.sendTo(m_request->data(), m_request->size(), groupAddress.toString(), coldStoreSendPort);
 
 
-        QTime time;
+        QElapsedTimer time;
         time.start();
 
         QList<QHostAddress> server_list;
 
         while(time.elapsed() < 500)
         {
-            while (recvSocket.hasPendingDatagrams())
+            while (recvSocket.hasData())
             {
                 QByteArray responseData;
-                responseData.resize(recvSocket.pendingDatagramSize());
+                responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-                if (recvSocket.pendingDatagramSize() < 157)
-                    continue;
 
-                QHostAddress sender;
+                QString sender;
                 quint16 senderPort;
 
-                recvSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+                int readed = recvSocket.recvFrom(responseData.data(), responseData.size(), sender, senderPort);
+                if (readed < 157)
+                    continue;
+                responseData = responseData.left(readed);
 
                 QString csMac = QLatin1String(responseData.data() + 24);
                 csMac = csMac.left(17); // mac 
@@ -154,7 +153,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
                     continue;
                 
 
-                server_list.push_back(sender);
+                server_list.push_back(QHostAddress(sender));
 
                 
             }
@@ -174,7 +173,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
         }
 
 
-        multicastLeaveGroup(recvSocket, groupAddress);
+        recvSocket.leaveGroup(groupAddress.toString());
 
     }
 
@@ -188,7 +187,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
 
     QByteArray ipba = addr.toString().toLocal8Bit();
     const char* ip = ipba.data();
-	
+    
 //	cl_log.log(QLatin1String("CS checking for files"), cl_logALWAYS);
 
     if (sfs_client->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
@@ -233,8 +232,8 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         if (*data == 0) break;
         tmp = QLatin1String(data);
         data += tmp.length()+1;
-		tmp.remove(0,7);
-	    fileList.push_back(tmp);
+        tmp.remove(0,7);
+        fileList.push_back(tmp);
     }
     
     foreach(const QString& fn, fileList)
@@ -247,7 +246,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         unit.factory = m_factoryList[addr.toString()]; // it does exist
         unit.resourceID = mac;
                 
-		result.push_back(unit);
+        result.push_back(unit);
     }
 
     

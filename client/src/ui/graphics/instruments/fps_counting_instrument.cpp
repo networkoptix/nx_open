@@ -1,5 +1,5 @@
 #include "fps_counting_instrument.h"
-#include <QDateTime>
+#include <QtCore/QDateTime>
 #include <utils/common/warnings.h>
 
 FpsCountingInstrument::FpsCountingInstrument(int updateIntervalMSec, QObject *parent):

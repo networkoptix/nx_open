@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
@@ -19,14 +22,18 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(AbstractStreamSocket* connection, const QString& userName)
+void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName)
 {
     connection->setSendTimeout(1);
-    m_connections << ClientConnectionInfo(TCPSocketPtr(connection), userName);
+    QMutexLocker lock(&m_mutex);
+    m_connections << ClientConnectionInfo(connection, userName);
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 
@@ -38,6 +45,8 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
     if (!rt.isValid())
         return result;
+
+    QMutexLocker lock(&m_mutex);
 
     QQueue<ClientConnectionInfo>::Iterator itr = m_connections.begin();
     
@@ -155,3 +164,5 @@ void QnDesktopCameraResourceSearcher::releaseConnection(TCPSocketPtr socket)
         }
     }
 }
+
+#endif //ENABLE_DESKTOP_CAMERA

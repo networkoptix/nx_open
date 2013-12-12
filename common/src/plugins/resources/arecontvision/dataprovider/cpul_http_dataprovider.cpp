@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "cpul_http_dataprovider.h"
 #include "../resource/av_resource.h"
 #include "utils/common/synctime.h"
@@ -187,3 +189,4 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
 }
 
+#endif

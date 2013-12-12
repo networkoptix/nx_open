@@ -6,7 +6,7 @@
 #ifndef TIMERMANAGER_H
 #define TIMERMANAGER_H
 
-#include <QThread>
+#include <QtCore/QThread>
 
 
 //!Interface of receiver of timer events

@@ -1,9 +1,9 @@
 #ifndef cl_net_tools_1232
 #define cl_net_tools_1232
 
-#include <QHostAddress>
-#include <QUdpSocket>
-#include <QNetworkAddressEntry>
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QUdpSocket>
+#include <QtNetwork/QNetworkAddressEntry>
 
 static const int ping_timeout = 300;
 
@@ -50,7 +50,7 @@ QN_EXPORT QString getMacByIP(const QHostAddress& ip, bool net = true);
 // returns all pingable hosts in the range
 QN_EXPORT QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
 
-QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0, QUdpSocket::BindMode mode = QUdpSocket::DefaultForPlatform);
+//QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0, QUdpSocket::BindMode mode = QUdpSocket::DefaultForPlatform);
 
 QN_EXPORT bool isIpv4Address(const QString& addr);
 QN_EXPORT QHostAddress resolveAddress(const QString& addr);

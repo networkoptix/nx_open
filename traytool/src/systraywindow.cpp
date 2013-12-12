@@ -1,5 +1,10 @@
-#include <QtGui>
-#include <QTcpServer>
+#include <QtCore/QSettings>
+#include <QtCore/QThreadPool>
+#include <QtCore/QProcess>
+#include <QtNetwork/QTcpServer>
+#include <QtWidgets/QMenu>
+#include <QtGui/QCloseEvent>
+#include <QtWidgets/QMessageBox>
 
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
@@ -80,12 +85,6 @@ QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnt
         m_findAppServerDialog.data(),
         SLOT(accept()) );
 
-#ifdef USE_SINGLE_STREAMING_PORT
-    ui->apiPortLineEdit->setVisible(false);
-    ui->label_ApiPort->setVisible(false);
-    ui->label_RtspPort->setText(tr("Port"));
-#endif
-
     m_iconOK = QIcon(lit(":/traytool.png"));
     m_iconBad = QIcon(lit(":/traytool.png"));
 
@@ -124,7 +123,7 @@ QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnt
 
     m_trayIcon->show();
 
-    setWindowTitle(tr("VMS settings"));
+    setWindowTitle(QString(lit(QN_ORGANIZATION_NAME)) + tr(" Tray Assistant"));
 
     connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
@@ -748,7 +747,6 @@ void QnSystrayWindow::onSettingsAction()
     ui->appPortSpinBox->setValue(m_mediaServerSettings.value(lit("appserverPort")).toInt());
     ui->appServerLogin->setText(m_mediaServerSettings.value(lit("appserverLogin")).toString());
     ui->appServerPassword->setText(m_mediaServerSettings.value(lit("appserverPassword")).toString());
-    ui->rtspPortLineEdit->setText(m_mediaServerSettings.value(lit("rtspPort")).toString());
     
     ui->staticPublicIPEdit->setText(m_mediaServerSettings.value(lit("staticPublicIP")).toString());
     if (m_mediaServerSettings.value(lit("publicIPEnabled")).isNull())
@@ -757,6 +755,15 @@ void QnSystrayWindow::onSettingsAction()
     ui->groupBoxPublicIP->setChecked(allowPublicIP > 0);
     ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
     ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
+    
+    Qt::CheckState discoveryState = Qt::Checked;
+    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
+    if (disabledVendors == lit("all"))
+        discoveryState = Qt::Unchecked;
+    else if (!disabledVendors.isEmpty())
+        discoveryState = Qt::PartiallyChecked;
+    ui->checkBoxDiscovery->setCheckState(discoveryState);
+
     onRadioButtonPublicIpChanged();
 
     QString rtspTransport = m_mediaServerSettings.value(lit("rtspTransport"), lit("AUTO")).toString().toUpper();
@@ -779,7 +786,6 @@ void QnSystrayWindow::onSettingsAction()
 
     onRadioButtonEcsPublicIpChanged();
     ui->ecsPortSpinBox->setValue(m_appServerSettings.value(lit("port")).toInt());
-    ui->mediaProxyPortSpinBox->setValue(m_appServerSettings.value(lit("proxyPort"), DEFAUT_PROXY_PORT).toInt());
 
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
@@ -789,8 +795,7 @@ void QnSystrayWindow::onSettingsAction()
 
 bool QnSystrayWindow::isAppServerParamChanged() const
 {
-    if (ui->ecsPortSpinBox->value() != m_appServerSettings.value(lit("port")).toInt() ||
-        ui->mediaProxyPortSpinBox->value() != m_appServerSettings.value(lit("proxyPort"), DEFAUT_PROXY_PORT).toInt())
+    if (ui->ecsPortSpinBox->value() != m_appServerSettings.value(lit("port")).toInt())
         return true;
 
     if (m_appServerSettings.value(lit("manualPublicIp")).toString().trimmed() != ui->ecsManuaPublicIPEdit->text().trimmed() && ui->ecsUseManualPublicIp->isChecked())
@@ -813,7 +818,7 @@ bool QnSystrayWindow::isAppServerParamChanged() const
 bool QnSystrayWindow::isMediaServerParamChanged() const
 {
     QUrl savedURL = getAppServerURL();
-    QUrl currentURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
+    QUrl currentURL( QString::fromLatin1("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
     if (savedURL.host() != currentURL.host() || savedURL.port(DEFAULT_APP_SERVER_PORT) != currentURL.port(DEFAULT_APP_SERVER_PORT))
         return true;
 
@@ -822,14 +827,6 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
 
     if (ui->appServerPassword->text() != m_mediaServerSettings.value(lit("appserverPassword")).toString())
         return true;
-
-    if (ui->rtspPortLineEdit->text().toInt() != m_mediaServerSettings.value(lit("rtspPort")).toInt())
-        return true;
-
-#ifndef USE_SINGLE_STREAMING_PORT
-    if (ui->apiPortLineEdit->text().toInt() != m_mediaServerSettings.value(lit("apiPort")).toInt())
-        return true;
-#endif
 
     if (m_mediaServerSettings.value(lit("staticPublicIP")).toString().trimmed() != ui->staticPublicIPEdit->text().trimmed() && ui->radioButtonCustomPublicIP->isChecked())
         return true;
@@ -934,17 +931,8 @@ bool QnSystrayWindow::validateData()
     if (m_appServerHandle)
     {
         checkedPorts << PortInfo(ui->ecsPortSpinBox->value(), m_appServerSettings.value(lit("port")).toInt(), tr("enterprise controller"), 1);
-        checkedPorts << PortInfo(ui->mediaProxyPortSpinBox->value(), m_appServerSettings.value(lit("proxyPort"), DEFAUT_PROXY_PORT).toInt(), tr("media proxy"), 1);
     }
 
-    if (m_mediaServerHandle)
-    {
-        checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mediaServerSettings.value(lit("rtspPort")).toInt(), tr("media server RTSP"), 0);
-#ifndef USE_SINGLE_STREAMING_PORT
-        checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mediaServerSettings.value(lit("apiPort")).toInt(), tr("media server API"), 0);
-#endif
-    }
-    
     for(int i = 0; i < checkedPorts.size(); ++i)
     {
         if (!checkPortNum(checkedPorts[i].newPort, checkedPorts[i].descriptor))
@@ -984,15 +972,10 @@ void QnSystrayWindow::saveData()
 {
     m_mediaServerSettings.setValue(lit("appserverLogin"), ui->appServerLogin->text());
     m_mediaServerSettings.setValue(lit("appserverPassword"),ui->appServerPassword->text());
-    m_mediaServerSettings.setValue(lit("rtspPort"), ui->rtspPortLineEdit->text());
-#ifndef USE_SINGLE_STREAMING_PORT
-    m_mediaServerSettings.setValue(lit("apiPort"), ui->apiPortLineEdit->text());
-#endif
 
     m_mediaServerSettings.setValue(lit("rtspTransport"), ui->rtspTransportComboBox->currentText());
 
     m_appServerSettings.setValue(lit("port"), QString::number(ui->ecsPortSpinBox->value()));
-    m_appServerSettings.setValue(lit("proxyPort"), QString::number(ui->mediaProxyPortSpinBox->value()));
 
     if (!ui->ecsAllowPublicIpGroupBox->isChecked())
         m_appServerSettings.setValue(lit("publicIpMode"), ECS_PUBLIC_IP_MODE_DISABLED);
@@ -1027,6 +1010,16 @@ void QnSystrayWindow::saveData()
         m_mediaServerSettings.setValue(lit("publicIPEnabled"), 1);
     else
         m_mediaServerSettings.setValue(lit("publicIPEnabled"), 2);
+
+    Qt::CheckState discoveryState = ui->checkBoxDiscovery->checkState();
+    if (discoveryState != Qt::PartiallyChecked)
+    {
+        QString disabledVendors;
+        if (discoveryState == Qt::Checked)
+            m_mediaServerSettings.setValue(lit("disabledVendors"), lit(""));
+        else
+            m_mediaServerSettings.setValue(lit("disabledVendors"), lit("all"));
+    }
 }
 
 void QnSystrayWindow::onTestButtonClicked()

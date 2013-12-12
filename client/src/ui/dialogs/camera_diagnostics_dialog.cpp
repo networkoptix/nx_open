@@ -1,8 +1,9 @@
 #include "ui_camera_diagnostics_dialog.h"
 #include "camera_diagnostics_dialog.h"
 
-#include <QApplication>
-#include <QClipboard>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
 
 #include <utils/common/delete_later.h>
 

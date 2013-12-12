@@ -1,7 +1,9 @@
+#ifdef ENABLE_AXIS
+#ifdef ENABLE_ONVIF
 
 #include "axis_onvif_resource.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "onvif/soapMediaBindingProxy.h"
 #include <utils/network/http/asynchttpclient.h>
@@ -17,3 +19,6 @@ int QnAxisOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolutio
     Q_UNUSED(fps)
     return 0;
 }
+
+#endif  //ENABLE_ONVIF
+#endif // #ifdef ENABLE_AXIS

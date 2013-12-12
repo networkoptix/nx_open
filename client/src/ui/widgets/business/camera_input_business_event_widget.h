@@ -1,7 +1,7 @@
 #ifndef CAMERA_INPUT_BUSINESS_EVENT_WIDGET_H
 #define CAMERA_INPUT_BUSINESS_EVENT_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {

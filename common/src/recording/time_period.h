@@ -5,6 +5,8 @@
 
 #include <common/common_globals.h>
 
+#include <utils/common/json.h>
+
 class QnTimePeriod;
 class QnTimePeriodList;
 
@@ -93,5 +95,7 @@ QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnTimePeriod);
+
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod);
 
 #endif // QN_TIME_PERIOD_H

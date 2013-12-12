@@ -17,9 +17,8 @@
 
 #include "utils/common/util.h"
 
-#if _MSC_VER < 1600
-DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_JackSubType,0x1da5d803,0xd492,0x4edd,0x8c,0x23,0xe0,0xc0,0xff,0xee,0x7f,0x0e,8);
-#endif
+/* This one is private API, but it is exported from QtGui. */
+extern QPixmap qt_pixmapFromWinHICON(HICON icon);
 
 bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
 {
@@ -48,7 +47,7 @@ bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
 
     //PropVariantToGUID(pv, &m_jackSubType);
     const ushort* guidData16 = (const ushort*) pv.pbVal;
-    QByteArray arr = QString::fromUtf16(guidData16).toAscii();
+    QByteArray arr = QString::fromUtf16(guidData16).toLatin1();
     const char* data8 = arr.constData();
     char guidBuffer[24];
     sscanf( data8,
@@ -128,7 +127,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
 {
     QStringList params = m_iconPath.split(QLatin1Char(','));
     if (params.size() < 2)
-        return 0;
+        return QPixmap();
     int persent1 = params[0].indexOf(QLatin1Char('%'));
     while (persent1 >= 0)
     {
@@ -144,7 +143,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
 
     HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
     if (!library)
-        return false;
+        return QPixmap();
     int resNumber = params[1].toInt();
     if (resNumber < 0) {
         resNumber = -resNumber;
@@ -159,7 +158,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
     HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
     QPixmap rez;
     if (hIcon)
-        rez = QPixmap::fromWinHICON( hIcon);
+        rez = qt_pixmapFromWinHICON(hIcon);
     DestroyIcon(hIcon);
     return rez;
 }

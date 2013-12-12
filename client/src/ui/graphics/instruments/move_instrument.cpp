@@ -1,8 +1,8 @@
 #include "move_instrument.h"
-#include <QGraphicsView>
-#include <QGraphicsItem>
-#include <QMouseEvent>
-#include <QApplication>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsItem>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QApplication>
 
 namespace {
     struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {

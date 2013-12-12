@@ -1,7 +1,7 @@
 #ifndef BUSINESS_EVENT_WIDGET_FACTORY_H
 #define BUSINESS_EVENT_WIDGET_FACTORY_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <business/events/abstract_business_event.h>
 

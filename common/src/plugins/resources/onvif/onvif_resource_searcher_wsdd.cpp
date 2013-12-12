@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "openssl/evp.h"
 
 #include <quuid.h>
@@ -313,6 +316,15 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
             readProbeMatches( iface, result );
         }
     }
+
+    // if interface list is changed, remove old sockets
+    std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
+    for(; itr != m_ifaceToSock.end() ; ++itr) {
+        ProbeContext& ctx = *itr->second;
+        ctx.sock.reset();
+        delete itr->second;
+    }
+    m_ifaceToSock.clear();
 
     foreach(QnInterfaceAndAddr iface, intfList)
     {
@@ -736,13 +748,15 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     {
         ctx = new ProbeContext();
         ctx->sock.reset( SocketFactory::createDatagramSocket() );
-        if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
+        if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
             ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
         }
+        ctx->sock->setMulticastIF(iface.address.toString());
 
         ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
         ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
@@ -752,8 +766,10 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
         ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
         ctx->soapWsddProxy.soap->fopen = NULL;
-        ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
-        ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+        //ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
+        //ctx->soapWsddProxy.soap->master = ctx->sock->handle();
+        ctx->soapWsddProxy.soap->socket = -1;
+        ctx->soapWsddProxy.soap->master = -1;
     }
 
     fillWsddStructs( ctx->wsddProbe, ctx->replyTo );
@@ -823,9 +839,9 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
             }
             soap_destroy(ctx.soapWsddProxy.soap);
             soap_end(ctx.soapWsddProxy.soap);
-            ctx.sock.reset();
-            delete it->second;
-            m_ifaceToSock.erase( it );
+            //ctx.sock.reset();
+            //delete it->second;
+            //m_ifaceToSock.erase( it );
             return true;
         }
 
@@ -848,3 +864,5 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         //soap_end(ctx.soapWsddProxy.soap);
     }
 }
+
+#endif //ENABLE_ONVIF

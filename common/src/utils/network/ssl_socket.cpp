@@ -8,7 +8,8 @@ const unsigned char sid[] = "Network Optix SSL socket";
 static SSL_CTX *serverCTX = 0;
 static SSL_CTX *clientCTX = 0;
 
-static int sock_read(BIO *b, char *out, int outl)
+// TODO: public methods are visible to all, quite bad
+int sock_read(BIO *b, char *out, int outl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     int ret=0;
@@ -27,7 +28,7 @@ static int sock_read(BIO *b, char *out, int outl)
     return ret;
 }
 
-static int sock_write(BIO *b, const char *in, int inl)
+int sock_write(BIO *b, const char *in, int inl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     //clear_socket_error();
@@ -41,6 +42,7 @@ static int sock_write(BIO *b, const char *in, int inl)
     return ret;
 }
 
+namespace {
 static int sock_puts(BIO *bp, const char *str)
 {
     int n = strlen(str);
@@ -117,6 +119,7 @@ static BIO_METHOD Proxy_server_socket =
     sock_free,
     NULL,
 };
+}
 
 // ---------------------------- QnSSLSocket -----------------------------------
 
@@ -154,8 +157,9 @@ void QnSSLSocket::releaseSSLEngine()
     }
 }
 
-struct QnSSLSocketPrivate
+class QnSSLSocketPrivate
 {
+public:
     AbstractStreamSocket* wrappedSocket;
     SSL* ssl;
     BIO* read;
@@ -335,11 +339,11 @@ bool QnSSLSocket::bind( const SocketAddress& localAddress )
     return d->wrappedSocket->bind(localAddress);
 }
 
-bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->bindToInterface(iface);
-}
+//bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
+//{
+//    Q_D(const QnSSLSocket);
+//    return d->wrappedSocket->bindToInterface(iface);
+//}
 
 SocketAddress QnSSLSocket::getLocalAddress() const
 {

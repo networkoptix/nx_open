@@ -22,7 +22,7 @@
 #include "workbench_license_notifier.h"
 
 #ifdef Q_OS_WIN
-#include "watchers/workbench_desktop_camera_watcher.h"
+#include "watchers/workbench_desktop_camera_watcher_win.h"
 #endif
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
@@ -42,7 +42,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 #ifdef Q_OS_WIN
-    m_desktopCameraWatcher = instance<QnWorkbenchDesktopCameraWatcher>();
+    instance<QnWorkbenchDesktopCameraWatcher>();
 #endif
 
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));

@@ -2,7 +2,7 @@
 
 #ifdef Q_OS_WIN
 
-#include <QScreen>
+#include <QtGui/QScreen>
 #include <QtCore/QLibrary>
 #include "utils/common/log.h"
 #include <emmintrin.h>
@@ -624,7 +624,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
 #else
         if (useSSE3())
         {
-            bgra_to_yv12_sse2_intr(data, dataStride,
+            bgra_to_yv12_simd_intr(data, dataStride,
                 m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
                 m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
@@ -641,7 +641,7 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
     {
         if (useSSE3())
         {
-            bgra_to_yv12_sse2_intr(data, dataStride, pFrame->data[0], pFrame->data[1], pFrame->data[2],
+            bgra_to_yv12_simd_intr(data, dataStride, pFrame->data[0], pFrame->data[1], pFrame->data[2],
                              pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == Qn::WindowMode);
         }
         else {
@@ -653,9 +653,11 @@ bool QnScreenGrabber::dataToFrame(quint8* data, int dataStride, int width, int h
 
 bool QnScreenGrabber::capturedDataToFrame(CaptureInfoPtr captureInfo, AVFrame* pFrame)
 {
+    static const int RGBA32_BYTES_PER_PIXEL = 4;
+
     bool rez = false;
     if (m_mode == Qn::WindowMode)
-        rez = dataToFrame((quint8*) captureInfo->opaque, captureInfo->width, captureInfo->width, captureInfo->height, pFrame);
+        rez = dataToFrame((quint8*) captureInfo->opaque, captureInfo->width*RGBA32_BYTES_PER_PIXEL, captureInfo->width, captureInfo->height, pFrame);
     else
         rez = direct3DDataToFrame(captureInfo->opaque, pFrame);
     pFrame->pts = captureInfo->pts;

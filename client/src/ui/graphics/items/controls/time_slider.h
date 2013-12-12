@@ -1,6 +1,8 @@
 #ifndef QN_TIME_SLIDER_H
 #define QN_TIME_SLIDER_H
 
+#include <QtCore/QLocale>
+
 #include <utils/math/functors.h>
 
 #include <recording/time_period_list.h>
@@ -141,6 +143,7 @@ public:
     void setToolTipFormat(const QString &format);
 
     Q_SLOT void finishAnimations();
+    Q_SLOT void hurryKineticAnimations();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -187,6 +190,7 @@ protected:
     virtual void tick(int deltaMSecs) override;
 
     virtual void kineticMove(const QVariant &degrees) override;
+    virtual void finishKinetic() override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
@@ -196,8 +200,8 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
     static QVector<QnTimeStep> createRelativeSteps();
-    static QVector<QnTimeStep> createAbsoluteSteps();
-    static QVector<QnTimeStep> enumerateSteps(const QVector<QnTimeStep> &steps);
+    static void createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTimeStep> *relativeSteps);
+    static void enumerateSteps(QVector<QnTimeStep> &steps);
 
 private:
     enum Marker {
@@ -284,6 +288,7 @@ private:
     void updateThumbnailsPeriod();
     void updateThumbnailsStepSizeLater();
     void updateThumbnailsVisibility();
+    void updateKineticProcessor();
     Q_SLOT void updateThumbnailsStepSizeTimer();
     Q_SLOT void updateThumbnailsStepSizeForced();
 
@@ -306,6 +311,7 @@ private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
     friend class QnTimeSliderChunkPainter;
+    friend class QnTimeSliderStepStorage;
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;
@@ -322,6 +328,7 @@ private:
 
     qint64 m_zoomAnchor;
     bool m_animating;
+    bool m_kineticsHurried;
     qint64 m_animationStart, m_animationEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
@@ -339,7 +346,7 @@ private:
     QVector<qint64> m_nextTickmarkPos;
     QVector<QVector<QPointF> > m_tickmarkLines;
 
-    QWeakPointer<QnThumbnailsLoader> m_thumbnailsLoader;
+    QPointer<QnThumbnailsLoader> m_thumbnailsLoader;
     qreal m_thumbnailsAspectRatio;
     QTimer *m_thumbnailsUpdateTimer;
     qint64 m_lastThumbnailsUpdateTime;
@@ -358,6 +365,8 @@ private:
     QVector<qint64> m_indicators;
 
     qint64 m_localOffset;
+
+    QLocale m_locale;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

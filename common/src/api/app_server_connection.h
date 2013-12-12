@@ -45,7 +45,7 @@ signals:
     void finished(int status, const QnConnectInfoPtr &reply, int handle);
     void finished(int status, const QnBusinessEventRuleList &reply, int handle);
     void finished(int status, const QnKvPairList &reply, int handle);
-	void finished(int status, bool reply, int handle);
+    void finished(int status, bool reply, int handle);
     void finished(int status, const QByteArray &reply, int handle);
     void finished(int status, const QStringList &reply, int handle);
 
@@ -93,15 +93,15 @@ public:
     int saveSync(const QnVirtualCameraResourcePtr &resource);
 
 
-	/**
-	  * Test if email settings are valid
-	  * 
-	  * Slot is (int status, const QByteArray& errorString, bool result, int handle),
-	  * where result is true if settings are valid
-	  * 
-	  * @return connection handle
-	  */
-	int testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot);
+    /**
+      * Test if email settings are valid
+      * 
+      * Slot is (int status, const QByteArray& errorString, bool result, int handle),
+      * where result is true if settings are valid
+      * 
+      * @return connection handle
+      */
+    int testEmailSettingsAsync(const QnKvPairList &settings, QObject *target, const char *slot);
 
     int sendEmailAsync(const QString& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
     int sendEmailAsync(const QStringList& to, const QString& subject, const QString& message, int timeout, QObject *target, const char *slot);
@@ -216,18 +216,22 @@ private:
 };
 
 
-class QN_EXPORT QnAppServerConnectionFactory {
+class QN_EXPORT QnAppServerConnectionFactory 
+{
 public:
+    QnAppServerConnectionFactory(): m_defaultMediaProxyPort(0), m_allowCameraChanges(true) {}
+
     static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
     static QByteArray prevSessionKey();
     static QByteArray sessionKey();
+    static bool allowCameraChanges();
     static QString systemName();
     static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
-	static QnResourceFactory* defaultFactory();
+    static QnResourceFactory* defaultFactory();
 
     static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
@@ -236,6 +240,7 @@ public:
     static void setDefaultMediaProxyPort(int port);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
+    static void setAllowCameraChanges(bool allowCameraChanges);
     static void setSystemName(const QString& systemName);
 
     static void setSessionKey(const QByteArray& sessionKey);
@@ -257,6 +262,7 @@ private:
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
     QnApiPbSerializer m_serializer;
+    bool m_allowCameraChanges;
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);

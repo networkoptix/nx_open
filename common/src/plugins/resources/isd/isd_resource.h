@@ -1,6 +1,8 @@
 #ifndef isd_resource_h_1934
 #define isd_resource_h_1934
 
+#ifdef ENABLE_ISD
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -18,7 +20,7 @@ public:
 
     virtual bool isResourceAccessible();
 
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
 
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;
@@ -34,7 +36,7 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
 private:
     void setMaxFps(int f);
@@ -46,4 +48,5 @@ protected:
 
 };
 
+#endif // #ifdef ENABLE_ISD
 #endif //isd_resource_h_1934

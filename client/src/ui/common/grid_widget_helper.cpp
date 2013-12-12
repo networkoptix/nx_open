@@ -1,6 +1,11 @@
-#include <QTableView>
-
 #include "grid_widget_helper.h"
+
+#include <QtCore/QMimeData>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QTableView>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QApplication>
+
 #include "client/client_settings.h"
 #include "ui/dialogs/custom_file_dialog.h"
 
@@ -24,7 +29,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
             caption,
             previousDir,
             QObject::tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")
-            ));
+        ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 

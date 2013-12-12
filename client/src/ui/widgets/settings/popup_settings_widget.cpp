@@ -17,9 +17,9 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
-QnPopupSettingsWidget::QnPopupSettingsWidget(QnWorkbenchContext *context, QWidget *parent) :
-    QWidget(parent),
-    QnWorkbenchContextAware(context),
+QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnPopupSettingsWidget)
 {
     ui->setupUi(this);
@@ -42,18 +42,19 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QnWorkbenchContext *context, QWidge
 
     m_showBusinessEventsHelper = this->context()->instance<QnShowBusinessEventsHelper>();
 
-    connect(ui->showAllCheckBox, SIGNAL(toggled(bool)),                             this,   SLOT(at_showAllCheckBox_toggled(bool)));
-    connect(context,             SIGNAL(userChanged(const QnUserResourcePtr &)),    this,   SLOT(at_context_userChanged()));
-    connect(m_showBusinessEventsHelper, SIGNAL(valueChanged(quint64)),              this,   SLOT(at_showBusinessEvents_valueChanged(quint64)));
-
-    at_showBusinessEvents_valueChanged(m_showBusinessEventsHelper->value());
+    connect(ui->showAllCheckBox,        SIGNAL(toggled(bool)),                              this,   SLOT(at_showAllCheckBox_toggled(bool)));
+    connect(m_showBusinessEventsHelper, SIGNAL(valueChanged(quint64)),                      this,   SLOT(at_showBusinessEvents_valueChanged(quint64)));
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
 {
 }
 
-void QnPopupSettingsWidget::submit() {
+void QnPopupSettingsWidget::updateFromSettings() {
+    at_showBusinessEvents_valueChanged(m_showBusinessEventsHelper->value());
+}
+
+void QnPopupSettingsWidget::submitToSettings() {
     quint64 eventsShown = m_showBusinessEventsHelper->value();
     quint64 eventsFlag = 1;
     for (int i = 0; i < BusinessEventType::Count; i++) {
@@ -113,9 +114,4 @@ void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged(quint64 value) {
     }
 
     ui->showAllCheckBox->setChecked(all);
-}
-
-
-void QnPopupSettingsWidget::at_context_userChanged() {
-    m_showBusinessEventsHelper->setResource(context()->user());
 }

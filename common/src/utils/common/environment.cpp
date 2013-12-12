@@ -1,11 +1,15 @@
+
 #include "environment.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QProcess>
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
-#include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
+#if defined(Q_OS_WIN)
+#include <QtWidgets/QMessageBox>
+#endif
+
 
 QString QnEnvironment::searchInPath(QString executable) {
     if (executable.isEmpty())
@@ -39,7 +43,7 @@ QString QnEnvironment::searchInPath(QString executable) {
 }
 
 void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
-    QString layoutPrefix = QLatin1String("layout://"); //hack
+    QString layoutPrefix = QLatin1String("layout://"); //hack //TODO: #Elric think where to place this magic const to be available from here
     QString checkedPath(path);
     if (checkedPath.startsWith(layoutPrefix))
         checkedPath = checkedPath.remove(0, layoutPrefix.length());
@@ -71,7 +75,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     scriptArgs 
         << QLatin1String("-e")
         << QLatin1String("tell application \"Finder\" to activate");
-    QProcess::execute("/usr/bin/osascript", scriptArgs);
+    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
 #else
     Q_UNUSED(parent)
     QDesktopServices::openUrl(QUrl(QLatin1String("file:///") + QFileInfo(path).path(), QUrl::TolerantMode));

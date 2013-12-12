@@ -2,7 +2,7 @@
 #define QN_ACTION_CONDITIONS_H
 
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
+
 
 #include <client/client_globals.h>
 
@@ -384,6 +384,12 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+};
+
+class QnChangeResolutionActionCondition: public QnActionCondition {
+public:
+    QnChangeResolutionActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 /** Display action only if user is logged in. */

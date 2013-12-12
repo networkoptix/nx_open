@@ -1,7 +1,7 @@
 
 #include "resource_selection_dialog_delegate.h"
 
-#include <QLayout>
+#include <QtWidgets/QLayout>
 
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -34,6 +34,11 @@ void QnResourceSelectionDialogDelegate::init(QWidget* parent) {
 
 bool QnResourceSelectionDialogDelegate::validate(const QnResourceList &selectedResources) {
     Q_UNUSED(selectedResources)
+    return true;
+}
+
+bool QnResourceSelectionDialogDelegate::isValid(const QnResourcePtr &resource) {
+    Q_UNUSED(resource)
     return true;
 }
 
@@ -75,6 +80,14 @@ bool QnCheckResourceAndWarnDelegate<ResourceType>::validate(const QnResourceList
     m_warningLabel->setText(getText(invalid, resources.size()));
     m_warningLabel->setVisible(invalid > 0);
     return true;
+}
+
+template<class ResourceType>
+bool QnCheckResourceAndWarnDelegate<ResourceType>::isValid(const QnResourcePtr &resource) {
+    QnSharedResourcePointer<ResourceType> derived = resource.template dynamicCast<ResourceType>();
+
+    // return true for resources of other type - so root elements will not be highlighted
+    return !derived || isResourceValid(derived);
 }
 
 

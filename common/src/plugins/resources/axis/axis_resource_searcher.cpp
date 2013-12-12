@@ -1,3 +1,5 @@
+#ifdef ENABLE_AXIS
+
 #include "axis_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "axis_resource.h"
@@ -135,9 +137,10 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     if (iqpos<0)
         return local_results;
 
-    int macpos = responseData.indexOf("00", iqpos);
+    int macpos = responseData.indexOf("- 00", iqpos);
     if (macpos < 0)
         return local_results;
+    macpos += 2;
 
     for (int i = iqpos; i < macpos; i++)
     {
@@ -241,3 +244,5 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     return local_results;
 }
+
+#endif // #ifdef ENABLE_AXIS

@@ -4,6 +4,7 @@
 #include <boost/array.hpp>
 
 #include <QtGui/QPixmap>
+#include <QtGui/QOpenGLFunctions>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
@@ -17,12 +18,11 @@ class QGLWidget;
 
 class VariantAnimator;
 class QnTextureTransitionShaderProgram;
-class QnGlFunctions;
 
 /**
  * A lightweight button widget that does not use styles for painting.
  */
-class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
+class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protected QOpenGLFunctions {
     Q_OBJECT
     Q_FLAGS(StateFlags StateFlag)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
@@ -141,7 +141,6 @@ private:
     bool m_actionIconOverridden;
 
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
-    QScopedPointer<QnGlFunctions> m_gl;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
@@ -188,9 +187,6 @@ public:
     const QString &text() const;
     void setText(const QString &text);
 
-    qreal relativeFontSize() const;
-    void setRelativeFontSize(qreal relativeFontSize);
-
     qreal relativeFrameWidth() const;
     void setRelativeFrameWidth(qreal relativeFrameWidth);
 
@@ -198,17 +194,16 @@ public:
     void setStateOpacity(StateFlags stateFlags, qreal opacity);
 
     virtual void setGeometry(const QRectF &geometry) override;
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
 
+    void updatePixmap();
 protected:
     StateFlags validOpacityState(StateFlags flags) const;
 
 private:
     QString m_text;
-    qreal m_relativeFontSize;
     qreal m_relativeFrameWidth;
     boost::array<qreal, FLAGS_MAX + 1> m_opacities;
 };

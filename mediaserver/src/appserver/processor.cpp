@@ -1,4 +1,4 @@
-#include <QThread>
+#include <QtCore/QThread>
 
 #include "processor.h"
 #include "core/resource_managment/resource_pool.h"

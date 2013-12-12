@@ -1,3 +1,5 @@
+#ifdef ENABLE_DROID
+
 #include "droid_stream_reader.h"
 #include "droid_resource.h"
 #include "droid_controlport_listener.h"
@@ -114,7 +116,7 @@ CameraDiagnostics::Result PlDroidStreamReader::openStream()
         m_allReaders.insert(ip, this);
     }
     QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalAddress().port).
-            arg(m_audioIoDevice->getMediaSocket()->getLocalAddress().port).arg(DROID_CONTROL_TCP_SERVER_PORT).toAscii();
+            arg(m_audioIoDevice->getMediaSocket()->getLocalAddress().port).arg(DROID_CONTROL_TCP_SERVER_PORT).toLatin1();
     
     int sendLen = m_tcpSock->send(request.data(), request.size());
     if (sendLen != request.size())
@@ -179,3 +181,5 @@ void PlDroidStreamReader::setSDPInfo(QByteArray sdpInfo)
     m_h264Parser->setSDPInfo(sdpInfo.split('\n'));
     m_gotSDP = true;
 }
+
+#endif // #ifdef ENABLE_DROID

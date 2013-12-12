@@ -1,7 +1,7 @@
 #ifndef WORKBENCH_NOTIFICATIONS_HANDLER_H
 #define WORKBENCH_NOTIFICATIONS_HANDLER_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
@@ -29,7 +29,6 @@ public:
     explicit QnWorkbenchNotificationsHandler(QObject *parent = 0);
     virtual ~QnWorkbenchNotificationsHandler();
 
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
 
@@ -38,6 +37,7 @@ signals:
     void systemHealthEventRemoved(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
 
     void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
+    void businessActionRemoved(const QnAbstractBusinessActionPtr& businessAction);
     void cleared();
 
 public slots:
@@ -47,11 +47,15 @@ public slots:
 private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
+
     void at_eventManager_connectionOpened();
     void at_eventManager_connectionClosed();
+    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
+
     void at_licensePool_licensesChanged();
     void at_settings_valueChanged(int id);
 private:
+    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
     /**
      * Check that system health message can be displayed to admins only.

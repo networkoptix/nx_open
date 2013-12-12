@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_LAYOUT_H
 #define QN_RESOURCE_LAYOUT_H
 
-#define CL_MAX_CHANNELS 4 // TODO: get rid of this definition
+#define CL_MAX_CHANNELS 4 // TODO: #Elric get rid of this definition
 
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
@@ -9,7 +9,7 @@
 #include <QtCore/QSize>
 
 #include <core/datapacket/abstract_data_packet.h>
-
+#include <common/common_globals.h>
 
 class QnResourceLayout {
 public:

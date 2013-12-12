@@ -1,14 +1,16 @@
+#ifdef ENABLE_ARECONT
+
+#ifdef _WIN32
+#  include <winsock2.h>
+#endif
+
 
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
 #include "core/resource/resource_command_processor.h"
 
-#include <QtNetwork/QUdpSocket>
-
-#if defined(Q_OS_WIN)
-#  include <winsock2.h>
-#elif defined(QT_LINUXBASE)
+#if defined(QT_LINUXBASE)
 #  include <arpa/inet.h>
 #endif
 #include "utils/network/nettools.h"
@@ -120,9 +122,9 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
     {
         return false; // never change ip 
 
-        QUdpSocket sock;
+        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
 
-        sock.bind(getDiscoveryAddr() , 0); // address usesd to find cam
+        sock->bind(getDiscoveryAddr().toString() , 0); // address usesd to find cam
         QString m_local_adssr_srt = getDiscoveryAddr().toString(); // debug only
         QString new_ip_srt = ip.toString(); // debug only
 
@@ -138,8 +140,8 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
         quint32 new_ip = htonl(ip.toIPv4Address());
         memcpy(data + shift + 6, &new_ip,4);
 
-        sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
-        sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
+        sock->sendTo(data, shift + 10, BROADCAST_ADDRESS, 69);
+        sock->sendTo(data, shift + 10, BROADCAST_ADDRESS, 69);
 
         removeARPrecord(ip);
         removeARPrecord(resolveAddress(getHostAddress()));
@@ -205,8 +207,20 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
-    QRect rect = getCroping(QnDomainMemory);
-    setCropingPhysical(rect);
+    QnPhysicalCameraResource::initInternal();
+    
+    {
+        // TODO: #Elric is this needed? This was a call to setCroppingPhysical
+        QVariant maxSensorWidth;
+        QVariant maxSensorHight;
+        getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
+        getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
+
+        setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
+    }
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
@@ -294,19 +308,6 @@ QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, 
 
 void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-}
-
-void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
-{
-    QVariant maxSensorWidth;
-    QVariant maxSensorHight;
-    getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-    getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
-
-    setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
@@ -457,3 +458,4 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
+#endif

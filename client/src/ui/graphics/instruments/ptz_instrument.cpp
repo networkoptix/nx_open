@@ -5,8 +5,8 @@
 #include <limits>
 
 #include <QtCore/QVariant>
-#include <QtGui/QGraphicsSceneMouseEvent>
-#include <QtGui/QApplication>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QApplication>
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -229,7 +229,6 @@ public:
         base_type(parent, windowFlags)
     {
         setFrameShape(Qn::EllipticalFrame);
-        setRelativeFontSize(0.5);
         setRelativeFrameWidth(1.0 / 16.0);
         
         setStateOpacity(0, 0.4);
@@ -249,7 +248,7 @@ public:
     }
 
 private:
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<QnMediaResourceWidget> m_target;
 };
 
 
@@ -296,12 +295,14 @@ public:
 
         /* Note that construction order is important as it defines which items are on top. */
         m_manipulatorWidget = new PtzManipulatorWidget(this);
-        m_zoomInButton = new PtzImageButtonWidget(this);
-        m_zoomOutButton = new PtzImageButtonWidget(this);
-        m_modeButton = new PtzImageButtonWidget(this);
 
+        m_zoomInButton = new PtzImageButtonWidget(this);
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
+
+        m_zoomOutButton = new PtzImageButtonWidget(this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
+
+        m_modeButton = new PtzImageButtonWidget(this);
         m_modeButton->setText(lit("90"));
         m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
@@ -495,6 +496,15 @@ PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
 }
 
+
+QnMediaResourceWidget *PtzInstrument::target() const {
+    return m_target.data();
+}
+
+PtzManipulatorWidget *PtzInstrument::manipulator() const {
+    return m_manipulator.data();
+}
+
 QnSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     QnSplashItem *result;
     if(!m_freeAnimations.empty()) {
@@ -543,6 +553,11 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     return overlay;
 }
 
+FixedArSelectionItem *PtzInstrument::selectionItem() const {
+    return m_selectionItem.data();
+}
+
+
 void PtzInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
@@ -556,6 +571,10 @@ void PtzInstrument::ensureSelectionItem() {
 
     if(scene())
         scene()->addItem(selectionItem());
+}
+
+PtzElementsWidget *PtzInstrument::elementsWidget() const {
+    return m_elementsWidget.data();
 }
 
 void PtzInstrument::ensureElementsWidget() {

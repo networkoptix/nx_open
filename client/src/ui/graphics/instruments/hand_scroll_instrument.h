@@ -42,7 +42,7 @@ protected:
 private:
     Qt::MouseButtons m_mouseButtons;
     QCursor m_originalCursor;
-    QWeakPointer<QGraphicsView> m_currentView;
+    QPointer<QGraphicsView> m_currentView;
 };
 
 /**

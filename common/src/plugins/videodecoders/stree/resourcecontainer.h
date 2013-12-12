@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include <QVariant>
+#include <QtCore/QVariant>
 
 
 namespace stree
@@ -50,20 +50,48 @@ namespace stree
         virtual void put( int resID, const QVariant& value ) = 0;
     };
 
+    //!Implement this interface to allow work through container
+    class AbstractIteratableContainer
+    {
+    public:
+        virtual ~AbstractIteratableContainer() {}
+
+        //!Sets iternal iterator just before the first element
+        virtual void goToBeginning() = 0;
+        //!Goes to the next element. Returns false if already at the end
+        virtual bool next() = 0;
+        virtual int resID() const = 0;
+        virtual QVariant value() const = 0;
+    };
+
     //!Allows to add/get resources. Represents associative container
     class ResourceContainer
     :
         public AbstractResourceReader,
-        public AbstractResourceWriter
+        public AbstractResourceWriter,
+        public AbstractIteratableContainer
     {
     public:
+        ResourceContainer();
+
         //!Implementation of AbstractResourceReader::get
-        virtual bool get( int resID, QVariant* const value ) const;
+        virtual bool get( int resID, QVariant* const value ) const override;
         //!Implementation of AbstractResourceReader::put
-        virtual void put( int resID, const QVariant& value );
+        virtual void put( int resID, const QVariant& value ) override;
+
+        //!Implementation of AbstractIteratableContainer::goToBeginning
+        virtual void goToBeginning() override;
+        //!Implementation of AbstractIteratableContainer::next
+        virtual bool next() override;
+        //!Implementation of AbstractIteratableContainer::resID
+        virtual int resID() const override;
+        //!Implementation of AbstractIteratableContainer::value
+        virtual QVariant value() const override;
 
     private:
         std::map<int, QVariant> m_mediaStreamPameters;
+        std::map<int, QVariant>::const_iterator m_curIter;
+        bool m_first;
     };
 
     class SingleResourceContainer

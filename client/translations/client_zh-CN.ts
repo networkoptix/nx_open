@@ -1565,6 +1565,14 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Export selected cameras to file</source>
         <translation>输出选取的摄像机至档案</translation>
     </message>
+    <message>
+        <source>Beta version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAboutDialog</name>
@@ -2685,6 +2693,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>How-to Videos and FAQ...</source>
         <translation>解说视频及常见问题</translation>
+    </message>
+    <message>
+        <source>Show Beta Version Warning Message</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4637,6 +4649,26 @@ Archive Streams Allowed: %4</source>
     <message>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
+    </message>
+    <message>
+        <source>Database error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The license key is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

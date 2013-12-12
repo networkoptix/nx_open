@@ -5,6 +5,8 @@
 
 QString authKey();
 QString serverGuid();
+void setUseAlternativeGuid(bool value);
+
 QString getDataDirectory();
 void syncStoragesToSettings(QnMediaServerResourcePtr server);
 

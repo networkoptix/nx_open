@@ -1,7 +1,7 @@
 #ifndef NOTIFICATION_SOUND_MANAGER_DIALOG_H
 #define NOTIFICATION_SOUND_MANAGER_DIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 #include <ui/workbench/workbench_context_aware.h>
 

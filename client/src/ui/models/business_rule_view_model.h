@@ -42,19 +42,6 @@ namespace QnBusiness {
     };
     Q_DECLARE_FLAGS(Fields, Field)
 
-    // TODO: #GDM move to common Qn roles
-    enum ItemDataRole {
-        ModifiedRole   = Qt::UserRole + 1,
-        DisabledRole,
-        ValidRole,
-        InstantActionRole,
-        ShortTextRole,
-
-        EventTypeRole,
-        EventResourcesRole,
-        ActionTypeRole,
-        ActionResourcesRole
-    };
 }
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)

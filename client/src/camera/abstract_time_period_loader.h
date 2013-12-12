@@ -1,9 +1,9 @@
 #ifndef __QN_ABSTRACT_TIME_PERIOD_LOADER_H__
 #define __QN_ABSTRACT_TIME_PERIOD_LOADER_H__
 
-#include <QObject>
-#include <QRegion>
-#include <QList>
+#include <QtCore/QObject>
+#include <QtGui/QRegion>
+#include <QtCore/QList>
 #include "recording/time_period_list.h"
 #include <core/resource/resource.h>
 

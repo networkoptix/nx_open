@@ -1,3 +1,4 @@
+#ifdef ENABLE_AXIS
 
 #include "axis_resource.h"
 
@@ -56,7 +57,7 @@ bool QnPlAxisResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
+void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -82,11 +83,11 @@ bool QnPlAxisResource::startInputPortMonitoring()
         ++it )
     {
         QMutexLocker lk( &m_inputPortMutex );
+
         pair<map<unsigned int, nx_http::AsyncHttpClient*>::iterator, bool>
             p = m_inputPortHttpMonitor.insert( make_pair( it->second, (nx_http::AsyncHttpClient*)NULL ) );
         if( !p.second )
             continue;   //port already monitored
-        lk.unlock();
 
         //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
             //and forgetHttpClient cannot be called before doGet call
@@ -99,9 +100,16 @@ bool QnPlAxisResource::startInputPortMonitoring()
         httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
         httpClient->setUserName( auth.user() );
         httpClient->setUserPassword( auth.password() );
-        httpClient->doGet( requestUrl );
-
-        p.first->second = httpClient;
+        
+        if( httpClient->doGet( requestUrl ) )
+        {
+            p.first->second = httpClient;
+        }
+        else
+        {
+            httpClient->scheduleForRemoval();
+            m_inputPortHttpMonitor.erase( p.first );
+        }
     }
 
     return true;
@@ -261,6 +269,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 
 CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
 
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
     {
@@ -567,16 +576,16 @@ int QnPlAxisResource::getChannelNum() const
     return result;
 }
 
-		// TEMPLATE STRUCT select1st
+        // TEMPLATE STRUCT select1st
 template<class _Pair>
-	struct select1st
+    struct select1st
         : public std::unary_function<_Pair, typename _Pair::first_type>
-	{	// functor for unary first of pair selector operator
-	const typename _Pair::first_type& operator()(const _Pair& _Left) const
-		{	// apply first selector operator to pair operand
-		return (_Left.first);
-		}
-	};
+    {	// functor for unary first of pair selector operator
+    const typename _Pair::first_type& operator()(const _Pair& _Left) const
+        {	// apply first selector operator to pair operand
+        return (_Left.first);
+        }
+    };
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
 QStringList QnPlAxisResource::getRelayOutputList() const
@@ -935,3 +944,5 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
     return m_ptzController.data();
 }
+
+#endif // #ifdef ENABLE_AXIS

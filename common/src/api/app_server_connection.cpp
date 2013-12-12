@@ -742,7 +742,7 @@ int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QBy
 
     QByteArray data("--" + bound);
     data += "\r\n";
-    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toAscii() + "\"\r\n";
+    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toLatin1() + "\"\r\n";
     data += "Content-Type: application/octet-stream\r\n\r\n";
     data += filedata;
     data += "\r\n";
@@ -961,6 +961,20 @@ void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_publicUrl.setHost(publicIp);
+    }
+}
+
+bool QnAppServerConnectionFactory::allowCameraChanges()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_allowCameraChanges;
+    return true; // default value
+}
+
+void QnAppServerConnectionFactory::setAllowCameraChanges(bool allowCameraChanges)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_allowCameraChanges = allowCameraChanges;
     }
 }
 

@@ -169,8 +169,8 @@ private:
 private:
     bool m_interactive;
     QColor m_frameColor;
-    QWeakPointer<ZoomOverlayWidget> m_overlay;
-    QWeakPointer<QnMediaResourceWidget> m_zoomWidget;
+    QPointer<ZoomOverlayWidget> m_overlay;
+    QPointer<QnMediaResourceWidget> m_zoomWidget;
 };
 
 
@@ -212,13 +212,14 @@ public:
         m_rectByWidget.remove(widget);
     }
     
-    void setWidgetRect(ZoomWindowWidget *widget, const QRectF &rect) {
+    void setWidgetRect(ZoomWindowWidget *widget, const QRectF &rect, bool updateLayout) {
         if(!m_rectByWidget.contains(widget))
             return;
 
         m_rectByWidget[widget] = rect;
 
-        updateLayout(widget);
+        if(updateLayout)
+            this->updateLayout(widget);
     }
 
     QRectF widgetRect(ZoomWindowWidget *widget) const {
@@ -260,7 +261,7 @@ private:
 
 private:
     QHash<ZoomWindowWidget *, QRectF> m_rectByWidget;
-    QWeakPointer<QnMediaResourceWidget> m_target;
+    QPointer<QnMediaResourceWidget> m_target;
     bool m_interactive;
 };
 
@@ -377,6 +378,18 @@ ZoomWindowWidget *ZoomWindowInstrument::windowWidget(QnMediaResourceWidget *widg
     return m_dataByWidget[widget].windowWidget;
 }
 
+QnMediaResourceWidget *ZoomWindowInstrument::target() const {
+    return m_target.data();
+}
+
+ZoomWindowWidget *ZoomWindowInstrument::windowTarget() const {
+    return m_windowTarget.data();
+}
+
+FixedArSelectionItem *ZoomWindowInstrument::selectionItem() const {
+    return m_selectionItem.data();
+}
+
 void ZoomWindowInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
@@ -484,7 +497,7 @@ void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget)
     ZoomOverlayWidget *overlayWidget = windowWidget ? windowWidget->overlay() : NULL;
 
     if(windowWidget && overlayWidget) {
-        overlayWidget->setWidgetRect(windowWidget, widget->zoomRect());
+        overlayWidget->setWidgetRect(windowWidget, widget->zoomRect(), true);
         windowWidget->setFrameColor(widget->frameColor().lighter(110));
     }
 
@@ -501,7 +514,7 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 
     if(overlayWidget && zoomWidget && !qFuzzyIsNull(overlayWidget->size())) {
         QRectF zoomRect = cwiseDiv(windowWidget->geometry(), overlayWidget->size());
-        overlayWidget->setWidgetRect(windowWidget, zoomRect);
+        overlayWidget->setWidgetRect(windowWidget, zoomRect, false);
         emit zoomRectChanged(zoomWidget, zoomRect);
     }
 

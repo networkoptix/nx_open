@@ -77,16 +77,18 @@ bool QnPtzMapperPool::loadInternal(const QString &fileName) {
     if(data.isEmpty())
         return false; /* Read error. */
 
-    QVariantMap map;
+    QJsonObject map;
     if(!QJson::deserialize(data, &map))
         return false;
 
-    QString version = map.value(lit("version")).toString();
+    QString version;
+    if(!QJson::deserialize(map, "version", &version))
+        return false;
     if(version != lit("1.0"))
         return false;
 
     QList<QnPtzSpaceMapper> mappers;
-    if(!QJson::deserialize(map.value(lit("mappers")), &mappers))
+    if(!QJson::deserialize(map, "mappers", &mappers))
         return false;
 
     foreach(const QnPtzSpaceMapper &mapper, mappers)

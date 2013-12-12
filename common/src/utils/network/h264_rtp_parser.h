@@ -1,8 +1,8 @@
 #ifndef __H264_RTP_PARSER_H
 #define __H264_RTP_PARSER_H
 
-#include <QByteArray>
-#include <QMap>
+#include <QtCore/QByteArray>
+#include <QtCore/QMap>
 
 #include "rtp_stream_parser.h"
 #include "../media/nalUnits.h"

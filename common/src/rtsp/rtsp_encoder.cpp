@@ -5,7 +5,7 @@ QnRtspEncoder::QnRtspEncoder()
 {
 }
 
-void QnRtspEncoder::setMediaData(QnAbstractMediaDataPtr media)
+void QnRtspEncoder::setMediaData(QnConstAbstractMediaDataPtr media)
 {
     m_sdpMediaPacket = media;
 }

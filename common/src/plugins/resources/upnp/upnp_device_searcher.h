@@ -5,12 +5,12 @@
 #include <list>
 #include <map>
 
-#include <QByteArray>
-#include <QElapsedTimer>
-#include <QHostAddress>
-#include <QObject>
-#include <QMutex>
-#include <QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QElapsedTimer>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
@@ -164,6 +164,7 @@ private:
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
 
 private slots:
+    void onDeviceDescriptionXmlResponseReceived( nx_http::AsyncHttpClient* httpClient );
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient );
 };
 

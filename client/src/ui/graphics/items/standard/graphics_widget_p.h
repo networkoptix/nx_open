@@ -47,7 +47,7 @@ protected:
     GraphicsWidget::HandlingFlags handlingFlags;
     GraphicsWidget::TransformOrigin transformOrigin;
     qreal resizeEffectRadius;
-    QWeakPointer<GraphicsWidgetSceneData> sceneData;
+    QPointer<GraphicsWidgetSceneData> sceneData;
     mutable GraphicsStyle *style;
     mutable QScopedPointer<GraphicsStyle> reserveStyle;
 

@@ -1,7 +1,7 @@
 #ifndef device_settings_tab_h_2004
 #define device_settings_tab_h_2004
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 class CLAbstractDeviceSettingsDlg;
 class QnParamList;

@@ -1,9 +1,9 @@
 #ifndef __QN_REDASS_CONTROLLER_H__
 #define __QN_REDASS_CONTROLLER_H__
 
-#include <QTime>
-#include <QTimer>
-#include <QThread>
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
+#include <QtCore/QThread>
 
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/synctime.h"

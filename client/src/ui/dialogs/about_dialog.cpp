@@ -3,12 +3,12 @@
 
 #include <QtCore/QEvent>
 
-#include <QtGui/QBoxLayout>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QGroupBox>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QApplication>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QApplication>
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
@@ -76,8 +76,6 @@ void QnAboutDialog::retranslateUi()
     ui->retranslateUi(this);
 
     m_copyButton->setText(tr("Copy to Clipboard"));
-
-    setWindowTitle(tr("About"));
 
     QString version = 
         tr(

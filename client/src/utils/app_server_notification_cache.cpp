@@ -4,6 +4,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QUuid>
 
+#include <client_message_processor.h>
+
 #include <transcoding/file_transcoder.h>
 
 #include <ui/models/notification_sound_model.h>
@@ -20,6 +22,10 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     base_type(folder, parent),
     m_model(new QnNotificationSoundModel(this))
 {
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileAdded(QString)),     this, SLOT(at_fileAddedEvent(QString)));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileUpdated(QString)),   this, SLOT(at_fileUpdatedEvent(QString)));
+    connect(QnClientMessageProcessor::instance(),               SIGNAL(fileRemoved(QString)),   this, SLOT(at_fileRemovedEvent(QString)));
+
     connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
     connect(this, SIGNAL(fileUploaded(QString,bool)),           this, SLOT(at_fileAdded(QString, bool)));

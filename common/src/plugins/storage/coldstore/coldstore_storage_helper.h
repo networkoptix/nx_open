@@ -1,11 +1,11 @@
 #ifndef coldstore_helper_h_2137_h
 #define coldstore_helper_h_2137_h
 
-#include <QtGlobal>
-#include <QFileInfoList>
+#include <QtCore/QtGlobal>
+#include <QtCore/QFileInfoList>
 #include <QHash>
-#include <QTime>
-#include <QMutex>
+#include <QtCore/QTime>
+#include <QtCore/QMutex>
 #include <QSharedPointer>
 
 

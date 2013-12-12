@@ -3,7 +3,7 @@
 
 #include <limits>
 
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -174,6 +174,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 void QnMultipleCameraSettingsWidget::reject()
 {
     updateFromResources();
+}
+
+bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
+{
+    return m_hasScheduleEnabledChanges || m_hasScheduleChanges;
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {

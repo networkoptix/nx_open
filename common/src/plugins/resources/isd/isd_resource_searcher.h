@@ -1,6 +1,8 @@
 #ifndef isd_device_server_h_1936
 #define isd_device_server_h_1936
 
+#ifdef ENABLE_ISD
+
 #include "core/resource_managment/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
@@ -23,4 +25,5 @@ protected:
     virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
 };
 
+#endif // #ifdef ENABLE_ISD
 #endif //isd_device_server_h_1936

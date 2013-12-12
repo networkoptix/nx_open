@@ -7,7 +7,7 @@
 
 #include <api/model/storage_space_reply.h>
 
-#include <platform/platform_abstraction.h>
+#include <platform/core_platform_abstraction.h>
 
 #include <recorder/storage_manager.h>
 
@@ -46,6 +46,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
             }
         }
 
+        if (storage->hasFlags(QnResource::deprecated))
+            continue;
+
         QnStorageSpaceData data;
         data.path = storage->getUrl();
         data.storageId = storage->getId();
@@ -55,6 +58,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         data.isExternal = isExternal;
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
+
+        if( data.totalSpace < QnStorageManager::DEFAULT_SPACE_LIMIT )
+            continue;
 
         // TODO: #Elric remove once UnknownSize is dropped.
         if(data.totalSpace == QnStorageResource::UnknownSize)
@@ -85,6 +91,9 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParamList 
         data.reservedSpace = -1;
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
+
+        if( data.totalSpace < QnStorageManager::DEFAULT_SPACE_LIMIT )
+            continue;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
         if (storage) {

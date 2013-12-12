@@ -1,7 +1,11 @@
 #ifndef __MOTION_ESTIMATION_H__
 #define __MOTION_ESTIMATION_H__
 
-#include <QByteArray>
+static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
+
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
+
+#include <QtCore/QByteArray>
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "core/resource/motion_window.h"
@@ -18,18 +22,18 @@ public:
     * As motion data, motion mask is rotated to 90 degree.
     */
     void setMotionMask(const QnMotionRegion& region);
+#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     //void analizeFrame(const CLVideoDecoderOutput* frame);
     /*!
         \return true if successfully decoded and analyzed \a frame
     */
     bool analizeFrame(QnCompressedVideoDataPtr frame);
+#endif
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;
 
     //!Returns resolution of video picture (it is known only after first successful \a QnMotionEstimation::analizeFrame call)
     QSize videoResolution() const;
-
-    static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 
 private:
     void scaleMask(quint8* mask, quint8* scaledMask);
@@ -64,5 +68,7 @@ private:
 
     QSize m_videoResolution;
 };
+
+#endif  //ENABLE_SOFTWARE_MOTION_DETECTION
 
 #endif // __MOTION_ESTIMATION_H__

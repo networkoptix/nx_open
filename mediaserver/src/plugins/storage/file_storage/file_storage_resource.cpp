@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "file_storage_resource.h"
 #include "utils/common/util.h"
@@ -26,7 +26,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ioBlockSize = IO_BLOCK_SIZE;
         ffmpegBufferSize = FFMPEG_BUFFER_SIZE;
 #ifdef Q_OS_WIN
-        if (qSettings.value("disableDirectIO").toInt() != 1)
+        if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -117,6 +117,9 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if( !isStorageDirMounted() )
         return false;
 
+    if (hasFlags(deprecated))
+        return false;
+
     QDir dir(getUrl());
 
     bool needRemoveDir = false;
@@ -158,8 +161,16 @@ bool QnFileStorageResource::isStorageAvailable()
             dir.rmdir(tmpDir);
             return true;
         }
-        else 
+        else {
+#ifdef WIN32
+            if (::GetLastError() == ERROR_DISK_FULL)
+                return true;
+#else
+            if (errno == ENOSPC)
+                return true;
+#endif
             return false;
+        }
     }
 
     return false;
@@ -251,7 +262,7 @@ bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* c
 
     while( !tabFile.atEnd() )
     {
-        QString line = QString::fromAscii(tabFile.readLine().trimmed());
+        QString line = QString::fromLatin1(tabFile.readLine().trimmed());
         if( line.isEmpty() || line.startsWith('#') )
             continue;
 

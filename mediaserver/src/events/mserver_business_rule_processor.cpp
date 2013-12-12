@@ -1,4 +1,6 @@
-#include <QList>
+
+#include <QtCore/QList>
+
 #include "business/actions/panic_business_action.h"
 #include "mserver_business_rule_processor.h"
 #include "core/resource/media_server_resource.h"
@@ -148,7 +150,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     if (!camera)
         return result;
 
-    QnCompressedVideoDataPtr video = camera->getLastVideoFrame(true);
+    QnConstCompressedVideoDataPtr video = camera->getLastVideoFrame(true);
     if (!video)
         video = camera->getLastVideoFrame(false);
 

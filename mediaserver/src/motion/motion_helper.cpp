@@ -2,8 +2,8 @@
 #include "motion_archive.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "utils/common/util.h"
-#include <QFileInfo>
-#include <QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
 #include "recorder/file_deletor.h"
 #include "serverutil.h"
 
@@ -34,7 +34,7 @@ QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res, int channel)
     return writer;
 }
 
-void QnMotionHelper::saveToArchive(QnMetaDataV1Ptr data)
+void QnMotionHelper::saveToArchive(QnConstMetaDataV1Ptr data)
 {
     QnMotionArchive* archive = getArchive(data->dataProvider->getResource(), data->channelNumber);
     if (archive)

@@ -40,6 +40,7 @@ QnResource::QnResource():
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult())
 {
+    m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
 
 QnResource::~QnResource()
@@ -381,12 +382,12 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
     return false;
 }
 
-bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
+bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        emit asyncParamGetDone(toSharedPointer(this), name, QVariant(), false);
+        emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
         return false;
     }
 
@@ -401,22 +402,22 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
 
     if (domain == QnDomainMemory)
     {
-        emit asyncParamGetDone(toSharedPointer(this), name, val, true);
+        emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, val, true);
         return true;
     }
     else if (domain == QnDomainPhysical)
     {
         QVariant newValue;
-        if (param.isPhysical() && getParamPhysical(param, newValue)) {
+        if (param.isPhysical() && const_cast<QnResource*>(this)->getParamPhysical(param, newValue)) {
             if (val != newValue) {
                 val = newValue;
                 m_mutex.lock();
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                emit parameterValueChanged(::toSharedPointer(this), param);
+                emit parameterValueChanged(::toSharedPointer(const_cast<QnResource*>(this)), param);
             }
-            emit asyncParamGetDone(toSharedPointer(this), name, newValue, true);
+            emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, newValue, true);
             return true;
         }
     }
@@ -424,12 +425,12 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     {
         if (param.isPhysical())
         {
-            emit asyncParamGetDone(toSharedPointer(this), name, val, true);
+            emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, val, true);
             return true;
         }
     }
 
-    emit asyncParamGetDone(toSharedPointer(this), name, QVariant(), false);
+    emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
     return false;
 }
 
@@ -932,7 +933,7 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 
 int QnResource::initializationAttemptCount() const
 {
-    return m_initializationAttemptCount;
+    return m_initializationAttemptCount.load();
 }
 
 bool QnResource::isInitialized() const

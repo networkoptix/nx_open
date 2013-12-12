@@ -1,10 +1,11 @@
 #ifndef QN_ACTION_MANAGER_H
 #define QN_ACTION_MANAGER_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include <QHash>
-#include <QSet>
-#include <QVariant>
+#include <QtCore/QSet>
+#include <QtCore/QVariant>
+#include <QtCore/QPointer>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_index.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -160,7 +161,7 @@ private:
     QnActionTargetProvider *m_targetProvider;
 
     /** Guard for target provider. */
-    QWeakPointer<QObject> m_targetProviderGuard;
+    QPointer<QObject> m_targetProviderGuard;
 
     /** Currently active action that was activated via a shortcut. */
     QnAction *m_shortcutAction;

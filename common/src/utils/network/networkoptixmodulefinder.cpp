@@ -7,9 +7,9 @@
 
 #include <memory>
 
-#include <QDateTime>
-#include <QNetworkInterface>
-#include <QScopedArrayPointer>
+#include <QtCore/QDateTime>
+#include <QtNetwork/QNetworkInterface>
+#include <QtCore/QScopedArrayPointer>
 
 #include "socket.h"
 #include "system_socket.h"
@@ -53,7 +53,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
         const QHostAddress& addressToUse = *addrIter; //using any address of interface
         try
         {
-            //if( addressToUse == QHostAddress(QString::fromAscii("127.0.0.1")) )
+            //if( addressToUse == QHostAddress(QString::fromLatin1("127.0.0.1")) )
             //    continue;
             std::auto_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
             sock->bind( addressToUse.toString(), 0 );
@@ -64,7 +64,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
         }
         catch( const std::exception& e )
         {
-            NX_LOG( QString::fromAscii("Failed to create socket on local address %1. %2").arg(addressToUse.toString()).arg(QString::fromAscii(e.what())), cl_logERROR );
+            NX_LOG( QString::fromLatin1("Failed to create socket on local address %1. %2").arg(addressToUse.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR );
         }
     }
 }
@@ -107,7 +107,7 @@ static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
 void NetworkOptixModuleFinder::run()
 {
     saveSysThreadID();
-    NX_LOG( QString::fromAscii("NetworkOptixModuleFinder started"), cl_logDEBUG1 );
+    NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder started"), cl_logDEBUG1 );
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
     quint8 searchPacket[SEARCH_PACKET_LENGTH];
@@ -148,7 +148,7 @@ void NetworkOptixModuleFinder::run()
                 {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1 );
+                    NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1 );
                     //TODO/IMPL if corresponding interface is down, should remove socket from set
                 }
             }
@@ -161,7 +161,7 @@ void NetworkOptixModuleFinder::run()
         if( socketCount < 0 )
         {
             SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
             msleep( ERROR_WAIT_TIMEOUT_MS );
             continue;
         }
@@ -187,7 +187,7 @@ void NetworkOptixModuleFinder::run()
             if( bytesRead == -1 )
             {
                 SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
+                NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
                     arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
                 continue;
             }
@@ -198,14 +198,14 @@ void NetworkOptixModuleFinder::run()
             if( !response.deserialize( &responseBufStart, readBuffer.data() + bytesRead ) )
             {
                 //invalid response
-                NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
+                NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
                     arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1 );
                 continue;
             }
 
-            if(!m_compatibilityMode && Qn::calculateCustomization(response.customization.toLatin1().constData()) != qnCustomization() )
+            if(!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower() ) // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
             {
-                NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
+                NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
                     arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2 );
                 continue;
             }
@@ -222,12 +222,12 @@ void NetworkOptixModuleFinder::run()
                 const QHostAddress& localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());
                 if( p.second )  //new module found
                 {
-                    NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
+                    NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
                         arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
                 }
                 else    //new address of existing module
                 {
-                    NX_LOG( QString::fromAscii("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
+                    NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
                         arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
                 }
                 emit moduleFound(
@@ -271,5 +271,5 @@ void NetworkOptixModuleFinder::run()
         }
     }
 
-    NX_LOG( QString::fromAscii("NetworkOptixModuleFinder stopped"), cl_logDEBUG1 );
+    NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder stopped"), cl_logDEBUG1 );
 }

@@ -1,8 +1,10 @@
 #ifndef __STARDOT_RESOURCE_H__
 #define __STARDOT_RESOURCE_H__
 
-#include <QMap>
-#include <QMutex>
+#ifdef ENABLE_STARDOT
+
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -31,7 +33,7 @@ public:
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
     virtual bool hasDualStreaming() const override;
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
 
     QString getRtspUrl() const;
 
@@ -42,12 +44,11 @@ public:
 
     bool isAudioSupported() const;
 
-    __m128i* getMotionMaskBinData() const;
+    simd128i* getMotionMaskBinData() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override;
     virtual bool isResourceAccessible() override;
     virtual void setMotionMaskPhysical(int channel) override;
 private:
@@ -61,7 +62,8 @@ private:
     int m_maxFps;
     int m_rtspPort;
     QString m_rtspTransport;
-    __m128i *m_motionMaskBinData;
+    simd128i *m_motionMaskBinData;
 };
 
+#endif // #ifdef ENABLE_STARDOT
 #endif // __STARDOT_RESOURCE_H__

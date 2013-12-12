@@ -1,4 +1,7 @@
-#include <QTextStream>
+
+#ifdef ENABLE_ONVIF
+
+#include <QtCore/QTextStream>
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "utils/common/sleep.h"
@@ -86,7 +89,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
     }
     */  
 
-
+    m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
     result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED && canChangeStatus())
@@ -101,7 +104,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
     int currentFps = getFps();
     Qn::StreamQuality currentQuality = getQuality();
 
-    if (!m_streamUrl.isEmpty() && m_onvifRes->isCameraControlDisabled())
+    if (!m_streamUrl.isEmpty() && isCameraControlDisabled())
     {
         m_cachedFps = -1;
         *streamUrl = m_streamUrl;
@@ -131,7 +134,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
 CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bool isPrimary, QString* const streamUrl ) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
     CameraInfoParams info;
 
     CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary);
@@ -260,7 +263,6 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
             encoder.RateControl->EncodingInterval = 1;
     }
 
-
     if (!encoder.RateControl) 
     {
         qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: RateControl is NULL. UniqueId: " << m_onvifRes->getUniqueId();
@@ -369,7 +371,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
-    if (m_onvifRes->isCameraControlDisabled())
+    if (isCameraControlDisabled())
         return CameraDiagnostics::NoErrorResult(); // do not update video encoder params
 
     updateVideoEncoder(*encoderParamsToSet, isPrimary);
@@ -439,7 +441,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
 CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(const QString& name, const QString& token) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
     std::string stdStrToken = token.toStdString();
 
     CreateProfileReq request;
@@ -497,7 +499,7 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
 CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile* profile) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
 
     bool vSourceMatched = profile && profile->VideoSourceConfiguration && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();
     if (!vSourceMatched)
@@ -636,7 +638,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoap
     //TODO: #vasilenko UTF unuse std::string
     info.audioEncoderId = QString::fromStdString(result->token);
 
-    if (m_onvifRes->isCameraControlDisabled())
+    if (isCameraControlDisabled())
         return CameraDiagnostics::NoErrorResult();    // do not update audio encoder params
 
     updateAudioEncoder(*result, isPrimary);
@@ -710,7 +712,7 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
 CameraDiagnostics::Result QnOnvifStreamReader::sendAudioEncoderToCamera(AudioEncoder& encoder) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
 
     SetAudioConfigReq request;
     SetAudioConfigResp response;
@@ -762,3 +764,5 @@ bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
 {
     return m_onvifRes->secondaryResolutionIsLarge();
 }
+
+#endif //ENABLE_ONVIF

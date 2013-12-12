@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "digital_watchdog_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_zoom_ptz_controller.h"
@@ -200,7 +203,7 @@ QString QnPlWatchDogResource::fetchCameraModel()
 {
     QAuthenticator auth(getAuth());
     //TODO: #vasilenko UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), getTimeDrift());
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     DeviceInfoReq request;
     DeviceInfoResp response;
@@ -331,3 +334,5 @@ bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QnParam &par
 
     return false;
 }
+
+#endif //ENABLE_ONVIF

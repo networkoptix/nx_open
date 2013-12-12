@@ -1,7 +1,9 @@
 #ifndef QN_LOGIN_DIALOG_H
 #define QN_LOGIN_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <memory>
+
+#include <QtWidgets/QDialog>
 
 #include <client/client_settings.h>
 #include <utils/network/networkoptixmodulefinder.h>
@@ -10,14 +12,14 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "connectinfo.h"
+#include "compatibility_version_installation_dialog.h"
 
-class QDataWidgetMapper;
 class QStandardItemModel;
+class QStandardItem;
 class QUrl;
 
 class QnWorkbenchContext;
 class QnAbstractArchiveReader;
-class QnVideoCamera;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 
@@ -58,6 +60,11 @@ protected:
     void resetConnectionsModel();
 
     /**
+     * Reset part of connections model containing saved sessions.
+     */
+    void resetSavedSessionsModel();
+
+    /**
      * Reset part of connections model containing auto-found controllers.
      */
     void resetAutoFoundConnectionsModel();
@@ -70,7 +77,7 @@ private slots:
     void at_testButton_clicked();
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
-    void at_connectionsComboBox_currentIndexChanged(int index);
+    void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
     void at_connectFinished(int status, QnConnectInfoPtr connectInfo, int requestHandle);
 
     void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
@@ -79,7 +86,10 @@ private slots:
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;
-    QDataWidgetMapper *m_dataWidgetMapper;
+    QStandardItem* m_lastUsedItem;
+    QStandardItem* m_savedSessionsItem;
+    QStandardItem* m_autoFoundItem;
+
     int m_requestHandle;
     QnConnectInfoPtr m_connectInfo;
 
@@ -88,6 +98,7 @@ private:
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
     QMultiHash<QString, QUrl> m_foundEcs;
+    std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
 
     bool m_restartPending;
     bool m_autoConnectPending;

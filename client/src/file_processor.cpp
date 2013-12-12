@@ -4,8 +4,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
-#include <QtGui/QApplication>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_managment/resource_pool.h>
@@ -13,6 +13,7 @@
 #include <plugins/resources/archive/avi_files/avi_bluray_resource.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h>
 #include <plugins/resources/archive/filetypesupport.h>
+#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
@@ -58,16 +59,15 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls)
 QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file)
 {
     // saved layout
-    QString exportedLayoutMagic = QLatin1String("layout://");
     QString fileName = file;
-    if (fileName.startsWith(exportedLayoutMagic)) {
+    if (fileName.startsWith(QnLayoutFileStorageResource::layoutPrefix())) {
         /*
          * translating filename from something like this:
          *    layout:///home/user/videos/layout.nov?file.avi
          * to
          *    /home/user/videos/layout.nov
          */
-        fileName = fileName.remove(0, exportedLayoutMagic.length());
+        fileName = fileName.remove(0, QnLayoutFileStorageResource::layoutPrefix().length());
         int n = fileName.indexOf(QLatin1Char('?'));
         if (n >= 0)
             fileName = fileName.remove(n, fileName.length());

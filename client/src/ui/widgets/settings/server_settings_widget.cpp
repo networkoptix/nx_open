@@ -1,8 +1,8 @@
 #include "server_settings_widget.h"
 #include "ui_server_settings_widget.h"
 
-QnServerSettingsWidget::QnServerSettingsWidget(QWidget *parent, Qt::WindowFlags windowFlags):
-    QWidget(parent, windowFlags),
+QnServerSettingsWidget::QnServerSettingsWidget(QWidget *parent):
+    base_type(parent),
     ui(new Ui::ServerSettingsWidget)
 {
     ui->setupUi(this);
@@ -12,14 +12,10 @@ QnServerSettingsWidget::~QnServerSettingsWidget() {
     return;
 }
 
-void QnServerSettingsWidget::submit() {
-    ui->smtpSettingsWidget->submit();
+void QnServerSettingsWidget::submitToSettings() {
+    ui->smtpSettingsWidget->submitToSettings();
 }
 
-void QnServerSettingsWidget::update() {
-    ui->smtpSettingsWidget->update();
-}
-
-void QnServerSettingsWidget::updateFocusedElement() {
-    ui->smtpSettingsWidget->updateFocusedElement();
+void QnServerSettingsWidget::updateFromSettings() {
+    ui->smtpSettingsWidget->updateFromSettings();
 }

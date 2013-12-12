@@ -15,11 +15,11 @@ int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, Q
     if(!camera)
         return Qn::RecordingType_Never;
 
-    // TODO: #Elric this should be a resource parameter that is update from the server.
-    QnMediaResourcePtr mediaRes = camera.dynamicCast<QnMediaResource>();
+    // TODO: #Elric this should be a resource parameter that is updated from the server.
+    QnMediaResourcePtr mediaRes = camera;
     QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0));
     int dayOfWeek = dateTime.date().dayOfWeek();
-    int seconds = QTime().secsTo(dateTime.time());
+    int seconds = QTime(0, 0, 0, 0).secsTo(dateTime.time());
 
     foreach(const QnScheduleTask &task, camera->getScheduleTasks())
         if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
@@ -32,13 +32,13 @@ QString QnRecordingStatusHelper::tooltip(int recordingMode)
 {
     switch(recordingMode) {
     case Qn::RecordingType_Never:
-        return QObject::tr("Not recording");
+        return tr("Not recording");
     case Qn::RecordingType_Run:
-        return QObject::tr("Recording everything");
+        return tr("Recording everything");
     case Qn::RecordingType_MotionOnly:
-        return QObject::tr("Recording motion only");
+        return tr("Recording motion only");
     case Qn::RecordingType_MotionPlusLQ:
-        return QObject::tr("Recording motion and low quality");
+        return tr("Recording motion and low quality");
     default:
         return QString();
     }
@@ -49,13 +49,13 @@ QString QnRecordingStatusHelper::shortTooltip(int recordingMode)
 {
     switch(recordingMode) {
     case Qn::RecordingType_Never:
-        return QObject::tr("Not recording");
+        return tr("Not recording");
     case Qn::RecordingType_Run:
-        return QObject::tr("Continuous");
+        return tr("Continuous");
     case Qn::RecordingType_MotionOnly:
-        return QObject::tr("Motion only");
+        return tr("Motion only");
     case Qn::RecordingType_MotionPlusLQ:
-        return QObject::tr("Motion + Lo-Res");
+        return tr("Motion + Lo-Res");
     default:
         return QString();
     }

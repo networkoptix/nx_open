@@ -3,10 +3,10 @@
 
 #include <list>
 
-#include <QTime>
-#include <QList>
-#include <QMap>
-#include <QStringList>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QStringList>
 
 #include "utils/network/socket.h"
 
@@ -50,7 +50,7 @@ private:
 private:
     QList<AbstractDatagramSocket*> m_socketList;
     UDPSocket* m_receiveSocket;
-    QTime m_socketLifeTime;
+    QElapsedTimer m_socketLifeTime;
     //!list<pair<consumer id, consumer data> >. List is required to garantee, that consumers receive data in order they were registered
     std::list<std::pair<long, ConsumerDataList> > m_data;
     QStringList m_localAddressList;

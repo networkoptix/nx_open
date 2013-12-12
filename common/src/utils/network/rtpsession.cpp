@@ -1,13 +1,13 @@
 
-#include "rtpsession.h"
-#include "rtp_stream_parser.h"
-
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
 
-#include <QFile>
-#include <QUuid>
+#include "rtpsession.h"
+#include "rtp_stream_parser.h"
+
+#include <QtCore/QFile>
+#include <QtCore/QUuid>
 
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
@@ -371,6 +371,8 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
 }
 
 
+static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
+
 // ================================================== RTPSession ==========================================
 RTPSession::RTPSession():
     m_csec(2),
@@ -387,12 +389,17 @@ RTPSession::RTPSession():
     m_isAudioEnabled(true),
     m_useDigestAuth(false),
     m_numOfPredefinedChannels(0),
-    m_TimeOut(0)
+    m_TimeOut(0),
+    m_additionalReadBuffer( nullptr ),
+    m_additionalReadBufferPos( 0 ),
+    m_additionalReadBufferSize( 0 )
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 
     m_tcpSock.reset( SocketFactory::createStreamSocket() );
+
+    m_additionalReadBuffer = new char[ADDITIONAL_READ_BUFFER_CAPACITY];
 
     // todo: debug only remove me
 }
@@ -401,6 +408,8 @@ RTPSession::~RTPSession()
 {
     m_tcpSock->close();
     delete [] m_responseBuffer;
+
+    delete[] m_additionalReadBuffer;
 }
 
 int RTPSession::getLastResponseCode() const
@@ -638,7 +647,10 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     //unsigned int port = DEFAULT_RTP_PORT;
 
     if (m_tcpSock->isClosed())
+    {
         m_tcpSock->reopen();
+        m_additionalReadBufferSize = 0;
+    }
 
     m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT);
 
@@ -1436,7 +1448,7 @@ void RTPSession::sendBynaryResponse(quint8* buffer, int size)
 bool RTPSession::processTextResponseInsideBinData()
 {
     // have text response or part of text response.
-    int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+    int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
     if (readed <= 0)
         return false;
     m_responseBufferLen += readed;
@@ -1463,7 +1475,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
+            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
             if (readed <= 0)
                 return readed;
             m_responseBufferLen += readed;
@@ -1486,7 +1498,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = m_tcpSock->recv(data, dataRestLen);
+        int readed = readSocketWithBuffering(data, dataRestLen, true);
         if (readed <= 0)
             return readed;
         dataRestLen -= readed;
@@ -1495,7 +1507,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     return dataLen;
 }
 
-quint8* RTPSession::prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve)
+quint8* RTPSession::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve)
 {
     if (demuxedData.size() <= channel)
         demuxedData.resize(channel+1);
@@ -1507,12 +1519,12 @@ quint8* RTPSession::prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int c
     return (quint8*) dataVect->data() + dataVect->size();
 }
 
-int RTPSession::readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber)
+int RTPSession::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber)
 {
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
+            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
             if (readed <= 0)
                 return readed;
             m_responseBufferLen += readed;
@@ -1534,14 +1546,16 @@ int RTPSession::readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& chan
         memmove(m_responseBuffer, m_responseBuffer + copyLen, m_responseBufferLen - copyLen);
     data += copyLen;
     m_responseBufferLen -= copyLen;
+
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = m_tcpSock->recv(data, dataRestLen);
+        int readed = readSocketWithBuffering(data, dataRestLen, true);
         if (readed <= 0)
             return readed;
         dataRestLen -= readed;
         data += readed;
     }
+
     demuxedData[channelNumber]->finishWriting(dataLen);
     return dataLen;
 }
@@ -1928,4 +1942,37 @@ bool RTPSession::setTCPReadBufferSize(int value)
 QString RTPSession::getVideoLayout() const
 {
     return m_videoLayout;
+}
+
+int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
+{
+    const size_t bufSizeBak = bufSize;
+
+    //this method introduced to minimize m_tcpSock->recv calls (on isd edge m_tcpSock->recv call is rather heavy)
+    //TODO: #ak remove extra data copying
+
+    for( ;; )
+    {
+        if( m_additionalReadBufferSize > 0 )
+        {
+            const size_t bytesToCopy = std::min<int>( m_additionalReadBufferSize, bufSize );
+            memcpy( buf, m_additionalReadBuffer + m_additionalReadBufferPos, bytesToCopy );
+            m_additionalReadBufferPos += bytesToCopy;
+            m_additionalReadBufferSize -= bytesToCopy;
+            bufSize -= bytesToCopy;
+            buf += bytesToCopy;
+        }
+
+        if( readSome && (bufSize < bufSizeBak) )
+            return bufSizeBak - bufSize;
+        if( bufSize == 0 )
+            return bufSizeBak;
+
+        m_additionalReadBufferSize = m_tcpSock->recv( m_additionalReadBuffer, ADDITIONAL_READ_BUFFER_CAPACITY );
+        m_additionalReadBufferPos = 0;
+        if( m_additionalReadBufferSize <= 0 )
+            return bufSize == bufSizeBak
+                ? m_additionalReadBufferSize    //if could not read anything returning error
+                : bufSizeBak - bufSize;
+    }
 }

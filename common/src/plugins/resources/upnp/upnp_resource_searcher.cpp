@@ -4,15 +4,11 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/network/simple_http_client.h"
 
-#include <QXmlDefaultHandler>
+#include <QtXml/QXmlDefaultHandler>
 #include "core/resource_managment/resource_pool.h"
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 
-
-extern bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress);
-
-extern bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress);
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
@@ -114,7 +110,8 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         UDPSocket* sock = new UDPSocket();
         QString localAddress = iface.address.toString();
 
-        if (!sock->bindToInterface(iface))
+        //if (!sock->bindToInterface(iface))
+        if (!sock->setLocalAddressAndPort(iface.address.toString()))
         {
             delete sock;
             return 0;
@@ -265,7 +262,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         /*
         data.clear();
         data.append("OPTIONS /ietf/ipp/printer HTTP/1.1\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toAscii()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
+        data.append("Host: ").append(sock->getLocalAddress().toLatin1()).append(":").append(QByteArray::number(sock->getLocalPort())).append('\r\n');
         data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
         */

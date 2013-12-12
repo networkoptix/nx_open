@@ -19,7 +19,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include <business/business_action_factory.h>
 
-#include <QSqlRecord>
+#include <QtSql/QSqlRecord>
 
 /* Prohibit the usage of std::string-QString conversion functions that do not 
  * explicitly state the encoding used for conversion. 
@@ -120,6 +120,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setModel(QString::fromUtf8(pb_camera.model().c_str()));
     vCamera->setFirmware(QString::fromUtf8(pb_camera.firmware().c_str()));
+    vCamera->setVendor(QString::fromUtf8(pb_camera.vendor().c_str()));
 
     vCamera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
@@ -265,7 +266,7 @@ void parseServers(QnMediaServerResourceList &servers, const PbResourceList &pb_s
     }
 }
 
-void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResource)
+void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResource, QList<QnLayoutItemDataList>* orderedItems)
 {
     const pb::Layout& pb_layout = pb_layoutResource.GetExtension(pb::Layout::resource);
 
@@ -323,16 +324,18 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
         }
 
         layout->setItems(items);
+        if (orderedItems)
+            orderedItems->push_back(items);
     }
 }
 
-void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layouts)
+void parseLayouts(QnLayoutResourceList& layouts, const PbResourceList& pb_layouts, QList<QnLayoutItemDataList>* orderedItems)
 {
     for (PbResourceList::const_iterator ci = pb_layouts.begin(); ci != pb_layouts.end(); ++ci)
     {
         const pb::Resource& pb_layoutResource = *ci;
         QnLayoutResourcePtr layout;
-        parseLayout(layout, pb_layoutResource);
+        parseLayout(layout, pb_layoutResource, orderedItems);
         if (layout)
             layouts.append(layout);
         else
@@ -355,7 +358,7 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
     user->setGuid(QString::fromUtf8(pb_userResource.guid().c_str()));
     if (pb_user.has_email())
         user->setEmail(QString::fromUtf8(pb_user.email().c_str()));
-    user->setPassword(QString::fromUtf8(pb_user.password().c_str()));
+    user->setHash(QString::fromUtf8(pb_user.hash().c_str()));
     user->setDigest(QString::fromUtf8(pb_user.digest().c_str()));
 }
 
@@ -424,6 +427,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
     pb_camera.set_groupid(cameraPtr->getGroupId().toUtf8().constData());
     pb_camera.set_groupname(cameraPtr->getGroupName().toUtf8().constData());
+    pb_camera.set_vendor(cameraPtr->getVendor().toUtf8().constData());
 
     pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
     pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());
@@ -481,6 +485,7 @@ int serializeBusinessActionType(BusinessActionType::Value value) {
     case BusinessActionType::Diagnostics:           return pb::Diagnostics;
     case BusinessActionType::ShowPopup:             return pb::ShowPopup;
     case BusinessActionType::PlaySound:             return pb::PlaySound;
+    case BusinessActionType::PlaySoundRepeated:     return pb::PlaySoundRepeated;
     case BusinessActionType::SayText:               return pb::SayText;
     }
     return pb::NotDefinedAction;
@@ -505,6 +510,7 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
     case BusinessEventType::Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
     case BusinessEventType::MediaServer_Failure: return pb::MediaServer_Failure;
     case BusinessEventType::MediaServer_Conflict:return pb::MediaServer_Conflict;
+    case BusinessEventType::MediaServer_Started: return pb::MediaServer_Started;
     default:
         break;
     }
@@ -553,7 +559,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
     pb_layoutResource.set_parentid(layoutIn->getParentId().toInt());
     pb_layoutResource.set_name(layoutIn->getName().toUtf8().constData());
-    pb_layoutResource.set_guid(layoutIn->getGuid().toAscii().constData());
+    pb_layoutResource.set_guid(layoutIn->getGuid().toLatin1().constData());
 
     pb_layout.set_cellaspectratio(layoutIn->cellAspectRatio());
     pb_layout.set_cellspacingwidth(layoutIn->cellSpacing().width());
@@ -594,16 +600,16 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
 
 void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
 {
-	// We can't remove it by now, as it's required in .proto
+    // We can't remove it by now, as it's required in .proto
     // Will remove it ocasionally.
     pb_license.set_name("");
     pb_license.set_hwid(""); 
     pb_license.set_signature("");
-	/////////
+    /////////
 
-	pb_license.set_key(license->key().constData());
-	pb_license.set_cameracount(license->cameraCount());
-	pb_license.set_rawlicense(license->rawLicense().constData());
+    pb_license.set_key(license->key().constData());
+    pb_license.set_cameracount(license->cameraCount());
+    pb_license.set_rawlicense(license->rawLicense().constData());
 }
 
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
@@ -625,6 +631,7 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     case pb::Camera_Ip_Conflict:    return BusinessEventType::Camera_Ip_Conflict;
     case pb::MediaServer_Failure:   return BusinessEventType::MediaServer_Failure;
     case pb::MediaServer_Conflict:  return BusinessEventType::MediaServer_Conflict;
+    case pb::MediaServer_Started:  return BusinessEventType::MediaServer_Started;
     }
     return BusinessEventType::NotDefined;
 }
@@ -641,6 +648,7 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     case pb::Diagnostics:           return BusinessActionType::Diagnostics;
     case pb::ShowPopup:             return BusinessActionType::ShowPopup;
     case pb::PlaySound:             return BusinessActionType::PlaySound;
+    case pb::PlaySoundRepeated:     return BusinessActionType::PlaySoundRepeated;
     case pb::SayText:               return BusinessActionType::SayText;
     }
     return BusinessActionType::NotDefined;
@@ -666,19 +674,19 @@ void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, c
     parseServers(servers, pb_servers.resource(), resourceFactory);
 }
 
-void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data)
+void QnApiPbSerializer::deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems)
 {
     pb::Resources pb_layouts;
     if (!pb_layouts.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized layouts."));
 
-    parseLayouts(layouts, pb_layouts.resource());
+    parseLayouts(layouts, pb_layouts.resource(), orderedItems);
 }
 
-void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data)
+void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems)
 {
     QnLayoutResourceList layouts;
-    deserializeLayouts(layouts, data);
+    deserializeLayouts(layouts, data, orderedItems);
 
     if (layouts.isEmpty())
         layout = QnLayoutResourcePtr();
@@ -773,6 +781,7 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     connectInfo->ecsGuid = QString::fromUtf8(pb_connectInfo.ecsguid().c_str());
     connectInfo->publicIp = QString::fromUtf8(pb_connectInfo.publicip().c_str());
     connectInfo->brand = QString::fromUtf8(pb_connectInfo.brand().c_str());
+    connectInfo->allowCameraChanges = pb_connectInfo.allowcamerachanges();
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &businessRules, const QByteArray &data)
@@ -795,9 +804,6 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
 
 void QnApiPbSerializer::deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized actions."));
@@ -852,7 +858,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
     pb_serverResource.set_id(serverPtr->getId().toInt());
     pb_serverResource.set_name(serverPtr->getName().toUtf8().constData());
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
-    pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
+    pb_serverResource.set_guid(serverPtr->getGuid().toLatin1().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
     pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
@@ -893,6 +899,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     pb_userResource.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
+    pb_user.set_hash(userPtr->getHash().toUtf8().constData());
     pb_user.set_rights(userPtr->getPermissions());
     pb_user.set_isadmin(userPtr->isAdmin());
     pb_user.set_email(userPtr->getEmail().toUtf8().constData());
@@ -1015,9 +1022,6 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
 
 void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActionList &actions, QByteArray &data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
 
     for (int i = 0; i < actions.size(); ++i)
@@ -1103,7 +1107,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
         case pb::Resource_Type_Layout:
         {
             QnLayoutResourcePtr layout;
-            parseLayout(layout, pb_resource);
+            parseLayout(layout, pb_resource, 0);
             resource = layout;
             break;
         }
@@ -1113,39 +1117,39 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 // TODO: #Ivan. Temporary code
 QByteArray combineV1LicenseBlock(const QString& name, const QString& serial, const QString& hwid, int count, const QString& signature)
 {
-	return (QString() +
-		QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
-		QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
-		QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
+    return (QString() +
+        QString(QLatin1String("NAME=")) + name + QLatin1String("\n") + 
+        QLatin1String("SERIAL=") +  serial + QLatin1String("\n") + 
+        QLatin1String("HWID=") + hwid + QLatin1String("\n") + 
         QLatin1String("COUNT=") + QString::number(count) + QLatin1String("\n") +
-		QLatin1String("SIGNATURE=") + signature).toUtf8();
+        QLatin1String("SIGNATURE=") + signature).toUtf8();
 }
 
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId)
 {
-	if (!pb_license.rawlicense().empty()) {
-		license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
-		return;
-	}
+    if (!pb_license.rawlicense().empty()) {
+        license = QnLicensePtr(new QnLicense(pb_license.rawlicense().c_str()));
+        return;
+    }
 
-	// TODO: #Ivan. Temporary code
-	QByteArray block;
+    // TODO: #Ivan. Temporary code
+    QByteArray block;
 
     // Seems like this block can be removed as if license was activated in >=1.5, then it's stored as license block
     // otherwise it should have oldhwid.
     // TODO: #Ivan. Commented out by now. Will remove it later.
     //
-	//block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
-	//if (QnLicense(block).isValid(hardwareId)) {
-	//	license = QnLicensePtr(new QnLicense(block));
-	//	return;
-	//}
+    //block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+    //if (QnLicense(block).isValid(hardwareId)) {
+    //	license = QnLicensePtr(new QnLicense(block));
+    //	return;
+    //}
 
-	block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
+    block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
     if (QnLicense(block).isValid(oldHardwareId, QLatin1String(QN_PRODUCT_NAME_SHORT))) {
-		license = QnLicensePtr(new QnLicense(block));
-		return;
-	}
+        license = QnLicensePtr(new QnLicense(block));
+        return;
+    }
 }
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
@@ -1289,8 +1293,8 @@ void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses)
 
         QnLicensePtr license;
         // Parse license and validate its signature
-		if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
-			parseLicense(license, pb_license, qnLicensePool->oldHardwareId());
+        if (!pb_license.rawlicense().empty() || !pb_license.signature().empty())
+            parseLicense(license, pb_license, qnLicensePool->oldHardwareId());
 
         // Verify that license is valid and for our hardwareid
         if (license)

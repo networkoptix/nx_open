@@ -187,8 +187,11 @@ QVariant VariantAnimator::interpolated(const QVariant &from, const QVariant &to,
 }
 
 QVariant VariantAnimator::currentValue() const {
-    if(accessor() == NULL || targetObject() == NULL)
+    if(accessor() == NULL || targetObject() == NULL) {
+        if (internalType() == QMetaType::Void)
+            return QVariant();
         return QVariant(internalType(), static_cast<void *>(NULL));
+    }
 
     return toInternal(accessor()->get(targetObject()));
 }
@@ -234,8 +237,13 @@ void VariantAnimator::updateState(State newState) {
 
 void VariantAnimator::updateInternalType(int newInternalType) {
     m_internalType = newInternalType;
-    m_internalStartValue = QVariant(newInternalType, static_cast<void *>(NULL));
-    m_internalTargetValue = QVariant(newInternalType, static_cast<void *>(NULL));
+
+    m_internalStartValue = (newInternalType == QMetaType::Void)
+            ? QVariant()
+            : QVariant(newInternalType, static_cast<void *>(NULL));
+    m_internalTargetValue = (newInternalType == QMetaType::Void)
+            ? QVariant()
+            : QVariant(newInternalType, static_cast<void *>(NULL));
 
     m_linearCombinator = LinearCombinator::forType(internalType());
     if(m_linearCombinator == NULL) {

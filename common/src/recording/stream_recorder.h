@@ -1,7 +1,7 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
 extern "C"
@@ -28,7 +28,7 @@ class QnStreamRecorder : public QnAbstractDataConsumer
     Q_OBJECT
 
 public:
-    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithTime, Role_FileExportWithEmptyContext};
+    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
@@ -64,7 +64,9 @@ public:
     */
     void setNeedCalcSignature(bool value);
 
+#ifdef SIGN_FRAME_ENABLED
     void setSignLogo(const QImage& logo);
+#endif
 
     /*
     * Return hash value 
@@ -72,6 +74,7 @@ public:
     QByteArray getSignature() const;
 
     void setRole(Role role);
+    void setTimestampCorner(Qn::Corner pos);
 
     void setStorage(QnStorageResourcePtr storage);
 
@@ -107,14 +110,14 @@ signals:
     void recordingProgress(int progress);
 protected:
     virtual void endOfRun();
-    bool initFfmpegContainer(QnCompressedVideoDataPtr mediaData);
+    bool initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData);
 
     void setPrebufferingUsec(int value);
     void flushPrebuffer();
     int getPrebufferingUsec() const;
-    virtual bool needSaveData(QnAbstractMediaDataPtr media);
+    virtual bool needSaveData(QnConstAbstractMediaDataPtr media);
 
-    virtual bool saveMotion(QnMetaDataV1Ptr media);
+    virtual bool saveMotion(QnConstMetaDataV1Ptr media);
 
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
@@ -126,9 +129,9 @@ protected:
 
     bool addSignatureFrame(QString& errorString);
     void markNeedKeyData();
-    virtual bool saveData(QnAbstractMediaDataPtr md);
+    virtual bool saveData(QnConstAbstractMediaDataPtr md);
+    virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
 private:
-    void writeData(QnAbstractMediaDataPtr md, int streamIndex);
     void updateSignatureAttr();
     qint64 findNextIFrame(qint64 baseTime);
 protected:
@@ -154,7 +157,7 @@ private:
     QString m_fileName;
     qint64 m_startOffset;
     int m_prebufferingUsec;
-    QnUnsafeQueue<QnAbstractMediaDataPtr> m_prebuffer;
+    QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
     qint64 m_EofDateTime;
     bool m_endOfData;
@@ -163,14 +166,16 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
     QnCryptographicHash m_mdctx;
+#ifdef SIGN_FRAME_ENABLED
     QImage m_logo;
+#endif
     QString m_container;
     int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
-    QnCompressedVideoDataPtr m_lastIFrame;
+    QnConstCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
     QnFfmpegVideoTranscoder* m_videoTranscoder;
@@ -178,6 +183,7 @@ private:
     CodecID m_dstVideoCodec;
     qint64 m_onscreenDateOffset;
     Role m_role;
+    Qn::Corner m_timestampCorner;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;

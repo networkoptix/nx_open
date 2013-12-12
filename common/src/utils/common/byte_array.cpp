@@ -66,7 +66,7 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
 
     reserve(m_size + size);
 
-    qMemCopy(m_data + m_size, data, size);
+    memcpy(m_data + m_size, data, size);
 
     m_size += size;
 
@@ -80,7 +80,7 @@ unsigned int QnByteArray::write(quint8 value)
 
     reserve(m_size + 1);
 
-    qMemCopy(m_data + m_size, &value, 1);
+    memcpy(m_data + m_size, &value, 1);
 
     m_size += 1;
 
@@ -94,7 +94,7 @@ unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 
     reserve(pos + size);
 
-    qMemCopy(m_data + pos, data, size);
+    memcpy(m_data + pos, data, size);
 
     if (size + pos > m_size)
         m_size = size + pos;
@@ -179,7 +179,7 @@ bool QnByteArray::reallocate(unsigned int capacity)
     if(!data)
         return false;
 
-    qMemCopy(data, m_data, m_size);
+    memcpy(data, m_data, m_size);
     if( m_ownBuffer )
         qFreeAligned(m_data);
     m_capacity = capacity;

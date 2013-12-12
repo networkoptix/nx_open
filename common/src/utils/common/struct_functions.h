@@ -11,6 +11,14 @@
 
 #include <utils/common/json.h>
 
+#ifdef Q_MOC_RUN
+/* Qt5 moc chokes on these macros, so we provide dummy definitions. */
+#define QN_DEFINE_STRUCT_FUNCTIONS(...)
+#define QN_DEFINE_STRUCT_QHASH_FUNCTION(...)
+#define QN_DEFINE_STRUCT_OPERATOR_EQ(...)
+#define QN_DEFINE_STRUCT_DATA_STREAM_FUNCTIONS(...)
+#else // Q_MOC_RUN
+
 /**
  * This macro generates several functions for the given struct type. Tokens for
  * the functions to generate are passed in FUNCTION_SEQ parameter. Accepted
@@ -99,5 +107,6 @@ __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         
 
 #define QN_DEFINE_STRUCT_DATA_STREAM_STEP_I(R, OP, FIELD) OP value.FIELD
 
+#endif // Q_MOC_RUN
 
 #endif // QN_STRUCT_FUNCTIONS_H

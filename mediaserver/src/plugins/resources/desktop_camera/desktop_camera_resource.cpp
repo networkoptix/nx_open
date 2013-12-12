@@ -1,5 +1,9 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_resource.h"
 #include "desktop_camera_reader.h"
+#include "serverutil.h"
 
 const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
 
@@ -20,8 +24,11 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS)
+bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)
 {
+    Q_UNUSED(outputID)
+    Q_UNUSED(activate)
+    Q_UNUSED(autoResetTimeoutMS)
     return false;
 }
 
@@ -37,12 +44,12 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 
 QString QnDesktopCameraResource::gePhysicalIdPrefix() const
 {
-    return lit(ID_PREFIX);
+    return lit(ID_PREFIX) + serverGuid() + lit("_");
 }
 
 QString QnDesktopCameraResource::getUserName() const 
 { 
-    return getPhysicalId().mid(ID_PREFIX.size());
+    return getPhysicalId().mid(gePhysicalIdPrefix().size());
 }
 
 const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
@@ -53,3 +60,5 @@ const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbs
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
+
+#endif //ENABLE_DESKTOP_CAMERA

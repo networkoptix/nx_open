@@ -1,4 +1,6 @@
-#include <QTextStream>
+#ifdef ENABLE_ISD
+
+#include <QtCore/QTextStream>
 #include "isd_resource.h"
 #include "isd_stream_reader.h"
 #include "utils/common/sleep.h"
@@ -27,12 +29,13 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     QnResource::ConnectionRole role = getRole();
+    m_rtpStreamParser.setRole(role);
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 
     CLSimpleHTTPClient http (res->getHostAddress(), 80, 3000, res->getAuth());
 
-    if (!res->isCameraControlDisabled())
+    if (!isCameraControlDisabled())
     {
         QByteArray request;
         QString result;
@@ -181,3 +184,5 @@ const QnResourceAudioLayout* QnISDStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }
+
+#endif // #ifdef ENABLE_ISD

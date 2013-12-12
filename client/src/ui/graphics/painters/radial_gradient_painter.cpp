@@ -7,17 +7,12 @@
 #include <ui/graphics/opengl/gl_buffer_stream.h>
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
-    QnGlFunctions(context),
+    QOpenGLFunctions(context->contextHandle()),
     m_initialized(false),
     m_shader(QnColorShaderProgram::instance(context))
 {
     if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
-        return;
-    }
-
-    if(!(features() & OpenGL2_0)) {
-        qnWarning("OpenGL version 2.0 is required.");
         return;
     }
 
@@ -48,7 +43,7 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
 }
 
 QnRadialGradientPainter::~QnRadialGradientPainter() {
-    if(m_initialized)
+    if(m_initialized && QGLContext::currentContext())
         glDeleteBuffers(1, &m_buffer);
 }
 
@@ -75,5 +70,5 @@ void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
 }
 
 void QnRadialGradientPainter::paint() {
-    paint(1.0);
+    paint(Qt::white);
 }

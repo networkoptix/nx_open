@@ -32,7 +32,7 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     // 2. calc gamma
     qreal curValue = (median - leftPos) / qreal(rightPos-leftPos+1);
     qreal recValue = 0.5;
-    return qBound(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
+    return qBound<double>(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
 }
 
 void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int height, int stride, 

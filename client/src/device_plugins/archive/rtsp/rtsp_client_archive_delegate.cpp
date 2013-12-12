@@ -1,7 +1,7 @@
 
 #include "rtsp_client_archive_delegate.h"
 
-#include <QBuffer>
+#include <QtCore/QBuffer>
 
 extern "C"
 {
@@ -379,8 +379,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     
     // Check if archive moved to other video server
     qint64 timeMs = AV_NOPTS_VALUE;
-	if (result && result->timestamp >= 0)
-		timeMs = result->timestamp/1000; // do not switch server if AV_NOPTS_VALUE and any other invalid packet timings
+    if (result && result->timestamp >= 0)
+        timeMs = result->timestamp/1000; // do not switch server if AV_NOPTS_VALUE and any other invalid packet timings
     bool outOfRange = (quint64)timeMs != AV_NOPTS_VALUE && ((m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
                       (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs));
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
@@ -675,6 +675,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     QnFfmpegRtpParserPtr parser = itr.value();
     parser->processData(data, 0, dataSize, RtspStatistic(), result);
     m_position = parser->position();
+    if (result)
+        result->channelNumber = channelNum;
     return result;
 }
 
@@ -769,7 +771,7 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
-	if (longNoData || m_quality == MEDIA_Quality_Low)
+    if (longNoData || m_quality == MEDIA_Quality_Low)
     {
         m_blockReopening = true;
         close();

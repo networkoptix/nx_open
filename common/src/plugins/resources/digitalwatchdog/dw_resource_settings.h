@@ -1,7 +1,7 @@
 #ifndef dw_resource_settings_h_1957
 #define dw_resource_settings_h_1957
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 #include "../camera_settings/camera_settings.h"
 #include "utils/network/simple_http_client.h"

@@ -1,10 +1,9 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
-#include <QTimer>
-#include <QThread>
-#include <QMultiMap>
-#include <QImage>
+#include <QtCore/QTimer>
+#include <QtCore/QThread>
+#include <QtCore/QMultiMap>
 
 #include <core/resource/resource_fwd.h>
 

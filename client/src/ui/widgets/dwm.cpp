@@ -3,15 +3,17 @@
 #include <boost/type_traits/remove_pointer.hpp>
 
 #include <QtCore/QLibrary>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/common/warnings.h>
 
 #include <utils/common/invocation_event.h>
 
 #ifdef QN_HAS_DWM
-#include <QtGui/private/qwidget_p.h>
+#include <QtWidgets/5.1.1/QtWidgets/private/qwidget_p.h>
 #include <qt_windows.h>
+#include <utils/qt5port_win.h>
+
 #define NOMINMAX
 #include <Windows.h>
 #include <WindowsX.h>
@@ -86,6 +88,7 @@ public:
 
 #ifdef QN_HAS_DWM
     void updateFrameStrut();
+    bool winEvent(MSG *message, long *result);
     bool calcSizeEvent(MSG *message, long *result);
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
@@ -146,7 +149,7 @@ void QnDwmPrivate::init(QWidget *widget) {
     hasApi = widget != NULL && qn_dwm_isSupported();
 
 #ifdef QN_HAS_DWM
-    QLibrary dwmLib(QString::fromAscii("dwmapi"));
+    QLibrary dwmLib(QString::fromLatin1("dwmapi"));
     dwmIsCompositionEnabled         = (PtrDwmIsCompositionEnabled)      dwmLib.resolve("DwmIsCompositionEnabled");
     dwmExtendFrameIntoClientArea    = (PtrDwmExtendFrameIntoClientArea) dwmLib.resolve("DwmExtendFrameIntoClientArea");
     dwmEnableBlurBehindWindow       = (PtrDwmEnableBlurBehindWindow)    dwmLib.resolve("DwmEnableBlurBehindWindow");
@@ -222,7 +225,7 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     blurBehind.dwFlags = DWM_BB_ENABLE;
     blurBehind.hRgnBlur = NULL;
     
-    status = d->dwmEnableBlurBehindWindow(d->widget->winId(), &blurBehind);
+    status = d->dwmEnableBlurBehindWindow(widToHwnd(d->widget->winId()), &blurBehind);
     
     return SUCCEEDED(status);
 #else
@@ -269,7 +272,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     winMargins.cyBottomHeight   = margins.bottom();
     winMargins.cyTopHeight      = margins.top();
     
-    status = d->dwmExtendFrameIntoClientArea(d->widget->winId(), &winMargins);
+    status = d->dwmExtendFrameIntoClientArea(widToHwnd(d->widget->winId()), &winMargins);
     
     if(SUCCEEDED(status)) {
         /* Make sure that the extended frame is visible by setting the WNDCLASS's
@@ -277,7 +280,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
          * This also eliminates artifacts with white (default background color) 
          * fields appearing in client area when the window is resized. */
         HGDIOBJ blackBrush = GetStockObject(BLACK_BRUSH);
-        DWORD result = SetClassLongPtr(d->widget->winId(), GCLP_HBRBACKGROUND, (LONG_PTR) blackBrush);
+        DWORD result = SetClassLongPtr(widToHwnd(d->widget->winId()), GCLP_HBRBACKGROUND, (LONG_PTR) blackBrush);
         if(result == 0) {
             DWORD error = GetLastError();
             if(error != 0)
@@ -339,11 +342,11 @@ QMargins QnDwm::currentFrameMargins() const {
         return errorValue;
 
 #ifdef QN_HAS_DWM
-    HWND hwnd = d->widget->winId();
+    HWND hwnd = widToHwnd(d->widget->winId());
     BOOL status = S_OK;
 
     RECT clientRect;
-    status = GetClientRect(d->widget->winId(), &clientRect);
+    status = GetClientRect(widToHwnd(d->widget->winId()), &clientRect);
     if(!SUCCEEDED(status))
         return errorValue;
 
@@ -373,7 +376,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
         return false;
 
 #ifdef QN_HAS_DWM
-    HWND hwnd = d->widget->winId();
+    HWND hwnd = widToHwnd(d->widget->winId());
     BOOL status = S_OK;
 
     /* Store supplied frame margins. They will be used in WM_NCCALCSIZE handler. */
@@ -425,15 +428,26 @@ bool QnDwm::widgetEvent(QEvent *event) {
     return false;
 }
 
-#ifdef Q_OS_WIN
-bool QnDwm::widgetWinEvent(MSG *message, long *result) {
+
+bool QnDwm::widgetNativeEvent(const QByteArray &eventType, void *message, long *result) {
 #ifdef QN_HAS_DWM
     if(d->widget == NULL)
         return false;
 
-    if(d->hasDwm) {
+    return d->winEvent(static_cast<MSG *>(message), result);
+#else
+    Q_UNUSED(eventType)
+    Q_UNUSED(message)
+    Q_UNUSED(result)
+    return false;
+#endif // QN_HAS_DWM
+}
+
+#ifdef QN_HAS_DWM
+bool QnDwmPrivate::winEvent(MSG *message, long *result) {
+    if(hasDwm) {
         RESULT localResult;
-        BOOL handled = d->dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
+        BOOL handled = dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
         if (handled) {
             *result = localResult;
             return true;
@@ -441,20 +455,15 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     }
 
     switch(message->message) {
-    case WM_NCCALCSIZE:             return d->calcSizeEvent(message, result);
-    case WM_DWMCOMPOSITIONCHANGED:  return d->compositionChangedEvent(message, result);
-    case WM_NCACTIVATE:             return d->activateEvent(message, result);
-    case WM_NCPAINT:                return d->ncPaintEvent(message, result);
-    case WM_GETMINMAXINFO:          return d->getMinMaxInfoEvent(message, result);
+    case WM_NCCALCSIZE:             return calcSizeEvent(message, result);
+    case WM_DWMCOMPOSITIONCHANGED:  return compositionChangedEvent(message, result);
+    case WM_NCACTIVATE:             return activateEvent(message, result);
+    case WM_NCPAINT:                return ncPaintEvent(message, result);
+    case WM_GETMINMAXINFO:          return getMinMaxInfoEvent(message, result);
     default:                        return false;
     }
-#else
-    return false;
-#endif // QN_HAS_DWM
 }
-#endif // Q_OS_WIN
 
-#ifdef QN_HAS_DWM
 bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     if(!overrideFrameMargins)
         return false;

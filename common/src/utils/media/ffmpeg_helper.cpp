@@ -1,7 +1,7 @@
 #include "ffmpeg_helper.h"
 
-#include <QBuffer>
-#include <QDebug>
+#include <QtCore/QBuffer>
+#include <QtCore/QDebug>
 
 #include "nalUnits.h"
 #include "bitStream.h"

@@ -1,7 +1,7 @@
 
 #include "business_event_parameters.h"
 
-#include <QVariant>
+#include <QtCore/QVariant>
 
 #include "events/abstract_business_event.h"
 
@@ -185,7 +185,7 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     result.m_source = QString::fromUtf8(field.data(), field.size());
                     break;
                 case conflictsParam:
-                    result.m_conflicts = QString::fromAscii(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
+                    result.m_conflicts = QString::fromLatin1(field.data(), field.size()).split(QLatin1Char(STRING_LIST_DELIM)); // optimization. mac address list here. UTF is not required
                     break;
             default:
                 break;
@@ -410,7 +410,7 @@ QString QnBusinessEventParameters::getParamsKey() const
         case BusinessEventType::Network_Issue:
         case BusinessEventType::Storage_Failure:
             paramKey += QLatin1String("_") + QString::number(getReasonCode());
-            if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed)
+            if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpace)
                 paramKey += QLatin1String("_") + getReasonText();
             break;
         case BusinessEventType::Camera_Input:

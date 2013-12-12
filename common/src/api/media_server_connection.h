@@ -12,7 +12,7 @@
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
-
+#include "api/model/rebuild_archive_reply.h"
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
@@ -42,6 +42,7 @@ public:
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
+    void finished(int status, const QnRebuildArchiveReply &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);
@@ -52,7 +53,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
+    void finished(int status, const QnManualCameraSearchProcessReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
 
@@ -60,6 +61,13 @@ private:
     friend class QnAbstractReplyProcessor;
 };
 
+
+enum RebuildAction
+{
+    RebuildAction_ShowProgress,
+    RebuildAction_Start,
+    RebuildAction_Cancel
+};
 
 class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
@@ -156,7 +164,11 @@ public:
      */
     int getStatisticsAsync(QObject *target, const char *slot);
 
-    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot); 
+    int searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot);
+    int searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot);
+    int searchCameraAsyncStop(const QUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
+
+
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
@@ -179,6 +191,12 @@ public:
     int doCameraDiagnosticsStepAsync(
         const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
+
+    /**
+        \param slot Slot MUST have signature (int, QnRebuildArchiveReply, int)
+        \returns Request handle
+     */
+    int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

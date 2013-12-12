@@ -1,7 +1,7 @@
 #include "update_checker.h"
 
-#include <QDebug>
-#include <QNetworkReply>
+#include <QtCore/QDebug>
+#include <QtNetwork/QNetworkReply>
 
 QnUpdateChecker::QnUpdateChecker(const QUrl& url, const QString& platform, const QString& version, QObject *parent)
     : QObject(parent),

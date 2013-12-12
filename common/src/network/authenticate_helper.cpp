@@ -1,6 +1,8 @@
+
 #include "authenticate_helper.h"
 
-#include <QUuid>
+#include <QtCore/QUuid>
+#include <QtCore/QCryptographicHash>
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "utils/common/util.h"
@@ -15,6 +17,7 @@ static const QString REALM(lit("NetworkOptix"));
 QnAuthHelper::QnAuthHelper()
 {
     connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(qnResPool, SIGNAL(resourceChanged(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
 }
 
@@ -34,35 +37,35 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders)
+bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response)
 {
-    QString cookie = headers.value(lit("Cookie"));
+    QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
         QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
-        if (doCustomAuthorization(digest.toLatin1(), responseHeaders, QnAppServerConnectionFactory::sessionKey()))
+        if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::sessionKey()))
             return true;
-        if (doCustomAuthorization(digest.toLatin1(), responseHeaders, QnAppServerConnectionFactory::prevSessionKey()))
+        if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::prevSessionKey()))
             return true;
     }
 
-    QString authorization = headers.value(lit("Authorization"));
+    nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
     if (authorization.isEmpty()) {
-        addAuthHeader(responseHeaders);
+        addAuthHeader(response);
         return false;
     }
 
-    QString authType;
-    QString authData;
+    nx_http::StringType authType;
+    nx_http::StringType authData;
     int pos = authorization.indexOf(L' ');
     if (pos > 0) {
         authType = authorization.left(pos).toLower();
         authData = authorization.mid(pos+1);
     }
-    if (authType == lit("digest"))
-        return doDigestAuth(headers.method().toUtf8(), authData.toUtf8(), responseHeaders);
-    else if (authType == lit("basic"))
-        return doBasicAuth(authData.toUtf8(), responseHeaders);
+    if (authType == "digest")
+        return doDigestAuth( request.requestLine.method, authData, response);
+    else if (authType == "basic")
+        return doBasicAuth(authData, response);
     else
         return false;
 }
@@ -104,7 +107,7 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, QHttpResponseHeader& responseHeaders)
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::HttpResponse& responseHeaders)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
@@ -124,7 +127,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         QByteArray value = data.mid(pos+1);
         value = value.mid(1, value.length()-2);
         if (key == "username")
-            userName = value;
+            userName = value.toLower();
         else if (key == "response")
             response = value;
         else if (key == "nonce")
@@ -146,7 +149,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         QMutexLocker lock(&m_mutex);
         foreach(QnUserResourcePtr user, m_users)
         {
-            if (user->getName().toUtf8() == userName)
+            if (user->getName().toUtf8().toLower() == userName)
             {
                 QByteArray dbHash = user->getDigest().toUtf8();
 
@@ -168,20 +171,20 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     return false;
 }
 
-bool QnAuthHelper::doBasicAuth(const QByteArray& authData, QHttpResponseHeader& responseHeaders)
+bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse& /*response*/)
 {
     QByteArray digest = QByteArray::fromBase64(authData);
     int pos = digest.indexOf(':');
     if (pos == -1)
         return false;
-    QByteArray userName = digest.left(pos);
+    QByteArray userName = digest.left(pos).toLower();
     QByteArray password = digest.mid(pos+1);
 
     foreach(QnUserResourcePtr user, m_users)
     {
-        if (user->getName().toUtf8() == userName)
+        if (user->getName().toUtf8().toLower() == userName)
         {
-            QList<QByteArray> pswdData = user->getPassword().toUtf8().split('$');
+            QList<QByteArray> pswdData = user->getHash().toUtf8().split('$');
             if (pswdData.size() == 3)
             {
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
@@ -196,7 +199,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, QHttpResponseHeader& 
     return false;
 }
 
-bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, QHttpResponseHeader& responseHeaders, const QByteArray& sesionKey)
+bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::HttpResponse& /*response*/, const QByteArray& sesionKey)
 {
     QByteArray digestBin = QByteArray::fromHex(authData);
     QByteArray sessionKeyBin = QByteArray::fromHex(sesionKey);
@@ -213,12 +216,10 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, QHttpRespon
     return false;
 }
 
-void QnAuthHelper::addAuthHeader(QHttpResponseHeader& responseHeaders)
+void QnAuthHelper::addAuthHeader(nx_http::HttpResponse& response)
 {
-    //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
-    //responseHeaders.setValue(lit("WWW-Authenticate"), auth.arg(REALM).arg(getNonce()));
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
-    responseHeaders.setValue(lit("WWW-Authenticate"), auth.arg(REALM).arg(lit(getNonce())));
+    response.headers.insert( nx_http::HttpHeader( "WWW-Authenticate", auth.arg(REALM).arg(lit(getNonce())).toLatin1() ) );
 }
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const

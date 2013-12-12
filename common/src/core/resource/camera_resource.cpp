@@ -2,15 +2,13 @@
 #include "resource_consumer.h"
 #include "api/app_server_connection.h"
 
+#include <QtCore/QUrlQuery>
+
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
 static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
 
 QnVirtualCameraResource::QnVirtualCameraResource():
-    m_scheduleDisabled(true),
-    m_audioEnabled(false),
-    m_manuallyAdded(false),
-    m_advancedWorking(false),
     m_dtsFactory(0)
 {}
 
@@ -52,7 +50,7 @@ void QnPhysicalCameraResource::setUrl(const QString &url)
     QnVirtualCameraResource::setUrl(url); /* This call emits, so we should not invoke it under lock. */
 
     QMutexLocker lock(&m_mutex);
-    m_channelNumber = QUrl(url).queryItemValue(QLatin1String("channel")).toInt();
+    m_channelNumber = QUrlQuery(QUrl(url).query()).queryItemValue(QLatin1String("channel")).toInt();
     if (m_channelNumber > 0)
         m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
 }
@@ -106,71 +104,12 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
+CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
+    m_vendor = getVendorInternal();
+    return CameraDiagnostics::NoErrorResult();
+}
+
 // --------------- QnVirtualCameraResource ----------------------
-
-void QnVirtualCameraResource::updateInner(QnResourcePtr other)
-{
-    QnNetworkResource::updateInner(other);
-    QnSecurityCamResource::updateInner(other);
-
-    QnVirtualCameraResourcePtr camera = other.dynamicCast<QnVirtualCameraResource>();
-    if (camera)
-    {
-        m_scheduleDisabled = camera->isScheduleDisabled();
-        m_audioEnabled = camera->isAudioEnabled();
-        m_manuallyAdded = camera->isManuallyAdded();
-        m_model = camera->m_model;
-        m_firmware = camera->m_firmware;
-    }
-}
-
-void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
-{
-    QMutexLocker locker(&m_mutex);
-
-    if(m_scheduleDisabled == disabled)
-        return;
-
-    m_scheduleDisabled = disabled;
-
-    locker.unlock();
-    emit scheduleDisabledChanged(::toSharedPointer(this));
-}
-
-bool QnVirtualCameraResource::isScheduleDisabled() const
-{
-    return m_scheduleDisabled;
-}
-
-void QnVirtualCameraResource::setAudioEnabled(bool enabled)
-{
-    m_audioEnabled = enabled;
-}
-
-bool QnVirtualCameraResource::isAudioEnabled() const
-{
-    return m_audioEnabled;
-}
-
-bool QnVirtualCameraResource::isManuallyAdded() const
-{
-    return m_manuallyAdded;
-}
-void QnVirtualCameraResource::setManuallyAdded(bool value)
-{
-    m_manuallyAdded = value;
-}
-
-
-bool QnVirtualCameraResource::isAdvancedWorking() const
-{
-    return m_advancedWorking;
-}
-
-void QnVirtualCameraResource::setAdvancedWorking(bool value)
-{
-    m_advancedWorking = value;
-}
 
 QnAbstractDTSFactory* QnVirtualCameraResource::getDTSFactory()
 {
@@ -192,36 +131,13 @@ void QnVirtualCameraResource::unLockDTSFactory()
     m_mutex.unlock();
 }
 
-QString QnVirtualCameraResource::getModel() const
-{
-    QMutexLocker locker(&m_mutex);
-    return m_model;
-}
-
-void QnVirtualCameraResource::setModel(QString model)
-{
-    QMutexLocker locker(&m_mutex);
-    m_model = model;
-}
-
-QString QnVirtualCameraResource::getFirmware() const
-{
-    QMutexLocker locker(&m_mutex);
-    return m_firmware;
-}
-
-void QnVirtualCameraResource::setFirmware(QString firmware)
-{
-    QMutexLocker locker(&m_mutex);
-    m_firmware = firmware;
-}
 
 QString QnVirtualCameraResource::getUniqueId() const
 {
-	if (hasFlags(foreigner))
-		return getPhysicalId() + getParentId().toString();
-	else 
-		return getPhysicalId();
+    if (hasFlags(foreigner))
+        return getPhysicalId() + getParentId().toString();
+    else 
+        return getPhysicalId();
 
 }
 
@@ -249,11 +165,8 @@ int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
 
 QString QnVirtualCameraResource::toSearchString() const
 {
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
-    QString manufacturer = resourceType ? resourceType->getManufacture() : QString();
-
     QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << manufacturer; //TODO: #Elric evil!
+    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
     return result;
 }
 

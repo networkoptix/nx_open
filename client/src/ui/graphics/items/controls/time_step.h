@@ -3,11 +3,13 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QPair>
+#include <QtCore/QString>
 
 class QnTimeStep {
 public:
     enum Type {
         Milliseconds,
+        Hours,
         Days,
         Months,
         Years

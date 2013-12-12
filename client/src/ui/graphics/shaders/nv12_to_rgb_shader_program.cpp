@@ -8,35 +8,35 @@ namespace {
     /** 
      * This is a matrix from Wikipedia, http://en.wikipedia.org/wiki/Yuv. 
      */
-    qreal yuv_coef_ebu[4][4] = {
+    float yuv_coef_ebu[4][4] = {
         { 1.0,      1.0,     1.0,     0.0 },
         { 0.0,     -0.3960,  2.029,   0.0 },
         { 1.140,   -0.581,   0.0,     0.0 },
         { 0.0,      0.0,     0.0,     1.0 }
     };
 
-    qreal yuv_coef_bt601[4][4] = {
+    float yuv_coef_bt601[4][4] = {
         { 1.0,      1.0,     1.0,     0.0 },
         { 0.0,     -0.344,   1.773,   0.0 },
         { 1.403,   -0.714,   0.0,     0.0 },
         { 0.0,      0.0,     0.0,     1.0 } 
     };
 
-    qreal yuv_coef_bt709[4][4] = {
+    float yuv_coef_bt709[4][4] = {
         { 1.0,      1.0,     1.0,     0.0 },
         { 0.0,     -0.1870,  1.8556,  0.0 },
         { 1.5701,  -0.4664,  0.0,     0.0 },
         { 0.0,      0.0,     0.0,     1.0 }
     };
 
-    qreal yuv_coef_smtp240m[4][4] = {
+    float yuv_coef_smtp240m[4][4] = {
         { 1.0,      1.0,     1.0,     0.0 },
         { 0.0,     -0.2253,  1.8270,  0.0 },
         { 1.5756,  -0.5000,  0.0,     0.0 },
         { 0.0,      0.0,     0.0,     1.0 }
     };
 
-    qreal (&rawColorTransform(QnNv12ToRgbShaderProgram::Colorspace colorspace))[4][4] {
+    float (&rawColorTransform(QnNv12ToRgbShaderProgram::Colorspace colorspace))[4][4] {
         switch(colorspace) {
         case QnNv12ToRgbShaderProgram::YuvEbu: return yuv_coef_ebu;
         case QnNv12ToRgbShaderProgram::YuvBt601: return yuv_coef_bt601;
@@ -90,7 +90,7 @@ QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QO
 }
 
 QMatrix4x4 QnNv12ToRgbShaderProgram::colorTransform(Colorspace colorspace, bool fullRange) {
-    QMatrix4x4 result(reinterpret_cast<qreal *>(rawColorTransform(colorspace)));
+    QMatrix4x4 result(reinterpret_cast<float *>(rawColorTransform(colorspace)));
 
     result.translate(0.0, -0.5, -0.5);
 

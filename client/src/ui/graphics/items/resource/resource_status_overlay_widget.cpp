@@ -2,7 +2,8 @@
 
 #include <cmath> /* For std::sin. */
 
-#include <QDateTime>
+#include <QtCore/QDateTime>
+#include <QtCore/QtMath>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -58,6 +59,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_offlineStaticText.setText(tr("NO SIGNAL"));
     m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_serverOfflineStaticText.setText(tr("Server offline"));
+    m_serverOfflineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText.setText(tr("Unauthorized"));
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticSubText.setText(tr("Please check authentication information<br/>in camera settings"));
@@ -72,7 +75,6 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_diagnosticsButton = new QnTextButtonWidget(this);
     m_diagnosticsButton->setText(tr("Diagnose..."));
     m_diagnosticsButton->setFrameShape(Qn::RectangularFrame);
-    m_diagnosticsButton->setRelativeFontSize(0.5);
     m_diagnosticsButton->setRelativeFrameWidth(1.0 / 16.0);
     m_diagnosticsButton->setStateOpacity(0, 0.4);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
@@ -200,19 +202,31 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         }
     }
 
-    if (m_statusOverlay == Qn::NoDataOverlay) {
+    switch (m_statusOverlay) {
+    case Qn::NoDataOverlay:
         paintFlashingText(painter, m_noDataStaticText, 0.125);
-    } else if (m_statusOverlay == Qn::OfflineOverlay) {
+        break;
+    case Qn::OfflineOverlay:
         paintFlashingText(painter, m_offlineStaticText, 0.125);
-    } else if (m_statusOverlay == Qn::UnauthorizedOverlay) {
+        break;
+    case Qn::UnauthorizedOverlay:
         paintFlashingText(painter, m_unauthorizedStaticText, 0.125);
         paintFlashingText(painter, m_unauthorizedStaticSubText, 0.05, QPointF(0.0, 0.25));
-    } else if (m_statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
+        break;
+    case Qn::AnalogWithoutLicenseOverlay: {
         QRectF rect = this->rect();
         int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
         for (int i = -count; i <= count; i++)
             paintFlashingText(painter, m_analogLicenseStaticText, 0.035, QPointF(0.0, 0.06 * i));
+        break;
+        }
+    case Qn::ServerOfflineOverlay:
+        paintFlashingText(painter, m_serverOfflineStaticText, 0.125);
+        break;
+    default:
+        break;
     }
+
 }
 
 void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {

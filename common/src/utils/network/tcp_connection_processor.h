@@ -1,8 +1,8 @@
 #ifndef __TCP_CONNECTION_PROCESSOR_H__
 #define __TCP_CONNECTION_PROCESSOR_H__
 
-#include <QMutex>
-#include <QUrl>
+#include <QtCore/QMutex>
+#include <QtCore/QUrl>
 
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
@@ -15,7 +15,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    QnTCPConnectionProcessor(AbstractStreamSocket* socket);
+    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -31,7 +31,7 @@ public:
 
     void execute(QMutex& mutex);
     virtual void pleaseStop();
-    AbstractStreamSocket* socket() const;
+    QSharedPointer<AbstractStreamSocket> socket() const;
     QUrl getDecodedUrl() const;
 
     bool sendBuffer(const QnByteArray& sendBuffer);
@@ -39,6 +39,9 @@ public:
 
     bool readRequest();
     virtual void parseRequest();
+
+    virtual bool isTakeSockOwnership() const { return false; }
+    void releaseSocket();
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -58,7 +61,8 @@ protected:
     */
     int readSocket( quint8* buffer, int bufSize );
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, AbstractStreamSocket* socket);
+    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, QSharedPointer<AbstractStreamSocket> socket);
+
 private:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }

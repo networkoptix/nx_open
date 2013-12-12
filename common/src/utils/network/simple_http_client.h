@@ -3,7 +3,7 @@
 
 #include <QAuthenticator>
 #include <QtCore/QHash>
-#include <QString>
+#include <QtCore/QString>
 #include <QSharedPointer>
 
 #include "socket.h"
@@ -16,7 +16,8 @@ enum CLHttpStatus
     CL_HTTP_AUTH_REQUIRED = 401,
     CL_HTTP_NOT_FOUND,
 
-    CL_TRANSPORT_ERROR = -1
+    CL_TRANSPORT_ERROR = -1,
+    CL_NOT_HTTP = -2
 };
 
 QString toString( CLHttpStatus status );

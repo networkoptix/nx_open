@@ -20,6 +20,7 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(Busi
     case BusinessActionType::ShowPopup:
         return new QnPopupBusinessActionWidget(parent);
     case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
         return new QnPlaySoundBusinessActionWidget(parent);
     case BusinessActionType::SayText:
         return new QnSayTextBusinessActionWidget(parent);

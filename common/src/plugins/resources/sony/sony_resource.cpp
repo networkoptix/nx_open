@@ -1,7 +1,9 @@
 
+#ifdef ENABLE_ONVIF
+
 #include "sony_resource.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "onvif/soapMediaBindingProxy.h"
 #include <utils/network/http/asynchttpclient.h>
@@ -34,8 +36,8 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     }
 
     QAuthenticator auth(getAuth());
-    std::string login = auth.user().toStdString();
-    std::string password = auth.password().toStdString();
+    QString login = auth.user();
+    QString password = auth.password();
     std::string endpoint = getMediaUrl().toStdString();
 
     MediaSoapWrapper soapWrapperGet(endpoint.c_str(), login, password, getTimeDrift());
@@ -272,3 +274,5 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClient* /*httpClient*
 {
     //TODO/IMPL reconnect
 }
+
+#endif //ENABLE_ONVIF

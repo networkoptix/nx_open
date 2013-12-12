@@ -1,8 +1,9 @@
 #ifndef QN_CACHING_PROXY_WIDGET_H
 #define QN_CACHING_PROXY_WIDGET_H
 
-#include <QGraphicsProxyWidget>
-#include <QImage>
+#include <QtCore/QPointer>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtGui/QImage>
 
 /**
  * Proxy widget that caches the widget's surface.
@@ -35,7 +36,7 @@ private:
     }
 
 private:
-    QWeakPointer<QWidget> m_currentWidget;
+    QPointer<QWidget> m_currentWidget;
     int m_maxTextureSize;
     QPoint m_offset;
     QImage m_image;

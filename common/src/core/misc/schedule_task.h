@@ -2,8 +2,8 @@
 #define _vms_schedule_task_h
 
 #include <QSharedPointer>
-#include <QList>
-#include <QTextStream>
+#include <QtCore/QList>
+#include <QtCore/QTextStream>
 
 #include "utils/common/id.h"
 #include "core/dataprovider/media_streamdataprovider.h"

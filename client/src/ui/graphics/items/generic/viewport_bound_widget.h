@@ -34,18 +34,19 @@ public:
      */
     void setFixedSize(const QSizeF &fixedSize);
 
+    virtual void setGeometry(const QRectF &geometry) override;
+
 protected:
-    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-private slots:
+public slots:
     void updateScale(QGraphicsView *view = NULL);
 
 private:
     QSizeF m_fixedSize;
     bool m_inUpdateScale;
-    QWeakPointer<QGraphicsView> m_lastView;
-    QWeakPointer<Instrument> m_instrument;
+    QPointer<QGraphicsView> m_lastView;
+    QPointer<Instrument> m_instrument;
     QGraphicsScale *m_scale;
 };
 

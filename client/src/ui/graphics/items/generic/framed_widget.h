@@ -41,6 +41,8 @@ public:
     void setWindowColor(const QColor &windowColor);
 
 protected:
+    QPainterPath framePath(const QRectF &rect) const;
+
     void paintFrame(QPainter *painter, const QRectF &rect);
 
     void initSelf(QGraphicsWidget *self);

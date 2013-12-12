@@ -2,7 +2,7 @@
 #define QN_RESOURCE_SELECTION_DIALOG_DELEGATE_H
 
 #include <QtCore/QObject>
-#include <QtGui/QLabel>
+#include <QtWidgets/QLabel>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
@@ -27,6 +27,8 @@ public:
      * @return                      True if selection is valid and OK button can be pressed.
      */
     virtual bool validate(const QnResourceList &selectedResources);
+
+    virtual bool isValid(const QnResourcePtr &resource);
 };
 
 
@@ -38,6 +40,7 @@ public:
     ~QnCheckResourceAndWarnDelegate();
     virtual void init(QWidget* parent) override;
     virtual bool validate(const QnResourceList &selected) override;
+    virtual bool isValid(const QnResourcePtr &resource) override;
 
 protected:
     virtual bool isResourceValid(const QnSharedResourcePointer<ResourceType> &resource) const = 0;

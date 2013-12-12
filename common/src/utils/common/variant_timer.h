@@ -3,9 +3,10 @@
 
 #include <boost/array.hpp>
 
-#include <QAbstractEventDispatcher>
-#include <QVariant>
-#include <QTimer>
+#include <QtCore/QAbstractEventDispatcher>
+#include <QtCore/QVariant>
+#include <QtCore/QTimer>
+#include <QtCore/QTimerEvent>
 
 class QnVariantTimer: public QTimer {
     Q_OBJECT

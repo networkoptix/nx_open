@@ -192,14 +192,14 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
 const QnResourceVideoLayout* QnArchiveStreamReader::getDPVideoLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-    	m_delegate->open(m_resource);
+        m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
 const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 {
-	if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-    	m_delegate->open(m_resource);
+    if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
+        m_delegate->open(m_resource);
     return m_delegate->getAudioLayout();
 }
 
@@ -209,7 +209,7 @@ bool QnArchiveStreamReader::init()
 
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
-	MediaQuality quality = m_quality;
+    MediaQuality quality = m_quality;
     m_jumpMtx.unlock();
     bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
     if (imSeek && (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode))
@@ -217,7 +217,7 @@ bool QnArchiveStreamReader::init()
         // It is optimization: open and jump at same time
         while (1)
         {
-			m_delegate->setQuality(quality, true);
+            m_delegate->setQuality(quality, true);
             qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
             bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
             Q_UNUSED(seekOk)
@@ -225,15 +225,15 @@ bool QnArchiveStreamReader::init()
             if (m_requiredJumpTime == requiredJumpTime) {
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     m_requiredJumpTime = AV_NOPTS_VALUE;
-				m_oldQuality = quality;
-				m_oldQualityFastSwitch = true;
+                m_oldQuality = quality;
+                m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
-			quality = m_quality;
+            quality = m_quality;
             m_jumpMtx.unlock();
         }
     }
@@ -424,7 +424,7 @@ begin_label:
                 beforeJumpInternal(displayTime);
                 if (!exactJumpToSpecifiedFrame && channelCount > 1)
                     setNeedKeyData();
-        		m_outOfPlaybackMask = false;
+                m_outOfPlaybackMask = false;
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
@@ -720,6 +720,10 @@ begin_label:
                 }
             }
         }
+    }
+    else if (m_currentData->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        m_skipFramesToTime = 0;
     }
 
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
@@ -1241,5 +1245,5 @@ void QnArchiveStreamReader::resume()
 
 bool QnArchiveStreamReader::isRealTimeSource() const
 {
-    return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
+    return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == (qint64)AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
 }

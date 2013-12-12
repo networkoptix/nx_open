@@ -20,6 +20,8 @@ int QnBusiness::eventHelpId(BusinessEventType::Value type) {
         return Qn::EventsActions_MediaServerFailure_Help;
     case BusinessEventType::MediaServer_Conflict:
         return Qn::EventsActions_MediaServerConflict_Help;
+    case BusinessEventType::MediaServer_Started:
+        return Qn::EventsActions_MediaServerStarted_Help;
     default:
         return -1;
     }
@@ -39,6 +41,7 @@ int QnBusiness::actionHelpId(BusinessActionType::Value type) {
     case BusinessActionType::ShowPopup:
         return Qn::EventsActions_ShowNotification_Help;
     case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
         return Qn::EventsActions_PlaySound_Help;
     case BusinessActionType::SayText:
         return Qn::EventsActions_Speech_Help;

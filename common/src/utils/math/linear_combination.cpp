@@ -44,6 +44,7 @@ namespace {
     public:
         Storage() {
             insert(new NoopLinearCombinator());
+            insert(QMetaType::Void, new NoopLinearCombinator());
             insert(new StandardLinearCombinator<int>());
             insert(new StandardLinearCombinator<long>());
             insert(new StandardLinearCombinator<long long>());

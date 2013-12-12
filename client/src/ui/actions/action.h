@@ -1,13 +1,15 @@
 #ifndef QN_ACTION_H
 #define QN_ACTION_H
 
-#include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
-#include <QtGui/QAction>
+#include <QtCore/QPointer>
+#include <QtWidgets/QAction>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
+#include "action_conditions.h"
+#include "action_factories.h"
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -214,8 +216,8 @@ private:
     QHash<int, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
-    QWeakPointer<QnActionCondition> m_condition;
-    QWeakPointer<QnActionFactory> m_childFactory;
+    QPointer<QnActionCondition> m_condition;
+    QPointer<QnActionFactory> m_childFactory;
 
     QList<QnAction *> m_children;
     QHash<QnActionCondition *, QString> m_textConditions;

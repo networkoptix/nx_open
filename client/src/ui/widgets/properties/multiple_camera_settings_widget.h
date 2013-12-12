@@ -1,7 +1,7 @@
 #ifndef QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 #define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
@@ -30,6 +30,8 @@ public:
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
 
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
     void updateFromResources();
     void submitToResources();
     void reject();

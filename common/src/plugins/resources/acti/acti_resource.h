@@ -1,8 +1,10 @@
 #ifndef __ACTI_RESOURCE_H__
 #define __ACTI_RESOURCE_H__
 
-#include <QMap>
-#include <QMutex>
+#ifdef ENABLE_ACTI
+
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -41,7 +43,7 @@ public:
 
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
     virtual bool hasDualStreaming() const override;
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
@@ -81,7 +83,6 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual void setCropingPhysical(QRect croping) override;
     virtual bool isResourceAccessible();
     //!Implementation of QnSecurityCamResource::startInputPortMonitoring
     virtual bool startInputPortMonitoring() override;
@@ -149,4 +150,5 @@ private:
     bool m_inputMonitored;
 };
 
+#endif // #ifdef ENABLE_ACTI
 #endif // __ACTI_RESOURCE_H__

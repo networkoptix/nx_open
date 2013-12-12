@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 #ifndef ssize_t
 #define ssize_t qint64

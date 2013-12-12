@@ -53,8 +53,10 @@ protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
+
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void tick(int deltaMSecs) override;
 

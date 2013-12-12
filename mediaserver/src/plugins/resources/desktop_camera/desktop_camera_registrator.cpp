@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_registrator.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
@@ -8,10 +11,10 @@ class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(AbstractStreamSocket* socket, QnTcpListener* _owner):
+QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket)
 {
-
+    Q_UNUSED(_owner)
 }
 
 void QnDesktopCameraRegistrator::run()
@@ -20,7 +23,9 @@ void QnDesktopCameraRegistrator::run()
 
     parseRequest();
     sendResponse("HTTP", 200, QByteArray());
-    QString userName = d->requestHeaders.value("user-name");
+    QByteArray userName = d->request.headers["user-name"];
     QnDesktopCameraResourceSearcher::instance().registerCamera(d->socket, userName);
-        d->socket = 0; // remove ownership from socket
+    d->socket.clear();
 }
+
+#endif //ENABLE_DESKTOP_CAMERA

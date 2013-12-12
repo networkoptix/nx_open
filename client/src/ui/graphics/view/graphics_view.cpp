@@ -1,6 +1,6 @@
 #include "graphics_view.h"
 
-#include <QtOpenGL>
+#include <QtOpenGL/QtOpenGL>
 
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
@@ -8,6 +8,21 @@
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 #   include <QtCore/QDateTime>
 #endif
+
+namespace {
+    class PaintDevice: public QPaintDevice {
+    public:
+        QPaintDevice *invokeRedirected(QPoint *offset) const {
+            return redirected(offset);
+        }
+    };
+
+    PaintDevice *open(QPaintDevice *paintDevice) {
+        return static_cast<PaintDevice *>(paintDevice);
+    }
+
+} // anonymous namespace
+
 
 QnLayerPainter::QnLayerPainter(): m_view(NULL), m_layer(static_cast<QGraphicsScene::SceneLayer>(0)) {}
 
@@ -25,7 +40,10 @@ QnGraphicsView::QnGraphicsView(QGraphicsScene *scene, QWidget * parent):
     QGraphicsView(scene, parent),
     m_paintFlags(0),
     m_behaviorFlags(0)
-{}
+{
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+}
 
 QnGraphicsView::~QnGraphicsView() {
     while(!m_backgroundPainters.empty())
@@ -83,8 +101,13 @@ void QnGraphicsView::showEvent(QShowEvent *event) {
     }
 }
 
+bool QnGraphicsView::isInRedirectedPaint() const {
+    QPoint offset;
+    return open(viewport())->invokeRedirected(&offset) != viewport();
+}
+
 void QnGraphicsView::paintEvent(QPaintEvent *event) {
-    if(!(m_paintFlags & PaintOnExternalSurfaces) && QPainter::redirected(viewport(), NULL) != viewport())
+    if(isInRedirectedPaint())
         return;
 
 #ifdef QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
@@ -103,6 +126,31 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
     if(deltaCpuTime > 1.0)
         qDebug() << QString("VIEWPORT PAINT: %1ms real time; %2ms cpu time (%3 cycles)").arg(deltaTime, 5).arg(deltaCpuTime, 8, 'g', 5).arg(deltaCycles, 8);
 #endif
+}
+
+void QnGraphicsView::wheelEvent(QWheelEvent *event) {
+    if(m_behaviorFlags & InvokeInheritedMouseWheel) {
+        base_type::wheelEvent(event);
+    } else {
+        /* Copied from QGraphicsView implementation.
+         * The only difference: we don't invoke QAbstractScrollArea implementation. */
+        if (!scene() || !isInteractive())
+            return;
+
+        event->ignore();
+
+        QGraphicsSceneWheelEvent wheelEvent(QEvent::GraphicsSceneWheel);
+        wheelEvent.setWidget(viewport());
+        wheelEvent.setScenePos(mapToScene(event->pos()));
+        wheelEvent.setScreenPos(event->globalPos());
+        wheelEvent.setButtons(event->buttons());
+        wheelEvent.setModifiers(event->modifiers());
+        wheelEvent.setDelta(event->delta());
+        wheelEvent.setOrientation(event->orientation());
+        wheelEvent.setAccepted(false);
+        QApplication::sendEvent(scene(), &wheelEvent);
+        event->setAccepted(wheelEvent.isAccepted());
+    }
 }
 
 void QnGraphicsView::drawBackground(QPainter *painter, const QRectF &rect) {

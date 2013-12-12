@@ -1,8 +1,8 @@
 #ifndef QN_COUNTER_H
 #define QN_COUNTER_H
 
-#include <QObject>
-#include <QMutex>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 class QnCounter: public QObject {
     Q_OBJECT;

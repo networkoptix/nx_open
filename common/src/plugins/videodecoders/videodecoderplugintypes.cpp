@@ -126,31 +126,31 @@ namespace DecoderParameter
 
 DecoderResourcesNameset::DecoderResourcesNameset()
 {
-    registerResource( DecoderParameter::decoderName, QString::fromAscii("decoderName"), QVariant::String );
-    registerResource( DecoderParameter::osName, QString::fromAscii("osName"), QVariant::String );
-    registerResource( DecoderParameter::architecture, QString::fromAscii("architecture"), QVariant::String );
-    registerResource( DecoderParameter::cpuString, QString::fromAscii("cpuString"), QVariant::String );
-    registerResource( DecoderParameter::cpuFamily, QString::fromAscii("cpuFamily"), QVariant::String );
-    registerResource( DecoderParameter::cpuModel, QString::fromAscii("cpuModel"), QVariant::String );
-    registerResource( DecoderParameter::cpuStepping, QString::fromAscii("cpuStepping"), QVariant::String );
-    registerResource( DecoderParameter::displayAdapterDeviceString, QString::fromAscii("displayAdapterDeviceString"), QVariant::String );
-    registerResource( DecoderParameter::gpuDeviceString, QString::fromAscii("gpuDeviceString"), QVariant::String );
-    registerResource( DecoderParameter::driverVersion, QString::fromAscii("driverVersion"), QVariant::String );
-    registerResource( DecoderParameter::gpuVendorId, QString::fromAscii("gpuVendorId"), QVariant::UInt );
-    registerResource( DecoderParameter::gpuDeviceId, QString::fromAscii("gpuDeviceId"), QVariant::UInt );
-    registerResource( DecoderParameter::gpuRevision, QString::fromAscii("gpuRevision"), QVariant::UInt );
-    registerResource( DecoderParameter::sdkVersion, QString::fromAscii("sdkVersion"), QVariant::String );
-    registerResource( DecoderParameter::framePictureWidth, QString::fromAscii("framePictureWidth"), QVariant::Int );
-    registerResource( DecoderParameter::framePictureHeight, QString::fromAscii("framePictureHeight"), QVariant::Int );
-    registerResource( DecoderParameter::framePictureSize, QString::fromAscii("framePictureSize"), QVariant::UInt );
-    registerResource( DecoderParameter::fps, QString::fromAscii("fps"), QVariant::Double );
-    registerResource( DecoderParameter::speed, QString::fromAscii("speed"), QVariant::Double );
-    registerResource( DecoderParameter::pixelsPerSecond, QString::fromAscii("pixelsPerSecond"), QVariant::ULongLong );
-    registerResource( DecoderParameter::videoMemoryUsage, QString::fromAscii("videoMemoryUsage"), QVariant::ULongLong );
-    registerResource( DecoderParameter::availableVideoMemory, QString::fromAscii("availableVideoMemory"), QVariant::ULongLong );
-    registerResource( DecoderParameter::simultaneousStreamCount, QString::fromAscii("simultaneousStreamCount"), QVariant::Int );
-    registerResource( DecoderParameter::totalCurrentNumberOfDecoders, QString::fromAscii("totalCurrentNumberOfDecoders"), QVariant::Int );
-    registerResource( DecoderParameter::graphicAdapterCount, QString::fromAscii("graphicAdapterCount"), QVariant::UInt );
+    registerResource( DecoderParameter::decoderName, QString::fromLatin1("decoderName"), QVariant::String );
+    registerResource( DecoderParameter::osName, QString::fromLatin1("osName"), QVariant::String );
+    registerResource( DecoderParameter::architecture, QString::fromLatin1("architecture"), QVariant::String );
+    registerResource( DecoderParameter::cpuString, QString::fromLatin1("cpuString"), QVariant::String );
+    registerResource( DecoderParameter::cpuFamily, QString::fromLatin1("cpuFamily"), QVariant::String );
+    registerResource( DecoderParameter::cpuModel, QString::fromLatin1("cpuModel"), QVariant::String );
+    registerResource( DecoderParameter::cpuStepping, QString::fromLatin1("cpuStepping"), QVariant::String );
+    registerResource( DecoderParameter::displayAdapterDeviceString, QString::fromLatin1("displayAdapterDeviceString"), QVariant::String );
+    registerResource( DecoderParameter::gpuDeviceString, QString::fromLatin1("gpuDeviceString"), QVariant::String );
+    registerResource( DecoderParameter::driverVersion, QString::fromLatin1("driverVersion"), QVariant::String );
+    registerResource( DecoderParameter::gpuVendorId, QString::fromLatin1("gpuVendorId"), QVariant::UInt );
+    registerResource( DecoderParameter::gpuDeviceId, QString::fromLatin1("gpuDeviceId"), QVariant::UInt );
+    registerResource( DecoderParameter::gpuRevision, QString::fromLatin1("gpuRevision"), QVariant::UInt );
+    registerResource( DecoderParameter::sdkVersion, QString::fromLatin1("sdkVersion"), QVariant::String );
+    registerResource( DecoderParameter::framePictureWidth, QString::fromLatin1("framePictureWidth"), QVariant::Int );
+    registerResource( DecoderParameter::framePictureHeight, QString::fromLatin1("framePictureHeight"), QVariant::Int );
+    registerResource( DecoderParameter::framePictureSize, QString::fromLatin1("framePictureSize"), QVariant::UInt );
+    registerResource( DecoderParameter::fps, QString::fromLatin1("fps"), QVariant::Double );
+    registerResource( DecoderParameter::speed, QString::fromLatin1("speed"), QVariant::Double );
+    registerResource( DecoderParameter::pixelsPerSecond, QString::fromLatin1("pixelsPerSecond"), QVariant::ULongLong );
+    registerResource( DecoderParameter::videoMemoryUsage, QString::fromLatin1("videoMemoryUsage"), QVariant::ULongLong );
+    registerResource( DecoderParameter::availableVideoMemory, QString::fromLatin1("availableVideoMemory"), QVariant::ULongLong );
+    registerResource( DecoderParameter::simultaneousStreamCount, QString::fromLatin1("simultaneousStreamCount"), QVariant::Int );
+    registerResource( DecoderParameter::totalCurrentNumberOfDecoders, QString::fromLatin1("totalCurrentNumberOfDecoders"), QVariant::Int );
+    registerResource( DecoderParameter::graphicAdapterCount, QString::fromLatin1("graphicAdapterCount"), QVariant::UInt );
 }
 
 MediaStreamParameterSumContainer::MediaStreamParameterSumContainer(

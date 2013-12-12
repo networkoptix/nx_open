@@ -11,7 +11,7 @@
 #include "streaming/hls/hls_live_playlist_manager.h"
 #include "utils/media/media_stream_cache.h"
 #include "utils/media/mediaindex.h"
-
+#include "core/dataprovider/live_stream_provider.h"
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
@@ -27,14 +27,14 @@ class QnVideoCamera: public QObject
 public:
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
-    QnAbstractMediaStreamDataProviderPtr getLiveReader(QnResource::ConnectionRole role);
+    QnLiveStreamProviderPtr getLiveReader(QnResource::ConnectionRole role);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue);
 
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
-    QnCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream);
-    QnCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime);
-    QnCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream);
+    QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream) const;
+    QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime) const;
+    QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
 
     void beforeStop();
 
@@ -80,8 +80,8 @@ private:
     QMutex m_readersMutex;
     QMutex m_getReaderMutex;
     QnResourcePtr m_resource;
-    QnAbstractMediaStreamDataProviderPtr m_primaryReader;
-    QnAbstractMediaStreamDataProviderPtr m_secondaryReader;
+    QnLiveStreamProviderPtr m_primaryReader;
+    QnLiveStreamProviderPtr m_secondaryReader;
 
     QnVideoCameraGopKeeper* m_primaryGopKeeper;
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;

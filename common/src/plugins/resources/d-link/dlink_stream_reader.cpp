@@ -1,5 +1,7 @@
+#ifdef ENABLE_DLINK
+
 #include "dlink_stream_reader.h"
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
@@ -51,6 +53,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         return CameraDiagnostics::NoErrorResult();
 
     //setRole(QnResource::Role_SecondaryLiveVideo);
+    m_rtpReader.setRole(getRole());
 
     //==== init if needed
     QnResource::ConnectionRole role = getRole();
@@ -96,7 +99,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
 
-    if (!res->isCameraControlDisabled()) {
+    if (!isCameraControlDisabled()) {
         if (role != QnResource::Role_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
         {
             res->setMotionMaskPhysical(0);
@@ -296,7 +299,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QTextStream t(&result);
 
     t << "config/video.cgi?profileid=" << profileNum;
-    if (!res->isCameraControlDisabled())
+    if (!isCameraControlDisabled())
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 
@@ -533,5 +536,8 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000*1000*1000; // 1000 sec 
+    filterMotionByMask(motion);
     return motion;
 }
+
+#endif // #ifdef ENABLE_DLINK

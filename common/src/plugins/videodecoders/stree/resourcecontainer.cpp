@@ -7,6 +7,12 @@
 
 namespace stree
 {
+    ResourceContainer::ResourceContainer()
+    :
+        m_first( false )
+    {
+    }
+
     bool ResourceContainer::get( int resID, QVariant* const value ) const
     {
         std::map<int, QVariant>::const_iterator it = m_mediaStreamPameters.find( resID );
@@ -20,6 +26,33 @@ namespace stree
     void ResourceContainer::put( int resID, const QVariant& value )
     {
         m_mediaStreamPameters[resID] = value;
+    }
+
+    void ResourceContainer::goToBeginning() 
+    {
+        m_curIter = m_mediaStreamPameters.begin();
+        m_first = true;
+    }
+
+    bool ResourceContainer::next()
+    {
+        if( m_curIter == m_mediaStreamPameters.end() )
+            return false;
+        if( m_first )
+            m_first = false;
+        else
+            ++m_curIter;
+        return m_curIter != m_mediaStreamPameters.end();
+    }
+
+    int ResourceContainer::resID() const
+    {
+        return m_curIter->first;
+    }
+
+    QVariant ResourceContainer::value() const
+    {
+        return m_curIter->second;
     }
 
 

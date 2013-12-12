@@ -1,6 +1,8 @@
 #ifndef dlink_resource_h_2215
 #define dlink_resource_h_2215
 
+#ifdef ENABLE_DLINK
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -60,7 +62,7 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override; // does a lot of physical work 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     
 
@@ -70,4 +72,5 @@ protected:
 
 typedef QnSharedResourcePointer<QnPlDlinkResource> QnPlDlinkResourcePtr;
 
+#endif // ENABLE_DLINK
 #endif //dlink_resource_h_2215

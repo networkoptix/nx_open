@@ -2,7 +2,7 @@
 #define QN_DATABASE_MANAGEMENT_WIDGET_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/common/request_param.h> /* For QnHTTPRawResponse */
 #include <utils/common/connective.h>

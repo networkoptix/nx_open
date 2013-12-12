@@ -5,14 +5,14 @@
 
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QSlider>
-#include <QtGui/QLabel>
-#include <QPainter>
-#include <QMenu>
-#include <QMouseEvent>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QLabel>
+#include <QtGui/QPainter>
+#include <QtWidgets/QMenu>
+#include <QtGui/QMouseEvent>
 
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
@@ -39,8 +39,9 @@
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
 namespace {
-    const qint64 defaultReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
-    const qint64 minimalReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
+    //setting free space to zero, since now client does not change this value, so it must keep current value
+    const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
+    const qint64 minimalReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
     const qint64 bytesInMiB = 1024 * 1024;
 
@@ -228,12 +229,12 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->setupUi(this);
 
     ui->storagesTable->resizeColumnsToContents();
-    ui->storagesTable->horizontalHeader()->setClickable(false);
-    ui->storagesTable->horizontalHeader()->setResizeMode(CheckBoxColumn, QHeaderView::Fixed);
-    ui->storagesTable->horizontalHeader()->setResizeMode(PathColumn, QHeaderView::ResizeToContents);
-    ui->storagesTable->horizontalHeader()->setResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setSectionsClickable(false);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(CheckBoxColumn, QHeaderView::Fixed);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(PathColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(CapacityColumn, QHeaderView::ResizeToContents);
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
-    ui->storagesTable->horizontalHeader()->setResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
+    ui->storagesTable->horizontalHeader()->setSectionResizeMode(ArchiveSpaceColumn, QHeaderView::ResizeToContents);
     ui->storagesTable->setItemDelegateForColumn(ArchiveSpaceColumn, new ArchiveSpaceItemDelegate(this));
 #else
     ui->storagesTable->setColumnCount(ColumnCount - 1);
@@ -245,6 +246,12 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
+#ifdef Q_OS_MACX
+    ui->rebuildGroupBox->setVisible(false);
+#else
+    connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString )), this, SLOT(at_updateRebuildInfo()));
+#endif
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -255,6 +262,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
+
+#ifndef Q_OS_MACX
+    connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+    connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
+#endif
 
     updateFromResources();
 }
@@ -367,8 +379,16 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     return result;
 }
 
-void QnServerSettingsDialog::updateFromResources() {
+void QnServerSettingsDialog::updateFromResources() 
+{
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+#ifndef Q_OS_MACX
+    at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+
+    if (m_server->getStatus() == QnResource::Online)
+        sendNextArchiveRequest();
+#endif
+
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
@@ -514,6 +534,61 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
         m_hasStorageChanges = true;
     }
 }
+
+#ifndef Q_OS_MACX
+void QnServerSettingsDialog::at_rebuildButton_clicked()
+{
+    RebuildAction action;
+    if (m_lastRebuildReply.state() == QnRebuildArchiveReply::Started)
+        action = RebuildAction_Cancel;
+    else
+        action = RebuildAction_Start;
+
+    if (action == RebuildAction_Start)
+    {
+        int button = QMessageBox::warning(
+            mainWindow(),
+            tr("Warning"),
+            tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
+            "Depending on the total size of archive it can take several hours. "
+            "This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
+            QMessageBox::Yes | QMessageBox::No
+            );
+        if(button == QMessageBox::No)
+            return;
+    }
+
+    m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+}
+
+void QnServerSettingsDialog::at_updateRebuildInfo()
+{
+    if (m_server->getStatus() == QnResource::Online)
+        sendNextArchiveRequest();
+    else
+        at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+}
+
+void QnServerSettingsDialog::sendNextArchiveRequest()
+{
+    m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+}
+
+void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
+{
+    Q_UNUSED(status)
+    Q_UNUSED(handle)
+    m_lastRebuildReply = reply;
+    ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
+    bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
+    ui->rebuildProgressBar->setValue(reply.progress());
+    ui->stackedWidget->setCurrentIndex(inProgress 
+        ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
+        : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
+    if (inProgress)
+        QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
+}
+#endif
 
 void QnServerSettingsDialog::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_server));

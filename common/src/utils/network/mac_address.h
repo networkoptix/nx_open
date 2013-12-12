@@ -25,6 +25,8 @@ public:
     bool operator==(const QnMacAddress &other) const;
     bool operator<(const QnMacAddress &other) const;
 
+	friend uint qHash(const QnMacAddress &value);
+
 private:
     unsigned char m_data[6];
 };

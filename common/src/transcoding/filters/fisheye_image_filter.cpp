@@ -1,4 +1,7 @@
+
 #include "fisheye_image_filter.h"
+
+#include <QtGui/QMatrix4x4>
 
 extern "C" {
 #ifdef WIN32
@@ -11,6 +14,7 @@ extern "C" {
 };
 
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
 // constant values that will be needed
 static const __m128 CONST_1111 = _mm_set1_ps(1);
 static const __m128 CONST_256 = _mm_set1_ps(256);
@@ -34,16 +38,16 @@ inline __m128 CalcWeights(float x, float y)
     return _mm_mul_ps(w_x, w_y);
 }
 
-inline quint8 GetPixelSSE3(quint8* buffer, int stride, float x, float y)
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 {
-    __m128 weight = CalcWeights(x, y);
+    simd128 weight = CalcWeights(x, y);
 
     const quint8* curPtr = buffer + (int)x + (int)y * stride; // pointer to first pixel
-    __m128 data = _mm_setr_ps((float) curPtr[0], (float) curPtr[1], (float) curPtr[stride], (float) curPtr[stride+1]);
+    simd128 data = _mm_setr_ps((float) curPtr[0], (float) curPtr[1], (float) curPtr[stride], (float) curPtr[stride+1]);
 
     union data {
         float fData[4];
-        __m128 sseData;
+        simd128 sseData;
     } memData;
 
     memData.sseData = _mm_mul_ps(data, weight);
@@ -51,6 +55,19 @@ inline quint8 GetPixelSSE3(quint8* buffer, int stride, float x, float y)
     // return
     //return _mm_cvtsi128_si32(out);
 }
+#elif __arm__ && __ARM_NEON__
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
+{
+    //TODO/ARM
+    return 0;
+}
+#else
+static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
+{
+    //TODO: C fallback routine
+    return 0;
+}
+#endif
 
 // ------------ QnFisheyeImageFilter ----------------------
 
@@ -75,7 +92,13 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO: C fallback routine
+#endif
 
     if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat) 
     {
@@ -112,7 +135,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
             for (int x = 0; x < w; ++x)
             {
                 const QPointF* dstPixel = m_transform[plane] + index;
-                quint8 pixel = GetPixelSSE3(m_tmpBuffer.data[plane], m_tmpBuffer.linesize[plane], dstPixel->x(), dstPixel->y());
+                quint8 pixel = GetPixel(m_tmpBuffer.data[plane], m_tmpBuffer.linesize[plane], dstPixel->x(), dstPixel->y());
                 dstLine[x] = pixel;
                 
                 index++;
@@ -235,7 +258,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 
     QPointF* dstPos = m_transform[plane];
-	
+    
     int dstDelta = 1;
     if (m_params.viewMode == DewarpingParams::VerticalDown) {
         dstPos += imageSize.height()*imageSize.width() - 1;

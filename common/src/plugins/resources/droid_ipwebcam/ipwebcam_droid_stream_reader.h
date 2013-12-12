@@ -1,6 +1,8 @@
 #ifndef QnPlDroidIpWebCamReader_14_04_h
 #define QnPlDroidIpWebCamReader_14_04_h
 
+#ifdef ENABLE_DROID
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 
@@ -28,4 +30,5 @@ private:
 
 };
 
+#endif // #ifdef ENABLE_DROID
 #endif //QnPlDroidIpWebCamReader_14_04_h

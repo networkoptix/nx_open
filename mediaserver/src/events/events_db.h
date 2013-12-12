@@ -1,7 +1,7 @@
 #ifndef __EVENTS_DB_H_
 #define __EVENTS_DB_H_
 
-#include <QtSql>
+#include <QtSql/QtSql>
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
 #include "recording/time_period.h"

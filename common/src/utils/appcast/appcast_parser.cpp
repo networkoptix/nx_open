@@ -1,5 +1,5 @@
-#include <QXmlStreamReader>
-#include <QDebug>
+#include <QtCore/QXmlStreamReader>
+#include <QtCore/QDebug>
 
 #include "appcast_parser.h"
 

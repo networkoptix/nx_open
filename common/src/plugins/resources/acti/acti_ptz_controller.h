@@ -1,8 +1,10 @@
 #ifndef QN_ACTI_PTZ_CONTROLLER_H
 #define QN_ACTI_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_ACTI
+
 #include <QtCore/QHash>
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include <core/resource/interface/abstract_ptz_controller.h>
 
@@ -42,5 +44,5 @@ private:
     bool m_isMirrored;
 };
 
-
+#endif // #ifdef ENABLE_ACTI
 #endif // QN_ACTI_PTZ_CONTROLLER_H

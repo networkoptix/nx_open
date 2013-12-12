@@ -4,7 +4,7 @@
 #include <libavcodec/avcodec.h>
 
 #include <QtCore/QObject>
-#include <QtCore/QWeakPointer>
+
 #include <QtCore/QSet>
 #include <QtCore/QMetaType>
 

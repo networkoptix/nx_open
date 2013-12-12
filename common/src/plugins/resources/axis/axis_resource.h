@@ -1,8 +1,10 @@
 #ifndef axis_resource_h_2215
 #define axis_resource_h_2215
 
-#include <QMap>
-#include <QMutex>
+#ifdef ENABLE_AXIS
+
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -77,7 +79,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
@@ -130,4 +132,5 @@ private:
     friend class QnAxisPtzController;
 };
 
+#endif // #ifdef ENABLE_AXIS
 #endif //axis_resource_h_2215

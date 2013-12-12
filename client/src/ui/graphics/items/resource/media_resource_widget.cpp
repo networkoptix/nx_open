@@ -2,7 +2,8 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
@@ -612,23 +613,23 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->translate(rect.topLeft());
 
     QnScopedPainterPenRollback penRollback(painter);
-    painter->setPen(QPen(QColor(255, 255, 255, 16)));
+    painter->setPen(QPen(QColor(255, 255, 255, 16), 0.0));
     painter->drawLines(gridLines[0]);
 
-    painter->setPen(QPen(QColor(255, 0, 0, 128)));
+    painter->setPen(QPen(QColor(255, 0, 0, 128), 0.0));
     painter->drawLines(gridLines[1]);
 }
 
 void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor) {
     // 4-6 fps
 
-    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback)
-
-    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback)
+    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback);
+    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback);
+    QnScopedPainterPenRollback penRollback(painter); Q_UNUSED(penRollback);
 
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
-    painter->setPen(QPen(penColor));
+    painter->setPen(QPen(penColor, 0.0));
     painter->drawPath(path);
 }
 
@@ -776,7 +777,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     // TODO: #Elric no pre-spaces in translatable strings, translators mess it up.
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
+    if (!(m_resource->toResource()->flags() & QnResource::local))
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
 #endif
 
     QString timeString;
@@ -898,14 +900,26 @@ void QnMediaResourceWidget::updateAspectRatio() {
     if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
         sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
+    QString resourceId;
+    if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
+        resourceId = networkResource->getPhysicalId();
+
     if(sourceSize.isEmpty()) {
-        setAspectRatio(-1);
+        setAspectRatio(
+            resourceId.isEmpty() ? -1.0 : qnSettings->resourceAspectRatios().value(resourceId, -1.0)
+        );
     } else {
         setAspectRatio(
             QnGeometry::aspectRatio(sourceSize) *
             QnGeometry::aspectRatio(channelLayout()->size()) *
             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
+
+        if (!resourceId.isEmpty()) {
+            QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
+            aspectRatios.insert(resourceId, aspectRatio());
+            qnSettings->setResourceAspectRatios(aspectRatios);
+        }
     }
 }
 

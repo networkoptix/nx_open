@@ -24,8 +24,6 @@ public:
     QnPlatformProcess(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformProcess() {}
 
-    static QnPlatformProcess *newInstance(QProcess *process, QObject *parent = NULL);
-
     /**
      * \returns                         PID of this process, or -1 if this 
      *                                  process is not valid (e.g. not yet started).

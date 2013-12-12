@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QUuid>
+#include <QtOpenGL/QGLWidget>
 
 #include <utils/common/connective.h>
 
@@ -51,7 +52,7 @@ class QnToggle;
 class QnThumbnailsLoader;
 class QnThumbnail;
 
-class QnVideoCamera;
+class QnClientVideoCamera;
 class QnCamDisplay;
 
 /**
@@ -196,7 +197,7 @@ public:
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
-    QnVideoCamera *camera(QnWorkbenchItem *item) const;
+    QnClientVideoCamera *camera(QnWorkbenchItem *item) const;
 
     QnCamDisplay *camDisplay(QnWorkbenchItem *item) const;
 
@@ -440,10 +441,10 @@ private:
     QnResourceWidget *m_widgetByRole[Qn::ItemRoleCount];
 
     /** Grid item. */
-    QWeakPointer<QnGridItem> m_gridItem;
+    QPointer<QnGridItem> m_gridItem;
 
     /** Grid background item. */
-    QWeakPointer<QnGridBackgroundItem> m_gridBackgroundItem;
+    QPointer<QnGridBackgroundItem> m_gridBackgroundItem;
 
     /** Current frame opacity for widgets. */
     qreal m_frameOpacity;
@@ -494,7 +495,7 @@ private:
     ViewportAnimator *m_viewportAnimator;
 
     /** Curtain item. */
-    QWeakPointer<QnCurtainItem> m_curtainItem;
+    QPointer<QnCurtainItem> m_curtainItem;
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;

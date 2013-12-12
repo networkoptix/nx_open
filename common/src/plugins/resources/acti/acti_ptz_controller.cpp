@@ -1,3 +1,5 @@
+#ifdef ENABLE_ACTI
+
 #include "acti_ptz_controller.h"
 
 #include <utils/math/math.h>
@@ -243,7 +245,7 @@ int QnActiPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
 {
     QMutexLocker lock(&m_mutex);
 
-    zoomPos = qMax(0.0, (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
+    zoomPos = qMax<double>(0.0, (zoomPos-m_minAngle)/(m_maxAngle-m_minAngle) * 1000);
 
     CLHttpStatus status;
 
@@ -289,3 +291,5 @@ Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
 const QnPtzSpaceMapper *QnActiPtzController::getSpaceMapper() {
     return m_spaceMapper;
 }
+
+#endif // #ifdef ENABLE_ACTI

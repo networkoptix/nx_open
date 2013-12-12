@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include "aiothread.h"
 #include "qglobal.h"
@@ -94,7 +94,7 @@ namespace aio
 
         //checking, if that socket is already monitored
         const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock.data(), eventToWatch );
-        map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::const_iterator it = m_sockets.lower_bound( sockCtx );
+        map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.lower_bound( sockCtx );
         if( it != m_sockets.end() && it->first == sockCtx )
             return true;    //socket already monitored for eventToWatch
 
@@ -125,12 +125,7 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-
-#if (GCC_VERSION >= 40700)
             std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
-#else
-            std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
-#endif
             newThread->start();
             if( !newThread->isRunning() )
                 return false;

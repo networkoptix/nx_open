@@ -42,6 +42,8 @@ namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
 }
 
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
+
 void QnCommonMetaTypes::initilize() {
     /* Note that running the code twice is perfectly OK, 
      * so we don't need heavyweight synchronization here. */
@@ -93,7 +95,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnCamerasFoundInfoList>();
+    qRegisterMetaType<QnManualCameraSearchProcessReply>();
     qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<QnPtzSpaceMapper>();
@@ -126,8 +128,12 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
+    qRegisterMetaType<QnRebuildArchiveReply>();
 
     qRegisterMetaType<DewarpingParams>();
+
+    qRegisterMetaType<Qn::Corner>();
+    qRegisterMetaTypeStreamOperators<Qn::Corner>();
 
     qn_commonMetaTypes_initialized = true;
 }

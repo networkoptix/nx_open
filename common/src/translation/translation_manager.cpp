@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
+#include <common/common_globals.h>
 
 QnTranslationManager::QnTranslationManager(QObject *parent):
     QObject(parent),
@@ -82,6 +83,13 @@ void QnTranslationManager::removeSearchPath(const QString &searchPath) {
 }
 
 void QnTranslationManager::installTranslation(const QnTranslation &translation) {
+    QString localeCode = translation.localeCode();
+    localeCode.replace(L'-', L'_'); /* Minus sign is not supported as a separator... */
+
+    QLocale locale(localeCode);
+    if(locale.language() != QLocale::C)
+        QLocale::setDefault(locale);
+
     foreach(const QString &file, translation.filePaths()) {
         QScopedPointer<QTranslator> translator(new QTranslator(qApp));
         if(translator->load(file))

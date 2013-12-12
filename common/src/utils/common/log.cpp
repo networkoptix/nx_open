@@ -1,8 +1,8 @@
 #include "log.h"
 #include <sstream>
-#include <QTextStream>
-#include <QThread>
-#include <QDateTime>
+#include <QtCore/QTextStream>
+#include <QtCore/QThread>
+#include <QtCore/QDateTime>
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
@@ -174,7 +174,7 @@ QnLog* QnLog::instance()
 {
     //return QnLog(qn_logPrivateInstance());
 
-    if( !qnLogInstance )
+    if( !qnLogInstance.load() )
     {
         QnLog* newInstance = new QnLog( qn_logPrivateInstance() );
         if( !qnLogInstance.testAndSetOrdered( NULL, newInstance ) )
@@ -182,7 +182,7 @@ QnLog* QnLog::instance()
         //else
         //    static QGlobalStaticDeleter<QnLog> cleanup(qnLogInstance);
     }
-    return qnLogInstance;
+    return qnLogInstance.load();
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
@@ -236,7 +236,9 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
     va_end(args);
 }
 
-void qnLogMsgHandler(QtMsgType type, const char *msg) {
+void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg) {
+    //TODO: ak use ctx
+
     QnLogLevel logLevel;
     switch (type) {
     case QtFatalMsg:
@@ -254,7 +256,7 @@ void qnLogMsgHandler(QtMsgType type, const char *msg) {
         break;
     }
 
-    cl_log.log(QString::fromLocal8Bit(msg), logLevel);
+    cl_log.log(msg, logLevel);
 }
 
 QString QnLog::logFileName()

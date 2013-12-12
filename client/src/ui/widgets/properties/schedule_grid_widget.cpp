@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include <QtCore/QDate>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
 
@@ -46,6 +46,8 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
         m_weekDays << date.toString(QLatin1String("ddd"));
         date = date.addDays(1);
     }
+
+    m_cornerText = tr("", "SCHEDULE_GRID_CORNER_TEXT");
 
     m_gridLeftOffset = 0;
     m_gridTopOffset = 0;
@@ -131,6 +133,19 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
     qreal cellSize = this->cellSize();
 
     p.setFont(m_labelsFont);
+
+    if(!m_cornerText.isEmpty()) {
+        QColor penClr;
+        if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
+            penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
+        else 
+            penClr = NORMAL_LABEL_COLOR;
+        if (!m_enabled)
+            penClr = shiftColor(toGrayscale(penClr), DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+        p.setPen(penClr);
+        p.drawText(QRect(0, 0, m_gridLeftOffset-TEXT_SPACING, m_gridTopOffset), Qt::AlignRight | Qt::AlignVCenter, m_cornerText);
+    }
+
     for (int y = 0; y < rowCount(); ++y) 
     {
         QColor penClr;
@@ -267,8 +282,10 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
     p.setPen(penClr);
     p.drawLine(QPoint(4, m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
     p.drawLine(QPoint(m_gridLeftOffset, 4), QPoint(m_gridLeftOffset, m_gridTopOffset));
-    if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
-        p.fillRect(QRectF(QPointF(4,4), QPointF(m_gridLeftOffset-4, m_gridTopOffset-4)), SELECTED_LABEL_COLOR);
+    
+    if(m_cornerText.isEmpty())
+        if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
+            p.fillRect(QRectF(QPointF(4,4), QPointF(m_gridLeftOffset-4, m_gridTopOffset-4)), SELECTED_LABEL_COLOR);
 
 
     // draw selection

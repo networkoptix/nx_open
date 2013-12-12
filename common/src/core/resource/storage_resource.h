@@ -1,10 +1,10 @@
 #ifndef QN_STORAGE_RESOURCE_H
 #define QN_STORAGE_RESOURCE_H
 
-#include <QSet>
+#include <QtCore/QSet>
 #include "resource.h"
-#include <QFileInfoList>
-#include <QIODevice>
+#include <QtCore/QFileInfoList>
+#include <QtCore/QIODevice>
 #include "abstract_storage_resource.h"
 
 class QnStorageResource : public QnAbstractStorageResource

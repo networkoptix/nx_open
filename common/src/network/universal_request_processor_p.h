@@ -9,6 +9,7 @@ public:
     QnTCPConnectionProcessor* processor;
     QMutex mutex;
     QnTcpListener* owner;
+    bool needAuth;
 };
 
 #endif // __UNIVERSAL_REQUEST_PROCESSOR_P_H__

@@ -1,11 +1,11 @@
 
-#include <QCoreApplication>
-#include <QtConcurrentMap>
-#include <QHostInfo>
-#include <QTime>
-#include <QSettings>
-#include <QStringList>
-#include <QThreadPool>
+#include <QtCore/QCoreApplication>
+#include <QtConcurrent/QtConcurrentMap>
+#include <QtNetwork/QHostInfo>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QSettings>
+#include <QtCore/QStringList>
+#include <QtCore/QThreadPool>
 
 #include "nettools.h"
 #include "ping.h"
@@ -20,6 +20,7 @@
 #include <unistd.h>
 #endif
 
+/*
 bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
 {
     int res;
@@ -28,24 +29,25 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
     Q_UNUSED(mode)
     if( !sock.bind(port) )
         return false;
-    res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
+    res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toLatin1().constData(), iface.name.length());
 #else
     res = !sock.bind(iface.address, port, mode);
 #endif
 
     if (res)
     {
-        //cl_log.log(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toAscii().constData(), strerror(errno));
+        //cl_log.log(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toLatin1().constData(), strerror(errno));
         return false;
     }
 
     return true;
 }
+*/
 
 QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {
     static QList<QnInterfaceAndAddr> lastResult;
-    static QTime timer;
+    static QElapsedTimer timer;
     static QMutex mutex;
 
     {
@@ -59,6 +61,9 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
     {
+        if (!(iface.flags() & QNetworkInterface::IsUp))
+            continue;
+
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         foreach (const QNetworkAddressEntry& address, addresses)
         {
@@ -552,13 +557,13 @@ QString getMacByIP(const QString& host, bool net)
 
 bool isIpv4Address(const QString& addr)
 {
-    int ip4Addr = inet_addr(addr.toAscii().data());
+    int ip4Addr = inet_addr(addr.toLatin1().data());
     return ip4Addr != 0 && ip4Addr != -1;
 }
 
 QHostAddress resolveAddress(const QString& addrString)
 {
-    int ip4Addr = inet_addr(addrString.toAscii().data());
+    int ip4Addr = inet_addr(addrString.toLatin1().data());
     if (ip4Addr != 0 && ip4Addr != -1)
         return QHostAddress(ntohl(ip4Addr));
 

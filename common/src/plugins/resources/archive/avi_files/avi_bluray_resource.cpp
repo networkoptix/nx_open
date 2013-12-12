@@ -1,6 +1,6 @@
 #include "avi_bluray_resource.h"
 
-#include <QDir>
+#include <QtCore/QDir>
 
 #include "avi_bluray_archive_delegate.h"
 #include "../archive_stream_reader.h"

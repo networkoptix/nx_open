@@ -1,7 +1,7 @@
 #ifndef ping_1750
 #define ping_1750
 
-#include <QString>
+#include <QtCore/QString>
 
 
 /**

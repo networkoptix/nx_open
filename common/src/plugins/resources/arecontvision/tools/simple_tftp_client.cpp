@@ -173,7 +173,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         else
                         {
                             // this is 3 times we got option ack; need to resend ack0?
-                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logWARNING);
+                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logDEBUG1);
 
                             if (len_recv<13) // unexpected answer
                                 continue;
@@ -204,7 +204,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             if (m_status == time_out)
                 return 0;
 
-        }
+                                                                                                 }
 
 LAST_PACKET:
 
@@ -233,7 +233,7 @@ int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
     int len = 2;
     int req_len = fn.length();
 
-    memcpy(buff+len, fn.toAscii(), req_len);    len+=req_len;
+    memcpy(buff+len, fn.toLatin1(), req_len);    len+=req_len;
     buff[len] = 0;    len++;
 
     memcpy(buff+len, "netascii", 8); len+=8;

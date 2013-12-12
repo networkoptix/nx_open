@@ -1,3 +1,5 @@
+#ifdef ENABLE_TEST_CAMERA
+
 #include "testcamera_stream_reader.h"
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
@@ -149,3 +151,5 @@ void QnTestCameraStreamReader::updateStreamParamsBasedOnFps()
 {
     pleaseReOpen();
 }
+
+#endif // #ifdef ENABLE_TEST_CAMERA

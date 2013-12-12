@@ -2,8 +2,8 @@
 #include <memory.h>
 #include <sstream>
 
-#include <QDebug>
-#include <QTextStream>
+#include <QtCore/QDebug>
+#include <QtCore/QTextStream>
 
 #include "vc1Parser.h"
 #include "nalUnits.h"
