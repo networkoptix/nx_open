@@ -219,12 +219,12 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
         return;
 
     QVector3D position;
-    if(!controller->getPosition(Qn::DeviceCoordinateSpace, &position))
+    if(!controller->getPosition(Qn::DevicePtzCoordinateSpace, &position))
         return;
 
     for(int i = 0; i <= 20; i++) {
         position.setZ(i / 20.0);
-        controller->absoluteMove(Qn::DeviceCoordinateSpace, position, 1.0);
+        controller->absoluteMove(Qn::DevicePtzCoordinateSpace, position, 1.0);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));

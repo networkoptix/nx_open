@@ -216,14 +216,14 @@ bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(space != Qn::LogicalCoordinateSpace)
+    if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())).arg(speed * 100));
 }
 
 bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::LogicalCoordinateSpace)
+    if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     QnAxisParameterMap params;
@@ -243,7 +243,7 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
 }
 
 bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    if(space != Qn::LogicalCoordinateSpace)
+    if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     *limits = m_limits;

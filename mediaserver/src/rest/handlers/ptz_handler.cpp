@@ -48,10 +48,10 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
 int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QString sequenceId;
     int sequenceNumber = -1;
-    Qn::PtzAction action;
+    Qn::PtzCommand command;
     QString resourceId;
     if(
-        !requireParameter(params, lit("action"), result, &action) || 
+        !requireParameter(params, lit("command"), result, &command) || 
         !requireParameter(params, lit("resourceId"), result, &resourceId) ||
         !requireParameter(params, lit("sequenceId"), result, &sequenceId, true) ||
         !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true)
@@ -79,21 +79,21 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     if(!checkSequence(sequenceId, sequenceNumber))
         return CODE_OK;
 
-    switch(action) {
-    case Qn::PtzContinousMoveAction:    return executeContinuousMove(controller, params, result);
-    case Qn::PtzAbsoluteMoveAction:     return executeAbsoluteMove(controller, params, result);
-    case Qn::PtzViewportMoveAction:     return executeViewportMove(controller, params, result);
-    case Qn::PtzGetPositionAction:      return executeGetPosition(controller, params, result);
-    case Qn::PtzCreatePresetAction:     return executeCreatePreset(controller, params, result);
-    case Qn::PtzUpdatePresetAction:     return executeUpdatePreset(controller, params, result);
-    case Qn::PtzRemovePresetAction:     return executeRemovePreset(controller, params, result);
-    case Qn::PtzActivatePresetAction:   return executeActivatePreset(controller, params, result);
-    case Qn::PtzGetPresetsAction:       return executeGetPresets(controller, params, result);
-    case Qn::PtzCreateTourAction:       return executeCreateTour(controller, params, body, result);
-    case Qn::PtzRemoveTourAction:       return executeRemoveTour(controller, params, result);
-    case Qn::PtzActivateTourAction:     return executeActivateTour(controller, params, result);
-    case Qn::PtzGetToursAction:         return executeGetTours(controller, params, result);
-    case Qn::PtzGetDataAction:          return executeGetData(controller, params, result);
+    switch(command) {
+    case Qn::ContinousMovePtzCommand:   return executeContinuousMove(controller, params, result);
+    case Qn::AbsoluteMovePtzCommand:    return executeAbsoluteMove(controller, params, result);
+    case Qn::ViewportMovePtzCommand:    return executeViewportMove(controller, params, result);
+    case Qn::GetPositionPtzCommand:     return executeGetPosition(controller, params, result);
+    case Qn::CreatePresetPtzCommand:    return executeCreatePreset(controller, params, result);
+    case Qn::UpdatePresetPtzCommand:    return executeUpdatePreset(controller, params, result);
+    case Qn::RemovePresetPtzCommand:    return executeRemovePreset(controller, params, result);
+    case Qn::ActivatePresetPtzCommand:  return executeActivatePreset(controller, params, result);
+    case Qn::GetPresetsPtzCommand:      return executeGetPresets(controller, params, result);
+    case Qn::CreateTourPtzCommand:      return executeCreateTour(controller, params, body, result);
+    case Qn::RemoveTourPtzCommand:      return executeRemoveTour(controller, params, result);
+    case Qn::ActivateTourPtzCommand:    return executeActivateTour(controller, params, result);
+    case Qn::GetToursPtzCommand:        return executeGetTours(controller, params, result);
+    case Qn::GetDataPtzCommand:         return executeGetData(controller, params, result);
     default:                            return CODE_INVALID_PARAMETER;
     }
 }

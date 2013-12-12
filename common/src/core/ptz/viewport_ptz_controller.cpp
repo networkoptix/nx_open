@@ -27,13 +27,13 @@ Qn::PtzCapabilities QnViewportPtzController::getCapabilities() {
 
 bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
     QVector3D oldPosition;
-    if(!getPosition(Qn::LogicalCoordinateSpace, &oldPosition))
+    if(!getPosition(Qn::LogicalPtzCoordinateSpace, &oldPosition))
         return false;
 
     /* Note that we don't care about getLimits result as default-constructed
      * limits is actually 'no limits'. */
     QnPtzLimits limits;
-    getLimits(Qn::LogicalCoordinateSpace, &limits); 
+    getLimits(Qn::LogicalPtzCoordinateSpace, &limits); 
 
     /* Same here, we don't care about getFlip result. */
     Qt::Orientations flip = 0;
@@ -79,5 +79,5 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     QVector3D newPosition = qBound(QVector3D(qRadiansToDegrees(newSpherical.phi), qRadiansToDegrees(newSpherical.psi), newFov), limits);
 
     /* Send it to the camera. */
-    return absoluteMove(Qn::LogicalCoordinateSpace, newPosition, speed);
+    return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
 }

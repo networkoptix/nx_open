@@ -229,7 +229,7 @@ bool QnActiPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(space != Qn::DeviceCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
     int devicePanTiltSpeed = toDevicePanTiltSpeed(qBound(0.01, speed, 1.0));
@@ -243,7 +243,7 @@ bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
 }
 
 bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::DeviceCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
     QMutexLocker lock(&m_mutex);

@@ -14,12 +14,12 @@ void QnAbstractPtzController::getData(Qn::PtzDataFields fields, QnPtzData *data)
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
     
-    if((fields & Qn::PtzDevicePositionField)    && getPosition(Qn::DeviceCoordinateSpace, &data->devicePosition))    data->fields |= Qn::PtzDevicePositionField;
-    if((fields & Qn::PtzLogicalPositionField)   && getPosition(Qn::LogicalCoordinateSpace, &data->logicalPosition))  data->fields |= Qn::PtzLogicalPositionField;
-    if((fields & Qn::PtzDeviceLimitsField)      && getLimits(Qn::DeviceCoordinateSpace, &data->deviceLimits))        data->fields |= Qn::PtzDeviceLimitsField;
-    if((fields & Qn::PtzLogicalLimitsField)     && getLimits(Qn::LogicalCoordinateSpace, &data->logicalLimits))      data->fields |= Qn::PtzLogicalLimitsField;
-    if((fields & Qn::PtzFlipField)              && getFlip(&data->flip))                                             data->fields |= Qn::PtzFlipField;
-    if((fields & Qn::PtzPresetsField)           && getPresets(&data->presets))                                       data->fields |= Qn::PtzPresetsField;
-    if((fields & Qn::PtzToursField)             && getTours(&data->tours))                                           data->fields |= Qn::PtzToursField;
+    if((fields & Qn::DevicePositionPtzField)    && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))    data->fields |= Qn::DevicePositionPtzField;
+    if((fields & Qn::LogicalPositionPtzField)   && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))  data->fields |= Qn::LogicalPositionPtzField;
+    if((fields & Qn::DeviceLimitsPtzField)      && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))        data->fields |= Qn::DeviceLimitsPtzField;
+    if((fields & Qn::LogicalLimitsPtzField)     && getLimits(Qn::LogicalPtzCoordinateSpace, &data->logicalLimits))      data->fields |= Qn::LogicalLimitsPtzField;
+    if((fields & Qn::FlipPtzField)              && getFlip(&data->flip))                                             data->fields |= Qn::FlipPtzField;
+    if((fields & Qn::PresetsPtzField)           && getPresets(&data->presets))                                       data->fields |= Qn::PresetsPtzField;
+    if((fields & Qn::ToursPtzField)             && getTours(&data->tours))                                           data->fields |= Qn::ToursPtzField;
 }
 
