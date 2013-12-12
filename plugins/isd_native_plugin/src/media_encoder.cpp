@@ -50,7 +50,8 @@ MediaEncoder::MediaEncoder(
     m_encoderNum( encoderNum ),
     m_fpsListRead( false ),
     m_resolutionListRead( false ),
-    m_motionMask(0)
+    m_motionMask( 0 ),
+    m_audioEnabled( false )
 {
 }
 
@@ -160,9 +161,24 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
         m_encoderNum) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+        m_streamReader->setAudioEnabled( m_audioEnabled );
     }
     m_streamReader->addRef();
     return m_streamReader.get();
+}
+
+int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
+{
+    if( !m_streamReader.get() ) {
+        m_streamReader.reset( new StreamReader(
+            &m_refManager,
+            m_encoderNum) );
+        if (m_motionMask)
+            m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+        m_streamReader->setAudioEnabled( m_audioEnabled );
+    }
+
+    return m_streamReader->getAudioFormat( audioFormat );
 }
 
 void MediaEncoder::setMotionMask( nxcip::Picture* motionMask )
@@ -173,6 +189,13 @@ void MediaEncoder::setMotionMask( nxcip::Picture* motionMask )
     m_motionMask->addRef();
     if (m_streamReader.get())
         m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+}
+
+void MediaEncoder::setAudioEnabled( bool audioEnabled )
+{
+    m_audioEnabled = audioEnabled;
+    if (m_streamReader.get())
+        m_streamReader->setAudioEnabled( m_audioEnabled );
 }
 
 int MediaEncoder::setCameraParam( const QString& request )

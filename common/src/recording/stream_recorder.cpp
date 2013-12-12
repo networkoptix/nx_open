@@ -284,6 +284,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
     {
         QnConstCompressedAudioDataPtr ad = qSharedPointerDynamicCast<const QnCompressedAudioData>(md);
+        assert( ad->context );
         QnCodecAudioFormat audioFormat(ad->context);
         if (!m_firstTime && audioFormat != m_prevAudioFormat) {
             close(); // restart recording file if audio format is changed

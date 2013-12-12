@@ -72,6 +72,7 @@ private:
     unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder[2];
     nxcip::Picture* m_motionMask;
+    bool m_audioEnabled;
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

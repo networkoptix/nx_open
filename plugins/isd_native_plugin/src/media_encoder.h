@@ -54,19 +54,23 @@ public:
 
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual nxcip::StreamReader* getLiveStreamReader() override;
+    //!Implementation of nxcip::CameraMediaEncoder::getAudioFormat
+    virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
     void setMotionMask( nxcip::Picture* motionMask );
+    void setAudioEnabled( bool audioEnabled );
 
 private:
-    nxpt::CommonRefManager m_refManager;
+    mutable nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
-    std::auto_ptr<StreamReader> m_streamReader;
+    mutable std::auto_ptr<StreamReader> m_streamReader;
     unsigned int m_encoderNum;
     nxcip::Picture* m_motionMask;
     mutable bool m_fpsListRead;
     mutable std::vector<float> m_supportedFpsList;
     mutable bool m_resolutionListRead;
     mutable std::vector<nxcip::ResolutionInfo> m_supportedResolutions;
+    bool m_audioEnabled;
 
     int setCameraParam( const QString& request );
     int getSupportedFps() const;

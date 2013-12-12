@@ -27,7 +27,8 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     CLServerPushStreamReader( res ),
     m_rtpStreamParser( res ),
     m_camManager( camManager ),
-    m_liveStreamReader( NULL )
+    m_liveStreamReader( NULL ),
+    m_mediaEncoder2Ref( NULL )
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
     Q_ASSERT( m_thirdPartyRes );
@@ -41,6 +42,9 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_liveStreamReader->releaseRef();
         m_liveStreamReader = NULL;
     }
+
+    if( m_mediaEncoder2Ref )
+        m_mediaEncoder2Ref->releaseRef();
 }
 
 static const nxcip::Resolution DEFAULT_SECOND_STREAM_RESOLUTION = nxcip::Resolution(480, 316);
@@ -144,10 +148,16 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
     }
 
-    nxcip::CameraMediaEncoder2* mediaEncoder2Ref = static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 ));
-    if( mediaEncoder2Ref && (m_liveStreamReader = mediaEncoder2Ref->getLiveStreamReader()) )
+    m_mediaEncoder2Ref = static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 ));
+    if( m_mediaEncoder2Ref && (m_liveStreamReader = m_mediaEncoder2Ref->getLiveStreamReader()) )
     {
-        mediaEncoder2Ref->releaseRef();
+        if( m_thirdPartyRes->isAudioEnabled() )
+        {
+            nxcip::AudioFormat audioFormat;
+            if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
+                initializeAudioContext( audioFormat );
+        }
+
         return CameraDiagnostics::NoErrorResult();
     }
     else
@@ -267,6 +277,17 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                         videoData->motion = QnMetaDataV1Ptr();
                         m_savedMediaPacket = videoData;
                     }
+
+                    if( rez->dataType == QnAbstractMediaData::AUDIO )
+                    {
+                        if( !m_audioContext )
+                        {
+                            nxcip::AudioFormat audioFormat;
+                            if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
+                                initializeAudioContext( audioFormat );
+                        }
+                        rez.staticCast<QnCompressedAudioData>()->context = m_audioContext;
+                    }
                 }
             }
         }
@@ -283,7 +304,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 //parseMotionInfo(videoData);
                 break;
             }
-            else if (rez->dataType == QnAbstractMediaData::AUDIO) {
+            else if (rez->dataType == QnAbstractMediaData::AUDIO)
+            {
                 break;
             }
             else if (rez->dataType == QnAbstractMediaData::META_V1)
@@ -315,7 +337,7 @@ void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
 const QnResourceAudioLayout* ThirdPartyStreamReader::getDPAudioLayout() const
 {
     return m_liveStreamReader
-        ? NULL    //TODO/IMPL
+        ? &m_audioLayout    //TODO/IMPL
         : m_rtpStreamParser.getAudioLayout();
 }
 
@@ -345,6 +367,10 @@ CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compress
             return CODEC_ID_MP3;
         case nxcip::CODEC_ID_AAC:
             return CODEC_ID_AAC;
+        case nxcip::CODEC_ID_PCM_S16LE:
+            return CODEC_ID_PCM_S16LE;
+        case nxcip::CODEC_ID_PCM_MULAW:
+            return CODEC_ID_PCM_MULAW;
         case nxcip::CODEC_ID_AC3:
             return CODEC_ID_AC3;
         case nxcip::CODEC_ID_DTS:
@@ -513,4 +539,48 @@ nxcip::Resolution ThirdPartyStreamReader::getSecondStreamResolution( const nxcip
             resList );
 
     return nxcip::Resolution( secondaryResolution.width(), secondaryResolution.height() );
+}
+
+void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
+{
+    const CodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
+    m_audioContext = QnMediaContextPtr( new QnMediaContext(ffmpegCodecId) );
+
+    //filling mediaPacket->context
+    m_audioContext->ctx()->codec_id = ffmpegCodecId;
+    m_audioContext->ctx()->codec_type = AVMEDIA_TYPE_AUDIO;
+
+    m_audioContext->ctx()->sample_rate = audioFormat.sampleRate;
+    m_audioContext->ctx()->bit_rate = audioFormat.bitrate;
+
+    m_audioContext->ctx()->channels = audioFormat.channels;
+    //setByteOrder(QnAudioFormat::LittleEndian);
+    switch( audioFormat.sampleFmt )
+    {
+        case nxcip::AudioFormat::stU8:
+            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_U8;
+            break;
+        case nxcip::AudioFormat::stS16:
+            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_S16;
+            break;
+        case nxcip::AudioFormat::stS32:
+            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_S32;
+            break;
+        case nxcip::AudioFormat::stFLT:
+            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_FLT;
+            break;
+        default:
+            assert( false );
+    }
+
+    //if (c->extradata_size > 0)
+    //{
+    //    extraData.resize(c->extradata_size);
+    //    memcpy(&extraData[0], c->extradata, c->extradata_size);
+    //}
+    m_audioContext->ctx()->channel_layout = audioFormat.channelLayout;
+    m_audioContext->ctx()->block_align = audioFormat.blockAlign;
+    m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
+
+    m_audioLayout.addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }
