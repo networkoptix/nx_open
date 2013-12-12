@@ -382,7 +382,6 @@ QList<QnPlatformMonitor::NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
 
 QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSpaceInfo()
 {
-#ifdef __linux__
     QList<QnPlatformMonitor::PartitionSpace> partitions = base_type::totalPartitionSpaceInfo();
     //filtering driectories, mounted to the same device
 
@@ -432,9 +431,6 @@ QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSp
             ++it;
     }
     return partitions;
-#else
-    return base_type::totalPartitionSpaceInfo();
-#endif
 }
 
 #endif
