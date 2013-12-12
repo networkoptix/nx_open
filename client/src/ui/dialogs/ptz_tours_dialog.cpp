@@ -52,8 +52,11 @@ void QnPtzToursDialog::accept() {
 
 void QnPtzToursDialog::updateModel() {
     QnPtzTourList tours;
-    if (m_controller && m_controller->getTours(&tours))
+    QnPtzPresetList presets;
+    if (m_controller && m_controller->getTours(&tours) && m_controller->getPresets(&presets)) {
+        ui->tourEditWidget->setPtzPresets(presets);
         m_model->setTours(tours);
+    }
 }
 
 void QnPtzToursDialog::at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {

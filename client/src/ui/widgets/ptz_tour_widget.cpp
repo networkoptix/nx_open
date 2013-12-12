@@ -25,3 +25,7 @@ void QnPtzTourWidget::setPtzTour(const QnPtzTour &tour) {
     m_model->setTour(tour);
     ui->nameLineEdit->setText(tour.name);
 }
+
+void QnPtzTourWidget::setPtzPresets(const QnPtzPresetList &presets) {
+    m_model->setPresets(presets);
+}

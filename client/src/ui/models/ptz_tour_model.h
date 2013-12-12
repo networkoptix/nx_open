@@ -23,11 +23,17 @@ public:
     explicit QnPtzTourModel(QObject *parent = 0);
     virtual ~QnPtzTourModel();
 
+    static QString speedToString(qreal speed);
+    static QList<qreal> speedValues();
+
     const QnPtzTour& tour() const;
     Q_SLOT void setTour(const QnPtzTour &tour);
 
     const QString tourName() const;
     Q_SLOT void setTourName(const QString &name);
+
+    const QnPtzPresetList &presets() const;
+    Q_SLOT void setPresets(const QnPtzPresetList &presets);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -35,16 +41,21 @@ public:
     virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 signals:
     void tourChanged(const QnPtzTour &tour);
 
 private slots:
     void at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+
 private:
     QnPtzTour m_tour;
+    QnPtzPresetList m_presets;
 };
 
 #endif // PTZ_TOUR_MODEL_H

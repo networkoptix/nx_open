@@ -19,6 +19,7 @@ public:
     ~QnPtzTourWidget();
 
     void setPtzTour(const QnPtzTour &tour);
+    void setPtzPresets(const QnPtzPresetList &presets);
 
 signals:
     void tourChanged(const QnPtzTour &tour);
