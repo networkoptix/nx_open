@@ -19,10 +19,11 @@ QnPtzTourItemDelegate::~QnPtzTourItemDelegate() {
 
 void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
     base_type::initStyleOption(option, index);
-    if (!index.data(Qn::ValidRole).toBool()) {
-        QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
-        option->palette.setColor(QPalette::Highlight, clr.lighter());
-    }
+//    if (!index.data(Qn::ValidRole).toBool()) {
+//        QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
+//        option->palette.setColor(QPalette::Highlight, clr.lighter());
+//    }
+    //TODO: #GDM PTZ invalid rows highlight
 }
 
 QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
@@ -39,10 +40,14 @@ QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOption
         }
         return comboBox;
     }
-//    case QnPtzTourModel::TimeColumn:
-//    {
-        //TODO: #GDM PTZ time selection widget
-//    }
+    case QnPtzTourModel::TimeColumn:
+    {
+        QComboBox* comboBox = new QComboBox(parent);
+        foreach (quint64 time, QnPtzTourModel::stayTimeValues()) {
+            comboBox->addItem(QnPtzTourModel::timeToString(time), time);
+        }
+        return comboBox;
+    }
     case QnPtzTourModel::SpeedColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
@@ -63,6 +68,7 @@ QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOption
 void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     switch (index.column()) {
     case QnPtzTourModel::NameColumn:
+    case QnPtzTourModel::TimeColumn:
     case QnPtzTourModel::SpeedColumn:
     {
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
@@ -71,10 +77,6 @@ void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         }
         return;
     }
-//    case QnPtzTourModel::TimeColumn:
-//    {
-        //TODO: #GDM PTZ time selection widget
-//    }
     default:
         break;
     }
@@ -84,6 +86,7 @@ void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 void QnPtzTourItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
     switch (index.column()) {
     case QnPtzTourModel::NameColumn:
+    case QnPtzTourModel::TimeColumn:
     case QnPtzTourModel::SpeedColumn:
     {
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
@@ -91,10 +94,6 @@ void QnPtzTourItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
         }
         return;
     }
-//    case QnPtzTourModel::TimeColumn:
-//    {
-        //TODO: #GDM PTZ time selection widget
-//    }
     default:
         break;
     }

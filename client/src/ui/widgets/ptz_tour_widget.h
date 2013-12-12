@@ -23,6 +23,12 @@ public:
 
 signals:
     void tourChanged(const QnPtzTour &tour);
+
+private slots:
+    void at_addSpotButton_clicked();
+    void at_deleteSpotButton_clicked();
+    void at_moveSpotUpButton_clicked();
+    void at_moveSpotDownButton_clicked();
 private:
     QScopedPointer<Ui::QnPtzTourWidget> ui;
     QnPtzTourModel *m_model;

@@ -26,6 +26,9 @@ public:
     static QString speedToString(qreal speed);
     static QList<qreal> speedValues();
 
+    static QString timeToString(quint64 time);
+    static QList<quint64> stayTimeValues();
+
     const QnPtzTour& tour() const;
     Q_SLOT void setTour(const QnPtzTour &tour);
 

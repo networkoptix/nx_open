@@ -11,7 +11,28 @@ namespace {
     static const qreal speedHigh    = 0.775;
     static const qreal speedHighest = 1.0;
 
-    static const QList<qreal> allSpeedValues(QList<qreal>() << speedLowest << speedLow << speedNormal << speedHigh << speedHighest);
+    static const QList<qreal> allSpeedValues(QList<qreal>()
+                                             << speedLowest
+                                             << speedLow
+                                             << speedNormal
+                                             << speedHigh
+                                             << speedHighest
+                                             );
+
+    static const int second = 1000;
+
+    static const QList<quint64> allStayTimeValues(QList<quint64>()
+                                                  << 0
+                                                  << second * 1
+                                                  << second * 2
+                                                  << second * 5
+                                                  << second * 10
+                                                  << second * 15
+                                                  << second * 20
+                                                  << second * 30
+                                                  << second * 45
+                                                  << second * 60
+                                                  );
 }
 
 QnPtzTourModel::QnPtzTourModel(QObject *parent) :
@@ -27,12 +48,16 @@ QList<qreal> QnPtzTourModel::speedValues() {
     return allSpeedValues;
 }
 
+QList<quint64> QnPtzTourModel::stayTimeValues() {
+    return allStayTimeValues;
+}
+
 QString QnPtzTourModel::speedToString(qreal speed) {
     static QList<QString> names(QList<QString>() << tr("Lowest") << tr("Low") << tr("Normal") << tr("High") << tr("Highest"));
     Q_ASSERT(names.size() == allSpeedValues.size());
 
     qreal value = qBound(speedLowest, speed, speedHighest);
-    for (int i = 1; i < allSpeedValues.size() - 1; ++i) {
+    for (int i = 1; i < allSpeedValues.size(); ++i) {
         if (allSpeedValues[i] < value)
             continue;
 
@@ -44,8 +69,14 @@ QString QnPtzTourModel::speedToString(qreal speed) {
     }
 
     //should never come here
-    DEBUG_CODE(Q_ASSERT(false);)
+    Q_ASSERT(false);
     return names[allSpeedValues.indexOf(speedNormal)];
+}
+
+QString QnPtzTourModel::timeToString(quint64 time) {
+    if (time == 0)
+        return tr("Instant");
+    return tr("%n seconds", "", time / second);
 }
 
 const QnPtzTour& QnPtzTourModel::tour() const {
@@ -96,6 +127,7 @@ bool QnPtzTourModel::removeRows(int row, int count, const QModelIndex &parent) {
     beginRemoveRows(parent, row, row + count - 1);
     m_tour.spots.erase(m_tour.spots.begin() + row, m_tour.spots.begin() + row + count);
     endRemoveRows();
+    emit tourChanged(m_tour);
     return true;
 }
 
@@ -107,6 +139,7 @@ bool QnPtzTourModel::insertRows(int row, int count, const QModelIndex &parent) {
     for(int i = 0; i < count; i++)
         m_tour.spots.insert(row, QnPtzTourSpot());
     endInsertRows();
+    emit tourChanged(m_tour);
     return true;
 }
 
@@ -135,7 +168,7 @@ QVariant QnPtzTourModel::data(const QModelIndex &index, int role) const {
             }
             return tr("<Invalid>");
         case TimeColumn:
-            return spot.stayTime;
+            return timeToString(spot.stayTime);
         case SpeedColumn:
             return speedToString(spot.speed);
         default:

@@ -36,7 +36,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QPushButton" name="addButton">
+        <widget class="QPushButton" name="addSpotButton">
          <property name="text">
           <string/>
          </property>
@@ -60,7 +60,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="moveUpButton">
+        <widget class="QPushButton" name="moveSpotUpButton">
          <property name="text">
           <string/>
          </property>
@@ -71,7 +71,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="moveDownButton">
+        <widget class="QPushButton" name="moveSpotDownButton">
          <property name="text">
           <string/>
          </property>
@@ -95,7 +95,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="removeButton">
+        <widget class="QPushButton" name="deleteSpotButton">
          <property name="text">
           <string/>
          </property>
