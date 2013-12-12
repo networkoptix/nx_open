@@ -101,3 +101,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     m_streamReader->addRef();
     return m_streamReader.get();
 }
+
+int MediaEncoder::getAudioFormat( nxcip::AudioFormat* /*format*/ ) const
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
