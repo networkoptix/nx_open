@@ -10,8 +10,6 @@ QN_DEFINE_STRUCT_FUNCTIONS(QnPtzTourSpot,    (json)(eq),    (presetId)(stayTime)
 QN_DEFINE_STRUCT_FUNCTIONS(QnPtzTour,        (json)(eq),    (id)(name)(spots))
 QN_DEFINE_STRUCT_FUNCTIONS(QnPtzLimits,      (json)(eq),    (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov))
 
-QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities, static)
-QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields, static)
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::Orientations, static)
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzData, (fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours))
