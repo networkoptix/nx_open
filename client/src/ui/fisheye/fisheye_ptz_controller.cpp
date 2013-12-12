@@ -245,7 +245,7 @@ Qn::PtzCapabilities QnFisheyePtzController::getCapabilities() {
 }
 
 bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    if(space != Qn::LogicalCoordinateSpace)
+    if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     *limits = m_limits;
@@ -299,7 +299,7 @@ bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(space != Qn::LogicalCoordinateSpace)
+    if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     m_speed = QVector3D();
@@ -310,7 +310,7 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
 }
 
 bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::LogicalCoordinateSpace)
+    if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
     
     *position = getPositionInternal();

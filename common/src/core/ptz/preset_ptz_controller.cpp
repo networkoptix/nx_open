@@ -14,7 +14,7 @@
 // Model Data
 // -------------------------------------------------------------------------- //
 struct QnPtzPresetData {
-    QnPtzPresetData(): space(Qn::DeviceCoordinateSpace) {}
+    QnPtzPresetData(): space(Qn::DevicePtzCoordinateSpace) {}
 
     QVector3D position;
     Qn::PtzCoordinateSpace space;
@@ -92,7 +92,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
         return false;
 
     QnPtzPresetData data;
-    data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
+    data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
     if(!getPosition(data.space, &data.position))
         return false;
 

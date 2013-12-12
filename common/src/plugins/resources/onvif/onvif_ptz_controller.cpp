@@ -159,7 +159,7 @@ bool QnOnvifPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(space != Qn::DeviceCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
     QAuthenticator auth(m_resource->getAuth());
@@ -202,7 +202,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 }
 
 bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::DeviceCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
     QAuthenticator auth(m_resource->getAuth());
@@ -233,7 +233,7 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
 }
 
 bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    if(space != Qn::DeviceCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
     *limits = m_limits;

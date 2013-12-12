@@ -8,8 +8,9 @@ class QnNonBlockingPtzControllerPrivate;
 class QnPtzCommandBase: public QObject {
     Q_OBJECT
 signals:
-    void finished(Qn::PtzDataFields fields, bool status, const QVariant &result);
+    void finished(Qn::PtzCommand command, const QVariant &data, const QVariant &result);
 };
+
 
 class QnNonBlockingPtzController: public QnProxyPtzController {
     Q_OBJECT
@@ -44,12 +45,13 @@ public:
     virtual void synchronize(Qn::PtzDataFields fields) override;
 
 protected:
-    bool hasSpaceCapabilities(Qn::PtzCapabilities capabilities, Qn::PtzCoordinateSpace space) const;
-
     template<class Functor>
-    void runCommand(Qn::PtzDataFields fields, const Functor &functor);
+    void runCommand(Qn::PtzCommand command, const QVariant &data, const Functor &functor) const;
 
-    Q_SLOT void at_ptzCommand_finished(Qn::PtzDataFields fields, bool status, const QVariant &result);
+    template<class T>
+    bool getField(Qn::PtzDataField field, T QnPtzData::*member, T *target);
+
+    Q_SLOT void at_ptzCommand_finished(Qn::PtzCommand command, const QVariant &data, const QVariant &result);
 
 private:
     QScopedPointer<QnNonBlockingPtzControllerPrivate> d;

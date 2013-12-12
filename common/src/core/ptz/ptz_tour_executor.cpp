@@ -53,8 +53,8 @@ public:
 
 void QnPtzTourExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     this->controller = controller;
-    defaultSpace = controller->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalCoordinateSpace : Qn::DeviceCoordinateSpace;
-    defaultDataField = defaultSpace == Qn::LogicalCoordinateSpace ? Qn::PtzLogicalPositionField : Qn::PtzDevicePositionField;
+    defaultSpace = controller->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
+    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
 
     QObject::connect(controller.data(), SIGNAL(synchronized(Qn::PtzDataFields)), q, SLOT(at_controller_synchronized(Qn::PtzDataFields)));
 }
