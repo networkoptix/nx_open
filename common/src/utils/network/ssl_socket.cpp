@@ -5,6 +5,7 @@
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
+static EVP_PKEY* pkey = 0;
 static SSL_CTX *serverCTX = 0;
 static SSL_CTX *clientCTX = 0;
 
@@ -141,7 +142,7 @@ void QnSSLSocket::initSSLEngine(const QByteArray& certData)
     BIO_free(bufio);
 
     bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bufio, NULL, serverCTX->default_passwd_callback, serverCTX->default_passwd_callback_userdata);
+    pkey = PEM_read_bio_PrivateKey(bufio, NULL, serverCTX->default_passwd_callback, serverCTX->default_passwd_callback_userdata);
     SSL_CTX_use_PrivateKey(serverCTX, pkey);
     BIO_free(bufio);
 
@@ -154,6 +155,12 @@ void QnSSLSocket::releaseSSLEngine()
     if (serverCTX) {
         SSL_CTX_free(serverCTX);
         serverCTX = 0;
+    }
+
+    if( pkey )
+    {
+        EVP_PKEY_free( pkey );
+        pkey = 0;
     }
 }
 
