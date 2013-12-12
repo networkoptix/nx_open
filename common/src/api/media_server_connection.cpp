@@ -682,7 +682,7 @@ int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera,
     QnRequestParamList params;
     params << QnRequestParam("action",          QnLexical::serialized(Qn::PtzGetDataAction));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
-    params << QnRequestParam("fields",          QnLexical::serialized(static_cast<int>(fields)));
+    params << QnRequestParam("fields",          QnLexical::serialized(fields));
 
     return sendAsyncGetRequest(PtzGetDataObject, params, QN_REPLY_TYPE(QnPtzData), target, slot);
 }

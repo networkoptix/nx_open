@@ -131,6 +131,8 @@ bool QnNonBlockingPtzController::continuousMove(const QVector3D &speed) {
     if(!(capabilities & Qn::ContinuousPtzCapabilities))
         return false;
 
+    // TODO: invalidate
+
     runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
         return controller->continuousMove(speed);
     });
@@ -142,6 +144,8 @@ bool QnNonBlockingPtzController::absoluteMove(Qn::PtzCoordinateSpace space, cons
     if(!(capabilities & Qn::AbsolutePtzCapabilities) || !hasSpaceCapabilities(capabilities, space))
         return false;
 
+    // TODO: invalidate
+
     runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
         return controller->absoluteMove(space, position, speed);
     });
@@ -152,6 +156,8 @@ bool QnNonBlockingPtzController::viewportMove(qreal aspectRatio, const QRectF &v
     Qn::PtzCapabilities capabilities = getCapabilities();
     if(!(capabilities & Qn::ViewportPtzCapability))
         return false;
+
+    // TODO: invalidate
 
     runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
         return controller->viewportMove(aspectRatio, viewport, speed);
@@ -226,45 +232,141 @@ bool QnNonBlockingPtzController::createPreset(const QnPtzPreset &preset) {
     if(!(capabilities & Qn::PresetsPtzCapability))
         return false;
 
-    return false;
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->createPreset(preset);
+    });
+    return true;
 }
 
 bool QnNonBlockingPtzController::updatePreset(const QnPtzPreset &preset) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::PresetsPtzCapability))
+        return false;
+
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->updatePreset(preset);
+    });
     return true;
 }
 
 bool QnNonBlockingPtzController::removePreset(const QString &presetId) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::PresetsPtzCapability))
+        return false;
+
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->removePreset(presetId);
+    });
     return true;
 }
 
 bool QnNonBlockingPtzController::activatePreset(const QString &presetId, qreal speed) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::PresetsPtzCapability))
+        return false;
+
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->activatePreset(presetId, speed);
+    });
     return true;
 }
 
 bool QnNonBlockingPtzController::getPresets(QnPtzPresetList *presets) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::PresetsPtzCapability))
+        return false;
+
+    Qn::PtzDataField field = Qn::PtzPresetsField;
+
+    QMutexLocker locker(&d->mutex);
+    if(!(d->data.fields & field)) {
+        locker.unlock();
+        synchronize(field);
+        return false;
+    }
+
+    *presets = d->data.presets;
     return true;
 }
 
 bool QnNonBlockingPtzController::createTour(const QnPtzTour &tour) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::ToursPtzCapability))
+        return false;
+
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->createTour(tour);
+    });
     return true;
 }
 
 bool QnNonBlockingPtzController::removeTour(const QString &tourId) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::ToursPtzCapability))
+        return false;
+
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->removeTour(tourId);
+    });
     return true;
 }
 
 bool QnNonBlockingPtzController::activateTour(const QString &tourId) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::ToursPtzCapability))
+        return false;
+
+    // TODO: invalidate
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *) -> bool {
+        return controller->activateTour(tourId);
+    });
     return true;
 }
 
 bool QnNonBlockingPtzController::getTours(QnPtzTourList *tours) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(!(capabilities & Qn::ToursPtzCapability))
+        return false;
+
+    Qn::PtzDataField field = Qn::PtzToursField;
+
+    QMutexLocker locker(&d->mutex);
+    if(!(d->data.fields & field)) {
+        locker.unlock();
+        synchronize(field);
+        return false;
+    }
+
+    *tours = d->data.tours;
     return true;
 }
 
 void QnNonBlockingPtzController::synchronize(Qn::PtzDataFields fields) {
-    
+    /* Don't call the base implementation as it calls the target's synchronize directly. */
+
+    runCommand(Qn::NoPtzFields, [=](const QnPtzControllerPtr &controller, QVariant *value) -> bool {
+        controller->synchronize(fields);
+
+        QnPtzData data;
+        controller->getData(fields, &data);
+        return true;
+        // TODO: pass data out
+    });
 }
 
 void QnNonBlockingPtzController::at_ptzCommand_finished(Qn::PtzDataFields fields, bool status, const QVariant &result) {
-
+    // TODO: merge data
 }

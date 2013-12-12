@@ -267,20 +267,12 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
 }
 
 int QnPtzHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    int fields;
+    Qn::PtzDataFields fields;
     if(!requireParameter(params, lit("fields"), result, &fields))
         return CODE_INVALID_PARAMETER;
 
     QnPtzData data;
-    data.capabilities = controller->getCapabilities();
-    if((fields & Qn::PtzDevicePositionField)    && controller->getPosition(Qn::DeviceCoordinateSpace, &data.devicePosition))    data.fields |= Qn::PtzDevicePositionField;
-    if((fields & Qn::PtzLogicalPositionField)   && controller->getPosition(Qn::LogicalCoordinateSpace, &data.logicalPosition))  data.fields |= Qn::PtzLogicalPositionField;
-    if((fields & Qn::PtzDeviceLimitsField)      && controller->getLimits(Qn::DeviceCoordinateSpace, &data.deviceLimits))        data.fields |= Qn::PtzDeviceLimitsField;
-    if((fields & Qn::PtzLogicalLimitsField)     && controller->getLimits(Qn::LogicalCoordinateSpace, &data.logicalLimits))      data.fields |= Qn::PtzLogicalLimitsField;
-    if((fields & Qn::PtzFlipField)              && controller->getFlip(&data.flip))                                             data.fields |= Qn::PtzFlipField;
-    if((fields & Qn::PtzPresetsField)           && controller->getPresets(&data.presets))                                       data.fields |= Qn::PtzPresetsField;
-    if((fields & Qn::PtzToursField)             && controller->getTours(&data.tours))                                           data.fields |= Qn::PtzToursField;
-
+    controller->getData(fields, &data);
     result.setReply(data);
     return CODE_OK;
 }
