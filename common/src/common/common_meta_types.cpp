@@ -131,14 +131,14 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();
+    qRegisterMetaType<QnPtzData>();
+    qRegisterMetaType<Qn::PtzDataFields>();
+    qRegisterMetaType<Qn::PtzCommand>();
 
     qRegisterMetaType<DewarpingParams>();
 
     qRegisterMetaType<Qn::Corner>();
     qRegisterMetaTypeStreamOperators<Qn::Corner>();
-
-    qRegisterMetaType<Qn::PtzDataFields>();
-    qRegisterMetaType<QnPtzData>();
 
     qn_commonMetaTypes_initialized = true;
 }

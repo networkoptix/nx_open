@@ -343,6 +343,7 @@ inline QChar lit(char c) {
 
 
 Q_DECLARE_METATYPE(Qn::PtzDataFields);
+Q_DECLARE_METATYPE(Qn::PtzCommand);
 Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodContent);

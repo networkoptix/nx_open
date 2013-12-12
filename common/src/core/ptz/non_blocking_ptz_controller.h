@@ -8,7 +8,7 @@ class QnNonBlockingPtzControllerPrivate;
 class QnPtzCommandBase: public QObject {
     Q_OBJECT
 signals:
-    void finished(Qn::PtzDataFields fields, bool status, const QVariant &result);
+    void finished(Qn::PtzCommand command, const QVariant &data, const QVariant &result);
 };
 
 
@@ -46,12 +46,12 @@ public:
 
 protected:
     template<class Functor>
-    void runCommand(Qn::PtzDataFields fields, const Functor &functor) const;
+    void runCommand(Qn::PtzCommand command, const QVariant &data, const Functor &functor) const;
 
     template<class T>
     bool getField(Qn::PtzDataField field, T QnPtzData::*member, T *target);
 
-    Q_SLOT void at_ptzCommand_finished(Qn::PtzDataFields fields, bool status, const QVariant &result);
+    Q_SLOT void at_ptzCommand_finished(Qn::PtzCommand command, const QVariant &data, const QVariant &result);
 
 private:
     QScopedPointer<QnNonBlockingPtzControllerPrivate> d;
