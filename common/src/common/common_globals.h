@@ -81,12 +81,15 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
 
     enum PtzCommand {
-        ContinousMovePtzCommand,
-        AbsoluteMovePtzCommand,
+        ContinuousMovePtzCommand,
+        AbsoluteDeviceMovePtzCommand,
+        AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
 
-        GetPositionPtzCommand,
-        GetLimitsPtzCommand,
+        GetDevicePositionPtzCommand,
+        GetLogicalPositionPtzCommand,
+        GetDeviceLimitsPtzCommand,
+        GetLogicalLimitsPtzCommand,
         GetFlipPtzCommand,
         
         CreatePresetPtzCommand,
@@ -120,7 +123,7 @@ public:
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
-        LogicalPtzCoordinateSpace,
+        LogicalPtzCoordinateSpace
     };
 
     enum PtzCapability {

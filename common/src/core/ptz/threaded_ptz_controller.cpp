@@ -134,10 +134,10 @@ Qn::PtzCapabilities QnThreadedPtzController::getCapabilities() {
 }
 
 bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
-    if(!supports(Qn::ContinousMovePtzCommand))
+    if(!supports(Qn::ContinuousMovePtzCommand))
         return false;
 
-    QN_RUN_COMMAND(Qn::ContinousMovePtzCommand, continuousMove(speed));
+    QN_RUN_COMMAND(Qn::ContinuousMovePtzCommand, continuousMove(speed));
 
     QMutexLocker locker(&d->mutex);
     d->data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
@@ -146,10 +146,11 @@ bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnThreadedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(!supports(Qn::AbsoluteMovePtzCommand, space))
+    Qn::PtzCommand command = space == Qn::DevicePtzCoordinateSpace ? Qn::AbsoluteDeviceMovePtzCommand : Qn::AbsoluteLogicalMovePtzCommand;
+    if(!supports(command))
         return false;
 
-    QN_RUN_COMMAND(Qn::AbsoluteMovePtzCommand, absoluteMove(space, position, speed));
+    QN_RUN_COMMAND(command, absoluteMove(space, position, speed));
 
     QMutexLocker locker(&d->mutex);
     d->data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
@@ -170,7 +171,8 @@ bool QnThreadedPtzController::viewportMove(qreal aspectRatio, const QRectF &view
 }
 
 bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(!supports(Qn::GetPositionPtzCommand, space))
+    Qn::PtzCommand command = space == Qn::DevicePtzCoordinateSpace ? Qn::GetDevicePositionPtzCommand : Qn::GetLogicalPositionPtzCommand;
+    if(!supports(command))
         return false;
 
     if(space == Qn::DevicePtzCoordinateSpace) {
@@ -181,7 +183,8 @@ bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3
 }
 
 bool QnThreadedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    if(!supports(Qn::GetLimitsPtzCommand, space))
+    Qn::PtzCommand command = space == Qn::DevicePtzCoordinateSpace ? Qn::GetDeviceLimitsPtzCommand : Qn::GetLogicalLimitsPtzCommand;
+    if(!supports(command))
         return false;
 
     if(space == Qn::DevicePtzCoordinateSpace) {

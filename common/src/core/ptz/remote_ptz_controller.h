@@ -3,12 +3,12 @@
 
 #include <QtCore/QUuid>
 
-#include "abstract_ptz_controller.h"
+#include "asynchronous_ptz_controller.h"
 #include "ptz_data.h"
 
-class QnRemotePtzController: public QnAbstractPtzController {
+class QnRemotePtzController: public QnAsynchronousPtzController {
     Q_OBJECT
-    typedef QnAbstractPtzController base_type;
+    typedef QnAsynchronousPtzController base_type;
 
 public:
     QnRemotePtzController(const QnNetworkResourcePtr &resource);
@@ -38,23 +38,12 @@ public:
     virtual void synchronize(Qn::PtzDataFields fields) override;
 
 private slots:
-    void at_continuousMove_replyReceived(int status, int handle);
-    void at_absoluteMove_replyReceived(int status, int handle);
-    void at_relativeMove_replyReceived(int status, int handle);
-
-    void at_createPreset_replyReceived(int status, int handle);
-    void at_updatePreset_replyReceived(int status, int handle);
-    void at_removePreset_replyReceived(int status, int handle);
-    void at_activatePreset_replyReceived(int status, int handle);
-
-    void at_createTour_replyReceived(int status, int handle);
-    void at_removeTour_replyReceived(int status, int handle);
-    void at_activateTour_replyReceived(int status, int handle);
-
-    void at_getData_replyReceived(int status, const QnPtzData &reply, int handle);
+    void at_replyReceived(int status, const QVariant &reply, int handle);
 
 private:
     Q_SIGNAL void synchronizedLater(Qn::PtzDataFields fields);
+
+    bool isPointless(Qn::PtzCommand command);
 
 private:
     QnNetworkResourcePtr m_resource;

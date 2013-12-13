@@ -36,11 +36,23 @@ Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
     return result;
 }
 
-bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
+bool QnRemotePtzController::isPointless(Qn::PtzCommand command) {
     if(!m_server)
+        return true;
+
+    QnResource::Status status = m_resource->getStatus();
+    if(status == QnResource::Unauthorized || status == QnResource::Offline)
+        return true;
+
+    return !base_type::supports(command);
+}
+
+bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
+    if(isPointless(Qn::ContinuousMovePtzCommand))
         return false;
 
-    m_server->apiConnection()->ptzContinuousMoveAsync(m_resource, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_continuousMove_replyReceived(int, int)));
+    int handle = m_server->apiConnection()->ptzContinuousMoveAsync(m_resource, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_replyReceived(int, const QVariant &, int)));
+
     return true;
 }
 

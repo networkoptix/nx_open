@@ -41,8 +41,11 @@ public:
      */
     bool hasCapabilities(Qn::PtzCapabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
 
+    /**
+     * \param command                   Ptz command to check.
+     * \returns                         Whether this controller supports the given command.
+     */
     bool supports(Qn::PtzCommand command);
-    bool supports(Qn::PtzCommand command, Qn::PtzCoordinateSpace space);
 
     /**
      * Starts PTZ movement. Speed is specified in image-based coordinate space and
@@ -247,8 +250,9 @@ public:
      * 
      * \param query                     Data fields to get.
      * \param[out] data                 PTZ data.
+     * \returns                         Whether the operation was successful.
      */
-    virtual void getData(Qn::PtzDataFields query, QnPtzData *data);
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data);
 
     /**
      * Synchronizes this controller's internal caches with the actual target values.
