@@ -43,14 +43,17 @@ public:
     virtual bool activateTour(const QString &tourId) override                                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
 
-    virtual void synchronize(Qn::PtzDataFields fields) override { 
-        m_baseController->synchronize(fields);
-        if(m_baseIsBlocking)
-            synchronizeProxy(fields); 
+    virtual void synchronize(Qn::PtzDataFields query) override { 
+        m_baseController->synchronize(query);
+        if(m_baseIsBlocking) {
+            QnPtzData data;
+            m_baseController->getData(query, &data);
+            synchronizeProxy(data); 
+        }
     }
 
-    Q_SLOT virtual void synchronizeProxy(Qn::PtzDataFields fields) {
-        emit synchronized(fields); 
+    Q_SLOT virtual void synchronizeProxy(const QnPtzData &data) {
+        emit synchronized(data); 
     }
 
 private:

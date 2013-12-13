@@ -12,7 +12,11 @@
 #include "ptz_tour.h"
 
 struct QnPtzData {
-    Qn::PtzDataFields fields;
+    QnPtzData() {}
+    QnPtzData(Qn::PtzDataFields query, Qn::PtzDataFields fields): query(query), fields(fields) {}
+
+    Qn::PtzDataFields query;    /**< Fields that were queried from the underlying PTZ controller to fill this data object. */
+    Qn::PtzDataFields fields;   /**< Fields that are valid in this data object. */
     Qn::PtzCapabilities capabilities;
     QVector3D logicalPosition;
     QVector3D devicePosition;
