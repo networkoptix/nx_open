@@ -2,13 +2,13 @@
 #define QN_REMOTE_PTZ_CONTROLLER_H
 
 #include <QtCore/QUuid>
+#include <QtCore/QAtomicInt>
 
-#include "asynchronous_ptz_controller.h"
-#include "ptz_data.h"
+#include "abstract_ptz_controller.h"
 
-class QnRemotePtzController: public QnAsynchronousPtzController {
+class QnRemotePtzController: public QnAbstractPtzController {
     Q_OBJECT
-    typedef QnAsynchronousPtzController base_type;
+    typedef QnAbstractPtzController base_type;
 
 public:
     QnRemotePtzController(const QnNetworkResourcePtr &resource);
@@ -35,23 +35,26 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
-    virtual void synchronize(Qn::PtzDataFields fields) override;
+    virtual bool synchronize(Qn::PtzDataFields query) override;
 
 private slots:
     void at_replyReceived(int status, const QVariant &reply, int handle);
 
 private:
-    Q_SIGNAL void synchronizedLater(Qn::PtzDataFields fields);
+    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 
     bool isPointless(Qn::PtzCommand command);
+
+    int nextSequenceNumber();
 
 private:
     QnNetworkResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;
     QUuid m_sequenceId;
-    int m_sequenceNumber;
-    
-    QHash<int, Qn::PtzDataFields> m_fieldsByHandle;
+    QAtomicInt m_sequenceNumber;
+
+    QMutex m_mutex;
+    QHash<int, Qn::PtzCommand> m_commandByHandle;
     QnPtzData m_data;
 };
 

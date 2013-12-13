@@ -256,26 +256,14 @@ public:
 
     /**
      * Synchronizes this controller's internal caches with the actual target values.
-     * At the end of each synchronization operation, a <tt>synchronized</tt>
-     * signal is emitted.
-     * 
-     * If this controller is blocking, then the signal will be emitted from inside 
-     * this function.
-     * 
-     * If it is non-blocking, then the function will return instantly, 
-     * and the signal will be emitted when the synchronization operation 
-     * actually completes, effectively making this function asynchronous.
-     * 
-     * Note that this function may be used by the controller internally,
-     * and thus the corresponding signal can be emitted basically anytime.
      * 
      * \param query                     Data fields to synchronize.
      */
-    virtual void synchronize(Qn::PtzDataFields query) = 0;
+    virtual bool synchronize(Qn::PtzDataFields query) = 0;
 
 signals:
     void capabilitiesChanged(); // TODO: #Elric handle in proxy?
-    void synchronized(QnPtzData data);
+    void finished(Qn::PtzCommand command, const QVariant &data);
 
 private:
     QnResourcePtr m_resource;

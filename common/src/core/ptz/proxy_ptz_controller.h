@@ -3,22 +3,18 @@
 
 #include "abstract_ptz_controller.h"
 
+/**
+ * A simple controller that proxies all requests into another controller.
+ * 
+ * Note that it does not proxy <tt>finished</tt> signals.
+ */
 class QnProxyPtzController: public QnAbstractPtzController {
     Q_OBJECT;
 public:
     QnProxyPtzController(const QnPtzControllerPtr &baseController):
         QnAbstractPtzController(baseController->resource()),
-        m_baseController(baseController),
-        m_baseIsBlocking(!baseController->hasCapabilities(Qn::NonBlockingPtzCapability))
-    {
-        if(!m_baseIsBlocking)
-            connect(m_baseController.data(), &QnAbstractPtzController::synchronized, this, &QnProxyPtzController::synchronizeProxy, Qt::QueuedConnection);
-    }
-
-    virtual ~QnProxyPtzController() {
-        if(!m_baseIsBlocking)
-            disconnect(m_baseController.data(), NULL, this, NULL);
-    }
+        m_baseController(baseController)
+    {}
 
     QnPtzControllerPtr baseController() const                                                                   { return m_baseController; }
 
@@ -43,22 +39,12 @@ public:
     virtual bool activateTour(const QString &tourId) override                                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
 
-    virtual void synchronize(Qn::PtzDataFields query) override { 
-        m_baseController->synchronize(query);
-        if(m_baseIsBlocking) {
-            QnPtzData data;
-            m_baseController->getData(query, &data);
-            synchronizeProxy(data); 
-        }
-    }
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return m_baseController->getData(query, data); }
 
-    Q_SLOT virtual void synchronizeProxy(const QnPtzData &data) {
-        emit synchronized(data); 
-    }
+    virtual bool synchronize(Qn::PtzDataFields query) override                                                  { return m_baseController->synchronize(query); }
 
 private:
     QnPtzControllerPtr m_baseController;
-    bool m_baseIsBlocking;
 };
 
 
