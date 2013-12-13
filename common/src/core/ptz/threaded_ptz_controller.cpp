@@ -1,20 +1,9 @@
-#include "non_blocking_ptz_controller.h"
+#include "threaded_ptz_controller.h"
 
 #include <QtCore/QMutex>
 #include <QtCore/QThreadPool>
 
 #include "ptz_data.h"
-
-namespace {
-    bool hasSpaceCapabilities(Qn::PtzCapabilities capabilities, Qn::PtzCoordinateSpace space) {
-        switch(space) {
-        case Qn::DevicePtzCoordinateSpace:     return capabilities & Qn::DevicePositioningPtzCapability;
-        case Qn::LogicalPtzCoordinateSpace:    return capabilities & Qn::LogicalPositioningPtzCapability;
-        default:                            return false; /* We should never get here. */
-        }
-    }
-
-} // anonymous namespace
 
 
 // -------------------------------------------------------------------------- //
@@ -145,8 +134,7 @@ Qn::PtzCapabilities QnThreadedPtzController::getCapabilities() {
 }
 
 bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::ContinuousPtzCapabilities))
+    if(!supports(Qn::ContinousMovePtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::ContinousMovePtzCommand, continuousMove(speed));
@@ -158,8 +146,7 @@ bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnThreadedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::AbsolutePtzCapabilities) || !hasSpaceCapabilities(capabilities, space))
+    if(!supports(Qn::AbsoluteMovePtzCommand, space))
         return false;
 
     QN_RUN_COMMAND(Qn::AbsoluteMovePtzCommand, absoluteMove(space, position, speed));
@@ -171,8 +158,7 @@ bool QnThreadedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const Q
 }
 
 bool QnThreadedPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::ViewportPtzCapability))
+    if(!supports(Qn::ViewportMovePtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::ViewportMovePtzCommand, viewportMove(aspectRatio, viewport, speed));
@@ -184,8 +170,7 @@ bool QnThreadedPtzController::viewportMove(qreal aspectRatio, const QRectF &view
 }
 
 bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::AbsolutePtzCapabilities) || !hasSpaceCapabilities(capabilities, space))
+    if(!supports(Qn::GetPositionPtzCommand, space))
         return false;
 
     if(space == Qn::DevicePtzCoordinateSpace) {
@@ -196,8 +181,7 @@ bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3
 }
 
 bool QnThreadedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::LimitsPtzCapability) || !hasSpaceCapabilities(capabilities, space))
+    if(!supports(Qn::GetLimitsPtzCommand, space))
         return false;
 
     if(space == Qn::DevicePtzCoordinateSpace) {
@@ -208,16 +192,14 @@ bool QnThreadedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimit
 }
 
 bool QnThreadedPtzController::getFlip(Qt::Orientations *flip) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::FlipPtzCapability))
+    if(!supports(Qn::GetFlipPtzCommand))
         return false;
 
     return getField(Qn::FlipPtzField, &QnPtzData::flip, flip);
 }
 
 bool QnThreadedPtzController::createPreset(const QnPtzPreset &preset) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::PresetsPtzCapability))
+    if(!supports(Qn::CreatePresetPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::CreatePresetPtzCommand, createPreset(preset));
@@ -229,8 +211,7 @@ bool QnThreadedPtzController::createPreset(const QnPtzPreset &preset) {
 }
 
 bool QnThreadedPtzController::updatePreset(const QnPtzPreset &preset) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::PresetsPtzCapability))
+    if(!supports(Qn::UpdatePresetPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::UpdatePresetPtzCommand, updatePreset(preset));
@@ -242,8 +223,7 @@ bool QnThreadedPtzController::updatePreset(const QnPtzPreset &preset) {
 }
 
 bool QnThreadedPtzController::removePreset(const QString &presetId) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::PresetsPtzCapability))
+    if(!supports(Qn::RemovePresetPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::RemovePresetPtzCommand, removePreset(presetId));
@@ -255,8 +235,7 @@ bool QnThreadedPtzController::removePreset(const QString &presetId) {
 }
 
 bool QnThreadedPtzController::activatePreset(const QString &presetId, qreal speed) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::PresetsPtzCapability))
+    if(!supports(Qn::ActivatePresetPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::ActivatePresetPtzCommand, activatePreset(presetId, speed));
@@ -268,42 +247,38 @@ bool QnThreadedPtzController::activatePreset(const QString &presetId, qreal spee
 }
 
 bool QnThreadedPtzController::getPresets(QnPtzPresetList *presets) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::PresetsPtzCapability))
+    if(!supports(Qn::GetPresetsPtzCommand))
         return false;
 
     return getField(Qn::PresetsPtzField, &QnPtzData::presets, presets);
 }
 
 bool QnThreadedPtzController::createTour(const QnPtzTour &tour) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::ToursPtzCapability))
+    if(!supports(Qn::CreateTourPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::CreateTourPtzCommand, createTour(tour));
 
     QMutexLocker locker(&d->mutex);
-    d->data.fields &= ~Qn::ToursPtzCapability;
+    d->data.fields &= ~Qn::ToursPtzField;
 
     return true;
 }
 
 bool QnThreadedPtzController::removeTour(const QString &tourId) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::ToursPtzCapability))
+    if(!supports(Qn::RemoveTourPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::RemoveTourPtzCommand, removeTour(tourId));
 
     QMutexLocker locker(&d->mutex);
-    d->data.fields &= ~Qn::ToursPtzCapability;
+    d->data.fields &= ~Qn::ToursPtzField;
 
     return true;
 }
 
 bool QnThreadedPtzController::activateTour(const QString &tourId) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::ToursPtzCapability))
+    if(!supports(Qn::ActivateTourPtzCommand))
         return false;
 
     QN_RUN_COMMAND(Qn::ActivateTourPtzCommand, activateTour(tourId));
@@ -315,8 +290,7 @@ bool QnThreadedPtzController::activateTour(const QString &tourId) {
 }
 
 bool QnThreadedPtzController::getTours(QnPtzTourList *tours) {
-    Qn::PtzCapabilities capabilities = getCapabilities();
-    if(!(capabilities & Qn::ToursPtzCapability))
+    if(!supports(Qn::GetToursPtzCommand))
         return false;
 
     return getField(Qn::ToursPtzField, &QnPtzData::tours, tours);

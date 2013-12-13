@@ -41,6 +41,9 @@ public:
      */
     bool hasCapabilities(Qn::PtzCapabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
 
+    bool supports(Qn::PtzCommand command);
+    bool supports(Qn::PtzCommand command, Qn::PtzCoordinateSpace space);
+
     /**
      * Starts PTZ movement. Speed is specified in image-based coordinate space and
      * all of its components are expected to be in range <tt>[-1, 1]</tt>. 
@@ -270,7 +273,7 @@ signals:
     void capabilitiesChanged(); // TODO: #Elric handle in proxy?
     void synchronized(QnPtzData data);
 
-protected:
+private:
     QnResourcePtr m_resource;
 };
 
