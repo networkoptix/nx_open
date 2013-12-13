@@ -113,6 +113,20 @@ namespace nx_http
         StringType* const headerValue,
         const ConstBufferRefType& data )
     {
+        ConstBufferRefType headerNameRef;
+        ConstBufferRefType headerValueRef;
+        if( !parseHeader( &headerNameRef, &headerValueRef, data ) )
+            return false;
+        *headerName = headerNameRef;
+        *headerValue = headerValueRef;
+        return true;
+    }
+
+    bool parseHeader(
+        ConstBufferRefType* const headerName,
+        ConstBufferRefType* const headerValue,
+        const ConstBufferRefType& data )
+    {
         //skipping whitespace at start
         const size_t headerNameStart = find_first_not_of( data, " " );
         if( headerNameStart == BufferNpos )
@@ -129,7 +143,6 @@ namespace nx_http
         const size_t headerValueStart = find_first_not_of( data, ": ", headerSepPos );
         if( headerValueStart == BufferNpos ) {
             *headerName = data.mid( headerNameStart, headerNameEnd-headerNameStart );
-            *headerValue = "";
             return true;
         }
 
@@ -142,7 +155,6 @@ namespace nx_http
         *headerValue = data.mid( headerValueStart, headerValueEnd+1-headerValueStart );
         return true;
     }
-
 
     namespace StatusCode
     {

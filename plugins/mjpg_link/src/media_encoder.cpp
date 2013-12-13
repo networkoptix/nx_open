@@ -11,13 +11,12 @@
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
-    int encoderNumber,
-    unsigned int frameDurationUsec )
+    int encoderNumber )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_encoderNumber( encoderNumber ),
-    m_frameDurationUsec( frameDurationUsec )
+    m_frameDurationUsec( 0 )
 {
 }
 
@@ -78,8 +77,9 @@ int MediaEncoder::setResolution( const nxcip::Resolution& /*resolution*/ )
     return nxcip::NX_NO_ERROR;
 }
 
-int MediaEncoder::setFps( const float& /*fps*/, float* /*selectedFps*/ )
+int MediaEncoder::setFps( const float& fps, float* selectedFps )
 {
+    //TODO/IMPL
     return nxcip::NX_NO_ERROR;
 }
 
@@ -93,8 +93,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     if( !m_streamReader.get() )
         m_streamReader.reset( new StreamReader(
             &m_refManager,
+            m_cameraManager->info(),
             m_frameDurationUsec,
-            true,
             m_encoderNumber ) );
 
     m_streamReader->addRef();
@@ -103,6 +103,5 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
-    //TODO/IMPL
     return nxcip::NX_UNSUPPORTED_CODEC;
 }

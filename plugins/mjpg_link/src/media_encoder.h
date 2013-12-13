@@ -26,8 +26,7 @@ class MediaEncoder
 public:
     MediaEncoder(
         CameraManager* const cameraManager,
-        int encoderNumber,
-        unsigned int frameDurationUsec );
+        int encoderNumber );
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface

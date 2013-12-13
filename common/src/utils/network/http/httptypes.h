@@ -6,6 +6,7 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <cstring>
 #include <functional>
 #include <map>
 
@@ -32,11 +33,19 @@ namespace nx_http
     /************************************************************************/
     /* Comparator for case-insensitive comparison in STL assos. containers  */
     /************************************************************************/
-    struct ci_less : std::less<QByteArray>
+    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
     {
         // case-independent (ci) compare_less binary function
         bool operator() (const QByteArray& c1, const QByteArray& c2) const {
-            return c1.toLower() < c2.toLower(); 
+            if( c1.size() < c2.size() )
+                return true;
+            if( c1.size() > c2.size() )
+                return false;
+#ifdef _WIN32
+            return _strnicmp( c1.constData(), c2.constData(), c1.size() ) < 0;
+#else
+            return strncasecmp( c1.constData(), c2.constData(), c1.size() ) < 0;
+#endif
         }
     };
 
@@ -135,6 +144,10 @@ namespace nx_http
     bool parseHeader(
         StringType* const headerName,
         StringType* const headerValue,
+        const ConstBufferRefType& data );
+    bool parseHeader(
+        ConstBufferRefType* const headerName,
+        ConstBufferRefType* const headerValue,
         const ConstBufferRefType& data );
 
     namespace StatusCode

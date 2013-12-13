@@ -6,15 +6,16 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
-#include <stdint.h>
+#include <memory>
 
-#include <map>
-#include <mutex>
-#include <string>
+#include <QtCore/QUrl>
 
 #include <plugins/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
+#include <utils/network/http/httpclient.h>
+#include <utils/network/http/multipart_content_parser.h>
+
+#include "ilp_video_packet.h"
 
 
 class DirContentsManager;
@@ -25,13 +26,10 @@ class StreamReader
     public nxcip::StreamReader
 {
 public:
-    /*!
-        \param liveMode In this mode, plays all pictures in a loop
-    */
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
+        const nxcip::CameraInfo& cameraInfo,
         unsigned int frameDurationUsec,
-        bool liveMode,
         int encoderNumber );
     virtual ~StreamReader();
 
@@ -49,10 +47,15 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    nxcip::UsecUTCTimestamp m_curTimestamp;
+    nxcip::CameraInfo m_cameraInfo;
     const unsigned int m_frameDuration;
-    bool m_liveMode;
     int m_encoderNumber;
+    nxcip::UsecUTCTimestamp m_curTimestamp;
+    std::unique_ptr<nx_http::HttpClient> m_httpClient;
+    nx_http::MultipartContentParser m_multipartContentParser;
+    std::unique_ptr<ILPVideoPacket> m_videoPacket;
+
+    void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
 };
 
 #endif  //ILP_STREAM_READER_H

@@ -12,6 +12,9 @@
 #endif
 #include <cstdio>
 
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QUrl>
+
 #include "camera_manager.h"
 #include "plugin.h"
 
@@ -59,9 +62,27 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
+static const QString HTTP_PROTO_NAME( QString::fromLatin1("http") );
+static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
+
+int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
-    //TODO/IMPL checking url to be http
+    QUrl url( QString::fromUtf8(address) );
+    if( url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME )
+        return 0;
+
+    //TODO/IMPL checking content type
+
+    const QByteArray& uidStr = QCryptographicHash::hash( QByteArray::fromRawData(address, strlen(address)), QCryptographicHash::Md5 ).toHex();
+
+    memset( &cameras[0], 0, sizeof(cameras[0]) );
+    strncpy( cameras[0].uid, uidStr.constData(), sizeof(cameras[0].uid)-1 );
+    strncpy( cameras[0].url, address, sizeof(cameras[0].url)-1 );
+    //cameras[0].auxiliaryData[256];
+    if( login )
+        strncpy( cameras[0].defaultLogin, login, sizeof(cameras[0].defaultLogin)-1 );
+    if( password )
+        strncpy( cameras[0].defaultPassword, password, sizeof(cameras[0].defaultPassword)-1 );
 
     return 1;
 }
