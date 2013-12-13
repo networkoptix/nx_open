@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <functional>
 #include <memory>
 
 #include <QtCore/QDateTime>
@@ -35,7 +36,7 @@
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
 static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
-static const size_t MAX_FRAME_SIZE = 4*1024*1024;
+static const int MAX_FRAME_SIZE = 4*1024*1024;
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -56,7 +57,7 @@ StreamReader::StreamReader(
 
     using namespace std::placeholders;
 
-    auto jpgFrameHandleFunc = std::bind( std::mem_fun1( &StreamReader::gotJpegFrame ), this, _1 );
+    auto jpgFrameHandleFunc = std::bind( std::mem_fn( &StreamReader::gotJpegFrame ), this, _1 );
     m_multipartContentParser.setNextFilter( std::make_shared<CustomOutputStream<decltype(jpgFrameHandleFunc)> >(jpgFrameHandleFunc) );
 }
 
