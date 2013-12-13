@@ -93,7 +93,6 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     if( !m_streamReader.get() )
         m_streamReader.reset( new StreamReader(
             &m_refManager,
-            m_cameraManager->dirContentsManager(),
             m_frameDurationUsec,
             true,
             m_encoderNumber ) );
@@ -102,7 +101,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     return m_streamReader.get();
 }
 
-int MediaEncoder::getAudioFormat( nxcip::AudioFormat* /*format*/ ) const
+int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
-    return nxcip::NX_NOT_IMPLEMENTED;
+    //TODO/IMPL
+    return nxcip::NX_UNSUPPORTED_CODEC;
 }

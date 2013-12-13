@@ -312,7 +312,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
         return result;
 
     QSet<QString> interfaceNames;
-	QSet<QnMacAddress> interfaceMacs;
+    QSet<QnMacAddress> interfaceMacs;
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
         if (interfaceNames.contains(interfaceName))
@@ -332,7 +332,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
             if(interfaceMacs.contains(load.macAddress))
                 continue; /* Skip entries with duplicate macs. */
 
-			/* Detect virtual interfaces. */ 
+            /* Detect virtual interfaces. */ 
             for(int i = 0; i < arraysize(virtualMacs); i++) {
                 if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
                     load.type = VirtualInterface;

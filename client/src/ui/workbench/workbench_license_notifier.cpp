@@ -6,6 +6,7 @@
 #include <utils/common/synctime.h>
 
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/dialogs/license_notification_dialog.h>
 
 namespace {
@@ -38,6 +39,9 @@ QnWorkbenchLicenseNotifier::~QnWorkbenchLicenseNotifier() {
 }
 
 void QnWorkbenchLicenseNotifier::checkLicenses() {
+    if (!context()->accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        return;
+
     QnLicenseWarningStateHash licenseWarningStates = qnSettings->licenseWarningStates();
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();

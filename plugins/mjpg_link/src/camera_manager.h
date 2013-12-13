@@ -25,9 +25,9 @@ public:
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
@@ -67,12 +67,10 @@ private:
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
-    nxpt::ScopedRef<IsdNativePlugin> m_pluginRef;
+    nxpt::ScopedRef<HttpLinkPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder[2];
-    nxcip::Picture* m_motionMask;
-    bool m_audioEnabled;
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

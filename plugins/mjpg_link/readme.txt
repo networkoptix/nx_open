@@ -1,0 +1,1 @@
+This plugin adds support of mjpeg stream available via http link

@@ -154,11 +154,14 @@ int main( int argc, char* argv[] )
     int status = applauncherProcess.run();
 
 #ifdef _WIN32
-    // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
-    while (app.isRunning()) {
+    if( quitMode )
+    {
+        // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
+        while (app.isRunning()) {
+            Sleep(100);
+        } 
         Sleep(100);
-    } 
-    Sleep(100);
+    }
 #endif
 
     return status;

@@ -50,9 +50,10 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual int setBitrate( int bitrateKbps, int* selectedBitrateKbps ) override;
 
-    //!Implementation of nxcip::CameraMediaEncoder::setBitrate
+    //!Implementation of nxcip::CameraMediaEncoder2::setBitrate
     virtual nxcip::StreamReader* getLiveStreamReader() override;
-    virtual int getAudioFormat( nxcip::AudioFormat* format ) const override;
+    //!Implementation of nxcip::CameraMediaEncoder2::getAudioFormat
+    virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
 private:
     nxpt::CommonRefManager m_refManager;
