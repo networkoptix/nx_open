@@ -16,7 +16,7 @@ namespace nx_http
     /*!
         Parses multipart http content (http://en.wikipedia.org/wiki/MIME#Multipart_messages)
     */
-    class MultipartContentParser
+    class MultipartContentParserHelper
     {
     public:
         enum State
@@ -37,8 +37,8 @@ namespace nx_http
             parseError
         };
 
-        MultipartContentParser( const StringType& boundary = "boundary" );
-        ~MultipartContentParser();
+        MultipartContentParserHelper( const StringType& boundary = "boundary" );
+        ~MultipartContentParserHelper();
 
         //!Parses maximum \a count bytes of \a data starting at \a offset
         /*!
@@ -61,6 +61,11 @@ namespace nx_http
         */
         const HttpHeaders& partHeaders() const;
         void setBoundary( const StringType& boundary );
+        //!Parses content type and takes boundary
+        /*!
+            \return \a false, if \a contentType does not name a multiparted content
+        */
+        bool setContentType( const StringType& contentType );
 
     private:
         StringType m_boundary;
