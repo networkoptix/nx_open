@@ -42,7 +42,7 @@
             <artifactId>ffmpeg</artifactId>
             <version>${ffmpeg.version}</version>
             <type>tar.gz</type>
-            <classifier>${profile.classifier}</classifier>
+            <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>      
         <dependency>
             <groupId>org</groupId>
