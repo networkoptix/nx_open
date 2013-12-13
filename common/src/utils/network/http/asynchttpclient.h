@@ -142,7 +142,7 @@ namespace nx_http
             \return Number of bytes, read from socket. -1 in case of read error
         */
         int readAndParseHttp();
-        void formRequest();
+        void composeRequest();
         void serializeRequest();
         //!Sends request through \a m_socket
         /*!
