@@ -1,9 +1,9 @@
-#ifndef QN_NON_BLOCKING_PTZ_CONTROLLER_H
-#define QN_NON_BLOCKING_PTZ_CONTROLLER_H
+#ifndef QN_THREADED_PTZ_CONTROLLER_H
+#define QN_THREADED_PTZ_CONTROLLER_H
 
 #include "proxy_ptz_controller.h"
 
-class QnNonBlockingPtzControllerPrivate;
+class QnThreadedPtzControllerPrivate;
 
 class QnPtzCommandBase: public QObject {
     Q_OBJECT
@@ -12,12 +12,12 @@ signals:
 };
 
 
-class QnNonBlockingPtzController: public QnProxyPtzController {
+class QnThreadedPtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 public:
-    QnNonBlockingPtzController(const QnPtzControllerPtr &baseController);
-    virtual ~QnNonBlockingPtzController();
+    QnThreadedPtzController(const QnPtzControllerPtr &baseController);
+    virtual ~QnThreadedPtzController();
 
     static bool extends(const QnPtzControllerPtr &baseController);
 
@@ -54,7 +54,7 @@ protected:
     Q_SLOT void at_ptzCommand_finished(Qn::PtzCommand command, const QVariant &data, const QVariant &result);
 
 private:
-    QScopedPointer<QnNonBlockingPtzControllerPrivate> d;
+    QScopedPointer<QnThreadedPtzControllerPrivate> d;
 };
 
-#endif // QN_NON_BLOCKING_PTZ_CONTROLLER_H
+#endif // QN_THREADED_PTZ_CONTROLLER_H

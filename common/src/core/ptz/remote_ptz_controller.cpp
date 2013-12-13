@@ -223,5 +223,3 @@ void QnRemotePtzController::at_getData_replyReceived(int status, const QnPtzData
     if(fields != Qn::NoPtzFields)
         emit synchronized(reply);
 }
-
-
