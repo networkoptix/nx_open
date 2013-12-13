@@ -57,6 +57,9 @@ private slots:
     void at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private:
+    bool isPresetValid(const QString &presetId) const;
+
+private:
     QnPtzTour m_tour;
     QnPtzPresetList m_presets;
 };

@@ -20,7 +20,7 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
     }
 
     connect(resource.data(), SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SIGNAL(capabilitiesChanged()));
-    connect(this, SIGNAL(synchronizedLater(Qn::PtzDataFields)), this, SIGNAL(synchronized(Qn::PtzDataFields)), Qt::QueuedConnection);
+    connect(this, SIGNAL(synchronizedLater(Qn::PtzDataFields)), this, SIGNAL(synchronized(Qn::PtzDataFields)), Qt::QueuedConnection); //TODO: #Elric no such signal
 
     synchronize(Qn::AllPtzFields);
 }

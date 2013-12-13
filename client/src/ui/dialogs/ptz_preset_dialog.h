@@ -1,37 +1,38 @@
 #ifndef QN_PTZ_PRESET_DIALOG_H
 #define QN_PTZ_PRESET_DIALOG_H
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_hotkey.h>
+
+#include <ui/dialogs/abstract_ptz_dialog.h>
 
 namespace Ui {
     class PtzPresetDialog;
 }
 
-class QnPtzPresetDialog: public QnButtonBoxDialog {
+class QnPtzPresetDialog: public QnAbstractPtzDialog {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnAbstractPtzDialog base_type;
 public:
     QnPtzPresetDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetDialog();
 
-    QString name() const;
-    void setName(const QString &name);
+    QnAbstractPtzHotkeyDelegate* hotkeysDelegate() const;
+    void setHotkeysDelegate(QnAbstractPtzHotkeyDelegate *delegate);
+protected:
+    virtual void loadData(const QnPtzData &data) override;
+    virtual void saveData() const override;
+    virtual Qn::PtzDataFields requiredFields() const override;
 
+protected:
     int hotkey() const;
     void setHotkey(int hotkey);
 
-    const QList<int> &forbiddenHotkeys() const;
-    void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys);
-
-protected:
-    void setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, bool force);
-
     Q_SLOT void updateOkButtonEnabled();
-
 private:
     QScopedPointer<Ui::PtzPresetDialog> ui;
-    QList<int> m_forbiddenHotkeys;
+    QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
 };
 
 #endif // QN_PTZ_PRESET_DIALOG_H

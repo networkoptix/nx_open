@@ -19,10 +19,10 @@ QnPtzTourItemDelegate::~QnPtzTourItemDelegate() {
 
 void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
     base_type::initStyleOption(option, index);
-//    if (!index.data(Qn::ValidRole).toBool()) {
-//        QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
-//        option->palette.setColor(QPalette::Highlight, clr.lighter());
-//    }
+    if (!index.data(Qn::ValidRole).toBool()) {
+        QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
+        option->palette.setColor(QPalette::Highlight, clr.lighter());
+    }
     //TODO: #GDM PTZ invalid rows highlight
 }
 

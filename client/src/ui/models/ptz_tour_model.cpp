@@ -4,6 +4,8 @@
 
 #include <core/ptz/ptz_preset.h>
 
+#include <ui/style/globals.h>
+
 namespace {
     static const qreal speedLowest  = 0.1;
     static const qreal speedLow     = 0.325;
@@ -189,6 +191,20 @@ QVariant QnPtzTourModel::data(const QModelIndex &index, int role) const {
         }
         return QVariant();
 
+    case Qt::BackgroundRole:
+        if (!isPresetValid(spot.presetId)) {
+            switch (index.column()) {
+            case NameColumn:
+                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+            case TimeColumn:
+            case SpeedColumn:
+                return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
+            default:
+                break;
+            }
+        }
+        break;
+
     case Qn::PtzTourSpotRole:
         return QVariant::fromValue<QnPtzTourSpot>(spot);
 
@@ -270,6 +286,14 @@ bool QnPtzTourModel::setData(const QModelIndex &index, const QVariant &value, in
         return base_type::setData(index, value, role);
     }
 
+}
+
+bool QnPtzTourModel::isPresetValid(const QString &presetId) const {
+    foreach (const QnPtzPreset &preset, m_presets) {
+        if (preset.id == presetId)
+            return true;
+    }
+    return false;
 }
 
 void QnPtzTourModel::at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
