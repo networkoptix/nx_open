@@ -30,25 +30,6 @@ namespace nx_http
 {
     const int DEFAULT_HTTP_PORT = 80;
 
-    /************************************************************************/
-    /* Comparator for case-insensitive comparison in STL assos. containers  */
-    /************************************************************************/
-    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
-    {
-        // case-independent (ci) compare_less binary function
-        bool operator() (const QByteArray& c1, const QByteArray& c2) const {
-            if( c1.size() < c2.size() )
-                return true;
-            if( c1.size() > c2.size() )
-                return false;
-#ifdef _WIN32
-            return _strnicmp( c1.constData(), c2.constData(), c1.size() ) < 0;
-#else
-            return strncasecmp( c1.constData(), c2.constData(), c1.size() ) < 0;
-#endif
-        }
-    };
-
     /*!
         TODO consider using another container.
         Need some buffer with:\n
@@ -61,6 +42,22 @@ namespace nx_http
     typedef QByteArray BufferType;
     typedef QnByteArrayConstRef ConstBufferRefType;
     typedef QByteArray StringType;
+
+    /*!
+        \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
+    */
+    int strcasecmp( const StringType& one, const StringType& two );
+
+    /************************************************************************/
+    /* Comparator for case-insensitive comparison in STL assos. containers  */
+    /************************************************************************/
+    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
+    {
+        // case-independent (ci) compare_less binary function
+        bool operator() (const QByteArray& c1, const QByteArray& c2) const {
+            return strcasecmp( c1, c2 ) < 0;
+        }
+    };
 
     typedef std::map<StringType, StringType, ci_less> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;

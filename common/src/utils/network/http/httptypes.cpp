@@ -17,6 +17,20 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http
 {
+    int strcasecmp( const StringType& one, const StringType& two )
+    {
+        if( one.size() < two.size() )
+            return -1;
+        if( one.size() > two.size() )
+            return 1;
+#ifdef _WIN32
+        return _strnicmp( one.constData(), two.constData(), one.size() );
+#else
+        return strncasecmp( one.constData(), two.constData(), one.size() );
+#endif
+    }
+
+
     StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
     {
         HttpHeaders::const_iterator it = headers.find( headerName );
@@ -232,7 +246,7 @@ namespace nx_http
     {
         *dstBuffer += method;
         *dstBuffer += " ";
-        *dstBuffer += url.toString().toLatin1();
+        *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         *dstBuffer += " ";
         *dstBuffer += version;
         *dstBuffer += "\r\n";
@@ -473,9 +487,9 @@ namespace nx_http
 
 			Value fromString( const char* str )
 			{
-				if( strcasecmp( str, "Basic" ) == 0 )
+				if( ::strcasecmp( str, "Basic" ) == 0 )
 					return basic;
-				if( strcasecmp( str, "Digest" ) == 0 )
+				if( ::strcasecmp( str, "Digest" ) == 0 )
 					return digest;
 				return none;
 			}

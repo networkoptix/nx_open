@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include <QtCore/QSize>
+
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
@@ -57,9 +59,10 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
-    std::auto_ptr<StreamReader> m_streamReader;
-    unsigned int m_frameDurationUsec;
+    std::unique_ptr<StreamReader> m_streamReader;
     int m_encoderNumber;
+    QSize m_resolution;
+    float m_currentFps;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

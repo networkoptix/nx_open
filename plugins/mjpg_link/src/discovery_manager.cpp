@@ -15,6 +15,9 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrl>
 
+#include <utils/network/http/httpclient.h>
+#include <utils/network/http/multipart_content_parser.h>
+
 #include "camera_manager.h"
 #include "plugin.h"
 
@@ -71,7 +74,22 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
     if( url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME )
         return 0;
 
-    //TODO/IMPL checking content type
+    nx_http::HttpClient httpClient;
+    if( login )
+        httpClient.setUserName( QLatin1String(login) );
+    if( password )
+        httpClient.setUserPassword( QLatin1String(password) );
+    if( !httpClient.doGet( QUrl(QLatin1String(address)) ) )
+        return 0;
+
+    //checking content-type
+    nx_http::MultipartContentParser multipartContentParser;
+    if( nx_http::strcasecmp(httpClient.contentType(), "image/jpeg") != 0 && //not a motion jpeg
+        !multipartContentParser.setContentType(httpClient.contentType()) )  //not a single jpeg
+    {
+        //inappropriate content-type
+        return 0;
+    }
 
     const QByteArray& uidStr = QCryptographicHash::hash( QByteArray::fromRawData(address, strlen(address)), QCryptographicHash::Md5 ).toHex();
 

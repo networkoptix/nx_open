@@ -492,7 +492,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
     //initializing plugin manager. TODO supply plugin dir (from settings)
-    PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
+    //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)

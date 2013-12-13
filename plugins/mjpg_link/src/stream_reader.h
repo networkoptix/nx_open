@@ -29,7 +29,7 @@ public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
         const nxcip::CameraInfo& cameraInfo,
-        unsigned int frameDurationUsec,
+        float fps,
         int encoderNumber );
     virtual ~StreamReader();
 
@@ -45,17 +45,29 @@ public:
     //!Implementation nxcip::StreamReader::interrupt
     virtual void interrupt() override;
 
+    void setFps( float fps );
+
 private:
+    enum StreamType
+    {
+        mjpg,
+        jpg
+    };
+
     nxpt::CommonRefManager m_refManager;
     nxcip::CameraInfo m_cameraInfo;
-    const unsigned int m_frameDuration;
+    float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
     std::unique_ptr<nx_http::HttpClient> m_httpClient;
     nx_http::MultipartContentParser m_multipartContentParser;
     std::unique_ptr<ILPVideoPacket> m_videoPacket;
+    StreamType m_streamType;
+    qint64 m_prevFrameClock;
+    qint64 m_frameDurationMSec;
 
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
+    void waitForNextFrameTime();
 };
 
 #endif  //ILP_STREAM_READER_H
