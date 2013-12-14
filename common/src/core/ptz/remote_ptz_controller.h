@@ -55,7 +55,6 @@ private:
 
     QMutex m_mutex;
     QHash<int, Qn::PtzCommand> m_commandByHandle;
-    QnPtzData m_data;
 };
 
 

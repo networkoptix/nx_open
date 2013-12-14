@@ -104,7 +104,9 @@ public:
         GetToursPtzCommand,
 
         GetDataPtzCommand,
-        SynchronizePtzCommand
+        SynchronizePtzCommand,
+
+        InvalidPtzCommand = -1
     };
 
     enum PtzDataField {
