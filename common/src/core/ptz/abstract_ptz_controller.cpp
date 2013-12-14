@@ -4,16 +4,6 @@
 
 #include <core/resource/resource.h>
 
-namespace {
-    bool hasSpaceCapabilities(Qn::PtzCapabilities capabilities, Qn::PtzCoordinateSpace space) {
-        switch(space) {
-        case Qn::DevicePtzCoordinateSpace:  return capabilities & Qn::DevicePositioningPtzCapability;
-        case Qn::LogicalPtzCoordinateSpace: return capabilities & Qn::LogicalPositioningPtzCapability;
-        default:                            return false; 
-        }
-    }
-} // anonymous namespace
-
 QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource): 
     m_resource(resource) 
 {}
@@ -86,3 +76,20 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
         return false; /* We should never get here. */
     }
 }
+
+Qn::PtzCommand QnAbstractPtzController::spaceCommand(Qn::PtzCommand command, Qn::PtzCoordinateSpace space) {
+    switch (command) {
+    case Qn::AbsoluteDeviceMovePtzCommand:
+    case Qn::AbsoluteLogicalMovePtzCommand:
+        return space == Qn::DevicePtzCoordinateSpace ? Qn::AbsoluteDeviceMovePtzCommand : Qn::AbsoluteLogicalMovePtzCommand;
+    case Qn::GetDevicePositionPtzCommand:
+    case Qn::GetLogicalPositionPtzCommand:
+        return space == Qn::DevicePtzCoordinateSpace ? Qn::GetDevicePositionPtzCommand : Qn::GetLogicalPositionPtzCommand;
+    case Qn::GetDeviceLimitsPtzCommand:
+    case Qn::GetLogicalLimitsPtzCommand:
+        return space == Qn::DevicePtzCoordinateSpace ? Qn::GetDeviceLimitsPtzCommand : Qn::GetLogicalLimitsPtzCommand;
+    default:
+        return command;
+    }
+}
+

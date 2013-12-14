@@ -78,7 +78,7 @@ void QnFisheyePtzController::updateCapabilities() {
             Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | 
             Qn::FlipPtzCapability | Qn::LimitsPtzCapability |
             Qn::LogicalPositioningPtzCapability | 
-            Qn::VirtualPtzCapability | Qn::NonBlockingPtzCapability;
+            Qn::VirtualPtzCapability;
     } else {
         capabilities = Qn::NoPtzCapabilities;
     }

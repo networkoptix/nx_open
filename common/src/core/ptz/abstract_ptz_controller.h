@@ -265,6 +265,9 @@ signals:
     void capabilitiesChanged(); // TODO: #Elric handle in proxy?
     void finished(Qn::PtzCommand command, const QVariant &data);
 
+protected:
+    static Qn::PtzCommand spaceCommand(Qn::PtzCommand command, Qn::PtzCoordinateSpace space);
+
 private:
     QnResourcePtr m_resource;
 };

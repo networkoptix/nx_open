@@ -28,7 +28,7 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    virtual void synchronize(Qn::PtzDataFields fields) override;
+    virtual bool synchronize(Qn::PtzDataFields fields) override;
 
 private:
     void updateState();

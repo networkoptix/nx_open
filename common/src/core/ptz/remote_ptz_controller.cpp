@@ -7,25 +7,6 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 
-namespace {
-    Qn::PtzCommand spaceCommand(Qn::PtzCommand command, Qn::PtzCoordinateSpace space) {
-        switch (command) {
-        case Qn::AbsoluteDeviceMovePtzCommand:
-        case Qn::AbsoluteLogicalMovePtzCommand:
-            return space == Qn::DevicePtzCoordinateSpace ? Qn::AbsoluteDeviceMovePtzCommand : Qn::AbsoluteLogicalMovePtzCommand;
-        case Qn::GetDevicePositionPtzCommand:
-        case Qn::GetLogicalPositionPtzCommand:
-            return space == Qn::DevicePtzCoordinateSpace ? Qn::GetDevicePositionPtzCommand : Qn::GetLogicalPositionPtzCommand;
-        case Qn::GetDeviceLimitsPtzCommand:
-        case Qn::GetLogicalLimitsPtzCommand:
-            return space == Qn::DevicePtzCoordinateSpace ? Qn::GetDeviceLimitsPtzCommand : Qn::GetLogicalLimitsPtzCommand;
-        default:
-            return command;
-        }
-    }
-
-} // anonymous namespace
-
 QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resource):
     base_type(resource),
     m_resource(resource),

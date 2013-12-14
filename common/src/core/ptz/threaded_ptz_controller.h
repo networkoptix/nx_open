@@ -42,16 +42,11 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
-    virtual void synchronize(Qn::PtzDataFields fields) override;
+    virtual bool synchronize(Qn::PtzDataFields fields) override;
 
 protected:
     template<class Functor>
     void runCommand(Qn::PtzCommand command, const Functor &functor) const;
-
-    template<class T>
-    bool getField(Qn::PtzDataField field, T QnPtzData::*member, T *target);
-
-    Q_SLOT void at_ptzCommand_finished(Qn::PtzCommand command, const QVariant &data, const QVariant &result);
 
 private:
     QScopedPointer<QnThreadedPtzControllerPrivate> d;
