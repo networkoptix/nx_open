@@ -1,9 +1,9 @@
 #include "tour_ptz_controller.h"
 
 #include <QtCore/QMetaObject>
+#include <QtCore/QMutexLocker>
 
 #include <utils/common/json.h>
-#include <utils/common/container.h>
 #include <utils/common/long_runnable.h>
 
 #include <api/kvpair_usage_helper.h>
@@ -111,28 +111,16 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 }
 
 bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
-    if(tour.id.isEmpty())
-        return false;
-
-    if(tour.spots.size() < 2)
-        return false;
-
-    /* We need to check validity of the tour first. */
     QnPtzPresetList presets;
     if(!getPresets(&presets))
         return false;
 
-    for(int i = 0; i < tour.spots.size(); i++) {
-        QnPtzTourSpot &spot = tour.spots[i];
+    /* We need to check validity of the tour first. */
+    if (!tour.isValid(presets))
+        return false;
 
-        int index = qnIndexOf(presets, [&](const QnPtzPreset &preset) { return spot.presetId == preset.id; });
-        if(index == -1)
-            return false;
-
-        /* Also fix invalid parameters. */
-        spot.stayTime = qMax(spot.stayTime, 0ll);
-        spot.speed = qBound<qreal>(0.01, spot.speed, 1.0);
-    }
+    /* No so important so fix and continue. */
+    tour.validateSpots();
 
     /* Tour is fine, save it. */
     QMutexLocker locker(&d->mutex);

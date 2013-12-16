@@ -35,6 +35,7 @@ void QnPtzToursDialog::loadData(const QnPtzData &data) {
 
     ui->tourEditWidget->setPtzPresets(data.presets);
     m_model->setTours(data.tours);
+    m_model->setPresets(data.presets);
 
     if (!data.tours.isEmpty())
         ui->tourTable->setCurrentIndex(ui->tourTable->model()->index(0, 0));

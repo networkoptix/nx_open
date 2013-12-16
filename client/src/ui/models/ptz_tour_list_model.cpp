@@ -2,7 +2,10 @@
 
 #include <common/common_globals.h>
 
+#include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
+
+#include <ui/style/globals.h>
 
 QnPtzTourListModel::QnPtzTourListModel(QObject *parent) :
     base_type(parent)
@@ -19,6 +22,16 @@ const QnPtzTourList& QnPtzTourListModel::tours() const {
 void QnPtzTourListModel::setTours(const QnPtzTourList &tours) {
     beginResetModel();
     m_tours = tours;
+    endResetModel();
+}
+
+const QnPtzPresetList& QnPtzTourListModel::presets() const {
+    return m_presets;
+}
+
+void QnPtzTourListModel::setPresets(const QnPtzPresetList &presets) {
+    beginResetModel();
+    m_presets = presets;
     endResetModel();
 }
 
@@ -72,8 +85,15 @@ QVariant QnPtzTourListModel::data(const QModelIndex &index, int role) const {
     case Qt::AccessibleDescriptionRole:
     case Qt::EditRole:
         return tour.name;
+
+    case Qt::BackgroundRole:
+        if (!tour.isValid(m_presets))
+            return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+        break;
     case Qn::PtzTourRole:
         return QVariant::fromValue<QnPtzTour>(tour);
+    case Qn::ValidRole:
+        return tour.isValid(m_presets);
     default:
         break;
     }

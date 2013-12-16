@@ -30,6 +30,18 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
     QnPtzTourSpotList spots;
 
     friend bool operator==(const QnPtzTour &l, const QnPtzTour &r);
+
+    /**
+     * @brief isValid                   Check validity of the tour.
+     * @param existingPresets           List of existing PTZ presets.
+     * @return                          True if the tour has at least two different spots and all spots are exist.
+     */
+    bool isValid(const QnPtzPresetList &existingPresets) const;
+
+    /**
+     * @brief validateSpots             Fix speed and stayTime values if required.
+     */
+    void validateSpots();
 };
 
 Q_DECLARE_METATYPE(QnPtzTourSpot)

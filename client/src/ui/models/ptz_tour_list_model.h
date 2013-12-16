@@ -23,6 +23,9 @@ public:
     const QnPtzTourList& tours() const;
     void setTours(const QnPtzTourList &tours);
 
+    const QnPtzPresetList& presets() const;
+    void setPresets(const QnPtzPresetList &presets);
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -35,7 +38,7 @@ public:
     Q_SLOT void updateTour(const QnPtzTour &tour);
 private:
     QnPtzTourList m_tours;
-
+    QnPtzPresetList m_presets;
 };
 
 #endif // PTZ_TOUR_LIST_MODEL_H
