@@ -15,7 +15,7 @@ public:
     QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAbstractPtzDialog();
 
-    const QnPtzControllerPtr& ptzController() const;
+    const QnPtzControllerPtr &ptzController() const;
     void setPtzController(const QnPtzControllerPtr &controller);
 
     virtual void accept() override;

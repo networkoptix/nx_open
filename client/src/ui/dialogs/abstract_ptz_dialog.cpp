@@ -12,7 +12,7 @@ QnAbstractPtzDialog::QnAbstractPtzDialog(QWidget *parent, Qt::WindowFlags window
 QnAbstractPtzDialog::~QnAbstractPtzDialog() {
 }
 
-const QnPtzControllerPtr& QnAbstractPtzDialog::ptzController() const {
+const QnPtzControllerPtr &QnAbstractPtzDialog::ptzController() const {
     return m_controller;
 }
 
@@ -50,20 +50,21 @@ void QnAbstractPtzDialog::synchronize() {
         return;
     }
 
-    QDialog* syncronizeDialog = new QDialog(this, Qt::SplashScreen);
-    QLabel *label = new QLabel(tr("Syncronizing..."), syncronizeDialog);
-    QLayout* layout = new QHBoxLayout(syncronizeDialog);
+    QDialog *synchronizeDialog = new QDialog(this, Qt::SplashScreen);
+    QLabel *label = new QLabel(tr("Synchronizing..."), synchronizeDialog);
+    QLayout *layout = new QHBoxLayout(synchronizeDialog);
     layout->addWidget(label);
     layout->setSizeConstraint(QLayout::SetFixedSize);
-    syncronizeDialog->setLayout(layout);
-    syncronizeDialog->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    syncronizeDialog->setModal(true);
-    syncronizeDialog->setGeometry(this->geometry().center().x(), this->geometry().center().y(), 1, 1); //TODO: #GDM make this on showEvent() and geometryChanged()
-    connect(m_controller, SIGNAL(synchronized(QnPtzData)), syncronizeDialog, SLOT(accept()));
+    synchronizeDialog->setLayout(layout);
+    synchronizeDialog->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    synchronizeDialog->setModal(true);
+    synchronizeDialog->setGeometry(this->geometry().center().x(), this->geometry().center().y(), 1, 1); //TODO: #GDM make this on showEvent() and geometryChanged()
+    connect(m_controller, &QnAbstractPtzController::finished, synchronizeDialog, &QDialog::accept); // TODO: #Elric wrong, we need only one specific signal
     m_controller->synchronize(requiredFields());
-    syncronizeDialog->exec();
+    synchronizeDialog->exec();
 }
 
 void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
-    //loadData(data);
+    if(command == Qn::SynchronizePtzCommand)
+        loadData(data.value<QnPtzData>());
 }
