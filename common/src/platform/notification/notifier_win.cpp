@@ -23,8 +23,8 @@ class QnWindowsNotifierWindow: public QObject {
 public:
     QnWindowsNotifierWindow(QObject *parent = NULL): 
         QObject(parent),
-        m_wndClass(NULL),
-        m_hwnd(NULL) 
+        m_wndClass(0),
+        m_hwnd(0) 
     {
         WNDCLASSEXW wcex;
         wcex.cbSize         = sizeof(WNDCLASSEXW);
@@ -32,13 +32,13 @@ public:
         wcex.lpfnWndProc    = qn_windowsNotifierWidgetProc;
         wcex.cbClsExtra     = 0;
         wcex.cbWndExtra     = 0;
-        wcex.hInstance      = GetModuleHandle(NULL);
-        wcex.hIcon          = NULL;
-        wcex.hCursor        = NULL;
-        wcex.hbrBackground  = NULL;
-        wcex.lpszMenuName   = NULL;
+        wcex.hInstance      = GetModuleHandle(0);
+        wcex.hIcon          = 0;
+        wcex.hCursor        = 0;
+        wcex.hbrBackground  = 0;
+        wcex.lpszMenuName   = 0;
         wcex.lpszClassName  = qn_windowsNotifierWindowClassName;
-        wcex.hIconSm        = NULL;
+        wcex.hIconSm        = 0;
         
         m_wndClass = RegisterClassExW(&wcex);
         if(!m_wndClass) {
@@ -47,17 +47,17 @@ public:
         }
 
         m_hwnd = CreateWindowExW(
-            NULL,
+            0,
             qn_windowsNotifierWindowClassName, 
             L"",
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, 
             CW_USEDEFAULT,
             100, 100,
-            NULL,
-            NULL,
-            GetModuleHandle(NULL),
-            NULL
+            0,
+            0,
+            GetModuleHandle(0),
+            0
         );
         if(!m_hwnd) {
             qnWarning("Windows notifier window creation failed.");

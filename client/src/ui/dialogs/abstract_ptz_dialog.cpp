@@ -25,7 +25,8 @@ void QnAbstractPtzDialog::setPtzController(const QnPtzControllerPtr &controller)
 
     m_controller = controller;
 
-    connect(m_controller, SIGNAL(synchronized(QnPtzData)), this, SLOT(at_controller_synchronized(QnPtzData)));
+    if(m_controller)
+        connect(m_controller, &QnAbstractPtzController::finished, this, &QnAbstractPtzDialog::at_controller_finished);
 
     synchronize();
 }
@@ -58,11 +59,11 @@ void QnAbstractPtzDialog::synchronize() {
     syncronizeDialog->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     syncronizeDialog->setModal(true);
     syncronizeDialog->setGeometry(this->geometry().center().x(), this->geometry().center().y(), 1, 1); //TODO: #GDM make this on showEvent() and geometryChanged()
-    connect(m_controller,  SIGNAL(synchronized(QnPtzData)), syncronizeDialog, SLOT(accept()));
+    connect(m_controller, SIGNAL(synchronized(QnPtzData)), syncronizeDialog, SLOT(accept()));
     m_controller->synchronize(requiredFields());
     syncronizeDialog->exec();
 }
 
-void QnAbstractPtzDialog::at_controller_synchronized(const QnPtzData &data) {
-    loadData(data);
+void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
+    //loadData(data);
 }

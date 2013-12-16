@@ -49,6 +49,13 @@
 #endif
 
 
+/* Define NULL. */
+#ifdef __cplusplus
+#   undef NULL
+#   define NULL nullptr
+#endif
+
+
 /* Define noexcept. */
 //#if defined(_MSC_VER) && _MSC_VER < 1700
 //#   define noexcept throw()
