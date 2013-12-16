@@ -221,16 +221,9 @@ namespace nx_hls
         QStringRef fileName;
         if( fileNameStartIndex == path.size()-1 )   //path ends with /. E.g., /hls/camera1.m3u/. Skipping trailing /
         {
-    #if QT_VERSION >= 0x040800
             int newFileNameStartIndex = path.midRef(0, path.size()-1).lastIndexOf(QChar('/'));
             if( newFileNameStartIndex == -1 )
                 return StatusCode::notFound;
-    #else
-            //TODO delete this block after move to Qt4.8
-            size_t newFileNameStartIndex = nx_http::find_last_of( path, QChar('/'), 0, path.size()-1 );
-            if( newFileNameStartIndex == nx_http::BufferNpos )
-                return StatusCode::notFound;
-    #endif
             fileName = path.midRef( newFileNameStartIndex+1, fileNameStartIndex-(newFileNameStartIndex+1) );
         }
         else
@@ -263,17 +256,8 @@ namespace nx_hls
         else
         {
             //found extension
-    #if QT_VERSION >= 0x040800
             const QStringRef& extension = fileName.mid( extensionSepPos-fileName.constData()+1 );
             const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos-fileName.constData() );
-    #else
-            const QStringRef& extension = fileName.string()->midRef(
-                fileName.position()+(extensionSepPos-fileName.constData()+1),
-                fileName.size()-(extensionSepPos-fileName.constData()+1) );
-            const QStringRef& shortFileName = fileName.string()->midRef(
-                fileName.position(),
-                extensionSepPos-fileName.constData() );
-    #endif
             if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
                 return getHLSPlaylist(
                     request,
