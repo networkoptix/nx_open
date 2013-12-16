@@ -45,7 +45,7 @@
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
-        <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+        <ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
