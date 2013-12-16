@@ -1,5 +1,7 @@
 #include "caching_ptz_controller.h"
 
+#include <common/common_meta_types.h>
+
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
 	base_type(baseController)
 {
@@ -50,8 +52,11 @@ bool QnCachingPtzController::viewportMove(qreal aspectRatio, const QRectF &viewp
 }
 
 bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+    if(!base_type::getPosition(space, position))
+        return false;
+
+    QMutexLocker locker(&m_mutex);
 	if(space == Qn::DevicePtzCoordinateSpace) {
-        QMutexLocker locker(&m_mutex);
 		if(m_data.fields & Qn::DevicePositionPtzField) {
 			*position = m_data.devicePosition;
 			return true;
@@ -59,7 +64,6 @@ bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 			return false;
         }
     } else {
-        QMutexLocker locker(&m_mutex);
         if(m_data.fields & Qn::LogicalPositionPtzField) {
             *position = m_data.logicalPosition;
             return true;
@@ -70,8 +74,11 @@ bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 }
 
 bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
+    if(!base_type::getLimits(space, limits))
+        return false;
+
+    QMutexLocker locker(&m_mutex);
     if(space == Qn::DevicePtzCoordinateSpace) {
-        QMutexLocker locker(&m_mutex);
         if(m_data.fields & Qn::DeviceLimitsPtzField) {
             *limits = m_data.deviceLimits;
             return true;
@@ -79,7 +86,6 @@ bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
             return false;
         }
     } else {
-        QMutexLocker locker(&m_mutex);
         if(m_data.fields & Qn::LogicalLimitsPtzField) {
             *limits = m_data.logicalLimits;
             return true;
@@ -90,6 +96,9 @@ bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
 }
 
 bool QnCachingPtzController::getFlip(Qt::Orientations *flip) {
+    if(!base_type::getFlip(flip))
+        return false;
+
     QMutexLocker locker(&m_mutex);
     if(m_data.fields & Qn::FlipPtzField) {
         *flip = m_data.flip;
@@ -116,6 +125,9 @@ bool QnCachingPtzController::activatePreset(const QString &presetId, qreal speed
 }
 
 bool QnCachingPtzController::getPresets(QnPtzPresetList *presets) {
+    if(!base_type::getPresets(presets))
+        return false;
+
     QMutexLocker locker(&m_mutex);
     if(m_data.fields & Qn::PresetsPtzField) {
         *presets = m_data.presets;
@@ -138,6 +150,9 @@ bool QnCachingPtzController::activateTour(const QString &tourId) {
 }
 
 bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
+    if(!base_type::getTours(tours))
+        return false;
+
     QMutexLocker locker(&m_mutex);
     if(m_data.fields & Qn::ToursPtzField) {
         *tours = m_data.tours;
@@ -148,6 +163,9 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
 }
 
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
+    if(!base_type::getData(query, data))
+        return false;
+
     QMutexLocker locker(&m_mutex);
 	*data = m_data;
 	data->query = query;
@@ -217,6 +235,27 @@ void QnCachingPtzController::at_baseController_finished(Qn::PtzCommand command, 
                 }
             }
             break;
+        case Qn::GetDeviceLimitsPtzCommand:
+            m_data.fields |= Qn::DeviceLimitsPtzField;
+            m_data.deviceLimits = data.value<QnPtzLimits>();
+            break;
+        case Qn::GetLogicalLimitsPtzCommand:
+            m_data.fields |= Qn::LogicalLimitsPtzField;
+            m_data.logicalLimits = data.value<QnPtzLimits>();
+            break;
+        case Qn::GetFlipPtzCommand:
+            m_data.fields |= Qn::FlipPtzField;
+            m_data.flip = data.value<Qt::Orientations>();
+            break;
+        case Qn::GetPresetsPtzCommand:
+            m_data.fields |= Qn::PresetsPtzField;
+            m_data.presets = data.value<QnPtzPresetList>();
+            break;
+        case Qn::GetToursPtzCommand:
+            m_data.fields |= Qn::ToursPtzField;
+            m_data.tours = data.value<QnPtzTourList>();
+            break;
+        case Qn::GetDataPtzCommand:
 		case Qn::SynchronizePtzCommand:
 			updateCacheLocked(data.value<QnPtzData>());
 			break;
