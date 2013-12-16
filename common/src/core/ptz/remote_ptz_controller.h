@@ -35,26 +35,33 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
     virtual bool synchronize(Qn::PtzDataFields query) override;
 
 private slots:
     void at_replyReceived(int status, const QVariant &reply, int handle);
 
 private:
-    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
-
     bool isPointless(Qn::PtzCommand command);
 
     int nextSequenceNumber();
 
 private:
+    struct PtzCommandData {
+        PtzCommandData(): command(Qn::InvalidPtzCommand) {}
+        PtzCommandData(Qn::PtzCommand command, const QVariant &value): command(command), value(value) {}
+
+        Qn::PtzCommand command;
+        QVariant value;
+    };
+
     QnNetworkResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;
     QUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 
     QMutex m_mutex;
-    QHash<int, Qn::PtzCommand> m_commandByHandle;
+    QHash<int, PtzCommandData> m_dataByHandle;
 };
 
 

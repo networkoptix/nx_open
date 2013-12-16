@@ -40,7 +40,6 @@ public:
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return m_baseController->getData(query, data); }
-
     virtual bool synchronize(Qn::PtzDataFields query) override                                                  { return m_baseController->synchronize(query); }
 
 private:

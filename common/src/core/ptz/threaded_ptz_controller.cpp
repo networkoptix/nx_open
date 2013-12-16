@@ -198,6 +198,10 @@ bool QnThreadedPtzController::getTours(QnPtzTourList *tours) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, result, getTours, &result);
 }
 
+bool QnThreadedPtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
+    RUN_COMMAND(Qn::GetDataPtzCommand, QnPtzData, result, getData, query, &result);
+}
+
 bool QnThreadedPtzController::synchronize(Qn::PtzDataFields query) {
     RUN_COMMAND(Qn::SynchronizePtzCommand, QnPtzData, (controller->getData(query, &result) ? result : QnPtzData(query, Qn::NoPtzFields)), synchronize, query);
 }
