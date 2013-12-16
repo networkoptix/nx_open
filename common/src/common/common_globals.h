@@ -81,12 +81,15 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
 
     enum PtzCommand {
-        ContinousMovePtzCommand,
-        AbsoluteMovePtzCommand,
+        ContinuousMovePtzCommand,
+        AbsoluteDeviceMovePtzCommand,
+        AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
 
-        GetPositionPtzCommand,
-        GetLimitsPtzCommand,
+        GetDevicePositionPtzCommand,
+        GetLogicalPositionPtzCommand,
+        GetDeviceLimitsPtzCommand,
+        GetLogicalLimitsPtzCommand,
         GetFlipPtzCommand,
         
         CreatePresetPtzCommand,
@@ -101,7 +104,9 @@ public:
         GetToursPtzCommand,
 
         GetDataPtzCommand,
-        SynchronizePtzCommand
+        SynchronizePtzCommand,
+
+        InvalidPtzCommand = -1
     };
 
     enum PtzDataField {
@@ -120,7 +125,7 @@ public:
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
-        LogicalPtzCoordinateSpace,
+        LogicalPtzCoordinateSpace
     };
 
     enum PtzCapability {
@@ -145,8 +150,9 @@ public:
         PresetsPtzCapability                = 0x00010000,
         ToursPtzCapability                  = 0x00020000,
 
-        VirtualPtzCapability                = 0x00100000,
-        NonBlockingPtzCapability            = 0x00200000,
+        AsynchronousPtzCapability           = 0x00100000,
+        SynchronizedPtzCapability           = 0x00200000,
+        VirtualPtzCapability                = 0x00400000,
 
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,

@@ -2,6 +2,7 @@
 #define QN_PTZ_LIMITS_H
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
 #include <QtGui/QVector3D>
 
 struct QnPtzLimits {
@@ -14,6 +15,9 @@ struct QnPtzLimits {
     qreal minFov;
     qreal maxFov;
 };
+
+Q_DECLARE_TYPEINFO(QnPtzLimits, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(QnPtzLimits);
 
 
 inline QVector3D qBound(const QVector3D &position, const QnPtzLimits &limits) {

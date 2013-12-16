@@ -4,16 +4,6 @@
 
 #include <core/resource/resource.h>
 
-namespace {
-    bool hasSpaceCapabilities(Qn::PtzCapabilities capabilities, Qn::PtzCoordinateSpace space) {
-        switch(space) {
-        case Qn::DevicePtzCoordinateSpace:  return capabilities & Qn::DevicePositioningPtzCapability;
-        case Qn::LogicalPtzCoordinateSpace: return capabilities & Qn::LogicalPositioningPtzCapability;
-        default:                            return capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability); 
-        }
-    }
-} // anonymous namespace
-
 QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource): 
     m_resource(resource) 
 {}
@@ -22,7 +12,7 @@ QnAbstractPtzController::~QnAbstractPtzController() {
     return;
 }
 
-void QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
+bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     data->query = query;
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
@@ -34,28 +24,32 @@ void QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     if((query & Qn::FlipPtzField)              && getFlip(&data->flip))                                                 data->fields |= Qn::FlipPtzField;
     if((query & Qn::PresetsPtzField)           && getPresets(&data->presets))                                           data->fields |= Qn::PresetsPtzField;
     if((query & Qn::ToursPtzField)             && getTours(&data->tours))                                               data->fields |= Qn::ToursPtzField;
+    return true;
 }
 
 bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
-    return supports(command, static_cast<Qn::PtzCoordinateSpace>(-1));
-}
-
-bool QnAbstractPtzController::supports(Qn::PtzCommand command, Qn::PtzCoordinateSpace space) {
     Qn::PtzCapabilities capabilities = getCapabilities();
 
     switch (command) {
-    case Qn::ContinousMovePtzCommand:       
+    case Qn::ContinuousMovePtzCommand:       
         return (capabilities & Qn::ContinuousPtzCapabilities);
 
-    case Qn::GetPositionPtzCommand:         
-    case Qn::AbsoluteMovePtzCommand:        
-        return (capabilities & Qn::AbsolutePtzCapabilities) && hasSpaceCapabilities(capabilities, space);
+    case Qn::GetDevicePositionPtzCommand:
+    case Qn::AbsoluteDeviceMovePtzCommand:
+        return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::DevicePositioningPtzCapability);
+
+    case Qn::GetLogicalPositionPtzCommand:
+    case Qn::AbsoluteLogicalMovePtzCommand:        
+        return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::LogicalPositioningPtzCapability);
 
     case Qn::ViewportMovePtzCommand:        
         return (capabilities & Qn::ViewportPtzCapability);
 
-    case Qn::GetLimitsPtzCommand:           
-        return (capabilities & Qn::LimitsPtzCapability) && hasSpaceCapabilities(capabilities, space);
+    case Qn::GetDeviceLimitsPtzCommand:           
+        return (capabilities & Qn::LimitsPtzCapability) && (capabilities & Qn::DevicePositioningPtzCapability);
+
+    case Qn::GetLogicalLimitsPtzCommand:           
+        return (capabilities & Qn::LimitsPtzCapability) && (capabilities & Qn::LogicalPositioningPtzCapability);
 
     case Qn::GetFlipPtzCommand:             
         return (capabilities & Qn::FlipPtzCapability);
@@ -82,3 +76,20 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command, Qn::PtzCoordinate
         return false; /* We should never get here. */
     }
 }
+
+Qn::PtzCommand QnAbstractPtzController::spaceCommand(Qn::PtzCommand command, Qn::PtzCoordinateSpace space) {
+    switch (command) {
+    case Qn::AbsoluteDeviceMovePtzCommand:
+    case Qn::AbsoluteLogicalMovePtzCommand:
+        return space == Qn::DevicePtzCoordinateSpace ? Qn::AbsoluteDeviceMovePtzCommand : Qn::AbsoluteLogicalMovePtzCommand;
+    case Qn::GetDevicePositionPtzCommand:
+    case Qn::GetLogicalPositionPtzCommand:
+        return space == Qn::DevicePtzCoordinateSpace ? Qn::GetDevicePositionPtzCommand : Qn::GetLogicalPositionPtzCommand;
+    case Qn::GetDeviceLimitsPtzCommand:
+    case Qn::GetLogicalLimitsPtzCommand:
+        return space == Qn::DevicePtzCoordinateSpace ? Qn::GetDeviceLimitsPtzCommand : Qn::GetLogicalLimitsPtzCommand;
+    default:
+        return command;
+    }
+}
+

@@ -2,9 +2,9 @@
 #define QN_REMOTE_PTZ_CONTROLLER_H
 
 #include <QtCore/QUuid>
+#include <QtCore/QAtomicInt>
 
 #include "abstract_ptz_controller.h"
-#include "ptz_data.h"
 
 class QnRemotePtzController: public QnAbstractPtzController {
     Q_OBJECT
@@ -35,35 +35,33 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
-    virtual void synchronize(Qn::PtzDataFields fields) override;
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
+    virtual bool synchronize(Qn::PtzDataFields query) override;
 
 private slots:
-    void at_continuousMove_replyReceived(int status, int handle);
-    void at_absoluteMove_replyReceived(int status, int handle);
-    void at_relativeMove_replyReceived(int status, int handle);
-
-    void at_createPreset_replyReceived(int status, int handle);
-    void at_updatePreset_replyReceived(int status, int handle);
-    void at_removePreset_replyReceived(int status, int handle);
-    void at_activatePreset_replyReceived(int status, int handle);
-
-    void at_createTour_replyReceived(int status, int handle);
-    void at_removeTour_replyReceived(int status, int handle);
-    void at_activateTour_replyReceived(int status, int handle);
-
-    void at_getData_replyReceived(int status, const QnPtzData &reply, int handle);
+    void at_replyReceived(int status, const QVariant &reply, int handle);
 
 private:
-    Q_SIGNAL void synchronizedLater(Qn::PtzDataFields fields);
+    bool isPointless(Qn::PtzCommand command);
+
+    int nextSequenceNumber();
 
 private:
+    struct PtzCommandData {
+        PtzCommandData(): command(Qn::InvalidPtzCommand) {}
+        PtzCommandData(Qn::PtzCommand command, const QVariant &value): command(command), value(value) {}
+
+        Qn::PtzCommand command;
+        QVariant value;
+    };
+
     QnNetworkResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;
     QUuid m_sequenceId;
-    int m_sequenceNumber;
-    
-    QHash<int, Qn::PtzDataFields> m_fieldsByHandle;
-    QnPtzData m_data;
+    QAtomicInt m_sequenceNumber;
+
+    QMutex m_mutex;
+    QHash<int, PtzCommandData> m_dataByHandle;
 };
 
 

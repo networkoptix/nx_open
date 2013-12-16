@@ -32,7 +32,8 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
     friend bool operator==(const QnPtzTour &l, const QnPtzTour &r);
 };
 
-Q_DECLARE_METATYPE(QnPtzTour)
 Q_DECLARE_METATYPE(QnPtzTourSpot)
+Q_DECLARE_METATYPE(QnPtzTour)
+Q_DECLARE_METATYPE(QnPtzTourList)
 
 #endif // QN_PTZ_TOUR_H

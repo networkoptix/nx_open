@@ -1384,7 +1384,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
         if (m_tourModeHintLabel) {
             m_tourModeHintLabel->hideImmideately();
-            disconnect(m_tourModeHintLabel, 0, this, 0);
+            disconnect(m_tourModeHintLabel, NULL, this, NULL);
             m_tourModeHintLabel = NULL;
         }
         return;

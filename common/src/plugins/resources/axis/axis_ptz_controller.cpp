@@ -255,8 +255,8 @@ bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
-void QnAxisPtzController::synchronize(Qn::PtzDataFields fields) {
-    base_type::synchronize(fields);
+bool QnAxisPtzController::synchronize(Qn::PtzDataFields fields) {
+    return base_type::synchronize(fields); // TODO
 }
 
 #endif // #ifdef ENABLE_AXIS

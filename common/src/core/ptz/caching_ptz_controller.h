@@ -1,23 +1,17 @@
-#ifndef QN_THREADED_PTZ_CONTROLLER_H
-#define QN_THREADED_PTZ_CONTROLLER_H
+#ifndef QN_CACHING_PTZ_CONTROLLER_H
+#define QN_CACHING_PTZ_CONTROLLER_H
+
+#include <QtCore/QMutex>
 
 #include "proxy_ptz_controller.h"
 
-class QnThreadedPtzControllerPrivate;
-
-class QnPtzCommandBase: public QObject {
-    Q_OBJECT
-signals:
-    void finished(Qn::PtzCommand command, const QVariant &data);
-};
-
-
-class QnThreadedPtzController: public QnProxyPtzController {
+class QnCachingPtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
+
 public:
-    QnThreadedPtzController(const QnPtzControllerPtr &baseController);
-    virtual ~QnThreadedPtzController();
+    QnCachingPtzController(const QnPtzControllerPtr &baseController);
+    virtual ~QnCachingPtzController();
 
     static bool extends(const QnPtzControllerPtr &baseController);
 
@@ -30,7 +24,7 @@ public:
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
-        
+
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
@@ -45,12 +39,14 @@ public:
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
     virtual bool synchronize(Qn::PtzDataFields query) override;
 
-protected:
-    template<class Functor>
-    void runCommand(Qn::PtzCommand command, const Functor &functor) const;
+private:
+    void updateCacheLocked(const QnPtzData &data);
+    Q_SLOT void at_baseController_finished(Qn::PtzCommand command, const QVariant &data);
 
 private:
-    QScopedPointer<QnThreadedPtzControllerPrivate> d;
+    QMutex m_mutex;
+    QnPtzData m_data;
 };
 
-#endif // QN_THREADED_PTZ_CONTROLLER_H
+
+#endif // QN_CACHING_PTZ_CONTROLLER_H

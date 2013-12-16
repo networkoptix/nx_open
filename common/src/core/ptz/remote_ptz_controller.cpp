@@ -2,16 +2,17 @@
 
 #include <QtCore/QEventLoop>
 
+#include <boost/preprocessor/tuple/enum.hpp>
+
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 
 QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resource):
     base_type(resource),
-    m_resource(resource)
+    m_resource(resource),
+    m_sequenceId(QUuid::createUuid()),
+    m_sequenceNumber(1)
 {
-    m_sequenceId = QUuid::createUuid();
-    m_sequenceNumber = 0;
-
     m_server = m_resource->getParentResource().dynamicCast<QnMediaServerResource>();
     if(!m_server) {
         /* Apparently this really does happen... */
@@ -19,10 +20,7 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
         return;
     }
 
-    connect(resource.data(), SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SIGNAL(capabilitiesChanged()));
-    connect(this, SIGNAL(synchronizedLater(Qn::PtzDataFields)), this, SIGNAL(synchronized(Qn::PtzDataFields)), Qt::QueuedConnection); //TODO: #Elric no such signal
-
-    synchronize(Qn::AllPtzFields);
+    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, &QnAbstractPtzController::capabilitiesChanged);
 }
 
 QnRemotePtzController::~QnRemotePtzController() {
@@ -31,46 +29,54 @@ QnRemotePtzController::~QnRemotePtzController() {
 
 Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
     Qn::PtzCapabilities result = m_resource->getPtzCapabilities();
-    result |= Qn::NonBlockingPtzCapability;
+    result |= Qn::AsynchronousPtzCapability;
     result &= ~(Qn::FlipPtzCapability | Qn::LimitsPtzCapability);
     return result;
 }
 
-bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
+bool QnRemotePtzController::isPointless(Qn::PtzCommand command) {
     if(!m_server)
-        return false;
+        return true;
 
-    m_server->apiConnection()->ptzContinuousMoveAsync(m_resource, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_continuousMove_replyReceived(int, int)));
-    return true;
+    QnResource::Status status = m_resource->getStatus();
+    if(status == QnResource::Unauthorized || status == QnResource::Offline)
+        return true;
+
+    return !base_type::supports(command);
+}
+
+int QnRemotePtzController::nextSequenceNumber() {
+    return m_sequenceNumber.fetchAndAddOrdered(1);
+}
+
+#define RUN_COMMAND(COMMAND, RETURN_VALUE, FUNCTION, ... /* PARAMS */)          \
+    {                                                                           \
+        Qn::PtzCommand command = COMMAND;                                       \
+        if(isPointless(command))                                                \
+            return false;                                                       \
+                                                                                \
+        int handle = m_server->apiConnection()->FUNCTION(m_resource, ##__VA_ARGS__, this, SLOT(at_replyReceived(int, const QVariant &, int))); \
+                                                                                \
+        QMutexLocker locker(&m_mutex);                                          \
+        m_dataByHandle[handle] = PtzCommandData(command, QVariant::fromValue(RETURN_VALUE)); \
+        return true;                                                            \
+    }
+
+
+bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
+    RUN_COMMAND(Qn::ContinuousMovePtzCommand, speed, ptzContinuousMoveAsync, speed, m_sequenceId, nextSequenceNumber());
 }
 
 bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzAbsoluteMoveAsync(m_resource, space, position, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_absoluteMove_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), position, ptzAbsoluteMoveAsync, space, position, speed, m_sequenceId, nextSequenceNumber());
 }
 
 bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzViewportMoveAsync(m_resource, aspectRatio, viewport, speed, m_sequenceId, m_sequenceNumber++, this, SLOT(at_relativeMove_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::ViewportMovePtzCommand, viewport, ptzViewportMoveAsync, aspectRatio, viewport, speed, m_sequenceId, nextSequenceNumber());
 }
 
-bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(!m_server)
-        return false;
-
-    QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzGetPositionAsync(m_resource, space, &result, SLOT(processReply(int, const QVariant &, int)));
-    if(result.exec() != 0)
-        return false;
-
-    *position = result.reply<QVector3D>();
-    return true;
+bool QnRemotePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *) {
+    RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVariant(), ptzGetPositionAsync, space);
 }
 
 bool QnRemotePtzController::getLimits(Qn::PtzCoordinateSpace, QnPtzLimits *) {
@@ -82,144 +88,72 @@ bool QnRemotePtzController::getFlip(Qt::Orientations *) {
 }
 
 bool QnRemotePtzController::createPreset(const QnPtzPreset &preset) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzCreatePresetAsync(m_resource, preset, this, SLOT(at_createPreset_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::CreatePresetPtzCommand, preset, ptzCreatePresetAsync, preset);
 }
 
 bool QnRemotePtzController::updatePreset(const QnPtzPreset &preset) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzUpdatePresetAsync(m_resource, preset, this, SLOT(at_updatePreset_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::UpdatePresetPtzCommand, preset, ptzUpdatePresetAsync, preset);
 }
 
 bool QnRemotePtzController::removePreset(const QString &presetId) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzRemovePresetAsync(m_resource, presetId, this, SLOT(at_removePreset_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::RemovePresetPtzCommand, presetId, ptzRemovePresetAsync, presetId);
 }
 
 bool QnRemotePtzController::activatePreset(const QString &presetId, qreal speed) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzActivatePresetAsync(m_resource, presetId, speed, this, SLOT(at_activatePreset_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::ActivatePresetPtzCommand, presetId, ptzActivatePresetAsync, presetId, speed);
 }
 
-bool QnRemotePtzController::getPresets(QnPtzPresetList *presets) {
-    if(!m_server)
-        return false;
-
-    *presets = m_data.presets; // TODO: #Elric implement properly =)
-
-    /*QnConnectionRequestResult result;
-    m_server->apiConnection()->ptzGetPresetsAsync(m_resource, &result, SLOT(processReply(int, const QVariant &, int)));
-    if(result.exec() != 0)
-        return false;
-
-    *presets = result.reply<QnPtzPresetList>();*/
-    return true;
+bool QnRemotePtzController::getPresets(QnPtzPresetList *) {
+    RUN_COMMAND(Qn::GetPresetsPtzCommand, QVariant(), ptzGetPresetsAsync);
 }
 
 bool QnRemotePtzController::createTour(const QnPtzTour &tour) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzCreateTourAsync(m_resource, tour, this, SLOT(at_createTour_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::CreateTourPtzCommand, tour, ptzCreateTourAsync, tour);
 }
 
 bool QnRemotePtzController::removeTour(const QString &tourId) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzRemoveTourAsync(m_resource, tourId, this, SLOT(at_removeTour_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::RemoveTourPtzCommand, tourId, ptzRemoveTourAsync, tourId);
 }
 
 bool QnRemotePtzController::activateTour(const QString &tourId) {
-    if(!m_server)
-        return false;
-
-    m_server->apiConnection()->ptzActivateTourAsync(m_resource, tourId, this, SLOT(at_activateTour_replyReceived(int, int)));
-    return true;
+    RUN_COMMAND(Qn::ActivateTourPtzCommand, tourId, ptzActivateTourAsync, tourId);
 }
 
-bool QnRemotePtzController::getTours(QnPtzTourList *tours) {
-    if(!m_server)
-        return false;
-
-    *tours = m_data.tours; // TODO: #Elric implement properly =)
-    return true;
+bool QnRemotePtzController::getTours(QnPtzTourList *) {
+    RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
-void QnRemotePtzController::synchronize(Qn::PtzDataFields fields) {
-    if(fields == Qn::NoPtzFields) {
-        emit synchronizedLater(fields);
-        return;
-    }
+bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
+    RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
+}
 
-    int handle = m_server->apiConnection()->ptzGetDataAsync(m_resource, fields, this, SLOT(at_getData_replyReceived(int, const QnPtzData &, int)));
-    m_fieldsByHandle.insert(handle, fields);
+bool QnRemotePtzController::synchronize(Qn::PtzDataFields query) {
+    /* There really is nothing to synchronize, so we just run getData. */
+    RUN_COMMAND(Qn::SynchronizePtzCommand, QVariant(), ptzGetDataAsync, query);
 }
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnRemotePtzController::at_continuousMove_replyReceived(int status, int handle) {
-    return;
-}
+void QnRemotePtzController::at_replyReceived(int status, const QVariant &reply, int handle) {
+    PtzCommandData data;
+    {
+        QMutexLocker locker(&m_mutex);
 
-void QnRemotePtzController::at_absoluteMove_replyReceived(int status, int handle) {
-    return;
-}
+        auto pos = m_dataByHandle.find(handle);
+        if(pos == m_dataByHandle.end())
+            return; /* This really should never happen. */
 
-void QnRemotePtzController::at_relativeMove_replyReceived(int status, int handle) {
-    return;
-}
+        data = *pos;
+        m_dataByHandle.erase(pos);
+    }
 
-void QnRemotePtzController::at_createPreset_replyReceived(int status, int handle) {
-    return;
-}
+    if(status == 0) {
+        if(!data.value.isValid())
+            data.value = reply;
+    } else {
+        data.value = QVariant();
+    }
 
-void QnRemotePtzController::at_updatePreset_replyReceived(int status, int handle) {
-    return;
-}
-
-void QnRemotePtzController::at_removePreset_replyReceived(int status, int handle) {
-    return;
-}
-
-void QnRemotePtzController::at_activatePreset_replyReceived(int status, int handle) {
-    return;
-}
-
-void QnRemotePtzController::at_createTour_replyReceived(int status, int handle) {
-    return;
-}
-
-void QnRemotePtzController::at_removeTour_replyReceived(int status, int handle) {
-    return;
-}
-
-void QnRemotePtzController::at_activateTour_replyReceived(int status, int handle) {
-    return;
-}
-
-void QnRemotePtzController::at_getData_replyReceived(int status, const QnPtzData &reply, int handle) {
-    Qn::PtzDataFields fields = m_fieldsByHandle.value(handle, Qn::NoPtzFields);
-    m_fieldsByHandle.remove(handle);
-    
-    // TODO: store only valid fields!
-    m_data = reply;
-    
-    if(fields != Qn::NoPtzFields)
-        emit synchronized(reply);
+    emit finished(data.command, data.value);
 }

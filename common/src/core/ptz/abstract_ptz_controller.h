@@ -41,8 +41,11 @@ public:
      */
     bool hasCapabilities(Qn::PtzCapabilities capabilities) { return (getCapabilities() & capabilities) == capabilities; }
 
+    /**
+     * \param command                   Ptz command to check.
+     * \returns                         Whether this controller supports the given command.
+     */
     bool supports(Qn::PtzCommand command);
-    bool supports(Qn::PtzCommand command, Qn::PtzCoordinateSpace space);
 
     /**
      * Starts PTZ movement. Speed is specified in image-based coordinate space and
@@ -247,31 +250,23 @@ public:
      * 
      * \param query                     Data fields to get.
      * \param[out] data                 PTZ data.
+     * \returns                         Whether the operation was successful.
      */
-    virtual void getData(Qn::PtzDataFields query, QnPtzData *data);
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data);
 
     /**
      * Synchronizes this controller's internal caches with the actual target values.
-     * At the end of each synchronization operation, a <tt>synchronized</tt>
-     * signal is emitted.
-     * 
-     * If this controller is blocking, then the signal will be emitted from inside 
-     * this function.
-     * 
-     * If it is non-blocking, then the function will return instantly, 
-     * and the signal will be emitted when the synchronization operation 
-     * actually completes, effectively making this function asynchronous.
-     * 
-     * Note that this function may be used by the controller internally,
-     * and thus the corresponding signal can be emitted basically anytime.
      * 
      * \param query                     Data fields to synchronize.
      */
-    virtual void synchronize(Qn::PtzDataFields query) = 0;
+    virtual bool synchronize(Qn::PtzDataFields query) = 0;
 
 signals:
     void capabilitiesChanged(); // TODO: #Elric handle in proxy?
-    void synchronized(QnPtzData data);
+    void finished(Qn::PtzCommand command, const QVariant &data);
+
+protected:
+    static Qn::PtzCommand spaceCommand(Qn::PtzCommand command, Qn::PtzCoordinateSpace space);
 
 private:
     QnResourcePtr m_resource;

@@ -80,21 +80,23 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
         return CODE_OK;
 
     switch(command) {
-    case Qn::ContinousMovePtzCommand:   return executeContinuousMove(controller, params, result);
-    case Qn::AbsoluteMovePtzCommand:    return executeAbsoluteMove(controller, params, result);
-    case Qn::ViewportMovePtzCommand:    return executeViewportMove(controller, params, result);
-    case Qn::GetPositionPtzCommand:     return executeGetPosition(controller, params, result);
-    case Qn::CreatePresetPtzCommand:    return executeCreatePreset(controller, params, result);
-    case Qn::UpdatePresetPtzCommand:    return executeUpdatePreset(controller, params, result);
-    case Qn::RemovePresetPtzCommand:    return executeRemovePreset(controller, params, result);
-    case Qn::ActivatePresetPtzCommand:  return executeActivatePreset(controller, params, result);
-    case Qn::GetPresetsPtzCommand:      return executeGetPresets(controller, params, result);
-    case Qn::CreateTourPtzCommand:      return executeCreateTour(controller, params, body, result);
-    case Qn::RemoveTourPtzCommand:      return executeRemoveTour(controller, params, result);
-    case Qn::ActivateTourPtzCommand:    return executeActivateTour(controller, params, result);
-    case Qn::GetToursPtzCommand:        return executeGetTours(controller, params, result);
-    case Qn::GetDataPtzCommand:         return executeGetData(controller, params, result);
-    default:                            return CODE_INVALID_PARAMETER;
+    case Qn::ContinuousMovePtzCommand:      return executeContinuousMove(controller, params, result);
+    case Qn::AbsoluteDeviceMovePtzCommand:
+    case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
+    case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);
+    case Qn::GetDevicePositionPtzCommand:
+    case Qn::GetLogicalPositionPtzCommand:  return executeGetPosition(controller, params, result);
+    case Qn::CreatePresetPtzCommand:        return executeCreatePreset(controller, params, result);
+    case Qn::UpdatePresetPtzCommand:        return executeUpdatePreset(controller, params, result);
+    case Qn::RemovePresetPtzCommand:        return executeRemovePreset(controller, params, result);
+    case Qn::ActivatePresetPtzCommand:      return executeActivatePreset(controller, params, result);
+    case Qn::GetPresetsPtzCommand:          return executeGetPresets(controller, params, result);
+    case Qn::CreateTourPtzCommand:          return executeCreateTour(controller, params, body, result);
+    case Qn::RemoveTourPtzCommand:          return executeRemoveTour(controller, params, result);
+    case Qn::ActivateTourPtzCommand:        return executeActivateTour(controller, params, result);
+    case Qn::GetToursPtzCommand:            return executeGetTours(controller, params, result);
+    case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
+    default:                                return CODE_INVALID_PARAMETER;
     }
 }
 
@@ -116,20 +118,20 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
 }
 
 int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Qn::PtzCommand command;
     qreal xPos, yPos, zPos, speed;
-    Qn::PtzCoordinateSpace space;
     if(
+        !requireParameter(params, lit("command"), result, &command) || 
         !requireParameter(params, lit("xPos"), result, &xPos) || 
         !requireParameter(params, lit("yPos"), result, &yPos) || 
         !requireParameter(params, lit("zPos"), result, &zPos) ||
-        !requireParameter(params, lit("space"), result, &space) ||
         !requireParameter(params, lit("speed"), result, &speed)
     ) {
         return CODE_INVALID_PARAMETER;
     }
     
     QVector3D position(xPos, yPos, zPos);
-    if(!controller->absoluteMove(space, position, speed))
+    if(!controller->absoluteMove(command == Qn::AbsoluteDeviceMovePtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, position, speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -156,12 +158,12 @@ int QnPtzHandler::executeViewportMove(const QnPtzControllerPtr &controller, cons
 }
 
 int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    Qn::PtzCoordinateSpace space;
-    if(!requireParameter(params, lit("space"), result, &space))
+    Qn::PtzCommand command;
+    if(!requireParameter(params, lit("command"), result, &command))
         return CODE_INVALID_PARAMETER;
 
     QVector3D position;
-    if(!controller->getPosition(space, &position))
+    if(!controller->getPosition(command == Qn::GetDevicePositionPtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, &position))
         return CODE_INTERNAL_ERROR;
 
     result.setReply(position);
@@ -267,12 +269,14 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
 }
 
 int QnPtzHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
-    Qn::PtzDataFields fields;
-    if(!requireParameter(params, lit("fields"), result, &fields))
+    Qn::PtzDataFields query;
+    if(!requireParameter(params, lit("query"), result, &query))
         return CODE_INVALID_PARAMETER;
 
     QnPtzData data;
-    controller->getData(fields, &data);
+    if(!controller->getData(query, &data))
+        return CODE_INTERNAL_ERROR;
+
     result.setReply(data);
     return CODE_OK;
 }
