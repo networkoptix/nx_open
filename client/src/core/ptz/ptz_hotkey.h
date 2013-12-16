@@ -21,6 +21,12 @@ struct PtzPresetHotkey {
 
 typedef QHash<QString, int> QnHotkeysHash;
 
+class QnAbstractPtzHotkeyDelegate {
+public:
+    virtual QnHotkeysHash hotkeys() const = 0;
+    virtual void updateHotkeys(const QnHotkeysHash &value) = 0;
+};
+
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(PtzPresetHotkey)
 
 #endif // PTZ_HOTKEY_H

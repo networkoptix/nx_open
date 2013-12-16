@@ -91,9 +91,11 @@ void QnPtzTourListModel::updateTour(const QnPtzTour &tour) {
     for (int i = 0; i < m_tours.size(); ++i) {
         if (m_tours[i].id != tour.id)
             continue;
+        if (m_tours[i] == tour)
+            return; //no changes were made
+
         m_tours[i] = tour;
         emit dataChanged(index(i, 0), index(i, ColumnCount));
-        qDebug() << "updated tour" << i;
         break;
     }
 

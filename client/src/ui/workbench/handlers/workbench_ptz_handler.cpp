@@ -26,6 +26,25 @@
 
 #include <ui/workbench/workbench_context.h>
 
+class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, protected QnWorkbenchContextAware {
+public:
+    QnSingleCameraPtzHotkeysDelegate(int cameraId, QnWorkbenchContext *context):
+        QnWorkbenchContextAware(context),
+        m_cameraId(cameraId){}
+    ~QnSingleCameraPtzHotkeysDelegate() {}
+
+    virtual QnHotkeysHash hotkeys() const override {
+        return context()->instance<QnPtzHotkeyKvPairWatcher>()->allHotkeysByResourceId(m_cameraId);
+    }
+
+    virtual void updateHotkeys(const QnHotkeysHash &value) override {
+        context()->instance<QnPtzHotkeyKvPairWatcher>()->updateHotkeys(m_cameraId, value);
+    }
+private:
+    int m_cameraId;
+};
+
+
 QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -43,8 +62,6 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
-    //TODO: #GDM PTZ ptzController->synchronize(PtzPresetsField);
-
     //TODO: #GDM PTZ fix the text
     if(widget->camera()->getStatus() == QnResource::Offline || widget->camera()->getStatus() == QnResource::Unauthorized) {
         QMessageBox::critical(
@@ -56,68 +73,12 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    QnPtzPresetList existing;
-    int n = widget->ptzController()->getPresets(&existing)
-            ? existing.size() + 1
-            : 1;
-
-    QnHotkeysHash hotkeys = context()
-            ->instance<QnPtzHotkeyKvPairWatcher>()
-            ->allHotkeysByResourceId(widget->camera()->getId());
-
-    QList<int> forbiddenHotkeys;
-    foreach (const QnPtzPreset &preset, existing) {
-        if (!hotkeys.contains(preset.name))
-            continue;
-        forbiddenHotkeys.push_back(hotkeys[preset.name]);
-    }
+    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(widget->camera()->getId(), context()));
 
     QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
-    dialog->setForbiddenHotkeys(forbiddenHotkeys);
-    dialog->setName(tr("Saved Position %1").arg(n));
-    dialog->setWindowTitle(tr("Save Position"));
-    if(dialog->exec() != QDialog::Accepted) {
-        return;
-    }
-
-    //TODO: #GDM PTZ replace if there is a preset with the same name. Maybe ask to replace.
-
-    QString presetId = QUuid::createUuid().toString();
-    if (!widget->ptzController()->createPreset(QnPtzPreset(presetId, dialog->name())))
-        return;
-
-   /* if(n > 2) {
-        QnPtzTour tour;
-        tour.name = tr("Tour");
-        tour.id = QUuid::createUuid().toString();
-
-        foreach(const QnPtzPreset &preset, existing) {
-            QnPtzTourSpot spot;
-            spot.presetId = preset.id;
-            spot.speed = 0.1;
-            spot.stayTime = 0;
-            tour.spots.push_back(spot);
-        }
-
-        widget->ptzController()->createTour(tour);
-
-        QnSleep::sleep(1);
-
-        widget->ptzController()->activateTour(tour.id);
-    }*/
-
-    if (dialog->hotkey() >= 0) {
-        hotkeys[presetId] = dialog->hotkey();
-        context()->instance<QnPtzHotkeyKvPairWatcher>()->updateHotkeys(widget->camera()->getId(), hotkeys);
-    }
-
-#if 0
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
-        );
-#endif
+    dialog->setHotkeysDelegate(hotkeysDelegate.data());
+    dialog->setPtzController(widget->ptzController());
+    dialog->exec();
 }
 
 void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
@@ -152,17 +113,12 @@ void QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
+    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(widget->camera()->getId(), context()));
+
     QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
+    dialog->setHotkeysDelegate(hotkeysDelegate.data());
     dialog->setPtzController(widget->ptzController());
-
-    QnPtzHotkeyKvPairWatcher* watcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
-    QnHotkeysHash hotkeys = watcher->allHotkeysByResourceId(widget->camera()->getId());
-    dialog->setHotkeys(hotkeys);
-
-    if (!dialog->exec())
-        return;
-
-    watcher->updateHotkeys(widget->camera()->getId(), dialog->hotkeys());
+    dialog->exec();
 }
 
 void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {

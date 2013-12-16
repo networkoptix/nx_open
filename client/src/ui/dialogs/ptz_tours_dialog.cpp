@@ -30,40 +30,47 @@ QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
 QnPtzToursDialog::~QnPtzToursDialog() {
 }
 
-const QnPtzControllerPtr& QnPtzToursDialog::ptzController() const {
-    return m_controller;
-}
+void QnPtzToursDialog::loadData(const QnPtzData &data) {
+    m_oldTours = data.tours;
 
-void QnPtzToursDialog::setPtzController(const QnPtzControllerPtr &controller) {
-    if(m_controller == controller)
-        return;
+    ui->tourEditWidget->setPtzPresets(data.presets);
+    m_model->setTours(data.tours);
 
-    m_controller = controller;
-    updateModel();
-}
-
-
-void QnPtzToursDialog::accept() {
-    if (m_controller) {
-        foreach (const QnPtzTour &tour, m_model->tours()) {
-            qDebug() <<"updating tour" << tour.name << tour.id;
-            m_controller->createTour(tour);
-        }
-        //TODO: #GDM PTZ remove deleted tours
-    }
-
-    base_type::accept();
-}
-
-void QnPtzToursDialog::updateModel() {
-    QnPtzTourList tours;
-    QnPtzPresetList presets;
-    if (m_controller && m_controller->getTours(&tours) && m_controller->getPresets(&presets)) {
-        ui->tourEditWidget->setPtzPresets(presets);
-        m_model->setTours(tours);
-    }
-    if (!tours.isEmpty())
+    if (!data.tours.isEmpty())
         ui->tourTable->setCurrentIndex(ui->tourTable->model()->index(0, 0));
+}
+
+void QnPtzToursDialog::saveData() const {
+    auto findTourById = [](const QnPtzTourList &list, const QString &id, QnPtzTour &result) {
+        foreach (const QnPtzTour &tour, list) {
+            if (tour.id != id)
+                continue;
+            result = tour;
+            return true;
+        }
+        return false;
+    };
+
+    // update or remove existing tours
+    foreach (const QnPtzTour &tour, m_oldTours) {
+        QnPtzTour updated;
+        if (!findTourById(m_model->tours(), tour.id, updated))
+            ptzController()->removeTour(tour.id);
+        else if (tour != updated)
+            ptzController()->createTour(updated);
+    }
+
+    //create new tours
+    foreach (const QnPtzTour &tour, m_model->tours()) {
+        QnPtzTour existing;
+        if (findTourById(m_oldTours, tour.id, existing))
+            continue;
+        ptzController()->createTour(tour);
+    }
+}
+
+Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {
+    return Qn::PresetsPtzField | Qn::ToursPtzField;
 }
 
 void QnPtzToursDialog::at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {

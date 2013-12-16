@@ -427,6 +427,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::WritePtzPermission).
         condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
+    factory(Qn::PtzStartTourAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Activate PTZ Tour")).
+        requiredPermissions(Qn::WritePtzPermission).
+        condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).

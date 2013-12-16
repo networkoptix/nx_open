@@ -1,11 +1,9 @@
 #ifndef PTZ_TOURS_DIALOG_H
 #define PTZ_TOURS_DIALOG_H
 
-#include <QtWidgets/QDialog>
-
 #include <core/ptz/ptz_fwd.h>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/abstract_ptz_dialog.h>
 
 namespace Ui {
 class QnPtzToursDialog;
@@ -13,21 +11,18 @@ class QnPtzToursDialog;
 
 class QnPtzTourListModel;
 
-class QnPtzToursDialog : public QnButtonBoxDialog {
+class QnPtzToursDialog : public QnAbstractPtzDialog {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnAbstractPtzDialog base_type;
 public:
     explicit QnPtzToursDialog(QWidget *parent = 0);
     ~QnPtzToursDialog();
 
-    const QnPtzControllerPtr &ptzController() const;
-    void setPtzController(const QnPtzControllerPtr &controller);
-
-    virtual void accept() override;
-
-private:
-    void updateModel();
+protected:
+    virtual void loadData(const QnPtzData &data) override;
+    virtual void saveData() const override;
+    virtual Qn::PtzDataFields requiredFields() const override;
 
 private slots:
     void at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
@@ -36,8 +31,8 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnPtzToursDialog> ui;
-    QnPtzControllerPtr m_controller;
     QnPtzTourListModel *m_model;
+    QnPtzTourList m_oldTours;
 };
 
 #endif // PTZ_TOURS_DIALOG_H
