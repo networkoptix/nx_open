@@ -121,12 +121,7 @@ int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDa
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
 {
-    const nxcip::CameraInfo& infoCopy( info );
-    if( strlen(infoCopy.auxiliaryData) == 0 )
-    {
-        //TODO/IMPL checking, if audio is present at info.url
-    }
-    return new CameraManager( infoCopy );
+    return new CameraManager( info );
 }
 
 int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
