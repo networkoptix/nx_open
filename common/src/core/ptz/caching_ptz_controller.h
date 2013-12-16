@@ -1,6 +1,8 @@
 #ifndef QN_CACHING_PTZ_CONTROLLER_H
 #define QN_CACHING_PTZ_CONTROLLER_H
 
+#include <QtCore/QMutex>
+
 #include "proxy_ptz_controller.h"
 
 class QnCachingPtzController: public QnProxyPtzController {
@@ -37,9 +39,12 @@ public:
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
     virtual bool synchronize(Qn::PtzDataFields query) override;
 
-
+private:
+    void updateCacheLocked(const QnPtzData &data);
+    Q_SLOT void at_baseController_finished(Qn::PtzCommand command, const QVariant &data);
 
 private:
+    QMutex m_mutex;
     QnPtzData m_data;
 };
 

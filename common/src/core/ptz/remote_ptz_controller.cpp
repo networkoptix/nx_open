@@ -119,7 +119,7 @@ bool QnRemotePtzController::activateTour(const QString &tourId) {
     RUN_COMMAND(Qn::ActivateTourPtzCommand, tourId, ptzActivateTourAsync, tourId);
 }
 
-bool QnRemotePtzController::getTours(QnPtzTourList *tours) {
+bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
