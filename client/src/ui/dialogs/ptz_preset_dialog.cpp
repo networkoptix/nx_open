@@ -40,14 +40,14 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
 
     QnHotkeysHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
-        if (!usedHotkeys.contains(preset.name))
+        if (!usedHotkeys.contains(preset.id))
             continue;
-        hotkeys.removeOne(usedHotkeys[preset.name]);
+        hotkeys.removeOne(usedHotkeys[preset.id]);
     }
 
     int currentHotkey = hotkey();
     ui->hotkeyComboBox->clear();
-    ui->hotkeyComboBox->addItem(tr("None"), -1);
+    ui->hotkeyComboBox->addItem(tr("None"), Qn::NoHotkey);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
     setHotkey(currentHotkey);
@@ -59,7 +59,7 @@ void QnPtzPresetDialog::saveData() const {
     if (!ptzController()->createPreset(QnPtzPreset(presetId, ui->nameEdit->text())))
         return;
 
-    if (!m_hotkeysDelegate || hotkey() >= 0)
+    if (!m_hotkeysDelegate || hotkey() < 0)
         return;
 
     QnHotkeysHash hotkeys = m_hotkeysDelegate->hotkeys();
@@ -80,13 +80,13 @@ void QnPtzPresetDialog::setHotkeysDelegate(QnAbstractPtzHotkeyDelegate *delegate
 }
 
 int QnPtzPresetDialog::hotkey() const {
-    return qvariant_cast<int>(ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()), -1);
+    return ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()).toInt();
 }
 
 void QnPtzPresetDialog::setHotkey(int hotkey) {
     int index = ui->hotkeyComboBox->findData(hotkey);
     if(index < 0)
-        index = ui->hotkeyComboBox->findData(-1);
+        index = ui->hotkeyComboBox->findData(Qn::NoHotkey);
     ui->hotkeyComboBox->setCurrentIndex(index);
 }
 

@@ -22,8 +22,8 @@ QnPtzHotkeyKvPairAdapter::QnPtzHotkeyKvPairAdapter(const QnResourcePtr &resource
     QObject(parent)
 {
     readHotkeys(resource, &m_hotkeys);
-    connect(resource.data(), SIGNAL(valueByKeyChanged(QnResourcePtr, QnKvPair)), this, SIGNAL(at_valueByKeyChanged(QnResourcePtr,QnKvPair)));
-    connect(resource.data(), SIGNAL(valueByKeyRemoved(QnResourcePtr, QString)), this, SIGNAL(at_valueByKeyRemoved(QnResourcePtr,QString)));
+    connect(resource.data(), SIGNAL(valueByKeyChanged(QnResourcePtr, QnKvPair)), this, SLOT(at_valueByKeyChanged(QnResourcePtr,QnKvPair)));
+    connect(resource.data(), SIGNAL(valueByKeyRemoved(QnResourcePtr, QString)), this, SLOT(at_valueByKeyRemoved(QnResourcePtr,QString)));
 }
 
 int QnPtzHotkeyKvPairAdapter::hotkeyByPresetId(const QString &presetId) const {

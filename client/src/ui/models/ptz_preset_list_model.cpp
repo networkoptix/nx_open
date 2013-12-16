@@ -1,8 +1,8 @@
 #include "ptz_preset_list_model.h"
 
 #include <common/common_globals.h>
-
 #include <core/ptz/ptz_preset.h>
+#include <utils/common/string.h>
 
 QnPtzPresetListModel::QnPtzPresetListModel(QObject *parent):
     base_type(parent),
@@ -32,6 +32,9 @@ const QnPtzPresetList &QnPtzPresetListModel::presets() const {
 void QnPtzPresetListModel::setPresets(const QnPtzPresetList &presets) {
     beginResetModel();
     m_presets = presets;
+    qSort(m_presets.begin(), m_presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+    });
     endResetModel();
 }
 
