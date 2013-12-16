@@ -53,6 +53,8 @@
 #ifdef __cplusplus
 #   undef NULL
 #   define NULL nullptr
+#   undef __null
+#   define __null nullptr
 #endif
 
 
