@@ -35,6 +35,8 @@ namespace {
                                                   << second * 45
                                                   << second * 60
                                                   );
+
+    static const QnPtzTourSpot defaultSpot(QString(), second*5, speedNormal);
 }
 
 QnPtzTourModel::QnPtzTourModel(QObject *parent) :
@@ -137,9 +139,13 @@ bool QnPtzTourModel::insertRows(int row, int count, const QModelIndex &parent) {
     if(parent.isValid() || row < 0 || row > m_tour.spots.size() || count < 1)
         return false;
 
+    QnPtzTourSpot sampleSpot(defaultSpot);
+    if (!m_presets.isEmpty())
+        sampleSpot.presetId = m_presets.first().id;
+
     beginInsertRows(parent, row, row + count - 1);
     for(int i = 0; i < count; i++)
-        m_tour.spots.insert(row, QnPtzTourSpot());
+        m_tour.spots.insert(row, sampleSpot);
     endInsertRows();
     emit tourChanged(m_tour);
     return true;
