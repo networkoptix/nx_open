@@ -56,6 +56,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
+    qRegisterMetaType<Qt::Orientations>();
 
     qRegisterMetaType<QnMacAddress>();
 
@@ -131,7 +132,10 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();
+    qRegisterMetaType<QnPtzTour>();
+    qRegisterMetaType<QnPtzTourList>();
     qRegisterMetaType<QnPtzData>();
+    qRegisterMetaType<QnPtzLimits>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
 

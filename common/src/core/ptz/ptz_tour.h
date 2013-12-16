@@ -26,7 +26,8 @@ struct QnPtzTour {
     QnPtzTourSpotList spots;
 };
 
-Q_DECLARE_METATYPE(QnPtzTour)
 Q_DECLARE_METATYPE(QnPtzTourSpot)
+Q_DECLARE_METATYPE(QnPtzTour)
+Q_DECLARE_METATYPE(QnPtzTourList)
 
 #endif // QN_PTZ_TOUR_H

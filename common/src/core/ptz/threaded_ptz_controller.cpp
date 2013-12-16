@@ -3,7 +3,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QThreadPool>
 
-#include "ptz_data.h"
+#include <common/common_meta_types.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -38,8 +38,8 @@ private:
 template<class Functor>
 class QnPtzCommand: public QnAbstractPtzCommand {
 public:
-    QnPtzCommand(const QnPtzControllerPtr &controller, Qn::PtzCommand command, const QVariant &data, const Functor &functor):
-        QnAbstractPtzCommand(controller, command, data),
+    QnPtzCommand(const QnPtzControllerPtr &controller, Qn::PtzCommand command, const Functor &functor):
+        QnAbstractPtzCommand(controller, command),
         m_functor(functor)
     {}
 
@@ -98,20 +98,16 @@ public:
             [=](const QnPtzControllerPtr &controller) -> QVariant {             \
                 RESULT_TYPE result;                                             \
                 Q_UNUSED(result);                                               \
-                bool status = controller->FUNCTION(__VA_ARGS__);                \
-                if(!status) {                                                   \
-                    return QVariant();                                          \
-                } else {                                                        \
+                if(controller->FUNCTION(__VA_ARGS__)) {                         \
                     return QVariant::fromValue(RETURN_VALUE);                   \
+                } else {                                                        \
+                    return QVariant();                                          \
                 }                                                               \
             }                                                                   \
         );                                                                      \
                                                                                 \
         return true;                                                            \
     }
-
-#define RUN_GET_COMMAND(COMMAND, RESULT_TYPE, FUNCTION, ... /* PARAMS */) RUN_COMMAND(COMMAND, RESULT_TYPE, result, FUNCTION, ##__VA_ARGS__, &result)
-#define RUN_ACT_COMMAND(COMMAND, FUNCTION, ... /* PARAMS */) RUN_COMMAND(COMMAND, bool, status, FUNCTION, ##__VA_ARGS__)
 
 QnThreadedPtzController::QnThreadedPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
@@ -143,66 +139,66 @@ Qn::PtzCapabilities QnThreadedPtzController::getCapabilities() {
 }
 
 bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
-    RUN_ACT_COMMAND(Qn::ContinuousMovePtzCommand, continuousMove, speed);
+    RUN_COMMAND(Qn::ContinuousMovePtzCommand, void *, speed, continuousMove, speed);
 }
 
 bool QnThreadedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    RUN_ACT_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), absoluteMove, space, position, speed);
+    RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), void *, position, absoluteMove, space, position, speed);
 }
 
 bool QnThreadedPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    RUN_ACT_COMMAND(Qn::ViewportMovePtzCommand, viewportMove, aspectRatio, viewport, speed);
+    RUN_COMMAND(Qn::ViewportMovePtzCommand, void *, viewport, viewportMove, aspectRatio, viewport, speed);
 }
 
 bool QnThreadedPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *) {
-    RUN_GET_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVector3D, getPosition, space);
+    RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVector3D, result, getPosition, space, &result);
 }
 
 bool QnThreadedPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *) {
-    RUN_GET_COMMAND(spaceCommand(Qn::GetDeviceLimitsPtzCommand, space), QnPtzLimits, getLimits, space);
+    RUN_COMMAND(spaceCommand(Qn::GetDeviceLimitsPtzCommand, space), QnPtzLimits, result, getLimits, space, &result);
 }
 
 bool QnThreadedPtzController::getFlip(Qt::Orientations *) {
-    RUN_GET_COMMAND(Qn::GetFlipPtzCommand, Qt::Orientations, getFlip);
+    RUN_COMMAND(Qn::GetFlipPtzCommand, Qt::Orientations, result, getFlip, &result);
 }
 
 bool QnThreadedPtzController::createPreset(const QnPtzPreset &preset) {
-    RUN_ACT_COMMAND(Qn::CreatePresetPtzCommand, createPreset, preset);
+    RUN_COMMAND(Qn::CreatePresetPtzCommand, void *, preset, createPreset, preset);
 }
 
 bool QnThreadedPtzController::updatePreset(const QnPtzPreset &preset) {
-    RUN_ACT_COMMAND(Qn::UpdatePresetPtzCommand, updatePreset, preset);
+    RUN_COMMAND(Qn::UpdatePresetPtzCommand, void *, preset, updatePreset, preset);
 }
 
 bool QnThreadedPtzController::removePreset(const QString &presetId) {
-    RUN_ACT_COMMAND(Qn::RemovePresetPtzCommand, removePreset, presetId);
+    RUN_COMMAND(Qn::RemovePresetPtzCommand, void *, presetId, removePreset, presetId);
 }
 
 bool QnThreadedPtzController::activatePreset(const QString &presetId, qreal speed) {
-    RUN_ACT_COMMAND(Qn::ActivatePresetPtzCommand, activatePreset, presetId, speed);
+    RUN_COMMAND(Qn::ActivatePresetPtzCommand, void *, presetId, activatePreset, presetId, speed);
 }
 
 bool QnThreadedPtzController::getPresets(QnPtzPresetList *presets) {
-    RUN_GET_COMMAND(Qn::GetPresetsPtzCommand, QnPtzPresetList, getPresets);
+    RUN_COMMAND(Qn::GetPresetsPtzCommand, QnPtzPresetList, result, getPresets, &result);
 }
 
 bool QnThreadedPtzController::createTour(const QnPtzTour &tour) {
-    RUN_ACT_COMMAND(Qn::CreateTourPtzCommand, createTour, tour);
+    RUN_COMMAND(Qn::CreateTourPtzCommand, void *, tour, createTour, tour);
 }
 
 bool QnThreadedPtzController::removeTour(const QString &tourId) {
-    RUN_ACT_COMMAND(Qn::RemoveTourPtzCommand, removeTour, tourId);
+    RUN_COMMAND(Qn::RemoveTourPtzCommand, void *, tourId, removeTour, tourId);
 }
 
 bool QnThreadedPtzController::activateTour(const QString &tourId) {
-    RUN_ACT_COMMAND(Qn::ActivateTourPtzCommand, activateTour, tourId);
+    RUN_COMMAND(Qn::ActivateTourPtzCommand, void *, tourId, activateTour, tourId);
 }
 
 bool QnThreadedPtzController::getTours(QnPtzTourList *tours) {
-    RUN_GET_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, getTours);
+    RUN_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, result, getTours, &result);
 }
 
-bool QnThreadedPtzController::synchronize(Qn::PtzDataFields fields) {
-    RUN_ACT_COMMAND(Qn::SynchronizePtzCommand, synchronize, fields);
+bool QnThreadedPtzController::synchronize(Qn::PtzDataFields query) {
+    RUN_COMMAND(Qn::SynchronizePtzCommand, QnPtzData, (controller->getData(query, &result) ? result : QnPtzData(query, Qn::NoPtzFields)), synchronize, query);
 }
 

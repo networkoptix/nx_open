@@ -42,7 +42,9 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
-    virtual bool synchronize(Qn::PtzDataFields fields) override;
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
+
+    virtual bool synchronize(Qn::PtzDataFields query) override;
 
 protected:
     template<class Functor>
