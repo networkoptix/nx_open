@@ -7,14 +7,8 @@
 
 #include "connective.h"
 
-template<class Base, bool baseIsDisconnective>
-class Disconnective;
-
-
 class DisconnectiveBase {
 public:
-    DisconnectiveBase() {}
-
     template<class T1, class S1, class T2, class S2>
     QMetaObject::Connection connect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method, Qt::ConnectionType type = Qt::AutoConnection) {
         QMetaObject::Connection result = ConnectiveBase::connect(sender, signal, receiver, method, type);
@@ -33,6 +27,10 @@ public:
             QObject::disconnect(connection);
         m_connections.clear();
     }
+
+protected:
+    DisconnectiveBase() {}
+    virtual ~DisconnectiveBase() {}
 
 private:
     QList<QMetaObject::Connection> m_connections;

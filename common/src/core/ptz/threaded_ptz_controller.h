@@ -45,9 +45,11 @@ public:
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
     virtual bool synchronize(Qn::PtzDataFields query) override;
 
-protected:
+private:
     template<class Functor>
     void runCommand(Qn::PtzCommand command, const Functor &functor) const;
+
+    Q_SLOT void at_command_finished(Qn::PtzCommand command, const QVariant &data);
 
 private:
     QScopedPointer<QnThreadedPtzControllerPrivate> d;

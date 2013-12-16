@@ -55,10 +55,6 @@ namespace Qn {
 } // namespace Qn
 
 
-template<class Base, bool baseIsConnective>
-class Connective;
-
-
 class ConnectiveBase {
 public:
     template<class T1, class S1, class T2, class S2>
@@ -75,12 +71,9 @@ public:
         return disconnect(sender, signal, receiver, method);
     }
 
-private:
+protected:
     ConnectiveBase() {}
     virtual ~ConnectiveBase() {}
-
-    template<class Base, bool baseIsConnective>
-    friend class ::Connective; /* So that only this class can access our methods. */
 };
 
 

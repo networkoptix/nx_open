@@ -670,7 +670,7 @@ int QnMediaServerConnection::ptzActivateTourAsync(const QnNetworkResourcePtr &ca
 
 int QnMediaServerConnection::ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("command",         QnLexical::serialized(Qn::ActivateTourPtzCommand));
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::GetToursPtzCommand));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncGetRequest(PtzGetToursObject, params, QN_REPLY_TYPE(QnPtzTourList), target, slot);

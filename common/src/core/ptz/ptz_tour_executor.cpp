@@ -6,14 +6,15 @@
 
 #include <utils/math/math.h>
 #include <utils/common/invocation_event.h>
+#include <utils/common/connective.h>
 
-#include "abstract_ptz_controller.h"
+#include "threaded_ptz_controller.h"
 
 
 // -------------------------------------------------------------------------- //
 // QnPtzTourExecutorPrivate
 // -------------------------------------------------------------------------- //
-class QnPtzTourExecutorPrivate {
+class QnPtzTourExecutorPrivate: public ConnectiveBase {
 public:
     enum State {
         Stopped,
@@ -21,7 +22,8 @@ public:
         Moving,
     };
 
-    QnPtzTourExecutorPrivate(): currentState(Stopped) {}
+    QnPtzTourExecutorPrivate();
+    virtual ~QnPtzTourExecutorPrivate();
 
     void init(const QnPtzControllerPtr &controller);
 
@@ -30,18 +32,21 @@ public:
 
     void startMoving();
     void processMoving();
+    void processMoving(const QVector3D &position);
     void tryStartWaiting();
     void startWaiting();
     void processWaiting();
 
     bool handleTimer(int timerId);
-    void handleSynchronized(Qn::PtzDataFields fields);
+    void handleFinished(Qn::PtzCommand command, const QVariant &data);
 
     QnPtzTourExecutor *q;
 
-    QnPtzControllerPtr controller;
+    QnPtzControllerPtr baseController;
+    QnPtzControllerPtr threadController;
     Qn::PtzCoordinateSpace defaultSpace;
     Qn::PtzDataField defaultDataField;
+    Qn::PtzCommand defaultCommand;
     
     QBasicTimer moveTimer, waitTimer;
 
@@ -51,12 +56,34 @@ public:
     QVector3D currentPosition;
 };
 
-void QnPtzTourExecutorPrivate::init(const QnPtzControllerPtr &controller) {
-    this->controller = controller;
-    defaultSpace = controller->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
-    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
+QnPtzTourExecutorPrivate::QnPtzTourExecutorPrivate(): 
+    currentState(Stopped) 
+{}
 
-    QObject::connect(controller.data(), SIGNAL(synchronized(Qn::PtzDataFields)), q, SLOT(at_controller_synchronized(Qn::PtzDataFields)));
+QnPtzTourExecutorPrivate::~QnPtzTourExecutorPrivate() {
+    /* It's important to release the QObject ownership here as it is also
+     * owned by a QSharedPointer. */
+    if(threadController)
+        threadController->setParent(NULL); 
+}
+
+void QnPtzTourExecutorPrivate::init(const QnPtzControllerPtr &controller) {
+    baseController = controller;
+    if(QnThreadedPtzController::extends(baseController)) {
+        threadController.reset(new QnThreadedPtzController(baseController));
+        baseController = threadController;
+
+        /* This call makes sure that thread controller lives in the same thread
+         * as tour executor. Both need an event loop to function properly,
+         * and tour executor can be moved between threads after construction. */
+        threadController->setParent(q); 
+    }
+
+    defaultSpace = baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
+    defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
+    defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
+
+    connect(baseController, &QnAbstractPtzController::finished, q, &QnPtzTourExecutor::at_controller_finished);
 }
 
 void QnPtzTourExecutorPrivate::stopTour() {
@@ -88,25 +115,25 @@ void QnPtzTourExecutorPrivate::startMoving() {
 
     const QnPtzTourSpot &spot = currentTour.spots[currentIndex];
 
-    controller->getPosition(defaultSpace, &currentPosition);
-    controller->activatePreset(spot.presetId, spot.speed);
+    baseController->activatePreset(spot.presetId, spot.speed);
+    baseController->getPosition(defaultSpace, NULL);
     moveTimer.start(1000, q);
 }
 
 void QnPtzTourExecutorPrivate::processMoving() {
     assert(currentState == Moving);
 
-    controller->synchronize(defaultDataField);
+    baseController->getPosition(defaultSpace, NULL);
 }
 
-void QnPtzTourExecutorPrivate::tryStartWaiting() {
+void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
     assert(currentState == Moving);
 
-    QVector3D lastPosition = currentPosition;
-    controller->getPosition(defaultSpace, &currentPosition);
-    if(qFuzzyCompare(lastPosition, currentPosition)) {
+    if(qFuzzyCompare(currentPosition, position)) {
         moveTimer.stop();
         startWaiting();
+    } else {
+        currentPosition = position;
     }
 }
 
@@ -142,9 +169,9 @@ bool QnPtzTourExecutorPrivate::handleTimer(int timerId) {
     }
 }
 
-void QnPtzTourExecutorPrivate::handleSynchronized(Qn::PtzDataFields fields) {
-    if(currentState == Moving && (fields & defaultDataField))
-        tryStartWaiting();
+void QnPtzTourExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
+    if(command == defaultCommand && data.isValid())
+        processMoving(data.value<QVector3D>());
 }
 
 
@@ -179,8 +206,8 @@ void QnPtzTourExecutor::timerEvent(QTimerEvent *event) {
         base_type::timerEvent(event);
 }
 
-void QnPtzTourExecutor::at_controller_synchronized(Qn::PtzDataFields fields) {
-    d->handleSynchronized(fields);
+void QnPtzTourExecutor::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
+    d->handleFinished(command, data);
 }
 
 void QnPtzTourExecutor::at_startTourRequested(const QnPtzTour &tour) {

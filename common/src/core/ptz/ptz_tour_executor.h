@@ -26,10 +26,12 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
 private:
+    friend class QnPtzTourExecutorPrivate;
+
     Q_SIGNAL void startTourRequested(const QnPtzTour &tour);
     Q_SIGNAL void stopTourRequested();
 
-    Q_SLOT void at_controller_synchronized(Qn::PtzDataFields fields);
+    Q_SLOT void at_controller_finished(Qn::PtzCommand command, const QVariant &data);
     Q_SLOT void at_startTourRequested(const QnPtzTour &tour);
     Q_SLOT void at_stopTourRequested();
 
