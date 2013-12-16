@@ -26,6 +26,7 @@ public:
 
     QnAbstractPtzHotkeyDelegate* hotkeysDelegate() const;
     void setHotkeysDelegate(QnAbstractPtzHotkeyDelegate *delegate);
+
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() const override;
