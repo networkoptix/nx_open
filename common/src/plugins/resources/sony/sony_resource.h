@@ -4,12 +4,14 @@
 #ifdef ENABLE_ONVIF
 
 #include <map>
+#include <memory>
 
 #include <QtCore/QMutex>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
+#include "utils/network/http/asynchttpclient.h"
 #include "utils/network/http/linesplitter.h"
 #include "core/datapacket/media_data_packet.h"
 #include "../onvif/onvif_resource.h"
@@ -40,7 +42,7 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    nx_http::AsyncHttpClient* m_inputMonitorHttpClient;
+    std::shared_ptr<nx_http::AsyncHttpClient> m_inputMonitorHttpClient;
     mutable QMutex m_inputPortMutex;
     nx_http::LineSplitter m_lineSplitter;
     std::map<int, bool> m_relayInputStates;
