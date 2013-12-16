@@ -95,12 +95,14 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         QMutexLocker lock(&m_mutexCatalog);
         m_rebuildProgress = 0;
         m_catalogLoaded = false;
+        /*
         foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogHi)
             catalog->beforeRebuildArchive();
         foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogLow)
             catalog->beforeRebuildArchive();
         m_devFileCatalogHi.clear();
         m_devFileCatalogLow.clear();
+        */
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     }
     loadFullFileCatalog(true);
@@ -111,7 +113,8 @@ void QnStorageManager::rebuildCatalogAsync()
 {
     if (m_rebuildState == RebuildState_None) {
         m_rebuildProgress = 0.0;
-        setRebuildState(QnStorageManager::RebuildState_WaitForRecordersStopped);
+        //setRebuildState(QnStorageManager::RebuildState_WaitForRecordersStopped);
+        setRebuildState(QnStorageManager::RebuildState_Started);
     }
 }
 
@@ -160,8 +163,16 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
     {
         if (rebuildMode && m_rebuildState != RebuildState_Started)
             return; // cancel rebuild
-        getFileCatalogInternal(fi.fileName(), role);
-        m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
+        if (rebuildMode)
+        {
+            DeviceFileCatalogPtr catalog(new DeviceFileCatalog(fi.fileName(), role));
+            catalog->doRebuildArchive();
+            addDataToCatalog(catalog, fi.fileName(), role);
+            m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
+        }
+        else {
+            getFileCatalogInternal(fi.fileName(), role);
+        }
     }
 }
 
@@ -529,25 +540,31 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 {
     QSet<QnStorageResourcePtr> result;
-    QSet<QnStorageResourcePtr> smallStorages;
 
     QnStorageManager::StorageMap storageRoots = getAllStorages();
+    qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
         {
             qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
-            if (available > BIG_STORAGE_THRESHOLD)
-                result << fileStorage;
-            else
-                smallStorages << fileStorage;
+            bigStorageThreshold = qMax(bigStorageThreshold, available);
         }
     }
-    if (result.isEmpty())
-        return smallStorages; // try small storages if no big storages
-    else
-        return result;
+    bigStorageThreshold /= BIG_STORAGE_THRESHOLD_COEFF;
+
+    for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        if (fileStorage && fileStorage->getStatus() != QnResource::Offline && fileStorage->isUsedForWriting()) 
+        {
+            qint64 available = fileStorage->getTotalSpace() - fileStorage->getSpaceLimit();
+            if (available >= bigStorageThreshold)
+                result << fileStorage;
+        }
+    }
+    return result;
 }
 
 void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
@@ -628,7 +645,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     const QSet<QnStorageResourcePtr> storages = getWritableStorages();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
-		QnStorageResourcePtr storage = *itr;
+        QnStorageResourcePtr storage = *itr;
         qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
         float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
@@ -640,8 +657,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
             candidates << bitrateInfo[i].second;
     }
 
-    // select storage with maximum free space
-    qint64 maxFreeSpace = -INT_MAX;
+    // select storage with maximum free space and do not use storages without free space at all
+    qint64 maxFreeSpace = 0;
     for (int i = 0; i < candidates.size(); ++i)
     {   
         qint64 freeSpace = candidates[i]->getFreeSpace();
@@ -653,10 +670,10 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     }
 
     if (result) {
-		qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+        qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
     }
     else {
-		qDebug() << "No storage available for recording";
+        qDebug() << "No storage available for recording";
         if (!m_warnSended) {
             emit noStoragesAvailable();
             m_warnSended = true;
@@ -737,6 +754,50 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
     return getFileCatalogInternal(mac, role);
 }
 
+void QnStorageManager::addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QString& mac, QnResource::ConnectionRole role)
+{
+    QMutexLocker lock(&m_mutexCatalog);
+    bool hiQuality = role == QnResource::Role_LiveVideo;
+    FileCatalogMap& catalog = hiQuality ? m_devFileCatalogHi : m_devFileCatalogLow;
+    DeviceFileCatalogPtr existingCatalog = catalog[mac];
+    bool isLastRecordRecording = false;
+    if (existingCatalog == 0)
+    {
+        existingCatalog = catalog[mac] = newCatalog;
+    }
+    else 
+    {
+        existingCatalog->close();
+
+        isLastRecordRecording = existingCatalog->isLastRecordRecording();
+        if (!newCatalog->isEmpty() && !existingCatalog->isEmpty()) {
+            // merge data
+            DeviceFileCatalog::Chunk& newChunk = newCatalog->m_chunks.last();
+            int idx = existingCatalog->m_chunks.size()-1;
+            for (; idx >= 0; --idx)
+            {
+                DeviceFileCatalog::Chunk oldChunk = existingCatalog->chunkAt(idx);
+                if (oldChunk.startTimeMs < newChunk.startTimeMs)
+                    break;
+            }
+            for (int i = idx+1; i < existingCatalog->m_chunks.size(); ++i)
+            {
+                if (existingCatalog->m_chunks[i].startTimeMs == newChunk.startTimeMs)
+                    newChunk.durationMs = existingCatalog->m_chunks[i].durationMs;
+                else
+                    newCatalog->addChunk(existingCatalog->m_chunks[i]);
+            }
+
+            existingCatalog = catalog[mac] = newCatalog;
+        }
+        else if (existingCatalog->isEmpty())
+        {
+            existingCatalog->m_chunks = newCatalog->m_chunks;
+        }
+    }
+    existingCatalog->rewriteCatalog(isLastRecordRecording);
+}
+
 DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_mutexCatalog);
@@ -746,6 +807,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& mac
     if (fileCatalog == 0)
     {
         fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, role));
+        fileCatalog->readCatalog();
         catalog[mac] = fileCatalog;
     }
     return fileCatalog;
@@ -756,7 +818,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
     // 1.4 to 1.5 compatibility notes:
     // 1.5 prevent duplicates path to same physical storage (aka c:/test and c:/test/)
     // for compatibility with 1.4 I keep all such patches as difference keys to same storage
-	// In other case we are going to lose archive from 1.4 because of storage_index is different for same physical folder
+    // In other case we are going to lose archive from 1.4 because of storage_index is different for same physical folder
     // If several storage keys are exists, function return minimal storage index
 
     storageIndex = -1;

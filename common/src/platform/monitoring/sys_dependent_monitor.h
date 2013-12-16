@@ -26,6 +26,7 @@ public:
 
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<NetworkLoad> totalNetworkLoad() override;
+    virtual QList<QnPlatformMonitor::PartitionSpace> totalPartitionSpaceInfo() override;
 
 private:
     Q_DECLARE_PRIVATE(QnSysDependentMonitor);

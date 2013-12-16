@@ -32,6 +32,8 @@ public:
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
     virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData) override;
+    //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
+    virtual void updateSoftwareMotion() override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
@@ -51,6 +53,7 @@ protected:
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 
 private:
+    //virtual bool needMetaData() const override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 private:
@@ -61,11 +64,16 @@ private:
     nxcip::StreamReader* m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;
+    QnMediaContextPtr m_audioContext;
+    nxcip::CameraMediaEncoder2* m_mediaEncoder2Ref;
+    QnResourceCustomAudioLayout m_audioLayout;
 
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
     nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     QnAbstractMediaDataPtr readLiveStreamReader();
+    nxcip::Resolution getSecondStreamResolution( const nxcip_qt::CameraMediaEncoder& cameraEncoder );
+    void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
 };
 
 #endif // THIRD_PARTY_STREAM_READER_H

@@ -1,3 +1,4 @@
+#ifdef ENABLE_DROID
 
 #include "ipwebcam_droid_stream_reader.h"
 
@@ -8,6 +9,10 @@
 
 char jpeg_start[2] = {'\xff', '\xd8'};
 char jpeg_end[2] = {'\xff', '\xd9'};
+
+#endif //ENABLE_DROID
+
+//eto polnaya hyunya
 
 int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 {
@@ -47,6 +52,7 @@ int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int
     return result+start_index;
 }
 
+#ifdef ENABLE_DROID
 
 QnPlDroidIpWebCamReader::QnPlDroidIpWebCamReader(QnResourcePtr res)
 :CLServerPushStreamReader(res),
@@ -192,3 +198,5 @@ bool QnPlDroidIpWebCamReader::isStreamOpened() const
 {
     return ( mHttpClient && mHttpClient->isOpened() );
 }
+
+#endif // #ifdef ENABLE_DROID

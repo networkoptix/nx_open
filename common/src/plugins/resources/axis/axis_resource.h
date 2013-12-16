@@ -1,6 +1,8 @@
 #ifndef axis_resource_h_2215
 #define axis_resource_h_2215
 
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
@@ -77,7 +79,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
@@ -104,7 +106,7 @@ private:
     mutable QMutex m_inputPortMutex;
     //!map<input port index (1-based), http client>
     std::map<unsigned int, std::shared_ptr<nx_http::AsyncHttpClient> > m_inputPortHttpMonitor;
-    nx_http::MultipartContentParser m_multipartContentParser;
+    nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
     QScopedPointer<QnAxisPtzController> m_ptzController;
 
@@ -130,4 +132,5 @@ private:
     friend class QnAxisPtzController;
 };
 
+#endif // #ifdef ENABLE_AXIS
 #endif //axis_resource_h_2215

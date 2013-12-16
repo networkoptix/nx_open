@@ -254,6 +254,8 @@ public:
         ActionTypeRole,                             /**< Role for business action type. Value of type BusinessActionType::Value. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
+        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
+
         RoleCount
     };
 

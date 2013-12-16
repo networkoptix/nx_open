@@ -1,3 +1,6 @@
+#ifdef ENABLE_DROID
+
+
 #include "droid_resource_searcher.h"
 #include "droid_resource.h"
 #include "utils/network/nettools.h"
@@ -154,3 +157,4 @@ QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const QUrl& url, c
     return QList<QnResourcePtr>();
 }
 
+#endif // #ifdef ENABLE_DROID

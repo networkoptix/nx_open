@@ -1,3 +1,5 @@
+#ifdef ENABLE_ACTI
+
 #include <QtNetwork/QNetworkReply>
 
 #include "acti_resource_searcher.h"
@@ -203,3 +205,5 @@ void QnActiResourceSearcher::processPacket(
 
     result << resource;
 }
+
+#endif // #ifdef ENABLE_ACTI

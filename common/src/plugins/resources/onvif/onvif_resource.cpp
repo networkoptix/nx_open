@@ -1,4 +1,6 @@
 
+#ifdef ENABLE_ONVIF
+
 #include <algorithm>
 #include <climits>
 #include <cmath>
@@ -14,6 +16,7 @@
 #include <onvif/soapNotificationProducerBindingProxy.h>
 #include <onvif/soapEventBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
+#include <onvif/soapSubscriptionManagerBindingProxy.h>
 
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
@@ -344,7 +347,7 @@ QString QnPlOnvifResource::getDriverName() const
     return QLatin1String(MANUFACTURE);
 }
 
-QString QnPlOnvifResource::getVendorName() const
+QString QnPlOnvifResource::getVendorInternal() const
 {
     return m_vendorName;
 }
@@ -405,13 +408,14 @@ QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
     return new QnOnvifStreamReader(toSharedPointer());
 }
 
-void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
+void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     setCodec(H264, true);
     setCodec(H264, false);
 
@@ -481,7 +485,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         ptzCaps = m_ptzController->getCapabilities();
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
-    else if (!hasDualStreaming())
+    else if (!hasDualStreaming2())
         setMotionType(Qn::MT_NoMotion);
 
     
@@ -657,7 +661,7 @@ void QnPlOnvifResource::setMaxFps(int f)
     setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
-int QnPlOnvifResource::getMaxFps()
+int QnPlOnvifResource::getMaxFps() const
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
@@ -1337,7 +1341,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
         confRangeStart = confRangeEnd/m_maxChannels * getChannel();
         confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
 
-        if (confRangeEnd > confResponse.Configurations.size()) {
+        if (confRangeEnd > (int) confResponse.Configurations.size()) {
             qWarning() << "invalid channel number " << getChannel()+1 << "for camera" << getHostAddress() << "max channels=" << m_maxChannels;
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
         }
@@ -1741,7 +1745,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
         soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
         if (soapRes != SOAP_OK)
             return false;
-        if (confResponse.Configurations.size() < m_maxChannels)
+        if ( (int)confResponse.Configurations.size() < m_maxChannels)
             m_maxChannels = confResponse.Configurations.size();
     }
 
@@ -1799,7 +1803,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
         if (soapRes != SOAP_OK)
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
 
-        if (confResponse.Configurations.size() < m_maxChannels)
+        if ( (int)confResponse.Configurations.size() < m_maxChannels)
             m_maxChannels = confResponse.Configurations.size();
     }
 
@@ -2107,10 +2111,13 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
 
     const QAuthenticator& auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
-        m_eventCapabilities->XAddr,
+        m_onvifNotificationSubscriptionReference.isEmpty()
+            ? m_eventCapabilities->XAddr
+            : m_onvifNotificationSubscriptionReference.toLatin1().constData(),
         auth.user(),
         auth.password(),
         m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     char buf[256];
 
@@ -2401,7 +2408,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
     QString localAddress;
-    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) ) )
     {
         cl_log.log( QString::fromLatin1("Failed to connect to %1:%2 to determine local address. %3").
@@ -2416,6 +2423,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         auth.user(),
         auth.password(),
         m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     char buf[512];
 
@@ -2459,21 +2467,26 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     Q_UNUSED(utcTerminationTime)
 
     std::string subscriptionID;
-    if( response.SubscriptionReference &&
-        response.SubscriptionReference->ns1__ReferenceParameters &&
-        response.SubscriptionReference->ns1__ReferenceParameters->__item )
+    if( response.SubscriptionReference )
     {
-        //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
-        QXmlSimpleReader reader;
-        SubscriptionReferenceParametersParseHandler handler;
-        reader.setContentHandler( &handler );
-        QBuffer srcDataBuffer;
-        srcDataBuffer.setData(
-            response.SubscriptionReference->ns1__ReferenceParameters->__item,
-            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
-        QXmlInputSource xmlSrc( &srcDataBuffer );
-        if( reader.parse( &xmlSrc ) )
-            m_onvifNotificationSubscriptionID = handler.subscriptionID;
+        if( response.SubscriptionReference->ns1__ReferenceParameters &&
+            response.SubscriptionReference->ns1__ReferenceParameters->__item )
+        {
+            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
+            QXmlSimpleReader reader;
+            SubscriptionReferenceParametersParseHandler handler;
+            reader.setContentHandler( &handler );
+            QBuffer srcDataBuffer;
+            srcDataBuffer.setData(
+                response.SubscriptionReference->ns1__ReferenceParameters->__item,
+                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            QXmlInputSource xmlSrc( &srcDataBuffer );
+            if( reader.parse( &xmlSrc ) )
+                m_onvifNotificationSubscriptionID = handler.subscriptionID;
+        }
+
+        if( response.SubscriptionReference->Address )
+            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
     }
 
     //launching renew-subscription timer
@@ -2508,6 +2521,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
         auth.user(),
         auth.password(),
         m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     _onvifEvents__CreatePullPointSubscription request;
     std::string initialTerminationTime = "PT600S";
@@ -2521,21 +2535,26 @@ bool QnPlOnvifResource::createPullPointSubscription()
     }
 
     std::string subscriptionID;
-    if( response.SubscriptionReference &&
-        response.SubscriptionReference->ns1__ReferenceParameters &&
-        response.SubscriptionReference->ns1__ReferenceParameters->__item )
+    if( response.SubscriptionReference )
     {
-        //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
-        QXmlSimpleReader reader;
-        SubscriptionReferenceParametersParseHandler handler;
-        reader.setContentHandler( &handler );
-        QBuffer srcDataBuffer;
-        srcDataBuffer.setData(
-            response.SubscriptionReference->ns1__ReferenceParameters->__item,
-            (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
-        QXmlInputSource xmlSrc( &srcDataBuffer );
-        if( reader.parse( &xmlSrc ) )
-            m_onvifNotificationSubscriptionID = handler.subscriptionID;
+        if( response.SubscriptionReference->ns1__ReferenceParameters &&
+            response.SubscriptionReference->ns1__ReferenceParameters->__item )
+        {
+            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
+            QXmlSimpleReader reader;
+            SubscriptionReferenceParametersParseHandler handler;
+            reader.setContentHandler( &handler );
+            QBuffer srcDataBuffer;
+            srcDataBuffer.setData(
+                response.SubscriptionReference->ns1__ReferenceParameters->__item,
+                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            QXmlInputSource xmlSrc( &srcDataBuffer );
+            if( reader.parse( &xmlSrc ) )
+                m_onvifNotificationSubscriptionID = handler.subscriptionID;
+        }
+
+        if( response.SubscriptionReference->Address )
+            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
     }
 
     //adding task to refresh subscription
@@ -2565,6 +2584,7 @@ bool QnPlOnvifResource::pullMessages()
         auth.user(),
         auth.password(),
         m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
 
     char buf[512];
 
@@ -2941,3 +2961,5 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
 
     return CameraDiagnostics::NoErrorResult();
 }
+
+#endif //ENABLE_ONVIF

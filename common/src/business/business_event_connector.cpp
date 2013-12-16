@@ -39,7 +39,7 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
     return _instance;
 }
 
-void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata)
+void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? Qn::OnState : Qn::OffState, timeStamp, metadata)); 
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
@@ -60,6 +60,12 @@ void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes
 void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode)
 {
     QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(resource, timeStamp, reasonCode));
+    qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
+}
+
+void QnBusinessEventConnector::at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp)
+{
+    QnMServerStartedBusinessEventPtr mserverEvent(new QnMServerStartedBusinessEvent(resource, timeStamp));
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 

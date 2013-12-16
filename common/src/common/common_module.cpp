@@ -14,7 +14,6 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     QnCommonMetaTypes::initilize();
     
     /* Init statics. */
-    qnCustomization();
     qnProductFeatures();
 
     /* Init members. */

@@ -1,6 +1,8 @@
 #ifndef onvif_soap_wrapper_h
 #define onvif_soap_wrapper_h
 
+#ifdef ENABLE_ONVIF
+
 #include <QSharedPointer>
 
 #include "onvif_helper.h"
@@ -490,7 +492,7 @@ public:
         int _timeDrift,
         bool tcpKeepAlive = false );
 
-	int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
+    int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
 };
 
 class PullPointSubscriptionWrapper
@@ -519,7 +521,7 @@ public:
         int _timeDrift,
         bool tcpKeepAlive = false );
 
-	int createPullPointSubscription(
+    int createPullPointSubscription(
         _onvifEvents__CreatePullPointSubscription& request,
         _onvifEvents__CreatePullPointSubscriptionResponse& response );
 };
@@ -535,7 +537,9 @@ public:
         int _timeDrift,
         bool tcpKeepAlive = false );
 
-	int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
+    int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif //onvif_soap_wrapper_h

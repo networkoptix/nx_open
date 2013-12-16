@@ -353,6 +353,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
+    if (!QDir(qnSettings->mediaFolder()).exists())
+        QDir().mkpath(qnSettings->mediaFolder());
+
     cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
@@ -489,7 +492,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
     //initializing plugin manager. TODO supply plugin dir (from settings)
-    PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
+    //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -509,11 +512,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
-    // show bet version warning message for the main instance only
-    if (!noSingleApplication &&
-            !qnSettings->isDevMode() &&
-            QLatin1String(QN_BETA) == QLatin1String("true"))
-        context->action(Qn::BetaVersionMessageAction)->trigger();
+        // show beta version warning message for the main instance only
+        if (!noSingleApplication &&
+                !qnSettings->isDevMode() &&
+                QLatin1String(QN_BETA) == QLatin1String("true"))
+            context->action(Qn::BetaVersionMessageAction)->trigger();
 
     if (argc <= 1) {
         /* If no input files were supplied --- open connection settings dialog. */

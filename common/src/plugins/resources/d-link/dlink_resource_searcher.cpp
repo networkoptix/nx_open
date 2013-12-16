@@ -1,3 +1,5 @@
+#ifdef ENABLE_DLINK
+
 #include "dlink_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "dlink_resource.h"
@@ -79,9 +81,6 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
         }
 
         // collecting response
-        QTime time;
-        time.start();
-
         QnSleep::msleep(150);
         while (sock->hasData())
         {
@@ -227,3 +226,4 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
     return result;
 }
 
+#endif // ENABLE_DLINK

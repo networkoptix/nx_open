@@ -1,6 +1,8 @@
 
 #include "events_db.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include "business/events/abstract_business_event.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
@@ -8,6 +10,7 @@
 #include "business/business_action_factory.h"
 #include "core/resource_managment/resource_pool.h"
 #include "recorder/storage_manager.h"
+#include "settings.h"
 
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
@@ -19,8 +22,7 @@ QnEventsDB::QnEventsDB():
     m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD)
 {
     m_sdb = QSqlDatabase::addDatabase("QSQLITE");
-    m_sdb.setDatabaseName(closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")));
-
+    m_sdb.setDatabaseName( MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")) ).toString() );
     if (m_sdb.open())
     {
         if (!createDatabase()) // create tables is DB is empty
@@ -212,7 +214,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     const QnId& businessRuleId) const
 
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     QList<QnAbstractBusinessActionPtr> result;
@@ -265,7 +267,7 @@ void QnEventsDB::getAndSerializeActions(
                                         const QnId& businessRuleId) const
 
 {
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);

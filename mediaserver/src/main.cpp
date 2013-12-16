@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+#include <iostream>
 
 #include <qtsinglecoreapplication.h>
 #include <QtCore/QCoreApplication>
@@ -100,6 +101,7 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
 #include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
+#include "utils/network/simple_http_client.h"
 #include "utils/network/ssl_socket.h"
 #include "network/authenticate_helper.h"
 #include "rest/handlers/rebuild_archive_handler.h"
@@ -107,7 +109,6 @@
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
-
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -279,7 +280,7 @@ QnStorageResourcePtr createStorage(const QString& path)
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
-    storage->setSpaceLimit(5ll * 1000000000);
+    storage->setSpaceLimit( QnStorageManager::DEFAULT_SPACE_LIMIT );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
 
     return storage;
@@ -346,22 +347,23 @@ static QStringList listRecordFolders()
 
 QnAbstractStorageResourceList createStorages()
 {
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
-
     QnAbstractStorageResourceList storages;
-    bool isBigStorageExist = false;
+    //bool isBigStorageExist = false;
+    qint64 bigStorageThreshold = 0;
     foreach(QString folderPath, listRecordFolders()) {
         QnStorageResourcePtr storage = createStorage(folderPath);
-        isBigStorageExist |= storage->isUsedForWriting() && storage->getTotalSpace() > BIG_STORAGE_THRESHOLD;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
         cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
     }
-    if (isBigStorageExist) {
-        for (int i = 0; i < storages.size(); ++i) {
-            QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
-            if (storage->getTotalSpace() <= BIG_STORAGE_THRESHOLD)
-                storage->setUsedForWriting(false);
-        }
+    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+
+    for (int i = 0; i < storages.size(); ++i) {
+        QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        if (available < bigStorageThreshold)
+            storage->setUsedForWriting(false);
     }
 
     return storages;
@@ -443,6 +445,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 int serverMain(int argc, char *argv[])
 {
+    Q_UNUSED(argc)
 #ifdef Q_OS_WIN
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
@@ -516,7 +519,7 @@ void initAppServerConnection(const QSettings &settings, bool tryDirectConnect)
     QUrl appServerUrl;
 
     // ### remove
-    appServerUrl.setScheme(QLatin1String("https"));
+    appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     QString host = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
     int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
@@ -559,7 +562,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     QUrl appServerEventsUrl;
 
     // ### remove
-    appServerEventsUrl.setScheme(QLatin1String("https"));
+    appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
@@ -768,10 +771,12 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_connectionOpened()
 {
-    if (m_firstRunningTime)
+    if (m_firstRunningTime) {
         qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
-        m_firstRunningTime*1000,
-        QnBusiness::MServerIssueStarted);
+            m_firstRunningTime*1000,
+            QnBusiness::MServerIssueStarted);
+        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+    }
     m_firstRunningTime = 0;
 }
 
@@ -829,7 +834,9 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
+#ifdef ENABLE_ACTI
     QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
+#endif
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
@@ -838,8 +845,14 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
-    
+
+    if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
+        m_universalTcpListener->disableAuth();
+
+#ifdef ENABLE_DESKTOP_CAMERA
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
+#endif   //ENABLE_DESKTOP_CAMERA
+
     m_universalTcpListener->start();
 
 #else
@@ -919,9 +932,11 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
+#ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
     QnSoapServer::instance()->start();
+#endif //ENABLE_ONVIF
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
@@ -1148,32 +1163,51 @@ void QnMain::run()
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
-
+#ifdef ENABLE_ARECONT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
+#endif
+#ifdef ENABLE_DLINK
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDlinkResourceSearcher::instance());
+#endif
+#ifdef ENABLE_DROID
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlDroidResourceSearcher::instance());
+#endif
+#ifdef ENABLE_TEST_CAMERA
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnTestCameraResourceSearcher::instance());
+#endif
+#ifdef ENABLE_PULSE_CAMERA
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
+#endif
+#ifdef ENABLE_AXIS
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
+#endif
+#ifdef ENABLE_ACTI
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+#endif
+#ifdef ENABLE_STARDOT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
+#endif
+#ifdef ENABLE_IQE
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlIqResourceSearcher::instance());
+#endif
+#ifdef ENABLE_ISD
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
+#endif
+#ifdef ENABLE_DESKTOP_CAMERA
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopCameraResourceSearcher::instance());
+#endif  //ENABLE_DESKTOP_CAMERA
 
-#ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
-    {
-        QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
-        QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
-    }
+#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+    QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
+    QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
 #endif
 
     //Onvif searcher should be the last:
+#ifdef ENABLE_ONVIF
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
+#endif //ENABLE_ONVIF
 
     
 
@@ -1253,12 +1287,9 @@ void QnMain::run()
     delete ThirdPartyResourceSearcher::instance();
     ThirdPartyResourceSearcher::initStaticInstance( NULL );
 
-#ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
-    {
-        delete QnPlVmax480ResourceSearcher::instance();
-        QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
-    }
+#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+    delete QnPlVmax480ResourceSearcher::instance();
+    QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
 #endif
 
     delete UPNPDeviceSearcher::instance();
@@ -1280,8 +1311,11 @@ void QnMain::run()
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+#ifdef ENABLE_ONVIF
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
+#endif //ENABLE_ONVIF
+
     QnStorageManager::instance()->stopAsyncTasks();
 
     av_lockmgr_register(NULL);
@@ -1381,6 +1415,18 @@ static void printHelp();
 
 int main(int argc, char* argv[])
 {
+#if __arm__
+#if defined(__GNUC__)
+# if defined(__i386__)
+        /* Enable Alignment Checking on x86 */
+        __asm__("pushf\norl $0x40000,(%esp)\npopf");
+# elif defined(__x86_64__) 
+             /* Enable Alignment Checking on x86_64 */
+            __asm__("pushf\norl $0x40000,(%rsp)\npopf");
+# endif
+#endif
+#endif //__arm__
+
     ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
@@ -1391,8 +1437,6 @@ int main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
-
-    //TODO/IMPL read path to data directory from command line
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
@@ -1426,7 +1470,7 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout<<"  "<<QN_APPLICATION_NAME" v."QN_APPLICATION_VERSION<<std::endl;
+    std::cout<<"  "<<QN_APPLICATION_NAME" v."<<QN_APPLICATION_VERSION<<std::endl;
 }
 
 static void printHelp()

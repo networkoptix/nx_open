@@ -15,26 +15,21 @@ V14 = Version(1, 4)
 V15 = Version(1, 5)
 V16 = Version(1, 6)
 V20 = Version(2, 0)
+V21 = Version(2, 1)
            
 COMPATIBILITY_INFO = (
-    (V15, (IOSCL,), V16), # iOS V1.5 can connect to 1.6
-    (V15, (IOSCL,), V20), # iOS V1.5 can connect to 2.0
+    (V15, (IOSCL,), Range(V16,V20)), # iOS V1.5 can connect to 1.6 and 2.0
+    (V20, (IOSCL,), Range(V15, V16)), # iOS V2.0 can connect to 1.5 and 1.6
 
-    (V20, (IOSCL,), V15), # iOS V2.0 can connect to 1.5
-    (V20, (IOSCL,), V16), # iOS V2.0 can connect to 1.6
-
-    (V16, (ANDROID,), V14), # android V1.6 can connect to 1.4
-    (V16, (ANDROID,), V15), # android V1.6 can connect to 1.5
-    (V16, (ANDROID,), V20), # android V1.6 can connect to 2.0
+    (V16, (ANDROID,), Range(V14, V20)), # android V1.6 can connect to 1.4, 1.5 and 2.0
     
-    (V16, (CL,), V20), # client V1.6 can connect to 2.0
-    (V20, (CL,), V16), # client V2.0 can connect to 1.6
+    (V16, (CL,MS), V20), # client and ms V1.6 can connect to 2.0
+    (V20, (CL,MS), V16), # client and ms V2.0 can connect to 1.6
     
-    (V16, (MS,), V20), # MediaServer V1.6 can connect to 2.0
-    (V20, (MS,), V16), # MediaServer V2.0 can connect to 1.6
-#    (V13, (CL,), Range(V12, V12)),
-#    (V14, (CL,), Range(V12, V13)),
+    (V21, (CL, MS, IOSCL, ANDROID), Range(V16, V20)), # Client 2.1 can connect to 1.6, but not vice-versa
+    (Range(V16, V20), (MS, IOSCL,ANDROID), V21), # MS, IOS and android 1.6-2.0 can connect to 2.1
 )
+
 COMPATIBILITY_MATRIX = set()
 
 class CompatibilityItem(object):
@@ -51,13 +46,15 @@ class CompatibilityItem(object):
             self.comp1 == other.comp1 and \
             self.v2 == other.v2
 
+    def __repr__(self):
+        return "%s, %s, %s" % (self.v1, self.comp1, self.v2)
 
 def fill_compatibility_matrix():
     for ver1list, clist, ver2list in COMPATIBILITY_INFO:
         for ver1 in ver1list:
             for comp in clist:
                 for ver2 in ver2list:
-                    COMPATIBILITY_MATRIX.add(CompatibilityItem(ver1, comp.name, ver2))
+                    COMPATIBILITY_MATRIX.add(CompatibilityItem(ver1.version, comp.name, ver2.version))
 
 def is_compatible(comp1, v1s, comp2, v2s):
     "Is component comp1 of version v1s (as string) and comp2 of version v2s compatible?"

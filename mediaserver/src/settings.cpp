@@ -2,6 +2,7 @@
 #include "settings.h"
 
 #include <atomic>
+#include <iostream>
 #include <mutex>
 
 #include <QtCore/QSettings>
@@ -11,32 +12,32 @@
 
 static std::mutex settingsMutex;
 
-static void initializeSettingsFromConfFile( std::atomic<QSettings*>& settingsInstance, const QString& fileName )
+static void initializeSettingsFromConfFile( QSettings*& settingsInstance, const QString& fileName )
 {
-    if( settingsInstance.load() )
+    if( settingsInstance )
         return;
 
     std::unique_lock<std::mutex> lk( settingsMutex );
 
-    if( settingsInstance.load() )
+    if( settingsInstance )
         return;
 
     settingsInstance = new QSettings( fileName, QSettings::IniFormat );
 }
 
 static QSettings* getSettingsInstance(
-    std::atomic<QSettings*>& settingsInstance
+    QSettings*& settingsInstance
 #ifndef _WIN32
     , const QString& defaultConfigFileName
 #endif
     )
 {
-    if( settingsInstance.load() )
+    if( settingsInstance )
         return settingsInstance;
 
     std::unique_lock<std::mutex> lk( settingsMutex );
 
-    if( settingsInstance.load() )
+    if( settingsInstance )
         return settingsInstance;
 
 #ifndef _WIN32
@@ -55,8 +56,8 @@ static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaser
 static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(VER_LINUX_ORGANIZATION_NAME);
 #endif
 
-static std::atomic<QSettings*> roSettingsInstance;
-static std::atomic<QSettings*> rwSettingsInstance;
+static QSettings* roSettingsInstance = NULL;
+static QSettings* rwSettingsInstance = NULL;
 
 QString MSSettings::defaultROSettingsFilePath()
 {

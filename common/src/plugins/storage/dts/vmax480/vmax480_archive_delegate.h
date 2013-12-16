@@ -1,6 +1,8 @@
 #ifndef __VMAX480_ARCHIVE_DELEGATE
 #define __VMAX480_ARCHIVE_DELEGATE
 
+#ifdef ENABLE_VMAX
+
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "vmax480_resource.h"
 #include "vmax480_stream_fetcher.h"
@@ -53,4 +55,5 @@ private:
     int m_noDataCounter;
 };
 
+#endif // #ifdef ENABLE_VMAX
 #endif // __VMAX480_ARCHIVE_DELEGATE

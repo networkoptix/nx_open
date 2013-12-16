@@ -2,14 +2,18 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <memory> // for auto_ptr
-#include <QtCore/QThread>
-#include <QAuthenticator>
-#include <QtCore/QTimer>
-#include "utils/common/long_runnable.h"
-#include "utils/network/netstate.h"
-#include "core/resource/resource.h"
-#include "utils/network/nettools.h"
 
+#include <QtCore/QThread>
+#include <QtCore/QTimer>
+#include <QtNetwork/QAuthenticator>
+
+#include <api/media_server_cameras_data.h>
+
+#include <core/resource/resource.h>
+
+#include <utils/common/long_runnable.h>
+#include <utils/network/netstate.h>
+#include <utils/network/nettools.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -85,11 +89,11 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
     bool registerManualCameras(const QnManualCamerasMap& cameras);
-    //QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
+
+    ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
     void doResourceDiscoverIteration();
@@ -101,6 +105,7 @@ public slots:
 
 protected:
     QMutex m_discoveryMutex;
+
     unsigned int m_runNumber;
 
     virtual void run();
@@ -143,6 +148,9 @@ private:
     State m_state;
     QSet<QString> m_recentlyDeleted;
     const CameraDriverRestrictionList* m_cameraDriverRestrictionList;
+
+    QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
+    QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

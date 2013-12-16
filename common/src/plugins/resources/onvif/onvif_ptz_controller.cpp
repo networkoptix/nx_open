@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "onvif_ptz_controller.h"
 #include "plugins/resources/onvif/onvif_resource.h"
 #include "soap_wrapper.h"
@@ -111,7 +114,10 @@ int QnOnvifPtzController::stopMove()
 {
     // TODO: #Elric TOTALLY EVIL!!! Refactor properly.
     QString model = m_resource->getModel();
-    if(model == lit("SD8362") || model == lit("SD83X3") || model == lit("SD81X1"))
+    if(model == lit("SD8362") ||
+            model == lit("SD83X3") ||
+            model == lit("SD81X1") ||
+            model == lit("SD83X1"))
         return startMove(0, 0, 0);
 
     QAuthenticator auth(m_resource->getAuth());
@@ -295,4 +301,5 @@ void QnOnvifPtzController::getFlipped(bool *horizontal, bool *vertical)
         *vertical = m_verticalFlipped;
 }
 
+#endif //ENABLE_ONVIF
 

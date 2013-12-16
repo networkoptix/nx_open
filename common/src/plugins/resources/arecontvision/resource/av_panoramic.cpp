@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
@@ -137,6 +139,7 @@ bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVar
 
 CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     const CameraDiagnostics::Result result = QnPlAreconVisionResource::initInternal();
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
@@ -208,3 +211,5 @@ const QnResourceVideoLayout* QnArecontPanoramicResource::getVideoLayout(const Qn
 
     return layout;
 }
+
+#endif

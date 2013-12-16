@@ -1,5 +1,4 @@
 
-#include <QtCore/QTime>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QRegExp>

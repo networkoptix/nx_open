@@ -9,8 +9,8 @@
 #include <memory>
 
 #include <plugins/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
+
 #include "stream_reader.h"
 
 
@@ -26,14 +26,15 @@ class MediaEncoder
 public:
     MediaEncoder(
         CameraManager* const cameraManager,
+        int encoderNumber,
         unsigned int frameDurationUsec );
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::CameraMediaEncoder::getMediaUrl
@@ -51,12 +52,14 @@ public:
 
     //!Implementation of nxcip::CameraMediaEncoder::setBitrate
     virtual nxcip::StreamReader* getLiveStreamReader() override;
+    virtual int getAudioFormat( nxcip::AudioFormat* format ) const override;
 
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     std::auto_ptr<StreamReader> m_streamReader;
     unsigned int m_frameDurationUsec;
+    int m_encoderNumber;
 };
 
 #endif  //ILP_MEDIA_ENCODER_H

@@ -48,38 +48,32 @@ public:
         This can be "axis", "dlink", "onvif", etc.
     */
     virtual QString getDriverName() const = 0;
-    //!Returns camera's vendor name
-    /*!
-        For onvif camera it returns real vendor name, not "onvif"
-    */
-    virtual QString getVendorName() const;
 
+    virtual int getMaxFps() const;
 
-    virtual int getMaxFps(); // in fact this is const function;
+    virtual int reservedSecondStreamFps() const;
 
-    virtual int reservedSecondStreamFps();  // in fact this is const function;
-
-    virtual QSize getMaxSensorSize(); // in fact this is const function;
+    virtual QSize getMaxSensorSize() const;
 
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
-    virtual QRect getCroping(QnDomain domain); // TODO: #Elric 'cropping' is spelled with double 'p'. Rename
-    virtual void setCroping(QRect croping, QnDomain domain); // sets cropping. rect is in the percents from 0 to 100
-
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
+    QList<QnMotionRegion> getMotionRegionList() const;
     void setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain);
+
+    QnMotionRegion getMotionRegion(int channel) const;
     void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
 
     QRegion getMotionMask(int channel) const;
-    QnMotionRegion getMotionRegion(int channel) const;
-    QList<QnMotionRegion> getMotionRegionList() const;
 
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     const QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 
+    /** Return true if dual streaming supported and don't blocked by user */
+    bool hasDualStreaming2() const;
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
@@ -117,6 +111,27 @@ public:
     virtual void setGroupName(const QString& value);
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
+
+    void setScheduleDisabled(bool value);
+    bool isScheduleDisabled() const;
+
+    bool isAudioEnabled() const;
+    void setAudioEnabled(bool value);
+
+    bool isAdvancedWorking() const;
+    void setAdvancedWorking(bool value);
+
+    bool isManuallyAdded() const;
+    void setManuallyAdded(bool value);
+
+    QString getModel() const;
+    void setModel(const QString &model);
+
+    QString getFirmware() const;
+    void setFirmware(const QString &firmware);
+
+    QString getVendor() const;
+    void setVendor(const QString &value);
 
     bool isGroupPlayOnly() const;
 
@@ -166,8 +181,10 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+
     //!Emitted on camera input port state has been changed
     /*!
         \param resource Smart pointer to \a this
@@ -185,6 +202,12 @@ protected slots:
     virtual void at_disabledChanged();
 
 protected:
+    //!Returns camera's vendor name
+    /*!
+        For onvif camera it returns real vendor name, not "onvif"
+    */
+    virtual QString getVendorInternal() const;
+
     void updateInner(QnResourcePtr other) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
@@ -192,7 +215,6 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setCropingPhysical(QRect croping) = 0; // TODO: #Elric 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
     //!MUST be overridden for camera with input port. Default implementation does noting
     /*!
@@ -208,10 +230,9 @@ protected:
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
+    QString m_vendor;
 
 private:
-    //mutable QMutex m_camIOMutex;
-
     QnDataProviderFactory *m_dpFactory;
     QnScheduleTaskList m_scheduleTasks;
     Qn::MotionType m_motionType;
@@ -222,6 +243,12 @@ private:
     Qn::SecondStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
     StatusFlags m_statusFlags;
+    bool m_scheduleDisabled;
+    bool m_audioEnabled;
+    bool m_advancedWorking;
+    bool m_manuallyAdded;
+    QString m_model;
+    QString m_firmware;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

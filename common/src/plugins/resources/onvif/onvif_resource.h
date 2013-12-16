@@ -1,6 +1,8 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#ifdef ENABLE_ONVIF
+
 #include <list>
 #include <memory>
 #include <stack>
@@ -108,9 +110,8 @@ public:
 
     virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
-    virtual QString getVendorName() const override;
 
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
@@ -203,6 +204,8 @@ public:
 
     bool isPTZDisabled() const;
 protected:
+    virtual QString getVendorInternal() const override;
+
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -210,7 +213,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
@@ -417,11 +420,12 @@ private:
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     QString m_vendorName;
-	
+    
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
     int m_streamConfCounter;
-    CameraDiagnostics::Result m_prevOnvifResultCode;
+    CameraDiagnostics::Result m_prevOnvifResultCode; 
+    QString m_onvifNotificationSubscriptionReference;
 
     bool createPullPointSubscription();
     bool pullMessages();
@@ -439,5 +443,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif //onvif_resource_h

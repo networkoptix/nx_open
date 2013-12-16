@@ -325,6 +325,7 @@ static const int MS_PER_SEC = 1000;
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
+    Q_UNUSED(_owner)
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
     d->streamingFormat = "webm";
@@ -546,10 +547,11 @@ void QnProgressiveDownloadingConsumer::run()
                 sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
-            if (dataProvider) {
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            dataProvider = liveReader;
+            if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
-                dataProvider->start();
+                liveReader->startIfNotRunning(true);
                 camera->inUse(this);
             }
         }

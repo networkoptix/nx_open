@@ -28,7 +28,7 @@ public slots:
         \param metadata region where is motion occured
         \param value true, if motion started or motion in progress. false, if motion finished. If motion is finished metadata is null
     */
-    void at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnAbstractDataPacketPtr metadata);
+    void at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata);
 
     /*! Camera goes to offline state
     */
@@ -49,6 +49,8 @@ public slots:
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStamp);
 
     void at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode);
+
+    void at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp);
 
     void at_cameraIPConflict(const QnResourcePtr& resource, const QHostAddress& hostAddress, const QStringList& macAddrList, qint64 timeStamp);
 

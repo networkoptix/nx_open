@@ -12,4 +12,13 @@ public:
 
 typedef QSharedPointer<QnMServerFailureBusinessEvent> QnMServerFailureBusinessEventPtr;
 
+class QnMServerStartedBusinessEvent: public QnInstantBusinessEvent
+{
+    typedef QnInstantBusinessEvent base_type;
+public:
+    QnMServerStartedBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp);
+};
+
+typedef QSharedPointer<QnMServerStartedBusinessEvent> QnMServerStartedBusinessEventPtr;
+
 #endif // __MSERVER_FAILURE_BUSINESS_EVENT_H__

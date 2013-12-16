@@ -1,10 +1,12 @@
 #ifndef upnp_resource_searcher_h_1806
 #define upnp_resource_searcher_h_1806
 
+#include <QtCore/QAtomicInt>
+#include <QtCore/QElapsedTimer>
+
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/network/nettools.h"
 #include "utils/network/socket.h"
-#include <QtCore/QAtomicInt>
 
 #include "upnp_device_searcher.h"
 
@@ -52,7 +54,7 @@ private:
     AbstractDatagramSocket* sockByName(const QnInterfaceAndAddr& iface);
 
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
-    QTime m_cacheLivetime;
+    QElapsedTimer m_cacheLivetime;
     AbstractDatagramSocket* m_receiveSocket;
 };
 

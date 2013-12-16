@@ -4,9 +4,10 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
+#include <QtCore/QSharedPointer>
+#include <QtCore/QUuid>
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
-#include <QSharedPointer>
 
 #include "utils/common/util.h"
 #include "utils/common/warnings.h"
@@ -39,7 +40,9 @@ namespace {
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
         ((TimeObject,               "gettime"))
-        ((CameraSearchObject,       "manualCamera/search"))
+        ((CameraSearchStartObject,  "manualCamera/search"))
+        ((CameraSearchStatusObject, "manualCamera/status"))
+        ((CameraSearchStopObject,   "manualCamera/stop"))
         ((CameraAddObject,          "manualCamera/add"))
         ((EventLogObject,           "events"))
         ((ImageObject,              "image"))
@@ -340,34 +343,17 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzStopObject:
     case PtzMoveObject:
     case CameraAddObject:
+        //TODO: #GDM processJsonReply if needed
         emitFinished(this, response.status, handle);
         break;
-    case CameraSearchObject: {
-        QnCamerasFoundInfoList reply;
-
-        if (response.status == 0) {
-            QByteArray root = extractXmlBody(response.data, "reply");
-            QByteArray resource;
-            int from = 0;
-            do {
-                resource = extractXmlBody(root, "resource", &from);
-                if (resource.length() == 0)
-                    break;
-                QString url = QLatin1String(extractXmlBody(resource, "url"));
-                QString name = QLatin1String(extractXmlBody(resource, "name"));
-                QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
-                bool exists = QString(QLatin1String(extractXmlBody(resource, "exists"))).toInt();
-                reply.append(QnCamerasFoundInfo(url, name, manufacture, exists));
-            } while (resource.length() > 0);
-        } else {
-            qnWarning("Camera search failed: %1.", extractXmlBody(response.data, "root"));
-        }
-
-        emitFinished(this, response.status, reply, handle);
+    case CameraSearchStartObject:
+    case CameraSearchStatusObject:
+    case CameraSearchStopObject:
+    {
+        processJsonReply<QnManualCameraSearchProcessReply>(this, response, handle);
         break;
     }
     case EventLogObject: {
-        QnApiPbSerializer serializer;
         QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
         if (response.status == 0)
             QnEventSerializer::deserialize(events, response.data);
@@ -508,7 +494,7 @@ int QnMediaServerConnection::setParamsSync(const QnNetworkResourcePtr &camera, c
     return sendSyncGetRequest(SetParamsObject, createSetParamsRequest(camera, params), reply);
 }
 
-int QnMediaServerConnection::searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot) {
+int QnMediaServerConnection::searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("start_ip", startAddr);
     if (!endAddr.isEmpty())
@@ -517,8 +503,21 @@ int QnMediaServerConnection::searchCameraAsync(const QString &startAddr, const Q
     params << QnRequestParam("password", password);
     params << QnRequestParam("port" ,QString::number(port));
 
-    return sendAsyncGetRequest(CameraSearchObject, params, QN_REPLY_TYPE(QnCamerasFoundInfoList), target, slot);
+    return sendAsyncGetRequest(CameraSearchStartObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
 }
+
+int QnMediaServerConnection::searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("uuid", processUuid.toString());
+    return sendAsyncGetRequest(CameraSearchStatusObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
+}
+
+int QnMediaServerConnection::searchCameraAsyncStop(const QUuid &processUuid, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("uuid", processUuid.toString());
+    return sendAsyncGetRequest(CameraSearchStopObject, params, QN_REPLY_TYPE(QnManualCameraSearchProcessReply), target, slot);
+}
+
 
 int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;

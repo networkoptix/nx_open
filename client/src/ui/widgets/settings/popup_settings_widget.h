@@ -4,6 +4,7 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -12,20 +13,21 @@ namespace Ui {
 
 class QnShowBusinessEventsHelper;
 
-class QnPopupSettingsWidget : public QWidget, public QnWorkbenchContextAware
+class QnPopupSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    explicit QnPopupSettingsWidget(QnWorkbenchContext *context, QWidget *parent = 0);
+    explicit QnPopupSettingsWidget(QWidget *parent = 0);
     ~QnPopupSettingsWidget();
 
-    void submit();
+    virtual void submitToSettings() override;
+    virtual void updateFromSettings() override;
 
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
     void at_showBusinessEvents_valueChanged(quint64 value);
-    void at_context_userChanged();
 
 private:
     QScopedPointer<Ui::QnPopupSettingsWidget> ui;

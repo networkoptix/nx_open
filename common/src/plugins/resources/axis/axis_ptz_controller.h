@@ -1,6 +1,8 @@
 #ifndef QN_AXIS_PTZ_CONTROLLER_H
 #define QN_AXIS_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QHash>
 
 #include <core/resource/interface/abstract_ptz_controller.h>
@@ -34,5 +36,5 @@ private:
     QnPtzSpaceMapper *m_spaceMapper;
 };
 
-
+#endif // #ifdef ENABLE_AXIS
 #endif // QN_AXIS_PTZ_CONTROLLER_H

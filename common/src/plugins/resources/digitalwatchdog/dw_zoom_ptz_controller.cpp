@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "dw_zoom_ptz_controller.h"
 
 #include <plugins/resources/camera_settings/camera_settings.h>
@@ -67,3 +70,5 @@ Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
 const QnPtzSpaceMapper *QnDwZoomPtzController::getSpaceMapper() {
     return NULL;
 }
+
+#endif //ENABLE_ONVIF

@@ -33,10 +33,10 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
     c(0),
     m_codec(data->compressionType)
 {
-	if (m_first_instance)
-	{
-		m_first_instance = false;
-	}
+    if (m_first_instance)
+    {
+        m_first_instance = false;
+    }
 
 //    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
@@ -51,7 +51,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         return;
     }
 
-	c = avcodec_alloc_context3(codec);
+    c = avcodec_alloc_context3(codec);
 
     if (data->context)
     {
@@ -79,18 +79,18 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         }
         */
     }
-	avcodec_open2(c, codec, NULL);
+    avcodec_open2(c, codec, NULL);
 
 }
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
-	if (c)
-	{
+    if (c)
+    {
         if (c->codec)
             avcodec_close(c);
-		av_free(c);
-	}
+        av_free(c);
+    }
 
 }
 
@@ -100,28 +100,28 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 {
     result.clear();
 
-	if (!codec)
-		return false;
+    if (!codec)
+        return false;
 
-	const unsigned char* inbuf_ptr = (const unsigned char*) data->data.data();
-	int size = data->data.size();
-	unsigned char* outbuf = (unsigned char*)result.data();
+    const unsigned char* inbuf_ptr = (const unsigned char*) data->data.data();
+    int size = data->data.size();
+    unsigned char* outbuf = (unsigned char*)result.data();
 
-	int outbuf_len = 0;
+    int outbuf_len = 0;
 
-	while (size > 0) 
-	{
+    while (size > 0) 
+    {
 
-		int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+        int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
-		//cl_log.log("before dec",  cl_logALWAYS);
+        //cl_log.log("before dec",  cl_logALWAYS);
 
-		if (outbuf_len + out_size > (int)result.capacity())
-		{
+        if (outbuf_len + out_size > (int)result.capacity())
+        {
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
             result.reserve(result.capacity() * 2);
             outbuf = (quint8*) result.data() + outbuf_len;
-		}
+        }
 
         AVPacket avpkt;
         av_init_packet(&avpkt);
@@ -131,17 +131,17 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
-		//cl_log.log("after dec",  cl_logALWAYS);
+        //cl_log.log("after dec",  cl_logALWAYS);
 
-		if (len < 0) 
-			return false;
+        if (len < 0) 
+            return false;
 
-		outbuf_len+=out_size;
-		outbuf+=out_size;
-		size -= len;
-		inbuf_ptr += len;
+        outbuf_len+=out_size;
+        outbuf+=out_size;
+        size -= len;
+        inbuf_ptr += len;
 
-	}
+    }
     result.finishWriting(outbuf_len);
-	return true;
+    return true;
 }

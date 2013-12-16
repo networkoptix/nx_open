@@ -1,3 +1,4 @@
+#ifdef ENABLE_STARDOT
 
 #include "stardot_resource.h"
 
@@ -62,11 +63,6 @@ QnAbstractStreamDataProvider* QnStardotResource::createLiveDataProvider()
 bool QnStardotResource::shoudResolveConflicts() const 
 {
     return false;
-}
-
-void QnStardotResource::setCropingPhysical(QRect /*croping*/)
-{
-
 }
 
 QSize QnStardotResource::extractResolution(const QByteArray& resolutionStr) const
@@ -143,6 +139,7 @@ void QnStardotResource::parseInfo(const QByteArray& info)
 
 CameraDiagnostics::Result QnStardotResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
        
     QByteArray resList = makeStardotRequest(lit("info.cgi?resolutions&api=2"), status);
@@ -200,7 +197,7 @@ QString QnStardotResource::getRtspUrl() const
     return url.toString();
 }
 
-int QnStardotResource::getMaxFps()
+int QnStardotResource::getMaxFps() const
 {
     return m_maxFps;
 }
@@ -254,3 +251,5 @@ simd128i* QnStardotResource::getMotionMaskBinData() const
 {
     return m_motionMaskBinData;
 }
+
+#endif // #ifdef ENABLE_STARDOT

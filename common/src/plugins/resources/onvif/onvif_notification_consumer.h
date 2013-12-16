@@ -6,6 +6,8 @@
 #ifndef ONVIF_NOTIFICATION_CONSUMER_H
 #define ONVIF_NOTIFICATION_CONSUMER_H
 
+#ifdef ENABLE_ONVIF
+
 #include <map>
 
 #include <QtCore/QMutex>
@@ -22,9 +24,9 @@ class OnvifNotificationConsumer
 {
 public:
     //!Implementation of NotificationConsumerBindingService::copy
-	virtual	NotificationConsumerBindingService* copy();
+    virtual	NotificationConsumerBindingService* copy();
     //!Implementation of NotificationConsumerBindingService::Notify
-	virtual	int Notify( _oasisWsnB2__Notify* oasisWsnB2__Notify );
+    virtual	int Notify( _oasisWsnB2__Notify* oasisWsnB2__Notify );
 
     //!Pass notifications from address \a notificationProducerAddress to \a resource
     void registerResource(
@@ -38,5 +40,7 @@ private:
     std::map<QString, QnPlOnvifResource*> m_notificationProducerAddressToResource;
     mutable QMutex m_mutex;
 };
+
+#endif  //ENABLE_ONVIF
 
 #endif  //ONVIF_NOTIFICATION_CONSUMER_H

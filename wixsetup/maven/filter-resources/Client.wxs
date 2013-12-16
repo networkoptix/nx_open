@@ -145,7 +145,7 @@
                 <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="$(var.SourceDir)/avdevice-53.dll"/>
+                <File Id="ClientAvdeviceDll" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll"/>
             </Component>
             <Component>
                 <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll"/>
@@ -235,7 +235,7 @@
                 <File Id="ClientAvcodecDll_1_4" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvdeviceDll_1_4" Name="avdevice-53.dll" Source="$(var.SourceDir)/avdevice-53.dll"/>
+                <File Id="ClientAvdeviceDll_1_4" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll"/>
             </Component>
             <Component>
                 <File Id="ClientAvfilterDll_1_4" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll"/>
@@ -310,7 +310,7 @@
                 <File Id="ClientAvcodecDll_1_5" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
             <Component>
-                <File Id="ClientAvdeviceDll_1_5" Name="avdevice-53.dll" Source="$(var.SourceDir)/avdevice-53.dll"/>
+                <File Id="ClientAvdeviceDll_1_5" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll"/>
             </Component>
             <Component>
                 <File Id="ClientAvfilterDll_1_5" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll"/>

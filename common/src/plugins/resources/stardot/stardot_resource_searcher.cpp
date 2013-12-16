@@ -1,3 +1,5 @@
+#ifdef ENABLE_STARDOT
+
 #include "stardot_resource_searcher.h"
 
 #include <QtCore/QCoreApplication>
@@ -52,10 +54,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
         }
 
         // collecting response
-        QTime time;
-        time.start();
         QnSleep::msleep(300); // to avoid 100% cpu usage
-        //while(time.elapsed()<150)
         {
             while (sock->hasData())
             {
@@ -253,3 +252,5 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     resList << res;
     return resList;
 }
+
+#endif // #ifdef ENABLE_STARDOT

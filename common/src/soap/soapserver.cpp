@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef ENABLE_ONVIF
+
 #include "soapserver.h"
 
 #include <sstream>
@@ -95,6 +97,7 @@ void QnSoapServer::run()
     strcpy( m_service.soap->path, m_path.c_str() );
 
     m_service.soap->accept_timeout = SOAP_CONNECTION_ACCEPT_TIMEOUT;
+    m_service.soap->imode |= SOAP_XML_IGNORENS;
 
     int m = soap_bind( m_service.soap, NULL, m_port, 100 ); 
     if( m < 0 )
@@ -165,3 +168,5 @@ void QnSoapServer::run()
     soap_end( m_service.soap );
     soap_done( m_service.soap );
 }
+
+#endif //ENABLE_ONVIF

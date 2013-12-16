@@ -63,6 +63,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->nameLabel,         ui->nameEdit,                       Qn::CameraSettings_General_Name_Help);
     setHelpTopic(ui->modelLabel,        ui->modelEdit,                      Qn::CameraSettings_General_Model_Help);
     setHelpTopic(ui->firmwareLabel,     ui->firmwareEdit,                   Qn::CameraSettings_General_Firmware_Help);
+    //TODO: #Elric add context help for vendor field
     setHelpTopic(ui->addressGroupBox,                                       Qn::CameraSettings_General_Address_Help);
     setHelpTopic(ui->enableAudioCheckBox,                                   Qn::CameraSettings_General_Audio_Help);
     setHelpTopic(ui->authenticationGroupBox,                                Qn::CameraSettings_General_Auth_Help);
@@ -395,14 +396,15 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     loadAdvancedSettings();
 
     if(!m_camera) {
-        ui->nameEdit->setText(QString());
-        ui->modelEdit->setText(QString());
-        ui->firmwareEdit->setText(QString());
+        ui->nameEdit->clear();
+        ui->modelEdit->clear();
+        ui->firmwareEdit->clear();
+        ui->vendorEdit->clear();
         ui->enableAudioCheckBox->setChecked(false);
         ui->checkBoxDewarping->setChecked(false);
-        ui->macAddressEdit->setText(QString());
-        ui->loginEdit->setText(QString());
-        ui->passwordEdit->setText(QString());
+        ui->macAddressEdit->clear();
+        ui->loginEdit->clear();
+        ui->passwordEdit->clear();
 
         ui->cameraScheduleWidget->setScheduleTasks(QnScheduleTaskList());
         ui->cameraScheduleWidget->setScheduleEnabled(false);
@@ -422,6 +424,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
         ui->firmwareEdit->setText(m_camera->getFirmware());
+        ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
         ui->checkBoxDewarping->setChecked(m_camera->getDewarpingParams().enabled);
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());

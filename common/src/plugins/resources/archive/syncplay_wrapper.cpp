@@ -1,3 +1,5 @@
+
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QWaitCondition>
 
 #include "syncplay_wrapper.h"
@@ -69,7 +71,7 @@ public:
     bool blockSetSpeedSignal;
     qint64 lastJumpTime;
     int bufferingCnt;
-    QTime timer;
+    QElapsedTimer timer;
     double speed;
     
     bool enabled;
@@ -541,7 +543,9 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 
             if (!i->buffering)
                 d->bufferingCnt++;
             i->buffering = true;
-            d->bufferingTime = bufferingTime;
+            if (bufferingTime != (qint64)AV_NOPTS_VALUE)
+                d->bufferingTime = bufferingTime;
+            break;
             break;
         }
     }
@@ -628,7 +632,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
 
         if (d->enabled) {
             if (allReady)
-                jumpTo(DATETIME_NOW, 0);         // all items at EOF position
+                QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
         }
         else {
             if (reader)
@@ -824,4 +828,9 @@ void QnArchiveSyncPlayWrapper::setLiveModeEnabled(bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     d->liveModeEnabled = value;    
+}
+    
+void QnArchiveSyncPlayWrapper::jumpToLive()
+{
+    jumpTo(DATETIME_NOW, 0);
 }

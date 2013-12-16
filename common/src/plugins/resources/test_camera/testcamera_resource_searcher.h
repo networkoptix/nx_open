@@ -1,6 +1,8 @@
 #ifndef __TEST_CAMERA_RESOURCE_SEARCHER_H_
 #define __TEST_CAMERA_RESOURCE_SEARCHER_H_
 
+#ifdef ENABLE_TEST_CAMERA
+
 #include <QtCore/QCoreApplication>
 
 #include "core/resource_managment/resource_searcher.h"
@@ -40,4 +42,5 @@ private:
     qint64 m_sockUpdateTime;
 };
 
+#endif // #ifdef ENABLE_TEST_CAMERA
 #endif // __TEST_CAMERA_RESOURCE_SEARCHER_H_

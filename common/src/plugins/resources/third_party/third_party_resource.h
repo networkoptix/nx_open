@@ -44,10 +44,11 @@ public:
     virtual void setIframeDistance( int frames, int timems ) override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    //!Implementation of QnSecurityCamResource::setCropingPhysical
-    virtual void setCropingPhysical( QRect croppingRect ) override;
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
+
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
@@ -81,7 +82,7 @@ public:
         unsigned long int timestamp ) override;
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
-
+    virtual bool hasDualStreaming() const override;
 protected:
     //!Implementation of QnResource::initInternal
     virtual CameraDiagnostics::Result initInternal() override;
@@ -107,6 +108,7 @@ private:
     std::auto_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
     QAtomicInt m_refCounter;
     QString m_defaultOutputID;
+    int m_encoderCount;
 
     bool initializeIOPorts();
 };

@@ -1,6 +1,8 @@
 #ifndef vmax480_live_h_1740
 #define vmax480_live_h_1740
 
+#ifdef ENABLE_VMAX
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "core/resource/resource_fwd.h"
 #include "vmax480_stream_fetcher.h"
@@ -41,4 +43,5 @@ private:
     //QnVMax480ConnectionProcessor* m_processor;
 };
 
+#endif // #ifdef ENABLE_VMAX
 #endif //vmax480_live_h_1740

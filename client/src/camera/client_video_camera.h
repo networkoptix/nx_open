@@ -1,5 +1,5 @@
-#ifndef QN_VIDEO_CAMERA_H
-#define QN_VIDEO_CAMERA_H
+#ifndef QN_CLIENT_VIDEO_CAMERA_H
+#define QN_CLIENT_VIDEO_CAMERA_H
 
 #include "cam_display.h"
 #include "recording/stream_recorder.h"
@@ -12,11 +12,11 @@ class QnResource;
 class QnStreamRecorder;
 class QnAbstractArchiveReader;
 
-class QnVideoCamera : public QObject {
+class QnClientVideoCamera : public QObject {
     Q_OBJECT
 public:
-    QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
-    virtual ~QnVideoCamera();
+    QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
+    virtual ~QnClientVideoCamera();
 
     QnMediaResourcePtr resource();
 
@@ -44,6 +44,7 @@ public:
     * Export motion stream to separate file
     */
     void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
+    QSharedPointer<QBuffer> motionIODevice(int channel);
 
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
                                  QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 
@@ -54,8 +55,6 @@ public:
                                  const DewarpingParams& dewarpingParams = DewarpingParams());
 
     void setResource(QnMediaResourcePtr resource);
-    void setExportProgressOffset(int value);
-    int getExportProgressOffset() const;
     QString exportedFileName() const;
 
     bool isDisplayStarted() const { return m_displayStarted; }
@@ -71,12 +70,6 @@ public slots:
     virtual void stopDisplay();
 
     void stopExport();
-    void onExportFinished(QString fileName);
-    void onExportFailed(QString fileName);
-
-protected slots:
-    void at_exportProgress(int value);
-
 private:
     mutable QMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
@@ -87,9 +80,8 @@ private:
     bool m_isVisible;
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
-    int m_progressOffset;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };
 
-#endif //QN_VIDEO_CAMERA_H
+#endif //QN_CLIENT_VIDEO_CAMERA_H

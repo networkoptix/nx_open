@@ -1,3 +1,5 @@
+#ifdef ENABLE_IQE
+
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource_searcher.h"
 #include "iqinvision_resource.h"
@@ -244,8 +246,6 @@ QnResourceList QnPlIqResourceSearcher::findResources()
             sendSock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, NATIVE_DISCOVERY_REQUEST_PORT);
         }
 
-        QTime time;
-        time.start();
         QnSleep::msleep(300);
 
         while (receiveSock->hasData())
@@ -268,3 +268,4 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 
 }
 
+#endif // #ifdef ENABLE_IQE

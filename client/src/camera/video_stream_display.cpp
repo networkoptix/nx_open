@@ -573,7 +573,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     m_mtx.unlock();
     if (decodeToFrame->width) {
         if (qFuzzyIsNull(m_overridenAspectRatio)) {
-            qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
+            //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
             QSize imageSize(decodeToFrame->width * dec->getSampleAspectRatio(), decodeToFrame->height);
             QMutexLocker lock(&m_imageSizeMtx);
             m_imageSize = imageSize;

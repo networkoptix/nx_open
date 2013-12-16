@@ -24,9 +24,10 @@ extern "C"
 #include <core/resource_managment/resource_pool.h>
 
 #include <camera/caching_time_period_loader.h>
+#include <camera/cam_display.h>
+#include <camera/client_video_camera.h>
 #include <camera/time_period_loader.h>
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -40,6 +41,7 @@ extern "C"
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
+#include "watchers/workbench_user_inactivity_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -75,6 +77,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastPlayingSupported(false),
     m_pausedOverride(false),
     m_preciseNextSeek(false),
+    m_autoPaused(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
@@ -241,6 +244,8 @@ void QnWorkbenchNavigator::initialize() {
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
 
+    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),    SIGNAL(stateChanged(bool)), this,   SLOT(setAutoPaused(bool)));
+
     updateLines();
     updateCalendar();
     updateScrollBarFromSlider();
@@ -331,7 +336,11 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     if(!isPlayingSupported())
         return false;
 
+    if (playing && m_autoPaused)
+        return false;
+
     m_pausedOverride = false;
+    m_autoPaused = false;
 
     QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
     QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
@@ -636,7 +645,6 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
         m_currentMediaWidget->display()->archiveReader()->pauseMedia();
     m_currentMediaWidget->display()->camDisplay()->playAudio(playing);
 }
-
 
 // -------------------------------------------------------------------------- //
 // Updaters
@@ -1105,6 +1113,38 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy() {
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());
 }
 
+void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
+    if (autoPaused == m_autoPaused)
+        return;
+
+    if (autoPaused) {
+        /* Collect all playing resources */
+        foreach (QnResourceWidget *widget, display()->widgets()) {
+            QnMediaResourceWidget *mediaResourceWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+            if (!mediaResourceWidget)
+                continue;
+
+            QnResourceDisplayPtr resourceDisplay = mediaResourceWidget->display();
+            if (resourceDisplay->isPaused())
+                continue;
+
+            bool isLive = resourceDisplay->archiveReader()->isRealTimeSource();
+            resourceDisplay->pause();
+            m_autoPausedResourceDisplays.insert(resourceDisplay, isLive);
+        }
+    } else if (m_autoPaused) {
+        for (QHash<QnResourceDisplayPtr, bool>::iterator itr = m_autoPausedResourceDisplays.begin(); itr != m_autoPausedResourceDisplays.end(); ++itr) {
+            itr.key()->play();
+            if (itr.value())
+                itr.key()->archiveReader()->jumpTo(DATETIME_NOW, 0);
+        }
+
+        m_autoPausedResourceDisplays.clear();
+    }
+
+    m_autoPaused = autoPaused;
+    action(Qn::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1197,15 +1237,18 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 
     /* Update tool tip format. */
     if (value == DATETIME_NOW) {
-        m_timeSlider->setToolTipFormat(tr("'Live'", "LIVE_TOOL_TIP_FORMAT"));
+        m_timeSlider->setToolTipFormat(tr("'Live'"));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
-            m_timeSlider->setToolTipFormat(lit("yyyy MMM dd\nhh:mm:ss"));
+            //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
+            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss"));
         } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                m_timeSlider->setToolTipFormat(lit("hh:mm:ss"));
+                //: This is a date/time format for time slider's tooltip for local files. Please translate it only if you're absolutely sure that you know what you're doing.
+                m_timeSlider->setToolTipFormat(tr("hh:mm:ss"));
             } else {
-                m_timeSlider->setToolTipFormat(lit("mm:ss"));
+                //: This is a date/time format for time slider's tooltip for short local files. Please translate it only if you're absolutely sure that you know what you're doing.
+                m_timeSlider->setToolTipFormat(tr("mm:ss"));
             }
         }
     }
@@ -1419,4 +1462,3 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
         m_timeSlider->setWindow(startMSec, endMSec, true);
     }
 }
-

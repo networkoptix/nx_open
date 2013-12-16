@@ -87,7 +87,7 @@ namespace nx_http
 
                         case PollSet::etWrite:
                             //connect successful
-                            formRequest();
+                            composeRequest();
                             serializeRequest();
                             m_state = sSendingRequest;
                             lk.unlock();
@@ -181,7 +181,15 @@ namespace nx_http
                     readAndParseHttp();
                     //TODO/IMPL reconnect in case of error
 
-                    if( m_httpStreamReader.state() == HttpStreamReader::readingMessageHeaders )
+                    if( m_state >= sFailed )
+                    {
+                        lk.unlock();
+                        emit done( this );
+                        lk.relock();
+                        break;
+                    }
+
+                    if( m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )
                         break;  //response has not been read yet
 
                     //read http message headers
@@ -487,12 +495,12 @@ namespace nx_http
         return bytesRead;
     }
 
-    void AsyncHttpClient::formRequest()
+    void AsyncHttpClient::composeRequest()
     {
         const bool useHttp11 = true;   //TODO/IMPL check. if we need it (e.g. we using keep-alive or requesting live capture)
 
         m_request.requestLine.method = nx_http::Method::GET;
-        m_request.requestLine.url = m_url.path();
+        m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
         if( !m_userAgent.isEmpty() )
             m_request.headers["User-Agent"] = m_userAgent.toLatin1();
@@ -500,7 +508,8 @@ namespace nx_http
         {
             m_request.headers["Accept"] = "*/*";
             m_request.headers["Accept-Encoding"] = "gzip;q=1.0, identity;q=0.5, *;q=0";
-            //m_request.headers["Accept-Encoding"] = "identity";
+            m_request.headers["Cache-Control"] = "max-age=0";
+            //m_request.headers["Connection"] = "keep-alive";
             m_request.headers["Host"] = m_url.host().toLatin1();
         }
         //adding user credentials

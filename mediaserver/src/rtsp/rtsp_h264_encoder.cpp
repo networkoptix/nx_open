@@ -65,7 +65,7 @@ void QnRtspH264Encoder::goNextNal()
     }
 }
 
-void QnRtspH264Encoder::setDataPacket(QnAbstractMediaDataPtr media)
+void QnRtspH264Encoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
     if (media->dataType != QnAbstractMediaData::VIDEO)
     {

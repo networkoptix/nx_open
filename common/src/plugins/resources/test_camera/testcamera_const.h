@@ -1,6 +1,8 @@
 #ifndef __TEST_CAMERA_CONST_H__
 #define __TEST_CAMERA_CONST_H__
 
+#ifdef ENABLE_TEST_CAMERA
+
 #include <QtCore/QByteArray>
 
 
@@ -14,4 +16,5 @@ public:
 };
 
 
+#endif // #ifdef ENABLE_TEST_CAMERA
 #endif // __TEST_CAMERA_CONST_H__

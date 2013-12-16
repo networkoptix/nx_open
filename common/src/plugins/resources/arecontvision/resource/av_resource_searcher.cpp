@@ -1,3 +1,5 @@
+#ifdef ENABLE_ARECONT
+
 #include "av_resource_searcher.h"
 
 #include <QtCore/QCoreApplication>
@@ -56,10 +58,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         }
 
         // collecting response
-        QTime time;
-        time.start();
         QnSleep::msleep(150); // to avoid 100% cpu usage
-        //while(time.elapsed()<150)
         {
             while (sock->hasData())
             {
@@ -265,3 +264,5 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     resList << res;
     return resList;
 }
+
+#endif

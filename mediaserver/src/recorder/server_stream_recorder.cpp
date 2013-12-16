@@ -29,7 +29,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_usedSpecialRecordingMode(false),
     m_lastMotionState(false),
     m_queuedSize(0),
-    m_lastMediaTime(AV_NOPTS_VALUE)
+    m_lastMediaTime(AV_NOPTS_VALUE),
+    m_diskErrorWarned(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -49,7 +50,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
 
     connect(this, SIGNAL(recordingFailed(QString)), this, SLOT(at_recordingFailed(QString)));
 
-    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnAbstractDataPacketPtr)));
+    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnConstAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnConstAbstractDataPacketPtr)));
     connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QnResourcePtr&)));
 }
 
@@ -61,9 +62,12 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 void QnServerStreamRecorder::at_recordingFailed(QString msg)
 {
     Q_UNUSED(msg)
-	Q_ASSERT(m_mediaServer);
-    if (m_mediaServer)
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError ,m_storage);
+    Q_ASSERT(m_mediaServer);
+    if (m_mediaServer) {
+        if (!m_diskErrorWarned)
+            emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueIoError ,m_storage);
+        m_diskErrorWarned = true;
+    }
 }
 
 bool QnServerStreamRecorder::canAcceptData() const
@@ -89,8 +93,10 @@ bool QnServerStreamRecorder::canAcceptData() const
     */
 }
 
-void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
+void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
 {
+    QnConstAbstractDataPacketPtr data = nonConstData;
+
     if (!isRunning()) 
         return;
 
@@ -98,24 +104,24 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueNotEnoughSpeed, m_storage);
 
-		qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
+        qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
         markNeedKeyData();
-		m_dataQueue.clear();
-		QMutexLocker lock(&m_queueSizeMutex);
-		m_queuedSize = 0;
+        m_dataQueue.clear();
+        QMutexLocker lock(&m_queueSizeMutex);
+        m_queuedSize = 0;
         return;
     }
 
     
-    QnAbstractMediaDataPtr media = data.dynamicCast<QnAbstractMediaData>();
+    QnConstAbstractMediaDataPtr media = data.dynamicCast<const QnAbstractMediaData>();
     if (media) {
         QMutexLocker lock(&m_queueSizeMutex);
         m_queuedSize += media->data.size();
     }
-    QnStreamRecorder::putData(data);
+    QnStreamRecorder::putData(nonConstData);
 }
 
-bool QnServerStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
+bool QnServerStreamRecorder::saveMotion(QnConstMetaDataV1Ptr motion)
 {
     if (motion)
         QnMotionHelper::instance()->saveToArchive(motion);
@@ -144,23 +150,24 @@ void QnServerStreamRecorder::updateStreamParams()
                 liveProvider->setFps(camera->getMaxFps()-5);
                 liveProvider->setQuality(Qn::QualityHighest);
             }
-            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+            liveProvider->setSecondaryQuality(liveProvider->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
         }
     }
 }
 
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
     return recType == Qn::RecordingType_MotionOnly || 
-           (m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ);
+           (m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ && camera->hasDualStreaming2());
 }
 
-void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
+void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media)
 {
     m_lastMediaTime = media->timestamp;
 
     Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
-    QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
+    QnConstMetaDataV1Ptr metaData = qSharedPointerDynamicCast<const QnMetaDataV1>(media);
     if (metaData) {
         m_dualStreamingHelper->onMotion(metaData);
         qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
@@ -171,7 +178,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         return;
     }
 
-	const QnScheduleTask task = currentScheduleTask();
+    const QnScheduleTask task = currentScheduleTask();
     bool isRecording = task.getRecordingType() != Qn::RecordingType_Never && qnStorageMan->isWritableStoragesAvailable();
     if (!m_device->isDisabled()) {
         if (isRecording) {
@@ -199,7 +206,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     }
 }
 
-void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData)
+void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, QnConstMetaDataV1Ptr metaData)
 {
     if (m_lastMotionState == value && !value)
         return;
@@ -207,7 +214,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
     emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
 }
 
-bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
+bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
 {
     qint64 afterThreshold = 5 * 1000000ll;
     if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionOnly)
@@ -220,11 +227,12 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         else
             updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
     }
-	QnScheduleTask task = currentScheduleTask();
+    QnScheduleTask task = currentScheduleTask();
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
 
     if (task.getRecordingType() == Qn::RecordingType_Run)
         return true;
-    else if (task.getRecordingType() == Qn::RecordingType_MotionPlusLQ && m_role == QnResource::Role_SecondaryLiveVideo)
+    else if (task.getRecordingType() == Qn::RecordingType_MotionPlusLQ && (m_role == QnResource::Role_SecondaryLiveVideo || !camera->hasDualStreaming2()))
         return true;
     else if (task.getRecordingType() == Qn::RecordingType_Never)
     {
@@ -234,7 +242,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         return false;
     }
     
-    QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
+    QnConstMetaDataV1Ptr metaData = qSharedPointerDynamicCast<const QnMetaDataV1>(media);
     if (metaData)
         return true;
 
@@ -411,7 +419,8 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
     // for empty schedule we record all time
     beforeProcessData(media);
-    return QnStreamRecorder::processData(data);
+    bool rez =  QnStreamRecorder::processData(data);
+    return rez;
 }
 
 void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
@@ -419,7 +428,6 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     QMutexLocker lock(&m_scheduleMutex);
     m_schedule = cameraRes->getScheduleTasks();
     Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DialStreaming helper must be defined!");
-    m_dualStreamingHelper->updateCamera(cameraRes);
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
@@ -477,6 +485,11 @@ void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr hel
     m_dualStreamingHelper = helper;
 }
 
+QnDualStreamingHelperPtr QnServerStreamRecorder::getDualStreamingHelper() const
+{
+    return m_dualStreamingHelper;
+}
+
 int QnServerStreamRecorder::getFRAfterThreshold() const
 {
     return m_forcedSchedileRecord.getAfterThreshold();
@@ -484,7 +497,7 @@ int QnServerStreamRecorder::getFRAfterThreshold() const
 
 void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
 {
-    writeAfterTime -= QnMotionEstimation::MOTION_AGGREGATION_PERIOD;
+    writeAfterTime -= MOTION_AGGREGATION_PERIOD;
     for (int i = 0; i < m_recentlyMotion.size(); ++i)
     {
         if (m_recentlyMotion[i]->timestamp > writeAfterTime)
@@ -493,15 +506,21 @@ void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
     m_recentlyMotion.clear();
 }
 
-void QnServerStreamRecorder::keepRecentlyMotion(QnAbstractMediaDataPtr md)
+void QnServerStreamRecorder::keepRecentlyMotion(QnConstAbstractMediaDataPtr md)
 {
     if (m_recentlyMotion.size() == MOTION_PREBUFFER_SIZE)
         m_recentlyMotion.dequeue();
     m_recentlyMotion.enqueue(md);
 }
 
-bool QnServerStreamRecorder::saveData(QnAbstractMediaDataPtr md)
+bool QnServerStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
 {
     writeRecentlyMotion(md->timestamp);
     return QnStreamRecorder::saveData(md);
+}
+
+void QnServerStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex)
+{
+    QnStreamRecorder::writeData(md, streamIndex);
+    m_diskErrorWarned = false;
 }

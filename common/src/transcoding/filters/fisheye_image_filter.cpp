@@ -64,7 +64,7 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 #else
 static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 {
-    //TODO
+    //TODO: C fallback routine
     return 0;
 }
 #endif
@@ -97,7 +97,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
 #else
-    //TODO
+    //TODO: C fallback routine
 #endif
 
     if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat) 
@@ -258,7 +258,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 
     QPointF* dstPos = m_transform[plane];
-	
+    
     int dstDelta = 1;
     if (m_params.viewMode == DewarpingParams::VerticalDown) {
         dstPos += imageSize.height()*imageSize.width() - 1;

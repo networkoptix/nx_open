@@ -29,17 +29,23 @@
 #include "ui/graphics/instruments/instrument_manager.h"
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include "ui/workbench/handlers/workbench_action_handler.h"
-#include "ui/workbench/handlers/workbench_panic_handler.h"
-#include "ui/workbench/handlers/workbench_screenshot_handler.h"
-#include "ui/workbench/workbench_controller.h"
-#include "ui/workbench/workbench_grid_mapper.h"
-#include "ui/workbench/workbench_layout.h"
-#include "ui/workbench/workbench_display.h"
-#include "ui/workbench/workbench_ui.h"
-#include "ui/workbench/workbench_synchronizer.h"
-#include "ui/workbench/workbench_context.h"
-#include "ui/workbench/workbench_resource.h"
+
+#include <ui/workbench/handlers/workbench_action_handler.h>
+#include <ui/workbench/handlers/workbench_layouts_handler.h>
+#include <ui/workbench/handlers/workbench_panic_handler.h>
+#include <ui/workbench/handlers/workbench_screenshot_handler.h>
+#include <ui/workbench/handlers/workbench_export_handler.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
+#include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_ui.h>
+#include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_resource.h>
+
 #include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
@@ -157,13 +163,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    {
-        /* Adjust palette so that inherited background painting is not needed. */
-        QPalette palette = m_view->palette();
-        palette.setColor(QPalette::Background, Qt::black);
-        palette.setColor(QPalette::Base, Qt::black);
-        m_view->setPalette(palette);
-    }
+    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
+    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
 
     m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -181,8 +182,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
+    context->instance<QnWorkbenchExportHandler>();
+    context->instance<QnWorkbenchLayoutsHandler>();
 
+    /* Set up watchers. */
+    context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     /* Set up actions. */
     addAction(action(Qn::NextLayoutAction));

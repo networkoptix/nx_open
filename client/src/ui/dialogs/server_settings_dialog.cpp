@@ -39,8 +39,9 @@
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
 namespace {
-    const qint64 defaultReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
-    const qint64 minimalReservedSpace = 5ll * 1024ll * 1024ll * 1024ll;
+    //setting free space to zero, since now client does not change this value, so it must keep current value
+    const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
+    const qint64 minimalReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
     const qint64 bytesInMiB = 1024 * 1024;
 
@@ -380,7 +381,7 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 
 void QnServerSettingsDialog::updateFromResources() 
 {
-      m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
+    m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
 #ifndef Q_OS_MACX
     at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
 
@@ -548,7 +549,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
         int button = QMessageBox::warning(
             mainWindow(),
             tr("Warning"),
-            tr("You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. "
+            tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
             "Depending on the total size of archive it can take several hours. "
             "This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
             QMessageBox::Yes | QMessageBox::No
@@ -573,8 +574,10 @@ void QnServerSettingsDialog::sendNextArchiveRequest()
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
 
-void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int)
+void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
 {
+    Q_UNUSED(status)
+    Q_UNUSED(handle)
     m_lastRebuildReply = reply;
     ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
     bool inProgress = reply.state() == QnRebuildArchiveReply::Started;

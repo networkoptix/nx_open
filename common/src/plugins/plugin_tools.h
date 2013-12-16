@@ -174,7 +174,7 @@ namespace nxpt
     //!Implements \a nxpl::PluginInterface reference counting. Can delegate reference counting to another \a CommonRefManager instance
     /*!
         This class does not inherit nxpl::PluginInterface because it would require virtual inheritance.
-        This class is supposed to be nested to monitored class
+        This class instance is supposed to be nested into monitored class
     */
     class CommonRefManager
     {

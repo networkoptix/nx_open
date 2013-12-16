@@ -1,3 +1,4 @@
+#ifdef ENABLE_ARECONT
 
 #ifdef _WIN32
 #  include <winsock2.h>
@@ -206,8 +207,20 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
-    QRect rect = getCroping(QnDomainMemory);
-    setCropingPhysical(rect);
+    QnPhysicalCameraResource::initInternal();
+    
+    {
+        // TODO: #Elric is this needed? This was a call to setCroppingPhysical
+        QVariant maxSensorWidth;
+        QVariant maxSensorHight;
+        getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
+        getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
+
+        setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
+    }
 
     QVariant val;
     if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
@@ -295,19 +308,6 @@ QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, 
 
 void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-}
-
-void QnPlAreconVisionResource::setCropingPhysical(QRect /*croping*/)
-{
-    QVariant maxSensorWidth;
-    QVariant maxSensorHight;
-    getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-    getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
-
-    setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
-    setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
@@ -458,3 +458,4 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
+#endif

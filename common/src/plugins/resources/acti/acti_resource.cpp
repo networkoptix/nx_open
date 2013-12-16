@@ -1,3 +1,4 @@
+#ifdef ENABLE_ACTI
 
 #include "acti_resource.h"
 
@@ -77,11 +78,6 @@ QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 bool QnActiResource::shoudResolveConflicts() const 
 {
     return false;
-}
-
-void QnActiResource::setCropingPhysical(QRect /*croping*/)
-{
-
 }
 
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
@@ -239,6 +235,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
 CameraDiagnostics::Result QnActiResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
+
     CLHttpStatus status;
         
     QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);
@@ -476,7 +474,7 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
-int QnActiResource::getMaxFps()
+int QnActiResource::getMaxFps() const
 {
     return m_availFps[0].last();
 }
@@ -630,3 +628,5 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
 }
+
+#endif // #ifdef ENABLE_ACTI

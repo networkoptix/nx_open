@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "openssl/evp.h"
 
 #include "soap_wrapper.h"
@@ -140,7 +143,7 @@ SoapWrapper<T>::SoapWrapper(
   m_timeDrift(_timeDrift)
 {
     //Q_ASSERT(!endpoint.empty());
-	Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
+    Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
     m_endpoint = new char[endpoint.size() + 1];
     strcpy(m_endpoint, endpoint.c_str());
     m_endpoint[endpoint.size()] = '\0';
@@ -931,3 +934,5 @@ template const QString SoapWrapper<ImagingBindingProxy>::getLastError();
 template const QString SoapWrapper<ImagingBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<ImagingBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<ImagingBindingProxy>::isConflictError();
+
+#endif //ENABLE_ONVIF

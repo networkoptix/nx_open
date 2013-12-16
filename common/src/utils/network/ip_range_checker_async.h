@@ -18,7 +18,7 @@
 
 
 //!Asynchronously scans specified ip address range for specified port to be opened and listening
-class QnIprangeCheckerAsync
+class QnIpRangeCheckerAsync
 :
     public QObject,
     public QnStoppable
@@ -26,8 +26,8 @@ class QnIprangeCheckerAsync
     Q_OBJECT
 
 public:
-    QnIprangeCheckerAsync();
-    ~QnIprangeCheckerAsync();
+    QnIpRangeCheckerAsync();
+    ~QnIpRangeCheckerAsync();
 
     //!Implmmentation of \a QnStoppable::pleaseStop
     virtual void pleaseStop() override;
@@ -36,10 +36,10 @@ public:
     /*!
         \return List of ip address from [\a startAddr; \a endAddr] range which have \a portToScan opened and listening
     */
-    QList<QString> onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan );
+    QStringList onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan );
 
 private:
-    QList<QString> m_openedIPs;
+    QStringList m_openedIPs;
     //!It is only because of aio::AsyncHttpClient API bug we have to create this terrible dictionary. it will be fixed soon
     std::set<std::shared_ptr<nx_http::AsyncHttpClient> > m_socketsBeingScanned;
     QMutex m_mutex;

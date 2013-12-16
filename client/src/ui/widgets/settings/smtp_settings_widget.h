@@ -36,16 +36,14 @@ public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
 
-    void update();
-    void submit();
-
-    void updateFocusedElement();
+    void updateFromSettings();
+    void submitToSettings();
 
 private:
     QnEmail::Settings settings();
     void stopTesting(QString result);
     void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
-
+    void updateFocusedElement();
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
     void at_testButton_clicked();

@@ -10,7 +10,6 @@
 
 static const int PORT_TO_SCAN = 80;
 
-QnIprangeCheckerAsync::QnIprangeCheckerAsync()
 :
     m_portToScan( 0 ),
     m_endIpv4( 0 ),
@@ -18,13 +17,13 @@ QnIprangeCheckerAsync::QnIprangeCheckerAsync()
 {
 }
 
-QnIprangeCheckerAsync::~QnIprangeCheckerAsync()
+QnIpRangeCheckerAsync::~QnIpRangeCheckerAsync()
 {
     pleaseStop();
     waitForScanToFinish();
 }
 
-void QnIprangeCheckerAsync::pleaseStop()
+void QnIpRangeCheckerAsync::pleaseStop()
 {
     //TODO/IMPL
 }
@@ -32,7 +31,7 @@ void QnIprangeCheckerAsync::pleaseStop()
 //static const int SOCKET_CONNECT_TIMEOUT_MILLIS = 2000;
 static const int MAX_HOSTS_CHECKED_SIMULTANEOUSLY = 256;
 
-QList<QString> QnIprangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
+QStringList QnIpRangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
 {
     m_openedIPs.clear();
 
@@ -57,7 +56,23 @@ QList<QString> QnIprangeCheckerAsync::onlineHosts( const QHostAddress& startAddr
     return m_openedIPs;
 }
 
-bool QnIprangeCheckerAsync::launchHostCheck()
+//void QnIpRangeCheckerAsync::eventTriggered( Socket* sock, PollSet::EventType eventType ) throw()
+//{
+//    QMutexLocker lk( &m_mutex );
+//
+//    if( eventType == PollSet::etWrite )
+//        m_openedIPs.push_back( static_cast<CommunicatingSocket*>(sock)->getForeignAddress() );
+//
+//    std::map<Socket*, QSharedPointer<Socket> >::iterator it = m_socketsBeingScanned.find( sock );
+//    assert( it != m_socketsBeingScanned.end() );
+//    aio::AIOService::instance()->removeFromWatch( it->second, PollSet::etWrite );
+//    m_socketsBeingScanned.erase( it );
+//
+//    if( m_socketsBeingScanned.empty() )
+//        m_cond.wakeAll();
+//}
+
+bool QnIpRangeCheckerAsync::launchHostCheck()
 {
     quint32 ipToCheck = m_nextIPToCheck++;
     if( ipToCheck > m_endIpv4 )
@@ -80,7 +95,7 @@ bool QnIprangeCheckerAsync::launchHostCheck()
     return true;
 }
 
-void QnIprangeCheckerAsync::waitForScanToFinish()
+void QnIpRangeCheckerAsync::waitForScanToFinish()
 {
     //waiting for scan to finish
     QMutexLocker lk( &m_mutex );

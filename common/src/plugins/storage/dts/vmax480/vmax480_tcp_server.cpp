@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_tcp_server.h"
 
 #include <QtCore/QElapsedTimer>
@@ -78,7 +80,7 @@ void QnVMax480ConnectionProcessor::vMaxDisconnect()
         quint8 dummy[1];
         d->socket->recv(dummy, sizeof(dummy));
     }
-    int waitTime = t.elapsed();
+//    int waitTime = t.elapsed();
     d->socket->close();
 }
 
@@ -214,9 +216,6 @@ void QnVMax480ConnectionProcessor::run()
     while (!needToStop())
     {
         quint8 vMaxHeader[16];
-
-        QTime t;
-        t.restart();
 
         if (!readBuffer(vMaxHeader, sizeof(vMaxHeader)))
         {
@@ -402,3 +401,5 @@ QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer
 {
     return new QnVMax480ConnectionProcessor(clientSocket, owner);
 }
+
+#endif // #ifdef ENABLE_VMAX

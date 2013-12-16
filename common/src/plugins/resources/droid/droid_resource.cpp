@@ -1,3 +1,6 @@
+#ifdef ENABLE_DROID
+
+
 #include "droid_resource.h"
 #include "droid_stream_reader.h"
 
@@ -8,7 +11,7 @@ QnDroidResource::QnDroidResource()
 {
 }
 
-int QnDroidResource::getMaxFps()
+int QnDroidResource::getMaxFps() const
 {
     return 30;
 }
@@ -33,12 +36,6 @@ QnAbstractStreamDataProvider* QnDroidResource::createLiveDataProvider()
     return new PlDroidStreamReader(toSharedPointer());
 }
 
-void QnDroidResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
-
 QString QnDroidResource::getHostAddress() const
 {
     QString url = getUrl();
@@ -54,3 +51,5 @@ bool QnDroidResource::setHostAddress(const QString &/*ip*/, QnDomain /*domain*/)
 {
     return false;
 }
+
+#endif //#ifdef ENABLE_DROID

@@ -8,7 +8,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QVariant>
 #include <QtCore/QQueue>
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QMetaType>
 #include <QtCore/QScopedPointer>
@@ -26,7 +26,7 @@ public:
     QnMessageSource(QUrl url, int retryTimeout = 3000);
     virtual ~QnMessageSource();
 
-	void setAuthKey(const QString& authKey);
+    void setAuthKey(const QString& authKey);
     void stop();
 
 signals:
@@ -54,12 +54,12 @@ private:
     bool m_timeoutFlag;
     QUrl m_url;
     int m_retryTimeout;
-	QString m_authKey;
+    QString m_authKey;
     QNetworkAccessManager m_manager;
     QNetworkReply *m_reply;
 
     quint32 m_seqNumber;
-    QTime m_eventWaitTimer;
+    QElapsedTimer m_eventWaitTimer;
     QTimer m_pingTimer;
 
     QScopedPointer<QnPbStreamParser> m_streamParser;

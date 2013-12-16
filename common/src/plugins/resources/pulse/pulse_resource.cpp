@@ -1,3 +1,4 @@
+#ifdef ENABLE_PULSE_CAMERA
 
 #include "../onvif/dataprovider/rtp_stream_provider.h"
 #include "pulse_resource.h"
@@ -32,7 +33,9 @@ QnAbstractStreamDataProvider* QnPlPulseResource::createLiveDataProvider()
     return new QnRtpStreamReader(toSharedPointer(), request);
 }
 
-void QnPlPulseResource::setCropingPhysical(QRect /*croping*/)
+void QnPlPulseResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
+
+#endif // #ifdef ENABLE_PULSE_CAMERA

@@ -53,7 +53,7 @@ signals:
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
+    void finished(int status, const QnManualCameraSearchProcessReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
 
@@ -164,7 +164,11 @@ public:
      */
     int getStatisticsAsync(QObject *target, const char *slot);
 
-    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot); 
+    int searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot);
+    int searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot);
+    int searchCameraAsyncStop(const QUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
+
+
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);

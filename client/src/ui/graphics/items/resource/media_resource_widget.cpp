@@ -777,7 +777,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     // TODO: #Elric no pre-spaces in translatable strings, translators mess it up.
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
+    if (!(m_resource->toResource()->flags() & QnResource::local))
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
 #endif
 
     QString timeString;
@@ -899,14 +900,26 @@ void QnMediaResourceWidget::updateAspectRatio() {
     if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
         sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
+    QString resourceId;
+    if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
+        resourceId = networkResource->getPhysicalId();
+
     if(sourceSize.isEmpty()) {
-        setAspectRatio(-1);
+        setAspectRatio(
+            resourceId.isEmpty() ? -1.0 : qnSettings->resourceAspectRatios().value(resourceId, -1.0)
+        );
     } else {
         setAspectRatio(
             QnGeometry::aspectRatio(sourceSize) *
             QnGeometry::aspectRatio(channelLayout()->size()) *
             (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
+
+        if (!resourceId.isEmpty()) {
+            QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
+            aspectRatios.insert(resourceId, aspectRatio());
+            qnSettings->setResourceAspectRatios(aspectRatios);
+        }
     }
 }
 

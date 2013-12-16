@@ -1,3 +1,5 @@
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QTextStream>
 #include "axis_resource.h"
 #include "axis_stream_reader.h"
@@ -157,7 +159,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     // --------------- update or insert new profile ----------------------
     
-    if (action == QByteArray("add") || !m_axisRes->isCameraControlDisabled())
+    if (action == QByteArray("add") || !isCameraControlDisabled())
     {
         QString streamProfile;
         QTextStream str(&streamProfile);
@@ -219,6 +221,8 @@ QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 {
     QnMetaDataV1Ptr rez = m_lastMetadata != 0 ? m_lastMetadata : QnMetaDataV1Ptr(new QnMetaDataV1());
     m_lastMetadata.clear();
+    if (rez)
+        filterMotionByMask(rez);
     return rez;
 }
 
@@ -386,3 +390,5 @@ const QnResourceAudioLayout* QnAxisStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }
+
+#endif // #ifdef ENABLE_AXIS

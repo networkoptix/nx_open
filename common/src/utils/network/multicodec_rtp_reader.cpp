@@ -133,9 +133,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     // int readed;
     int audioRetryCount = 0;
     int videoRetryCount = 0;
-    int channelNum = 0;
+    int channelNum = -1;
 
-    QTime dataTimer;
+    QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
@@ -146,6 +146,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             break; // error
         RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(channelNum);
         int rtpBufferOffset = m_demuxedData[channelNum]->size() - readed;
+
         if (format == RTPSession::TT_VIDEO && m_videoParser) 
         {
             if (!m_videoParser->processData((quint8*)m_demuxedData[channelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIO->getStatistic(), m_lastVideoData)) 
@@ -203,7 +204,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastVideoData;
         m_lastVideoData.clear();
-        m_demuxedData[channelNum]->clear();
+        if (channelNum >= 0)
+            m_demuxedData[channelNum]->clear();
         m_gotSomeFrame = true;
         return result;
     }
@@ -211,7 +213,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastAudioData[0];
         m_lastAudioData.removeAt(0);
-        m_demuxedData[channelNum]->clear();
+        if (channelNum >= 0)
+            m_demuxedData[channelNum]->clear();
         result->channelNumber += m_numberOfVideoChannels;
 
         m_gotSomeFrame = true;
@@ -261,8 +264,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     timeVal.tv_sec  = 0;
     timeVal.tv_usec = 100*1000;
 
-
-    QTime dataTimer;
+    QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)

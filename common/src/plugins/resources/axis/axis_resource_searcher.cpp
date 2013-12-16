@@ -1,3 +1,5 @@
+#ifdef ENABLE_AXIS
+
 #include "axis_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "axis_resource.h"
@@ -242,3 +244,5 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     return local_results;
 }
+
+#endif // #ifdef ENABLE_AXIS

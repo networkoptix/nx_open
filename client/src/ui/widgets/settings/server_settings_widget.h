@@ -3,21 +3,22 @@
 
 #include <QtWidgets/QWidget>
 
+#include <ui/widgets/settings/abstract_preferences_widget.h>
+
 namespace Ui {
     class ServerSettingsWidget;
 }
 
-class QnServerSettingsWidget: public QWidget {
-    Q_OBJECT;
+class QnServerSettingsWidget: public QnAbstractPreferencesWidget {
+    Q_OBJECT
+    typedef QnAbstractPreferencesWidget base_type;
+
 public:
-    QnServerSettingsWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnServerSettingsWidget(QWidget *parent = NULL);
     virtual ~QnServerSettingsWidget();
 
-    void submit();
-    void update();
-
-    // now is used only for email setup so parameter is omitted
-    void updateFocusedElement();
+    virtual void submitToSettings() override;
+    virtual void updateFromSettings() override;
 private:
     QScopedPointer<Ui::ServerSettingsWidget> ui;
 };

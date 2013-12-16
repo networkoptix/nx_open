@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef ENABLE_ONVIF
+
 #include "onvif_notification_consumer.h"
 
 #include <QtCore/QMutexLocker>
@@ -99,3 +101,6 @@ SOAP_SOCKET OnvifNotificationConsumer::accept()
 {
     return TCPServerSocket::accept(soap->master);
 }
+
+#endif  //ENABLE_ONVIF
+

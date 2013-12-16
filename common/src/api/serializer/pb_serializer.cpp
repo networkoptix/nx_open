@@ -120,6 +120,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     vCamera->setModel(QString::fromUtf8(pb_camera.model().c_str()));
     vCamera->setFirmware(QString::fromUtf8(pb_camera.firmware().c_str()));
+    vCamera->setVendor(QString::fromUtf8(pb_camera.vendor().c_str()));
 
     vCamera->setMotionType(static_cast<Qn::MotionType>(pb_camera.motiontype()));
 
@@ -426,6 +427,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
     pb_camera.set_groupid(cameraPtr->getGroupId().toUtf8().constData());
     pb_camera.set_groupname(cameraPtr->getGroupName().toUtf8().constData());
+    pb_camera.set_vendor(cameraPtr->getVendor().toUtf8().constData());
 
     pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
     pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());
@@ -508,6 +510,7 @@ int serializeBusinessEventType(BusinessEventType::Value value) {
     case BusinessEventType::Camera_Ip_Conflict:  return pb::Camera_Ip_Conflict;
     case BusinessEventType::MediaServer_Failure: return pb::MediaServer_Failure;
     case BusinessEventType::MediaServer_Conflict:return pb::MediaServer_Conflict;
+    case BusinessEventType::MediaServer_Started: return pb::MediaServer_Started;
     default:
         break;
     }
@@ -628,6 +631,7 @@ BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     case pb::Camera_Ip_Conflict:    return BusinessEventType::Camera_Ip_Conflict;
     case pb::MediaServer_Failure:   return BusinessEventType::MediaServer_Failure;
     case pb::MediaServer_Conflict:  return BusinessEventType::MediaServer_Conflict;
+    case pb::MediaServer_Started:  return BusinessEventType::MediaServer_Started;
     }
     return BusinessEventType::NotDefined;
 }
@@ -800,9 +804,6 @@ void QnApiPbSerializer::deserializeBusinessAction(QnAbstractBusinessActionPtr& b
 
 void QnApiPbSerializer::deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
     if (!pb_businessActionList.ParseFromArray(data.data(), data.size()))
         throw QnSerializationException(tr("Cannot parse serialized actions."));
@@ -1021,9 +1022,6 @@ void QnApiPbSerializer::serializeBusinessAction(const QnAbstractBusinessActionPt
 
 void QnApiPbSerializer::serializeBusinessActionList(const QnAbstractBusinessActionList &actions, QByteArray &data)
 {
-    QTime t;
-    t.restart();
-
     pb::BusinessActionList pb_businessActionList;
 
     for (int i = 0; i < actions.size(); ++i)

@@ -1,3 +1,4 @@
+#ifdef ENABLE_AXIS
 
 #include "axis_resource.h"
 
@@ -56,7 +57,7 @@ bool QnPlAxisResource::shoudResolveConflicts() const
     return false;
 }
 
-void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
+void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
 }
@@ -258,6 +259,7 @@ bool resolutionGreatThan(const QnPlAxisResource::AxisResolution& res1, const QnP
 
 CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
 
     //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
     {
@@ -702,46 +704,19 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
         return;
     }
 
-    static const char* multipartContentType = "multipart/x-mixed-replace";
-
     //analyzing response headers (if needed)
-    const nx_http::StringType& contentType = httpClient->contentType();
-    const nx_http::StringType::value_type* sepPos = std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
-    if( sepPos == contentType.constData()+contentType.size() ||
-        nx_http::ConstBufferRefType(contentType, 0, sepPos-contentType.constData()) != multipartContentType )
+    if( !m_multipartContentParser.setContentType(httpClient->contentType()) )
     {
+        static const char* multipartContentType = "multipart/x-mixed-replace";
+
         //unexpected content type
-        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Unexpected Content-Type (%2) in monitor response, Expected: %3").
-            arg(getUrl()).arg(QLatin1String(contentType)).arg(QLatin1String(multipartContentType)), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("Error monitoring axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
+            arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
         return;
     }
 
-    const nx_http::StringType::value_type* boundaryStart = std::find_if(
-        sepPos+1,
-        contentType.constData()+contentType.size(),
-        std::not1( std::bind1st( std::equal_to<nx_http::StringType::value_type>(), ' ' ) ) );   //searching first non-space
-    if( boundaryStart == contentType.constData()+contentType.size() )
-    {
-        //failed to read boundary marker
-        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Missing boundary marker in content-type %2 (1)").
-            arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
-        //deleting httpClient
-        forgetHttpClient( httpClient );
-        return;
-    }
-    if( !nx_http::ConstBufferRefType(contentType, boundaryStart-contentType.constData()).startsWith("boundary=") )
-    {
-        //failed to read boundary marker
-        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Missing boundary marker in content-type %2 (2)").
-            arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
-        //deleting httpClient
-        forgetHttpClient( httpClient );
-        return;
-    }
-    boundaryStart += sizeof("boundary=")-1;
-    m_multipartContentParser.setBoundary( contentType.mid( boundaryStart-contentType.constData() ) );
 }
 
 void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
@@ -752,13 +727,13 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
     for( int offset = 0; offset < msgBodyBuf.size(); )
     {
         size_t bytesProcessed = 0;
-        nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
+        nx_http::MultipartContentParserHelper::ResultCode resultCode = m_multipartContentParser.parseBytes(
             nx_http::ConstBufferRefType(msgBodyBuf, offset),
             &bytesProcessed );
         offset += (int) bytesProcessed;
         switch( resultCode )
         {
-            case nx_http::MultipartContentParser::partDataDone:
+            case nx_http::MultipartContentParserHelper::partDataDone:
                 if( m_currentMonitorData.isEmpty() )
                 {
                     if( !m_multipartContentParser.prevFoundData().isEmpty() )
@@ -775,14 +750,14 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
                 }
                 break;
 
-            case nx_http::MultipartContentParser::someDataAvailable:
+            case nx_http::MultipartContentParserHelper::someDataAvailable:
                 if( !m_multipartContentParser.prevFoundData().isEmpty() )
                     m_currentMonitorData.append(
                         m_multipartContentParser.prevFoundData().data(),
                         (int) m_multipartContentParser.prevFoundData().size() );
                 break;
 
-            case nx_http::MultipartContentParser::eof:
+            case nx_http::MultipartContentParserHelper::eof:
                 //TODO/IMPL reconnect
                 break;
 
@@ -928,3 +903,5 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
 QnAbstractPtzController* QnPlAxisResource::getPtzController() {
     return m_ptzController.data();
 }
+
+#endif // #ifdef ENABLE_AXIS

@@ -25,7 +25,7 @@
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
 
-#define GENERATE_RANDOM_MOTION
+//#define GENERATE_RANDOM_MOTION
 #ifdef GENERATE_RANDOM_MOTION
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 #endif
@@ -39,14 +39,15 @@ StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     DirContentsManager* const dirContentsManager,
     unsigned int frameDurationUsec,
-    bool liveMode )
+    bool liveMode,
+    int encoderNumber )
 :
     m_refManager( parentRefManager ),
     m_dirContentsManager( dirContentsManager ),
-    m_encoderNumber( 0 ),
     m_curTimestamp( 0 ),
     m_frameDuration( frameDurationUsec ),
     m_liveMode( liveMode ),
+    m_encoderNumber( encoderNumber ),
     m_streamReset( true ),
     m_nextFrameDeployTime( 0 ),
     m_isReverse( false ),
@@ -92,6 +93,11 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
+//#ifdef _DEBUG
+//    if( rand() % 10 == 7 )
+//        return nxcip::NX_IO_ERROR;
+//#endif
+
     nxcip::UsecUTCTimestamp curTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     bool streamReset = false;
     std::string fileName;
@@ -115,17 +121,19 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     {
         //end of data
         *lpPacket = new ILPEmptyPacket(
-            m_encoderNumber,
+            0,
             curTimestamp,
-            isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0,
+            (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0) |
+                (m_encoderNumber > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
             cSeq );
         return nxcip::NX_NO_ERROR;
     }
 
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
-        m_encoderNumber,
+        0,
         curTimestamp,
         nxcip::MediaDataPacket::fKeyPacket |
+            (m_encoderNumber > 0 ? nxcip::MediaDataPacket::fLowQuality : 0) |
             (streamReset ? nxcip::MediaDataPacket::fStreamReset : 0) |
             (isReverse ? (nxcip::MediaDataPacket::fReverseBlockStart | nxcip::MediaDataPacket::fReverseStream) : 0),
         cSeq ) );
