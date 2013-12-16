@@ -627,8 +627,13 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         }
 
         if (d->enabled) {
-            if (allReady)
-                QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
+            if (allReady) {
+                bool callSync = QThread::currentThread() == qApp->thread();
+                if (callSync)
+                    jumpTo(DATETIME_NOW, 0);
+                else
+                    QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
+            }
         }
         else {
             if (reader)
