@@ -6,7 +6,9 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 
 #include <QtCore/QUrl>
 
@@ -65,9 +67,15 @@ private:
     StreamType m_streamType;
     qint64 m_prevFrameClock;
     qint64 m_frameDurationMSec;
-
+    bool m_terminated;
+    std::condition_variable m_cond;
+    std::mutex m_mutex;
+ 
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
-    void waitForNextFrameTime();
+    /*!
+        \return false, if has been interrupted. Otherwise \a true
+    */
+    bool waitForNextFrameTime();
 };
 
 #endif  //ILP_STREAM_READER_H

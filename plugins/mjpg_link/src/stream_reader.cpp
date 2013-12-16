@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <functional>
 #include <memory>
@@ -51,7 +52,8 @@ StreamReader::StreamReader(
     m_curTimestamp( 0 ),
     m_streamType( jpg ),
     m_prevFrameClock( -1 ),
-    m_frameDurationMSec( 0 )
+    m_frameDurationMSec( 0 ),
+    m_terminated( false )
 {
     setFps( fps );
 
@@ -102,14 +104,15 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         if( !m_httpClient.get() )
         {
             if( m_streamType == jpg )
-                waitForNextFrameTime();
+                if( !waitForNextFrameTime() )
+                    return nxcip::NX_INTERRUPTED;
             m_httpClient.reset( new nx_http::HttpClient() );
             m_httpClient->setUserName( QLatin1String(m_cameraInfo.defaultLogin) );
             m_httpClient->setUserPassword( QLatin1String(m_cameraInfo.defaultPassword) );
             if( !m_httpClient->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) ||
                 !m_httpClient->startReadMessageBody() )
             {
-                NX_LOG( QString::fromLatin1("Failed to requesting %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1("Failed to request %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );
                 return nxcip::NX_NETWORK_ERROR;
             }
 
@@ -177,7 +180,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    //TODO/IMPL
+    std::unique_lock<std::mutex> lk( m_mutex );
+    m_terminated = true;
+    m_cond.notify_all();
 }
 
 void StreamReader::setFps( float fps )
@@ -200,7 +205,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
         memcpy( m_videoPacket->data(), jpgFrame.constData(), jpgFrame.size() );
 }
 
-void StreamReader::waitForNextFrameTime()
+bool StreamReader::waitForNextFrameTime()
 {
     const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     if( m_prevFrameClock != -1 &&
@@ -208,7 +213,19 @@ void StreamReader::waitForNextFrameTime()
     {
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
         if( msecToSleep > 0 )
-            QThread::msleep( msecToSleep );
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+            if( m_cond.wait_until(
+                    lk,
+                    std::chrono::steady_clock::now() + std::chrono::milliseconds(msecToSleep),
+                    [this](){ return m_terminated; } ) )   //returns true, if terminated
+            {
+                //call has been interrupted
+                m_terminated = false;
+                return false;
+            }
+        }
     }
     m_prevFrameClock = QDateTime::currentMSecsSinceEpoch();
+    return true;
 }
