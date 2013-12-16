@@ -672,16 +672,12 @@ QString QnResource::getUrl() const
 
 void QnResource::setUrl(const QString &url)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-
-    if(m_url == url)
-        return;
-
-    QString oldUrl = m_url;
-    m_url = url;
-
-    mutexLocker.unlock();
-
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if(m_url == url)
+            return;
+        m_url = url;
+    }
     emit urlChanged(toSharedPointer(this));
 }
 
@@ -804,6 +800,39 @@ QnAbstractPtzController *QnResource::createPtzControllerInternal() {
 
 void QnResource::initializationDone()
 {
+}
+
+QString QnResource::getValueByKey(const QString &key, const QString &defaultValue) const {
+    QMutexLocker mutexLocker(&m_mutex);
+    return m_valuesByKey.value(key, defaultValue);
+}
+
+void QnResource::setValueByKey(const QString &key, const QString &value) {
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if (m_valuesByKey.value(key) == value)
+            return;
+        m_valuesByKey[key] = value;
+    }
+    emit valueByKeyChanged(toSharedPointer(this), QnKvPair(key, value));
+}
+
+void QnResource::removeValueByKey(const QString &key) {
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if (!m_valuesByKey.contains(key))
+            return;
+        m_valuesByKey.remove(key);
+    }
+    emit valueByKeyRemoved(toSharedPointer(this), key);
+}
+
+QnKvPairList QnResource::getAllKvPairs() const {
+    QMutexLocker mutexLocker(&m_mutex);
+    QnKvPairList result;
+    foreach (const QString &key, m_valuesByKey.keys())
+        result << QnKvPair(key, m_valuesByKey[key]);
+    return result;
 }
 
 // -----------------------------------------------------------------------------

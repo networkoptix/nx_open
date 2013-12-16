@@ -9,6 +9,8 @@
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QThreadPool>
 
+#include <api/model/kvpair.h>
+
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
 #include <utils/common/id.h>
@@ -267,6 +269,12 @@ public:
 
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
+    //TODO: #Elric why do we need these if we have getResourceParamList() ??
+    QString getValueByKey(const QString &key, const QString &defaultValue = QString()) const;
+    void setValueByKey(const QString &key, const QString &value);
+    void removeValueByKey(const QString &key);
+    QnKvPairList getAllKvPairs() const;
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
@@ -277,6 +285,8 @@ signals:
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
     void ptzCapabilitiesChanged(const QnResourcePtr &resource);
+    void valueByKeyChanged(const QnResourcePtr &resource, const QnKvPair &kvPair);
+    void valueByKeyRemoved(const QnResourcePtr &resource, const QString &key);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -395,6 +405,9 @@ private:
     QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
+
+    /** Additional values aka kvPairs. */
+    QHash<QString, QString> m_valuesByKey;
 
     bool m_initialized;    
     QMutex m_initAsyncMutex;

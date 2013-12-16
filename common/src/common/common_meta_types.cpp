@@ -65,7 +65,7 @@ void QnCommonMetaTypes::initilize() {
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
-    qRegisterMetaType<QnKvPairs>();
+    qRegisterMetaType<QnKvPairListsById>();
 
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();

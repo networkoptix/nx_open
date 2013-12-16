@@ -4,9 +4,12 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QMessageBox>
 
+#include <api/app_server_connection.h>
+
 #include <common/common_globals.h>
 
-#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_hotkey.h>
 #include <core/ptz/ptz_preset.h>
@@ -28,20 +31,26 @@
 
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, protected QnWorkbenchContextAware {
 public:
-    QnSingleCameraPtzHotkeysDelegate(int cameraId, QnWorkbenchContext *context):
+    QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
-        m_cameraId(cameraId){}
+        m_resourceId(resource->getId()),
+        m_adapter(new QnPtzHotkeyKvPairAdapter(resource))
+    {}
+
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
     virtual QnHotkeysHash hotkeys() const override {
-        return context()->instance<QnPtzHotkeyKvPairWatcher>()->allHotkeysByResourceId(m_cameraId);
+        return m_adapter->hotkeys();
     }
 
     virtual void updateHotkeys(const QnHotkeysHash &value) override {
-        context()->instance<QnPtzHotkeyKvPairWatcher>()->updateHotkeys(m_cameraId, value);
+        QString serialized = QString::fromUtf8(QJson::serialized(value));
+
+        QnAppServerConnectionFactory::createConnection()->saveAsync(m_resourceId, QnKvPairList() << QnKvPair(m_adapter->key(), serialized));
     }
 private:
-    int m_cameraId;
+    int m_resourceId;
+    QScopedPointer<QnPtzHotkeyKvPairAdapter> m_adapter;
 };
 
 
@@ -73,7 +82,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         return;
     }
 
-    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(widget->camera()->getId(), context()));
+    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(widget->camera(), context()));
 
     QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
@@ -113,7 +122,7 @@ void QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
-    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(widget->camera()->getId(), context()));
+    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(widget->camera(), context()));
 
     QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
     dialog->setHotkeysDelegate(hotkeysDelegate.data());

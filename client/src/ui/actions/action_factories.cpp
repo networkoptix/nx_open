@@ -4,7 +4,7 @@
 
 #include <utils/common/string.h>
 
-#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -76,14 +76,13 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
 
-    QnPtzHotkeyKvPairWatcher* hotkeysWatcher = context()->instance<QnPtzHotkeyKvPairWatcher>();
-    int resourceId = widget->camera()->getId();
+    QnPtzHotkeyKvPairAdapter adapter(widget->camera());
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
         action->setText(preset.name);
 
-        int hotkey = hotkeysWatcher->hotkeyByPresetId(resourceId, preset.id);
+        int hotkey = adapter.hotkeyByPresetId(preset.id);
         if(hotkey >= 0)
             action->setShortcut(Qt::Key_0 + hotkey);
 

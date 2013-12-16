@@ -5,6 +5,8 @@
 
 #include <business/business_event_rule.h>
 
+#include <core/resource_managment/resource_pool.h>
+
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
 {
@@ -52,7 +54,7 @@ void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
     switch(message.messageType) {
     case Qn::Message_Type_Initial: {
         loadRuntimeInfo(message);
-        emit kvPairsChanged(message.kvPairs);
+        updateKvPairs(message.kvPairs);
         break;
     }
     case Qn::Message_Type_Ping: {
@@ -91,15 +93,33 @@ void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
         break;
     }
     case Qn::Message_Type_KvPairChange: {
-        emit kvPairsChanged(message.kvPairs);
+        updateKvPairs(message.kvPairs);
         break;
     }
     case Qn::Message_Type_KvPairDelete: {
-        emit kvPairsDeleted(message.kvPairs);
+        foreach (int resourceId, message.kvPairs.keys()) {
+            QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+            if (!resource)
+                continue;
+            QnKvPairList values = message.kvPairs[resourceId];
+            foreach (const QnKvPair &pair, values)
+                resource->removeValueByKey(pair.name());
+        }
         break;
     }
     default:
         break;
+    }
+}
+
+void QnCommonMessageProcessor::updateKvPairs(const QnKvPairListsById &kvPairs) {
+    foreach (int resourceId, kvPairs.keys()) {
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+        if (!resource)
+            continue;
+        QnKvPairList values = kvPairs[resourceId];
+        foreach (const QnKvPair &pair, values)
+            resource->setValueByKey(pair.name(), pair.value());
     }
 }
 

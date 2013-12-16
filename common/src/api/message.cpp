@@ -26,7 +26,7 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
-void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs);
+void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs);
 
 namespace Qn {
     QString toString(const Message_Type val) {

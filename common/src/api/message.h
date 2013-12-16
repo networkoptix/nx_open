@@ -88,7 +88,7 @@ public:
     QString publicIp;
     bool allowCameraChanges;
 
-    QnKvPairs kvPairs;
+    QnKvPairListsById kvPairs;
 
     bool load(const pb::Message& message);
 

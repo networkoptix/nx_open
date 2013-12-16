@@ -39,14 +39,12 @@ signals:
     void businessRuleReset(QnBusinessEventRuleList rules);
 
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
-
-    void kvPairsChanged(const QnKvPairs &kvPairs);
-    void kvPairsDeleted(const QnKvPairs &kvPairs);
 protected:
     virtual void loadRuntimeInfo(const QnMessage &message);
     virtual void handleConnectionOpened(const QnMessage &message);
     virtual void handleConnectionClosed(const QString &errorString);
     virtual void handleMessage(const QnMessage &message);
+    virtual void updateKvPairs(const QnKvPairListsById &kvPairs);
 
 private slots:
     void at_connectionOpened(const QnMessage &message);

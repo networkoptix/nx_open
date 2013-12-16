@@ -57,7 +57,7 @@ void parseResources(QnResourceList& resources, const PbResourceList& pb_resource
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
-void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs);
+void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs);
 
 namespace {
 
@@ -735,7 +735,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
 
-void QnApiPbSerializer::deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data)
+void QnApiPbSerializer::deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
 
@@ -1444,7 +1444,7 @@ void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCame
     }
 }
 
-void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs)
+void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs)
 {
     for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
     {

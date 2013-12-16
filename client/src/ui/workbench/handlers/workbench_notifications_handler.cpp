@@ -7,7 +7,8 @@
 
 #include <business/business_strings_helper.h>
 
-#include <core/kvpair/business_events_filter_kvpair_watcher.h>
+#include <core/kvpair/business_events_filter_kvpair_adapter.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -77,7 +78,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    if (!context()->instance<QnBusinessEventsFilterKvPairWatcher>()->eventAllowed(context()->user()->getId(), eventType))
+    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
         return;
 
 

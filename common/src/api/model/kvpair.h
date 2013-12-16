@@ -28,11 +28,10 @@ private:
 
 // TODO: #Elric bad naming
 typedef QList<QnKvPair> QnKvPairList;
-
-typedef QMap<int, QnKvPairList> QnKvPairs;
+typedef QMap<int, QnKvPairList> QnKvPairListsById;
 
 Q_DECLARE_METATYPE(QnKvPair)
 Q_DECLARE_METATYPE(QnKvPairList)
-Q_DECLARE_METATYPE(QnKvPairs)
+Q_DECLARE_METATYPE(QnKvPairListsById)
 
 #endif // QN_API_MODEL_KVPAIR_H

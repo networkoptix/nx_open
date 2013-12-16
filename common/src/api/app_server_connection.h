@@ -35,7 +35,7 @@ signals:
     void finished(int status, const QnResourceList &reply, int handle);
     void finished(int status, const QnResourceTypeList &reply, int handle);
     void finished(int status, const QnLicenseList &reply, int handle);
-    void finished(int status, const QnKvPairs &reply, int handle);
+    void finished(int status, const QnKvPairListsById &reply, int handle);
     void finished(int status, const QnConnectInfoPtr &reply, int handle);
     void finished(int status, const QnBusinessEventRuleList &reply, int handle);
     void finished(int status, const QnKvPairList &reply, int handle);
@@ -167,7 +167,7 @@ public:
     int saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
     int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
 
-    int saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot);
+    int saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target = NULL, const char *slot = NULL);
     int saveSettingsAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
 
     int deleteAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);

@@ -229,7 +229,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
     case KvPairObject: {
         int status = response.status;
 
-        QnKvPairs reply;
+        QnKvPairListsById reply;
         if(status == 0) {
             try {
                 m_serializer.deserializeKvPairs(reply, response.data);
@@ -480,7 +480,7 @@ int QnAppServerConnection::saveAsync(int resourceId, const QnKvPairList &kvPairs
     QByteArray data;
     m_serializer.serializeKvPairs(resourceId, kvPairs, data);
 
-    return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
+    return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
 }
 
 int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
@@ -505,12 +505,12 @@ int QnAppServerConnection::getKvPairsAsync(const QnResourcePtr &resource, QObjec
 {
     QnRequestParamList params(m_requestParams);
     params.append(QnRequestParam("resource_id", resource->getId().toString()));
-    return sendAsyncGetRequest(KvPairObject, params, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
+    return sendAsyncGetRequest(KvPairObject, params, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
 }
 
 int QnAppServerConnection::getAllKvPairsAsync(QObject *target, const char *slot)
 {
-    return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
+    return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
 }
 
 int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)

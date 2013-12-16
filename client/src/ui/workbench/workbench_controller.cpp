@@ -24,7 +24,8 @@
 #include <utils/common/toggle.h>
 #include <utils/math/color_transformations.h>
 
-#include <core/kvpair/ptz_hotkey_kvpair_watcher.h>
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -767,9 +768,8 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
             break;
 
         int hotkey = e->key() - Qt::Key_0;
-        QString presetId = context()
-                ->instance<QnPtzHotkeyKvPairWatcher>()
-                ->presetIdByHotkey(widget->camera()->getId(), hotkey);
+
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->camera(), hotkey);
         if (presetId.isEmpty())
             break;
 
