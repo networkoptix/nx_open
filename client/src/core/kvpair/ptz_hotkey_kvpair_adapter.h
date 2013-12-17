@@ -3,12 +3,15 @@
 
 #include <QtCore/QObject>
 
+#include <utils/common/connective.h>
 #include <api/model/kvpair.h>
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_hotkey.h>
 
-class QnPtzHotkeyKvPairAdapter: public QObject {
+class QnPtzHotkeyKvPairAdapter: public Connective<QObject> {
     Q_OBJECT
+    typedef Connective<QObject> base_type;
+
 public:
     explicit QnPtzHotkeyKvPairAdapter(const QnResourcePtr &resource, QObject *parent = 0);
 
@@ -32,9 +35,9 @@ public:
 
     static QString key();
     QnHotkeysHash hotkeys() const;
+
 private slots:
-    void at_valueByKeyChanged(const QnResourcePtr &resource, const QnKvPair &kvPair);
-    void at_valueByKeyRemoved(const QnResourcePtr &resource, const QString &key);
+    void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
 
 private:
     QnHotkeysHash m_hotkeys;

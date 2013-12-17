@@ -26,6 +26,7 @@ namespace {
         ((ResourceObject,           "resource"))
         ((ResourceTypeObject,       "resourceType"))
         ((ServerObject,             "server"))
+        ((ServerAuthObject,         "server"))
         ((UserObject,               "user"))
         ((LayoutObject,             "layout"))
         ((LicenseObject,            "license"))
@@ -73,29 +74,29 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         m_errorString += QLatin1String(response.errorString) + lit("\n");
 
     switch(object()) {
+    case ServerAuthObject:
     case ServerObject: {
         int status = response.status;
 
-        QnMediaServerResourceList reply;
+        QnServersReply reply;
         if(status == 0) {
             try {
-                m_serializer.deserializeServers(reply, response.data, m_resourceFactory);
+                m_serializer.deserializeServers(reply.servers, response.data, m_resourceFactory);
 
-                QByteArray authKey;
                 foreach(QNetworkReply::RawHeaderPair rawHeader, response.headers)
                     if (rawHeader.first == "X-NetworkOptix-AuthKey")
-                        authKey = rawHeader.second;
-
-                if(!authKey.isEmpty())
-                    foreach(QnMediaServerResourcePtr resource, reply)
-                        resource->setProperty("authKey", authKey);
+                        reply.authKey = rawHeader.second;
             } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
         }
 
-        emitFinished(this, status, QnResourceList(reply), handle);
+        if(object() == ServerObject) {
+            emitFinished(this, status, QnResourceList(reply.servers), handle);
+        } else {
+            emitFinished(this, status, reply, handle);
+        }
         break;
     }
     case CameraObject: {
@@ -432,11 +433,11 @@ int QnAppServerConnection::saveServer(const QnMediaServerResourcePtr &serverPtr,
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
-    QnResourceList reply;
-    int status = sendSyncRequest(QNetworkAccessManager::PostOperation, ServerObject, m_requestHeaders, m_requestParams, data, &reply);
+    QnServersReply reply;
+    int status = sendSyncRequest(QNetworkAccessManager::PostOperation, ServerAuthObject, m_requestHeaders, m_requestParams, data, &reply);
     if (status == 0) {
-        servers = reply.filtered<QnMediaServerResource>();
-        authKey = servers.isEmpty() ? QByteArray() : servers[0]->property("authKey").toByteArray();
+        servers = reply.servers;
+        authKey = reply.authKey;
     }
 
     return status;

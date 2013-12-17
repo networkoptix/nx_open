@@ -802,36 +802,31 @@ void QnResource::initializationDone()
 {
 }
 
-QString QnResource::getValueByKey(const QString &key, const QString &defaultValue) const {
+QString QnResource::getProperty(const QString &key, const QString &defaultValue) const {
     QMutexLocker mutexLocker(&m_mutex);
-    return m_valuesByKey.value(key, defaultValue);
+    return m_propertyByKey.value(key, defaultValue);
 }
 
-void QnResource::setValueByKey(const QString &key, const QString &value) {
+void QnResource::setProperty(const QString &key, const QString &value) {
     {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_valuesByKey.value(key) == value)
+        if (m_propertyByKey.value(key) == value)
             return;
-        m_valuesByKey[key] = value;
+        if(value.isEmpty()) {
+            m_propertyByKey.remove(key);
+        } else {
+            m_propertyByKey[key] = value;
+        }
     }
-    emit valueByKeyChanged(toSharedPointer(this), QnKvPair(key, value));
+    emit propertyChanged(toSharedPointer(this), key);
 }
 
-void QnResource::removeValueByKey(const QString &key) {
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        if (!m_valuesByKey.contains(key))
-            return;
-        m_valuesByKey.remove(key);
-    }
-    emit valueByKeyRemoved(toSharedPointer(this), key);
-}
-
-QnKvPairList QnResource::getAllKvPairs() const {
+QnKvPairList QnResource::getProperties() const {
     QMutexLocker mutexLocker(&m_mutex);
+    
     QnKvPairList result;
-    foreach (const QString &key, m_valuesByKey.keys())
-        result << QnKvPair(key, m_valuesByKey[key]);
+    for(auto pos = m_propertyByKey.begin(); pos != m_propertyByKey.end(); pos++)
+        result.push_back(QnKvPair(pos.key(), pos.value()));
     return result;
 }
 

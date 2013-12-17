@@ -269,11 +269,13 @@ public:
 
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
-    //TODO: #Elric why do we need these if we have getResourceParamList() ??
-    QString getValueByKey(const QString &key, const QString &defaultValue = QString()) const;
-    void setValueByKey(const QString &key, const QString &value);
-    void removeValueByKey(const QString &key);
-    QnKvPairList getAllKvPairs() const;
+    /* Note that these functions hide property API inherited from QObject.
+     * This is intended as this API cannot be used with QnResource anyway 
+     * because of threading issues. */
+
+    QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
+    void setProperty(const QString &key, const QString &value);
+    QnKvPairList getProperties() const;
 
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
@@ -285,8 +287,7 @@ signals:
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
     void ptzCapabilitiesChanged(const QnResourcePtr &resource);
-    void valueByKeyChanged(const QnResourcePtr &resource, const QnKvPair &kvPair);
-    void valueByKeyRemoved(const QnResourcePtr &resource, const QString &key);
+    void propertyChanged(const QnResourcePtr &resource, const QString &key);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -407,7 +408,7 @@ private:
     QStringList m_tags;
 
     /** Additional values aka kvPairs. */
-    QHash<QString, QString> m_valuesByKey;
+    QHash<QString, QString> m_propertyByKey;
 
     bool m_initialized;    
     QMutex m_initAsyncMutex;

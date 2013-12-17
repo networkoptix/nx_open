@@ -3,7 +3,7 @@
 #include <core/resource/resource.h>
 
 namespace {
-    static const QLatin1String target_key("showBusinessEvents");
+    static const QString targetKey = lit("showBusinessEvents");
 
     static const quint64 allIsEnabled = 0xFFFFFFFFFFFFFFFFull;
 
@@ -15,21 +15,20 @@ namespace {
     }
 
     quint64 readValue(const QnResourcePtr &resource) {
-        QString encoded = resource->getValueByKey(target_key);
+        QString encoded = resource->getProperty(targetKey);
         return readValue(encoded);
     }
 }
 
 QnBusinessEventsFilterKvPairAdapter::QnBusinessEventsFilterKvPairAdapter(const QnResourcePtr &resource, QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     m_value(defaultValue())
 {
     if (!resource)
         return;
 
     m_value = readValue(resource);
-    connect(resource.data(), SIGNAL(valueByKeyChanged(QnResourcePtr, QnKvPair)), this, SIGNAL(at_valueByKeyChanged(QnResourcePtr,QnKvPair)));
-    connect(resource.data(), SIGNAL(valueByKeyRemoved(QnResourcePtr, QString)), this, SIGNAL(at_valueByKeyRemoved(QnResourcePtr,QString)));
+    connect(resource, &QnResource::propertyChanged, this, &QnBusinessEventsFilterKvPairAdapter::at_resource_propertyChanged);
 }
 
 bool QnBusinessEventsFilterKvPairAdapter::eventAllowed(BusinessEventType::Value eventType) const {
@@ -42,7 +41,7 @@ bool QnBusinessEventsFilterKvPairAdapter::eventAllowed(const QnResourcePtr &reso
 }
 
 QString QnBusinessEventsFilterKvPairAdapter::key() {
-    return target_key;
+    return targetKey;
 }
 
 quint64 QnBusinessEventsFilterKvPairAdapter::value() const {
@@ -53,18 +52,9 @@ quint64 QnBusinessEventsFilterKvPairAdapter::defaultValue() {
     return allIsEnabled;
 }
 
-void QnBusinessEventsFilterKvPairAdapter::at_valueByKeyChanged(const QnResourcePtr &resource, const QnKvPair &kvPair) {
-    Q_UNUSED(resource)
-    if (kvPair.name() != target_key)
+void QnBusinessEventsFilterKvPairAdapter::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
+    if (key != targetKey)
         return;
-    m_value = readValue(kvPair.value());
-    emit valueChanged(m_value);
-}
-
-void QnBusinessEventsFilterKvPairAdapter::at_valueByKeyRemoved(const QnResourcePtr &resource, const QString &key) {
-    Q_UNUSED(resource)
-    if (key != target_key)
-        return;
-    m_value = defaultValue();
+    m_value = readValue(resource);
     emit valueChanged(m_value);
 }

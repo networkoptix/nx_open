@@ -3,14 +3,17 @@
 
 #include <QtCore/QMutex>
 
-#include "utils/common/request_param.h"
-#include <core/resource/resource_fwd.h>
-#include "core/misc/schedule_task.h"
-#include "core/misc/schedule_task.h"
-#include "licensing/license.h"
-#include "connectinfo.h"
+#include <utils/common/request_param.h>
 
-#include "api/serializer/pb_serializer.h"
+#include <core/resource/resource_fwd.h>
+#include <core/misc/schedule_task.h>
+
+#include <licensing/license.h>
+
+#include <api/model/servers_reply.h>
+#include <api/serializer/pb_serializer.h>
+
+#include "connectinfo.h"
 
 #include "api_fwd.h"
 #include "abstract_connection.h"
@@ -34,6 +37,7 @@ signals:
     void finished(int status, const QnCameraHistoryList &reply, int handle);
     void finished(int status, const QnResourceList &reply, int handle);
     void finished(int status, const QnResourceTypeList &reply, int handle);
+    void finished(int status, const QnServersReply &reply, int handle);
     void finished(int status, const QnLicenseList &reply, int handle);
     void finished(int status, const QnKvPairListsById &reply, int handle);
     void finished(int status, const QnConnectInfoPtr &reply, int handle);

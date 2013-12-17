@@ -103,7 +103,7 @@ void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
                 continue;
             QnKvPairList values = message.kvPairs[resourceId];
             foreach (const QnKvPair &pair, values)
-                resource->removeValueByKey(pair.name());
+                resource->setProperty(pair.name(), QString());
         }
         break;
     }
@@ -119,7 +119,7 @@ void QnCommonMessageProcessor::updateKvPairs(const QnKvPairListsById &kvPairs) {
             continue;
         QnKvPairList values = kvPairs[resourceId];
         foreach (const QnKvPair &pair, values)
-            resource->setValueByKey(pair.name(), pair.value());
+            resource->setProperty(pair.name(), pair.value());
     }
 }
 
