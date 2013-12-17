@@ -1,14 +1,15 @@
 #include "preset_ptz_controller.h"
 
-#include <cassert>
-
-#include <QtCore/QMutex>
-
-#include <api/kvpair_usage_helper.h>
-#include <utils/common/json.h>
+#include <utils/common/model_functions.h>
+#include <api/app_server_connection.h>
+#include <api/resource_property_adaptor.h>
+#include <core/resource/resource.h>
 
 #include "ptz_preset.h"
 
+namespace {
+    const QString propertyKey = lit("ptzPresets");
+}
 
 // -------------------------------------------------------------------------- //
 // Model Data
@@ -19,7 +20,7 @@ struct QnPtzPresetData {
     QVector3D position;
     Qn::PtzCoordinateSpace space;
 };
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetData, (position)(space))
+QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
 
 struct QnPtzPresetRecord {
     QnPtzPresetRecord() {}
@@ -28,35 +29,9 @@ struct QnPtzPresetRecord {
     QnPtzPreset preset;
     QnPtzPresetData data;
 };
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetRecord, (preset)(data))
+QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
 
-
-// -------------------------------------------------------------------------- //
-// QnPresetPtzControllerPrivate
-// -------------------------------------------------------------------------- //
-class QnPresetPtzControllerPrivate {
-public:
-    QnPresetPtzControllerPrivate(): helper(NULL) {}
-    
-    void loadRecords() {
-        if(!records.isEmpty())
-            return;
-
-        if(helper->value().isEmpty()) {
-            records.clear();
-        } else {
-            QJson::deserialize(helper->value().toUtf8(), &records);
-        }
-    }
-
-    void saveRecords() {
-        helper->setValue(QString::fromUtf8(QJson::serialized(records)));
-    }
-
-    QMutex mutex;
-    QnStringKvPairUsageHelper *helper;
-    QHash<QString, QnPtzPresetRecord> records;
-};
+Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 
 
 // -------------------------------------------------------------------------- //
@@ -64,12 +39,8 @@ public:
 // -------------------------------------------------------------------------- //
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
     base_type(baseController),
-    d(new QnPresetPtzControllerPrivate())
-{
-    // TODO: don't use usage helper, use sync api?
-
-    d->helper = new QnStringKvPairUsageHelper(resource(), lit("ptzPresets"), QString(), this);
-}
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), this))
+{}
 
 QnPresetPtzController::~QnPresetPtzController() {
     return;
@@ -96,51 +67,51 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
     if(!getPosition(data.space, &data.position))
         return false;
 
-    QMutexLocker locker(&d->mutex);
-    d->loadRecords();
-    d->records.insert(preset.id, QnPtzPresetRecord(preset, data));
-    d->saveRecords();
+    QMutexLocker locker(&m_mutex);
+    
+    QnPtzPresetRecordHash records = m_adaptor->value();
+    records.insert(preset.id, QnPtzPresetRecord(preset, data));
+    m_adaptor->setValue(records);
+    
     return true;
 }
 
 bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
-    QMutexLocker locker(&d->mutex);
+    QMutexLocker locker(&m_mutex);
 
-    d->loadRecords();
-
-    if(!d->records.contains(preset.id))
+    QnPtzPresetRecordHash records = m_adaptor->value();
+    if(!records.contains(preset.id))
         return false;
 
-    QnPtzPresetRecord &record = d->records[preset.id];
+    QnPtzPresetRecord &record = records[preset.id];
     if(record.preset == preset)
         return true; /* No need to save it. */
     record.preset = preset;
-
-    d->saveRecords();
+    
+    m_adaptor->setValue(records);
     return true;
 }
 
 bool QnPresetPtzController::removePreset(const QString &presetId) {
-    QMutexLocker locker(&d->mutex);
+    QMutexLocker locker(&m_mutex);
 
-    d->loadRecords();
-    if(d->records.remove(presetId) == 0)
+    QnPtzPresetRecordHash records = m_adaptor->value();
+    if(records.remove(presetId) == 0)
         return false;
-    d->saveRecords();
+
+    m_adaptor->setValue(records);
     return true;
 }
 
 bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed) {
     QnPtzPresetData data;
     {
-        QMutexLocker locker(&d->mutex);
-        d->loadRecords();
+        QMutexLocker locker(&m_mutex);
 
-        if(!d->records.contains(presetId))
+        const QnPtzPresetRecordHash &records = m_adaptor->value();
+        if(!records.contains(presetId))
             return false;
-        data = d->records[presetId].data;
-
-        qDebug() << "PRESET" << d->records[presetId].preset.name << d->records[presetId].data.position;
+        data = records.value(presetId).data;
     }
 
     if(!absoluteMove(data.space, data.position, speed))
@@ -150,11 +121,10 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 }
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
-    QMutexLocker locker(&d->mutex);
+    QMutexLocker locker(&m_mutex);
 
-    d->loadRecords();
     presets->clear();
-    foreach(const QnPtzPresetRecord &record, d->records)
+    foreach(const QnPtzPresetRecord &record, m_adaptor->value())
         presets->push_back(record.preset);
 
     return true;

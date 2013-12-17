@@ -1,9 +1,15 @@
 #ifndef QN_PRESET_PTZ_CONTROLLER_H
 #define QN_PRESET_PTZ_CONTROLLER_H
 
+#include <QtCore/QMutex>
+
 #include "proxy_ptz_controller.h"
 
-class QnPresetPtzControllerPrivate;
+template<class T>
+class QnResourcePropertyAdaptor;
+
+struct QnPtzPresetRecord;
+typedef QHash<QString, QnPtzPresetRecord> QnPtzPresetRecordHash;
 
 class QnPresetPtzController: public QnProxyPtzController {
     Q_OBJECT
@@ -24,7 +30,8 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
-    QScopedPointer<QnPresetPtzControllerPrivate> d;
+    QMutex m_mutex;
+    QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
 };
 
 #endif // QN_PRESET_PTZ_CONTROLLER_H
