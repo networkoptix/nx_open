@@ -287,6 +287,7 @@ signals:
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
     void ptzCapabilitiesChanged(const QnResourcePtr &resource);
+    void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
 
     //!Emitted on completion of every async get started with getParamAsync

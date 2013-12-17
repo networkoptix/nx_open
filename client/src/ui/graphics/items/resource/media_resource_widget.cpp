@@ -81,6 +81,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
+    connect(m_resource->toResource(), &QnResource::mediaDewarpingParamsChanged, this, &QnMediaResourceWidget::updateItemFlip);
+    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::itemDewarpingParamsChanged);
+    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateItemFlip);
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
     updateDisplay();
 
@@ -493,6 +496,13 @@ void QnMediaResourceWidget::updateRendererEnabled() {
         m_renderer->setEnabled(channel, !exposedRect(channel, true, true, false).isEmpty());
 }
 
+void QnMediaResourceWidget::updateItemFlip() {
+    bool flip = item()->dewarpingParams().enabled
+            && m_resource->isFisheye()
+            && m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown;
+    item()->setData(Qn::ItemFlipRole, flip);
+}
+
 ImageCorrectionParams QnMediaResourceWidget::imageEnhancement() const {
     return item()->imageEnhancement();
 }
@@ -503,16 +513,13 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
     m_renderer->setImageCorrection(imageEnhancement);
 }
 
-DewarpingParams QnMediaResourceWidget::dewarpingParams() const {
+QnItemDewarpingParams QnMediaResourceWidget::itemDewarpingParams() const {
     return item()->dewarpingParams();
 }
 
-void QnMediaResourceWidget::setDewarpingParams(const DewarpingParams &dewarpingParams) {
+void QnMediaResourceWidget::setItemDewarpingParams(const QnItemDewarpingParams &dewarpingParams) {
     buttonBar()->button(FishEyeButton)->setChecked(dewarpingParams.enabled);
     item()->setDewarpingParams(dewarpingParams);
-    item()->setData(Qn::ItemFlipRole, dewarpingParams.enabled && dewarpingParams.viewMode == DewarpingParams::VerticalDown);
-
-    emit dewarpingParamsChanged();
 }
 
 
@@ -977,9 +984,9 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
     
-    DewarpingParams params = dewarpingParams();
+    QnItemDewarpingParams params = itemDewarpingParams();
     params.enabled = checked;
-    setDewarpingParams(params);
+    setItemDewarpingParams(params);
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {

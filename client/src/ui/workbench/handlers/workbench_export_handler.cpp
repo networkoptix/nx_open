@@ -200,7 +200,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString selectedExtension;
     QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
-    DewarpingParams dewarpingParams = itemData.dewarpingParams;
+    QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     while (true) {
         QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), lit('_'));

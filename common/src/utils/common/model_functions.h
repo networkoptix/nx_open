@@ -19,6 +19,15 @@
 #define QN_DEFINE_STRUCT_DATA_STREAM_FUNCTIONS(...)
 #else // Q_MOC_RUN
 
+namespace QnModelFunctionsDetail {
+    template<class T>
+    bool equals(const T &l, const T &r) { return l == r; }
+
+    bool equals(float l, float r);
+    bool equals(double l, double r);
+}
+
+
 /**
  * This macro generates several functions for the given struct type. Tokens for
  * the functions to generate are passed in FUNCTION_SEQ parameter. Accepted
@@ -81,10 +90,10 @@ __VA_ARGS__ bool operator==(const TYPE &l, const TYPE &r) {                     
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool operator!=(const TYPE &l, const TYPE &r) {                     \
-    return !(l == r);                                                           \
+    return !QnModelFunctionsDetail::equals(l, r);                                                           \
 }
 
-#define QN_DEFINE_STRUCT_OPERATOR_EQ_STEP_I(R, DATA, FIELD) && l.FIELD == r.FIELD
+#define QN_DEFINE_STRUCT_OPERATOR_EQ_STEP_I(R, DATA, FIELD) && QnModelFunctionsDetail::equals(l.FIELD, r.FIELD)
 
 
 /**

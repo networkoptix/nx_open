@@ -158,6 +158,7 @@ public:
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+        FisheyePtzCapabilities              = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositioningPtzCapability
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
@@ -255,7 +256,7 @@ public:
         ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
-        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type DewarpingParams. */
+        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
         ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */

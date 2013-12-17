@@ -31,6 +31,8 @@
 #include <core/resource/camera_history.h>
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_data.h>
+#include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/item_dewarping_params.h>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
@@ -140,7 +142,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
 
-    qRegisterMetaType<DewarpingParams>();
+    qRegisterMetaType<QnMediaDewarpingParams>();
+    qRegisterMetaType<QnItemDewarpingParams>();
 
     qRegisterMetaType<Qn::Corner>();
     qRegisterMetaTypeStreamOperators<Qn::Corner>();

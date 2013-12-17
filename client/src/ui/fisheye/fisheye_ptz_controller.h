@@ -2,11 +2,14 @@
 #define QN_FISHEYE_PTZ_CONTROLLER_H
 
 #include <QtCore/QPointer>
+#include <QtCore/QElapsedTimer>
 #include <QtGui/QVector3D>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/dewarping_params.h>
 #include <core/ptz/basic_ptz_controller.h>
+
+#include <core/ptz/item_dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
 
 class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
@@ -33,17 +36,19 @@ public:
 
     void tick();
 
-    const DewarpingParams &dewarpingParams() const;
-    //void setDewarpingParams(const DewarpingParams &dewarpingParams);
-
     ///virtual void changePanoMode() override;
     ///virtual QString getPanoModeText() const override;
+
+    QnMediaDewarpingParams mediaDewarpingParams() const;
+    QnItemDewarpingParams itemDewarpingParams() const;
 
 private:
     Q_SLOT void updateLimits();
     Q_SLOT void updateCapabilities();
     Q_SLOT void updateAspectRatio();
-    Q_SLOT void updateDewarpingParams();
+
+    Q_SLOT void updateMediaDewarpingParams();
+    Q_SLOT void updateItemDewarpingParams();
 
     QVector3D boundedPosition(const QVector3D &position);
     QVector3D getPositionInternal();
@@ -64,7 +69,8 @@ private:
     bool m_animating;
     QVector3D m_speed;
 
-    DewarpingParams m_dewarpingParams;
+    QnMediaDewarpingParams m_mediaDewarpingParams;
+    QnItemDewarpingParams m_itemDewarpingParams;
 };
 
 #endif // QN_FISHEYE_PTZ_CONTROLLER_H

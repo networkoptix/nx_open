@@ -8,11 +8,11 @@
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
+#include <core/ptz/item_dewarping_params.h>
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
 #include <utils/color_space/image_correction.h>
-#include <core/resource/dewarping_params.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -107,8 +107,8 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-    DewarpingParams dewarpingParams() const;
-    void setDewarpingParams(const DewarpingParams &dewarpingParams);
+    QnItemDewarpingParams itemDewarpingParams() const;
+    void setItemDewarpingParams(const QnItemDewarpingParams &itemDewarpingParams);
 
     /**
      * This function returns a PTZ controller associated with this widget.
@@ -122,7 +122,7 @@ public:
 signals:
     void motionSelectionChanged();
     void displayChanged();
-    void dewarpingParamsChanged();
+    void itemDewarpingParamsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -179,6 +179,7 @@ private:
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
+    Q_SLOT void updateItemFlip();
 
 private:
     /** Media resource. */

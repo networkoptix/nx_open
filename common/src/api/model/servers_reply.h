@@ -1,4 +1,3 @@
-#include "core\resource\resource_fwd.h"
 #ifndef QN_SERVERS_REPLY_H
 #define QN_SERVERS_REPLY_H
 
