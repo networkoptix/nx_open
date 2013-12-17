@@ -37,7 +37,7 @@ public:
     //!Implementation of nxcip::DtsArchiveReader::getCapabilities
     virtual unsigned int getCapabilities() const override;
     //!Implementation of nxcip::DtsArchiveReader::open
-    virtual bool open() override;
+    virtual int open() override;
     //!Implementation of nxcip::DtsArchiveReader::getStreamReader
     virtual nxcip::StreamReader* getStreamReader() override;
     //!Implementation of nxcip::DtsArchiveReader::startTime

@@ -25,6 +25,7 @@
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
 
+//if defined, random motion is generated
 //#define GENERATE_RANDOM_MOTION
 #ifdef GENERATE_RANDOM_MOTION
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
@@ -93,11 +94,6 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
-//#ifdef _DEBUG
-//    if( rand() % 10 == 7 )
-//        return nxcip::NX_IO_ERROR;
-//#endif
-
     nxcip::UsecUTCTimestamp curTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     bool streamReset = false;
     std::string fileName;
@@ -187,9 +183,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         bytesRead += f.gcount();
     }
     f.close();
-
-    //if( m_liveMode )
-    //    m_dirContentsManager->add( curTimestamp, fileName );
 
     {
         Mutex::ScopedLock lk( &m_mutex );

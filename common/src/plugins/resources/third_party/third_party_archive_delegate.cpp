@@ -48,7 +48,7 @@ bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
 {
     if( m_resource != resource )
         return false;
-    if( !m_archiveReader->open() )
+    if( m_archiveReader->open() != nxcip::NX_NO_ERROR )
         return false;
     if( m_streamReader )
         m_streamReader->releaseRef();

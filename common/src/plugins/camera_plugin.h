@@ -626,6 +626,8 @@ namespace nxcip
                 255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
                 For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
                 If difference is less then value in a mask, motion is not detected.
+            \warning motion mask is rotated by 90 degrees clock-wise! That means, \a motionMask is actually \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
+                \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels in height
             \return \b NX_NO_ERROR on success, otherwise - error code
         */
         virtual int setMotionMask( Picture* motionMask ) = 0;
@@ -754,7 +756,9 @@ namespace nxcip
     //!Type of packets provided by \a StreamReader
     enum DataPacketType
     {
+        //!Audio packet. Can contain mutiple audio frames
         dptAudio,
+        //!Video packet. Usually contains one frame. Video packet class MUST inherit \a nxcip::VideoDataPacket
         dptVideo,
         //!Packet containing no data (e.g., signals end of stream)
         /*!
@@ -840,12 +844,14 @@ namespace nxcip
         public MediaDataPacket
     {
     public:
-        //!Returns motion data. Can be NULL
+        //!Returns motion data. Can be NULL, if no motion
         /*!
-            Can return same object with each call, incrementing ref count
-            \return monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
-                set bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
-                those of video picture. Motion data just designates regions of video picture where motion has been detected
+            Motion data is a monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
+                those of video picture. Motion data just designates regions of video picture where motion has been detected.
+            \warning motion data MUST be rotated by 90 degrees clock-wise! That means, picture returned here is \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
+                \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels height
+            \return motion data
             \note size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels is required!
                 If picture has greater size, only required region will be used. If picture has less size, considering that missing region contains no motion
         */
@@ -889,7 +895,12 @@ namespace nxcip
     {
         //!Default quality SHOULD be high quality
         msqDefault = 0,
+        //!High quality
+        /*!
+            It is implementation specific what is considered high quality. Generally, \a low quality SHOULD have bitrate several times lower than high
+        */
         msqHigh,
+        //!Low quality
         msqLow
     };
 
@@ -899,8 +910,9 @@ namespace nxcip
 
     //!Provides access to archive, stored on camera
     /*!
-        Does not provide media stream itself, but provides methods to manage (seek, select playback direction, select stream source (encoder) ) stream, 
-            provided by \a StreamReader instance
+        Implements methods to manage (seek, select playback direction, select stream quality) archive playback.
+
+        Media stream is provided by \a nxcip::StreamReader instance returned by \a nxcip::DtsArchiveReader::getStreamReader().
 
         \par \b cSeq (command sequence counter)
         Methods \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange accept \a cSeq value which
@@ -973,9 +985,9 @@ namespace nxcip
 
         //!Initialize connection to archive
         /*!
-            \return \a false, if failed. Use \a DtsArchiveReader::getLastErrorString to get error description
+            \return zero on success, error code in case on failure. Use \a DtsArchiveReader::getLastErrorString to get error description
         */
-        virtual bool open() = 0;
+        virtual int open() = 0;
         //!Returns stream reader
         /*!
             \a DtsArchiveReader instance holds reference to returned \a StreamReader instance
