@@ -41,6 +41,7 @@ namespace nx_http
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
+        StringType contentType() const;
         bool startReadMessageBody();
 
         void setSubsequentReconnectTries( int reconnectTries );

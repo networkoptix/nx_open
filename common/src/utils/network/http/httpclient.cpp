@@ -69,6 +69,11 @@ namespace nx_http
         return m_asyncHttpClient->url();
     }
 
+    StringType HttpClient::contentType() const
+    {
+        return m_asyncHttpClient->contentType();
+    }
+
     bool HttpClient::startReadMessageBody()
     {
         return m_asyncHttpClient->startReadMessageBody();

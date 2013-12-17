@@ -56,9 +56,6 @@ public:
     void resizeBuffer( size_t bufSize );
     void* data();
 
-    //!Adds reference to \a motionData
-    void setMotionData( nxcip::Picture* motionData );
-
 private:
     nxpt::CommonRefManager m_refManager;
     const int m_channelNumber;
@@ -66,7 +63,6 @@ private:
     void* m_buffer;
     size_t m_bufSize;
     unsigned int m_flags;
-    nxcip::Picture* m_motionData;
     unsigned int m_cSeq;
 };
 
