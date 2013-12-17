@@ -10,6 +10,7 @@
 
 static const int PORT_TO_SCAN = 80;
 
+QnIpRangeCheckerAsync::QnIpRangeCheckerAsync()
 :
     m_portToScan( 0 ),
     m_endIpv4( 0 ),
@@ -103,7 +104,7 @@ void QnIpRangeCheckerAsync::waitForScanToFinish()
         m_cond.wait( lk.mutex() );
 }
 
-void QnIprangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
+void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     QMutexLocker lk( &m_mutex );
 

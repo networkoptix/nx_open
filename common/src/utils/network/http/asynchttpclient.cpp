@@ -184,7 +184,7 @@ namespace nx_http
                     if( m_state >= sFailed )
                     {
                         lk.unlock();
-                        emit done( this );
+                        emit done( sharedThis );
                         lk.relock();
                         break;
                     }

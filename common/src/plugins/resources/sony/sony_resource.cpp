@@ -199,7 +199,7 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient.get() != httpClient )    //this can happen just after stopInputPortMonitoring() call
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoring() call
         return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
@@ -219,7 +219,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient.get() != httpClient )
+    if( m_inputMonitorHttpClient != httpClient )
         return;
 
     const BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();

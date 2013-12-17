@@ -109,8 +109,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             m_httpClient.reset( new nx_http::HttpClient() );
             m_httpClient->setUserName( QLatin1String(m_cameraInfo.defaultLogin) );
             m_httpClient->setUserPassword( QLatin1String(m_cameraInfo.defaultPassword) );
-            if( !m_httpClient->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) ||
-                !m_httpClient->startReadMessageBody() )
+            if( !m_httpClient->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) )
             {
                 NX_LOG( QString::fromLatin1("Failed to request %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );
                 return nxcip::NX_NETWORK_ERROR;
