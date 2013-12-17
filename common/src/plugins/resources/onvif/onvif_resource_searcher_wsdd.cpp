@@ -320,8 +320,6 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
     // if interface list is changed, remove old sockets
     std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
     for(; itr != m_ifaceToSock.end() ; ++itr) {
-        ProbeContext& ctx = *itr->second;
-        ctx.sock.reset();
         delete itr->second;
     }
     m_ifaceToSock.clear();
@@ -751,7 +749,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
         if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
-            ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
@@ -800,7 +797,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         return true;
 
     //removing socket for it to be recreated on next sendProbe call
-    ctx->sock.reset();
     delete ctx;
     m_ifaceToSock.erase( p.first );
     return false;

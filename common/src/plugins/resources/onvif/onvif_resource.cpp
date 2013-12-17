@@ -205,7 +205,6 @@ QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
 
 QnPlOnvifResource::QnPlOnvifResource()
 :
-    m_onvifAdditionalSettings(0),
     m_physicalParamsMutex(QMutex::Recursive),
     m_advSettingsLastUpdated(),
     m_iframeDistance(-1),
@@ -257,7 +256,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
     stopInputPortMonitoring();
 
-    delete m_onvifAdditionalSettings;
+    m_onvifAdditionalSettings.reset();
 }
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
@@ -1990,9 +1989,8 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
     QMutexLocker lock(&m_physicalParamsMutex);
-    if (!m_onvifAdditionalSettings) {
+    if (!m_onvifAdditionalSettings)
         return false;
-    }
 
     CameraSetting tmp;
     tmp.deserializeFromStr(val.toString());
@@ -2039,8 +2037,9 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
     QAuthenticator auth(getAuth());
-    OnvifCameraSettingsResp* settings = new OnvifCameraSettingsResp(getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
-        auth.user(), auth.password(), m_videoSourceToken.toStdString(), getUniqueId(), m_timeDrift);
+    std::unique_ptr<OnvifCameraSettingsResp> settings( new OnvifCameraSettingsResp(
+        getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
+        auth.user(), auth.password(), m_videoSourceToken.toStdString(), getUniqueId(), m_timeDrift) );
 
     if (!imagingUrl.isEmpty()) {
         settings->makeGetRequest();
@@ -2072,11 +2071,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    if (m_onvifAdditionalSettings) {
-        delete m_onvifAdditionalSettings;
-    }
-
-    m_onvifAdditionalSettings = settings;    
+    m_onvifAdditionalSettings = std::move(settings);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const

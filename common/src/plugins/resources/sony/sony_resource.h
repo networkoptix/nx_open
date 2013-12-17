@@ -17,11 +17,6 @@
 #include "../onvif/onvif_resource.h"
 
 
-namespace nx_http
-{
-    class AsyncHttpClient;
-}
-
 class QnPlSonyResource : public QnPlOnvifResource
 {
     static int MAX_RESOLUTION_DECREASES_NUM;
