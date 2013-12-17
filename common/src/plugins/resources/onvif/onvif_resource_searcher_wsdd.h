@@ -95,7 +95,7 @@ private:
     class ProbeContext
     {
     public:
-        std::auto_ptr<AbstractDatagramSocket> sock;
+        std::unique_ptr<AbstractDatagramSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;

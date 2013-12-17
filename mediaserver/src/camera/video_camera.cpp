@@ -279,9 +279,13 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
-        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*> (m_resource->createDataProvider(role)));
+        QnAbstractStreamDataProvider* dataProvider = m_resource->createDataProvider(role);
+        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
         if (reader == 0)
+        {
+            delete dataProvider;
             return;
+        }
 
         QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, role);
         if (primaryLiveStream)

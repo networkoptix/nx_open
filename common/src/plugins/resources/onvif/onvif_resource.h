@@ -260,7 +260,7 @@ private:
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
-    OnvifCameraSettingsResp* m_onvifAdditionalSettings;
+    std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
 
     mutable QMutex m_physicalParamsMutex;
     QDateTime m_advSettingsLastUpdated;
