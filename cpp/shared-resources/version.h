@@ -47,6 +47,8 @@
 #define QN_PRODUCT_NAME_LONG            "${product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
 
+#define QN_VMAX                         ${vmax}
+
 /* 
  * These constans are here for windows resouce file.
  *

@@ -1077,7 +1077,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 
 #ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
+    if (QN_VMAX)
     {
         QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
         QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
@@ -1167,7 +1167,7 @@ void QnMain::run()
     ThirdPartyResourceSearcher::initStaticInstance( NULL );
 
 #ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
+    if (QN_VMAX)
     {
         delete QnPlVmax480ResourceSearcher::instance();
         QnPlVmax480ResourceSearcher::initStaticInstance( NULL );

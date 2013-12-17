@@ -8,6 +8,8 @@
 #include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
+#include "version.h"
+
 QMutex QnVideoCameraPool::m_staticMtx;
 
 void QnVideoCameraPool::stop()
@@ -16,7 +18,7 @@ void QnVideoCameraPool::stop()
         camera->beforeStop();
 
 #ifdef Q_OS_WIN
-    if (qnCustomization() == Qn::DwSpectrumCustomization)
+    if (QN_VMAX)
     {
         VMaxStreamFetcher::pleaseStopAll(); // increase stop time
     }
