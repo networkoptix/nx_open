@@ -122,7 +122,7 @@ public:
     QnJsonResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent = NULL):
         base_type(resource, key, parent)
     {
-        loadValue();
+        base_type::loadValue();
     }
 
 protected:
@@ -144,7 +144,7 @@ public:
     QnLexicalResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent = NULL):
         base_type(resource, key, parent)
     {
-        loadValue();
+        base_type::loadValue();
     }
 
 protected:
