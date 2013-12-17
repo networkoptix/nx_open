@@ -6,7 +6,7 @@
 #include <utils/common/json.h>
 #include <utils/common/long_runnable.h>
 
-#include <api/kvpair_usage_helper.h>
+#include <api/resource_property_adaptor.h>
 
 #include "ptz_tour_executor.h"
 
@@ -38,55 +38,14 @@ Q_GLOBAL_STATIC(QnPtzTourExecutorThread, qn_ptzTourExecutorThread_instance);
 
 
 // -------------------------------------------------------------------------- //
-// QnTourPtzControllerPrivate
-// -------------------------------------------------------------------------- //
-class QnTourPtzControllerPrivate {
-public:
-    QnTourPtzControllerPrivate(): helper(NULL), executor(NULL) {}
-
-    ~QnTourPtzControllerPrivate() {
-        executor->deleteLater();
-    }
-
-    void init() {
-        helper = new QnStringKvPairUsageHelper(q->resource(), lit("ptzTours"), QString(), q);
-        
-        executor = new QnPtzTourExecutor(q->baseController());
-        executor->moveToThread(qn_ptzTourExecutorThread_instance());
-    }
-
-    void loadRecords() {
-        if(!records.isEmpty())
-            return;
-
-        if(helper->value().isEmpty()) {
-            records.clear();
-        } else {
-            QJson::deserialize(helper->value().toUtf8(), &records);
-        }
-    }
-
-    void saveRecords() {
-        helper->setValue(QString::fromUtf8(QJson::serialized(records)));
-    }
-
-    QnTourPtzController *q;
-    QMutex mutex;
-    QnStringKvPairUsageHelper *helper;
-    QHash<QString, QnPtzTour> records;
-    QnPtzTourExecutor *executor;
-};
-
-
-// -------------------------------------------------------------------------- //
 // QnTourPtzController
 // -------------------------------------------------------------------------- //
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    d(new QnTourPtzControllerPrivate())
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), this)),
+    m_executor(new QnPtzTourExecutor(baseController))
 {
-    d->q = this;
-    d->init();
+    m_executor->moveToThread(qn_ptzTourExecutorThread_instance());
 }
 
 QnTourPtzController::~QnTourPtzController() {
@@ -123,41 +82,42 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     tour.validateSpots();
 
     /* Tour is fine, save it. */
-    QMutexLocker locker(&d->mutex);
-    d->loadRecords();
-    d->records.insert(tour.id, tour);
-    d->saveRecords();
+    QMutexLocker locker(&m_mutex);
+    QnPtzTourHash records = m_adaptor->value();
+    records.insert(tour.id, tour);
+    
+    m_adaptor->setValue(records);
     return true;
 }
 
 bool QnTourPtzController::removeTour(const QString &tourId) {
-    QMutexLocker locker(&d->mutex);
+    QMutexLocker locker(&m_mutex);
 
-    d->loadRecords();
-    if(d->records.remove(tourId) == 0)
+    QnPtzTourHash records = m_adaptor->value();
+    if(records.remove(tourId) == 0)
         return false;
-    d->saveRecords();
+    
+    m_adaptor->setValue(records);
     return true;
 }
 
 bool QnTourPtzController::activateTour(const QString &tourId) {
     QnPtzTour tour;
     {
-        QMutexLocker locker(&d->mutex);
-        d->loadRecords();
-        if(!d->records.contains(tourId))
+        QMutexLocker locker(&m_mutex);
+        const QnPtzTourHash &records = m_adaptor->value();
+        if(!records.contains(tourId))
             return false;
-        tour = d->records[tourId];
+        tour = records.value(tourId);
     }
 
-    d->executor->startTour(tour);
+    m_executor->startTour(tour);
     return true;
 }
 
 bool QnTourPtzController::getTours(QnPtzTourList *tours) {
-    QMutexLocker locker(&d->mutex);
+    QMutexLocker locker(&m_mutex);
 
-    d->loadRecords();
-    *tours = d->records.values();
+    *tours = m_adaptor->value().values();
     return true;
 }
