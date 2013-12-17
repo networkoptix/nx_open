@@ -115,15 +115,17 @@ void QnPtzTourExecutorPrivate::startMoving() {
 
     const QnPtzTourSpot &spot = currentTour.spots[currentIndex];
 
+    QVector3D tmp;
     baseController->activatePreset(spot.presetId, spot.speed);
-    baseController->getPosition(defaultSpace, NULL);
+    baseController->getPosition(defaultSpace, &tmp);
     moveTimer.start(1000, q);
 }
 
 void QnPtzTourExecutorPrivate::processMoving() {
     assert(currentState == Moving);
 
-    baseController->getPosition(defaultSpace, NULL);
+    QVector3D tmp;
+    baseController->getPosition(defaultSpace, &tmp);
 }
 
 void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {

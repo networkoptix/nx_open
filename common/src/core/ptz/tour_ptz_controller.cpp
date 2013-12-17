@@ -25,13 +25,17 @@ public:
         stop();
     }
 
-    virtual void pleaseStop() {
+    virtual void pleaseStop() override {
         base_type::pleaseStop();
 
         QMetaObject::invokeMethod(this, "quit", Qt::QueuedConnection);
     }
 
-    /* Default run implementation is OK as we don't need anything besides an event loop. */
+    virtual void run() override {
+        /* Default implementation is OK, but we want to see this function on 
+         * the stack when debugging. */
+        return base_type::run(); 
+    }
 };
 
 Q_GLOBAL_STATIC(QnPtzTourExecutorThread, qn_ptzTourExecutorThread_instance);
