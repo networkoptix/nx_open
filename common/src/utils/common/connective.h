@@ -38,7 +38,9 @@ namespace Qn {
 
     template<class T1, class S1, class T2, class S2>
     inline bool disconnect(const T1 *sender, const S1 &signal, const T2 *receiver, const S2 &method) {
-        method; signal; /* Silence the spurious MSVC warning. */ // TODO: unused(x, y, z) call
+#ifdef Q_OS_WIN
+        method; signal; /* Silence the spurious MSVC warning and add ~100 gcc warnings. */ // TODO: unused(x, y, z) call
+#endif
         return QObject::disconnect(sender, signal, receiver, method);
     }
 
