@@ -21,11 +21,11 @@
 
 namespace QnModelFunctionsDetail {
     template<class T>
-    bool equals(const T &l, const T &r) { return l == r; }
+    inline bool equals(const T &l, const T &r) { return l == r; }
 
-    bool equals(float l, float r);
-    bool equals(double l, double r);
-}
+    inline bool equals(float l, float r) { return qFuzzyCompare(l, r); }
+    inline bool equals(double l, double r) { return qFuzzyCompare(l, r); }
+} // namespace QnModelFunctionsDetail
 
 
 /**
@@ -86,14 +86,15 @@ __VA_ARGS__ uint qHash(const TYPE &value) {                                     
  */
 #define QN_DEFINE_STRUCT_OPERATOR_EQ(TYPE, FIELD_SEQ, ... /* PREFIX */)         \
 __VA_ARGS__ bool operator==(const TYPE &l, const TYPE &r) {                     \
+    using namespace QnModelFunctionsDetail;                                     \
     return true BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_OPERATOR_EQ_STEP_I, ~, FIELD_SEQ); \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool operator!=(const TYPE &l, const TYPE &r) {                     \
-    return !QnModelFunctionsDetail::equals(l, r);                                                           \
+    return !(l == r);                                                           \
 }
 
-#define QN_DEFINE_STRUCT_OPERATOR_EQ_STEP_I(R, DATA, FIELD) && QnModelFunctionsDetail::equals(l.FIELD, r.FIELD)
+#define QN_DEFINE_STRUCT_OPERATOR_EQ_STEP_I(R, DATA, FIELD) && equals(l.FIELD, r.FIELD)
 
 
 /**
