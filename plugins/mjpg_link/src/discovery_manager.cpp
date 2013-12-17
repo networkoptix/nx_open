@@ -12,6 +12,12 @@
 #endif
 #include <cstdio>
 
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QUrl>
+
+#include <utils/network/http/httpclient.h>
+#include <utils/network/http/multipart_content_parser.h>
+
 #include "camera_manager.h"
 #include "plugin.h"
 
@@ -59,9 +65,42 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
+static const QString HTTP_PROTO_NAME( QString::fromLatin1("http") );
+static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
+
+int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
-    //TODO/IMPL checking url to be http
+    QUrl url( QString::fromUtf8(address) );
+    if( url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME )
+        return 0;
+
+    nx_http::HttpClient httpClient;
+    if( login )
+        httpClient.setUserName( QLatin1String(login) );
+    if( password )
+        httpClient.setUserPassword( QLatin1String(password) );
+    if( !httpClient.doGet( QUrl(QLatin1String(address)) ) )
+        return 0;
+
+    //checking content-type
+    nx_http::MultipartContentParser multipartContentParser;
+    if( nx_http::strcasecmp(httpClient.contentType(), "image/jpeg") != 0 && //not a motion jpeg
+        !multipartContentParser.setContentType(httpClient.contentType()) )  //not a single jpeg
+    {
+        //inappropriate content-type
+        return 0;
+    }
+
+    const QByteArray& uidStr = QCryptographicHash::hash( QByteArray::fromRawData(address, strlen(address)), QCryptographicHash::Md5 ).toHex();
+
+    memset( &cameras[0], 0, sizeof(cameras[0]) );
+    strncpy( cameras[0].uid, uidStr.constData(), sizeof(cameras[0].uid)-1 );
+    strncpy( cameras[0].url, address, sizeof(cameras[0].url)-1 );
+    //cameras[0].auxiliaryData[256];
+    if( login )
+        strncpy( cameras[0].defaultLogin, login, sizeof(cameras[0].defaultLogin)-1 );
+    if( password )
+        strncpy( cameras[0].defaultPassword, password, sizeof(cameras[0].defaultPassword)-1 );
 
     return 1;
 }
@@ -82,12 +121,7 @@ int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDa
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
 {
-    const nxcip::CameraInfo& infoCopy( info );
-    if( strlen(infoCopy.auxiliaryData) == 0 )
-    {
-        //TODO/IMPL checking, if audio is present at info.url
-    }
-    return new CameraManager( infoCopy );
+    return new CameraManager( info );
 }
 
 int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )

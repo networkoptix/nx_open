@@ -42,6 +42,8 @@ public:
     float toFloat() const;
     QList<QnByteArrayConstRef> split( char sep ) const;
 
+    bool isEqualCaseInsensitive( const char* str, size_t strLength = (size_t)-1 ) const;
+
     const value_type& operator[]( size_type index ) const;
     //!Constructs new \a QByteArray object by calling \a QByteArray::mid
     operator QByteArray() const;

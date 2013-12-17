@@ -44,6 +44,8 @@ namespace nxcip
     static const int NX_IO_ERROR = -25;
     //!Operation could not be completed now, but it may still be available later
     static const int NX_TRY_AGAIN = -26;
+    //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
+    static const int NX_INTERRUPTED = -27;
     static const int NX_OTHER_ERROR = -100;
 
 
