@@ -3,7 +3,11 @@
 
 #include "proxy_ptz_controller.h"
 
-class QnTourPtzControllerPrivate;
+template<class T>
+class QnResourcePropertyAdaptor;
+class QnPtzTourExecutor;
+
+typedef QHash<QString, QnPtzTour> QnPtzTourHash;
 
 class QnTourPtzController: public QnProxyPtzController {
     Q_OBJECT
@@ -26,7 +30,9 @@ private:
     bool createTourInternal(QnPtzTour tour);
 
 private:
-    QScopedPointer<QnTourPtzControllerPrivate> d;
+    QMutex m_mutex;
+    QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
+    QnPtzTourExecutor *m_executor;
 };
 
 

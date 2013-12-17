@@ -5,6 +5,8 @@
 
 #include <common/common_globals.h>
 
+#include <utils/common/connective.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include "ptz_fwd.h"
@@ -16,7 +18,7 @@
 /**
  * A thread-safe interface for accessing camera's PTZ functions.
  */
-class QnAbstractPtzController: public QObject {
+class QnAbstractPtzController: public Connective<QObject> {
     Q_OBJECT
 public:
     /**

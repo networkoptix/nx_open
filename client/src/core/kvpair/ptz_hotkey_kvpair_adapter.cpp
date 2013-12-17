@@ -4,7 +4,7 @@
 #include <utils/common/json.h>
 
 namespace {
-    static const QString targetKey = lit("ptz_hotkeys");
+    const QString targetKey = lit("ptz_hotkeys");
 
     bool readHotkeys(const QString &encoded, QnHotkeysHash* target) {
         return QJson::deserialize<QnHotkeysHash >(encoded.toUtf8(), target);

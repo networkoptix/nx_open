@@ -3,9 +3,9 @@
 #include <core/resource/resource.h>
 
 namespace {
-    static const QString targetKey = lit("showBusinessEvents");
+    const QString targetKey = lit("showBusinessEvents");
 
-    static const quint64 allIsEnabled = 0xFFFFFFFFFFFFFFFFull;
+    const quint64 allIsEnabled = 0xFFFFFFFFFFFFFFFFull;
 
     quint64 readValue(const QString &encoded) {
         quint64 result = encoded.isEmpty()
