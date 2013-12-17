@@ -10,7 +10,7 @@
     },
     
     "settings": {
-        "updateFeedUrl":            "${updatefeed.url}"
+        "updateFeedUrl":            "${updatefeed.url}",
         "translationPath":          ":/translations/client_${translation.lang}.qm"
     }
 }
