@@ -169,7 +169,6 @@ private slots:
     void at_statusOverlayWidget_diagnosticsRequested();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
-    void at_item_dewarpingParamsChanged();
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -178,7 +177,7 @@ private:
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
-    Q_SLOT void updateItemFlip();
+    Q_SLOT void updateFisheye();
 
 private:
     /** Media resource. */

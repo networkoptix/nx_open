@@ -244,8 +244,7 @@ void QnWorkbenchItem::setImageEnhancement(const ImageCorrectionParams& imageEnha
     emit dataChanged(Qn::ItemImageEnhancementRole);
 }
 
-void QnWorkbenchItem::setDewarpingParams(const QnItemDewarpingParams& params)
-{
+void QnWorkbenchItem::setDewarpingParams(const QnItemDewarpingParams& params) {
     if(m_itemDewarpingParams == params)
         return;
 
