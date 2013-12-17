@@ -82,8 +82,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
     connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
     connect(m_resource->toResource(), &QnResource::mediaDewarpingParamsChanged, this, &QnMediaResourceWidget::updateItemFlip);
-    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::itemDewarpingParamsChanged);
-    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateItemFlip);
+    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::at_item_dewarpingParamsChanged);
     connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
     updateDisplay();
 
@@ -192,32 +191,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
     updateCursor();
     setImageEnhancement(item->imageEnhancement());
-}
-
-void QnMediaResourceWidget::updateFisheyeController() {
-    /*setOption(VirtualZoomWindow, m_resource->isFisheye());
-
-    if (m_resource->isFisheye()) {
-        if (!m_fisheyePtz) {
-            m_fisheyePtz = new QnFisheyePtzController(m_resource);
-            connect(m_fisheyePtz, SIGNAL(dewarpingParamsChanged(DewarpingParams)), this, SLOT(at_dewarpingParamsChanged(DewarpingParams)));
-            connect(m_fisheyePtz, SIGNAL(spaceMapperChanged()), this, SLOT(updateAspectRatio()));
-            m_fisheyePtz->addRenderer(m_renderer);
-
-            if (!zoomRect().isEmpty()) {
-                m_fisheyePtz->setEnabled(true);
-                m_fisheyePtz->moveToRect(zoomRect());
-            }
-        }
-        m_fisheyePtz->setDewarpingParams(item()->dewarpingParams());
-    } else {
-        delete m_fisheyePtz;
-        m_fisheyePtz = 0;
-        if(buttonBar()->button(FishEyeButton))
-            buttonBar()->button(FishEyeButton)->setChecked(false);
-        at_dewarpingParamsChanged(item()->dewarpingParams());
-    }
-    updateAspectRatio();*/
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -512,16 +485,6 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
     item()->setImageEnhancement(imageEnhancement);
     m_renderer->setImageCorrection(imageEnhancement);
 }
-
-QnItemDewarpingParams QnMediaResourceWidget::itemDewarpingParams() const {
-    return item()->dewarpingParams();
-}
-
-void QnMediaResourceWidget::setItemDewarpingParams(const QnItemDewarpingParams &dewarpingParams) {
-    buttonBar()->button(FishEyeButton)->setChecked(dewarpingParams.enabled);
-    item()->setDewarpingParams(dewarpingParams);
-}
-
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -984,9 +947,9 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(checked)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
     
-    QnItemDewarpingParams params = itemDewarpingParams();
+    QnItemDewarpingParams params = item()->dewarpingParams();
     params.enabled = checked;
-    setItemDewarpingParams(params);
+    item()->setDewarpingParams(params);
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
@@ -1019,6 +982,11 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
         m_fisheyePtz->setEnabled(true);
         m_fisheyePtz->moveToRect(zoomRect());
     }*/
+}
+
+void QnMediaResourceWidget::at_item_dewarpingParamsChanged() {
+    buttonBar()->button(FishEyeButton)->setChecked(item()->dewarpingParams().enabled);
+    updateItemFlip();
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
