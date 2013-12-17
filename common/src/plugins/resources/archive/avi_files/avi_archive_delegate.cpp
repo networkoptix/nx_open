@@ -398,7 +398,7 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
             if (dewarpInfo) {
                 QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
                 if (mediaRes)
-                    mediaRes->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(dewarpInfo->value));
+                    mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
             }
         }
     }

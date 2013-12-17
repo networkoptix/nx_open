@@ -25,6 +25,10 @@ public:
 
     friend bool operator==(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
 
+    /**
+     * Compatibility function to support reading data from previous software version.
+     */
+    static QnMediaDewarpingParams deserialized(const QByteArray &data);
 public:
     /** Whether dewarping is currently enabled. */
     bool enabled;

@@ -141,7 +141,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
     vCamera->setSecondaryStreamQuality(static_cast<Qn::SecondStreamQuality>(pb_camera.secondaryquality()));
     vCamera->setCameraControlDisabled(pb_camera.controldisabled());
     vCamera->setStatusFlags((QnSecurityCamResource::StatusFlags) pb_camera.statusflags());
-    vCamera->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(pb_camera.dewarpingparams().c_str()));
+    vCamera->setDewarpingParams(QnMediaDewarpingParams::deserialized(pb_camera.dewarpingparams().c_str()));
 
     if (pb_camera.has_region())
     {
