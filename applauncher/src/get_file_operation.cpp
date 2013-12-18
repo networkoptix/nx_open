@@ -6,7 +6,6 @@
 #include "get_file_operation.h"
 
 #include <utils/common/log.h>
-#include <utils/network/http/asynchttpclient.h>
 
 
 namespace detail
@@ -25,7 +24,6 @@ namespace detail
             baseUrl,
             filePath,
             _handler ),
-        m_httpClient( nullptr ),
         m_state( State::sInit ),
         m_localDirPath( localDirPath ),
         m_hashTypeName( hashTypeName ),
@@ -33,18 +31,18 @@ namespace detail
         m_totalBytesDownloaded( 0 ),
         m_totalBytesWritten( 0 )
     {
-        m_httpClient = new nx_http::AsyncHttpClient();
+        m_httpClient.reset( new nx_http::AsyncHttpClient() );
         connect(
-            m_httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),
-            this, SLOT(onResponseReceived(nx_http::AsyncHttpClient*)),
+            m_httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onResponseReceived(nx_http::AsyncHttpClientPtr)),
             Qt::DirectConnection );
         connect(
-            m_httpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),
-            this, SLOT(onSomeMessageBodyAvailable(nx_http::AsyncHttpClient*)),
+            m_httpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),
             Qt::DirectConnection );
         connect(
-            m_httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),
-            this, SLOT(onHttpDone(nx_http::AsyncHttpClient*)),
+            m_httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onHttpDone(nx_http::AsyncHttpClientPtr)),
             Qt::DirectConnection );
     }
 
@@ -54,8 +52,6 @@ namespace detail
             return;
 
         m_httpClient->terminate();
-        m_httpClient->scheduleForRemoval();
-        m_httpClient = nullptr;
     }
 
     void GetFileOperation::pleaseStop()
@@ -70,8 +66,7 @@ namespace detail
         if( m_httpClient )
         {
             m_httpClient->terminate();
-            m_httpClient->scheduleForRemoval();
-            m_httpClient = nullptr;
+            m_httpClient.reset();
         }
 
         if( !m_fileWritePending )
@@ -168,21 +163,19 @@ namespace detail
         }
     }
 
-    void GetFileOperation::onResponseReceived( nx_http::AsyncHttpClient* httpClient )
+    void GetFileOperation::onResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 
         switch( m_state )
         {
             case State::sDownloadingFile:
-                if( (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) ||
-                    !httpClient->startReadMessageBody() )
+                if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
                 {
                     setResult( ResultCode::downloadFailure );
                     setErrorText( httpClient->response()->statusLine.reasonPhrase );
                     m_httpClient->terminate();
-                    m_httpClient->scheduleForRemoval();
-                    m_httpClient = nullptr;
+                    m_httpClient.reset();
                     m_state = State::sInterrupted;
                     m_outFile->closeAsync( this );
                     return;
@@ -195,14 +188,14 @@ namespace detail
         }
     }
 
-    void GetFileOperation::onSomeMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient )
+    void GetFileOperation::onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         assert( m_httpClient == httpClient );
         onSomeMessageBodyAvailableNonSafe();
     }
 
-    void GetFileOperation::onHttpDone( nx_http::AsyncHttpClient* httpClient )
+    void GetFileOperation::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 

@@ -30,8 +30,9 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_timer.start();
 
     connect(m_widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateAspectRatio()));
-    connect(m_widget->item(),           &QnWorkbenchItem::dewarpingParamsChanged,               this, &QnFisheyePtzController::updateItemDewarpingParams);
-    connect(m_widget->camera().data(),  &QnVirtualCameraResource::mediaDewarpingParamsChanged,  this, &QnFisheyePtzController::updateMediaDewarpingParams);
+    connect(m_widget->item(),       &QnWorkbenchItem::dewarpingParamsChanged,               this, &QnFisheyePtzController::updateItemDewarpingParams);
+    if (m_widget->camera())
+        connect(m_widget->camera(), &QnVirtualCameraResource::mediaDewarpingParamsChanged,  this, &QnFisheyePtzController::updateMediaDewarpingParams);
 
     updateAspectRatio();
     updateItemDewarpingParams();

@@ -50,11 +50,15 @@ namespace aio
         /*!
             Garantees that no \a eventTriggered will be called after return of this method.
             If \a eventTriggered is running and \a removeFromWatch called not from \a eventTriggered, method blocks till \a eventTriggered had returned
+            \param waitForRunningHandlerCompletion See comment to \a aio::AIOService::removeFromWatch
             \return true if removed socket. false if failed to remove
             \note Calling this method with same parameters simultaneously from multiple threads can cause undefined behavour
             \note MUST be called with \a mutex locked
         */
-        bool removeFromWatch( const QSharedPointer<AbstractSocket>& sock, PollSet::EventType eventType );
+        bool removeFromWatch(
+            const QSharedPointer<AbstractSocket>& sock,
+            PollSet::EventType eventType,
+            bool waitForRunningHandlerCompletion );
         //!Returns number of sockets monitored for \a eventToWatch event
         size_t size( PollSet::EventType eventToWatch ) const;
         //!Returns true, if can monitor one more socket for \a eventToWatch
