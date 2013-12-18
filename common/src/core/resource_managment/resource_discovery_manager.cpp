@@ -1,25 +1,29 @@
+
 #include "resource_discovery_manager.h"
 
 #include <set>
 
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-#include "resource_discovery_manager.h"
-#include "utils/common/sleep.h"
-#include "resource_searcher.h"
-#include "../resource/network_resource.h"
-#include "resource_pool.h"
-#include "utils/common/util.h"
-#include "api/app_server_connection.h"
-#include "utils/common/synctime.h"
-#include "utils/network/ping.h"
-#include "utils/network/ip_range_checker.h"
-#include "utils/network/ip_range_checker_async.h"
-#include "plugins/resources/upnp/upnp_device_searcher.h"
-#include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/storage_resource.h"
-#include "camera_driver_restriction_list.h"
+
+#include <api/app_server_connection.h>
+
+#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_managment/camera_driver_restriction_list.h>
+#include <core/resource_managment/resource_searcher.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <plugins/resources/upnp/upnp_device_searcher.h>
+#include <plugins/storage/dts/abstract_dts_searcher.h>
+
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/network/ip_range_checker.h>
 
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
