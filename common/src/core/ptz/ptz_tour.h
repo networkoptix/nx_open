@@ -39,9 +39,9 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
     bool isValid(const QnPtzPresetList &existingPresets) const;
 
     /**
-     * @brief validateSpots             Fix speed and stayTime values if required.
+     * @brief optimize                  Fix whatever is fixable in this tour.
      */
-    void validateSpots();
+    void optimize();
 };
 
 Q_DECLARE_METATYPE(QnPtzTourSpot)

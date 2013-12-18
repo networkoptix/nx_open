@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <QtCore/QBasicTimer>
+#include <QtCore/QElapsedTimer>
 
 #include <utils/math/math.h>
 #include <utils/common/invocation_event.h>
@@ -13,6 +14,8 @@
 // -------------------------------------------------------------------------- //
 // Model Data
 // -------------------------------------------------------------------------- //
+
+
 struct QnPtzTourSpotData {
     QVector3D position;
     qint64 moveTime;
@@ -69,6 +72,9 @@ public:
     QnPtzTour currentTour;
     int currentIndex;
     State currentState;
+    
+    QElapsedTimer spotTimer;
+    QVector3D startPosition;
     QVector3D currentPosition;
 };
 
@@ -113,6 +119,8 @@ void QnPtzTourExecutorPrivate::startTour(const QnPtzTour &tour) {
     stopTour();
 
     currentTour = tour;
+    currentTour.optimize();
+
     startMoving();
 }
 
@@ -121,11 +129,14 @@ void QnPtzTourExecutorPrivate::startMoving() {
 
     if(currentState == Stopped) {
         currentIndex = 0;
+        currentPosition = qQNaN<QVector3D>();
+        startPosition = qQNaN<QVector3D>();
     } else {
         currentIndex = (currentIndex + 1) % currentTour.spots.size();
+        startPosition = currentPosition;
     }
     currentState = Moving;
-    currentPosition = qQNaN<QVector3D>();
+    spotTimer.restart();
 
     qDebug() << "TOUR SPOT" << currentIndex;
 
@@ -134,7 +145,7 @@ void QnPtzTourExecutorPrivate::startMoving() {
     QVector3D tmp;
     baseController->activatePreset(spot.presetId, spot.speed);
     baseController->getPosition(defaultSpace, &tmp);
-    moveTimer.start(1000, q);
+    moveTimer.start(200, q);
 }
 
 void QnPtzTourExecutorPrivate::processMoving() {
@@ -147,7 +158,7 @@ void QnPtzTourExecutorPrivate::processMoving() {
 void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
     assert(currentState == Moving);
 
-    if(qFuzzyCompare(currentPosition, position)) {
+    if(qFuzzyCompare(currentPosition, position) && !qFuzzyCompare(currentPosition, startPosition)) {
         moveTimer.stop();
         startWaiting();
     } else {

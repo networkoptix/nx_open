@@ -83,7 +83,7 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
         return false;
 
     /* No so important so fix and continue. */
-    tour.validateSpots();
+    tour.optimize();
 
     /* Tour is fine, save it. */
     QMutexLocker locker(&m_mutex);

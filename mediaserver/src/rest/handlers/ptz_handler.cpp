@@ -8,8 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
-
-#include <ptz/ptz_controller_pool.h>
+#include <core/ptz/ptz_controller_pool.h>
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 

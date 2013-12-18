@@ -32,10 +32,25 @@ bool QnPtzTour::isValid(const QnPtzPresetList &existingPresets) const {
     return true;
 }
 
-void QnPtzTour::validateSpots() {
+void QnPtzTour::optimize() {
+    /* Fix speed & stay time first. */
     for(int i = 0; i < spots.size(); i++) {
         QnPtzTourSpot &spot = spots[i];
         spot.stayTime = qMax(spot.stayTime, 0ll);
         spot.speed = qBound<qreal>(minimalSpeed, spot.speed, maximalSpeed);
+    }
+
+    /* Check for duplicates next. */
+    for(int i = 0; i < spots.size(); i++) {
+        int j = (i + 1) % spots.size();
+
+        QnPtzTourSpot &lastSpot = spots[i];
+        QnPtzTourSpot &nextSpot = spots[j];
+        if(lastSpot.presetId == nextSpot.presetId) {
+            nextSpot.speed = lastSpot.speed;
+            nextSpot.stayTime += lastSpot.stayTime;
+            spots.removeAt(i);
+            i--;
+        }
     }
 }
