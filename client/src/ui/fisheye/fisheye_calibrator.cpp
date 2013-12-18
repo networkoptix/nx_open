@@ -107,7 +107,7 @@ void QnFisheyeCalibrator::findCircleParams()
         int xLeft = findPixel(y, 0, 1);
         if (xLeft == -1)
             continue;
-        qint64 distance = sqrt(xLeft*xLeft + y*y);
+        qint64 distance = xLeft*xLeft + y*y;
         if (distance < distances[LeftTop].distance) {
             distances[LeftTop].distance = distance;
             distances[LeftTop].pos = QPointF(xLeft, y);
@@ -116,7 +116,7 @@ void QnFisheyeCalibrator::findCircleParams()
         int xRight = findPixel(y, rightEdge, -1);
         if (xRight == -1)
             continue;
-        distance = sqrt((rightEdge-xRight) * (rightEdge-xRight) + y*y);
+        distance = (rightEdge-xRight) * (rightEdge-xRight) + y*y;
         if (distance < distances[RightTop].distance) {
             distances[RightTop].distance = distance;
             distances[RightTop].pos = QPointF(xRight, y);
@@ -129,7 +129,7 @@ void QnFisheyeCalibrator::findCircleParams()
         int xLeft = findPixel(y, 0, 1);
         if (xLeft == -1)
             continue;
-        int distance = sqrt(xLeft*xLeft + (bottomEdge-y) * (bottomEdge-y));
+        int distance = xLeft*xLeft + (bottomEdge-y) * (bottomEdge-y);
         if (distance < distances[LeftBottom].distance) {
             distances[LeftBottom].distance = distance;
             distances[LeftBottom].pos = QPoint(xLeft, y);
@@ -140,7 +140,7 @@ void QnFisheyeCalibrator::findCircleParams()
         if (xRight == -1)
             continue;
 
-        distance = sqrt((rightEdge-xRight) * (rightEdge-xRight) + (bottomEdge-y) * (bottomEdge-y));
+        distance = (rightEdge-xRight) * (rightEdge-xRight) + (bottomEdge-y) * (bottomEdge-y);
         if (distance < distances[RightBottom].distance) {
             distances[RightBottom].distance = distance;
             distances[RightBottom].pos = QPoint(xRight, y);
