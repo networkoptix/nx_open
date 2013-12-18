@@ -331,7 +331,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     float ar = 1.0;
     if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
     {
-        //ar = picLock->width()/(float)picLock->height();
+        ar = picLock->width()/(float)picLock->height();
         m_fisheyeController->tick();
         mediaParams = m_fisheyeController->mediaDewarpingParams();
         itemParams = m_fisheyeController->itemDewarpingParams();
