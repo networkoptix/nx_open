@@ -15,12 +15,15 @@ public:
         VerticalUp
     };
 
-    QnMediaDewarpingParams(): enabled(false), viewMode(VerticalDown), fovRot(0.0) {}
+    QnMediaDewarpingParams(): enabled(false), viewMode(VerticalDown), fovRot(0.0), xCenter(0.5), yCenter(0.5), radius(0.5) {}
 
     QnMediaDewarpingParams(const QnMediaDewarpingParams &other) {
         enabled = other.enabled;
         viewMode = other.viewMode;
         fovRot = other.fovRot;
+        xCenter = other.xCenter;
+        yCenter = other.yCenter;
+        radius = other.radius;
     }
 
     friend bool operator==(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
@@ -38,6 +41,13 @@ public:
 
     /** View correction angle, in radians. */
     qreal fovRot;
+
+    /** Normalized position of the circle*/ 
+    qreal xCenter;
+    qreal yCenter;
+
+    /** Circle radius in range 0..1 (r/width) */ 
+    qreal radius;
 };
 
 Q_DECLARE_METATYPE(QnMediaDewarpingParams)
