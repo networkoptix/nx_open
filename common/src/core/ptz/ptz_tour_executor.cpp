@@ -79,7 +79,9 @@ public:
     int currentSize;
     int currentIndex;
     State currentState;
-    bool restartMoveTimer;
+    bool pendingMoveTimerRestart;
+    bool pendingGetPosition;
+    bool waitingForPosition;
     
     QElapsedTimer spotTimer;
     QVector3D startPosition;
@@ -162,12 +164,15 @@ void QnPtzTourExecutorPrivate::startMoving() {
     baseController->activatePreset(spot.presetId, spot.speed);
     baseController->getPosition(defaultSpace, &tmp);
 
+    pendingGetPosition = false;
+    waitingForPosition = true;
+
     if(currentState == Moving && spotData.moveTime > 200) {
         moveTimer.start(spotData.moveTime - 200, q);
-        restartMoveTimer = true;
+        pendingMoveTimerRestart = true;
     } else {
         moveTimer.start(200, q);
-        restartMoveTimer = false;
+        pendingMoveTimerRestart = false;
     }
 }
 
@@ -175,18 +180,27 @@ void QnPtzTourExecutorPrivate::processMoving() {
     if(currentState != Entering && currentState != Moving)
         return;
 
-    if(restartMoveTimer) {
+    if(pendingMoveTimerRestart) {
         moveTimer.start(200, q);
-        restartMoveTimer = false;
+        pendingMoveTimerRestart = false;
     }
 
-    QVector3D tmp;
-    baseController->getPosition(defaultSpace, &tmp);
+    if(waitingForPosition) {
+        pendingGetPosition = true;
+    } else {
+        QVector3D tmp;
+        baseController->getPosition(defaultSpace, &tmp);
+        
+        pendingGetPosition = false;
+        waitingForPosition = true;
+    }
 }
 
 void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
     if(currentState != Entering && currentState != Moving)
         return;
+
+    qDebug() << "GOT POS" << position;
 
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(currentPosition, position);
@@ -196,6 +210,16 @@ void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
         startWaiting();
     } else {
         currentPosition = position;
+
+        if(pendingGetPosition) {
+            QVector3D tmp;
+            baseController->getPosition(defaultSpace, &tmp);
+
+            waitingForPosition = true;
+            pendingGetPosition = false;
+        } else {
+            waitingForPosition = false;
+        }
     }
 }
 
