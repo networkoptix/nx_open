@@ -223,12 +223,17 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     
     vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5,       -yPos/ aspectRatio);
-    
+
+/*
     vec2 xy3 = vec2(maxX / PI,  maxY / PI);
     vec2 xy4 = vec2(maxX / 2.0, maxY / 2.0);
 
     vec2 xy5 = vec2(radius*2.0,  radius*2.0*aspectRatio);
     vec2 xy6 = vec2(xCenter - radius, yCenter - radius*aspectRatio);
+*/
+
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * radius + xCenter - radius, maxY * radius * aspectRatio + yCenter - radius*aspectRatio);
 
     void main() 
     {
@@ -239,7 +244,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         
         vec2 pos = vec2(cos(theta), sin(theta)) * r;
         pos = pos * xy3 + xy4;
-        pos = pos * xy5 + xy6;
+        //pos = pos * xy5 + xy6;
 
         // do gamma correction and color transformation yuv->RGB
         float y = texture2D(yTexture, pos).p;
@@ -298,8 +303,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
-    vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * radius + xCenter - radius, maxY * radius * aspectRatio + yCenter - radius*aspectRatio);
 
     void main() 
     {
