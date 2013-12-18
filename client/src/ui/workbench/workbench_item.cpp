@@ -244,13 +244,11 @@ void QnWorkbenchItem::setImageEnhancement(const ImageCorrectionParams& imageEnha
     emit dataChanged(Qn::ItemImageEnhancementRole);
 }
 
-void QnWorkbenchItem::setDewarpingParams(const DewarpingParams& params)
-{
-    if(m_dewarpingParams == params)
+void QnWorkbenchItem::setDewarpingParams(const QnItemDewarpingParams& params) {
+    if(m_itemDewarpingParams == params)
         return;
 
-    m_dewarpingParams = params;
-
+    m_itemDewarpingParams = params;
     emit dewarpingParamsChanged();
     emit dataChanged(Qn::ItemImageDewarpingRole);
 }
@@ -314,7 +312,7 @@ QVariant QnWorkbenchItem::data(int role) const {
     case Qn::ItemImageEnhancementRole:
         return QVariant::fromValue<ImageCorrectionParams>(imageEnhancement());
     case Qn::ItemImageDewarpingRole:
-        return QVariant::fromValue<DewarpingParams>(dewarpingParams());
+        return QVariant::fromValue<QnItemDewarpingParams>(dewarpingParams());
     case Qn::ItemFlagsRole:
         return static_cast<int>(flags());
     case Qn::ItemRotationRole:
@@ -383,8 +381,8 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
     }
 
     case Qn::ItemImageDewarpingRole: {
-        if(value.canConvert<DewarpingParams>()) {
-            setDewarpingParams(value.value<DewarpingParams>());
+        if(value.canConvert<QnItemDewarpingParams>()) {
+            setDewarpingParams(value.value<QnItemDewarpingParams>());
             return true;
         } else {
             qnWarning("Provided dewarping params is not convertible.", value);

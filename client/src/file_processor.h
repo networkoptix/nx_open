@@ -4,7 +4,7 @@
 #include <QtCore/QList>
 #include <QtCore/QUrl>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 
 class QnFileProcessor
 {

@@ -24,6 +24,8 @@
 #include <utils/common/toggle.h>
 #include <utils/math/color_transformations.h>
 
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -90,8 +92,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
-#include "workbench_ptz_preset_manager.h"
-
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -763,20 +763,18 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_7:
     case Qt::Key_8:
     case Qt::Key_9: {
-        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-        if(!widget)
-            break;
-
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if(!camera)
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+        if(!widget || !widget->ptzController() || !widget->camera())
             break;
 
         int hotkey = e->key() - Qt::Key_0;
-        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
-        if(preset.isNull())
+
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->camera(), hotkey);
+        if (presetId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::PtzPresetIdRole, presetId));
+        break;
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
@@ -1386,7 +1384,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
         if (m_tourModeHintLabel) {
             m_tourModeHintLabel->hideImmideately();
-            disconnect(m_tourModeHintLabel, 0, this, 0);
+            disconnect(m_tourModeHintLabel, NULL, this, NULL);
             m_tourModeHintLabel = NULL;
         }
         return;

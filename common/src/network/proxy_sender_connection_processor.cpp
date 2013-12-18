@@ -85,7 +85,7 @@ void QnProxySenderConnection::run()
 {
     Q_D(QnProxySenderConnection);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
         doDelay();

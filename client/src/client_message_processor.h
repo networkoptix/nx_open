@@ -1,48 +1,34 @@
 #ifndef QN_CLIENT_MESSAGE_PROCESSOR_H
 #define QN_CLIENT_MESSAGE_PROCESSOR_H
 
-#include <QSharedPointer>
+#include <api/common_message_processor.h>
 
-#include "api/message_source.h"
-#include "api/app_server_connection.h"
-#include "core/resource/resource.h"
-#include <utils/common/singleton.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/resource_fwd.h>
 
-class QnClientMessageProcessor : public QObject, public Singleton<QnClientMessageProcessor>
+#include <licensing/license.h>
+
+class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
 
+    typedef QnCommonMessageProcessor base_type;
 public:
     QnClientMessageProcessor();
 
-    void stop();
-
-signals:
-    void connectionOpened();
-    void connectionClosed();
-
-    void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(int id);
-    void businessRuleReset(QnBusinessEventRuleList rules);
-
-    void businessActionReceived(const QnAbstractBusinessActionPtr& action);
-
-    void fileAdded(const QString &filename);
-    void fileUpdated(const QString &filename);
-    void fileRemoved(const QString &filename);
-public slots:
-    void run();
+    virtual void run() override;
+protected:
+    virtual void loadRuntimeInfo(const QnMessage &message) override;
+    virtual void handleConnectionOpened(const QnMessage &message) override;
+    virtual void handleMessage(const QnMessage &message) override;
 
 private slots:
-    void at_messageReceived(QnMessage message);
-    void at_connectionClosed(QString errorString);
-    void at_connectionOpened(QnMessage message);
+
     void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
 
 private:
     void init();
-    void init(const QUrl& url, int reconnectTimeout);
-    void determineOptimalIF(QnMediaServerResource* mediaServer);
+    void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     bool updateResource(QnResourcePtr resource, bool insert = true);
     void processResources(const QnResourceList& resources);
     void processLicenses(const QnLicenseList& licenses);
@@ -50,10 +36,7 @@ private:
     void updateHardwareIds(const QnMessage& message);
 
 private:
-    static const int EVENT_RECONNECT_TIMEOUT = 3000;
-
     quint32 m_seqNumber;
-    QSharedPointer<QnMessageSource> m_source;
 };
 
 #endif // _client_event_manager_h

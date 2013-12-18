@@ -1,11 +1,11 @@
 #ifndef QN_INSTANCE_STORAGE_H
 #define QN_INSTANCE_STORAGE_H
 
-#include <QObject>
-#include <QByteArray>
-#include <QPointer>
-#include <QList>
-#include <QHash>
+#include <QtCore/QObject>
+#include <QtCore/QByteArray>
+#include <QtCore/QPointer>
+#include <QtCore/QList>
+#include <QtCore/QHash>
 
 class QnInstanceStorage {
 public:

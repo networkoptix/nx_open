@@ -306,9 +306,10 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     if (!bitrateCap.isEmpty())
         m_availBitrate = parseVideoBitrateCap(bitrateCap);
 
-    initializePtz();
-
     initializeIO( report );
+
+    QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
+    setPtzCapabilities(ptzController->getCapabilities());
 
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
@@ -530,9 +531,9 @@ bool QnActiResource::hasDualStreaming() const
     return mediaVariant.toInt();
 }
 
-QnAbstractPtzController* QnActiResource::getPtzController()
+QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
 {
-    return m_ptzController.data();
+    return new QnActiPtzController(toSharedPointer(this));
 }
 
 QStringList QnActiResource::getRelayOutputList() const
@@ -602,16 +603,6 @@ void QnActiResource::onTimer( const quint64& timerID )
         m_triggerOutputTasks.insert( std::make_pair(
             TimerManager::instance()->addTimer( this, triggerOutputTask.autoResetTimeoutMS ),
             TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
-}
-
-void QnActiResource::initializePtz()
-{
-    m_ptzController.reset(new QnActiPtzController(this));
-    Qn::PtzCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoPtzCapabilities)
-        m_ptzController.reset();
-
-    setPtzCapabilities((getPtzCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
 }
 
 void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )

@@ -199,11 +199,12 @@ void QnMessageSource::httpReadyRead()
             }
 
             emit connectionOpened(message);
-        } else if (message.messageType != Qn::Message_Type_Ping)
-        {
-            emit messageReceived(message);
         }
+
         // If it's ping event -> just update last event time (m_eventWaitTimer)
+        if (message.messageType != Qn::Message_Type_Ping)
+            emit messageReceived(message);
+
     }
 }
 

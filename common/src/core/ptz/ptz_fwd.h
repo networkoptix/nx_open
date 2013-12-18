@@ -1,0 +1,36 @@
+#ifndef QN_PTZ_FWD_H
+#define QN_PTZ_FWD_H
+
+#include <QtCore/QSharedPointer>
+#include <QtCore/QList>
+
+#include <utils/common/json_fwd.h>
+
+class QnPtzMapper;
+typedef QSharedPointer<QnPtzMapper> QnPtzMapperPtr;
+
+class QnAbstractPtzController;
+typedef QSharedPointer<QnAbstractPtzController> QnPtzControllerPtr;
+
+struct QnPtzPreset;
+typedef QList<QnPtzPreset> QnPtzPresetList;
+
+struct QnPtzTourSpot;
+typedef QList<QnPtzTourSpot> QnPtzTourSpotList;
+
+struct QnPtzTour;
+typedef QList<QnPtzTour> QnPtzTourList;
+
+struct QnPtzLimits;
+
+struct QnPtzData;
+
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzMapperPtr)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzPreset)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzTourSpot)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzTour)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzLimits)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzData)
+
+#endif // QN_PTZ_FWD_H
+

@@ -10,6 +10,7 @@
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
 public:
+    QnRequestParam(const QPair<QString, QString> &other): base_type(other) {}
     QnRequestParam(const QString &first, const QString &second): base_type(first, second) {}
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
     QnRequestParam(const char *first, const QString &second): base_type(QLatin1String(first), second) {}
@@ -22,6 +23,7 @@ typedef QPair<QString, QString> QnRequestHeader;
 typedef QList<QPair<QString, QString> > QnRequestParamList;
 typedef QList<QPair<QString, QString> > QnRequestHeaderList;
 typedef QList<QNetworkReply::RawHeaderPair> QnReplyHeaderList;
+typedef QHash<QString, QString> QnRequestParams;
 
 struct QnHTTPRawResponse
 {

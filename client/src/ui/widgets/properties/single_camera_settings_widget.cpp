@@ -358,11 +358,9 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
-        DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
+        QnMediaDewarpingParams dewarping = ui->fisheyeSettingsWidget->getMediaDewarpingParams();
         dewarping.enabled = ui->checkBoxDewarping->isChecked();
         m_camera->setDewarpingParams(dewarping);
-        ui->fisheyeSettingsWidget->updateFromResource(m_camera);
-        m_dewarpingParamsBackup = dewarping;
 
         setHasDbChanges(false);
     }
@@ -379,8 +377,6 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
 void QnSingleCameraSettingsWidget::reject()
 {
-    if (m_camera)
-        m_camera->setDewarpingParams(m_dewarpingParamsBackup);
     updateFromResource();
 }
 
@@ -486,8 +482,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
-            ui->fisheyeSettingsWidget->updateFromResource(m_camera);
-            m_dewarpingParamsBackup = m_camera->getDewarpingParams();
+            ui->fisheyeSettingsWidget->setMediaDewarpingParams(m_camera->getDewarpingParams());
         }
     }
 
@@ -809,16 +804,6 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
             : Qn::MT_SoftwareGrid;
 
     d->calculateMaxFps(&maxFps, &maxDualStreamingFps, motionType);
-/*
-    int maxFps = m_camera->getMaxFps();
-    if (ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
-        maxFps -= MIN_SECOND_STREAM_FPS;
-
-    int maxDualStreamingFps;
-    if (m_camera->streamFpsSharingMethod() == Qn::shareFps)
-        maxDualStreamingFps = m_camera->getMaxFps() - MIN_SECOND_STREAM_FPS;
-    else
-        maxDualStreamingFps = maxFps;*/
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
@@ -968,7 +953,7 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
 void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
 {
     at_dbDataChanged();
-    m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->dewarpingParams());
+    at_cameraDataChanged();
 
     emit fisheyeSettingChanged();
 }

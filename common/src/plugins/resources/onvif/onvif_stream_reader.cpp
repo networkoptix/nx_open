@@ -542,31 +542,25 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
-        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: #Elric EVIL!
-        {
-            bool ptzMatched = profile && profile->PTZConfiguration;
-            if (!ptzMatched)
-            {
-                AddPTZConfigReq request;
-                AddPTZConfigResp response;
+        bool ptzMatched = profile && profile->PTZConfiguration;
+        if (!ptzMatched) {
+            AddPTZConfigReq request;
+            AddPTZConfigResp response;
 
-                request.ProfileToken = info.profileToken.toStdString();
-                request.ConfigurationToken = ptzController->getPtzConfigurationToken().toStdString();
+            request.ProfileToken = info.profileToken.toStdString();
+            request.ConfigurationToken = m_onvifRes->getPtzConfigurationToken().toStdString();
 
-                int soapRes = soapWrapper.addPTZConfiguration(request, response);
-                if (soapRes == SOAP_OK) {
-                    ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
-                }
-                else {
-                    qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
-                        << soapRes << ", description: " << soapWrapper.getLastError() 
-                        << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-                    return CameraDiagnostics::RequestFailedResult( QLatin1String("addPTZConfiguration"), soapWrapper.getLastError() );
-                }
+            int soapRes = soapWrapper.addPTZConfiguration(request, response);
+            if (soapRes == SOAP_OK) {
+                m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
+            } else {
+                qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
+                    << soapRes << ", description: " << soapWrapper.getLastError() 
+                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+                return CameraDiagnostics::RequestFailedResult( QLatin1String("addPTZConfiguration"), soapWrapper.getLastError() );
             }
-            else {
-                ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
-            }
+        } else {
+            m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
         }
     }
 

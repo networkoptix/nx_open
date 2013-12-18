@@ -257,7 +257,7 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
 
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
     if (m_blinker)
-        disconnect(m_list, 0, m_blinker, 0);
+        disconnect(m_list, NULL, m_blinker, NULL);
     
     m_blinker = blinker;
     

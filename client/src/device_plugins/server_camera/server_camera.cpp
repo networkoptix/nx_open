@@ -80,7 +80,7 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
 QnServerCameraPtr QnServerCamera::findEnabledSubling()
 {
     if (!isDisabled())
-        return toSharedPointer(this);
+        return ::toSharedPointer(this);
 
     {
         QMutexLocker lock(&m_mutex);

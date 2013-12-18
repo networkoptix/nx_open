@@ -7,7 +7,7 @@
 #include <QtCore/QUuid>
 #include <QtCore/QVariant>
 
-#include <core/resource/dewarping_params.h>
+#include <core/ptz/item_dewarping_params.h>
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/id.h>
@@ -32,7 +32,7 @@ public:
     QRectF zoomRect;
     qreal rotation;
     ImageCorrectionParams contrastParams;
-    DewarpingParams dewarpingParams;
+    QnItemDewarpingParams dewarpingParams;
 
     QHash<int, QVariant> dataByRole;
 

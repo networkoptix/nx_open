@@ -72,7 +72,7 @@ void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     if (d->clientRequest.isEmpty()) {
         if (!readRequest())

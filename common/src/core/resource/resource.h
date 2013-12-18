@@ -1,7 +1,6 @@
 #ifndef QN_RESOURCE_H
 #define QN_RESOURCE_H
 
-#include <cassert>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
 #include <QtCore/QMetaType>
@@ -9,15 +8,22 @@
 #include <QtCore/QStringList>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QThreadPool>
-#include "utils/camera/camera_diagnostics.h"
-#include "utils/common/from_this_to_shared.h"
-#include "utils/common/id.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "resource_fwd.h"
-#include "param.h"
-#include "resource_type.h"
+
+#include <api/model/kvpair.h>
+
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/from_this_to_shared.h>
+#include <utils/common/id.h>
+
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/ptz/ptz_fwd.h>
+
+#include <common/common_globals.h>
+
 #include "shared_resource_pointer.h"
-#include "interface/abstract_ptz_controller.h"
+#include "resource_fwd.h"
+#include "resource_type.h"
+#include "param.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -251,8 +257,6 @@ public:
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
 
-    virtual QnAbstractPtzController* getPtzController(); // TODO: #vasilenko: OMG what is THIS doing here???
-
     static void stopAsyncTasks();
 
     /**
@@ -263,6 +267,16 @@ public:
     void setPtzCapabilities(Qn::PtzCapabilities capabilities);
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
 
+    QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
+
+    /* Note that these functions hide property API inherited from QObject.
+     * This is intended as this API cannot be used with QnResource anyway 
+     * because of threading issues. */
+
+    QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
+    void setProperty(const QString &key, const QString &value);
+    QnKvPairList getProperties() const;
+
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
@@ -272,6 +286,9 @@ signals:
     void flagsChanged(const QnResourcePtr &resource);
     void urlChanged(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
+    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
+    void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
+    void propertyChanged(const QnResourcePtr &resource, const QString &key);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -287,9 +304,9 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void initAsyncFinished(const QnResourcePtr &resource, bool initialized);
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove bool param
 
-    void ptzCapabilitiesChanged(const QnResourcePtr &resource);
+
 public:
     // this is thread to process commands like setparam
     static void startCommandProc();
@@ -316,6 +333,7 @@ protected:
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
     virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
     //!Called just after successful \a initInternal()
@@ -323,6 +341,8 @@ protected:
         Inherited class implementation MUST call base class method first
     */
     virtual void initializationDone();
+
+    virtual void parameterValueChangedNotify(const QnParam &param);
 
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
@@ -387,6 +407,9 @@ private:
     QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
+
+    /** Additional values aka kvPairs. */
+    QHash<QString, QString> m_propertyByKey;
 
     bool m_initialized;    
     QMutex m_initAsyncMutex;

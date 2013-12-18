@@ -615,6 +615,8 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /* PTZ Actions */
+
         /**
          * Opens preset name editing dialog and saves current position as a new PTZ preset.
          */
@@ -629,7 +631,7 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          *
          * Parameters:
-         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
+         * <tt>QString PtzPresetIdRole</tt> --- id of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -639,12 +641,25 @@ namespace Qn {
         PtzManagePresetsAction,
 
         /**
-         * Sets the current picture as a layout background.
+         * Starts given PTZ tour.
+         *
+         * Parameters:
+         * <tt>QString PtzTourIdRole</tt> --- id of the PTZ tour.
          */
-        SetAsBackgroundAction,
+        PtzStartTourAction,
+
+        /**
+         * Opens PTZ tours management dialog.
+         */
+        PtzManageToursAction,
 
 
         /* Layout actions. */
+
+        /**
+         * Sets the current picture as a layout background.
+         */
+        SetAsBackgroundAction,
 
         /**
          * Deletes the file from disk.

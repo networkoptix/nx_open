@@ -8,8 +8,6 @@
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
-#include "core/resource/dewarping_params.h"
-
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -184,7 +182,6 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
-    DewarpingParams m_dewarpingParamsBackup;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

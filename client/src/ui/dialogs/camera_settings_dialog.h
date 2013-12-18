@@ -5,7 +5,6 @@
 #include <QtWidgets/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/dewarping_params.h>
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 

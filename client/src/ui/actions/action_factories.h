@@ -10,7 +10,7 @@
 class QAction;
 
 class QnActionFactory: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnActionFactory(QObject *parent = NULL):
         QObject(parent),
@@ -27,7 +27,7 @@ public:
 
 
 class QnOpenCurrentUserLayoutActionFactory: public QnActionFactory {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnOpenCurrentUserLayoutActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
 
@@ -39,7 +39,7 @@ private slots:
 
 
 class QnPtzGoToPresetActionFactory: public QnActionFactory {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnPtzGoToPresetActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
 
@@ -49,5 +49,15 @@ private slots:
     void at_action_triggered();
 };
 
+class QnPtzStartTourActionFactory: public QnActionFactory {
+    Q_OBJECT
+public:
+    QnPtzStartTourActionFactory(QObject *parent = NULL): QnActionFactory(parent) {}
+
+    virtual QList<QAction *> newActions(const QnActionParameters &parameters, QObject *parent) override;
+
+private slots:
+    void at_action_triggered();
+};
 
 #endif // QN_ACTION_FACTORIES_H

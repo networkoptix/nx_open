@@ -411,22 +411,11 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
     setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
 }
 
-bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
-    if (name != lit("cameraCapabilities"))
-        return QnResource::setParam(name, val, domain);
-
-    QVariant old;
-    Qn::CameraCapabilities oldCapabilities = getParam(QLatin1String("cameraCapabilities"), old, domain)
-            ? static_cast<Qn::CameraCapabilities>(old.toInt())
-            : Qn::NoCapabilities;
-    Qn::CameraCapabilities newCapabilities = static_cast<Qn::CameraCapabilities>(val.toInt());
-    if (oldCapabilities == newCapabilities)
-        return true;
-
-    bool result = QnResource::setParam(name, val, domain);
-    if (result)
+void QnSecurityCamResource::parameterValueChangedNotify(const QnParam &param) {
+    if (param.name() == lit("cameraCapabilities"))
         emit cameraCapabilitiesChanged(::toSharedPointer(this));
-    return result;
+
+    base_type::parameterValueChangedNotify(param);
 }
 
 bool QnSecurityCamResource::isRecordingEventAttached() const {

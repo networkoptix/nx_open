@@ -16,6 +16,8 @@
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/camera_output_business_action.h>
 
+#include <utils/common/request_param.h>
+
 class QnProcessorAggregationInfo {
 public:
     QnProcessorAggregationInfo():
@@ -117,19 +119,20 @@ public slots:
     static void init(QnBusinessRuleProcessor* instance);
     static void fini();
 
-    void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
-    void at_businessRuleDeleted(int id);
-    void at_businessRuleReset(QnBusinessEventRuleList rules);
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
-    void at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle);
+    void at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle);
     void at_sendEmailFinished(int status, bool result, int handle);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
+
+    void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
+    void at_businessRuleDeleted(int id);
+    void at_businessRuleReset(QnBusinessEventRuleList rules);
 
     void at_timer();
 

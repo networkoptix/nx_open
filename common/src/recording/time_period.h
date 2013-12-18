@@ -5,7 +5,7 @@
 
 #include <common/common_globals.h>
 
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 class QnTimePeriod;
 class QnTimePeriodList;

@@ -3,12 +3,10 @@
 
 #include <QtWidgets/QDialog>
 
-#include <core/resource/resource_fwd.h>
+#include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_hotkey.h>
 
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_ptz_preset_manager.h>
-
-#include "button_box_dialog.h"
+#include <ui/dialogs/abstract_ptz_dialog.h>
 
 class QPushButton;
 class QnPtzPresetListModel;
@@ -17,38 +15,37 @@ namespace Ui {
     class PtzPresetsDialog;
 }
 
-class QnPtzPresetsDialog: public Connective<QnButtonBoxDialog>, public QnWorkbenchContextAware {
+class QnPtzPresetsDialog: public QnAbstractPtzDialog {
     Q_OBJECT
 
-    typedef Connective<QnButtonBoxDialog> base_type;
+    typedef QnAbstractPtzDialog base_type;
 
 public:
     QnPtzPresetsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetsDialog();
 
-    const QnVirtualCameraResourcePtr &camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    QnAbstractPtzHotkeyDelegate* hotkeysDelegate() const;
+    void setHotkeysDelegate(QnAbstractPtzHotkeyDelegate *delegate);
 
-    virtual void accept() override;
+protected:
+    virtual void loadData(const QnPtzData &data) override;
+    virtual void saveData() const override;
+    virtual Qn::PtzDataFields requiredFields() const override;
 
 private slots:
     void at_removeButton_clicked();
     void at_activateButton_clicked();
 
-    void updateFromResource();
-    void submitToResource();
-
-    void updateLabel();
-    void updateModel();
     void updateRemoveButtonEnabled();
     void updateActivateButtonEnabled();
-
 private:
     QScopedPointer<Ui::PtzPresetsDialog> ui;
-    QnVirtualCameraResourcePtr m_camera;
+
     QPushButton *m_removeButton;
     QPushButton *m_activateButton;
     QnPtzPresetListModel *m_model;
+    QnPtzPresetList m_oldPresets;
+    QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
 };
 
 #endif // QN_PTZ_PRESETS_DIALOG_H

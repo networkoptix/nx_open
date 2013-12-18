@@ -26,6 +26,10 @@ typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
 
+class QnBusinessEventRule;
+typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
+
 namespace QnBusiness {
     enum EventReason {
         NoReason,

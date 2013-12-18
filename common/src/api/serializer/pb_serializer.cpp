@@ -16,8 +16,19 @@
 
 #include "pb_serializer.h"
 
-#include "core/resource_managment/resource_pool.h"
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/item_dewarping_params.h>
+
 #include <business/business_action_factory.h>
+
+#include <utils/common/json.h>
 
 #include <QtSql/QSqlRecord>
 
@@ -51,6 +62,7 @@ void parseResources(QnResourceList& resources, const PbResourceList& pb_resource
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourceTypeList& pb_resourceTypes);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
+void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs);
 
 namespace {
 
@@ -129,7 +141,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
     vCamera->setSecondaryStreamQuality(static_cast<Qn::SecondStreamQuality>(pb_camera.secondaryquality()));
     vCamera->setCameraControlDisabled(pb_camera.controldisabled());
     vCamera->setStatusFlags((QnSecurityCamResource::StatusFlags) pb_camera.statusflags());
-    vCamera->setDewarpingParams(DewarpingParams::deserialize(pb_camera.dewarpingparams().c_str()));
+    vCamera->setDewarpingParams(QnMediaDewarpingParams::deserialized(pb_camera.dewarpingparams().c_str()));
 
     if (pb_camera.has_region())
     {
@@ -308,7 +320,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
             itemData.combinedGeometry.setBottom(pb_item.bottom());
             itemData.rotation = pb_item.rotation();
             itemData.contrastParams = ImageCorrectionParams::deserialize(QByteArray(pb_item.contrastparams().c_str()));
-            itemData.dewarpingParams = DewarpingParams::deserialize(pb_item.dewarpingparams().c_str());
+            itemData.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(pb_item.dewarpingparams().c_str());
 
             if(pb_item.has_zoomtargetuuid())
                 itemData.zoomTargetUuid = QUuid(QString::fromUtf8(pb_item.zoomtargetuuid().c_str()));
@@ -376,18 +388,6 @@ void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
     }
 }
 
-void parseKvPairs(QnKvPairs& kvPairs, const PbKvPairList& pb_kvPairs)
-{
-    for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
-    {
-        QnKvPair kvPair;
-        kvPair.setName(QString::fromUtf8(ci->name().c_str()));
-        kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
-
-        kvPairs[ci->resourceid()].append(kvPair);
-    }
-}
-
 void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
 {
     for (PbSettingList::const_iterator ci = pb_settings.begin(); ci != pb_settings.end(); ++ci)
@@ -432,7 +432,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_secondaryquality(static_cast<pb::Camera_SecondaryQuality>(cameraPtr->secondaryStreamQuality()));
     pb_camera.set_controldisabled(cameraPtr->isCameraControlDisabled());
     pb_camera.set_statusflags((int) cameraPtr->statusFlags());
-    pb_camera.set_dewarpingparams(cameraPtr->getDewarpingParams().serialize().constData());
+    pb_camera.set_dewarpingparams(QJson::serialized<QnMediaDewarpingParams>(cameraPtr->getDewarpingParams()));
 
     QnParamList params = cameraPtr->getResourceParamList();
     foreach(QString key, params.keys())
@@ -587,7 +587,7 @@ void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePt
             pb_item.set_bottom(itemIn.combinedGeometry.bottom());
             pb_item.set_rotation(itemIn.rotation);
             pb_item.set_contrastparams(itemIn.contrastParams.serialize().constData());
-            pb_item.set_dewarpingparams(itemIn.dewarpingParams.serialize().constData());
+            pb_item.set_dewarpingparams(QJson::serialized<QnItemDewarpingParams>(itemIn.dewarpingParams));
 
             pb_item.set_zoomtargetuuid(itemIn.zoomTargetUuid.toString().toUtf8().constData());
             pb_item.set_zoomleft(itemIn.zoomRect.left());
@@ -740,7 +740,7 @@ void QnApiPbSerializer::deserializeCameraHistoryList(QnCameraHistoryList &camera
     parseCameraServerItems(cameraHistoryList, pb_csis.cameraserveritem());
 }
 
-void QnApiPbSerializer::deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data)
+void QnApiPbSerializer::deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
 
@@ -1055,12 +1055,12 @@ void QnApiPbSerializer::serializeKvPair(const QnResourcePtr& resource, const QnK
     data = QByteArray(str.data(), (int) str.length());
 }
 
-void QnApiPbSerializer::serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data)
+void QnApiPbSerializer::serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data)
 {
     pb::KvPairs pb_kvPairs;
 
     foreach(const QnKvPair &kvPair, kvPairs)
-        serializeKvPair_i(resource->getId(), *pb_kvPairs.add_kvpair(), kvPair);
+        serializeKvPair_i(resourceId, *pb_kvPairs.add_kvpair(), kvPair);
 
     std::string str;
     pb_kvPairs.SerializeToString(&str);
@@ -1449,3 +1449,14 @@ void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCame
     }
 }
 
+void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs)
+{
+    for (PbKvPairList::const_iterator ci = pb_kvPairs.begin(); ci != pb_kvPairs.end(); ++ci)
+    {
+        QnKvPair kvPair;
+        kvPair.setName(QString::fromUtf8(ci->name().c_str()));
+        kvPair.setValue(QString::fromUtf8(ci->value().c_str()));
+
+        kvPairs[ci->resourceid()].append(kvPair);
+    }
+}

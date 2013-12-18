@@ -8,6 +8,8 @@
 
 #include "compatibility.h"
 
+// TODO: #Elric #GDM move out. Why this file is in common root?
+
 struct QnConnectInfo 
 {
     QnConnectInfo(): allowCameraChanges(true) {}

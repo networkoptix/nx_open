@@ -720,7 +720,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         return;
     }
 
-    QnManualCameraSearchProcessReply result = reply.value<QnManualCameraSearchProcessReply>();
+    QnManualCameraSearchReply result = reply.value<QnManualCameraSearchReply>(); // TODO: use this type in slot signature.
 
     int newCameras = fillTable(result.cameras);
 

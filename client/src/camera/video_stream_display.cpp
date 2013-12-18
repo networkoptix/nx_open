@@ -1009,8 +1009,9 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping)
-{
+QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
+                                           const QnMediaDewarpingParams& mediaDewarping,
+                                           const QnItemDewarpingParams& itemDewarping) {
     if (m_decoder.isEmpty())
         return QImage();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
@@ -1027,7 +1028,7 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
     srcFrame->setUseExternalData(false);
 
     QSize srcSize(QSize(lastFrame->width, lastFrame->height));
-    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, dewarping);
+    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, itemDewarping);
 
     srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
 
@@ -1050,7 +1051,7 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
     QnContrastImageFilter filter(params);
     filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
 
-    QnFisheyeImageFilter filter2(dewarping);
+    QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
     filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
 
     // convert colorSpace

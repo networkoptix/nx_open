@@ -527,6 +527,7 @@ void DeviceFileCatalog::rewriteCatalog(bool isLastRecordRecording)
 
         if (m_file.remove())
             newFile.rename(m_file.fileName());
+
         m_file.open(QFile::ReadWrite);
         m_file.seek(m_file.size());
     }
