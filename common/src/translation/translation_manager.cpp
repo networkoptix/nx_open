@@ -13,6 +13,8 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
 {
     addPrefix(lit("common"));
     addPrefix(lit("qt"));
+    addPrefix(lit("qtbase"));
+    addPrefix(lit("qtmultimedia"));
     
     addSearchPath(lit(":/translations"));
     if(qApp) {
