@@ -68,11 +68,11 @@ namespace QnModelFunctionsDetail {
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
 #define QN_DEFINE_STRUCT_HASH_FUNCTION(TYPE, FIELD_SEQ, ... /* PREFIX */)       \
-__VA_ARGS__ uint qHash(const TYPE &value) {                                     \
+__VA_ARGS__ uint qHash(const TYPE &value, uint seed) {                          \
     return 0 BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_QHASH_STEP_I, ~, FIELD_SEQ); \
 }
 
-#define QN_DEFINE_STRUCT_QHASH_STEP_I(R, DATA, FIELD) ^ qHash(value.FIELD)
+#define QN_DEFINE_STRUCT_QHASH_STEP_I(R, DATA, FIELD) ^ qHash(value.FIELD, seed)
 
 
 /**

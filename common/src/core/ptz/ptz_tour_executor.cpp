@@ -10,6 +10,22 @@
 
 #include "threaded_ptz_controller.h"
 
+// -------------------------------------------------------------------------- //
+// Model Data
+// -------------------------------------------------------------------------- //
+struct QnPtzTourSpotData {
+    QVector3D position;
+    qint64 moveTime;
+};
+
+typedef QList<QnPtzTourSpotData> QnPtzTourSpotDataList;
+
+struct QnPtzTourData {
+    Qn::PtzCoordinateSpace space;
+    QnPtzTourSpotDataList spots;
+    uint hash;
+};
+
 
 // -------------------------------------------------------------------------- //
 // QnPtzTourExecutorPrivate
@@ -61,8 +77,8 @@ QnPtzTourExecutorPrivate::QnPtzTourExecutorPrivate():
 {}
 
 QnPtzTourExecutorPrivate::~QnPtzTourExecutorPrivate() {
-    /* It's important to release the QObject ownership here as it is also
-     * owned by a QSharedPointer. */
+    /* It's important to release the QObject ownership here as thread controller 
+     * is also owned by a QSharedPointer. */
     if(threadController)
         threadController->setParent(NULL); 
 }

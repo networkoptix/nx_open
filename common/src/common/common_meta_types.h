@@ -5,6 +5,7 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
 
+// TODO: #Elric move to model functions?
 /**
  * Convenience macro for generating stream operators of enumerations.
  */

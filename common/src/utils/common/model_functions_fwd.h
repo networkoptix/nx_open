@@ -36,7 +36,7 @@ class QDataStream;
 #endif // Q_MOC_RUN
 
 #define QN_DECLARE_HASH_FUNCTION(TYPE, ... /* PREFIX */)                        \
-__VA_ARGS__ uint qHash(const TYPE &value);
+__VA_ARGS__ uint qHash(const TYPE &value, uint seed);
 
 #define QN_DECLARE_DATA_STREAM_FUNCTIONS(TYPE, ... /* PREFIX */)                \
 __VA_ARGS__ QDataStream &operator<<(QDataStream &stream, const TYPE &value);    \
