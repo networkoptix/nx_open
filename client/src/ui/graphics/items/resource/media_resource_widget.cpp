@@ -49,9 +49,7 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
-#include "core/ptz/abstract_ptz_controller.h"
-#include "core/ptz/remote_ptz_controller.h"
-#include "core/ptz/caching_ptz_controller.h"
+#include "core/ptz/ptz_controller_pool.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -93,12 +91,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     }
 
     /* Set up PTZ controller. */
-    if(!m_resource->isFisheye() && m_camera && m_camera->getPtzCapabilities() != Qn::NoPtzCapabilities) {
-        m_ptzController.reset(new QnRemotePtzController(m_camera));
-        m_ptzController.reset(new QnCachingPtzController(m_ptzController));
-    } else {
+    m_ptzController = qnPtzPool->controller(m_camera);
+    if(!m_ptzController)
         m_ptzController.reset(new QnFisheyePtzController(this));
-    }
     connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
 
     /* Set up info updates. */
