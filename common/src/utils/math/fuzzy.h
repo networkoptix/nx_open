@@ -4,9 +4,11 @@
 #include <QtCore/QPointF>
 #include <QtCore/QSizeF>
 #include <QtCore/QRectF>
+#include <QtCore/QtNumeric>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
+
 
 // TODO: #Elric #5.3 remove
 quint32 qFloatDistance(float a, float b);
@@ -59,11 +61,11 @@ inline bool qFuzzyIsNull(const QVector4D &vector) {
 // TODO: #Elric deprecate qFuzzyCompare
 
 inline bool qFuzzyEquals(float l, float r, quint32 distance = QN_FLOAT_FUZZY_EQUALS_PRECISION) {
-    return qFloatDistance(l, r) < distance;
+    return qIsFinite(l) && qIsFinite(r) && qFloatDistance(l, r) < distance;
 }
 
 inline bool qFuzzyEquals(double l, double r, quint64 distance = QN_DOUBLE_FUZZY_EQUALS_PRECISION) {
-    return qFloatDistance(l, r) < distance;
+    return qIsFinite(l) && qIsFinite(r) && qFloatDistance(l, r) < distance;
 }
 
 inline bool qFuzzyEquals(const QPointF &l, const QPointF &r) {
@@ -80,6 +82,18 @@ inline bool qFuzzyEquals(const QRectF &l, const QRectF &r) {
         qFuzzyEquals(l.y(), r.y()) && 
         qFuzzyEquals(l.width(), r.width()) &&
         qFuzzyEquals(l.height(), r.height());
+}
+
+inline bool qFuzzyEquals(const QVector2D &l, const QVector2D &r) {
+    return qFuzzyEquals(l.x(), r.x()) && qFuzzyEquals(l.y(), r.y());
+}
+
+inline bool qFuzzyEquals(const QVector3D &l, const QVector3D &r) {
+    return qFuzzyEquals(l.x(), r.x()) && qFuzzyEquals(l.y(), r.y()) && qFuzzyEquals(l.z(), r.z());
+}
+
+inline bool qFuzzyEquals(const QVector4D &l, const QVector4D &r) {
+    return qFuzzyEquals(l.x(), r.x()) && qFuzzyEquals(l.y(), r.y()) && qFuzzyEquals(l.w(), r.w());
 }
 
 
