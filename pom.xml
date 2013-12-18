@@ -221,6 +221,7 @@
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
                 <module>mediaproxy</module>
+                <module>hole_punching_mediator</module>
                 <!-- <module>testcamera</module> -->
             </modules>
         </profile> 
