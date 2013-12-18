@@ -13,7 +13,9 @@
 #include "../../common/systemerror.h"
 
 
-//TODO/IMPL reconnect
+//TODO: #ak persistent connection support
+//TODO: #ak MUST call removeFromWatch with 3rd parameter set to false
+//TODO: #ak reconnect support
 
 static const int DEFAULT_CONNECT_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
@@ -24,8 +26,6 @@ namespace nx_http
 {
     static const size_t RESPONSE_BUFFER_SIZE = 16*1024;
 
-    static QAtomicInt AsyncHttpClient_instanceCount = 0;
-
     AsyncHttpClient::AsyncHttpClient()
     :
         m_state( sInit ),
@@ -35,15 +35,11 @@ namespace nx_http
         m_totalBytesRead( 0 )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
-
-        //AsyncHttpClient_instanceCount.ref();
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
         terminate();
-
-        //AsyncHttpClient_instanceCount.deref();
     }
 
     void AsyncHttpClient::terminate()
@@ -474,7 +470,9 @@ namespace nx_http
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
             //TODO/IMPL check if whole message body is received (if message body size is known)
             m_httpStreamReader.flush();
-            m_state = sDone;
+            m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) || (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+                ? sDone
+                : sFailed;
             return 0;
         }
 
