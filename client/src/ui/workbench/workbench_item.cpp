@@ -142,7 +142,7 @@ bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
     if(isPinned())
         return false;
 
-    if(qFuzzyCompare(m_geometryDelta, geometryDelta))
+    if(qFuzzyEquals(m_geometryDelta, geometryDelta))
         return true;
 
     m_geometryDelta = geometryDelta;
@@ -224,7 +224,7 @@ void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
 }
 
 void QnWorkbenchItem::setZoomRect(const QRectF &zoomRect) {
-    if(qFuzzyCompare(zoomRect, m_zoomRect))
+    if(qFuzzyEquals(zoomRect, m_zoomRect))
         return;
 
     m_zoomRect = zoomRect;

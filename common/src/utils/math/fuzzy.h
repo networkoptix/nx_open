@@ -8,6 +8,13 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
+// TODO: #Elric #5.3 remove
+quint32 qFloatDistance(float a, float b);
+quint64 qFloatDistance(double a, double b);
+
+// -------------------------------------------------------------------------- //
+// qFuzzyIsNull
+// -------------------------------------------------------------------------- //
 #define QN_DEFINE_INTEGER_FUZZY_IS_NULL(TYPE)                                   \
 inline bool qFuzzyIsNull(TYPE p) { return p == 0; }
 
@@ -29,22 +36,6 @@ inline bool qFuzzyIsNull(const QSizeF &s) {
     return ::qFuzzyIsNull(s.width()) && ::qFuzzyIsNull(s.height());
 }
 
-inline bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
-    return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
-}
-
-inline bool qFuzzyCompare(const QSizeF &l, const QSizeF &r) {
-    return ::qFuzzyCompare(l.width(), r.width()) && ::qFuzzyCompare(l.height(), r.height());
-}
-
-inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
-    return 
-        ::qFuzzyCompare(l.x(), r.x()) && 
-        ::qFuzzyCompare(l.y(), r.y()) && 
-        ::qFuzzyCompare(l.width(), r.width()) &&
-        ::qFuzzyCompare(l.height(), r.height());
-}
-
 inline bool qFuzzyIsNull(const QVector2D &vector) {
     return qFuzzyIsNull(vector.x()) && qFuzzyIsNull(vector.y());
 }
@@ -58,16 +49,67 @@ inline bool qFuzzyIsNull(const QVector4D &vector) {
 }
 
 
+// -------------------------------------------------------------------------- //
+// qFuzzyEquals
+// -------------------------------------------------------------------------- //
+/* These numbers define precision of qFuzzyCompare. */
+#define QN_FLOAT_FUZZY_EQUALS_PRECISION 84
+#define QN_DOUBLE_FUZZY_EQUALS_PRECISION 4504
+
+// TODO: #Elric deprecate qFuzzyCompare
+
+inline bool qFuzzyEquals(float l, float r, quint32 distance = QN_FLOAT_FUZZY_EQUALS_PRECISION) {
+    return qFloatDistance(l, r) < distance;
+}
+
+inline bool qFuzzyEquals(double l, double r, quint64 distance = QN_DOUBLE_FUZZY_EQUALS_PRECISION) {
+    return qFloatDistance(l, r) < distance;
+}
+
+inline bool qFuzzyEquals(const QPointF &l, const QPointF &r) {
+    return qFuzzyEquals(l.x(), r.x()) && qFuzzyEquals(l.y(), r.y());
+}
+
+inline bool qFuzzyEquals(const QSizeF &l, const QSizeF &r) {
+    return qFuzzyEquals(l.width(), r.width()) && qFuzzyEquals(l.height(), r.height());
+}
+
+inline bool qFuzzyEquals(const QRectF &l, const QRectF &r) {
+    return 
+        qFuzzyEquals(l.x(), r.x()) && 
+        qFuzzyEquals(l.y(), r.y()) && 
+        qFuzzyEquals(l.width(), r.width()) &&
+        qFuzzyEquals(l.height(), r.height());
+}
+
+
+// -------------------------------------------------------------------------- //
+// Fuzzy border functions
+// -------------------------------------------------------------------------- //
+
+// TODO: #Elric clean this part up
+
+namespace QnFuzzyDetail {
+    template<class T>
+    inline bool qFuzzyBetween(const T &value, const T &min, const T &max) {
+        return (min <= value && value <= max) || qFuzzyEquals(value, min) || qFuzzyEquals(value, max);
+    }
+
+} // namespace QnFuzzyDetail
+
+
 /**
  * \param value                         Value to check.
  * \param min                           Interval's left border.
  * \param max                           Interval's right border.
  * \returns                             Whether the given value lies in [min, max] interval.
  */
-inline bool qFuzzyBetween(double value, double min, double max, double precision = 0.000000000001) {
-    double localPrecision = precision * qMax(qAbs(min), qAbs(max));
+inline bool qFuzzyBetween(double value, double min, double max) {
+    return QnFuzzyDetail::qFuzzyBetween(value, min, max);
+}
 
-    return min - localPrecision <= value && value <= max + localPrecision;
+inline bool qFuzzyBetween(float value, float min, float max) {
+    return QnFuzzyDetail::qFuzzyBetween(value, min, max);
 }
 
 float qFuzzyFloor(float value);

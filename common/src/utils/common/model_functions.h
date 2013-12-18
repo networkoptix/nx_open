@@ -10,6 +10,7 @@
 #include <QtCore/QHash>
 
 #include <utils/common/json.h>
+#include <utils/math/fuzzy.h>
 
 #ifdef Q_MOC_RUN
 /* Qt5 moc chokes on these macros, so we provide dummy definitions. */
@@ -23,8 +24,8 @@ namespace QnModelFunctionsDetail {
     template<class T>
     inline bool equals(const T &l, const T &r) { return l == r; }
 
-    inline bool equals(float l, float r) { return qFuzzyCompare(l, r); }
-    inline bool equals(double l, double r) { return qFuzzyCompare(l, r); }
+    inline bool equals(float l, float r) { return qFuzzyEquals(l, r); }
+    inline bool equals(double l, double r) { return qFuzzyEquals(l, r); }
 } // namespace QnModelFunctionsDetail
 
 

@@ -144,7 +144,7 @@ void QnStatusOverlayWidget::setGeometry(const QRectF &geometry) {
 
     base_type::setGeometry(geometry);
 
-    if(!qFuzzyCompare(oldSize, size()))
+    if(!qFuzzyEquals(oldSize, size()))
         updateLayout();
 }
 

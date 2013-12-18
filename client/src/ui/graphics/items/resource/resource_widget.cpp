@@ -293,7 +293,7 @@ const QRectF &QnResourceWidget::zoomRect() const {
 }
 
 void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
-    if(qFuzzyCompare(m_zoomRect, zoomRect))
+    if(qFuzzyEquals(m_zoomRect, zoomRect))
         return;
 
     m_zoomRect = zoomRect;

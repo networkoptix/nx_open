@@ -240,7 +240,7 @@ QPointF QnGeometry::pointCentroid(const QPolygonF &polygon) {
 
     /* Add last point only if it's not equal to the first. 
      * This way both open and closed support polygons are supported. */
-    if(!qFuzzyCompare(polygon[0], polygon[size])) {
+    if(!qFuzzyEquals(polygon[0], polygon[size])) {
         result += polygon[size];
         size++;
     }
@@ -492,7 +492,7 @@ QPointF QnGeometry::closestPoint(const QRectF &rect, const QPointF &point) {
 }
 
 QPointF QnGeometry::closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t) {
-    if(qFuzzyCompare(a, b))
+    if(qFuzzyEquals(a, b))
         return a;
 
     qreal k = qBound(0.0, dotProduct(point - a, b - a) / lengthSquared(b - a), 1.0);

@@ -37,8 +37,8 @@ public:
     QHash<int, QVariant> dataByRole;
 
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
-        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || 
-            !qFuzzyCompare(l.zoomRect, r.zoomRect) || !qFuzzyCompare(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams) || !(l.dewarpingParams == r.dewarpingParams))
+        if (l.uuid != r.uuid || l.flags != r.flags || l.zoomTargetUuid != r.zoomTargetUuid || !qFuzzyEquals(l.combinedGeometry, r.combinedGeometry) || 
+            !qFuzzyEquals(l.zoomRect, r.zoomRect) || !qFuzzyEquals(l.rotation, r.rotation) || !(l.contrastParams == r.contrastParams) || !(l.dewarpingParams == r.dewarpingParams))
             return false;
 
         if(l.resource.path == r.resource.path && (l.resource.id == r.resource.id || !l.resource.id.isValid() || !r.resource.id.isValid()))

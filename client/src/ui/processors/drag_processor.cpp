@@ -381,7 +381,7 @@ void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &
 
     if(!m_firstDragSent) {
         m_firstDragSent = true;
-    } else if(!(m_flags & DONT_COMPRESS) && m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyCompare(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos)) {
+    } else if(!(m_flags & DONT_COMPRESS) && m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyEquals(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos)) {
         return;
     }
 

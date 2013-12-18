@@ -245,7 +245,7 @@ public:
 
         base_type::setGeometry(rect);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             updateLayout();
     }
 

@@ -241,7 +241,7 @@ QSizeF QnLayoutResource::cellSpacing() const {
 void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
     {
         QMutexLocker locker(&m_mutex);
-        if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+        if(qFuzzyEquals(m_cellSpacing, cellSpacing))
             return;
         m_cellSpacing = cellSpacing;
     }

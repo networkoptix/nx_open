@@ -87,7 +87,7 @@ public:
     }
 
     void setSize(const QSizeF &size) {
-        if(qFuzzyCompare(size, m_size))
+        if(qFuzzyEquals(size, m_size))
             return;
 
         m_size = size;
@@ -163,7 +163,7 @@ public:
     }
 
     void setSize(const QSizeF &size) {
-        if(qFuzzyCompare(size, m_size))
+        if(qFuzzyEquals(size, m_size))
             return;
 
         m_size = size;
@@ -350,7 +350,7 @@ public:
 
         base_type::setGeometry(rect);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             updateLayout();
     }
 

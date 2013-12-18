@@ -299,7 +299,7 @@ public:
 
             /* Apply center correction. */
             QRectF centerPositionBounds = calculateCenterPositionBounds();
-            if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyCompare(m_sceneViewportCenter, oldCenter)) {
+            if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyEquals(m_sceneViewportCenter, oldCenter)) {
                 QPointF correction = calculateCorrection(oldCenter, m_sceneViewportCenter, centerPositionBounds);
 
                 moveViewportScene(m_view, correction);
