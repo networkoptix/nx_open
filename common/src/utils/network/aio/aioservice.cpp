@@ -146,7 +146,10 @@ namespace aio
     /*!
         Garantees that no \a eventTriggered will be called after return of this method
     */
-    void AIOService::removeFromWatch( const QSharedPointer<AbstractSocket>& sock, PollSet::EventType eventType )
+    void AIOService::removeFromWatch(
+        const QSharedPointer<AbstractSocket>& sock,
+        PollSet::EventType eventType,
+        bool waitForRunningHandlerCompletion )
     {
         QMutexLocker lk( &m_mutex );
 
@@ -154,7 +157,7 @@ namespace aio
         map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
         if( it != m_sockets.end() )
         {
-            if( it->second->removeFromWatch( sock, eventType ) )
+            if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
                 m_sockets.erase( it );
         }
     }

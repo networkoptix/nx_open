@@ -322,7 +322,7 @@ namespace aio
     };
 
 
-    AIOThread::AIOThread( QMutex* const mutex )
+    AIOThread::AIOThread( QMutex* const mutex ) //TODO: #ak give up using single mutex for all aio threads
     :
         m_impl( new AIOThreadImpl() )
     {
@@ -380,14 +380,13 @@ namespace aio
             Q_ASSERT( false );
         m_impl->pollSet.interrupt();
 
-        m_impl->mutex->unlock();
-        //TODO/IMPL releasing mutex and waiting for add task to be processed
-        m_impl->mutex->lock();
-
         return true;
     }
 
-    bool AIOThread::removeFromWatch( const QSharedPointer<AbstractSocket>& sock, PollSet::EventType eventType )
+    bool AIOThread::removeFromWatch(
+        const QSharedPointer<AbstractSocket>& sock,
+        PollSet::EventType eventType,
+        bool waitForRunningHandlerCompletion )
     {
         //NOTE m_impl->mutex is locked up the stack
 
@@ -403,7 +402,8 @@ namespace aio
             return false; //socket already marked for removal
         handlingData->markedForRemoval.ref();
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventType, NULL, SocketAddRemoveTask::tRemoving, 0) );
-        if( QThread::currentThread() != this )
+
+        if( waitForRunningHandlerCompletion && (QThread::currentThread() != this) )
         {
             m_impl->pollSet.interrupt();
 
