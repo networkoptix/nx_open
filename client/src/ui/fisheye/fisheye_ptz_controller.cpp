@@ -68,13 +68,8 @@ void QnFisheyePtzController::updateLimits() {
         m_unlimitedPan = true;
         m_limits.minPan = 0.0;
         m_limits.maxPan = 360.0;
-        if(m_mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalUp) {
-            m_limits.minTilt = 0.0;
-            m_limits.maxTilt = 90.0;
-        } else {
-            m_limits.minTilt = -90.0;
-            m_limits.maxTilt = 0.0;
-        }
+        m_limits.minTilt = -45.0;
+        m_limits.maxTilt = 90.0;
     }
 }
 
