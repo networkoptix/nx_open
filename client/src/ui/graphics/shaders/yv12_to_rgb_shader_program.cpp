@@ -212,16 +212,9 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
     float kx =  2.0*tan(dstFov/2.0);
 
-    //vec3 sphericalToCartesian(in float theta, in float phi) {
-    //    return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
-    //}
-    //vec3 xVect  = vec3(sphericalToCartesian(xShift + PI/2.0, 0.0)) * kx;
-    //vec3 yVect  = vec3(sphericalToCartesian(xShift, -yShift + PI/2.0)) * kx /aspectRatio;
-    //vec3 center = vec3(sphericalToCartesian(xShift, -yShift));
-
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx; // /aspectRatio;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    

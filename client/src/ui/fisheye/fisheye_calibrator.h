@@ -17,6 +17,8 @@ public:
     *   analize frame. Can be called several times for different video frames to improve quality
     */
     void analizeFrame(QSharedPointer<CLVideoDecoderOutput> frame);
+    QPointF center() const { return m_center; }
+    qreal radius() const { return m_radius; }
 private:
     quint32 drawCircle(QSharedPointer<CLVideoDecoderOutput> frame, const QPoint& center, int radius);
     void findCircleParams();
