@@ -78,8 +78,6 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
-#include <ptz/ptz_controller_pool.h>
-
 #include <recorder/file_deletor.h>
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>
@@ -128,6 +126,7 @@
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
+#include "core/ptz/server_ptz_controller_pool.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -979,6 +978,8 @@ void QnMain::run()
     initAppServerConnection(*MSSettings::roSettings(), directConnectTried);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
+
+    QnServerPtzControllerPool ptzPool;
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));

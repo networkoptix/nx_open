@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 
 void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    connect(resource, &QnResource::ptzCapabilitiesChanged, this, &QnPtzControllerPool::updateController);
+    connect(resource, &QnResource::ptzCapabilitiesChanged, this, &QnClientPtzControllerPool::updateController);
     base_type::registerResource(resource);
 }
 

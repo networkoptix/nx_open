@@ -71,7 +71,6 @@ extern "C"
 #include "plugins/resources/isd/isd_resource_searcher.h"
 //#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
-#include "utils/common/module_resources.h"
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
@@ -102,6 +101,7 @@ extern "C"
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
+#include "core/ptz/client_ptz_controller_pool.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -328,7 +328,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    
+    QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
+
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
 

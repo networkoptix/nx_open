@@ -2,11 +2,7 @@
 
 #include <QtWidgets/QApplication>
 
-#include <utils/common/module_resources.h>
-
 #include <common/common_module.h>
-
-#include <core/ptz/client_ptz_controller_pool.h>
 
 #include "client_meta_types.h"
 #include "client_settings.h"
@@ -14,7 +10,7 @@
 #include "version.h"
 
 QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
-    QN_INIT_MODULE_RESOURCES(client);
+    Q_INIT_RESOURCE(client);
 
     QnClientMetaTypes::initialize();
 
@@ -28,7 +24,6 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
-    common->instance<QnClientPtzControllerPool>;
     common->instance<QnClientSettings>();
 }
 
