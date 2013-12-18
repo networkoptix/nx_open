@@ -120,13 +120,11 @@ void UPNPDeviceSearcher::pleaseStop()
 
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
-    for( std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo>::iterator
-        it = m_httpClients.begin();
+    for( auto it = m_httpClients.begin();
         it != m_httpClients.end();
         ++it )
     {
         it->first->terminate();     //this method blocks till event handler returns
-        it->first->scheduleForRemoval();
     }
     m_httpClients.clear();
 }
@@ -323,7 +321,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
     info.uuid = uuidStr;
     info.descriptionUrl = descriptionUrl;
 
-    nx_http::AsyncHttpClient* httpClient = NULL;
+    std::shared_ptr<nx_http::AsyncHttpClient> httpClient;
     //checking, whether new http request is needed
     {
         QMutexLocker lk( &m_mutex );
@@ -339,8 +337,8 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
             return;
         }
 
-        //TODO: #ak linear search is not among fastest ones, known to humanity
-        for( std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo>::const_iterator
+        //TODO: #ak linear search is not among fastest ones known to humanity
+        for( std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo>::const_iterator
             it = m_httpClients.begin();
             it != m_httpClients.end();
             ++it )
@@ -349,24 +347,19 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
                 return; //if there is unfinished request to url descriptionUrl or to device with id uuidStr, then return
         }
 
-        httpClient = new nx_http::AsyncHttpClient();
+        httpClient = std::make_shared<nx_http::AsyncHttpClient>();
         m_httpClients.insert( make_pair( httpClient, info ) );
     }
 
     QObject::connect(
-        httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),
-        this, SLOT(onDeviceDescriptionXmlResponseReceived(nx_http::AsyncHttpClient*)),
-        Qt::DirectConnection );
-    QObject::connect(
-        httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),
-        this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClient*)),
+        httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+        this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)),
         Qt::DirectConnection );
     if( !httpClient->doGet( descriptionUrl ) )
     {
         QObject::disconnect(
-            httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),
-            this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClient*)) );
-        httpClient->scheduleForRemoval();
+            httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)) );
 
         QMutexLocker lk( &m_mutex );
         m_httpClients.erase( httpClient );
@@ -434,35 +427,29 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 }
 
-void UPNPDeviceSearcher::onDeviceDescriptionXmlResponseReceived( nx_http::AsyncHttpClient* httpClient )
-{
-    httpClient->startReadMessageBody();
-}
-
-void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient )
+void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     DiscoveredDeviceInfo* ctx = NULL;
+    std::shared_ptr<nx_http::AsyncHttpClient> httpClientPtr;
     {
         QMutexLocker lk( &m_mutex );
-        std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo>::iterator it = m_httpClients.find( httpClient );
+        HttpClientsDict::iterator it = m_httpClients.find( httpClient );
         if (it == m_httpClients.end())
             return;
-        //Q_ASSERT( it != m_httpClients.end() );
+        httpClientPtr = it->first;
         ctx = &it->second;
     }
 
-
-    if( httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
+    if( httpClientPtr->response() && httpClientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {
         //TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
-        const nx_http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
+        const nx_http::BufferType& msgBody = httpClientPtr->fetchMessageBodyBuffer();
         processDeviceXml( *ctx, msgBody );
     }
 
     QMutexLocker lk( &m_mutex );
     if( m_terminated )
         return;
-    httpClient->scheduleForRemoval();
-    m_httpClients.erase( httpClient );
+    m_httpClients.erase( httpClientPtr );
 }

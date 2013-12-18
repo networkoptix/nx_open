@@ -71,9 +71,9 @@ public:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
 public slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClient* httpClient );
+    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -105,7 +105,7 @@ private:
     std::map<QString, unsigned int> m_outputPortNameToIndex;
     mutable QMutex m_inputPortMutex;
     //!map<input port index (1-based), http client>
-    std::map<unsigned int, nx_http::AsyncHttpClient*> m_inputPortHttpMonitor;
+    std::map<unsigned int, std::shared_ptr<nx_http::AsyncHttpClient> > m_inputPortHttpMonitor;
     nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
 
@@ -124,7 +124,7 @@ private:
         unsigned int* paramValue );
     void initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    void forgetHttpClient( nx_http::AsyncHttpClient* const httpClient );
+    void forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient );
 
     void initializePtz(CLSimpleHTTPClient *http);
 

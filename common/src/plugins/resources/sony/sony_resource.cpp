@@ -166,13 +166,10 @@ bool QnPlSonyResource::startInputPortMonitoring()
             //and forgetHttpClient cannot be called before doGet call
 
     requestUrl.setPath( QString::fromLatin1("/command/alarmdata.cgi?interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC) );
-
-    m_inputMonitorHttpClient = std::shared_ptr<nx_http::AsyncHttpClient>(
-        new nx_http::AsyncHttpClient(),
-        []( nx_http::AsyncHttpClient* ptr ){ ptr->scheduleForRemoval(); } );
-    connect( m_inputMonitorHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
-    connect( m_inputMonitorHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
-    connect( m_inputMonitorHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+    m_inputMonitorHttpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    connect( m_inputMonitorHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
+    connect( m_inputMonitorHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),    Qt::DirectConnection );
+    connect( m_inputMonitorHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
     m_inputMonitorHttpClient->setTotalReconnectTries( AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
     m_inputMonitorHttpClient->setUserName( auth.user() );
     m_inputMonitorHttpClient->setUserPassword( auth.password() );
@@ -198,11 +195,11 @@ bool QnPlSonyResource::isInputPortMonitored() const
     return m_inputMonitorHttpClient.get() != NULL;
 }
 
-void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClient* httpClient )
+void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient )
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient.get() != httpClient )    //this can happen just after stopInputPortMonitoring() call
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoring() call
         return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
@@ -216,14 +213,13 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClient* httpClient )
     //TODO/IMPL multipart/x-mixed-replace support
 
     m_lineSplitter.reset();
-    m_inputMonitorHttpClient->startReadMessageBody();
 }
 
-void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClient* httpClient )
+void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpClient )
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient.get() != httpClient )
+    if( m_inputMonitorHttpClient != httpClient )
         return;
 
     const BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
@@ -267,7 +263,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClient* httpClien
     }
 }
 
-void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClient* /*httpClient*/ )
+void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr /*httpClient*/ )
 {
     //TODO/IMPL reconnect
 }

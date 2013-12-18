@@ -13,6 +13,7 @@
 #include "utils/network/simple_http_client.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/http/linesplitter.h"
+#include "utils/network/http/asynchttpclient.h"
 #include "core/datapacket/media_data_packet.h"
 #include "../onvif/onvif_resource.h"
 
@@ -37,15 +38,15 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    std::shared_ptr<nx_http::AsyncHttpClient> m_inputMonitorHttpClient;
+    nx_http::AsyncHttpClientPtr m_inputMonitorHttpClient;
     mutable QMutex m_inputPortMutex;
     nx_http::LineSplitter m_lineSplitter;
     std::map<int, bool> m_relayInputStates;
 
 private slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClient* httpClient );
+    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 };
 
 //typedef QnSharedResourcePointer<QnPlSonyResource> QnPlSonyResourcePtr;
