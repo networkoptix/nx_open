@@ -4,14 +4,13 @@
 #include <QtCore/QFile>
 
 #include <common/common_meta_types.h>
-#include <utils/common/module_resources.h>
 #include <core/resource_managment/resource_data_pool.h>
 #include <api/session_manager.h>
 
 #include "customization.h"
 
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
-    QN_INIT_MODULE_RESOURCES(common);
+    Q_INIT_RESOURCE(common);
 
     QnCommonMetaTypes::initilize();
     

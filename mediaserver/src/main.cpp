@@ -972,8 +972,6 @@ void QnMain::run()
     connectorThread->start();
     qnBusinessRuleConnector->moveToThread(connectorThread.get());
 
-    QnPtzControllerPool ptzControllerPool;
-
     CameraDriverRestrictionList cameraDriverRestrictionList;
 
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));

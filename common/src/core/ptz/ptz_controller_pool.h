@@ -19,17 +19,20 @@ public:
 
     QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
 
-private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resource_initAsyncFinished(const QnResourcePtr &resource);
+signals:
+    void controllerChanged(const QnResourcePtr &resource);
+
+protected:
+    void setController(const QnResourcePtr &resource, const QnPtzControllerPtr &controller);
+
+    Q_SLOT virtual void registerResource(const QnResourcePtr &resource);
+    Q_SLOT virtual void unregisterResource(const QnResourcePtr &resource);
+    Q_SLOT virtual QnPtzControllerPtr createController(const QnResourcePtr &resource);
+
+    Q_SLOT void updateController(const QnResourcePtr &resource);
 
 private:
-    struct PtzData {
-        QnPtzControllerPtr controller;
-    };
-
-    QHash<QnResourcePtr, PtzData> m_dataByResource;
+    QHash<QnResourcePtr, QnPtzControllerPtr> m_controllerByResource;
 };
 
 #define qnPtzPool (QnPtzControllerPool::instance())

@@ -6,6 +6,8 @@
 
 #include <common/common_module.h>
 
+#include <core/ptz/client_ptz_controller_pool.h>
+
 #include "client_meta_types.h"
 #include "client_settings.h"
 
@@ -25,8 +27,9 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QApplication::setDesktopSettingsAware(false);
 
     /* Init singletons. */
-    new QnCommonModule(argc, argv, this);
-    new QnClientSettings(this);
+    QnCommonModule *common = new QnCommonModule(argc, argv, this);
+    common->instance<QnClientPtzControllerPool>;
+    common->instance<QnClientSettings>();
 }
 
 QnClientModule::~QnClientModule() {

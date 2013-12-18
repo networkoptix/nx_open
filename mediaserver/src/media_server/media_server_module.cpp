@@ -1,18 +1,17 @@
 #include "media_server_module.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QFile>
-
-#include <utils/common/module_resources.h>
-
 #include <common/common_module.h>
+
+#include <core/ptz/server_ptz_controller_pool.h>
 
 QnMediaServerModule::QnMediaServerModule(int &argc, char **argv, QObject *parent):
     QObject(parent) 
 {
-    QN_INIT_MODULE_RESOURCES(mediaserver);
+    Q_INIT_RESOURCE(mediaserver);
 
     m_common = new QnCommonModule(argc, argv, this);
+    
+    m_common->instance<QnServerPtzControllerPool>();
 }
 
 QnMediaServerModule::~QnMediaServerModule() {
