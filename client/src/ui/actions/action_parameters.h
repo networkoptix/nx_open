@@ -71,6 +71,8 @@ public:
 
     QnResourceWidget *widget(int key = -1) const;
 
+    QnMediaResourceWidget *mediaWidget(int key = -1) const;
+
     QnResourceWidgetList widgets(int key = -1) const;
 
     const ArgumentHash &arguments() const {

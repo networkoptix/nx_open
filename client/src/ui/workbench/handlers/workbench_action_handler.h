@@ -4,17 +4,20 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
-
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
-#include <ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
+
+#include <core/resource/user_resource.h>
+
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include "ui/dialogs/event_log_dialog.h"
-#include "ui/dialogs/camera_list_dialog.h"
+
+#include <ui/actions/actions.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/event_log_dialog.h>
+#include <ui/dialogs/camera_list_dialog.h>
 
 class QAction;
 class QMenu;
@@ -114,7 +117,7 @@ protected:
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
-        DewarpingParams dewarpingParams;
+        QnItemDewarpingParams dewarpingParams;
 
         AddToLayoutParams():
             usePosition(false),
@@ -187,7 +190,6 @@ protected slots:
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
     void at_debugShowResourcePoolAction_triggered();
-    void at_debugCalibratePtzAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -281,10 +283,6 @@ protected slots:
     void at_radassAutoAction_triggered();
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
-
-    void at_ptzSavePresetAction_triggered();
-    void at_ptzGoToPresetAction_triggered();
-    void at_ptzManagePresetsAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);

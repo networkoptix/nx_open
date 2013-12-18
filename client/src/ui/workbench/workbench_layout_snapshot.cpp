@@ -17,11 +17,11 @@ bool operator==(const QnWorkbenchLayoutSnapshot &l, const QnWorkbenchLayoutSnaps
     return 
         l.name == r.name &&
         l.items == r.items &&
-        qFuzzyCompare(l.cellAspectRatio, r.cellAspectRatio) &&
-        qFuzzyCompare(l.cellSpacing, r.cellSpacing) &&
+        qFuzzyEquals(l.cellAspectRatio, r.cellAspectRatio) &&
+        qFuzzyEquals(l.cellSpacing, r.cellSpacing) &&
         l.backgroundSize == r.backgroundSize &&
         l.backgroundImageFilename == r.backgroundImageFilename &&
-        qFuzzyCompare(l.backgroundOpacity, r.backgroundOpacity) &&
+        qFuzzyEquals(l.backgroundOpacity, r.backgroundOpacity) &&
         l.locked == r.locked;
 }
 

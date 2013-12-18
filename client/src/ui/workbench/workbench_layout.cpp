@@ -628,7 +628,7 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
         return;
     }
 
-    if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+    if(qFuzzyEquals(m_cellSpacing, cellSpacing))
         return;
 
     m_cellSpacing = cellSpacing;

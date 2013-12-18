@@ -24,7 +24,7 @@ public:
     void deserializeBusinessRules(QnBusinessEventRuleList& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
     void deserializeBusinessActionVector(QnBusinessActionDataListPtr &businessActionList, const QByteArray& data) override;
-    void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data);
+    void deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data);
     void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
@@ -39,7 +39,7 @@ public:
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
     void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) override;
     void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data);
-    void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data);
+    void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data);
     void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data);
 
 private:

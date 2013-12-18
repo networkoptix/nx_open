@@ -68,7 +68,7 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
@@ -108,7 +108,6 @@ private:
     std::map<unsigned int, std::shared_ptr<nx_http::AsyncHttpClient> > m_inputPortHttpMonitor;
     nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
-    QScopedPointer<QnAxisPtzController> m_ptzController;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(

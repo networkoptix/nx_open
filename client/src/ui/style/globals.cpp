@@ -14,7 +14,7 @@
 #include <client/config.h>
 
 #include <utils/common/color.h>
-#include <utils/common/module_resources.h>
+#include <utils/common/json.h>
 
 
 Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
@@ -25,7 +25,7 @@ QnGlobals::QnGlobals(QObject *parent):
     /* Ensure that default skin resource is loaded. 
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
-    QN_INIT_MODULE_RESOURCES(client);
+    Q_INIT_RESOURCE(client);
 
     init();
 

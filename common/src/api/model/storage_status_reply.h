@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 struct QnStorageSpaceData {
     QString path;
@@ -21,9 +21,8 @@ struct QnStorageStatusReply {
     QnStorageSpaceData storage;
 };
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting), inline)
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageStatusReply, (pluginExists)(storage), inline)
-
 Q_DECLARE_METATYPE(QnStorageStatusReply)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageStatusReply)
 
 #endif // QN_CHECK_STORAGE_REPLY_H

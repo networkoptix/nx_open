@@ -17,7 +17,6 @@
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
-
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
@@ -201,7 +200,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString selectedExtension;
     QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
-    DewarpingParams dewarpingParams = itemData.dewarpingParams;
+    QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     while (true) {
         QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), lit('_'));

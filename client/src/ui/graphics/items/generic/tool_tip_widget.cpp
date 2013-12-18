@@ -52,10 +52,10 @@ namespace  {
         QPointF pos0 = path->currentPosition();
         QPointF pos1 = QPointF(x, y);
 
-        if(qFuzzyCompare(pos0, pos1))
+        if(qFuzzyEquals(pos0, pos1))
             return;
 
-        if(qFuzzyCompare(pos0.x(), pos1.x()) || qFuzzyCompare(pos0.y(), pos1.y())) {
+        if(qFuzzyEquals(pos0.x(), pos1.x()) || qFuzzyEquals(pos0.y(), pos1.y())) {
             path->lineTo(x, y);
             return;
         }
@@ -120,7 +120,7 @@ Qn::Border QnToolTipWidget::tailBorder() const {
 }
 
 void QnToolTipWidget::setTailPos(const QPointF &tailPos) {
-    if(qFuzzyCompare(tailPos, m_tailPos))
+    if(qFuzzyEquals(tailPos, m_tailPos))
         return;
 
     m_tailPos = tailPos;
@@ -205,7 +205,7 @@ void QnToolTipWidget::setGeometry(const QRectF &rect) {
 
     base_type::setGeometry(rect);
 
-    if(!qFuzzyCompare(size(), oldSize))
+    if(!qFuzzyEquals(size(), oldSize))
         invalidateShape();
 }
 

@@ -1,8 +1,13 @@
+#include "main.h"
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
+#include <signal.h>
 
 #include <qtsinglecoreapplication.h>
+#include "qtservice.h"
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
@@ -15,100 +20,113 @@
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QNetworkInterface>
 
-#include "version.h"
-#include "utils/common/util.h"
-#include "media_server/media_server_module.h"
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resource_managment/resource_discovery_manager.h"
-#include "core/resource_managment/resource_pool.h"
-#include "utils/common/sleep.h"
-#include "rtsp/rtsp_listener.h"
-#include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
-#include "recorder/recording_manager.h"
-#include "recorder/storage_manager.h"
-#include "api/app_server_connection.h"
-#include "appserver/processor.h"
-#include "rest/server/rest_server.h"
-#include "rest/handlers/recorded_chunks_handler.h"
-#include "core/resource/media_server_resource.h"
-#include "api/session_manager.h"
-#include <signal.h>
-#include "core/misc/schedule_task.h"
-#include "qtservice.h"
-#include "server_message_processor.h"
-#include "settings.h"
-#include "motion/motion_helper.h"
+#include <appserver/processor.h>
 
-#include <fstream>
-#include "soap/soapserver.h"
-#include "plugins/resources/onvif/onvif_resource_searcher.h"
-#include "plugins/resources/axis/axis_resource_searcher.h"
-#include "plugins/resources/acti/acti_resource_searcher.h"
-#include "plugins/resources/d-link/dlink_resource_searcher.h"
-#include "plugins/resources/third_party/third_party_resource_searcher.h"
-#include "utils/common/log.h"
-#include "camera/camera_pool.h"
-#include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
-#include "serverutil.h"
-#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
-#include "plugins/resources/droid/droid_resource_searcher.h"
-#include "plugins/resources/isd/isd_resource_searcher.h"
-#include "plugins/resources/test_camera/testcamera_resource_searcher.h"
-#include "utils/common/command_line_parser.h"
-#include "plugins/resources/pulse/pulse_resource_searcher.h"
-//#include "plugins/storage/file_storage/file_storage_protocol.h"
-#include "plugins/storage/file_storage/file_storage_resource.h"
-#include "plugins/storage/coldstore/coldstore_storage.h"
-#include "main.h"
-#include "rest/handlers/file_system_handler.h"
-#include "rest/handlers/statistics_handler.h"
-#include "rest/handlers/camera_settings_handler.h"
-#include "rest/handlers/camera_diagnostics_handler.h"
-#include "rest/handlers/manual_camera_addition_handler.h"
-#include "rest/handlers/camera_event_handler.h"
-#include "rest/server/rest_connection_processor.h"
-#include "rtsp/rtsp_connection.h"
-#include "network/default_tcp_connection_processor.h"
-#include "rest/handlers/ptz_handler.h"
-#include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
-#include "rest/handlers/image_handler.h"
-#include "events/mserver_business_rule_processor.h"
+#include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
-#include "rest/handlers/exec_action_handler.h"
-#include "rest/handlers/time_handler.h"
-#include "rest/handlers/ping_handler.h"
-#include "rest/handlers/events_handler.h"
-#include "platform/core_platform_abstraction.h"
-#include "recorder/file_deletor.h"
-#include "rest/handlers/ext_bevent_handler.h"
-#include <business/business_event_connector.h>
-#include "utils/common/synctime.h"
-#include "plugins/resources/flex_watch/flexwatch_resource_searcher.h"
-#include "core/resource_managment/mserver_resource_discovery_manager.h"
-#include "plugins/resources/mserver_resource_searcher.h"
-#include "rest/handlers/log_handler.h"
-#include "plugins/storage/dts/vmax480/vmax480_resource_searcher.h"
-#include "business/events/reasoned_business_event.h"
-#include "rest/handlers/favico_handler.h"
-#include "rest/handlers/storage_space_handler.h"
-#include "common/customization.h"
-#include "common/global_settings.h"
-#include "plugins/resources/stardot/stardot_resource_searcher.h"
-#include "plugins/plugin_manager.h"
-#include "core/resource_managment/camera_driver_restriction_list.h"
+#include <business/events/reasoned_business_event.h>
+
+#include <camera/camera_pool.h>
+
+#include <common/customization.h>
+#include <common/global_settings.h>
+
+#include <core/misc/schedule_task.h>
+#include <core/resource_managment/camera_driver_restriction_list.h>
+#include <core/resource_managment/mserver_resource_discovery_manager.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+
+#include <events/mserver_business_rule_processor.h>
+
+#include <media_server/media_server_module.h>
+
+#include <motion/motion_helper.h>
+
+#include <network/authenticate_helper.h>
+#include <network/default_tcp_connection_processor.h>
+
+#include <platform/core_platform_abstraction.h>
+
+#include <plugins/plugin_manager.h>
+#include <plugins/resources/acti/acti_resource_searcher.h>
+#include <plugins/resources/archive/avi_files/avi_resource.h>
+#include <plugins/resources/arecontvision/resource/av_resource_searcher.h>
+#include <plugins/resources/axis/axis_resource_searcher.h>
+#include <plugins/resources/desktop_camera/desktop_camera_registrator.h>
+#include <plugins/resources/desktop_camera/desktop_camera_resource_searcher.h>
+#include <plugins/resources/d-link/dlink_resource_searcher.h>
+#include <plugins/resources/droid/droid_resource_searcher.h>
+#include <plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
+#include <plugins/resources/flex_watch/flexwatch_resource_searcher.h>
+#include <plugins/resources/iqinvision/iqinvision_resource_searcher.h>
+#include <plugins/resources/isd/isd_resource_searcher.h>
+#include <plugins/resources/mserver_resource_searcher.h>
+#include <plugins/resources/onvif/onvif_resource_searcher.h>
+#include <plugins/resources/pulse/pulse_resource_searcher.h>
+#include <plugins/resources/stardot/stardot_resource_searcher.h>
+#include <plugins/resources/test_camera/testcamera_resource_searcher.h>
+#include <plugins/resources/third_party/third_party_resource_searcher.h>
+#include <plugins/storage/coldstore/coldstore_storage.h>
+#include <plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h>
+#include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
+
+#include <recorder/file_deletor.h>
+#include <recorder/recording_manager.h>
+#include <recorder/storage_manager.h>
+
+#include <rest/handlers/camera_diagnostics_handler.h>
+#include <rest/handlers/camera_event_handler.h>
+#include <rest/handlers/camera_settings_handler.h>
+#include <rest/handlers/events_handler.h>
+#include <rest/handlers/exec_action_handler.h>
+#include <rest/handlers/ext_bevent_handler.h>
+#include <rest/handlers/favico_handler.h>
+#include <rest/handlers/file_system_handler.h>
+#include <rest/handlers/image_handler.h>
+#include <rest/handlers/log_handler.h>
+#include <rest/handlers/manual_camera_addition_handler.h>
+#include <rest/handlers/ping_handler.h>
+#include <rest/handlers/ptz_handler.h>
+#include <rest/handlers/rebuild_archive_handler.h>
+#include <rest/handlers/recorded_chunks_handler.h>
+#include <rest/handlers/statistics_handler.h>
+#include <rest/handlers/storage_space_handler.h>
+#include <rest/handlers/time_handler.h>
+#include <rest/server/rest_connection_processor.h>
+#include <rest/server/rest_server.h>
+
+#include <rtsp/rtsp_connection.h>
+#include <rtsp/rtsp_listener.h>
+
+#include <soap/soapserver.h>
+
+#include <utils/common/command_line_parser.h>
+#include <utils/common/log.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
 #include <utils/network/multicodec_rtp_reader.h>
-#include "plugins/resources/desktop_camera/desktop_camera_registrator.h"
-#include "plugins/resources/desktop_camera/desktop_camera_resource_searcher.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/ssl_socket.h"
-#include "network/authenticate_helper.h"
-#include "rest/handlers/rebuild_archive_handler.h"
+#include <utils/network/simple_http_client.h>
+#include <utils/network/ssl_socket.h>
+
+
+#include "server_message_processor.h"
+#include "settings.h"
+#include "serverutil.h"
+#include "version.h"
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
+#include "core/ptz/server_ptz_controller_pool.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -575,10 +593,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("format", "pb");
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
-    static const int EVENT_RECONNECT_TIMEOUT = 3000;
-
-    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->init(appServerEventsUrl, settings.value("authKey").toString().toLatin1(), EVENT_RECONNECT_TIMEOUT);
+    QnServerMessageProcessor::instance()->init(appServerEventsUrl, settings.value("authKey").toString());
 }
 
 
@@ -671,7 +686,7 @@ void QnMain::loadResourcesFromECS()
         QnSleep::msleep(10000);
     }
 
-    QnManualCamerasMap manualCameras;
+    QnManualCameraInfoMap manualCameras;
     foreach(const QnSecurityCamResourcePtr &camera, cameras)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(camera->getId());
@@ -929,6 +944,8 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine(certData);
     }
 
+    QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
+
     // Create SessionManager
     QnSessionManager::instance()->start();
     
@@ -961,6 +978,8 @@ void QnMain::run()
     initAppServerConnection(*MSSettings::roSettings(), directConnectTried);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
+
+    QnServerPtzControllerPool ptzPool;
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
@@ -1125,8 +1144,7 @@ void QnMain::run()
     qnStorageMan->loadFullFileCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
-    QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
-    eventManager->run();
+    QnServerMessageProcessor::instance()->run();
 
     std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
 
@@ -1223,7 +1241,7 @@ void QnMain::run()
 
     loadResourcesFromECS();
 
-    connect(eventManager, SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 
     /*
     QnScheduleTaskList scheduleTasks;
@@ -1321,7 +1339,7 @@ void QnMain::run()
     av_lockmgr_register(NULL);
 
     // First disconnect eventManager from all slots, to not try to reconnect on connection close
-    disconnect(eventManager);
+    disconnect(QnServerMessageProcessor::instance());
 
     // This method will set flag on message channel to threat next connection close as normal
     appServerConnection->disconnectSync();
@@ -1336,7 +1354,6 @@ class QnVideoService : public QtService<QtSingleCoreApplication>
 public:
     QnVideoService(int argc, char **argv): 
         QtService<QtSingleCoreApplication>(argc, argv, SERVICE_NAME),
-        m_main(argc, argv),
         m_argc(argc),
         m_argv(argv)
     {
@@ -1345,9 +1362,11 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-
         QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
+        QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+        
+        m_main.reset(new QnMain(m_argc, m_argv));
 
         return application()->exec();
     }
@@ -1387,7 +1406,7 @@ protected:
         }
 
         serverMain(m_argc, m_argv);
-        m_main.start();
+        m_main->start();
     }
 
     virtual void stop() override
@@ -1397,9 +1416,9 @@ protected:
     }
 
 private:
-    QnMain m_main;
     int m_argc;
     char **m_argv;
+    QScopedPointer<QnMain> m_main;
 };
 
 void stopServer(int signal)

@@ -25,13 +25,13 @@
 
 #include <client/client_connection_data.h>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
 
 #include <device_plugins/server_camera/appserver.h>
-
-#include <ui/dialogs/notification_sound_manager_dialog.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
@@ -58,12 +58,11 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
-#include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
+#include <ui/dialogs/notification_sound_manager_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -89,8 +88,6 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_ptz_preset_manager.h>
-#include <ui/workbench/workbench_ptz_controller.h>
 
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
@@ -201,7 +198,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
     connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
     connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
-    connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -282,9 +278,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
     connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
     connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
-    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
-    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
-    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
@@ -302,7 +295,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
-    context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
     context()->instance<QnAppServerNotificationCache>();
 
     /* Run handlers that update state. */
@@ -791,34 +783,6 @@ void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
     QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
     dialog->setResources(resourcePool()->getResources());
     dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
-    if(!widget)
-        return;
-    QPointer<QnResourceWidget> guard(widget);
-
-    
-
-    QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
-    QVector3D position = ptzController->position(widget);
-
-    for(int i = 0; i <= 20; i++) {
-        qreal zoom = i / 20.0;
-
-        position.setZ(zoom);
-        ptzController->setPosition(widget, position);
-
-        QEventLoop loop;
-        QTimer::singleShot(10000, &loop, SLOT(quit()));
-        loop.exec();
-
-        if(!guard)
-            break;
-
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
-    }
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -1398,12 +1362,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
         QnConnectionRequestResult result;
         connection->connectAsync(&result, SLOT(processReply(int, const QVariant &, int)));
-
-        QEventLoop loop;
-        connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
-        loop.exec();
-
-        if(result.status() != 0)
+        if(result.exec() != 0)
             return;
 
         connectionInfo = result.reply<QnConnectInfoPtr>();
@@ -2341,90 +2300,6 @@ void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
     setResolutionMode(Qn::HighResolution);
-}
-
-void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
-    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(menu()->currentParameters(sender()).widget());
-    if(!camera || !widget)
-        return;
-
-    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
-        );
-        return;
-    }
-
-    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(widget);
-    if(qIsNaN(position)) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
-        );
-        return;
-    }
-
-    QList<int> forbiddenHotkeys;
-    foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera))
-        forbiddenHotkeys.push_back(preset.hotkey);
-
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
-    dialog->setForbiddenHotkeys(forbiddenHotkeys);
-    dialog->setPreset(QnPtzPreset(-1, QString(), position));
-    dialog->setWindowTitle(tr("Save Position"));
-    if(dialog->exec() != QDialog::Accepted)
-        return;
-
-    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, dialog->preset());
-}
-
-void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-
-    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
-    
-    QList<QnResourceWidget *> widgets = display()->widgets(camera);
-    if(widgets.empty())
-        return;
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
-    if(!widget)
-        return;
-
-    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
-    if(name.isEmpty())
-        return;
-
-    QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
-    if(preset.isNull())
-        return;
-
-    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not set position from camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
-        );
-        return;
-    }
-
-    action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
-    context()->instance<QnWorkbenchPtzController>()->setPosition(widget, preset.logicalPosition);
-}
-
-void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
-    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
-
-    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
-    dialog->setCamera(camera);
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {

@@ -14,6 +14,8 @@
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 
+#include <utils/common/json.h>
+
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
@@ -463,7 +465,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
         !m_srcRect.isEmpty() ||
         m_contrastParams.enabled ||
-        m_dewarpingParams.enabled;
+        m_itemDewarpingParams.enabled;
 
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
@@ -473,10 +475,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toLatin1().data(), 0);
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
-        DewarpingParams resDeworping = mediaDev->getDewarpingParams();
-        if (resDeworping.enabled && !m_dewarpingParams.enabled) {
+        QnMediaDewarpingParams mediaDewarpingParams = mediaDev->getDewarpingParams();
+        if (mediaDewarpingParams.enabled && !m_itemDewarpingParams.enabled) {
             // deworping exists in resource and not activated now. Allow deworping for saved file
-            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt), resDeworping.serialize(), 0);
+            av_dict_set(&m_formatCtx->metadata,
+                        QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt),
+                        QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams), 0);
         }
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
@@ -522,13 +526,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                if (m_dewarpingParams.enabled) {
-                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(m_dewarpingParams));
-                    if (m_dewarpingParams.panoFactor > 1) 
+                if (m_itemDewarpingParams.enabled) {
+                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(mediaDev->getDewarpingParams(), m_itemDewarpingParams));
+                    if (m_itemDewarpingParams.panoFactor > 1)
                     {
                         // update image aspect, keep megapixels amount unchanged
                         m_videoTranscoder->open(mediaData);
-                        QSize res = QnFisheyeImageFilter::getOptimalSize(m_videoTranscoder->getResolution(), m_dewarpingParams);
+                        QSize res = QnFisheyeImageFilter::getOptimalSize(m_videoTranscoder->getResolution(), m_itemDewarpingParams);
                         m_videoTranscoder->setResolution(res);
                     }
                 }
@@ -538,7 +542,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
                     m_videoTranscoder->addFilter(new QnTimeImageFilter(m_timestampCorner, m_onscreenDateOffset));
 
                 m_videoTranscoder->setQuality(Qn::QualityHighest);
-                if (!m_srcRect.isEmpty() && !m_dewarpingParams.enabled)
+                if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled)
                     m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData);
@@ -841,7 +845,7 @@ void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
     m_contrastParams = params;
 }
 
-void QnStreamRecorder::setDewarpingParams(const DewarpingParams& params)
+void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& params)
 {
-    m_dewarpingParams = params;
+    m_itemDewarpingParams = params;
 }

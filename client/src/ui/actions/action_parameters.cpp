@@ -3,6 +3,7 @@
 #include <utils/common/warnings.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include "action_parameter_types.h"
 
@@ -110,6 +111,10 @@ QnResourceWidget *QnActionParameters::widget(int key) const {
         qnWarning("Invalid number of target widgets: expected %2, got %3.", 1, widgets.size());
 
     return widgets.isEmpty() ? NULL : widgets.front();
+}
+
+QnMediaResourceWidget *QnActionParameters::mediaWidget(int key) const {
+    return dynamic_cast<QnMediaResourceWidget *>(widget(key));
 }
 
 QnResourceWidgetList QnActionParameters::widgets(int key) const {

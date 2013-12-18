@@ -1293,7 +1293,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_sliderYAnimator->isRunning()) {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_sliderYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         sliderPos = m_sliderItem->pos();
     }
@@ -1304,14 +1304,14 @@ void QnWorkbenchUi::updateTreeGeometry() {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     } else if(m_titleYAnimator->isRunning()) {
         titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(titlePos, m_titleItem->pos());
+        defer |= !qFuzzyEquals(titlePos, m_titleItem->pos());
     } else {
         titlePos = m_titleItem->pos();
     }
 
     /* Calculate target geometry. */
     geometry = updatedTreeGeometry(m_treeItem->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_sliderItem->size()));
-    if(qFuzzyCompare(geometry, m_treeItem->geometry()))
+    if(qFuzzyEquals(geometry, m_treeItem->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
@@ -1337,7 +1337,7 @@ void QnWorkbenchUi::updateTreeResizerGeometry() {
     treeResizerGeometry.moveTo(treeResizerGeometry.topRight());
     treeResizerGeometry.setWidth(8);
 
-    if(!qFuzzyCompare(treeResizerGeometry, m_treeResizerWidget->geometry())) {
+    if(!qFuzzyEquals(treeResizerGeometry, m_treeResizerWidget->geometry())) {
         QN_SCOPED_VALUE_ROLLBACK(&m_ignoreTreeResizerGeometryChanges2, true);
 
         m_treeResizerWidget->setGeometry(treeResizerGeometry);
@@ -1381,7 +1381,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_sliderYAnimator->isRunning()) {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_sliderYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         sliderPos = m_sliderItem->pos();
     }
@@ -1392,7 +1392,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         calendarPos = QPointF(m_calendarItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_calendarSizeAnimator->isRunning()) {
         calendarPos = QPointF(m_calendarItem->pos().x(), sliderPos.y() - m_calendarSizeAnimator->targetValue().toSizeF().height());
-        defer |= !qFuzzyCompare(calendarPos, m_calendarItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(calendarPos, m_calendarItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         calendarPos = m_calendarItem->pos();
     }
@@ -1403,7 +1403,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     } else if(m_titleYAnimator->isRunning()) {
         titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(titlePos, m_titleItem->pos());
+        defer |= !qFuzzyEquals(titlePos, m_titleItem->pos());
     } else {
         titlePos = m_titleItem->pos();
     }
@@ -1413,7 +1413,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         dayTimePos = QPointF(m_dayTimeItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_dayTimeSizeAnimator->isRunning()) {
         dayTimePos = QPointF(m_dayTimeItem->pos().x(), calendarPos.y() - m_dayTimeSizeAnimator->targetValue().toSizeF().height());
-        defer |= !qFuzzyCompare(dayTimePos, m_dayTimeItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(dayTimePos, m_dayTimeItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         dayTimePos = m_dayTimeItem->pos();
     }
@@ -1426,7 +1426,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
                                             QRectF(calendarPos, m_calendarItem->paintSize()),
                                             QRectF(dayTimePos, m_dayTimeItem->paintSize()),
                                             &maxHeight);
-    if(qFuzzyCompare(geometry, m_notificationsItem->geometry()))
+    if(qFuzzyEquals(geometry, m_notificationsItem->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
@@ -1502,7 +1502,7 @@ void QnWorkbenchUi::updateFpsGeometry() {
         m_titleItem->geometry().bottom()
     );
 
-    if(qFuzzyCompare(pos, m_fpsItem->pos()))
+    if(qFuzzyEquals(pos, m_fpsItem->pos()))
         return;
 
     m_fpsItem->setPos(pos);
@@ -1524,7 +1524,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
     sliderResizerGeometry.setHeight(16);
 
-    if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerWidget->geometry())) {
+    if(!qFuzzyEquals(sliderResizerGeometry, m_sliderResizerWidget->geometry())) {
         QN_SCOPED_VALUE_ROLLBACK(&m_ignoreSliderResizerGeometryChanges2, true);
 
         m_sliderResizerWidget->setGeometry(sliderResizerGeometry);
@@ -1879,7 +1879,7 @@ void QnWorkbenchUi::at_controlsWidget_deactivated() {
 void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     QGraphicsWidget *controlsWidget = m_controlsWidget;
     QRectF rect = controlsWidget->rect();
-    if(qFuzzyCompare(m_controlsWidgetRect, rect))
+    if(qFuzzyEquals(m_controlsWidgetRect, rect))
         return;
     QRectF oldRect = m_controlsWidgetRect;
     m_controlsWidgetRect = rect;

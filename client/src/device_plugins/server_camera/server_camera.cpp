@@ -38,11 +38,6 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-void QnServerCamera::setCroppingPhysical(QRect cropping)
-{
-    Q_UNUSED(cropping)
-}
-
 const QnResourceVideoLayout* QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     Q_UNUSED(dataProvider)
@@ -77,10 +72,10 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
     return getPhysicalId() + mServer->getId().toString();
 }
 
-QnServerCameraPtr QnServerCamera::findEnabledSubling()
+QnServerCameraPtr QnServerCamera::findEnabledSibling()
 {
     if (!isDisabled())
-        return toSharedPointer(this);
+        return ::toSharedPointer(this);
 
     {
         QMutexLocker lock(&m_mutex);

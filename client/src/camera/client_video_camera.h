@@ -8,6 +8,8 @@
 #include "core/dataprovider/statistics.h"
 #include "utils/media/externaltimesource.h"
 
+#include <core/ptz/item_dewarping_params.h>
+
 class QnResource;
 class QnStreamRecorder;
 class QnAbstractArchiveReader;
@@ -52,7 +54,7 @@ public:
                                  qint64 timeOffsetMs = 0, qint64 serverTimeZoneMs = Qn::InvalidUtcOffset,
                                  QRectF srcRect = QRectF(),
                                  const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),
-                                 const DewarpingParams& dewarpingParams = DewarpingParams());
+                                 const QnItemDewarpingParams& itemDewarpingParams = QnItemDewarpingParams());
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

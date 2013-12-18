@@ -7,13 +7,13 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
-#include <api/media_server_cameras_data.h>
-
-#include <core/resource/resource.h>
-
 #include <utils/common/long_runnable.h>
 #include <utils/network/netstate.h>
 #include <utils/network/nettools.h>
+
+#include <api/model/manual_camera_seach_reply.h>
+
+#include <core/resource/resource.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -28,7 +28,7 @@ struct QnManualCameraInfo
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
 };
-typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
+typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
 class QnAbstractResourceSearcher;
 
@@ -89,7 +89,7 @@ public:
 
     void setReady(bool ready);
 
-    bool registerManualCameras(const QnManualCamerasMap& cameras);
+    bool registerManualCameras(const QnManualCameraInfoMap& cameras);
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
 
@@ -132,7 +132,7 @@ private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QnManualCamerasMap m_manualCameraMap;
+    QnManualCameraInfoMap m_manualCameraMap;
 
     bool m_server;
     volatile bool m_ready;

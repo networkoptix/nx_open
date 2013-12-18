@@ -11,6 +11,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #endif
 
@@ -19,21 +20,10 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
+#include "adl_wrapper.h"
+#include "json_fwd.h"
+
 namespace QJsonDetail {
-    template<class T>
-    class ValueWrapper {
-    public:
-        ValueWrapper(const T &value): m_value(value) {}
-
-        operator const T &() const {
-            return m_value;
-        }
-
-    private:
-        const T &m_value;
-    };
-
-
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
 
@@ -49,7 +39,7 @@ namespace QJsonDetail {
          * Note that we wrap a json value into a wrapper so that
          * ADL would find only overloads with QJsonValue as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(ValueWrapper<QJsonValue>(value), target); /* That's the place where ADL kicks in. */
+        return deserialize(adlWrap(value), target); /* That's the place where ADL kicks in. */
     }
 
 } // namespace QJsonDetail
@@ -167,13 +157,13 @@ namespace QJson {
      * Serializes the given value into a JSON string and returns it in the utf-8 format.
      *
      * \param value                     Value to serialize.
-     * \returns                         Result JSON string.
+     * \returns                         Result JSON data.
      */
     template<class T>
-    QString serialized(const T &value) {
+    QByteArray serialized(const T &value) {
         QByteArray result;
         QJson::serialize(value, &result);
-        return QString::fromUtf8(result);
+        return result;
     }
 
     /**
@@ -184,9 +174,9 @@ namespace QJson {
      * \returns                         Deserialization target.
      */
     template<class T>
-    T deserialized(const QString &value, bool *success = NULL) {
+    T deserialized(const QByteArray &value, bool *success = NULL) {
         T target;
-        bool result = QJson::deserialize(value.toUtf8(), &target);
+        bool result = QJson::deserialize(value, &target);
         if (success)
             *success = result;
         return target;
@@ -251,17 +241,6 @@ namespace QJsonDetail {
 #ifndef Q_MOC_RUN
 
 /**
- * \param TYPE                          Type to declare json (de)serialization functions for.
- * \param PREFIX                        Optional function declaration prefix, e.g. <tt>inline</tt>.
- * \note                                This macro generates function declarations only.
- *                                      Definitions still have to be supplied.
- */
-#define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)         \
-__VA_ARGS__ void serialize(const TYPE &value, QJsonValue *target);              \
-__VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target);
-
-
-/**
  * This macro generates the necessary boilerplate to (de)serialize struct types.
  * It uses field names for JSON keys.
  *
@@ -308,10 +287,30 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 
 #define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II(GETTER, SETTER, NAME)      \
     {                                                                           \
-        typedef decltype(getMember(result, GETTER)) member_type;                \
+        typedef boost::remove_reference<decltype(getMember(result, GETTER))>::type member_type; \
         if(!QJsonDetail::deserializeMember(object, QStringLiteral(NAME), result, SETTER, static_cast<const member_type *>(NULL))) \
             return false;                                                       \
     }
+
+
+#define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+__VA_ARGS__ void serialize(const TYPE &value, QJsonValue *target) {             \
+    *target = QnLexical::serialized(value);                                     \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           \
+    QString string;                                                             \
+    return QJson::deserialize(value, &string) && QnLexical::deserialize(string, target); \
+}
+
+
+#define QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
+    QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)    \
+    QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
+
+#define QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
+    QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)  \
+    QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
 
 #else // Q_MOC_RUN
 
@@ -319,6 +318,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 #define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(...)
 
 #endif // Q_MOC_RUN
 

@@ -325,15 +325,20 @@ void QnGLRenderer::drawYV12VideoTexture(
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
     QnFisheyeShaderProgram* fisheyeShader = 0;
-    DewarpingParams params;
+    QnMediaDewarpingParams mediaParams;
+    QnItemDewarpingParams itemParams;
+
     float ar = 1.0;
-    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
+    if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
     {
-        ar = picLock->width()/(float)picLock->height();
-        params = m_fisheyeController->updateDewarpingParams(ar);
-        if (params.panoFactor > 1.0)
+        //ar = picLock->width()/(float)picLock->height();
+        m_fisheyeController->tick();
+        mediaParams = m_fisheyeController->mediaDewarpingParams();
+        itemParams = m_fisheyeController->itemDewarpingParams();
+
+        if (itemParams.panoFactor > 1.0)
         {
-            if (params.viewMode == DewarpingParams::Horizontal)
+            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal)
             {
                 if (m_imgCorrectParam.enabled)
                     gammaShader = fisheyeShader = m_shaders->fisheyePanoHGammaProgram;
@@ -368,7 +373,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setOpacity(m_decodedPictureProvider.opacity());
 
     if (fisheyeShader) {
-        fisheyeShader->setDewarpingParams(params, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
+        fisheyeShader->setDewarpingParams(mediaParams, itemParams, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
     }
 
     if (gammaShader) 
@@ -578,13 +583,5 @@ void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 bool QnGLRenderer::isFisheyeEnabled() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_fisheyeController && m_fisheyeController->isEnabled();
-}
-
-int QnGLRenderer::panoFactor() const
-{
-    if (m_fisheyeController && m_fisheyeController->isEnabled()) 
-        return (int) m_fisheyeController->getDewarpingParams().panoFactor;
-    else
-        return 1;
+    return m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities;
 }

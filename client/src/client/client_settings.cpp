@@ -12,6 +12,7 @@
 #include <client/config.h>
 
 #include <utils/common/util.h>
+#include <utils/common/json.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <utils/common/string.h>

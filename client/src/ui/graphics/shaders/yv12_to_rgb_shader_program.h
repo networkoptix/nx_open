@@ -5,7 +5,9 @@
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
 #include "shader_source.h"
-#include "ui/fisheye/fisheye_ptz_controller.h"
+
+#include <core/ptz/item_dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
 
 class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram {
     Q_OBJECT
@@ -67,7 +69,9 @@ public:
 
     QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
     
-    void setDewarpingParams(const DewarpingParams& params, float aspectRatio, float maxX, float maxY);
+    void setDewarpingParams(const QnMediaDewarpingParams &mediaParams,
+                            const QnItemDewarpingParams &itemParams,
+                            float aspectRatio, float maxX, float maxY);
 
     virtual bool link() override;
 protected:

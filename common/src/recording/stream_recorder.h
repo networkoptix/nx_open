@@ -11,12 +11,13 @@ extern "C"
 
 #include <utils/common/cryptographic_hash.h>
 
+#include <core/ptz/item_dewarping_params.h>
+
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/datapacket/media_data_packet.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
-#include <core/resource/dewarping_params.h>
 #include "utils/color_space/image_correction.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -94,7 +95,7 @@ public:
 
     void setContrastParams(const ImageCorrectionParams& params);
 
-    void setDewarpingParams(const DewarpingParams& params);
+    void setItemDewarpingParams(const QnItemDewarpingParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
@@ -190,7 +191,7 @@ private:
     qint64 m_truncateIntervalEps;
     QRectF m_srcRect;
     ImageCorrectionParams m_contrastParams;
-    DewarpingParams m_dewarpingParams;
+    QnItemDewarpingParams m_itemDewarpingParams;
 };
 
 #endif // _STREAM_RECORDER_H__

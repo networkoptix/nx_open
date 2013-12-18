@@ -38,7 +38,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
     stopInputPortMonitoring();
 }
 
-QnAbstractPtzController* QnThirdPartyResource::getPtzController()
+QnAbstractPtzController *QnThirdPartyResource::createPtzControllerInternal()
 {
     //TODO/IMPL
     return NULL;
@@ -336,7 +336,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        setPtzCapability( Qn::AbsolutePtzCapability, true );
+        //setPtzCapability( Qn::AbsolutePtzCapability, true );
         //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
@@ -414,7 +414,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
     {
         QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 

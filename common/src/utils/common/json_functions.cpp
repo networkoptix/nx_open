@@ -41,6 +41,24 @@ QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QPointF,
     ((&QPointF::y, &QPointF::setY, "y"))
 )
 
+QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector2D, 
+    ((&QVector2D::x, &QVector2D::setX, "x"))
+    ((&QVector2D::y, &QVector2D::setY, "y"))
+)
+
+QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector3D, 
+    ((&QVector3D::x, &QVector3D::setX, "x"))
+    ((&QVector3D::y, &QVector3D::setY, "y"))
+    ((&QVector3D::z, &QVector3D::setZ, "z"))
+)
+
+QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector4D, 
+    ((&QVector4D::x, &QVector4D::setX, "x"))
+    ((&QVector4D::y, &QVector4D::setY, "y"))
+    ((&QVector4D::z, &QVector4D::setZ, "z"))
+    ((&QVector4D::w, &QVector4D::setW, "w"))
+)
+
 void serialize(const QRegion &value, QJsonValue *target) {
     QJson::serialize(value.rects(), target);
 }
@@ -60,7 +78,7 @@ bool deserialize(const QJsonValue &value, QRegion *target) {
 }
 
 void serialize(const QUuid &value, QJsonValue *target) {
-    *target = value.toString();
+    *target = QnLexical::serialized(value);
 }
 
 bool deserialize(const QJsonValue &value, QUuid *target) {
@@ -75,12 +93,7 @@ bool deserialize(const QJsonValue &value, QUuid *target) {
     if(!QJson::deserialize(value, &jsonString))
         return false;
 
-    QUuid result(jsonString);
-    if(result.isNull() && jsonString != QLatin1String("00000000-0000-0000-0000-000000000000") && jsonString != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
-        return false;
-
-    *target = result;
-    return true;
+    return QnLexical::deserialize(jsonString, target);
 }
 
 void serialize(const QColor &value, QJsonValue *target) {

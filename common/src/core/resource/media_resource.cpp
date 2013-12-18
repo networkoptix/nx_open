@@ -8,19 +8,15 @@
 
 #include "resource_media_layout.h"
 
-namespace {
-    QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
-        ((Qn::QualityLowest,  "lowest"))
-        ((Qn::QualityLow,     "low"))
-        ((Qn::QualityNormal,  "normal"))
-        ((Qn::QualityHigh,    "high"))
-        ((Qn::QualityHighest, "highest"))
-        ((Qn::QualityPreSet,  "preset"))
-    )
-
-    Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<Qn::StreamQuality>, qn_streamQuality_nameMapper, (createEnumNameMapper<Qn::StreamQuality>()))
-} // anonymous namespace
-
+QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
+    ((Qn::QualityLowest,  "lowest"))
+    ((Qn::QualityLow,     "low"))
+    ((Qn::QualityNormal,  "normal"))
+    ((Qn::QualityHigh,    "high"))
+    ((Qn::QualityHighest, "highest"))
+    ((Qn::QualityPreSet,  "preset"))
+)
+Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<Qn::StreamQuality>, qn_streamQualityNameMapper_instance, (QnEnumNameMapper::create<Qn::StreamQuality>()))
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -81,12 +77,12 @@ QString Qn::toShortDisplayString(Qn::StreamQuality value) {
 
 template<>
 Qn::StreamQuality Qn::fromString<Qn::StreamQuality>(const QString &string) {
-    return qn_streamQuality_nameMapper()->value(string, Qn::QualityNotDefined);
+    return qn_streamQualityNameMapper_instance()->value(string, Qn::QualityNotDefined);
 }
 
 template<>
 QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
-    return qn_streamQuality_nameMapper()->name(value, QString());
+    return qn_streamQualityNameMapper_instance()->name(value, QString());
 }
 
 
@@ -145,22 +141,25 @@ void QnMediaResource::initMediaResource()
     toResource()->addFlags(QnResource::media);
 }
 
-DewarpingParams QnMediaResource::getDewarpingParams() const
+QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
 {
     return m_dewarpingParams;
 }
 
 
-void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
-{
+void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
+    if (m_dewarpingParams == params)
+        return;
+
     bool capsChanged = params.enabled != m_dewarpingParams.enabled;
     m_dewarpingParams = params;
     if (capsChanged) {
         if (params.enabled)
-            toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
+            toResource()->setPtzCapabilities(Qn::FisheyePtzCapabilities); // TODO: #PTZ this is not the right place?
         else
             toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
     }
+    emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
 bool QnMediaResource::isFisheye() const

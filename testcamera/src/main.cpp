@@ -6,7 +6,6 @@
 
 #include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
-#include "utils/common/module_resources.h"
 #include "common/common_module.h"
 
 

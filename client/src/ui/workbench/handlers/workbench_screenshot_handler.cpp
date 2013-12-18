@@ -137,14 +137,15 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QImage screenshot;
     {
         QList<QImage> images;
-        DewarpingParams dewarping;
-        if (widget->resource()->getDewarpingParams().enabled)
-            dewarping = widget->item()->dewarpingParams();
+        QnItemDewarpingParams itemDewarpingParams;
+        QnMediaDewarpingParams mediaDewarpingParams = widget->resource()->getDewarpingParams();
+        if (mediaDewarpingParams.enabled)
+            itemDewarpingParams = widget->item()->dewarpingParams();
         for (int i = 0; i < layout->channelCount(); ++i)
-            images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement(), dewarping));
+            images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement(), mediaDewarpingParams, itemDewarpingParams));
         QSize channelSize = images[0].size();
         QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
-        QRectF zoomRect = (widget->zoomRect().isNull() || dewarping.enabled) ? QRectF(0, 0, 1, 1) : widget->zoomRect();
+        QRectF zoomRect = (widget->zoomRect().isNull() || mediaDewarpingParams.enabled) ? QRectF(0, 0, 1, 1) : widget->zoomRect();
 
         screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
         screenshot.fill(qRgba(0, 0, 0, 0));

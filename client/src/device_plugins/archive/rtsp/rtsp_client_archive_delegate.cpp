@@ -180,7 +180,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
     if (time == DATETIME_NOW)
     {
-        QnServerCameraPtr activeCam = camRes->findEnabledSubling();
+        QnServerCameraPtr activeCam = camRes->findEnabledSibling();
         return activeCam ? activeCam : camRes;
     }
 

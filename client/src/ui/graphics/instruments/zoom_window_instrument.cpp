@@ -245,7 +245,7 @@ public:
 
         base_type::setGeometry(rect);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             updateLayout();
     }
 
@@ -473,12 +473,12 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
     } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity)) {
         /* Leave invisible. */
     } else if(widget->options() & QnResourceWidget::DisplayCrosshair) {
-        if(widget->virtualPtzController()) {
-            /* Leave invisible. */
-        } else {
+        //if(widget->virtualPtzController()) {
+            ///* Leave invisible. */
+        //} else {
             opacity = 0.4;
             interactive = false;
-        }
+        //} // TODO: #PTZ
     } else {
         opacity = 1.0;
         interactive = true;

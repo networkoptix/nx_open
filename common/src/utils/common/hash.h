@@ -1,37 +1,31 @@
 #ifndef QN_HASH_H
 #define QN_HASH_H
 
+#include <typeindex>
+
 #include <QtCore/QPoint>
 #include <QtCore/QHash>
 #include <QtCore/QUuid>
 #include <QtGui/QColor>
 
-inline uint qHash(const QPoint &value) {
+inline uint qHash(const QPoint &value, uint seed = 0) {
     using ::qHash;
 
-    return qHash(qMakePair(value.x(), value.y()));
+    return qHash(qMakePair(value.x(), value.y()), seed);
 }
 
-/* This one is commented out because if it's not included then we'll likely have ODR violations. */
-#if 0
-inline uint qHash(const QUuid &uuid) {
-#if defined(_MSC_VER) && _MSC_VER >= 1600
-    static_assert(sizeof(QUuid) == 4 * sizeof(uint), "Size of QUuid is expected to be four times the size of uint.");
-#endif
-
-    const uint *u = reinterpret_cast<const uint *>(&uuid);
-    return u[0] ^ u[1] ^ u[2] ^ u[3];
-}
-#endif
-
-inline uint qHash(const QColor &color) {
+inline uint qHash(const QColor &color, uint seed = 0) {
     using ::qHash;
 
     if(color.isValid()) {
-        return qHash(color.rgba());
+        return qHash(color.rgba(), seed);
     } else {
         return 0;
     }
+}
+
+inline uint qHash(const std::type_index &index, uint seed = 0) {
+    return qHash(index.hash_code(), seed);
 }
 
 #endif // QN_HASH_H

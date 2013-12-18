@@ -189,6 +189,7 @@ typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPt
 
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
+
 /** 
 * This structure used for serialized QnMetaDataV1
 * Timestamp and duration specified in milliseconds

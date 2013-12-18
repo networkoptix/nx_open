@@ -267,7 +267,7 @@ void QnNotificationListWidget::updateVisibleSize() {
         }
     }
 
-    if (qFuzzyCompare(m_visibleSize, size))
+    if (qFuzzyEquals(m_visibleSize, size))
         return;
     m_visibleSize = size;
 
@@ -339,7 +339,7 @@ Qn::NotificationLevel QnNotificationListWidget::notificationLevel() const {
 }
 
 void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
-    if (qFuzzyCompare(m_tooltipsEnclosingRect, rect))
+    if (qFuzzyEquals(m_tooltipsEnclosingRect, rect))
         return;
     m_tooltipsEnclosingRect = rect;
 
