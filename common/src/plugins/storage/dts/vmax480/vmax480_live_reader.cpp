@@ -1,3 +1,4 @@
+#ifdef ENABLE_VMAX
 
 #include "vmax480_live_reader.h"
 
@@ -46,7 +47,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
         return getMetaData();
 
     QnAbstractDataPacketPtr result;
-    QTime getTimer;
+    QElapsedTimer getTimer;
     getTimer.restart();
     while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
     {
@@ -146,3 +147,5 @@ int QnVMax480LiveProvider::getChannel() const
 {
     return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();
 }
+
+#endif // #ifdef ENABLE_VMAX

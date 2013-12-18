@@ -24,7 +24,8 @@ ArchiveReader::ArchiveReader(
         &m_refManager,
         m_dirContentsManager,
         frameDurationUsec,
-        false ) );
+        false,
+        0 ) );
 }
 
 ArchiveReader::~ArchiveReader()
@@ -66,13 +67,9 @@ unsigned int ArchiveReader::getCapabilities() const
 }
 
 //!Implementation of nxcip::DtsArchiveReader::open
-bool ArchiveReader::open()
+int ArchiveReader::open()
 {
-    return true;
-    ////touching directory
-    //struct stat st;
-    //memset( &st, 0, sizeof(st) );
-    //return stat( m_pictureDirectoryPath.c_str(), &st ) == 0;
+    return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::DtsArchiveReader::getStreamReader

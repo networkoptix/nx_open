@@ -19,7 +19,7 @@ public:
     virtual ~QnMotionHelper();
 
     // write motion data to file
-    void saveToArchive(QnMetaDataV1Ptr data);
+    void saveToArchive(QnConstMetaDataV1Ptr data);
 
     QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
@@ -40,7 +40,6 @@ private:
     void createMask(const QRegion& region);
 
     // mach one motion image by mask
-    bool mathImage(const __m128i* data);
     void mathImage(
         const QList<QRegion>& regions,
         QnResourcePtr res,

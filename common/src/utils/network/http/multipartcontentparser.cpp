@@ -8,7 +8,7 @@
 
 namespace nx_http
 {
-    MultipartContentParser::MultipartContentParser( const StringType& boundary )
+    MultipartContentParserHelper::MultipartContentParserHelper( const StringType& boundary )
     :
         m_boundary( boundary ),
         m_startBoundaryLine( "--"+boundary+"\r\n" ), //--boundary\r\n
@@ -17,11 +17,11 @@ namespace nx_http
     {
     }
 
-    MultipartContentParser::~MultipartContentParser()
+    MultipartContentParserHelper::~MultipartContentParserHelper()
     {
     }
 
-    MultipartContentParser::ResultCode MultipartContentParser::parseBytes(
+    MultipartContentParserHelper::ResultCode MultipartContentParserHelper::parseBytes(
         const ConstBufferRefType& data,
         size_t* bytesProcessed )
     {
@@ -109,7 +109,7 @@ namespace nx_http
         return needMoreData;
     }
 
-    ConstBufferRefType MultipartContentParser::prevFoundData() const
+    ConstBufferRefType MultipartContentParserHelper::prevFoundData() const
     {
         return m_prevFoundData;
     }
@@ -117,7 +117,7 @@ namespace nx_http
     /*!
         \note Only valid after \a parseBytes returned \a partRead. Next \a parseBytes call can invalidate it
     */
-    StringType MultipartContentParser::partContentType() const
+    StringType MultipartContentParserHelper::partContentType() const
     {
         return m_partContentType;
     }
@@ -125,16 +125,49 @@ namespace nx_http
     /*!
         \note Only valid after \a parseBytes returned \a partRead. Next \a parseBytes call can invalidate it
     */
-    const HttpHeaders& MultipartContentParser::partHeaders() const
+    const HttpHeaders& MultipartContentParserHelper::partHeaders() const
     {
         return m_headers;
     }
 
-    void MultipartContentParser::setBoundary( const StringType& boundary )
+    void MultipartContentParserHelper::setBoundary( const StringType& boundary )
     {
         //boundary can contain starting -- (depends on implementation. e.g. axis P1344 does so)
         m_boundary = boundary.startsWith( "--" ) ? boundary.mid(2, boundary.size()-2) : boundary;
         m_startBoundaryLine = "--"+m_boundary/*+"\r\n"*/; //--boundary\r\n
         m_endBoundaryLine = "--"+m_boundary+"--" /*"\r\n"*/;
+    }
+
+    bool MultipartContentParserHelper::setContentType(const StringType& contentType)
+    {
+        static const char* multipartContentType = "multipart/x-mixed-replace";
+
+        //analyzing response headers (if needed)
+        const nx_http::StringType::value_type* sepPos = std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
+        if( sepPos == contentType.constData()+contentType.size() ||
+            nx_http::ConstBufferRefType(contentType, 0, sepPos-contentType.constData()) != multipartContentType )
+        {
+            //unexpected content type
+            return false;
+        }
+
+        const nx_http::StringType::value_type* boundaryStart = std::find_if(
+            sepPos+1,
+            contentType.constData()+contentType.size(),
+            std::not1( std::bind1st( std::equal_to<nx_http::StringType::value_type>(), ' ' ) ) );   //searching first non-space
+        if( boundaryStart == contentType.constData()+contentType.size() )
+        {
+            //failed to read boundary marker
+            return false;
+        }
+        if( !nx_http::ConstBufferRefType(contentType, boundaryStart-contentType.constData()).startsWith("boundary=") )
+        {
+            //failed to read boundary marker
+            return false;
+        }
+        boundaryStart += sizeof("boundary=")-1;
+        setBoundary( contentType.mid( boundaryStart-contentType.constData() ) );
+
+        return true;
     }
 }

@@ -4,17 +4,20 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
-
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
-#include <ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
+
+#include <core/resource/user_resource.h>
+
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include "ui/dialogs/event_log_dialog.h"
-#include "ui/dialogs/camera_list_dialog.h"
+
+#include <ui/actions/actions.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/event_log_dialog.h>
+#include <ui/dialogs/camera_list_dialog.h>
 
 class QAction;
 class QMenu;
@@ -33,7 +36,6 @@ class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
 class QnLoginDialog;
-class QnVideoCamera;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
@@ -104,7 +106,6 @@ public:
 protected:
     QnAppServerConnectionPtr connection() const;
 
-    QString newLayoutName(const QnUserResourcePtr &user, const QString &baseName = tr("New layout")) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
 
     struct AddToLayoutParams {
@@ -116,7 +117,7 @@ protected:
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
-        DewarpingParams dewarpingParams;
+        QnItemDewarpingParams dewarpingParams;
 
         AddToLayoutParams():
             usePosition(false),
@@ -134,11 +135,6 @@ protected:
 
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
-
-    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
-    bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
-    bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
-    bool closeAllLayouts(bool waitForReply = false);
 
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
@@ -176,7 +172,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-    void submitInstantDrop(QnMimeData &data);
+    void submitInstantDrop();
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
@@ -187,7 +183,6 @@ protected slots:
 
     void at_messageProcessor_connectionClosed();
     void at_messageProcessor_connectionOpened();
-    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
@@ -195,7 +190,6 @@ protected slots:
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
     void at_debugShowResourcePoolAction_triggered();
-    void at_debugCalibratePtzAction_triggered();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -208,15 +202,6 @@ protected slots:
     void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
-    void at_saveLayoutAction_triggered(const QnLayoutResourcePtr &layout);
-    void at_saveLayoutAction_triggered();
-    void at_saveCurrentLayoutAction_triggered();
-    void at_saveLayoutAsAction_triggered(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
-    void at_saveLayoutAsAction_triggered();
-    void at_saveLayoutForCurrentUserAsAction_triggered();
-    void at_saveCurrentLayoutAsAction_triggered();
-    void at_closeLayoutAction_triggered();
-    void at_closeAllButThisLayoutAction_triggered();
 
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
@@ -273,7 +258,6 @@ protected slots:
     void at_removeFromServerAction_triggered();
 
     void at_newUserAction_triggered();
-    void at_newUserLayoutAction_triggered();
 
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
@@ -300,17 +284,8 @@ protected slots:
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
 
-    void at_ptzSavePresetAction_triggered();
-    void at_ptzGoToPresetAction_triggered();
-    void at_ptzManagePresetsAction_triggered();
-
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
-
-    void at_exportTimeSelectionAction_triggered();
-    void at_exportLayoutAction_triggered();
-    void at_camera_exportFinished(QString fileName);
-    void at_camera_exportFailed(QString errorMessage);
 
     void at_resources_saved(int status, const QnResourceList &resources, int handle);
     void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
@@ -326,17 +301,7 @@ protected slots:
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
-    /*!
-        \return true, if export continues. false, if nothing more to export
-    */
-    bool at_layoutCamera_exportFinished(QString fileName);
-    void at_layoutCamera_exportFinished2();
-    void at_layout_exportFinished();
-    void at_layoutCamera_exportFailed(QString errorMessage);
-
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
-    void at_cancelExport();
 
     void at_whatsThisAction_triggered();
 
@@ -351,49 +316,18 @@ protected slots:
     void at_versionMismatchMessageAction_triggered();
     void at_versionMismatchWatcher_mismatchDataChanged();
 
+    void at_betaVersionMessageAction_triggered();
+
+    void at_queueAppRestartAction_triggered();
+
 private:
-    enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
-
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    /*!
-        \return true, if started saving process (that MUST be awaited for)
-    */
-    bool saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly, bool cancellable, bool newWindowOpenable);
-    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
-#ifdef Q_OS_WIN
-    QString binaryFilterName() const;
-#endif
-    bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-    void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
+
     void notifyAboutUpdate(bool alwaysNotify);
-
-    /**
-     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
-     * @param name                      Suggested new name.
-     * @param user                      User that will own the layout.
-     * @param layout                    Layout that we want to rename (if any).
-     * @return                          List of existing layouts with same name.
-     */
-    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
-
-    /**
-     * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
-     * @param buttons               Messagebox buttons.
-     * @param defaultButton         Default button.
-     * @return                      Selected button.
-     */
-    QMessageBox::StandardButton askOverrideLayout(QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton);
-
-    bool canRemoveLayouts(const QnLayoutResourceList &layouts);
-
-    void removeLayouts(const QnLayoutResourceList &layouts);
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
     QnAdjustVideoDialog* adjustVideoDialog();
-
-    //!Checks if need to close layout
-    void checkForClosurePending();
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -421,27 +355,17 @@ private:
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
+    QList<QnMimeData> m_instantDrops;
 
-    QnVideoCamera* m_layoutExportCamera;
-    QnVideoCamera* m_exportedCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QPointer<QnProgressDialog> m_exportProgressDialog;
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
-    QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
-    QnMediaResourcePtr m_exportedMediaRes;
-    //QString m_layoutExportMessage;
-    LayoutExportMode m_layoutExportMode;
-    int m_exportRetryCount; // anitvirus sometimes block exe file. workaround
-    QString m_exportTmpFileName;
+
+
 
     QTimer *m_tourTimer;
-
-    int m_exportsToFinishBeforeClosure;
-    QObject* m_objectToSignalWhenDone;
-    QByteArray m_methodToInvokeWhenDone;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

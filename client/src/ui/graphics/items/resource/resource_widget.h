@@ -4,6 +4,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtCore/QPointer>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
 
@@ -43,17 +44,19 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
 
 public:
     enum Option {
-        DisplayActivity             = 0x001,    /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelection            = 0x002,    /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        DisplayButtons              = 0x008,    /**< Whether item buttons are to be displayed. */
-        DisplayMotionSensitivity    = 0x010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x020,    /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x040,    /** Whether info panel is to be displayed. */
+        DisplayActivity             = 0x0001,    /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x0002,    /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x0004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        DisplayButtons              = 0x0008,    /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x0010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x0020,    /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x0040,    /** Whether info panel is to be displayed. */
 
-        ControlPtz                  = 0x100,    /**< Whether PTZ state can be controlled with mouse. */
-        ControlZoomWindow           = 0x200,    /**< Whether zoom windows can be created by dragging the mouse. */
-        VirtualZoomWindow           = 0x400,    /**< Whether zoom windows is fisheye shader. */
+        ControlPtz                  = 0x0100,    /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x0200,    /**< Whether zoom windows can be created by dragging the mouse. */
+        VirtualZoomWindow           = 0x0400,    /**< Whether zoom windows is fisheye shader. */
+
+        WindowRotationForbidden     = 0x1000
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -456,7 +459,6 @@ private:
     Qn::RenderStatus m_renderStatus;
 
     qint64 m_lastNewFrameTimeMSec;
-
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

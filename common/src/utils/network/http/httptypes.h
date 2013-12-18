@@ -6,6 +6,7 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <cstring>
 #include <functional>
 #include <map>
 
@@ -29,17 +30,6 @@ namespace nx_http
 {
     const int DEFAULT_HTTP_PORT = 80;
 
-    /************************************************************************/
-    /* Comparator for case-insensitive comparison in STL assos. containers  */
-    /************************************************************************/
-    struct ci_less : std::less<QByteArray>
-    {
-        // case-independent (ci) compare_less binary function
-        bool operator() (const QByteArray& c1, const QByteArray& c2) const {
-            return c1.toLower() < c2.toLower(); 
-        }
-    };
-
     /*!
         TODO consider using another container.
         Need some buffer with:\n
@@ -52,6 +42,22 @@ namespace nx_http
     typedef QByteArray BufferType;
     typedef QnByteArrayConstRef ConstBufferRefType;
     typedef QByteArray StringType;
+
+    /*!
+        \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
+    */
+    int strcasecmp( const StringType& one, const StringType& two );
+
+    /************************************************************************/
+    /* Comparator for case-insensitive comparison in STL assos. containers  */
+    /************************************************************************/
+    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
+    {
+        // case-independent (ci) compare_less binary function
+        bool operator() (const QByteArray& c1, const QByteArray& c2) const {
+            return strcasecmp( c1, c2 ) < 0;
+        }
+    };
 
     typedef std::map<StringType, StringType, ci_less> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
@@ -136,6 +142,10 @@ namespace nx_http
         StringType* const headerName,
         StringType* const headerValue,
         const ConstBufferRefType& data );
+    bool parseHeader(
+        ConstBufferRefType* const headerName,
+        ConstBufferRefType* const headerValue,
+        const ConstBufferRefType& data );
 
     namespace StatusCode
     {
@@ -144,7 +154,9 @@ namespace nx_http
             undefined = 0,
             _continue = 100,
             ok = 200,
+            noContent = 204,
             multipleChoices = 300,
+            moved = 302,
             badRequest = 400,
             unauthorized = 401,
             notFound = 404,

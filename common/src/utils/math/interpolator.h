@@ -7,15 +7,15 @@
 #include <common/common_globals.h>
 
 #include <QtCore/QVector>
-#include <QtCore/QPointF>
 
 #include "math.h"
 #include "linear_combination.h"
 
+
 template<class T>
-class QnInterpolator: public std::unary_function<qreal, T> {
+class QnInterpolator: public std::unary_function<T, T> {
 public:
-    typedef QPair<qreal, T> point_type;
+    typedef QPair<T, T> point_type;
 
     explicit QnInterpolator(Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation): 
         m_extrapolationMode(extrapolationMode)
@@ -45,7 +45,7 @@ public:
         qSort(m_points.begin(), m_points.end(), PointLess());
     }
 
-    T operator()(qreal x) const{
+    T operator()(const T &x) const{
         return valueInternal(x, m_extrapolationMode);
     }
 
@@ -66,7 +66,7 @@ protected:
         }
     };
 
-    T valueInternal(qreal x, Qn::ExtrapolationMode extrapolationMode) const {
+    T valueInternal(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
         typename QVector<point_type>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
 
         if(pos == m_points.begin()) {
@@ -78,12 +78,12 @@ protected:
         }
     }
 
-    T interpolate(const point_type &a, const point_type &b, qreal x) const {
-        qreal divisor = b.first - a.first;
+    T interpolate(const point_type &a, const point_type &b, const T &x) const {
+        const T &divisor = b.first - a.first;
         return linearCombine((b.first - x) / divisor, a.second, (x - a.first) / divisor, b.second);
     }
 
-    T extrapolateStart(qreal x, Qn::ExtrapolationMode extrapolationMode) const {
+    T extrapolateStart(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
         if(m_points.size() < 2)
             return extrapolateNoData();
 
@@ -100,7 +100,7 @@ protected:
         }
     }
 
-    T extrapolateEnd(qreal x, Qn::ExtrapolationMode extrapolationMode) const {
+    T extrapolateEnd(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
         if(m_points.size() < 2)
             return extrapolateNoData();
 
@@ -117,9 +117,9 @@ protected:
         }
     }
 
-    T extrapolatePeriodic(qreal x) const {
-        qreal start = m_points.front().first;
-        qreal end = m_points.back().first;
+    T extrapolatePeriodic(const T &x) const {
+        T start = m_points.front().first;
+        T end = m_points.back().first;
 
         /* Pass linear extrapolation here so that we don't end up in 
          * infinite recursion due to FP precision errors. */

@@ -30,6 +30,8 @@ public:
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
 
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
     void updateFromResources();
     void submitToResources();
     void reject();

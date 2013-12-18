@@ -25,7 +25,8 @@ public:
     typedef const void *Address; 
 
     //!Registers handler to intercept system exceptions (e.g., Access violation)
-    static void install_handler();
+    static void installGlobalUnhandledExceptionHandler();
+    static void installThreadSpecificUnhandledExceptionHandler();
     virtual const char* what() const;
     Address where() const;
     unsigned code() const;

@@ -5,7 +5,8 @@
 #include <QtWidgets/QLabel>
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
-    base_type(parent, caption, directory, filter)
+    base_type(parent, caption, directory, filter),
+    m_currentCol(0)
 {
     setOption(QFileDialog::DontUseNativeDialog);
     connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
@@ -14,17 +15,12 @@ QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, 
 QnCustomFileDialog::~QnCustomFileDialog() {
 }
 
-void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate) {
+void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnWidgetControlAbstractDelegate* delegate) {
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);
     checkbox->setChecked(*value);
     m_checkBoxes.insert(checkbox, value);
-    addWidget(checkbox);
-
-    if (delegate) {
-        delegate->setCheckbox(checkbox);
-        connect(this, SIGNAL(filterSelected(QString)), delegate, SLOT(at_filterSelected(QString)));
-    }
+    addWidget(checkbox, false, delegate);
 }
 
 void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxValue, int *value) {
@@ -85,13 +81,27 @@ void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
 }
 
 
-void QnCustomFileDialog::addWidget(QWidget *widget) {
+void QnCustomFileDialog::addWidget(QWidget *widget, bool newRow, QnWidgetControlAbstractDelegate* delegate) {
     QGridLayout * gl = dynamic_cast<QGridLayout*>(layout());
     if (gl)
     {
         int r = gl->rowCount();
-        gl->addWidget(widget, r, 0, 1, gl->columnCount());
-        gl->setRowStretch(r, 0);
+        if (newRow) {
+            m_currentCol = 0;
+            gl->addWidget(widget, r, m_currentCol, 1, gl->columnCount());
+
+        }
+        else {
+            gl->addWidget(widget, r-1, m_currentCol);
+        }
+        gl->setRowStretch(r, m_currentCol++);
+        widget->raise();
+    }
+
+    if (delegate) {
+        delegate->addWidget(widget);
+        delegate->disconnect();
+        connect(this, SIGNAL(filterSelected(QString)), delegate, SLOT(at_filterSelected(QString)));
     }
 }
 

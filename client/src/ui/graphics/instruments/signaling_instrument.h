@@ -1,17 +1,20 @@
 #ifndef QN_SIGNALING_INSTRUMENT_H
 #define QN_SIGNALING_INSTRUMENT_H
 
+#include "utils/common/util.h"
 #include "instrument.h"
 
 class SignalingInstrument: public Instrument {
     Q_OBJECT;
 public:
     SignalingInstrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-        Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent)
+        Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent),
+        m_previousTime(0)
     {}
 
     SignalingInstrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent = NULL):
-        Instrument(type, eventTypes, parent)
+        Instrument(type, eventTypes, parent),
+        m_previousTime(0)
     {}
 
 signals:
@@ -40,6 +43,8 @@ protected:
         emit activated(item, event);
         return false;
     }
+private:
+    quint64 m_previousTime;
 };
 
 #endif // QN_SIGNALING_INSTRUMENT_H

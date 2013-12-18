@@ -10,7 +10,7 @@ class RTPIODevice;
 class RtspStatistic;
 
 #pragma pack(push, 1)
-typedef struct
+struct RtpHeader
 {
     static const int RTP_HEADER_SIZE = 12;
     static const int RTP_VERSION = 2;
@@ -34,7 +34,7 @@ typedef struct
     quint32 ssrc;                   // synchronization source
     //quint32 csrc;                 // synchronization source
     //quint32 csrc[1];              // optional CSRC list
-} RtpHeader;
+};
 #pragma pack(pop)
 
 class QnRtpStreamParser: public QObject

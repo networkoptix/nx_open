@@ -6,12 +6,9 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QStyle>
+#include <QtGui/QPixmapCache>
 #include <QtOpenGL/QGLContext>
 
-#include <utils/common/warnings.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/checked_cast.h>
-#include <utils/math/linear_combination.h>
 #include <client/client_settings.h>
 
 #include <ui/animation/variant_animator.h>
@@ -22,9 +19,15 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
+#include <ui/common/palette.h>
 
+#include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
+#include <utils/math/linear_combination.h>
+#include <utils/math/color_transformations.h>
 
-#define QN_IMAGE_BUTTON_WIDGET_DEBUG
+//#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
 namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
@@ -643,6 +646,8 @@ void QnImageButtonWidget::setCached(bool cached) {
         return;
 
     m_cached = cached;
+
+    invalidatePixmapCache();
 }
 
 void QnImageButtonWidget::setFixedSize(qreal size) {
@@ -666,7 +671,16 @@ void QnImageButtonWidget::ensurePixmapCache() const {
         if(m_pixmaps[i].isNull()) {
             m_pixmapCache[i] = m_pixmaps[i];
         } else {
-            m_pixmapCache[i] = QPixmap::fromImage(m_pixmaps[i].toImage().scaled(size().toSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+            QSize size = this->size().toSize();
+            QString key = lit("ibw_%1_%2x%3").arg(m_pixmaps[i].cacheKey()).arg(size.width()).arg(size.height());
+            
+            QPixmap pixmap;
+            if (!QPixmapCache::find(key, &pixmap)) {
+                pixmap = QPixmap::fromImage(m_pixmaps[i].toImage().scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+                QPixmapCache::insert(key, pixmap);
+            }
+
+            m_pixmapCache[i] = pixmap;
         }
     }
 
@@ -715,11 +729,9 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    m_relativeFontSize(-1.0),
     m_relativeFrameWidth(-1.0)
 {
     setFrameShape(Qn::NoFrame);
-
     qFill(m_opacities, -1.0);
     m_opacities[0] = 1.0;
 }
@@ -733,19 +745,7 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
-    update();
-}
-
-qreal QnTextButtonWidget::relativeFontSize() const {
-    return m_relativeFontSize;
-}
-
-void QnTextButtonWidget::setRelativeFontSize(qreal relativeFontSize) {
-    if(qFuzzyCompare(m_relativeFontSize, relativeFontSize))
-        return;
-
-    m_relativeFontSize = relativeFontSize;
-    update();
+    updatePixmap();
 }
 
 qreal QnTextButtonWidget::relativeFrameWidth() const {
@@ -768,7 +768,7 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
 
         base_type::setGeometry(geometry);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             setFrameWidth(qMin(size().height(), size().width()) * m_relativeFrameWidth);
     }
 }
@@ -787,17 +787,35 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
 
     /* Draw image. */ 
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
+}
 
-    /* Draw text. */
-    if(!m_text.isEmpty()) {
-        QFont font = this->font();
-        if(m_relativeFontSize > 0)
-            font.setPixelSize(size().height() * m_relativeFontSize);
-        QnScopedPainterFontRollback fontRollback(painter, font);
-        painter->drawText(rect, Qt::AlignCenter, m_text);
+void QnTextButtonWidget::updatePixmap() {
+    if (m_text.isEmpty())
+        return;
+
+    // create caching image
+    const static int fontSize = 40;
+    const static qreal offset = 10 * 0.01; // border offset in percents
+
+    QFont font = this->font();
+    font.setPixelSize(fontSize);
+    QFontMetrics metrics(font);
+    QSize imageSize = metrics.size(0, m_text);
+    if (imageSize.width() == 0)
+        return; // font still not initialized
+
+    imageSize *= (1.0 + offset*2.0);
+
+    QPixmap pixmap(imageSize);
+    pixmap.fill(Qt::transparent);
+    {
+        QPainter p(&pixmap);
+        p.setFont(font);
+        p.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
     }
 
-    painter->setOpacity(opacity);
+    setPixmap(0, pixmap);
+    update();
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {

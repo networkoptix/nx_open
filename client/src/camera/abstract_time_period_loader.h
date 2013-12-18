@@ -5,7 +5,7 @@
 #include <QtGui/QRegion>
 #include <QtCore/QList>
 #include "recording/time_period_list.h"
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 
 class QnAbstractTimePeriodLoader: public QObject
 {

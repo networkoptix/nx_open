@@ -48,7 +48,7 @@ bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
 {
     if( m_resource != resource )
         return false;
-    if( !m_archiveReader->open() )
+    if( m_archiveReader->open() != nxcip::NX_NO_ERROR )
         return false;
     if( m_streamReader )
         m_streamReader->releaseRef();
@@ -143,7 +143,7 @@ void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
     m_archiveReader->setReverseMode(
         ++m_cSeq,
         value,
-        (displayTime == 0 || displayTime == AV_NOPTS_VALUE)
+        (displayTime == 0 || displayTime == (qint64)AV_NOPTS_VALUE)
             ? nxcip::INVALID_TIMESTAMP_VALUE
             : displayTime,
         &actualSelectedTimestamp );

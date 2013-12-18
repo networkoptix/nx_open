@@ -1,3 +1,4 @@
+#ifdef ENABLE_ACTI
 
 #include "acti_resource.h"
 
@@ -77,11 +78,6 @@ QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 bool QnActiResource::shoudResolveConflicts() const 
 {
     return false;
-}
-
-void QnActiResource::setCropingPhysical(QRect /*croping*/)
-{
-
 }
 
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
@@ -239,6 +235,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
 CameraDiagnostics::Result QnActiResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
+
     CLHttpStatus status;
         
     QByteArray resolutions= makeActiRequest(QLatin1String("system"), QLatin1String("VIDEO_RESOLUTION_CAP"), status);
@@ -308,9 +306,10 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     if (!bitrateCap.isEmpty())
         m_availBitrate = parseVideoBitrateCap(bitrateCap);
 
-    initializePtz();
-
     initializeIO( report );
+
+    QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
+    setPtzCapabilities(ptzController->getCapabilities());
 
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
@@ -476,7 +475,7 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
-int QnActiResource::getMaxFps()
+int QnActiResource::getMaxFps() const
 {
     return m_availFps[0].last();
 }
@@ -532,9 +531,9 @@ bool QnActiResource::hasDualStreaming() const
     return mediaVariant.toInt();
 }
 
-QnAbstractPtzController* QnActiResource::getPtzController()
+QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
 {
-    return m_ptzController.data();
+    return new QnActiPtzController(toSharedPointer(this));
 }
 
 QStringList QnActiResource::getRelayOutputList() const
@@ -606,16 +605,6 @@ void QnActiResource::onTimer( const quint64& timerID )
             TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
-void QnActiResource::initializePtz()
-{
-    m_ptzController.reset(new QnActiPtzController(this));
-    Qn::PtzCapabilities capabilities = m_ptzController->getCapabilities();
-    if(capabilities == Qn::NoPtzCapabilities)
-        m_ptzController.reset();
-
-    setPtzCapabilities((getPtzCapabilities() & ~Qn::AllPtzCapabilities) | capabilities);
-}
-
 void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInfo )
 {
     QMap<QByteArray, QByteArray>::const_iterator it = systemInfo.find( "di" );
@@ -630,3 +619,5 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
 }
+
+#endif // #ifdef ENABLE_ACTI

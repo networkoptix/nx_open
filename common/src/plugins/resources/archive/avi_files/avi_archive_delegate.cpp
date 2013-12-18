@@ -10,6 +10,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
+#include <core/ptz/media_dewarping_params.h>
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"
@@ -19,6 +20,7 @@ extern "C"
 #include "motion/light_motion_archive_connection.h"
 #include "core/resource/media_resource.h"
 #include "export/sign_helper.h"
+#include <utils/common/json.h>
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -396,7 +398,7 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
             if (dewarpInfo) {
                 QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
                 if (mediaRes)
-                    mediaRes->setDewarpingParams(DewarpingParams::deserialize(dewarpInfo->value));
+                    mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
             }
         }
     }

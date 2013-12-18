@@ -33,6 +33,8 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
         errorString = errorString.mid(n + 1).trimmed();
     }
     emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), m_handle);
+    disconnect(reply, NULL, this, NULL);
+    disconnect(reply, NULL, reply, NULL);
 
     qnDeleteLater(reply);
     qnDeleteLater(this);
@@ -263,9 +265,24 @@ void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , 
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
-    QAuthenticator auth;
+    // QnSessionManager instance can be used with different instances of QnAppServerConnection simultaneously
+    // so we first checking the reply url for login and password - they are present in case of EC connections
+    // otherwise - mediaserver connections do not include login and password in the url, but we can have
+    // mediaserver connections only within one EC session so we can use defaultUrl() method
+
+    bool useDefaultValues = reply->url().userName().isEmpty();
+    QString user = useDefaultValues
+            ? QnAppServerConnectionFactory::defaultUrl().userName()
+            :reply->url().userName();
+    QString password = useDefaultValues
+            ? QnAppServerConnectionFactory::defaultUrl().password()
+            : reply->url().password();
+
+    // if current values are already present in authenticator, do not send them again -
+    // it will cause an infinite loop until a timeout
+    if ((authenticator->user() == user && authenticator->password() == password))
+        return;
+
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }
@@ -273,9 +290,12 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
 void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {
     assert(QThread::currentThread() == this->thread());
 
-    if (!m_accessManager) {
-        qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
-        return;
+    {
+        QMutexLocker lock(&m_accessManagerMutex);
+        if (!m_accessManager) {
+            qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
+            return;
+        }
     }
 
     QNetworkRequest request;
@@ -307,7 +327,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
         break;
     default:
         qnWarning("Unknown HTTP operation '%1'.", static_cast<int>(operation));
-        break;
+        return;
     }
 
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));

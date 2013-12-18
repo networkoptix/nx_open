@@ -27,7 +27,8 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_camInfo( camInfo ),
     m_camManager( camManager ),
     m_discoveryManager( discoveryManager ),
-    m_refCounter( 2 )
+    m_refCounter( 2 ),
+    m_encoderCount(0)
 {
     setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
 }
@@ -37,7 +38,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
     stopInputPortMonitoring();
 }
 
-QnAbstractPtzController* QnThirdPartyResource::getPtzController()
+QnAbstractPtzController *QnThirdPartyResource::createPtzControllerInternal()
 {
     //TODO/IMPL
     return NULL;
@@ -70,32 +71,23 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     return new ThirdPartyStreamReader( toSharedPointer(), m_camManager.getRef() );
 }
 
-void QnThirdPartyResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
 void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
 {
     //TODO/IMPL
 }
 
-#if 0
 const QnResourceAudioLayout* QnThirdPartyResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
-    //TODO/IMPL
-    return NULL;
-    //if (isAudioEnabled()) {
-    //    const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
-    //    if (axisReader && axisReader->getDPAudioLayout())
-    //        return axisReader->getDPAudioLayout();
-    //    else
-    //        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-    //}
-    //else
-    //    return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    if (isAudioEnabled()) {
+        const ThirdPartyStreamReader* reader = dynamic_cast<const ThirdPartyStreamReader*>(dataProvider);
+        if (reader && reader->getDPAudioLayout())
+            return reader->getDPAudioLayout();
+        else
+            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    }
+    else
+        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
-#endif
 
 //!Implementation of QnSecurityCamResource::getRelayOutputList
 QStringList QnThirdPartyResource::getRelayOutputList() const
@@ -187,7 +179,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !regions.isEmpty() )
     {
         //filling in motion mask
-        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture() );
+        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::PIX_FMT_MONOBLACK ) );
 
         QRegion unitedRegion;
         for( QList<QRegion>::const_iterator
@@ -287,6 +279,7 @@ const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( 
 
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     m_camManager.setCredentials( getAuth().user(), getAuth().password() );
 
     int result = m_camManager.getCameraInfo( &m_camInfo );
@@ -302,8 +295,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     setFirmware( QString::fromUtf8(m_camInfo.firmware) );
 
-    int encoderCount = 0;
-    result = m_camManager.getEncoderCount( &encoderCount );
+    m_encoderCount = 0;
+    result = m_camManager.getEncoderCount( &m_encoderCount );
     if( result != nxcip::NX_NO_ERROR )
     {
         NX_LOG( QString::fromLatin1("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
@@ -313,14 +306,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    if( encoderCount == 0 )
+    if( m_encoderCount == 0 )
     {
         NX_LOG( QString::fromLatin1("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    setParam( lit("hasDualStreaming"), encoderCount > 1, QnDomainDatabase );
+    setParam( lit("hasDualStreaming"), m_encoderCount > 1, QnDomainDatabase );
 
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
@@ -343,25 +336,34 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        setPtzCapability( Qn::AbsolutePtzCapability, true );
+        //setPtzCapability( Qn::AbsolutePtzCapability, true );
         //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
         setParam( lit("dts"), 1, QnDomainMemory );
+    if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
+    {
+        setMotionType( Qn::MT_HardwareGrid );
+        setParam( lit("motionWindowCnt"), 100, QnDomainDatabase );
+        setParam( lit("motionMaskWindowCnt"), 100, QnDomainDatabase );
+        setParam( lit("motionSensWindowCnt"), 100, QnDomainDatabase );
+    }
+    else
+        setMotionType( Qn::MT_SoftwareGrid );
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
     //    setCameraCapability( Qn:: );
 
     QVector<EncoderData> encoderDataTemp;
-    encoderDataTemp.resize( encoderCount );
+    encoderDataTemp.resize( m_encoderCount );
 
     //reading resolution list
     QVector<nxcip::ResolutionInfo> resolutionInfoList;
     float maxFps = 0;
-    for( int encoderNumber = 0; encoderNumber < encoderCount; ++encoderNumber )
+    for( int encoderNumber = 0; encoderNumber < m_encoderCount; ++encoderNumber )
     {
         //const int result = m_camManager.getResolutionList( i, &resolutionInfoList );
         nxcip::CameraMediaEncoder* intf = NULL;
@@ -412,7 +414,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
     {
         QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 
@@ -465,4 +467,9 @@ bool QnThirdPartyResource::initializeIOPorts()
         m_defaultOutputID = outputPortList[0];
 
     return true;
+}
+
+bool QnThirdPartyResource::hasDualStreaming() const
+{
+    return m_encoderCount > 1;
 }

@@ -25,7 +25,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
+#include <camera/client_video_camera.h>
 
 #include <ui/common/notification_levels.h>
 
@@ -209,7 +209,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_transformListenerInstrument,  SIGNAL(transformChanged(QGraphicsView *)),                  this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(synchronizeSceneBoundsExtension()));
-    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()));
+
+    //queueing connection because some OS make resize call before move widget to correct postion while expanding it to fullscreen --gdm
+    connect(resizeSignalingInstrument,      SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(fitInView()), Qt::QueuedConnection);
+
     connect(m_beforePaintInstrument,        SIGNAL(activated(QWidget *, QEvent *)),                     this,                   SLOT(updateFrameWidths()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityStopped()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStopped()));
     connect(m_curtainActivityInstrument,    SIGNAL(activityResumed()),                                  this,                   SLOT(at_curtainActivityInstrument_activityStarted()));
@@ -686,7 +689,7 @@ QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     return NULL;
 }
 
-QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
+QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     QnResourceDisplay *display = this->display(item);
     if(display == NULL)
         return NULL;
@@ -695,7 +698,7 @@ QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
 }
 
 QnCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
-    QnVideoCamera *camera = this->camera(item);
+    QnClientVideoCamera *camera = this->camera(item);
     if(camera == NULL)
         return NULL;
 
@@ -1880,13 +1883,15 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         QRectF rect = widget->rect();
         qreal expansion = qMin(rect.width(), rect.height()) / 2.0;
 
-        QnSplashItem *splashItem = new QnSplashItem(widget);
+        QnSplashItem *splashItem = new QnSplashItem();
         splashItem->setSplashType(QnSplashItem::Rectangular);
-        splashItem->setPos(rect.center());
+        splashItem->setPos(rect.center() + widget->pos());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
         splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<BusinessEventType::Value>(type)), 128));
         splashItem->setOpacity(0.0);
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
+        scene()->addItem(splashItem);
+        setLayer(splashItem, Qn::EffectsLayer);
     }
 }
 

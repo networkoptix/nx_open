@@ -1,49 +1,49 @@
 #ifndef QN_ONVIF_PTZ_CONTROLLER_H
 #define QN_ONVIF_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_ONVIF
+
 #include <QtCore/QMutex>
 #include <QtCore/QPair>
-#include <QtGui/QMatrix4x4>
 
-#include "core/resource/resource_fwd.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
+#include <core/ptz/basic_ptz_controller.h>
 
 class QnPtzSpaceMapper;
 
-class QnOnvifPtzController: public QnAbstractPtzController {
+class QnOnvifPtzController: public QnBasicPtzController {
     Q_OBJECT
+    typedef QnBasicPtzController base_type;
+
 public:
-    QnOnvifPtzController(QnPlOnvifResource* resource);
+    QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
 
-    virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
-    virtual int stopMove() override;
-    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
-    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual const QnPtzSpaceMapper *getSpaceMapper() override;
-
-    // TODO: #Elric need to implement this one properly.
-    void setFlipped(bool horizontal, bool vertical);
-    void getFlipped(bool *horizontal, bool *vertical);
-
-    QString getPtzConfigurationToken();
-    void setMediaProfileToken(const QString& value);
+    
+    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
+    
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
+    virtual bool getFlip(Qt::Orientations *flip) override;
 
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
+    
+    bool stopInternal();
+    bool moveInternal(const QVector3D &speed);
 
 private:
-    QnPlOnvifResource* m_resource;
-    Qn::PtzCapabilities m_ptzCapabilities;
-    const QnPtzSpaceMapper *m_ptzMapper;
-    QString m_mediaProfile;
-    QString m_ptzConfigurationToken;
+    QnPlOnvifResourcePtr m_resource;
+    Qn::PtzCapabilities m_capabilities;
+    bool m_stopBroken;
+
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
     QPair<qreal, qreal> m_yNativeVelocityCoeff;
     QPair<qreal, qreal> m_zoomNativeVelocityCoeff;
-    mutable QMutex m_mutex;
 
-    bool m_verticalFlipped, m_horizontalFlipped;
+    QnPtzLimits m_limits;
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // QN_ONVIF_PTZ_CONTROLLER_H

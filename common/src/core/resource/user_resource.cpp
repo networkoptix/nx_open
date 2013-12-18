@@ -96,6 +96,7 @@ void QnUserResource::updateInner(QnResourcePtr other)
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
         setPassword(localOther->getPassword());
+        setHash(localOther->getHash());
         setDigest(localOther->getDigest());
         setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());

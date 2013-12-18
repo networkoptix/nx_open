@@ -573,33 +573,6 @@
     </message>
 </context>
 <context>
-    <name>CompatibilityVersionInstallationDialog</name>
-    <message>
-        <source>Dialog</source>
-        <translation type="unfinished">对话框</translation>
-    </message>
-    <message>
-        <source>Installing version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installation failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not cancel installation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installation completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Installation has been cancelled</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectionTestingDialog</name>
     <message>
         <source>Connection Test</source>
@@ -1466,7 +1439,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation type="obsolete">*最后使用的连接*</translation>
+        <translation>*最后使用的连接*</translation>
     </message>
     <message>
         <source>While %1</source>
@@ -1542,19 +1515,19 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Not recording</source>
-        <translation type="obsolete">不录像</translation>
+        <translation>不录像</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation type="obsolete">录像全部</translation>
+        <translation>录像全部</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation type="obsolete">仅移动侦测录像</translation>
+        <translation>仅移动侦测录像</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation type="obsolete">移动侦测和低分辨率录像</translation>
+        <translation>移动侦测和低分辨率录像</translation>
     </message>
     <message>
         <source>Everything</source>
@@ -1562,11 +1535,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Motion only</source>
-        <translation type="obsolete">仅移动</translation>
+        <translation>仅移动</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation type="obsolete">移动+低分辨率</translation>
+        <translation>移动+低分辨率</translation>
     </message>
     <message>
         <source>b/s</source>
@@ -1586,11 +1559,19 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Continuous</source>
-        <translation type="obsolete">连续</translation>
+        <translation>连续</translation>
     </message>
     <message>
         <source>Export selected cameras to file</source>
         <translation>输出选取的摄像机至档案</translation>
+    </message>
+    <message>
+        <source>Beta version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2714,7 +2695,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>解说视频及常见问题</translation>
     </message>
     <message>
-        <source>Change Camera Aspect Ratio...</source>
+        <source>Show Beta Version Warning Message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4148,17 +4129,6 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
 </context>
 <context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished">音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find video encoder </source>
-        <translation type="unfinished">无法找到视频编码器</translation>
-    </message>
-</context>
-<context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -4373,19 +4343,19 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="obsolete">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation type="obsolete">重要性能提示</translation>
+        <translation>重要性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="obsolete">我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation type="obsolete">关键性能提示</translation>
+        <translation>关键性能提示</translation>
     </message>
 </context>
 <context>
@@ -4680,6 +4650,26 @@ Archive Streams Allowed: %4</source>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation>您未安装有效的许可。请激活您所购买的许可。</translation>
     </message>
+    <message>
+        <source>Database error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The license key is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseNotificationDialog</name>
@@ -4844,29 +4834,10 @@ Please close the application and start it again using the shortcut in the start 
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation type="obsolete">您连接到了不同版本的系统控制器:
+        <translation>您连接到了不同版本的系统控制器:
   - 客户端版本n: %1。
   -系统控制器版本: %2。
 客户端版本 %2必须连接到此系统控制器。请下载版本 %2 並升级系统。</translation>
-    </message>
-    <message>
-        <source>* Last used connection *</source>
-        <translation type="unfinished">*最后使用的连接*</translation>
-    </message>
-    <message>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Unable to connect to applauncher to enable client compatibility mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Client Version %3 is required to connect to this Enterprise Controller.
-Download version %3?</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5700,37 +5671,6 @@ Please close the application and start it again using the shortcut in the start 
     </message>
 </context>
 <context>
-    <name>QnRecordingStatusHelper</name>
-    <message>
-        <source>Not recording</source>
-        <translation type="unfinished">不录像</translation>
-    </message>
-    <message>
-        <source>Recording everything</source>
-        <translation type="unfinished">录像全部</translation>
-    </message>
-    <message>
-        <source>Recording motion only</source>
-        <translation type="unfinished">仅移动侦测录像</translation>
-    </message>
-    <message>
-        <source>Recording motion and low quality</source>
-        <translation type="unfinished">移动侦测和低分辨率录像</translation>
-    </message>
-    <message>
-        <source>Continuous</source>
-        <translation type="unfinished">连续</translation>
-    </message>
-    <message>
-        <source>Motion only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion + Lo-Res</source>
-        <translation type="unfinished">移动+低分辨率</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
@@ -5862,13 +5802,6 @@ Please close the application and start it again using the shortcut in the start 
     </message>
 </context>
 <context>
-    <name>QnScreenRecorder</name>
-    <message>
-        <source>Screen capturing subsystem is not initialized yet. Please try latter</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
@@ -5895,7 +5828,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="obsolete">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -5908,14 +5841,6 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>Check Issues</source>
         <translation>检查问题</translation>
-    </message>
-    <message>
-        <source>%1 %2 </source>
-        <translation type="unfinished">%1% {1 %2 ?}</translation>
-    </message>
-    <message>
-        <source>(up %1 days, %2)</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6001,14 +5926,6 @@ You have only %2Gb left for video archive.</source>
     <message>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;添加外部存储空间...&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">警告</translation>
-    </message>
-    <message>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. Depending on the total size of archive it can take several hours. This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7673,22 +7590,6 @@ hh:mm:ss</source>
     <message>
         <source>Ping</source>
         <translation>Ping</translation>
-    </message>
-    <message>
-        <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rebuild progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>

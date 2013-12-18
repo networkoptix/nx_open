@@ -57,7 +57,6 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QVBoxLayout>
 
-
 #if defined(QT_SOFTKEYS_ENABLED)
 #include <qaction.h>
 #endif
@@ -151,6 +150,7 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     layout->addWidget(label);
     layout->addWidget(bar);
     layout->addWidget(buttonBox);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     q->setLayout(layout);
 
     forceTimer = new QTimer(q);
@@ -161,6 +161,7 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     } else {
         q->setCancelButtonText(cancelText);
     }
+
     QObject::connect(q, SIGNAL(canceled()), q, SLOT(cancel()));
 }
 
@@ -337,8 +338,8 @@ QnProgressDialog::~QnProgressDialog()
 
 
 /*!
-  Sets the label to \a label. The progress dialog resizes to fit. The
-  label becomes owned by the progress dialog and will be deleted when
+  Sets the label to \a label.
+  The label becomes owned by the progress dialog and will be deleted when
   necessary, so do not pass the address of an object on the stack.
 
   \sa setLabelText()
@@ -349,18 +350,11 @@ void QnProgressDialog::setLabel(QLabel *label)
     Q_D(QnProgressDialog);
     delete d->label;
     d->label = label;
-    if (label) {
-        if (label->parentWidget() == this) {
-            label->hide(); // until we resize
-        } else {
-            label->setParent(this, 0);
-        }
-    }
-    int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-    int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-    resize(w, h);
-    if (label)
-        label->show();
+    if (!label)
+        return;
+    if (label->parentWidget() != this)
+        label->setParent(this, 0);
+    label->show();
 }
 
 
@@ -382,12 +376,8 @@ QString QnProgressDialog::labelText() const
 void QnProgressDialog::setLabelText(const QString &text)
 {
     Q_D(QnProgressDialog);
-    if (d->label) {
+    if (d->label)
         d->label->setText(text);
-        int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-        int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-        resize(w, h);
-    }
 }
 
 
@@ -420,9 +410,6 @@ void QnProgressDialog::setCancelButton(QPushButton *cancelButton)
         d->escapeShortcut = 0;
 #endif
     }
-    int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-    int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-    resize(w, h);
     if (cancelButton)
 #if !defined(QT_SOFTKEYS_ENABLED)
         cancelButton->show();
@@ -467,15 +454,12 @@ void QnProgressDialog::setCancelButtonText(const QString &cancelButtonText)
     } else {
         setCancelButton(0);
     }
-    int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-    int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-    resize(w, h);
 }
 
 
 /*!
-  Sets the progress bar widget to \a bar. The progress dialog resizes to
-  fit. The progress dialog takes ownership of the progress \a bar which
+  Sets the progress bar widget to \a bar.
+  The progress dialog takes ownership of the progress \a bar which
   will be deleted when necessary, so do not use a progress bar
   allocated on the stack.
 */
@@ -494,9 +478,6 @@ void QnProgressDialog::setBar(QProgressBar *bar)
 #endif
     delete d->bar;
     d->bar = bar;
-    int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-    int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-    resize(w, h);
 }
 
 
@@ -681,14 +662,11 @@ void QnProgressDialog::setValue(int progress)
                 }
             }
             if (need_show) {
-                int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-                int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-                resize(w, h);
                 show();
                 d->shown_once = true;
             }
         }
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
         QApplication::flush();
 #endif
     }
@@ -735,7 +713,7 @@ int QnProgressDialog::minimumDuration() const
 void QnProgressDialog::closeEvent(QCloseEvent *e)
 {
     emit canceled();
-    QDialog::closeEvent(e);
+    base_type::closeEvent(e);
 }
 
 /*!
@@ -787,15 +765,12 @@ bool QnProgressDialog::autoClose() const
 void QnProgressDialog::showEvent(QShowEvent *e)
 {
     Q_D(QnProgressDialog);
-    QDialog::showEvent(e);
-    int w = qMax(isVisible() ? width() : 0, sizeHint().width());
-    int h = qMax(isVisible() ? height() : 0, sizeHint().height());
-    resize(w, h);
+    base_type::showEvent(e);
     d->forceTimer->stop();
 }
 
 void QnProgressDialog::changeEvent(QEvent *event) {
-    QDialog::changeEvent(event);
+    base_type::changeEvent(event);
 
     if(event->type() == QEvent::LanguageChange)
         d_func()->retranslateStrings();
@@ -834,7 +809,7 @@ void QnProgressDialog::open(QObject *receiver, const char *member)
     connect(this, SIGNAL(canceled()), receiver, member);
     d->receiverToDisconnectOnClose = receiver;
     d->memberToDisconnectOnClose = member;
-    QDialog::open();
+    base_type::open();
 }
 
 void QnProgressDialog::_q_disconnectOnClose() {

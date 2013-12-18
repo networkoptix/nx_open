@@ -1,6 +1,8 @@
 #ifndef iq_resource_h_1547
 #define iq_resource_h_1547
 
+#ifdef ENABLE_IQE
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -24,7 +26,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     CLHttpStatus readOID(const QString& oid, QString& result);
     CLHttpStatus readOID(const QString& oid, int& result);
@@ -34,4 +36,5 @@ protected:
     QSize getMaxResolution() const;
 };
 
+#endif // #ifdef ENABLE_IQE
 #endif //iq_resource_h_1547

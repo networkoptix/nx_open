@@ -56,7 +56,7 @@ static void updateActivity()
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
 
-static const int REALTIME_AUDIO_BUFFER_SIZE = 300; // at ms, max buffer 
+static const int REALTIME_AUDIO_BUFFER_SIZE = 750; // at ms, max buffer 
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer 
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 300 * 1000; // 300ms
@@ -200,7 +200,7 @@ void QnCamDisplay::resume()
         QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->resume();
     }
-	m_firstAfterJumpTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = AV_NOPTS_VALUE;
     QnAbstractDataConsumer::resume();
 }
 
@@ -227,9 +227,12 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
     }
 }
 
-QImage QnCamDisplay::getScreenshot(int channel, const ImageCorrectionParams& params, const DewarpingParams& dewarping)
+QImage QnCamDisplay::getScreenshot(int channel,
+                                   const ImageCorrectionParams& params,
+                                   const QnMediaDewarpingParams &mediaDewarping,
+                                   const QnItemDewarpingParams &itemDewarping)
 {
-    return m_display[channel]->getScreenshot(params, dewarping);
+    return m_display[channel]->getScreenshot(params, mediaDewarping, itemDewarping);
 }
 
 QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
@@ -252,33 +255,33 @@ void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 
 void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 {
-	bool isVideoCamera = media->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+    bool isVideoCamera = media->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
     if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return;
 
-	if (isVideoCamera)
-	{
+    if (isVideoCamera)
+    {
         //bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
         //bool isPrebuffer = media->flags & QnAbstractMediaData::MediaFlags_FCZ;
-		if (m_speed < 1.0 || m_singleShotMode)
-			return;
+        if (m_speed < 1.0 || m_singleShotMode)
+            return;
         if ((quint64)m_firstAfterJumpTime == AV_NOPTS_VALUE) {
-			m_firstAfterJumpTime = media->timestamp;
-			m_receivedInterval = 0;
-			m_afterJumpTimer.restart();
-			return;
-		}
+            m_firstAfterJumpTime = media->timestamp;
+            m_receivedInterval = 0;
+            m_afterJumpTimer.restart();
+            return;
+        }
 
-		m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
-		if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
-		{
-			if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
-			{
-				QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
+        m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
+        if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
+        {
+            if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
+            {
+                QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
                 qnRedAssController->onSlowStream(reader);
-			}
-		}
-	}
+            }
+        }
+    }
 }
 
 QnArchiveStreamReader* QnCamDisplay::getArchiveReader() const {
@@ -791,7 +794,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
         }
     }
     m_audioDisplay->clearAudioBuffer();
-	m_firstAfterJumpTime = AV_NOPTS_VALUE;
+    m_firstAfterJumpTime = AV_NOPTS_VALUE;
     m_prevLQ = -1;
 }
 
@@ -928,8 +931,8 @@ void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
         m_delay.breakSleep();
     }
     QnAbstractDataConsumer::putData(data);
-	if (video && m_dataQueue.size() < 2)
-		hurryUpCkeckForCamera2(video); // check if slow network
+    if (video && m_dataQueue.size() < 2)
+        hurryUpCkeckForCamera2(video); // check if slow network
 }
 
 bool QnCamDisplay::canAcceptData() const
@@ -946,7 +949,7 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
 {
     
     qint64 aTime = m_audioDisplay->startBufferingTime();
-    if (aTime == AV_NOPTS_VALUE)
+    if (aTime == (qint64)AV_NOPTS_VALUE)
         return false;
 
     return vTime > aTime;
@@ -1084,8 +1087,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     if (emptyData && !flushCurrentBuffer)
     {
-        if (speed == 0)
-            return true;
+        //if (speed == 0) 
+        //    return true;
 
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling

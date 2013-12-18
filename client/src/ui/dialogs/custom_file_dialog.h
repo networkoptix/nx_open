@@ -8,27 +8,27 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QLineEdit>
 
-class QnCheckboxControlAbstractDelegate: public QObject
+class QnWidgetControlAbstractDelegate: public QObject
 {
     Q_OBJECT
 
 public:
-    QnCheckboxControlAbstractDelegate(QObject *parent = 0): QObject(parent) {}
-    ~QnCheckboxControlAbstractDelegate() {}
+    QnWidgetControlAbstractDelegate(QObject *parent = 0): QObject(parent) {}
+    ~QnWidgetControlAbstractDelegate() {}
 
-    QCheckBox* checkbox() const {
-        return m_checkBox;
+    QList<QWidget*> widgets() const {
+        return m_widgets;
     }
 
-    void setCheckbox(QCheckBox *value) {
-        m_checkBox = value;
+    void addWidget(QWidget *value) {
+        m_widgets << value;
     }
 
 public slots:
     virtual void at_filterSelected(const QString &value) = 0;
 
 private:
-    QCheckBox* m_checkBox;
+    QList<QWidget*> m_widgets;
 };
 
 class QnCustomFileDialog : public QFileDialog
@@ -52,7 +52,7 @@ public:
      *                                  that pointed-to value still exists at that point.
      * @param delegate                  Delegate that will control state of the checkbox.
      */
-    void addCheckBox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate = NULL);
+    void addCheckBox(const QString &text, bool *value, QnWidgetControlAbstractDelegate* delegate = NULL);
 
     /**
      * @brief addSpinBox                Adds a spinbox to this file dialog.
@@ -75,7 +75,7 @@ public:
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
      */
-    void addWidget(QWidget *widget);
+    void addWidget(QWidget *widget, bool newRow = true, QnWidgetControlAbstractDelegate* delegate = NULL);
 
 private slots:
     void at_accepted();
@@ -84,6 +84,7 @@ private:
     QMap<QCheckBox*, bool *> m_checkBoxes;
     QMap<QSpinBox*, int *> m_spinBoxes;
     QMap<QLineEdit*, QString *> m_lineEdits;
+    int m_currentCol;
 };
 
 #endif // CUSTOM_FILE_DIALOG_H

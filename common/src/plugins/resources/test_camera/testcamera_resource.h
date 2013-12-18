@@ -1,6 +1,8 @@
 #ifndef __TEST_CAMERA_RESOURCE_H__
 #define __TEST_CAMERA_RESOURCE_H__
 
+#ifdef ENABLE_TEST_CAMERA
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 
@@ -14,7 +16,7 @@ public:
 
     QnTestCameraResource();
 
-    virtual int getMaxFps() override; 
+    virtual int getMaxFps() const override; 
     virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
@@ -25,11 +27,11 @@ public:
     virtual bool shoudResolveConflicts() const override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual void setCropingPhysical(QRect croping) override;
 
 private:
 };
 
 typedef QnSharedResourcePointer<QnTestCameraResource> QnTestCameraResourcePtr;
 
+#endif // #ifdef ENABLE_TEST_CAMERA
 #endif //__TEST_CAMERA_RESOURCE_H__

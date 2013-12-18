@@ -14,6 +14,7 @@
 
 #include <deque>
 #include <fstream>
+#include <mutex>
 #include <vector>
 
 #ifdef USE_OPENCL
@@ -82,7 +83,7 @@ public:
     virtual PixelFormat GetPixelFormat() const override;
 
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
+    virtual bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) override;
 #ifndef XVBA_TEST
     //!Not implemented yet
     virtual void setLightCpuMode( DecodeMode val ) override;
@@ -97,7 +98,7 @@ public:
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const override;
     //!Reset decoder. Used for seek
-    virtual void resetDecoder( QnCompressedVideoDataPtr data ) override;
+    virtual void resetDecoder( QnConstCompressedVideoDataPtr data ) override;
 #endif
     //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
     virtual const AVFrame* lastFrame() const override;
@@ -221,6 +222,7 @@ private:
             Returns crop rect from h.264 sps
         */
         virtual QRect cropRect() const;
+        const QSharedPointer<SurfaceContext>& getSurfaceContext() const;
 
     private:
         QSharedPointer<SurfaceContext> m_mfxSurface;
@@ -278,15 +280,16 @@ private:
     unsigned int m_totalBytesDropped;
     mfxU64 m_prevTimestamp;
     QSharedPointer<CLVideoDecoderOutput> m_lastAVFrame;
+    mutable std::mutex m_mutex;
 
     MFXBufferAllocator m_bufAllocator;
     MFXSysMemFrameAllocator m_sysMemFrameAllocator;
     MFXDirect3DSurfaceAllocator m_d3dFrameAllocator;
     MFXFrameAllocatorDispatcher m_frameAllocator;
     SurfacePool m_decoderSurfacePool;
-    SurfacePool m_vppOutSurfacePool;
+    SurfacePool m_scaledFramePool;
     size_t m_decoderSurfaceSizeInBytes;
-    size_t m_vppSurfaceSizeInBytes;
+    size_t m_scaledSurfaceSizeInBytes;
     mfxFrameAllocResponse m_decodingAllocResponse;
     mfxFrameAllocResponse m_vppAllocResponse;
     QSize m_outPictureSize;
@@ -317,6 +320,7 @@ private:
     //!Length (in bytes) of "nal unit size" field in source data
     int m_nalLengthSize;
     std::basic_string<uint8_t> m_tempFrameBuffer;
+    mutable CLVideoDecoderOutput* m_lastFrameInSysMem;
 #ifdef USE_OPENCL
     cl_context m_clContext;
     cl_int m_prevCLStatus;
@@ -361,7 +365,11 @@ private:
 #endif
     QSharedPointer<SurfaceContext> findUnlockedSurface( SurfacePool* const surfacePool );
     bool processingNeeded() const;
-    void saveToAVFrame( CLVideoDecoderOutput* outFrame, const QSharedPointer<SurfaceContext>& decodedFrameCtx );
+    void saveToAVFrame(
+        CLVideoDecoderOutput* outFrame,
+        const QSharedPointer<SurfaceContext>& decodedFrameCtx,
+        bool returnD3DSurface,
+        bool convertNV12ToYV12 = true );
     /*!
         \param streamParams If not NULL than filled with stream parameters
         \return \a MFX_ERR_NONE if sequence header has been read successfully
@@ -372,12 +380,6 @@ private:
     QString mfxStatusCodeToString( mfxStatus status ) const;
     QSharedPointer<SurfaceContext> getSurfaceCtxFromSurface( mfxFrameSurface1* const surf ) const;
     void resetMfxSession();
-    //!Copies interleaved UV plane \a nv12UVPlane stored in USWC memory to separate U- and V- buffers in system RAM
-    void loadAndDeinterleaveUVPlane(
-        __m128i* nv12UVPlane,
-        size_t nv12UVPlaneSize,
-        __m128i* yv12YPlane,
-        __m128i* yv12VPlane );
 #ifdef USE_OPENCL
     QString prevCLErrorText() const;
 #endif
@@ -385,11 +387,11 @@ private:
     void initializeScaleSurfacePool();
     mfxStatus scaleFrame( const mfxFrameSurface1& from, mfxFrameSurface1* const to );
 #endif
-    bool isH264SeqHeaderInExtraData( const QnCompressedVideoDataPtr data ) const;
+    bool isH264SeqHeaderInExtraData( const QnConstCompressedVideoDataPtr data ) const;
     /*!
         On return, \a seqHeader contains NALUs, reader from \a data->context->ctx()->extradata
     */
-    bool readH264SeqHeaderFromExtraData( const QnCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
+    bool readH264SeqHeaderFromExtraData( const QnConstCompressedVideoDataPtr data, std::basic_string<mfxU8>* const seqHeader );
 
     mfxStatus doDecodingStep( mfxBitstream* const inputStream, mfxFrameSurface1** decodedFrame );
     mfxStatus doProcessingStep( QSharedPointer<SurfaceContext> decodedFrameCtx, QSharedPointer<SurfaceContext>* const scaledFrameCtx );

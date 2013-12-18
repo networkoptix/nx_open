@@ -32,7 +32,8 @@ public:
         nxpt::CommonRefManager* const parentRefManager,
         DirContentsManager* const dirContentsManager,
         unsigned int frameDurationUsec,
-        bool liveMode );
+        bool liveMode,
+        int encoderNumber );
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -62,10 +63,10 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     DirContentsManager* const m_dirContentsManager;
-    int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
     const unsigned int m_frameDuration;
     bool m_liveMode;
+    int m_encoderNumber;
     std::map<nxcip::UsecUTCTimestamp, std::string> m_dirEntries;
     std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator m_curPos;
     bool m_streamReset;

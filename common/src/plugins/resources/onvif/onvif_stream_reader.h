@@ -1,6 +1,8 @@
 #ifndef onvif_stream_reader_h
 #define onvif_stream_reader_h
 
+#ifdef ENABLE_ONVIF
+
 #include "onvif_helper.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
@@ -100,5 +102,7 @@ private:
     Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_stream_reader_h

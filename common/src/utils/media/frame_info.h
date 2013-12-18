@@ -13,7 +13,8 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 #include "core/datapacket/media_data_packet.h"
-#include <core/resource/dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/item_dewarping_params.h>
 #include "utils/color_space/image_correction.h"
 
 
@@ -126,8 +127,8 @@ class QnOpenGLPictureData
 public:
     QnOpenGLPictureData(
         SynchronizationContext* const syncCtx,
-//  		GLXContext _glContext,
-   		unsigned int _glTexture );
+        //GLXContext _glContext,
+        unsigned int _glTexture );
 
     virtual QnAbstractPictureDataRef::PicStorageType type() const { return QnAbstractPictureDataRef::pstOpenGL; }
 
@@ -144,8 +145,8 @@ private:
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
-	//!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
-	QSharedPointer<QnAbstractPictureDataRef> picData;
+    //!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
+    QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
@@ -252,7 +253,9 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping) = 0; // 8 bit Y channel only
+    virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
+                                 const QnMediaDewarpingParams& mediaDewarping,
+                                 const QnItemDewarpingParams& itemDewarping) = 0; // 8 bit Y channel only
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

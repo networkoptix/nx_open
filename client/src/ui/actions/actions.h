@@ -148,6 +148,12 @@ namespace Qn {
          */
         VersionMismatchMessageAction,
 
+
+        /**
+         * Displays beta version warning dialog.
+         */
+        BetaVersionMessageAction,
+
         /**
          * Opens the provided url in the default browser.
          *
@@ -169,6 +175,17 @@ namespace Qn {
          * Supports cameras list in the resources field as a cameras filter.
          */
         OpenBusinessRulesAction,
+
+
+        /**
+         * Tries to restart the application as soon as all modal dialogs are closed.
+         * Parameters:
+         * <tt>QnSoftwareVersion  SoftwareVersionRole</tt>  --- application version that should be started.
+         *                                                      If not provided, current version will be used.
+         * <tt>QUrl UrlRole</tt>                            --- url the application should connect to.
+         *                                                      If not provided, current connection info will be used.
+         */
+        QueueAppRestartAction,
 
 
         /* Main menu actions. */
@@ -598,6 +615,8 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /* PTZ Actions */
+
         /**
          * Opens preset name editing dialog and saves current position as a new PTZ preset.
          */
@@ -612,7 +631,7 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          *
          * Parameters:
-         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
+         * <tt>QString PtzPresetIdRole</tt> --- id of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -622,12 +641,25 @@ namespace Qn {
         PtzManagePresetsAction,
 
         /**
-         * Sets the current picture as a layout background.
+         * Starts given PTZ tour.
+         *
+         * Parameters:
+         * <tt>QString PtzTourIdRole</tt> --- id of the PTZ tour.
          */
-        SetAsBackgroundAction,
+        PtzStartTourAction,
+
+        /**
+         * Opens PTZ tours management dialog.
+         */
+        PtzManageToursAction,
 
 
         /* Layout actions. */
+
+        /**
+         * Sets the current picture as a layout background.
+         */
+        SetAsBackgroundAction,
 
         /**
          * Deletes the file from disk.
@@ -725,6 +757,11 @@ namespace Qn {
          * Clears selection.
          */
         ClearTimeSelectionAction,
+
+        /**
+         * Scale timeline to match the selection.
+         */
+        ZoomToTimeSelectionAction,
 
         /**
          * Exports selected range.

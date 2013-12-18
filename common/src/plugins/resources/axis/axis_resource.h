@@ -1,6 +1,8 @@
 #ifndef axis_resource_h_2215
 #define axis_resource_h_2215
 
+#ifdef ENABLE_AXIS
+
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
@@ -66,18 +68,18 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
 public slots:
-    void onMonitorResponseReceived( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* httpClient );
-    void onMonitorConnectionClosed( nx_http::AsyncHttpClient* httpClient );
+    void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
+    void onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
     virtual bool isInputPortMonitored() const override;
@@ -103,10 +105,9 @@ private:
     std::map<QString, unsigned int> m_outputPortNameToIndex;
     mutable QMutex m_inputPortMutex;
     //!map<input port index (1-based), http client>
-    std::map<unsigned int, nx_http::AsyncHttpClient*> m_inputPortHttpMonitor;
-    nx_http::MultipartContentParser m_multipartContentParser;
+    std::map<unsigned int, std::shared_ptr<nx_http::AsyncHttpClient> > m_inputPortHttpMonitor;
+    nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
-    QScopedPointer<QnAxisPtzController> m_ptzController;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(
@@ -123,11 +124,12 @@ private:
         unsigned int* paramValue );
     void initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
-    void forgetHttpClient( nx_http::AsyncHttpClient* const httpClient );
+    void forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient );
 
     void initializePtz(CLSimpleHTTPClient *http);
 
     friend class QnAxisPtzController;
 };
 
+#endif // #ifdef ENABLE_AXIS
 #endif //axis_resource_h_2215

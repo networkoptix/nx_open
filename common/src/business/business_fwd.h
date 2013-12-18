@@ -26,6 +26,10 @@ typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
 
+class QnBusinessEventRule;
+typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
+
 namespace QnBusiness {
     enum EventReason {
         NoReason,
@@ -66,6 +70,9 @@ namespace BusinessEventType {
 
         /** Two or more mediaservers are running. */
         MediaServer_Conflict,
+
+        /** Media server started */
+        MediaServer_Started,
 
         /** Event type is not defined. Used in rules. */
         NotDefined,
@@ -116,6 +123,7 @@ namespace BusinessActionType {
                 - soundUrl (string, required)               - url of sound, contains path to sound on the EC
         */
         PlaySound,
+        PlaySoundRepeated,
 
         /*!
             parameters:\n

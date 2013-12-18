@@ -14,6 +14,7 @@ Qn::NotificationLevel QnNotificationLevels::notificationLevel(BusinessEventType:
     case BusinessEventType::Camera_Ip_Conflict:     return Qn::CriticalNotification;
     case BusinessEventType::MediaServer_Failure:    return Qn::CriticalNotification;
     case BusinessEventType::MediaServer_Conflict:   return Qn::CriticalNotification;
+    case BusinessEventType::MediaServer_Started:    return Qn::CommonNotification;
     case BusinessEventType::SystemHealthMessage:    return Qn::SystemNotification;
     default:                                        
         qnWarning("Invalid business event type '%1'.", static_cast<int>(eventType));
@@ -29,6 +30,7 @@ QColor QnNotificationLevels::notificationColor(Qn::NotificationLevel level) {
     case Qn::ImportantNotification: return qnGlobals->notificationColorImportant();
     case Qn::CriticalNotification:  return qnGlobals->notificationColorCritical();
     case Qn::SystemNotification:    return qnGlobals->notificationColorSystem();
+    case Qn::SoundNotification:     return qnGlobals->notificationColorCommon(); //TODO: #GDM add special color
     default:
         qnWarning("Invalid notification level '%1'.", static_cast<int>(level));
         return QColor();

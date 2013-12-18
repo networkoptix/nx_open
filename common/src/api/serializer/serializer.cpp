@@ -1,5 +1,11 @@
 #include "serializer.h"
 
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
+
 void parseRegion(QRegion& region, const QString& regionString)
 {
     foreach (QString rectString, regionString.split(QLatin1Char(';')))

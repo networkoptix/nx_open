@@ -2,14 +2,18 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <memory> // for auto_ptr
-#include <QtCore/QThread>
-#include <QAuthenticator>
-#include <QtCore/QTimer>
-#include "utils/common/long_runnable.h"
-#include "utils/network/netstate.h"
-#include "core/resource/resource.h"
-#include "utils/network/nettools.h"
 
+#include <QtCore/QThread>
+#include <QtCore/QTimer>
+#include <QtNetwork/QAuthenticator>
+
+#include <utils/common/long_runnable.h>
+#include <utils/network/netstate.h>
+#include <utils/network/nettools.h>
+
+#include <api/model/manual_camera_seach_reply.h>
+
+#include <core/resource/resource.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -24,7 +28,7 @@ struct QnManualCameraInfo
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
 };
-typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
+typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
 class QnAbstractResourceSearcher;
 
@@ -59,6 +63,12 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
     Q_OBJECT;
 
 public:
+    enum State
+    {
+        initialSearch,
+        periodicSearch
+    };
+
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
@@ -79,28 +89,30 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
-    bool registerManualCameras(const QnManualCamerasMap& cameras);
-    //QnResourceList processManualAddedResources();
+    bool registerManualCameras(const QnManualCameraInfoMap& cameras);
     void setDisabledVendors(const QStringList& vendors);
     bool containManualCamera(const QString& uniqId);
+
+    ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
     void doResourceDiscoverIteration();
 
     static void init(QnResourceDiscoveryManager* instance);
-
+    State state() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
 protected:
     QMutex m_discoveryMutex;
+
     unsigned int m_runNumber;
 
     virtual void run();
     virtual bool processDiscoveredResources(QnResourceList& resources);
 
 signals:
+    void localSearchDone();
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
@@ -109,12 +121,6 @@ private slots:
     void at_resourceDeleted(const QnResourcePtr& resource);
 
 private:
-    enum State
-    {
-        initialSearch,
-        periodicSearch
-    };
-
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
@@ -126,7 +132,7 @@ private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-    QnManualCamerasMap m_manualCameraMap;
+    QnManualCameraInfoMap m_manualCameraMap;
 
     bool m_server;
     volatile bool m_ready;
@@ -142,6 +148,9 @@ private:
     State m_state;
     QSet<QString> m_recentlyDeleted;
     const CameraDriverRestrictionList* m_cameraDriverRestrictionList;
+
+    QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
+    QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

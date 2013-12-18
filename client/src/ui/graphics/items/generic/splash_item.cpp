@@ -49,7 +49,7 @@ void QnSplashItem::setColor(const QColor &color) {
 }
 
 void QnSplashItem::setRect(const QRectF &rect) {
-    if(qFuzzyCompare(m_rect, rect))
+    if(qFuzzyEquals(m_rect, rect))
         return;
 
     prepareGeometryChange();

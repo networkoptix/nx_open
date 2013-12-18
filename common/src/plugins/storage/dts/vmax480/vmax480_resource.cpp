@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_resource.h"
 #include "vmax480_live_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -30,7 +32,7 @@ QnPlVmax480Resource::~QnPlVmax480Resource()
     }
 }
 
-int QnPlVmax480Resource::getMaxFps() 
+int QnPlVmax480Resource::getMaxFps() const
 {
     return 30;
 }
@@ -138,15 +140,9 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-
-void QnPlVmax480Resource::setCropingPhysical(QRect croping)
-{
-    Q_UNUSED(croping)
-}
-
 CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
-
+    QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
@@ -266,3 +262,6 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 
     return m_chunks.intersected(period);
 }
+
+#endif // #ifdef ENABLE_VMAX
+

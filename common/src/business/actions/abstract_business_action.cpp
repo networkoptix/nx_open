@@ -16,9 +16,10 @@ namespace BusinessActionType {
         case CameraRecording:       return QObject::tr("Camera recording");
         case PanicRecording:        return QObject::tr("Panic recording");
         case SendMail:              return QObject::tr("Send mail");
-        case Diagnostics:           return QObject::tr("Diagnostics");
+        case Diagnostics:           return QObject::tr("Write to log");
         case ShowPopup:             return QObject::tr("Show notification");
         case PlaySound:             return QObject::tr("Play sound");
+        case PlaySoundRepeated:     return QObject::tr("Repeat sound");
         case SayText:               return QObject::tr("Say");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);
@@ -32,6 +33,7 @@ namespace BusinessActionType {
         case Diagnostics:
         case ShowPopup:
         case PlaySound:
+        case PlaySoundRepeated:
         case SayText:
             return false;
 
@@ -55,6 +57,7 @@ namespace BusinessActionType {
         case Diagnostics:
         case ShowPopup:
         case PlaySound:
+        case PlaySoundRepeated:
         case SayText:
             return false;
 
@@ -79,6 +82,7 @@ namespace BusinessActionType {
         case CameraOutput:
         case CameraRecording:
         case PanicRecording:
+        case PlaySoundRepeated:
             return true;
         }
         return false;

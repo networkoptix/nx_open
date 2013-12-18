@@ -401,12 +401,12 @@ QnBusinessActionParameters QnBusinessActionParameters::fromBusinessParams(const 
 
 QByteArray serializeBusinessParams(const QnBusinessParams& value) {
     QByteArray result;
-    QJson::serialize(value, &result);
+    QJson::serialize(QJsonObject::fromVariantMap(value), &result); // TODO: #Elric unuse variants
     return result;
 }
 
 QnBusinessParams deserializeBusinessParams(const QByteArray& value) {
-    QnBusinessParams result;
-    QJson::deserialize(value, &result);
-    return result; /* Returns empty map in case of deserialization error. */
+    QJsonValue result;
+    QJson::deserialize(value, &result); // TODO: #Elric unuse variants
+    return result.toObject().toVariantMap(); /* Returns empty map in case of deserialization error. */
 }

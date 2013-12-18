@@ -34,6 +34,7 @@ namespace nxcip
     static const int NX_NOT_AUTHORIZED = -1;
     static const int NX_INVALID_ENCODER_NUMBER = -2;
     static const int NX_UNKNOWN_PORT_NAME = -3;
+    static const int NX_UNSUPPORTED_CODEC = -8;
     static const int NX_UNSUPPORTED_RESOLUTION = -9;
     static const int NX_UNDEFINED_BEHAVOUR = -20;
     static const int NX_NOT_IMPLEMENTED = -21;
@@ -41,6 +42,10 @@ namespace nxcip
     static const int NX_MORE_DATA = -23;
     static const int NX_NO_DATA = -24;
     static const int NX_IO_ERROR = -25;
+    //!Operation could not be completed now, but it may still be available later
+    static const int NX_TRY_AGAIN = -26;
+    //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
+    static const int NX_INTERRUPTED = -27;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -160,6 +165,9 @@ namespace nxcip
         virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, CameraInfo* cameraInfo ) = 0;
 
         //!Instanciates camera manager instance based on \a info
+        /*!
+            \note This method MUST be thread-safe (can be called by multiple threads using same interface pointer)
+        */
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
         //!Get model model names, reserved by the plugin
@@ -275,6 +283,48 @@ namespace nxcip
     };
 
 
+    struct AudioFormat
+    {
+        enum SampleType
+        {
+            stU8,   ///< unsigned 8 bits
+            stS16,  ///< signed 16 bits
+            stS32,  ///< signed 32 bits
+            stFLT
+        };
+
+        enum ByteOrderType
+        {
+            boLittleEndian,
+            boBigEndian
+        };
+
+        CompressionType compressionType;
+        int sampleRate;
+        //!in bps
+        int bitrate;
+        ByteOrderType byteOrder;
+        int channels;
+        SampleType sampleFmt;
+        int channelLayout;
+        int blockAlign;
+        int bitsPerCodedSample;
+
+        AudioFormat()
+        :
+            compressionType(CODEC_ID_NONE),
+            sampleRate(0),
+            bitrate(0),
+            byteOrder(boLittleEndian),
+            channels(0),
+            sampleFmt(stU8),
+            channelLayout(0),
+            blockAlign(0),
+            bitsPerCodedSample(0)
+        {
+        }
+    };
+
         // {9A1BDA18-563C-42de-8E23-B9244FD00658}
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
@@ -293,6 +343,8 @@ namespace nxcip
             Can be used if camera uses some proprietary media stream control protocol or wants to provide motion information
         */
         virtual StreamReader* getLiveStreamReader() = 0;
+        //!Returns audio format, if audio is supported
+        virtual int getAudioFormat( AudioFormat* audioFormat ) const = 0;
     };
 
 
@@ -301,7 +353,7 @@ namespace nxcip
     class CameraRelayIOManager;
     class DtsArchiveReader;
 
-        // {B7AA2FE8-7592-4459-A52F-B05E8E089AFE}
+    // {B7AA2FE8-7592-4459-A52F-B05E8E089AFE}
     static const nxpl::NX_GUID IID_BaseCameraManager = { { 0xb7, 0xaa, 0x2f, 0xe8, 0x75, 0x92, 0x44, 0x59, 0xa5, 0x2f, 0xb0, 0x5e, 0x8e, 0x8, 0x9a, 0xfe } };
 
     //!Provides base camera operations: getting/settings fps, resolution, bitrate, media stream url(s). Also provides pointer to other camera-management interfaces
@@ -425,16 +477,18 @@ namespace nxcip
 
         //!Returns pixel format
         virtual PixelFormat pixelFormat() const = 0;
+        //!Returns number of planes in picture (this depends on format)
+        virtual int planeCount() const = 0;
         //!Width (pixels)
         virtual int width() const = 0;
         //!Height (pixels)
         virtual int height() const = 0;
-        //!Length of horizontal line in bytes
-        virtual int xStride() const = 0;
-        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-        virtual const void* scanLine( int lineNumber ) const = 0;
-        //!Returns pointer to horizontal line \a lineNumber (starting with 0)
-        virtual void* scanLine( int lineNumber ) = 0;
+        //!Length of horizontal line (in bytes) of plane \a planeNumber
+        virtual int xStride( int planeNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0) of plane \a planeNumber
+        virtual const void* scanLine( int planeNumber, int lineNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0) of plane \a planeNumber
+        virtual void* scanLine( int planeNumber, int lineNumber ) = 0;
         /*!
             \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
@@ -543,7 +597,8 @@ namespace nxcip
         //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability2
         { 
-            searchByMotionMaskCapability = 0x1000   //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            searchByMotionMaskCapability = 0x1000,  //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            motionRegionCapability = 0x2000         //!<if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
         };
 
         virtual ~BaseCameraManager2() {}
@@ -564,6 +619,18 @@ namespace nxcip
             \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
         */
         virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
+        //!If camera plugin implements this method, it MUST report motion only on for region specified (\a motionMask)
+        /*!
+            \param motionMask 8bpp (format \a nxcip::PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                pixel value designates motion sensitivity for pixel position.
+                255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
+                For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
+                If difference is less then value in a mask, motion is not detected.
+            \warning motion mask is rotated by 90 degrees clock-wise! That means, \a motionMask is actually \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
+                \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels in height
+            \return \b NX_NO_ERROR on success, otherwise - error code
+        */
+        virtual int setMotionMask( Picture* motionMask ) = 0;
     };
 
 
@@ -604,7 +671,7 @@ namespace nxcip
             AbsoluteTiltCapability              = 0x020,    //!< Camera supports absolute tilt.
             AbsoluteZoomCapability              = 0x040,    //!< Camera supports absolute zoom.
             LogicalPositionSpaceCapability      = 0x080,    //!< Camera supports absolute positioning in logical space ---
-                                                            //! degrees for pan and tilt and width-based 35mm-equivalent focal length for zoom.
+                                                            //! degrees for pan, tilt and fov (zoom).
 
             AutomaticStateUpdateCapability      = 0x100    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
                                                             //! the user doesn't have to call \a updateState when it changes.
@@ -643,27 +710,27 @@ namespace nxcip
 
         //!Move to absolute logical position
         /*!
-            Pan and tilt values are in degrees, zoom is in width-based 35mm-equivalent focal length. 
+            Pan, tilt and fov values are in degrees. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
-        virtual int setLogicalPosition( double pan, double tilt, double zoom ) = 0;
+        virtual int setLogicalPosition( double pan, double tilt, double fov ) = 0;
 
         //!Get absolute logical position
         /*!
-            Pan and tilt values are in degrees, zoom is in 35mm equivalent.
+            Pan, tilt and fov values are in degrees. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
-        virtual int getLogicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
+        virtual int getLogicalPosition( double* pan, double* tilt, double* fov ) const = 0;
 
         struct LogicalPtzLimits {
             double minPan;
             double maxPan;
             double minTilt;
             double maxTilt;
-            double minZoom;
-            double maxZoom;
+            double minFov;
+            double maxFov;
         };
 
         //!Get PTZ limits in logical space
@@ -689,7 +756,9 @@ namespace nxcip
     //!Type of packets provided by \a StreamReader
     enum DataPacketType
     {
+        //!Audio packet. Can contain mutiple audio frames
         dptAudio,
+        //!Video packet. Usually contains one frame. Video packet class MUST inherit \a nxcip::VideoDataPacket
         dptVideo,
         //!Packet containing no data (e.g., signals end of stream)
         /*!
@@ -755,7 +824,8 @@ namespace nxcip
         virtual unsigned int flags() const = 0;
         //!Returns sequence number of command this packet belongs to
         /*!
-            Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange
+            Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange.
+            In case of live stream \a cSeq is ignored
         */
         virtual unsigned int cSeq() const = 0;
     };
@@ -774,12 +844,14 @@ namespace nxcip
         public MediaDataPacket
     {
     public:
-        //!Returns motion data. Can be NULL
+        //!Returns motion data. Can be NULL, if no motion
         /*!
-            Can return same object with each call, incrementing ref count
-            \return monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
-                set bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
-                those of video picture. Motion data just designates regions of video picture where motion has been detected
+            Motion data is a monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
+                those of video picture. Motion data just designates regions of video picture where motion has been detected.
+            \warning motion data MUST be rotated by 90 degrees clock-wise! That means, picture returned here is \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
+                \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels height
+            \return motion data
             \note size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels is required!
                 If picture has greater size, only required region will be used. If picture has less size, considering that missing region contains no motion
         */
@@ -823,7 +895,12 @@ namespace nxcip
     {
         //!Default quality SHOULD be high quality
         msqDefault = 0,
+        //!High quality
+        /*!
+            It is implementation specific what is considered high quality. Generally, \a low quality SHOULD have bitrate several times lower than high
+        */
         msqHigh,
+        //!Low quality
         msqLow
     };
 
@@ -833,8 +910,9 @@ namespace nxcip
 
     //!Provides access to archive, stored on camera
     /*!
-        Does not provide media stream itself, but provides methods to manage (seek, select playback direction, select stream source (encoder) ) stream, 
-            provided by \a StreamReader instance
+        Implements methods to manage (seek, select playback direction, select stream quality) archive playback.
+
+        Media stream is provided by \a nxcip::StreamReader instance returned by \a nxcip::DtsArchiveReader::getStreamReader().
 
         \par \b cSeq (command sequence counter)
         Methods \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange accept \a cSeq value which
@@ -907,9 +985,9 @@ namespace nxcip
 
         //!Initialize connection to archive
         /*!
-            \return \a false, if failed. Use \a DtsArchiveReader::getLastErrorString to get error description
+            \return zero on success, error code in case on failure. Use \a DtsArchiveReader::getLastErrorString to get error description
         */
-        virtual bool open() = 0;
+        virtual int open() = 0;
         //!Returns stream reader
         /*!
             \a DtsArchiveReader instance holds reference to returned \a StreamReader instance

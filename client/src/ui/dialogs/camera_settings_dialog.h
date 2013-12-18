@@ -5,7 +5,6 @@
 #include <QtWidgets/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/dewarping_params.h>
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
@@ -17,7 +16,7 @@ class QnWorkbenchContext;
 class QnCameraSettingsDialog: public QDialog {
     Q_OBJECT
 public:
-    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags =  Qt::Tool);
     virtual ~QnCameraSettingsDialog();
 
     QnCameraSettingsWidget *widget() const {

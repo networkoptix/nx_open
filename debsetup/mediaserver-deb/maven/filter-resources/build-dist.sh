@@ -9,6 +9,7 @@ ARCHITECTURE=${os.arch}
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
+LIBPLUGINTARGET=$LIBTARGET/plugins
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
@@ -17,6 +18,7 @@ STAGEBASE=deb
 STAGE=$STAGEBASE/${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
+LIBPLUGINSTAGE=$STAGE$LIBPLUGINTARGET
 ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
@@ -24,20 +26,30 @@ INITDSTAGE=$STAGE$INITDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
+SERVER_LIB_PLUGIN_PATH=$SERVER_LIB_PATH/plugins
+SCRIPTS_PATH=${basedir}/../scripts
 
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
 mkdir -p $LIBSTAGE
+mkdir -p $LIBPLUGINSTAGE
 mkdir -p $ETCSTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
+for f in `find $LIBPLUGINSTAGE -type f`
+do
+    strip $f
+    chrpath -d $f
+done
+
 for f in `find $LIBSTAGE -type f`
 do
     strip $f
@@ -50,9 +62,13 @@ chmod -R 755 $BINSTAGE
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
+
+# We set rpath as settings capabilities makes LD_LIBRARY_PATH useless
+chrpath -r ../lib $BINSTAGE/mediaserver-bin
 
 # Copy upstart and sysv script
 install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
@@ -70,6 +86,4 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
-sudo chown -R root:root $STAGEBASE
-
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+(cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)

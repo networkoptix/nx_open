@@ -7,6 +7,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "utils/common/synctime.h"
 #include <deque>
+#include "core/dataprovider/live_stream_provider.h"
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -32,16 +33,16 @@ public:
 
     //QnMediaContextPtr getVideoCodecContext();
     //QnMediaContextPtr getAudioCodecContext();
-    QnCompressedVideoDataPtr getLastVideoFrame();
-    QnCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime);
-    QnCompressedAudioDataPtr getLastAudioFrame();
+    QnConstCompressedVideoDataPtr getLastVideoFrame() const;
+    QnConstCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime) const;
+    QnConstCompressedAudioDataPtr getLastAudioFrame() const;
     void updateCameraActivity();
 private:
-    QMutex m_queueMtx;
+    mutable QMutex m_queueMtx;
     int m_lastKeyFrameChannel;
-    QnCompressedAudioDataPtr m_lastAudioData;
-    QnCompressedVideoDataPtr m_lastKeyFrame;
-    std::deque<QnCompressedVideoDataPtr> m_lastKeyFrames;
+    QnConstCompressedAudioDataPtr m_lastAudioData;
+    QnConstCompressedVideoDataPtr m_lastKeyFrame;
+    std::deque<QnConstCompressedVideoDataPtr> m_lastKeyFrames;
     int m_gotIFramesMask;
     int m_allChannelsMask;
     bool m_isSecondaryStream;
@@ -90,10 +91,12 @@ bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNu
     return media && media->channelNumber == ch;
 }
 
-void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
+void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
 {
-    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-    QnCompressedAudioDataPtr audio = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
+    QnAbstractDataPacketPtr data = nonConstData;
+
+    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
+    QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(data);
 
     QMutexLocker lock(&m_queueMtx);
     if (video)
@@ -115,8 +118,8 @@ void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr data)
         }
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
-            video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            QnAbstractDataConsumer::putData(video);
+            video.constCast<QnCompressedVideoData>()->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            QnAbstractDataConsumer::putData(nonConstData);
         }
     }
     else if (audio) {
@@ -135,8 +138,8 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     QMutexLocker lock(&m_queueMtx);
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
-        QnAbstractDataPacketPtr data = m_dataQueue.at(i);
-        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        QnConstAbstractDataPacketPtr data = m_dataQueue.at(i);
+        QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
         if (video && skipTime && video->timestamp <= skipTime)
         {
             QnCompressedVideoData* newData = video->clone();
@@ -144,7 +147,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
             dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
         else { 
-            dstQueue.push(data);
+            dstQueue.push(data.constCast<QnAbstractDataPacket>());    //TODO: #ak remove const_cast
         }
         rez++;
     }
@@ -152,9 +155,9 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
 }
 
 
-QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime)
+QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime) const
 {
-    QnCompressedVideoDataPtr result;
+    QnConstCompressedVideoDataPtr result;
 
     QMutexLocker lock(&m_queueMtx);
     if (m_lastKeyFrames.empty() || 
@@ -164,7 +167,7 @@ QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bo
         return result;
     }
 
-    for (int i = 0; i < m_lastKeyFrames.size(); ++i)
+    for (int i = 0; i < (int)m_lastKeyFrames.size(); ++i)
     {
         if (m_lastKeyFrames[i]->timestamp >= time) {
             if (iFrameAfterTime || m_lastKeyFrames[i]->timestamp == time || i == 0)
@@ -180,13 +183,13 @@ QnCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bo
 }
 
 
-QnCompressedVideoDataPtr QnVideoCameraGopKeeper::getLastVideoFrame()
+QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getLastVideoFrame() const
 {
     QMutexLocker lock(&m_queueMtx);
     return m_lastKeyFrame;
 }
 
-QnCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame()
+QnConstCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame() const
 {
     QMutexLocker lock(&m_queueMtx);
     return m_lastAudioData;
@@ -203,9 +206,9 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             m_activityStartTime = usecTime;
             m_nextMinTryTime = usecTime + (rand()%100 + 60*5) * 1000000ll;
             m_camera->inUse(this);
-            QnAbstractMediaStreamDataProviderPtr provider = m_camera->getLiveReader(m_role);
+            QnLiveStreamProviderPtr provider = m_camera->getLiveReader(m_role);
             if (provider)
-                provider->start();
+                provider->startIfNotRunning(false);
         }
         else if (m_activityStarted && usecTime - m_activityStartTime > GET_FRAME_MAX_TIME )
         {
@@ -273,12 +276,16 @@ QnVideoCamera::~QnVideoCamera()
 void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
-    QnAbstractMediaStreamDataProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
+    QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
-        reader = QnAbstractMediaStreamDataProviderPtr(dynamic_cast<QnAbstractMediaStreamDataProvider*> (m_resource->createDataProvider(role)));
+        QnAbstractStreamDataProvider* dataProvider = m_resource->createDataProvider(role);
+        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
         if (reader == 0)
+        {
+            delete dataProvider;
             return;
+        }
 
         QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, role);
         if (primaryLiveStream)
@@ -290,19 +297,18 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
     }
 }
 
-QnAbstractMediaStreamDataProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_getReaderMutex);
 
-    if (m_primaryReader == 0 && !m_resource->isDisabled() && m_resource->isInitialized())
+    if (!m_resource->isDisabled() && m_resource->isInitialized()) 
     {
-        createReader(QnResource::Role_LiveVideo);
-        createReader(QnResource::Role_SecondaryLiveVideo);
-        //if (m_primaryReader)
-        //    m_primaryReader->start();
-        //if (m_secondaryReader)
-        //    m_secondaryReader->start();
+        if (role == QnResource::Role_LiveVideo && m_primaryReader == 0)
+            createReader(QnResource::Role_LiveVideo);
+        else if (role == QnResource::Role_SecondaryLiveVideo && m_secondaryReader == 0)
+            createReader(QnResource::Role_SecondaryLiveVideo);
     }
+
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 
@@ -332,7 +338,7 @@ QnMediaContextPtr QnVideoCamera::getAudioCodecContext(bool primaryLiveStream)
 }
 */
 
-QnCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime)
+QnConstCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime) const
 {
     QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
     if (gopKeeper)
@@ -341,7 +347,7 @@ QnCompressedVideoDataPtr QnVideoCamera::getFrameByTime(bool primaryLiveStream, q
         return QnCompressedVideoDataPtr();
 }
 
-QnCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream)
+QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream) const
 {
     QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
     if (gopKeeper)
@@ -350,7 +356,7 @@ QnCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream
         return QnCompressedVideoDataPtr();
 }
 
-QnCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(bool primaryLiveStream)
+QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(bool primaryLiveStream) const
 {
     QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
     if (gopKeeper)

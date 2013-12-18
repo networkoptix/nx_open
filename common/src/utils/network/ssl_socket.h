@@ -34,7 +34,7 @@ public:
     virtual bool isConnected() const override;
 
     virtual bool bind( const SocketAddress& localAddress ) override;
-    virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
+    //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual SocketAddress getPeerAddress() const override;
     virtual void close() override;

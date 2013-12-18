@@ -1,6 +1,8 @@
 #ifndef cl_av_clien_pull1529
 #define cl_av_clien_pull1529
 
+#ifdef ENABLE_ARECONT
+
 #include "core/dataprovider/cpull_media_stream_provider.h"
 
 
@@ -32,6 +34,8 @@ protected:
     QnByteArray m_videoFrameBuff; 
 
 };
+
+#endif
 
 #endif //cl_av_clien_pull1529
 

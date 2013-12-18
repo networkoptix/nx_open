@@ -7,6 +7,7 @@
 #define ASYNCHTTPCLIENT_H
 
 #include <map>
+#include <memory>
 
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
@@ -15,30 +16,33 @@
 
 #include "httpstreamreader.h"
 #include "../aio/aioeventhandler.h"
-#include "../aio/selfremovable.h"
 
 
 namespace nx_http
 {
+    class AsyncHttpClient;
+    typedef std::shared_ptr<AsyncHttpClient> AsyncHttpClientPtr;
+
     //!Http client. All operations are done asynchronously using aio::AIOService
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
-        Object can be freed from signal handler by calling SelfRemovable::scheduleForRemoval
+        
+        \warning Instance of \a AsyncHttpClient MUST be used as shared pointer (std::shared_ptr)
 
-        \note On receiving reply, client will not start downloading message body until \a readMessageBody() call
         \note This class methods are not thread-safe
-        \note All signals are emitted from aio::AIOService threads
+        \note All signals are emitted from io::AIOService threads
         \note State is changed just before emitting signal
-        \note It is strongly recommended to call terminate before scheduleForRemoval!
+        \warning It is strongly recommended to listen for \a AsyncHttpClient::someMessageBodyAvailable() signal and
+            read current message body buffer with a \a AsyncHttpClient::fetchMessageBodyBuffer() call every time
         \todo pipelining support
         \todo keep-alive connection support
-        \todo entity-body compression support
+        \todo Ability to suspend message body receiving
     */
     class AsyncHttpClient
     :
         public QObject,
         public aio::AIOEventHandler,
-        public SelfRemovable
+        public std::enable_shared_from_this<AsyncHttpClient>
     {
         Q_OBJECT
 
@@ -58,8 +62,12 @@ namespace nx_http
         static const int UNLIMITED_RECONNECT_TRIES = -1;
 
         AsyncHttpClient();
+        virtual ~AsyncHttpClient();
 
-        //!Stops socket event processing. If some event handler is running, method blocks until event handler has been stopped
+        //!Stops socket event processing. If some event handler is running in a thread different from current one, method blocks until event handler had returned
+        /*!
+            \note No signal is emitted after this call
+        */
         virtual void terminate();
 
         State state() const;
@@ -77,17 +85,14 @@ namespace nx_http
         */
         const HttpResponse* response() const;
         StringType contentType() const;
-        //!Start receiving message body
-        /*!
-            \return false if failed to start reading message body
-        */
-        bool startReadMessageBody();
         //!Returns current message body buffer, clearing it
         /*!
             \note This method is thread-safe and can be called in any thread
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
+        //!Number of total bytes read (including http request line and headers)
+        quint64 totalBytesRead() const;
 
         void setSubsequentReconnectTries( int reconnectTries );
         void setTotalReconnectTries( int reconnectTries );
@@ -96,24 +101,27 @@ namespace nx_http
         void setUserPassword( const QString& userAgent );
 
     signals:
-        void tcpConnectionEstablished( nx_http::AsyncHttpClient* );
+        void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
-        void responseReceived( nx_http::AsyncHttpClient* );
+        void responseReceived( nx_http::AsyncHttpClientPtr );
         //!Message body buffer is not empty
-        void someMessageBodyAvailable( nx_http::AsyncHttpClient* );
+        /*!
+            Received message body buffer is appended to internal buffer which can be read with \a AsyncHttpClient::fetchMessageBodyBuffer() call.
+            Responsibility for preventing internal message body buffer to grow beyond reasonable sizes lies on user of this class.
+            \warning It is strongly recommended to call \a AsyncHttpClient::fetchMessageBodyBuffer() every time on receiving this signal
+        */
+        void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
             Emmitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
         */
-        void done( nx_http::AsyncHttpClient* );
+        void done( nx_http::AsyncHttpClientPtr );
         //!Connection to server has been restored after a sudden disconnect
-        void reconnected( nx_http::AsyncHttpClient* );
+        void reconnected( nx_http::AsyncHttpClientPtr );
 
     protected:
-        virtual ~AsyncHttpClient();
-
         //!Implementation of aio::AIOEventHandler::eventTriggered
         virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
 
@@ -133,13 +141,14 @@ namespace nx_http
         std::map<BufferType, BufferType> m_customHeaders;
         bool m_terminated;
         mutable QMutex m_mutex;
+        quint64 m_totalBytesRead;
 
         bool doGetPrivate( const QUrl& url );
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
         int readAndParseHttp();
-        void formRequest();
+        void composeRequest();
         void serializeRequest();
         //!Sends request through \a m_socket
         /*!

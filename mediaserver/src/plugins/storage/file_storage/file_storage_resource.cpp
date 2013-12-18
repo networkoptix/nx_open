@@ -26,18 +26,15 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ioBlockSize = IO_BLOCK_SIZE;
         ffmpegBufferSize = FFMPEG_BUFFER_SIZE;
 #ifdef Q_OS_WIN
-        if (qSettings.value("disableDirectIO").toInt() != 1)
+        if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
-    QBufferedFile* rez = new QBufferedFile(fileName, ioBlockSize, ffmpegBufferSize);
+    std::unique_ptr<QBufferedFile> rez( new QBufferedFile(fileName, ioBlockSize, ffmpegBufferSize) );
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
-    {
-        delete rez;
         return 0;
-    }
-    return rez;
+    return rez.release();
 }
 
 QnFileStorageResource::QnFileStorageResource():
@@ -117,6 +114,9 @@ bool QnFileStorageResource::isStorageAvailableForWriting()
     if( !isStorageDirMounted() )
         return false;
 
+    if (hasFlags(deprecated))
+        return false;
+
     QDir dir(getUrl());
 
     bool needRemoveDir = false;
@@ -158,8 +158,16 @@ bool QnFileStorageResource::isStorageAvailable()
             dir.rmdir(tmpDir);
             return true;
         }
-        else 
+        else {
+#ifdef WIN32
+            if (::GetLastError() == ERROR_DISK_FULL)
+                return true;
+#else
+            if (errno == ENOSPC)
+                return true;
+#endif
             return false;
+        }
     }
 
     return false;

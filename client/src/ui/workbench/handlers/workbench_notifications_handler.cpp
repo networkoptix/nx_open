@@ -1,9 +1,13 @@
 #include "workbench_notifications_handler.h"
 
+#include <api/app_server_connection.h>
+
 #include <client/client_settings.h>
 #include <client_message_processor.h>
 
 #include <business/business_strings_helper.h>
+
+#include <core/kvpair/business_events_filter_kvpair_adapter.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -13,26 +17,14 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
-
-QnShowBusinessEventsHelper::QnShowBusinessEventsHelper(QObject *parent) :
-    base_type(QnResourcePtr(),
-              QLatin1String("showBusinessEvents"),
-              0xFFFFFFFFFFFFFFFFull,
-              parent)
-{
-}
-
-QnShowBusinessEventsHelper::~QnShowBusinessEventsHelper(){}
-
+#include <utils/media/audio_player.h>
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    m_showBusinessEventsHelper = context()->instance<QnShowBusinessEventsHelper>();
-    m_showBusinessEventsHelper->setResource(context()->user());
-
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, SIGNAL(userEmailValidityChanged(const QnUserResourcePtr &, bool)),
             this,               SLOT(at_userEmailValidityChanged(const QnUserResourcePtr &, bool)));
@@ -44,6 +36,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             this, SLOT(at_eventManager_connectionOpened()));
     connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()),
             this, SLOT(at_eventManager_connectionClosed()));
+    connect(QnClientMessageProcessor::instance(), SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)),
+            this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), SIGNAL(valueChanged(int)), this, SLOT(at_settings_valueChanged(int)));
 }
@@ -57,14 +51,13 @@ void QnWorkbenchNotificationsHandler::clear() {
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    if (businessAction->actionType() != BusinessActionType::ShowPopup)
-        return;
+//    if (businessAction->actionType() != BusinessActionType::ShowPopup)
+//        return;
 
     //TODO: #GDM check if camera is visible to us
     QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        qDebug() << "popup for admins received, we are not admin";
         return;
     }
 
@@ -82,16 +75,13 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
     }
 
-    if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
-//        qDebug() << "popup received, ignoring" << QnBusinessStringsHelper::eventName(eventType);
+    if (!context()->user())
         return;
-    }
 
-    int id = businessAction->getRuntimeParams().getEventResourceId();
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
-    QString resource = res ? res->getName() : QString();
+    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+        return;
 
-//    qDebug() << "popup received" << eventType << QnBusinessStringsHelper::eventName(eventType) << "from" << resource << "(" << id << ")";
+
     emit businessActionAdded(businessAction);
 }
 
@@ -172,8 +162,6 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    m_showBusinessEventsHelper->setResource(context()->user());
-
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
@@ -199,6 +187,46 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
     setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
+}
+
+void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
+    switch (businessAction->actionType()) {
+    case BusinessActionType::ShowPopup:
+    {
+        addBusinessAction(businessAction);
+        break;
+    }
+    case BusinessActionType::PlaySound:
+    {
+        QString filename = businessAction->getParams().getSoundUrl();
+        QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
+        // if file is not exists then it is already deleted or just not downloaded yet
+        // I think it should not be played when downloaded
+        AudioPlayer::playFileAsync(filePath);
+        break;
+    }
+    case BusinessActionType::PlaySoundRepeated:
+    {
+        switch (businessAction->getToggleState()) {
+        case Qn::OnState:
+            addBusinessAction(businessAction);
+            break;
+        case Qn::OffState:
+            emit businessActionRemoved(businessAction);
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case BusinessActionType::SayText:
+    {
+        AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {

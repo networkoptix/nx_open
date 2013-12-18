@@ -8,13 +8,19 @@
 
 #include "compatibility.h"
 
-struct QnConnectInfo {
+// TODO: #Elric #GDM move out. Why this file is in common root?
+
+struct QnConnectInfo 
+{
+    QnConnectInfo(): allowCameraChanges(true) {}
+
     QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     int proxyPort;
     QString ecsGuid;
     QString publicIp;
     QString brand;
+    bool allowCameraChanges;
 };
 
 // TODO: #Elric remove shared pointer.

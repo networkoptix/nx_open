@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="54"/>
         <source>Suggestions...</source>
-        <translation type="unfinished"></translation>
+        <translation>Рекомендации...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/plugins/arecontvision/arecont_dlg.cpp" line="240"/>
@@ -24,7 +24,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="20"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация о продукте</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="26"/>
@@ -32,22 +32,22 @@
         <location filename="../src/ui/dialogs/about_dialog.ui" line="64"/>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="83"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="39"/>
         <source>Credits</source>
-        <translation type="unfinished"></translation>
+        <translation>Внешние библиотеки</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="58"/>
         <source>GPU Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Графический адаптер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="77"/>
         <source>Connected servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Используемые серверы</translation>
     </message>
 </context>
 <context>
@@ -55,32 +55,32 @@
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="14"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция изображения</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="23"/>
         <source>Enable enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить коррекцию</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="42"/>
         <source>Gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>Гамма</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="93"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="100"/>
         <source>Black level</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровень черного</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="136"/>
         <source>White level</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровень белого</translation>
     </message>
 </context>
 <context>
@@ -88,77 +88,77 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="214"/>
         <source>Warning! Please read documentation prior to change these settings!</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Ознакомьтесь с документацией прежде чем вносить изменения в данные настройки!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="46"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="40"/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление настройками камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="27"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
+        <translation>Я прочел инструкцию и понимаю, что делаю</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="53"/>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Изменения параметров &quot;Частота кадров&quot; и &quot;качество изображения&quot; в настроках расписания не будут учтены!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="63"/>
         <source>Secondary Stream Quality Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка параметров второго потока</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
         <source>Override current value</source>
-        <translation type="unfinished"></translation>
+        <translation>Переопределить текущие значения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Внимание! Установка низкого качества приведет к уменьшению разрешения &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="167"/>
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Установка высокого качества может привести к увеличению нагрузки на процессор Медиа Сервера, ошибкам сети и т.п.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="234"/>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="250"/>
         <source>Selected camera(s) have no expert settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранный набор камер не поддерживает экспертные настройки</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="101"/>
         <source>Low quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Низкое качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="124"/>
         <source>Medium quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="147"/>
         <source>High quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Высокое качество</translation>
     </message>
 </context>
 <context>
@@ -166,7 +166,7 @@
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="98"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -174,37 +174,37 @@
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="14"/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Связь с событием</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="22"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="33"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="58"/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="70"/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Расширенные...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="86"/>
         <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр по камерам...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="93"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -212,22 +212,22 @@
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="20"/>
         <source>Camera settings: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительные настройки камеры: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="101"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="140"/>
         <source>Unable to save changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу сохранить изменения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/specific/device_settings_dlg.cpp" line="140"/>
         <source>Please try to save changes later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, попробуйте сохранить изменения позднее.</translation>
     </message>
 </context>
 <context>
@@ -235,107 +235,108 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="44"/>
         <source>&amp;Camera Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Адрес камеры:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="54"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Например:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;62.82.122.156&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;www.example.com:8080&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;rtsp://example.com:554/video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="60"/>
         <source>IP, hostname, RTSP link...</source>
-        <translation type="unfinished"></translation>
+        <translation>IP, доменное имя, RTSP ссылка...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="86"/>
         <source>S&amp;tart IP:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>&amp;Конечный IP</translatorcomment>
+        <translation>&amp;Начальный IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="121"/>
         <source>&amp;End IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Конечный IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="159"/>
         <source>S&amp;ubnet scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Сканировать Сеть</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="185"/>
         <source>&amp;Login:</source>
-        <translation type="unfinished">&amp;Логин</translation>
+        <translation>&amp;Логин:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="220"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Пароль</translation>
+        <translation>&amp;Пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="273"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="285"/>
         <source>&amp;Discovery Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;орт:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="311"/>
         <source>&amp;Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Искать</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="349"/>
         <source>Scanning...</source>
-        <translation type="unfinished"></translation>
+        <translation>Идет поиск...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="368"/>
         <source>Cancel &amp;scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Ос&amp;тановить поиск</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="385"/>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Превышен , максимальный  размер диапазона IP адресов (255)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="398"/>
         <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Найденные камеры:&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="450"/>
         <source>Manuf.</source>
-        <translation type="unfinished"></translation>
+        <translation>Произв.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="460"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="470"/>
         <source>Server is offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер не в сети</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="496"/>
         <source>&amp;Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Добавить выбранные</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="515"/>
         <source>Cl&amp;ose</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Закрыть</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="455"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
 </context>
 <context>
@@ -343,7 +344,7 @@
     <message>
         <location filename="../src/camera/camera_diagnose_tool.cpp" line="142"/>
         <source>No connection to media server %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет соединения с Медиа Сервером %1</translation>
     </message>
 </context>
 <context>
@@ -351,12 +352,12 @@
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.ui" line="14"/>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.ui" line="20"/>
         <source>Diagnostics for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Результаты диагностики по камере</translation>
     </message>
 </context>
 <context>
@@ -364,12 +365,12 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="14"/>
         <source>Camera list</source>
-        <translation type="unfinished"></translation>
+        <translation>Список камер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="22"/>
         <source>Search string:</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск:</translation>
     </message>
 </context>
 <context>
@@ -377,141 +378,108 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="52"/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить лицензии...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="14"/>
         <source>Camera Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор расписания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="22"/>
         <source>Enable Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить запись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="75"/>
         <source>Schedule Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>График планировщика</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="92"/>
         <source>Display Quality on Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Отображать качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="118"/>
         <source>Display FPS on Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Отображать частоту кадров</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="141"/>
         <source>Panic Mode: </source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по тревоге:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="164"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="170"/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Примечание: Расписание по серверному времени</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="185"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="197"/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки расписания</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="193"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="205"/>
         <source>FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Частота кадров</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="216"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="228"/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="282"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="294"/>
         <source>Record Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Писать постоянно</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="336"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="348"/>
         <source>Motion Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только движение (ДД)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="387"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="399"/>
         <source>Motion+ Lo-Res Always</source>
-        <translation type="unfinished"></translation>
+        <translation>ДД+ низк. кач-во </translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="438"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="450"/>
         <source>Do not Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Не писать</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="458"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="470"/>
         <source>Motion Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по движению</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="478"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="490"/>
         <source>Pre-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Пре-запись</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="501"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="519"/>
         <source>Post-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Пост-запись</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="544"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="568"/>
         <source>Copy Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать расписание...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="551"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="581"/>
         <source>Apply changes before copying schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохраните изменения перед копированием</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="485"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="508"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="497"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="526"/>
         <source> s</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CompatibilityVersionInstallationDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="227"/>
-        <source>Installing version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="238"/>
-        <source>Installation failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="250"/>
-        <source>Could not cancel installation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="259"/>
-        <source>Installation completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="277"/>
-        <source>Installation has been cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
 </context>
 <context>
@@ -519,12 +487,12 @@
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.ui" line="20"/>
         <source>Connection Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка подключения</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.ui" line="35"/>
         <source>Testing connection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка подключения...</translation>
     </message>
 </context>
 <context>
@@ -532,17 +500,17 @@
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui" line="20"/>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы можете создать резервную копию системных настроек для восстановления в случае краха системы.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui" line="45"/>
         <source>Create Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui" line="52"/>
         <source>Restore from Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановить...</translation>
     </message>
 </context>
 <context>
@@ -550,37 +518,37 @@
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="14"/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="62"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="128"/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любая камера&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="268"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.ui" line="259"/>
         <source>All media servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Все Медиа Серверы отключены. Журналы недоступны.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="106"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="87"/>
         <source>Clear filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить фильтр</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="151"/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Связь с событием</translation>
     </message>
 </context>
 <context>
@@ -588,27 +556,27 @@
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="20"/>
         <source>Horizontal mount (camera on the wall)</source>
-        <translation type="unfinished"></translation>
+        <translation>Горизонтальное положение (камера на стене)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="30"/>
         <source>Vertical mount (camera on the floor)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вертикальное положение (камера на полу)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="37"/>
         <source>Vertical mount (camera on the ceiling)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вертикальное положение (камера на потолке)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="49"/>
         <source>Camera view angle correction:</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция угла обзора:</translation>
     </message>
 </context>
 <context>
@@ -616,67 +584,67 @@
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="184"/>
         <source>Scroll here</source>
-        <translation type="unfinished"></translation>
+        <translation>Пролистать сюда</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="186"/>
         <source>Left edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Левая граница</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="186"/>
         <source>Top</source>
-        <translation type="unfinished"></translation>
+        <translation>Верх</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="187"/>
         <source>Right edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Правая граница</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="187"/>
         <source>Bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>НИз</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="189"/>
         <source>Page left</source>
-        <translation type="unfinished"></translation>
+        <translation>На страницу влево</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="189"/>
         <source>Page up</source>
-        <translation type="unfinished"></translation>
+        <translation>На страницу вверх</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="190"/>
         <source>Page right</source>
-        <translation type="unfinished"></translation>
+        <translation>На страницу вправо</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="190"/>
         <source>Page down</source>
-        <translation type="unfinished"></translation>
+        <translation>На страницу вниз</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="192"/>
         <source>Scroll left</source>
-        <translation type="unfinished"></translation>
+        <translation>Листать влево</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="192"/>
         <source>Scroll up</source>
-        <translation type="unfinished"></translation>
+        <translation>Листать вверх</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="193"/>
         <source>Scroll right</source>
-        <translation type="unfinished"></translation>
+        <translation>Листать вправо</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/standard/graphics_scroll_bar.cpp" line="193"/>
         <source>Scroll down</source>
-        <translation type="unfinished"></translation>
+        <translation>Листать вниз</translation>
     </message>
 </context>
 <context>
@@ -684,27 +652,27 @@
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="22"/>
         <source>Active Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Используемые лицензии</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="48"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="68"/>
         <source>Selected License Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация о выбранной лицензии</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="82"/>
         <source>New License</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая лицензия</translation>
     </message>
 </context>
 <context>
@@ -712,7 +680,7 @@
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.ui" line="14"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение</translation>
     </message>
 </context>
 <context>
@@ -720,27 +688,27 @@
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="20"/>
         <source>Activate your License Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Активация лицензии</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="80"/>
         <source>License Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензионный ключ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="103"/>
         <source>Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Аппаратный идентификатор:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="30"/>
         <source>Automatic Activation via Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматическая активация через интернет</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="35"/>
         <source>Manual Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Активация вручную</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="49"/>
@@ -749,37 +717,41 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="123"/>
         <source>Activation Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ключ активации:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="154"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="161"/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="170"/>
         <source>Activation Key File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл с ключом активации:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="197"/>
         <source>Activate Free License</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать бесплатную лицензию</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="207"/>
         <source>Activate License</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать лицензию</translation>
     </message>
 </context>
 <context>
@@ -788,58 +760,58 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/ui/dialogs/login_dialog.ui" line="14"/>
         <source>Connect to Enterprise Controller</source>
         <comment>Window Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>Подключение к Enterprise Controller&apos;у</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="65"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="56"/>
         <source>Connect to Enterprise Controller</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>Подключение к Enterprise Controller&apos;у</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="89"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="80"/>
         <source>Save...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="87"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="96"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="105"/>
         <source>&amp;Connection options:</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;араметры подключения:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="117"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="108"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Хост</translation>
+        <translation>&amp;Сервер:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="160"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="142"/>
         <source>P&amp;ort:</source>
-        <translation>П&amp;орт</translation>
+        <translation>П&amp;орт:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="188"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="170"/>
         <source>&amp;Login:</source>
-        <translation>&amp;Логин</translation>
+        <translation>&amp;Логин:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="217"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="199"/>
         <source>&amp;Password:</source>
-        <translation>&amp;Пароль</translation>
+        <translation>&amp;Пароль:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="270"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="243"/>
         <source>&amp;Test</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;роверка</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="282"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="255"/>
         <source>&amp;Auto-Login</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Запомнить пароль</translation>
     </message>
 </context>
 <context>
@@ -847,57 +819,57 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="14"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настроки камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="24"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="134"/>
         <source>Enable audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить звук</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="94"/>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторизация</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="30"/>
         <source>Licensing</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензирование</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="38"/>
         <source>Use analog licenses to view selected analog cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать аналоговые лицензии для работы с выбранными камерами</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="68"/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить лицензии...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="105"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Логин:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="115"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="158"/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="168"/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспертные</translation>
     </message>
 </context>
 <context>
@@ -905,22 +877,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="77"/>
         <source>Root</source>
-        <translation type="unfinished"></translation>
+        <translation>Корень</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="80"/>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation>Локальные</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="84"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>Система</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="88"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователи</translation>
     </message>
 </context>
 <context>
@@ -928,108 +900,110 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="20"/>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки ситемы</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="39"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="51"/>
         <source>Main Media Folder</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>???</translatorcomment>
+        <translation>Основная папка с видео</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="70"/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Выбрать...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="80"/>
         <source>Extra Media Folders</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>???</translatorcomment>
+        <translation>Дополнительные  папки с видео</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="113"/>
         <source>&amp;Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Добавить...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="123"/>
         <source>&amp;Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="150"/>
         <source>Look and Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>Интерфейс</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="283"/>
         <source>Clear local cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить локальный кэш</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="310"/>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="355"/>
         <source>Restart required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Требуется перезапуск.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="319"/>
         <source>Use Hardware Acceleration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать аппаратное ускорение:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="326"/>
         <source>Downmix Audio from 5.1 to 2.1:</source>
-        <translation type="unfinished"></translation>
+        <translation>Конвертировать звук из 5.1 в 2.1:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="400"/>
         <source>Experimental. May result in glitches.</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспериментально. Возможны сбои.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="364"/>
         <source>Run Application when PC Boots up:</source>
-        <translation type="unfinished"></translation>
+        <translation>Запускать приложение при старте системы:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="180"/>
         <source>Sequence Cycle Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Интервал смены камер в режиме тура:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="171"/>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="190"/>
         <source>Show IP in Tree:</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать IP адрес в дереве:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="207"/>
         <source>Timeline Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим линейки времени:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="237"/>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation>Прочее</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="252"/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Язык:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="412"/>
         <source>Network Interfaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Сетевые интерфейсы</translation>
     </message>
 </context>
 <context>
@@ -1037,17 +1011,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="20"/>
         <source>PTZ Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Предустановка PTZ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="26"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="36"/>
         <source>Hotkey:</source>
-        <translation type="unfinished"></translation>
+        <translation>Горячая клавиша:</translation>
     </message>
 </context>
 <context>
@@ -1055,118 +1029,159 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/ptz_presets_dialog.ui" line="14"/>
         <source>PTZ Presets</source>
-        <translation type="unfinished"></translation>
+        <translation>Предустановки PTZ</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/ui/screen_recording/video_recorder_settings.cpp" line="105"/>
+        <location filename="../src/ui/screen_recording/video_recorder_settings.cpp" line="95"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="639"/>
         <source>Can&apos;t overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно перезаписать файл &apos;%1&apos;. Попробуйте другое имя.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="641"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание</translation>
+    </message>
+    <message>
+        <location filename="../src/client/client_connection_data.cpp" line="54"/>
+        <source>* Last used connection *</source>
+        <translation>* Последнее подключение *</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="54"/>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Во время %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="56"/>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="33"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="44"/>
         <source>Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Кончается</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="35"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="46"/>
         <source>Starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Начинается</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="37"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="49"/>
         <source>Starts/Stops</source>
-        <translation type="unfinished"></translation>
+        <translation>Начинается/Кончается</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="44"/>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>начать</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="45"/>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>закончить</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="51"/>
         <source>Occurs</source>
-        <translation type="unfinished"></translation>
+        <translation>Происходит</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="522"/>
         <source>Export selected events to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выбранных событий в файл</translation>
     </message>
     <message>
-        <location filename="../src/ui/common/grid_widget_helper.cpp" line="31"/>
+        <location filename="../src/ui/common/grid_widget_helper.cpp" line="26"/>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML файл (*.html);;Файл (CSV) с разделителями (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/ui/common/grid_widget_helper.cpp" line="52"/>
+        <location filename="../src/ui/common/grid_widget_helper.cpp" line="47"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить как</translation>
     </message>
     <message>
-        <location filename="../src/ui/common/grid_widget_helper.cpp" line="53"/>
+        <location filename="../src/ui/common/grid_widget_helper.cpp" line="48"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл %1 уже существует. Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/ui/common/grid_widget_helper.cpp" line="65"/>
+        <location filename="../src/ui/common/grid_widget_helper.cpp" line="60"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно перезаписать файл</translation>
     </message>
     <message>
-        <location filename="../src/ui/common/grid_widget_helper.cpp" line="66"/>
+        <location filename="../src/ui/common/grid_widget_helper.cpp" line="61"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл %1 занят другим процессом. Попробуйте другое имя.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="35"/>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="52"/>
+        <source>Not recording</source>
+        <translation>Не записывается</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="37"/>
+        <source>Recording everything</source>
+        <translation>Записывается постоянно</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="39"/>
+        <source>Recording motion only</source>
+        <translation>Записывается только движение</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="41"/>
+        <source>Recording motion and low quality</source>
+        <translation>Записывается движение и низкое качество</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="54"/>
+        <source>Continuous</source>
+        <translation>Постоянная</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="56"/>
+        <source>Motion only</source>
+        <translation>Только движение (ДД)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/common/recording_status_helper.cpp" line="58"/>
+        <source>Motion + Lo-Res</source>
+        <translation>ДД + низк. кач-во</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="81"/>
+        <source>b/s</source>
+        <translation>бит/с</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="82"/>
-        <source>b/s</source>
-        <translation type="unfinished"></translation>
+        <source>Kb/s</source>
+        <translation>Кбит/с</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="83"/>
-        <source>Kb/s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="84"/>
         <source>Mb/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Мбит/с</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="131"/>
         <source>Export selected cameras to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выбранных камер в файл</translation>
     </message>
 </context>
 <context>
@@ -1174,36 +1189,38 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="78"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать в буфер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="80"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>О программе</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="83"/>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; версия %2 (%3).&lt;br/&gt;
+Сборка для %5-%6 с помощью %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="99"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Enterprise controller&lt;/b&gt; не в сети.&lt;br&gt;
+</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="101"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; version %1 at %2:%3.&lt;br&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Enterprise controller&lt;/b&gt; версии %1 адрес %2:%3.&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="112"/>
         <source>&lt;b&gt;Media Server&lt;/b&gt; version %2 at %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Медиа Сервер&lt;/b&gt; версии %2 адрес %3.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="119"/>
@@ -1217,12 +1234,20 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
 &lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; использует следующие внешние библиотеки:&lt;br/&gt;
+&lt;br /&gt;
+&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
+&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
+&lt;b&gt;Color Picker v2.6 Qt Solution&lt;/b&gt; - Copyright (c) 2009 Nokia Corporation.&lt;br/&gt;
+&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
+&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
+&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
+&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="140"/>
         <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="146"/>
@@ -1231,7 +1256,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br/&gt;
 &lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;OpenGL версия&lt;/b&gt;: %1.&lt;br/&gt;
+&lt;b&gt;OpenGL драйвер&lt;/b&gt;: %2.&lt;br/&gt;
+&lt;b&gt;OpenGL производитель&lt;/b&gt;: %3.&lt;br/&gt;
+&lt;b&gt;OpenGL макс. размер текстур&lt;/b&gt;: %4.&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -1239,12 +1267,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action.cpp" line="109"/>
         <source>%n</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action.cpp" line="111"/>
         <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1252,17 +1280,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="329"/>
         <source>Show FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать частоту кадров</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="330"/>
         <source>Hide FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть частоту кадров</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="331"/>
         <source>Ctrl+Alt+F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="336"/>
@@ -1287,57 +1315,57 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="353"/>
         <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместить камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="358"/>
         <source>Next Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующая раскладка</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="359"/>
         <source>Ctrl+Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="364"/>
         <source>Previous Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Предыдущая раскладка</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="365"/>
         <source>Ctrl+Shift+Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="370"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать все</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="371"/>
         <source>Ctrl+A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="376"/>
         <source>Selection Changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Выборка изменена</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="380"/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить лицензии...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="384"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="388"/>
         <source>Reconnect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Переподключиться к серверу</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="392"/>
@@ -1347,1053 +1375,1046 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="393"/>
         <source>F11</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="398"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Помощь</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="407"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1065"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
         <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр ошибок камеры...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="424"/>
         <source>Fit in View</source>
-        <translation type="unfinished"></translation>
+        <translation>Вписать в экран</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="432"/>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Главное меню</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="433"/>
         <source>Alt+Space</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="454"/>
         <source>Start Panic Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Начать запись по тревоге</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="455"/>
         <source>Stop Panic Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить запись по тревоге</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="457"/>
         <source>Ctrl+P</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="468"/>
         <source>New...</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="474"/>
         <source>Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладку...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="475"/>
         <source>New Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать раскладку...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="480"/>
         <source>Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкладку</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="481"/>
         <source>New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать вкладку</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="482"/>
         <source>Ctrl+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="488"/>
         <source>Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Окно</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="489"/>
         <source>New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать окно</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="490"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="496"/>
         <source>User...</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователя...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="497"/>
         <source>New User...</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать пользователя...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="502"/>
         <source>Open Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть раскладку...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="508"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="514"/>
         <source>File(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл(ы)...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="515"/>
         <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="522"/>
         <source>Layout(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладк(и)...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>Folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Папк(и)...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="534"/>
         <source>Save Current Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить раскладку</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="535"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="543"/>
         <source>Save Current Layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить раскладку как...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="544"/>
         <source>Ctrl+Alt+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="554"/>
         <source>Start Screen Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Начать захват экрана</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="555"/>
         <source>Stop Screen Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Закончить захват экрана</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="556"/>
         <source>Alt+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="567"/>
         <source>Stop current action</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить текущее действие</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="571"/>
         <source>Go to Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>На полный экран</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="572"/>
         <source>Exit Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>В оконный режим</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="575"/>
         <source>Ctrl+F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="577"/>
         <source>Alt+Enter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="578"/>
         <source>Alt+Return</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="566"/>
         <source>Esc</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="586"/>
         <source>Minimize</source>
-        <translation type="unfinished"></translation>
+        <translation>Свернуть</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="592"/>
         <source>Maximize</source>
-        <translation type="unfinished"></translation>
+        <translation>Развернуть</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="593"/>
         <source>Restore Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Уменьшить в окно</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="599"/>
         <source>Show Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать сообщение</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="603"/>
         <source>Show Version Mismatch Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать сообщение о несоответствии версий</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="612"/>
         <source>System Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки системы...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="664"/>
         <source>How-to Videos and FAQ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Обучающие видео и ЧаВо...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="674"/>
         <source>About...</source>
-        <translation type="unfinished"></translation>
+        <translation>О программе...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="675"/>
         <source>F1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="685"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="686"/>
         <source>Alt+F4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="700"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="701"/>
         <source>Ctrl+W</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="706"/>
         <source>Close All But This</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть все кроме этой</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="715"/>
         <source>Open in Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в раскладке</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="720"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="721"/>
         <source>Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Мониторинг</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="727"/>
         <source>Monitor in a New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Мониторинг в новой вкладке</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="733"/>
         <source>Monitor in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Мониторингв новом окне</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="738"/>
         <source>Open Layout in a New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть раскладку в новой вкладке</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="748"/>
         <source>Open Layout(s) in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть раскладк(и) в новом окне</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="762"/>
         <source>Open Containing Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в каталоге</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
         <source>Ctrl+Enter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="764"/>
         <source>Ctrl+Return</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1071"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1033"/>
         <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила для камеры...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1111"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1073"/>
         <source>Server Logs...</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал сервера...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1210"/>
         <source>Preview Search...</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск по интервалам...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1264"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1232"/>
         <source>Calibrate PTZ</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1357"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
         <source>Show Title Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать заголовок</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1358"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>Hide Title Bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть заголовок</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1363"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1331"/>
         <source>Pin Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Прикрепить дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1364"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
         <source>Unpin Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Открепить дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1369"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
         <source>Show Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1370"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
         <source>Hide Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1375"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1343"/>
         <source>Show Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать шкалу времени</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
         <source>Hide Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть шкалу времени</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="743"/>
         <source>Open Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть раскладки</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="403"/>
         <source>Clear cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить кэш</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="619"/>
         <source>Open Web Client...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть Web клиент...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="418"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="630"/>
         <source>Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Связь с событием...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="631"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="413"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="638"/>
         <source>Alarm/Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="639"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="646"/>
         <source>Camera List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Список камер...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="647"/>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
         <source>Backup/Restore Configuration...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить/Восстановить конфигурацию...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="669"/>
         <source>Check for Updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверить обновления...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="726"/>
         <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в новой вкладке</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="732"/>
         <source>Open in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в новом окне</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
         <source>Open Current Layout in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть текущую раскладку в новом окне</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="757"/>
         <source>Open Layout(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть раскладк(и)</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="776"/>
         <source>Save Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить раскладку</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="783"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="790"/>
         <source>Save Layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить раскладку как...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
         <source>Maximize Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео на полный экран</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="801"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="809"/>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="802"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="810"/>
         <source>Return</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="808"/>
         <source>Restore Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео в режим сетки</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="816"/>
         <source>Show Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать информацию</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="817"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="823"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="829"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="892"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="888"/>
         <source>Alt+I</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="822"/>
         <source>Hide Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть информацию</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="828"/>
         <source>Toggle Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать/скрыть информацию</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="834"/>
         <source>Change Resolution...</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить разрешение...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="841"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1048"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="847"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Низкое</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="852"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Высокое</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="859"/>
         <source>PTZ...</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="864"/>
         <source>Save Current Position...</source>
-        <translation type="unfinished"></translation>
+        <translation>Записать позицию...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="870"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="869"/>
         <source>Go to Position...</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместиться на позицию...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="875"/>
         <source>Manage Saved Positions...</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление позициями...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="883"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="880"/>
         <source>Go To Saved Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместиться на сохраненную позицию</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="891"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="887"/>
         <source>Toggle Resolution Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключение разрешения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="898"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="894"/>
         <source>Show Motion/Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать движение/поиск по движению</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="899"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="895"/>
         <source>Show Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать движение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="900"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="907"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="918"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="896"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="903"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="914"/>
         <source>Alt+G</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="905"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="901"/>
         <source>Hide Motion/Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть движение/поиск по движению</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="906"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="902"/>
         <source>Hide Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть движение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="912"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="908"/>
         <source>Clear Motion Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить регион поиска движения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="917"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="913"/>
         <source>Toggle Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключение в режим поиска движения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="923"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="919"/>
         <source>Check File Watermark</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверить целостность файла</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="924"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="920"/>
         <source>Alt+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="930"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="926"/>
         <source>Take Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Сделать стоп-кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="931"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="927"/>
         <source>Alt+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="937"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="933"/>
         <source>Image Enhancement...</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция изображения...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="938"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="934"/>
         <source>Alt+J</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="944"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="940"/>
         <source>Create Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать окно приближения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="949"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
         <source>Rotate to...</source>
-        <translation type="unfinished"></translation>
+        <translation>Повернуть на...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="950"/>
+        <source>0 degrees</source>
+        <translation>0 градусов</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="954"/>
-        <source>0 degrees</source>
-        <translation type="unfinished"></translation>
+        <source>90 degrees</source>
+        <translation>90 градусов</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="958"/>
-        <source>90 degrees</source>
-        <translation type="unfinished"></translation>
+        <source>180 degrees</source>
+        <translation>180 градусов</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="962"/>
-        <source>180 degrees</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="966"/>
         <source>270 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>270 градусов</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="975"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="971"/>
         <source>Remove from Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Убрать с раскладки</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="972"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="980"/>
+        <source>Del</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="979"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="991"/>
-        <source>Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="987"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1004"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="992"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1005"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="993"/>
         <source>F2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1014"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1002"/>
         <source>Upload to YouTube...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить на Youtube...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1028"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1016"/>
         <source>Set as Layout Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить как фон на раскладку</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1040"/>
-        <source>Change Camera Aspect Ratio...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1083"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1206"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1045"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
         <source>Layout Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки раскладки...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1093"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1055"/>
         <source>Clear Camera Settings Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить диалог настроек камер</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1097"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
         <source>Add Camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить камеры...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
         <source>Camera(s) List by Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Список камер по серверам...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1107"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
         <source>Ping...</source>
-        <translation type="unfinished"></translation>
+        <translation>Пинг...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1078"/>
         <source>Server Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика сервера...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1127"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1089"/>
         <source>Change Cell Aspect Ratio...</source>
-        <translation type="unfinished"></translation>
+        <translation>Соотношение сторон ячеек...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1151"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1113"/>
         <source>Change Cell Spacing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Расстояние между ячейками...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1195"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1157"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1173"/>
         <source>Alt+T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1380"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
         <source>Pin Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Прикрепить панель оповещений</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1381"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1349"/>
         <source>Unpin Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Открепить панель оповещений</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1021"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1009"/>
         <source>Delete from Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить с диска</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="444"/>
         <source>Logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Отсоединиться от сервера</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1034"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1022"/>
         <source>User Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки пользователя...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1077"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1039"/>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки камер...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1089"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
         <source>Open in Camera Settings Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в диалоге настройки камер</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1083"/>
+        <source>Server Settings...</source>
+        <translation>Настройки сервера...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1097"/>
+        <source>4:3</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1104"/>
+        <source>16:9</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
-        <source>Server Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1053"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
-        <source>4:3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1142"/>
-        <source>16:9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1159"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1166"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1128"/>
         <source>Small</source>
-        <translation type="unfinished"></translation>
+        <translation>Маленькое</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1173"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1142"/>
+        <source>Large</source>
+        <translation>Большое</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
+        <source>Start Tour</source>
+        <translation>Начать тур</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
+        <source>Stop Tour</source>
+        <translation>Закончить тур</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1179"/>
+        <source>Mark Selection Start</source>
+        <translation>Отметить начало выделения</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1180"/>
-        <source>Large</source>
-        <translation type="unfinished"></translation>
+        <source>[</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1186"/>
+        <source>Mark Selection End</source>
+        <translation>Отметить конец выделения</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
+        <source>]</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1193"/>
-        <source>Start Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1194"/>
-        <source>Stop Tour</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1211"/>
-        <source>Mark Selection Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1212"/>
-        <source>[</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
-        <source>Mark Selection End</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1219"/>
-        <source>]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1225"/>
         <source>Clear Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить выделение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1347"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1315"/>
         <source>Show Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать миниатюры</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1316"/>
         <source>Hide Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть миниатюры</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1270"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1238"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизведение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1271"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1239"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1336"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1304"/>
         <source>Synchronize Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Сонхронизация видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1305"/>
         <source>Disable Stream Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить синхронизацию видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1352"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
         <source>Show Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать календарь</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1353"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1321"/>
         <source>Hide Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть календарь</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
         <source>Ctrl+Alt+Shift++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="607"/>
         <source>Open in Browser...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в браузере...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1198"/>
         <source>Export Selected Area...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выбранного фрагмента...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1236"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1204"/>
         <source>Export Multi-Video...</source>
-        <translation type="unfinished"></translation>
+        <translation>Мульти-Видео Экспорт...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1250"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
         <source>Increment Debug Counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1254"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1222"/>
         <source>Ctrl+Alt+Shift+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1255"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1223"/>
         <source>Decrement Debug Counter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
         <source>Ctrl+Alt+Shift+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1260"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1228"/>
         <source>Show Resource Pool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1269"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1237"/>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1276"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1244"/>
         <source>Ctrl+-</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1277"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1245"/>
         <source>Speed Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Замедлить</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1282"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1250"/>
         <source>Ctrl++</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1283"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1251"/>
         <source>Speed Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Ускорить</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1256"/>
         <source>Ctrl+Left</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1257"/>
         <source>Previous Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Предыдущий кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1294"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1262"/>
         <source>Ctrl+Right</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1295"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1263"/>
         <source>Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующий кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1300"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1268"/>
         <source>Z</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1301"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1269"/>
         <source>To Start</source>
-        <translation type="unfinished"></translation>
+        <translation>В начало</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1275"/>
         <source>To End</source>
-        <translation type="unfinished"></translation>
+        <translation>В конец</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1285"/>
         <source>Ctrl+Down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1313"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1281"/>
         <source>Volume Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Тише</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1312"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1280"/>
         <source>Ctrl+Up</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1318"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1286"/>
         <source>Volume Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Громче</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1322"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1290"/>
         <source>M</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1323"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1291"/>
         <source>Toggle Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкл/Выкл заук</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1328"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1296"/>
         <source>L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1329"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
         <source>Jump to Live</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео в реальном времени</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1335"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1303"/>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2401,12 +2422,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="59"/>
         <source>[No item selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Элемент не выбран]</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="60"/>
         <source>Image Enhancement - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция изображенияt - %1</translation>
     </message>
 </context>
 <context>
@@ -2414,47 +2435,47 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="20"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="32"/>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите для установки периода срабатывания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="42"/>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>Интервал:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="55"/>
         <source>Once per</source>
-        <translation type="unfinished"></translation>
+        <translation>Раз в</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="91"/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Мгновенное</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="9"/>
         <source>sec</source>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="10"/>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation>м</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="11"/>
         <source>hrs</source>
-        <translation type="unfinished"></translation>
+        <translation>ч</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="12"/>
         <source>days</source>
-        <translation type="unfinished"></translation>
+        <translation>д</translation>
     </message>
 </context>
 <context>
@@ -2490,17 +2511,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="68"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="66"/>
         <source>You have new notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Есть новые оповещения</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="119"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="117"/>
         <source>You have %n notifications</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>У вас %n оповещение</numerusform>
+            <numerusform>У вас %n оповещения</numerusform>
+            <numerusform>У вас %n оповещений</numerusform>
         </translation>
     </message>
 </context>
@@ -2509,12 +2530,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="134"/>
         <source>For All Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Для всех</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="135"/>
         <source>For Administrators Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только Администраторам</translation>
     </message>
 </context>
 <context>
@@ -2523,22 +2544,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="746"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="772"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любая Камера&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="750"/>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись или детекция движения отключены для %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="788"/>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>У пользователя %1 неправильный E-Mail: %2</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="826"/>
         <source>%1 of %2 cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 из %2 камер</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="756"/>
@@ -2546,148 +2567,148 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="829"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="852"/>
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Камера</numerusform>
+            <numerusform>%n Камеры</numerusform>
+            <numerusform>%n Камер</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="753"/>
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 из %n камеры</numerusform>
+            <numerusform>%1 из %n камер</numerusform>
+            <numerusform>%1 из %n камер</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="761"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="845"/>
         <source>&lt;System&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Система&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="767"/>
         <source>&lt;Any Server&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой Сервер&gt;</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="769"/>
         <source>%n Server(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Сервер</numerusform>
+            <numerusform>%n Сервера</numerusform>
+            <numerusform>%n Серверов</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="786"/>
         <source>User &apos;%1&apos; has empty E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>У пользователя %1 не задан E-Mail</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="798"/>
         <source>Invalid email address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильный E-Mail: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="803"/>
         <source>Select at least one user</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы одного пользователя</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="806"/>
         <source>Send mail to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить письмо %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="808"/>
         <source>%1 users, %2 additional</source>
-        <translation type="unfinished"></translation>
+        <translation>пользователей: %1 , дополнительных: %2 </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="809"/>
         <source>%1 users</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 пользователей</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="813"/>
         <source>Administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation>только для Администраторов</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="815"/>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>Для всех</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="819"/>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="850"/>
         <source>Select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите хотя бы одну камеру</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="823"/>
         <source>Recording is disabled for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись для %1 отключена</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="833"/>
         <source>Select a sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите звук</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="839"/>
         <source>Enter the text</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите текст</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="863"/>
         <source>Not Applied</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="869"/>
         <source>Every %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждый день</numerusform>
+            <numerusform>Каждые %n дня</numerusform>
+            <numerusform>Каждые %n дней</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="872"/>
         <source>Every %n hours</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждый час</numerusform>
+            <numerusform>Каждые %n часа</numerusform>
+            <numerusform>Каждые %n часов</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="875"/>
         <source>Every %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждую минуту</numerusform>
+            <numerusform>Каждые %n минуты</numerusform>
+            <numerusform>Каждые %n минут</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="877"/>
         <source>Every %n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Каждую секунду</numerusform>
+            <numerusform>Каждые %n секунды</numerusform>
+            <numerusform>Каждые %n секунд</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="866"/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Мгновенно</translation>
     </message>
 </context>
 <context>
@@ -2695,59 +2716,59 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="23"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="34"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Событие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Когда&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="79"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="224"/>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="161"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="163"/>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation>на</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="86"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Любой камере&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="155"/>
         <source>Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Расписание...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="185"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Действие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="231"/>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Выберите хотя бы одну камеру&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="304"/>
         <source>Comments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Комментарий:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="161"/>
+        <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="163"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>кому</translation>
     </message>
 </context>
 <context>
@@ -2755,84 +2776,84 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="139"/>
         <source>Confirm exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть окно</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="140"/>
         <source>Unsaved changes will be lost. Save?</source>
-        <translation type="unfinished"></translation>
+        <translation>Несохраненные изменения будут утеряны. Продолжить?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error while saving rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при сохранении правила.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
         <source>Hide Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть расширенные</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
         <source>Show Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать расширенные</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
         <source>Error while receiving rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при получении списка правил</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="41"/>
         <source>Reset Default Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Сброс на правила по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="228"/>
         <source>Confirm rules reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтверждение сброса</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что Вы хотите вернуть правила к значениям по умолчанию? Это действие необратимо!</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="271"/>
         <source>Error while deleting rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при удалении правила</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="312"/>
         <source>&amp;New...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Создать...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
         <source>&amp;Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="322"/>
         <source>&amp;Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Расписание...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="339"/>
         <source>Confirm save invalid rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранение некорректноых правил</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="340"/>
         <source>Some rules are not valid. Should we disable them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые правила некорректны. Отключить их?</translation>
     </message>
 </context>
 <context>
@@ -2840,42 +2861,42 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="89"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation>#</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="90"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкл</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="91"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Событие</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="92"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Источник</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="93"/>
         <source>-&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>-&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="94"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Действие</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="95"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rules_view_model.cpp" line="96"/>
         <source>Interval of Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Интервал срабатывания</translation>
     </message>
 </context>
 <context>
@@ -2883,154 +2904,157 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="440"/>
         <source>First address in range is greater than last one</source>
-        <translation type="unfinished"></translation>
+        <translation>Начальный адрес диапазона больше конечного</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="446"/>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>Превышен , максимальный  размер диапазона IP адресов (255)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="177"/>
         <source>Add cameras to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить камеры на %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="181"/>
         <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Длбавить камеры...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="182"/>
         <source>Select target mediaserver in the tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите Медиа Сервер в дереве.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="294"/>
         <source>Server is offline.
 Camera addition is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер не в сети. Добавление камер возможно только на активный сервер.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="509"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="513"/>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Завершено</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="554"/>
         <source>No cameras selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Не выбраны камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="554"/>
         <source>Please select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>пожалуйста выберите хотя бы одну камеру</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="580"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Успешно</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="293"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="526"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="587"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="454"/>
         <source>Camera address field must contain valid url, ip address or rtsp link</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес камеры должен содержать корректный URL, IP или RTSP ссылку</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="509"/>
         <source>All cameras are already in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Все камеры уже зарегистрированы в списке.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="513"/>
         <source>No cameras found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Камеры не найдены.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="521"/>
         <source>Could not connect to server.
 Make sure the server is available and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно соединиться с сервером. Убедитесь что сервер в сети и попробуйте снова.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="523"/>
         <source>Server returned an error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер вернул ошибку.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="581"/>
         <source>%n camera(s) added successfully.
 It might take a few moments to populate them in the tree.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n камера успешно добавлена.
+Через некоторое время она отобразится в дереве.</numerusform>
+            <numerusform>%n камеры успешно добавлена.
+Через некоторое время она отобразится в дереве.</numerusform>
+            <numerusform>%n камер успешно добавлена.
+Через некоторое время она отобразится в дереве.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="587"/>
         <source>Error while adding camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ошибка добавления камеры</numerusform>
+            <numerusform>Ошибка добавления камер</numerusform>
+            <numerusform>Ошибка добавления камер</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="30"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="29"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Скоприровать в буфер</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="99"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="98"/>
         <source>Diagnostics for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика камеры %1.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="114"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="113"/>
         <source>Checking media server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка доступности Медиа Сервера</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="116"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="115"/>
         <source>Checking that camera is accessible</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка доступности камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="118"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="117"/>
         <source>Checking that camera provides media stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка получения медиа потока с камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="120"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="119"/>
         <source>Checking media stream for errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка корректности медиапотока</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="136"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="135"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>ОК</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="139"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="138"/>
         <source>FAILED: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ОШИБКА: %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="149"/>
+        <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="148"/>
         <source>Diagnostics finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика завершена</translation>
     </message>
 </context>
 <context>
@@ -3038,12 +3062,12 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/widgets/business/camera_disconnected_business_event_widget.ui" line="20"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_disconnected_business_event_widget.ui" line="32"/>
         <source>Event will be raised when any camera goes offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Событие будет сгенерировано когда любая камера выйдет из сети</translation>
     </message>
 </context>
 <context>
@@ -3051,17 +3075,17 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui" line="23"/>
         <source>Input ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>ID тревожного входа:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/business/camera_input_business_event_widget.cpp" line="50"/>
+        <location filename="../src/ui/widgets/business/camera_input_business_event_widget.cpp" line="51"/>
         <source>&lt;automatic&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Авто&gt;</translation>
     </message>
 </context>
 <context>
@@ -3069,34 +3093,34 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="50"/>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать в буфер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="54"/>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выделения в файл...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="55"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать все</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="142"/>
         <source>Camera List - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Список камер - найдена %n камера</numerusform>
+            <numerusform>Список камер - найдены %n камеры</numerusform>
+            <numerusform>Список камер - найдено %n камер</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="144"/>
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Список камер Медиа Сервера %1- найдена %n камера</numerusform>
+            <numerusform>Список камер Медиа Сервера %1- найдено %n камеры</numerusform>
+            <numerusform>Список камер Медиа Сервера %1- найдено %n камер</numerusform>
         </translation>
     </message>
 </context>
@@ -3105,67 +3129,67 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="106"/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="107"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="108"/>
         <source>Driver</source>
-        <translation type="unfinished"></translation>
+        <translation>Драйвер</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="109"/>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Модель</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="110"/>
         <source>Firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>Прошивка</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="111"/>
         <source>IP/Name</source>
-        <translation type="unfinished"></translation>
+        <translation>IP/Имя хоста</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="112"/>
         <source>ID/MAC</source>
-        <translation type="unfinished"></translation>
+        <translation>ID/MAC</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="113"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionMaskWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="172"/>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="181"/>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="171"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="180"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="189"/>
         <source>Too many motion windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Слишком много регионов детекции движения</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="173"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="172"/>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальное количество регионов детекции движения %1 , а выбрано %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="182"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="181"/>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальное количество степеней детекции движения %1 , а выбрано %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="191"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальное количество регионов детекции движения %1 , а выбрано %2.</translation>
     </message>
 </context>
 <context>
@@ -3173,143 +3197,143 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="23"/>
         <source>&amp;Output ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>ID тревожного в&amp;ыхода:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="36"/>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Авто-сброс через (сек):</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/business/camera_output_business_action_widget.cpp" line="71"/>
+        <location filename="../src/ui/widgets/business/camera_output_business_action_widget.cpp" line="72"/>
         <source>&lt;automatic&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;авто&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnCameraScheduleWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="322"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="321"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Выкл</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="332"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="331"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкл</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="522"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="528"/>
+        <source>FPS value is too high</source>
+        <translation>Частота кадров слишком большая</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="523"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="529"/>
-        <source>FPS value is too high</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="524"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущее значение частоты кадров в расписании: %1. Частота кадров сброшена на максимальную частоту, поддерживаемую камерой: %2</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="530"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="529"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Для программной детекции движения 2 кадра/сек. зарезервированы для второго потока. Текущее значение частоты кадров в расписании: %1. Частота кадров сброшена на значение %2</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="620"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="598"/>
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сейчас используется %n из %1 цифровых лицензий.</numerusform>
+            <numerusform>Сейчас используется %n из %1 цифровых лицензий.</numerusform>
+            <numerusform>Сейчас используется %n из %1 цифровых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="629"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="607"/>
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сейчас используется %n из %1 аналоговых лицензий.</numerusform>
+            <numerusform>Сейчас используется %n из %1 аналоговых лицензий.</numerusform>
+            <numerusform>Сейчас используется %n из %1 аналоговых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="656"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="634"/>
         <source>Activate %n more digital license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Активируйте еще %n цифровую лицензию.</numerusform>
+            <numerusform>Активируйте еще %n цифровые лицензии.</numerusform>
+            <numerusform>Активируйте еще %n цифровых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="658"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="636"/>
         <source>Activate %n more analog license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Активируйте еще %n аналоговую лицензию.</numerusform>
+            <numerusform>Активируйте еще %n аналоговые лицензии.</numerusform>
+            <numerusform>Активируйте еще %n аналоговых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="665"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="643"/>
         <source>%n more digital license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Будет дополнительно использована %n цифровая лицензия.</numerusform>
+            <numerusform>Будет дополнительно использовано %n цифровые лицензии.</numerusform>
+            <numerusform>Будет дополнительно использовано %n цифровых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="667"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="645"/>
         <source>%n more analog license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Будет дополнительно использована %n аналоговая  лицензия.</numerusform>
+            <numerusform>Будет дополнительно использовано %n аналоговые  лицензии.</numerusform>
+            <numerusform>Будет дополнительно использовано %n аналоговых  лицензий.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="651"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="629"/>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Активируйте еще %1 цифров(ых) и %2 аналогов(ых) лицензи(й).</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="660"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="638"/>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Будет дополнительно использовано: %1 цифров(ых) и %2 аналогов(ых) лицензи(й).</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="808"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="811"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="813"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="815"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="786"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="793"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="808"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="786"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по движению отключена или не поддерживается некоторыми из выбранных камер. Пожалуйста, проверьтена web-странице камеры, что детекция движения поддерживается и включена.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="811"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="789"/>
         <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта камера не поддерживает два потока.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="813"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="791"/>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта камера не поддерживает два потока и детекцию движения.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="815"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="793"/>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по движению отключена. Пожалуйста, перейдите на web-страницу камеры для настройки детекции движения и чувствительности.</translation>
     </message>
 </context>
 <context>
@@ -3317,22 +3341,22 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="15"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="24"/>
         <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в новой вкладке</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="27"/>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="30"/>
         <source>Camera Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила для камеры</translation>
     </message>
 </context>
 <context>
@@ -3340,20 +3364,20 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_settings_widget.cpp" line="22"/>
         <source>Cannot edit properties for items of different types.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно редактировать параметры объектов разных типов.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_settings_widget.cpp" line="26"/>
         <source>No cameras selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не выбраны камеры.</translation>
     </message>
 </context>
 <context>
     <name>QnCheckableMessageBox</name>
     <message>
-        <location filename="../src/ui/dialogs/checkable_message_box.cpp" line="43"/>
+        <location filename="../src/ui/dialogs/checkable_message_box.cpp" line="41"/>
         <source>Do not ask again</source>
-        <translation type="unfinished"></translation>
+        <translation>Больше не спрашивать</translation>
     </message>
 </context>
 <context>
@@ -3361,7 +3385,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Истекло время ожидания ответа на запрос.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="102"/>
@@ -3369,7 +3393,10 @@ It might take a few moments to populate them in the tree.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с  Enterprise Controller не может быть установлено.
+Неверные параметы соединения .
+
+Попробуйте еще раз. Если ошибка повторяется, свяжитесь с администратором системы.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="110"/>
@@ -3377,7 +3404,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Другая версия Enterprise Controller: 
+ - Клиент: %1.
+ - Enterprise Controller: %2.
+Режим совместимости для версий ниже %3 не поддерживается.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="120"/>
@@ -3385,17 +3415,20 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Другая версия Enterprise Controller: 
+ - Клиент: %1.
+ - Enterprise Controller: %2.
+Потребуется перезапуск клиента в режиме совместимости.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="140"/>
         <source>Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="140"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение установлено</translation>
     </message>
 </context>
 <context>
@@ -3403,99 +3436,86 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="37"/>
         <source>Save Database Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить резервную копию БД...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="37"/>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="71"/>
         <source>Database Backup Files (*.db)</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл резервного копирования БД(*.db)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="44"/>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="78"/>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="112"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="44"/>
         <source>Could not open file &apos;%1&apos; for writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не могу открыть файл %1 на запись.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="51"/>
         <source>Downloading Database Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Загружается резервную копию БД</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
         <source>Database backup is being downloaded from the server. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервная копия БД загружается с сервера. Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="67"/>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="108"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="67"/>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервная копия БД была успешно сохранена в файл %1.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="71"/>
         <source>Open Database Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть резервную копию БД...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="78"/>
         <source>Could not open file &apos;%1&apos; for reading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть файл %1.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="82"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="82"/>
         <source>Are you sure you want to start restoring database? All current data will be lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены что хотите начать процесс восстановления БД? Все текущие данные будут потеряны.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="94"/>
         <source>Restoring Database Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстанавливаю БД</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="95"/>
         <source>Database backup is being uploaded to the server. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервная копия БД загружается на сервер. Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="109"/>
         <source>Database was successfully restored from file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>БД была успешно восстановлена из файла %1.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="112"/>
         <source>An error has occured while restoring the database from file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnDesktopDataProvider</name>
-    <message>
-        <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="243"/>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="389"/>
-        <source>Can&apos;t find video encoder </source>
-        <translation type="unfinished"></translation>
+        <translation>Произошла ошибка при восстановлении БД из файла %1.</translation>
     </message>
 </context>
 <context>
@@ -3503,25 +3523,25 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="313"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Форматы 44100 и 48000 Гц не поддерживаются устройством захвата звука! Пожалуйста, выберите другое устройство или значение &apos;нет&apos;</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="480"/>
         <source>Can&apos;t find video encoder </source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается найти видео кодировщик</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="488"/>
         <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается создать временный файл в папке %1. Пожалуйста настройте параметр &apos;Основной каталог&apos; в настройках захвата экрана. </translation>
     </message>
 </context>
 <context>
     <name>QnEmailValidDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="181"/>
+        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="168"/>
         <source>%1 of %2 selected users have invalid email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверные почтовые адреса у %1 из %2 выбранных пользователей.</translation>
     </message>
 </context>
 <context>
@@ -3529,7 +3549,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/business/empty_business_action_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3537,7 +3557,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/business/empty_business_event_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3545,100 +3565,100 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="80"/>
         <source>Any action</source>
-        <translation type="unfinished"></translation>
+        <translation>Любое действие</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="100"/>
         <source>Filter Similar Rows</source>
-        <translation type="unfinished"></translation>
+        <translation>Отфильтровать похожие строки</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="102"/>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать в буфер обмена</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="103"/>
         <source>Export Selection to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт выделенного в файл...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="104"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>Выделить все</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="107"/>
         <source>Clear Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить фильтр</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="362"/>
         <source>Event log for period from %1 to %2 - %3 event(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий за период с %1 по %2 - %3 событи(й)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="367"/>
         <source>Event log for %1  - %2 event(s) found</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий за %1 - %2 событи(й)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="406"/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; Любая камера &gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="408"/>
         <source>&lt; 1 camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; 1 камера &gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="410"/>
         <source>&lt; %1 cameras &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; %1 камер(ы) &gt;</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="268"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="267"/>
         <source>Date/Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата/Время</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/event_log_model.cpp" line="268"/>
+        <source>Event</source>
+        <translation>Событие</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="269"/>
-        <source>Event</source>
-        <translation type="unfinished"></translation>
+        <source>Source</source>
+        <translation>Источник</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="270"/>
-        <source>Source</source>
-        <translation type="unfinished"></translation>
+        <source>Action</source>
+        <translation>Действие</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="271"/>
-        <source>Action</source>
-        <translation type="unfinished"></translation>
+        <source>Target</source>
+        <translation>Объект</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="272"/>
-        <source>Target</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="273"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="407"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="406"/>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>Всем пользователям</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="409"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="408"/>
         <source>Administrators Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только администраторам</translation>
     </message>
 </context>
 <context>
@@ -3646,30 +3666,53 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="63"/>
         <source>Schedule motion type is not supported by some cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Исходный тип записи не поддерживается на некоторых камерах</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="69"/>
         <source>Recording cannot be enabled for some cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись не может быть включения на некоторых камерах</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Будет использована %n цифровая лицензия из %1.</numerusform>
+            <numerusform>Будет использовано %n цифровые лицензии из %1.</numerusform>
+            <numerusform>Будет использовано %n цифровых лицензий из %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="89"/>
         <source>%n analog license(s) will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Будет использована %n аналоговая лицензия из %1.</numerusform>
+            <numerusform>Будет использовано %n аналоговые лицензии из %1.</numerusform>
+            <numerusform>Будет использовано %n аналоговых лицензий из %1.</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnGlHardwareChecker</name>
+    <message>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="38"/>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation>Используемая видеокарта не поддерживается. Вы можете продолжать работу на свой страх и риск.&lt;br/&gt;Установка или обновление драйверов на видеокарте может решить эту проблему&lt;br/&gt;Для информации о том, как установить или обновить драйвера перейдите по ссылке &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="41"/>
+        <source>Critical Performance Tip</source>
+        <translation>Важный совет по увеличению производительности</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="43"/>
+        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
+        <translation>Драйверы для используемой видеокарты не установлены или устарели.&lt;br/&gt;Установка или обновление драйверов на видеокарте может существенно повысить производительность системы при работе с видео.&lt;br/&gt;Для информации о том, как установить или обновить драйвера перейдите по ссылке &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="46"/>
+        <source>Important Performance Tip</source>
+        <translation>Важный совет по увеличению производительности</translation>
     </message>
 </context>
 <context>
@@ -3677,7 +3720,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/histogram_widget.cpp" line="77"/>
         <source>Gamma %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Гамма %1</translation>
     </message>
 </context>
 <context>
@@ -3685,20 +3728,20 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/dialogs/image_preview_dialog.ui" line="14"/>
         <source>Image View</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр изображения</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/image_preview_dialog.ui" line="72"/>
         <source>Image loading can take a lot of time. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузка изображения может занять долгое время. Пожалуйста, подождите.</translation>
     </message>
 </context>
 <context>
     <name>QnInputEnabledDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="145"/>
+        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="132"/>
         <source>%1 of %2 selected cameras have no input ports.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 из %2 выбранных камер не имею тревожных входов.</translation>
     </message>
 </context>
 <context>
@@ -3706,104 +3749,104 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Диалог</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="20"/>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие настройки</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="36"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Фон</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="64"/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="71"/>
         <source>View...</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="123"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обработка изображения может занять продолжительное время. Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="163"/>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Обрезать по соотношению сторон монитора</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="175"/>
         <source>&amp;Width:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ширина:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="188"/>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="217"/>
         <source> cells</source>
-        <translation type="unfinished"></translation>
+        <translation> ячеек</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="204"/>
         <source>&amp;Height:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Высота:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="233"/>
         <source>&amp;Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Прозрачность:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="246"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="265"/>
         <source>Keep aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранять соотношение сторон</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="84"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="26"/>
         <source>Layout is locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Запретить изменение раскладки</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="300"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="299"/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Нет изображения&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="417"/>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="516"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="418"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="517"/>
         <source>&lt;Image cannot be loaded&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Изображение не может быть загружено&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="430"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="431"/>
         <source>&lt;Image cannot be uploaded&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Изображение не может быть загружено на сервер&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="479"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="480"/>
         <source>Open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="490"/>
+        <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="491"/>
         <source>Pictures %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображения %1</translation>
     </message>
 </context>
 <context>
@@ -3811,104 +3854,106 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="53"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="54"/>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Ко-во камер</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="55"/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Ключ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="56"/>
         <source>Expiration Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата окончания</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="57"/>
         <source>Expires in</source>
-        <translation type="unfinished"></translation>
+        <translation>Истекает через</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="78"/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Никогда</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="87"/>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Срок закончен</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="95"/>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Сегодня</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="97"/>
         <source>Tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Завтра</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/license_list_model.cpp" line="99"/>
         <source>In %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Через %n день</numerusform>
+            <numerusform>Через %n дня</numerusform>
+            <numerusform>Через %n дней</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="85"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="87"/>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Required at least %3 digital and %4 analog licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>В системе установлено %1 цифровы(х) и %2 аналоговы(х) лицензи(й).
+Требуется по крайней мере %3 цифровы(х) и %4 аналоговы(х) лицензи(й).</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="103"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="105"/>
         <source>Obtaining licenses from Enterprise Controller...</source>
-        <translation type="unfinished"></translation>
+        <translation>Список лицензий загружается с Enterprise Controller&apos;a...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="93"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="95"/>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 %3 digital and %4 analog licenses are currently in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>В системе установлено %1 цифровых и %2 аналоговых лицензий.
+Используется %3 цифровых и %4 аналоговых лицензий.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="107"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="109"/>
         <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет лицензий. Пожалуйста активируйте коммерческую или временную бесплатную лицензию.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="108"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="110"/>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет лицензий. Пожалуйста активируйте коммерческую лицензию.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="184"/>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="188"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="240"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="254"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="235"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="249"/>
         <source>License Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Активация лиценизий</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="185"/>
         <source>Invalid License. Contact our support team to get a valid License.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверная лицензия. Свяжитесь со службой поддержки для приобретения корректной лицензии.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="189"/>
         <source>The license is already activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия уже активирована.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="195"/>
@@ -3919,28 +3964,34 @@ Locked to Hardware ID: %3&lt;br /&gt;
 &lt;br /&gt;
 &lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
 Archive Streams Allowed: %4</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Общая информация:&lt;/b&gt;&lt;br /&gt;
+Тип: %1&lt;br /&gt;
+Лицензионный ключ: %2&lt;br /&gt;
+Идентификатор системы: %3&lt;br /&gt;
+&lt;br /&gt;
+&lt;b&gt;Возможности:&lt;/b&gt;&lt;br /&gt;
+Количество одновременно записываемых камер: %4</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="206"/>
         <source>License Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация по лицензии</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="230"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="225"/>
         <source>There was a problem activating your license.</source>
-        <translation type="unfinished"></translation>
+        <translation>При активации лицензии возникла проблема.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="232"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="227"/>
         <source>License was successfully activated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия успешно активирована.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="255"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="250"/>
         <source>Network error has occurred during the Automatic License Activation.
 Try to activate your License manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>При активации лицензии произошла ошибка. Пожалуйста, попробуйте активировать лицензию вручную.</translation>
     </message>
 </context>
 <context>
@@ -3948,288 +3999,285 @@ Try to activate your License manually.</source>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="41"/>
         <source>Some of your licenses have expired.</source>
-        <translation type="unfinished"></translation>
+        <translation>У некоторых лицензий заканчивается срок действия.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="43"/>
         <source>Some of your licenses will soon expire.</source>
-        <translation type="unfinished"></translation>
+        <translation>У некоторых лицензий закончился срок действия.</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="37"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="36"/>
         <source>Activate Trial License</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать временную лицензию</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="37"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="36"/>
         <source>Activate Free License</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать бесплатную лицензию</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="39"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="38"/>
         <source>Please send E-Mail with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key which should be filled in the field below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, отправьте письмо с указанием серийного номера и идентификатора системына электронный адрес &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Вам будет выслан ключ активации, который должен быть указан в нижеследующем поле.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="108"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="107"/>
         <source>Activate License</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать лицензию</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="111"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="110"/>
         <source>Activating...</source>
-        <translation type="unfinished"></translation>
+        <translation>Активируется...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="142"/>
+        <source>Open License File</source>
+        <translation>Открыть файл лицензии</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="143"/>
-        <source>Open License File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="144"/>
         <source>All files (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы (*.*)</translation>
     </message>
 </context>
 <context>
     <name>QnLoginDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="172"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="164"/>
         <source>Invalid Login Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректные детали подключения</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="172"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="164"/>
         <source>The Login Information you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Введенные некорректные детали подключения.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="105"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="239"/>
         <source>Saved Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохраненные сессии</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="107"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="257"/>
         <source>Auto-Discovered ECs</source>
-        <translation type="unfinished"></translation>
+        <translation>EC, найденные в сети</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="238"/>
-        <source>* Last used connection *</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="273"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="279"/>
         <source>&lt;none&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;нет&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="379"/>
-        <source>You are about to connect to Enterprise Controller which has a different version:
- - Client version: %1.
- - EC version: %2.
-Unable to connect to applauncher to enable client compatibility mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="405"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="396"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Процесс Launcher не найден</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="406"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="397"/>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось перезапустить клиентское приложение в режиме совместимости. Пожалуйста, закройте приложение и запустите его снова с помощью ярлыка в главном меню или на рабочем столе.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="330"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="357"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="378"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="392"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="417"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="339"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="366"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="383"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="409"/>
         <source>Could not connect to Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось соединиться с Enterprise Controller&apos;ом</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="331"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="340"/>
         <source>Connection to the Enterprise Controller could not be established.
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с  Enterprise Controller не может быть установлено.
+Неверные параметы соединения .
+
+Попробуйте еще раз. Если ошибка повторяется, свяжитесь с администратором системы.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="358"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="367"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обнаружена другая версия Enterprise Controller: 
+ - Клиент: %1.
+ - Enterprise Controller: %2.
+Режим совместимости для версий ниже %3 не поддерживается.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="393"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="384"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Would you like to restart client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>Обнаружена другая версия Enterprise Controller: 
+ - Клиент: %1.
+ - Enterprise Controller: %2.
+Хотите ли вы перезапустить клиентское приложение в режиме совместимости?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="418"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="410"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
-Client Version %3 is required to connect to this Enterprise Controller.
-Download version %3?</source>
-        <translation type="unfinished"></translation>
+Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
+        <translation>Обнаружена другая версия Enterprise Controller: 
+ - Клиент: %1.
+ - Enterprise Controller: %2.
+Требуемая версия клиентского приложения для соединения с этим Enterprise Controller&apos;ом: %2. Пожалуйста, загрузите и установите версию %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="467"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="482"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="488"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="442"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="457"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
         <source>Invalid parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверные параметры</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="467"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="442"/>
         <source>The information you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Введенная информация некорректна.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="457"/>
+        <source>Entered hostname is not valid.</source>
+        <translation>.Введенно некорректное доменное имя.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
+        <source>Host field cannot be empty.</source>
+        <translation>Доменное имя должно быть указано.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="472"/>
+        <source>%1 at %2</source>
+        <translation>%1 на %2</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="473"/>
+        <source>Save connection as...</source>
+        <translation>Сохранить соединение как...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="473"/>
+        <source>Enter name:</source>
+        <translation>Введите имя:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="481"/>
+        <source>Connection already exists</source>
+        <translation>Соединение уже существует</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="482"/>
-        <source>Entered hostname is not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="488"/>
-        <source>Host field cannot be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="497"/>
-        <source>%1 at %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="498"/>
-        <source>Save connection as...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="498"/>
-        <source>Enter name:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="506"/>
-        <source>Connection already exists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="507"/>
         <source>Connection with the same name already exists. Overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с таким именем уже существует. Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="541"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="517"/>
         <source>Delete connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить соединени(я)</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="542"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="518"/>
         <source>Are you sure you want to delete the connection
 %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите удалить содинение %1?</translation>
     </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="105"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="104"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоп-кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="113"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="111"/>
         <source>Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск по движению</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="121"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="119"/>
         <source>PTZ</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="129"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="127"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция искривления</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="138"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="136"/>
         <source>Create Zoom Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать окно увеличения</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="146"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="144"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция изображения</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="466"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="463"/>
         <source>Zoom window</source>
-        <translation type="unfinished"></translation>
+        <translation>Окно увеличения</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="774"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="771"/>
         <source> (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="780"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="777"/>
         <source> Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="780"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="777"/>
         <source> Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="789"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="786"/>
         <source>	%1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="791"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="788"/>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="796"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="793"/>
         <source> HW</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="796"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="793"/>
         <source> SW</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="797"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="794"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnMotionEnabledDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="109"/>
+        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="96"/>
         <source>Recording or motion detection is disabled for %1 of %2 selected cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись или детекция движения выключены на %1 из %2 выбранных камер.</translation>
     </message>
 </context>
 <context>
@@ -4238,74 +4286,74 @@ Download version %3?</source>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="276"/>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
-        <translation type="unfinished"></translation>
+        <translation>&lt;несколько значений&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="284"/>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
-        <translation type="unfinished"></translation>
+        <translation>&lt;несколько значений&gt;</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="415"/>
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сейчас используется %n из %1 цифровых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 цифровых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 цифровых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="424"/>
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сейчас используется %n из %1 аналоговых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 аналоговых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 аналоговых лицензий.</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnNavigationItem</name>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="379"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="373"/>
         <source>Speed Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Замедлить</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="379"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="373"/>
         <source>Previous Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Предыдущий кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="380"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="374"/>
         <source>Speed Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Ускорить</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="380"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="374"/>
         <source>Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующий кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="392"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="386"/>
         <source>Previuos Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation>Предыдущий фрагмент</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="392"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="386"/>
         <source>To Start</source>
-        <translation type="unfinished"></translation>
+        <translation>В начало</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="393"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="387"/>
         <source>Next Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующий фрагмент</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="393"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="387"/>
         <source>To End</source>
-        <translation type="unfinished"></translation>
+        <translation>В конец</translation>
     </message>
 </context>
 <context>
@@ -4313,7 +4361,7 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notification_list_widget.cpp" line="178"/>
         <source>%1 items more</source>
-        <translation type="unfinished"></translation>
+        <translation>Еще %1 </translation>
     </message>
 </context>
 <context>
@@ -4321,84 +4369,84 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="14"/>
         <source>Notification Sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Звуки оповещений</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="43"/>
         <source>&amp;Play</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Играть</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="57"/>
         <source>&amp;Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Добавить...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="64"/>
         <source>&amp;Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Переименовать...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="71"/>
         <source>&amp;Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Удалить...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="59"/>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать файл...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="62"/>
         <source>Sound files</source>
-        <translation type="unfinished"></translation>
+        <translation>Звуковые файлы</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="69"/>
         <source>Clip sound up to %n seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизводить % секунд</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="70"/>
         <source>Custom Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Другой заголовок</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="82"/>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="107"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="83"/>
         <source>File cannot be added.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл не может быть добавлен.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="98"/>
         <source>Rename sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать звук</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="99"/>
         <source>Enter new title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите новое название:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="108"/>
         <source>New title could not be set</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось установить новый заголовок</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="124"/>
         <source>Confirm file deletion</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтвердите удаление файла</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="125"/>
         <source>Are you sure you want to delete
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите удалить %1?</translation>
     </message>
 </context>
 <context>
@@ -4406,22 +4454,22 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/models/notification_sound_model.cpp" line="13"/>
         <source>&lt;Downloading sound list...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Загружается список звуков...&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/notification_sound_model.cpp" line="23"/>
         <source>&lt;No Sound&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Нет звука&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/notification_sound_model.cpp" line="35"/>
         <source>&lt;Downloading sound...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Загружается звук...&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/notification_sound_model.cpp" line="45"/>
         <source>&lt;Uploading sound...&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Звук... Загружается на сервер&gt;</translation>
     </message>
 </context>
 <context>
@@ -4429,93 +4477,93 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notification_widget.cpp" line="48"/>
         <source>Close (&lt;b&gt;Right Click&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть (&lt;b&gt;Right Click&lt;/b&gt;)</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="157"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="155"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="166"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="164"/>
         <source>Filter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="175"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="173"/>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="187"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="185"/>
         <source>DEBUG</source>
-        <translation type="unfinished"></translation>
+        <translation>ОТЛАДКА</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="294"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="291"/>
         <source>Browse Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр архива</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="304"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="301"/>
         <source>Open Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть камеру</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="314"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="333"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="311"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="330"/>
         <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="324"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="442"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="450"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="321"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="439"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="447"/>
         <source>Server settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки сервера</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="345"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="342"/>
         <source>Open camera web page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть web-страницу камеры...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="354"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="351"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="398"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="420"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="395"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="417"/>
         <source>User Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки пользователя</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="406"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="403"/>
         <source>Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="413"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="435"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="410"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="432"/>
         <source>SMTP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки  SMTP</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="428"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="425"/>
         <source>Connect to server</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с сервером</translation>
     </message>
 </context>
 <context>
     <name>QnOutputEnabledDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="163"/>
+        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="150"/>
         <source>%1 of %2 selected cameras have not output relays.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 из %2 выбранных камер не имеет тревожных выходов.</translation>
     </message>
 </context>
 <context>
@@ -4523,22 +4571,22 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="28"/>
         <source>Manage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настроить...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="56"/>
         <source>Test...</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="39"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Громкость:</translation>
     </message>
 </context>
 <context>
@@ -4546,12 +4594,12 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui" line="23"/>
         <source>Show to Administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только Администраторам</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui" line="43"/>
         <source>Global Notification Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки уведомлений...</translation>
     </message>
 </context>
 <context>
@@ -4559,22 +4607,22 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="20"/>
         <source>Show all notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать все</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="34"/>
         <source>Show Alarms/Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать тревоги/события</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="42"/>
         <source>Show System Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Системные уведомления</translation>
     </message>
 </context>
 <context>
@@ -4584,152 +4632,154 @@ Download version %3?</source>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="40"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="43"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
 </context>
 <context>
     <name>QnPreferencesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="57"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="54"/>
         <source>Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Время сервера</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="58"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="55"/>
         <source>Client Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Время клиента</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="62"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="59"/>
         <source>Screen Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Захват экрана</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="74"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="68"/>
         <source>Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Уведомления</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="78"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="72"/>
         <source>YouTube</source>
-        <translation type="unfinished"></translation>
+        <translation>YoyTube</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="83"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="77"/>
         <source>Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="87"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="81"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="137"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="130"/>
         <source>Settings file is read-only. Please contact your system administrator.
 All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл настроек доступен только для чтения. Пожалуйста, свяжитесь с системным администратором. Все изменения будут потеряны после завершения работы программы.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="139"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="132"/>
         <source>Settings cannot be saved. Please contact your system administrator.
 All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сохранить настройки. Пожалуйста, свяжитесь с системным администратором. Все изменения будут потеряны после завершения работы программы.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="163"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="156"/>
         <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Аппаратное ускорение - экспериментальная возможность и может привести к сбоям на некоторых системах. Вы уверены, что хотите включить его?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="177"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="170"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="258"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="251"/>
         <source>IP Address: %1, Network Mask: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>IP адрес: %1, Маска подсети: %2</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="320"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="313"/>
         <source>Folder is already added</source>
-        <translation type="unfinished"></translation>
+        <translation>Папка уже добавлена</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="320"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="313"/>
         <source>This folder is already added.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта папка уже была добавлена.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="162"/>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="348"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="155"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="341"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="178"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="171"/>
         <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые настройки вступят в силу только после перезапуск. Чтобы перезапустить приложение сейчас, нажмите ОК.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="187"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="180"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Процесс Launcher не найден</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="188"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="181"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно перезапустить клиент.
+Пожалуйста, закройте приложение и запустите его заново, используя ярлык в меню Пуск.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="348"/>
+        <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="341"/>
         <source>This settings will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Данные настройки никак не повлияют на расписание планировщика.
+Расписание планировщика всегда использует время сервера.</translation>
     </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/progress_dialog.cpp" line="171"/>
+        <location filename="../src/ui/dialogs/progress_dialog.cpp" line="169"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="71"/>
+        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="69"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="46"/>
+        <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="44"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetListModel</name>
     <message>
-        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="108"/>
+        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="106"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="212"/>
+        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="210"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="213"/>
+        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="211"/>
         <source>Hotkey</source>
-        <translation type="unfinished"></translation>
+        <translation>Горячая клавиша</translation>
     </message>
 </context>
 <context>
@@ -4737,17 +4787,17 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="23"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="24"/>
         <source>Activate</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="85"/>
         <source>PTZ presets for camera %1:</source>
-        <translation type="unfinished"></translation>
+        <translation>Предустановка PTZ для камеры %1:</translation>
     </message>
 </context>
 <context>
@@ -4755,99 +4805,60 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="23"/>
         <source>Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="43"/>
         <source>fps</source>
-        <translation type="unfinished"></translation>
+        <translation>к/с</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="63"/>
         <source>before</source>
-        <translation type="unfinished"></translation>
+        <translation>Предзапись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="70"/>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="87"/>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="97"/>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="80"/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Постзапись:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="110"/>
         <source>max</source>
-        <translation type="unfinished"></translation>
+        <translation>максимум</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingEnabledDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="127"/>
+        <location filename="../src/ui/delegates/resource_selection_dialog_delegate.cpp" line="114"/>
         <source>Recording is disabled for %1 of %2 selected cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись отключена для %1 из %2 выбранных камер.</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/recording_settings_widget.cpp" line="50"/>
+        <location filename="../src/ui/widgets/settings/recording_settings_widget.cpp" line="48"/>
         <source>Screen %1 - %2x%3</source>
-        <translation type="unfinished"></translation>
+        <translation>Экран %1 - %2х%3</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/recording_settings_widget.cpp" line="55"/>
+        <location filename="../src/ui/widgets/settings/recording_settings_widget.cpp" line="53"/>
         <source>%1 (Primary)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnRecordingStatusHelper</name>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="35"/>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="52"/>
-        <source>Not recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="37"/>
-        <source>Recording everything</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="39"/>
-        <source>Recording motion only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="41"/>
-        <source>Recording motion and low quality</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="54"/>
-        <source>Continuous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="56"/>
-        <source>Motion only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/common/recording_status_helper.cpp" line="58"/>
-        <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Основной)</translation>
     </message>
 </context>
 <context>
@@ -4855,46 +4866,46 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.cpp" line="169"/>
         <source>Any Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Любой</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.cpp" line="170"/>
         <source>Video Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Видеофайлы</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.cpp" line="171"/>
         <source>Image Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Файлы изображений</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.cpp" line="172"/>
         <source>Live Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео с камер</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.cpp" line="474"/>
         <source>Sample Tooltip</source>
-        <translation type="unfinished"></translation>
+        <translation>Пример подсказки</translation>
     </message>
 </context>
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/resource_selection_dialog.ui" line="20"/>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="78"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="54"/>
         <source>Select cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите камеры...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="73"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="49"/>
         <source>Select users...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите пользователей...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="81"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="57"/>
         <source>Select resources...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите ресурсы...</translation>
     </message>
 </context>
 <context>
@@ -4903,35 +4914,35 @@ Recording Schedule is always based on Server Time.</source>
         <location filename="../src/ui/widgets/resource_tree_widget.ui" line="32"/>
         <location filename="../src/ui/widgets/resource_tree_widget.ui" line="42"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_tree_widget.ui" line="49"/>
         <source>Reset Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить поиск</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_tree_widget.ui" line="52"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>Х</translation>
     </message>
 </context>
 <context>
     <name>QnResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="164"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="162"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="172"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="170"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="179"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="177"/>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>Повернуть</translation>
     </message>
 </context>
 <context>
@@ -4939,35 +4950,27 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="25"/>
         <source>Say the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>Произнести:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="32"/>
         <source>Type any text here</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите текст</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="43"/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Громкость:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="60"/>
         <source>Test...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnScreenRecorder</name>
-    <message>
-        <location filename="../src/ui/screen_recording/screen_recorder.cpp" line="95"/>
-        <source>Screen capturing subsystem is not initialized yet. Please try latter</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка...</translation>
     </message>
 </context>
 <context>
@@ -4975,35 +4978,30 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui" line="23"/>
         <source>&amp;Additional Recipients:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Дополнительные получатели:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui" line="36"/>
         <source>&amp;Global Email Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Настройки e-mail...</translation>
     </message>
 </context>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="500"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="499"/>
         <source>Show Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать журнал</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="509"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="507"/>
         <source>Check Issues</source>
-        <translation type="unfinished"></translation>
+        <translation>Найти проблемы</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="693"/>
-        <source>%1 %2 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="698"/>
-        <source>(up %1 days, %2)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="691"/>
+        <source>%1 (%2)</source>
+        <translation>%1 (%2)</translation>
     </message>
 </context>
 <context>
@@ -5011,47 +5009,37 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="242"/>
         <source>Remove Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить хранилище</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="308"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="304"/>
         <source>Not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Недоступно</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="382"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="373"/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузка...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="389"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="380"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкл</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="389"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="380"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Выкл</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="539"/>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="540"/>
-        <source>You are about to launch the archive re-synchronization routine. ATTENTION! All recording will be stopped during this process. Depending on the total size of archive it can take several hours. This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="584"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="524"/>
         <source>Could not load storages from server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно загрузить хранилища с сервера.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="621"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="561"/>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;1&apos;&gt;Добавить внешнее хранилище...&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
@@ -5059,58 +5047,58 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/sign_info.cpp" line="69"/>
         <source>Analyzing: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Анализ: %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/sign_info.cpp" line="79"/>
         <source>Watermark not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Водяной знак не найден</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/sign_info.cpp" line="83"/>
         <source>Watermark matched</source>
-        <translation type="unfinished"></translation>
+        <translation>Корректный водяной знак</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/sign_info.cpp" line="87"/>
         <source>Invalid watermark</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный водяной знак</translation>
     </message>
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="828"/>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="832"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="808"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="812"/>
         <source>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="442"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="439"/>
         <source>Hardware (Camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>Аппаратный (встроенный в камеру)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="444"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="441"/>
         <source>Do not record motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Не записывать движение</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="637"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="625"/>
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сейчас используется %n из %1 цифровых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 цифровых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 цифровых лицензий.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="646"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="634"/>
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сейчас используется %n из %1 аналоговых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 аналоговых лицензий.</numerusform>
+            <numerusform>Сейчас используются %n из %1 аналоговых лицензий.</numerusform>
         </translation>
     </message>
 </context>
@@ -5119,187 +5107,187 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="32"/>
         <source>Advanced settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительные настройки...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="52"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="81"/>
         <source>&amp;E-Mail:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;E-mail:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="94"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="179"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Пароль</translation>
+        <translation>&amp;Пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="111"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="275"/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Описание системы:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="128"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="285"/>
         <source>Enter short system description here...</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите краткое описание...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="153"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>SMTP &amp;сервер:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="166"/>
         <source>&amp;User:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Имя пользователь:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="200"/>
         <source>P&amp;ort</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;орт</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="224"/>
         <source>Unsecure connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Незащищенное соединение</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="231"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="261"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(рекомендуется)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="244"/>
         <source>Secure connection using TLS</source>
-        <translation type="unfinished"></translation>
+        <translation>Защищенное соединение с TLS</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="254"/>
         <source>Secure connection using SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>Защищенное соединение с SSL</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="306"/>
         <source>Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="320"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="334"/>
         <source>User:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя пользователя:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="348"/>
         <source>Security:</source>
-        <translation type="unfinished"></translation>
+        <translation>Безопасность:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="362"/>
         <source>Progress:</source>
-        <translation type="unfinished"></translation>
+        <translation>Прогресс:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="382"/>
         <source>Result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Результат:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="400"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>ОК</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="413"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="71"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="200"/>
+        <source>Email is not valid</source>
+        <translation>Некорректный e-mail</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="203"/>
-        <source>Email is not valid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="206"/>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished"></translation>
+        <translation>Шаблон не найден. Воспользуйтесь дополнительными настройками.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="245"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="238"/>
         <source>Invalid data</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректные данные</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="245"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="238"/>
         <source>Cannot test such parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно проверить данные настройки</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="257"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="250"/>
         <source>TLS</source>
-        <translation type="unfinished"></translation>
+        <translation>TLS</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="259"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="252"/>
         <source>SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>SSL</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="253"/>
+        <source>Unsecured</source>
+        <translation>Незащищенное</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="260"/>
-        <source>Unsecured</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="267"/>
         <source>In Progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполняется...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="278"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="271"/>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменено</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="288"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="281"/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Истек период ожидания</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="296"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="289"/>
         <source>Error while testing settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при проверке настроек</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="298"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="291"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Успешно</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="299"/>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="319"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="292"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="313"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="319"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="313"/>
         <source>Error while receiving settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при получении параметров</translation>
     </message>
 </context>
 <context>
@@ -5307,50 +5295,50 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/graphics/items/controls/speed_slider.cpp" line="177"/>
         <source>%1x</source>
-        <translation type="unfinished"></translation>
+        <translation>%1х</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/speed_slider.cpp" line="177"/>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Приостановлено</translation>
     </message>
 </context>
 <context>
     <name>QnStatusOverlayWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="58"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="57"/>
         <source>NO DATA</source>
-        <translation type="unfinished"></translation>
+        <translation>НЕТ ДАННЫХ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="60"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="59"/>
         <source>NO SIGNAL</source>
-        <translation type="unfinished"></translation>
+        <translation>НЕТ СИГНАЛА</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="62"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="61"/>
         <source>Unauthorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Не авторизован</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="64"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="63"/>
         <source>Please check authentication information&lt;br/&gt;in camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, проверьте реквизиты&lt;br/&gt;доступа в настройках камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="67"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="66"/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузка...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="69"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="68"/>
         <source>Activate analog license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation>Активируйте аналогувую лицензию, чтобы убрать это сообщение</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="74"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="73"/>
         <source>Diagnose...</source>
-        <translation type="unfinished"></translation>
+        <translation>Диагностика...</translation>
     </message>
 </context>
 <context>
@@ -5358,84 +5346,85 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.cpp" line="65"/>
         <source>Invalid Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка хранилища</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.cpp" line="65"/>
         <source>Provided storage path does not define a valid external storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Введённый путь не указывает на корректное внешнее хранилище.</translation>
     </message>
 </context>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="450"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="448"/>
         <source>NO THUMBNAILS
 AVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <translation>МИНИАТЮРЫ 
+НЕДОСТУПНЫ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="503"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="504"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="505"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="506"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="529"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="530"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="531"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="532"/>
-        <source>ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="507"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="508"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="509"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="510"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="531"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="532"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="533"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="534"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="535"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="536"/>
-        <source>s</source>
-        <translation type="unfinished"></translation>
+        <source>ms</source>
+        <translation>мс</translation>
     </message>
     <message>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="509"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="510"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="511"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="512"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="513"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="535"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="536"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="537"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="538"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="539"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="540"/>
-        <source>m</source>
-        <translation type="unfinished"></translation>
+        <source>s</source>
+        <translation>с</translation>
     </message>
     <message>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="513"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="515"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="516"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="517"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="539"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="540"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="541"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="542"/>
+        <source>m</source>
+        <translation>м</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="517"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="518"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="519"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="543"/>
-        <source>h</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="544"/>
-        <source>d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="545"/>
-        <source>M</source>
-        <translation type="unfinished"></translation>
+        <source>h</source>
+        <translation>ч</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="546"/>
+        <source>d</source>
+        <translation>д</translation>
+    </message>
+    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="547"/>
+        <source>M</source>
+        <translation>М</translation>
+    </message>
+    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="548"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="549"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="550"/>
         <source>y</source>
-        <translation type="unfinished"></translation>
+        <translation>г</translation>
     </message>
 </context>
 <context>
@@ -5443,105 +5432,105 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="446"/>
         <source>Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео с камер и архив</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="443"/>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="462"/>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>Администратор</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="113"/>
         <source>New Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый пароль</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="115"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="302"/>
         <source>Login cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Логин должен быть задан.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="306"/>
         <source>User with specified login already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь с таким логином уже существует.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="315"/>
         <source>To change your password, please
  enter your current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтобы сменить пароль, введите, пожалуйста, Ваш текущий пароль.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="318"/>
         <source>Invalid current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий пароль неверен.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="331"/>
         <source>Password cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль должен быть задан.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="325"/>
         <source>Passwords do not match.</source>
-        <translation type="unfinished"></translation>
+        <translation>Введённые пароли не совпадают.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="337"/>
         <source>Choose access rights.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите права доступа.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="349"/>
         <source>Invalid email address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный e-mail.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="439"/>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="460"/>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>Владелец</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="445"/>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр и настройка</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="447"/>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Только видео с камер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="449"/>
         <source>Custom...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настраиваемый...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="465"/>
         <source>Can adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Может изменять настройки камер</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="466"/>
         <source>Can use PTZ controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Может пользоваться PTZ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="467"/>
         <source>Can view video archives</source>
-        <translation type="unfinished"></translation>
+        <translation>Может просматривать архив</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="468"/>
         <source>Can export video</source>
-        <translation type="unfinished"></translation>
+        <translation>Может экспортировать видео</translation>
     </message>
 </context>
 <context>
@@ -5549,7 +5538,7 @@ AVAILABLE</source>
     <message>
         <location filename="../src/camera/video_camera.cpp" line="137"/>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректный тип ресурса для экспорта данных.</translation>
     </message>
 </context>
 <context>
@@ -5557,12 +5546,12 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/graphics/items/controls/volume_slider.cpp" line="51"/>
         <source>Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Беззвучный</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/volume_slider.cpp" line="51"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -5570,665 +5559,680 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.h" line="107"/>
         <source>New layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая раскладка</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="524"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="520"/>
         <source>Close Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть раскладку</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="525"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="521"/>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Раскладка не сохранена. Хотите сохранить её?</numerusform>
+            <numerusform>Следующие %n раскладки не сохранены. Хотите сохранить их?</numerusform>
+            <numerusform>Следующие %n раскладок не сохранены. Хотите сохранить их?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="553"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="549"/>
         <source>Saving Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранение раскладок</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="554"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="550"/>
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Раскладка сохраняется.</numerusform>
+            <numerusform>%n раскладки сохраняются.</numerusform>
+            <numerusform>%n раскладок сохраняются.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="555"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="551"/>
         <source>Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, подождите.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="697"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="683"/>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation> Настройки записи не были сохранены. Выберите желаемые Сценарий записи, частоту кадров и качество и отметьте изменения на графике.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="698"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="707"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="684"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="693"/>
         <source>Changes are not applied</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменения не сохранены.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="706"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="692"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Чувствительность детектора движения не изменена. Чтобы изменить чувствительность детектора движения, выберите область на изображении.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="730"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="716"/>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Исчерпан лимит лицензий. Изменения будут сохранены, но не вступят в силу.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="775"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3279"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="761"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3211"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка сохранения параметров (%1):
+%2</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="957"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="927"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Подключиться к серверу...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="969"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="939"/>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Подключиться к другому серверу...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1053"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1023"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1216"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1186"/>
         <source>Save Layout As</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить раскладку как</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1217"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1187"/>
         <source>Enter layout name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите имя раскладки:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1412"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3809"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3869"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3886"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3909"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1381"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3705"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3767"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3784"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3807"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1413"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1382"/>
         <source>Camera(s) cannot be moved to server &apos;%1&apos;. It might have been offline since the server is up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Камеры не могут быть перемещены на сервер &apos;%1&apos;. Они могли быть отключены, когда сервер был запущен.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1435"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1404"/>
         <source>Layout is locked and cannot be changed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладка заблокирована и не может быть изменена.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1455"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1424"/>
         <source>Cannot add item</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно добавить элемент</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1456"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1425"/>
         <source>Cannot add a local file to Multi-Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно добавить локальный файл к мультивидео</translation>
     </message>
     <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1467"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1484"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1498"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1515"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1529"/>
         <source>Open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1503"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1472"/>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все поддерживаемые (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1504"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1473"/>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1505"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1474"/>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображения (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1507"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1521"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1476"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1490"/>
         <source>All files (*.*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1519"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1488"/>
         <source>All Supported (*.layout)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все поддерживаемые (*.layout)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1520"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1489"/>
         <source>Layouts (*.layout)</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладки (*.layout)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1541"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1511"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1541"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1511"/>
         <source>No updates available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет доступных обновлений.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1554"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1523"/>
         <source>Software update is available</source>
-        <translation type="unfinished"></translation>
+        <translation>Доступно обновление</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1556"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1525"/>
         <source>Don&apos;t notify again about this update.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не уведомлять больше об этом обновлении.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1233"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1253"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1582"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2456"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2564"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1202"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1222"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1551"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2419"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2527"/>
         <source>Layout already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладка уже существует</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1583"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1552"/>
         <source>Layout with the same name already exists. Overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладка с таким именем уже существует. Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2159"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2132"/>
         <source>Camera(s) not Saved</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>здесь бы тоже plural forms</translatorcomment>
+        <translation>Камера(ы) не сохранена</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2160"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2133"/>
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Сохранить изменения для камеры?</numerusform>
+            <numerusform>Сохранить изменения для %n следующих камер?</numerusform>
+            <numerusform>Сохранить изменения для %n следующих камер?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2377"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2341"/>
         <source>Delete Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить файлы</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2378"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2342"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
+            <numerusform>Вы уверены, что хотите навсегда удалить %n файла?</numerusform>
+            <numerusform>Вы уверены, что хотите навсегда удалить %n файлов?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2395"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2358"/>
         <source>Remove Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить элементы</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2396"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2359"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Вы уверены, что хотите удалить этот элемент из раскладки?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить эти %n элемента из раскладки?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить эти %n элементов из раскладки?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2437"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2400"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2438"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2401"/>
         <source>Enter new name for the selected item:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите новое имя для выбранного элемента:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2502"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2465"/>
         <source>Delete Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить ресурсы</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2503"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2466"/>
         <source>Do you really want to delete the following %n item(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Вы уверены, что хотите удалить этот  элемент из раскладки?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить эти %n элемента из раскладки?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить эти %n элементов из раскладки?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2548"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2511"/>
         <source>New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая раскладка</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2549"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2512"/>
         <source>Enter the name of the layout to create:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите имя создаваемой раскладки:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3899"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3797"/>
         <source>Could not delete resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно удалить ресурс</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3899"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3797"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при удалении ресурса из Enterprise Controller&apos;а.
+
+Описание ошибки: &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2636"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2599"/>
         <source>User Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки пользователя</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2726"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3322"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2689"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3254"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2727"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2690"/>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы собираетесь экспортировать несколько видеороликов общей продолжительностью более 30 минут.
+Для этого может потребоваться более гигабайта на жёстком диске и, в зависимости от скорости подключения, может занять неколько минут.
+Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2767"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2730"/>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation>В текущей раскладке есть изображения. Изображения недопустимы при экспорте мультивидео.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2788"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2751"/>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Исполняемый медиафайл %1 (х86) (*.exe)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2790"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2753"/>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Исполняемый медиафайл %1 (х64) (*.exe)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2817"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2780"/>
         <source>Save local layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить раскладку как...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2819"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2782"/>
         <source>Export Layout As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспортировать раскладку как...</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2797"/>
+        <source>Media File (*.nov)</source>
+        <translation>Медиафайл (*.nov)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2847"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3385"/>
+        <source>Could not overwrite file</source>
+        <translation>Невозможно перезаписать файл</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3236"/>
+        <source>Could not export file</source>
+        <translation>Невозможно экспортировать файл</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3269"/>
+        <source>AVI (*.avi)</source>
+        <translation>AVI (*.avi)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3270"/>
+        <source>Matroska (*.mkv)</source>
+        <translation>Matroska (*.mkv)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3371"/>
+        <source>AVI format is not recommended</source>
+        <translation>Не рекомендуется использовать формат AVI</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1524"/>
+        <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
+        <translation>Версия %1 доступна для скачивания по адресу &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2834"/>
-        <source>Media File (*.nov)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2884"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3453"/>
-        <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3304"/>
-        <source>Could not export file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3337"/>
-        <source>AVI (*.avi)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3338"/>
-        <source>Matroska (*.mkv)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3439"/>
-        <source>AVI format is not recommended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1555"/>
-        <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2871"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3405"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3419"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3351"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить как</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2016"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1987"/>
         <source>Could not perform preview search</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно выполнить поиск по фрагментам</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="731"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="717"/>
         <source>Could not apply changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сохранить изменения</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="774"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3278"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="760"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3210"/>
         <source>Could not save parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сохранить настройки</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1234"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1254"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2565"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1203"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1223"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2420"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2528"/>
         <source>Layout with the same name already exists
 and you do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Раскладка с таким именем уже существует
+и у Вас нет прав на её изменение.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1618"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1587"/>
         <source>Layout Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки раскладок</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2016"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1987"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранный интервал слишком короток, чтобы произвести поиск по миниатюрам. Пожалуйста, выберите более длинный интервал.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2100"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2073"/>
         <source>Preview Search for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск по фрагментам для %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2766"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2775"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2912"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2729"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2738"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2875"/>
         <source>Could not save a layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сохранить раскладку</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2776"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2739"/>
         <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущая раскладка содержит несколько камер и локальных файлов. Нужно оставить либо только камеры, либо только локальные файлы</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2853"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2816"/>
         <source>Make file read-only</source>
-        <translation type="unfinished"></translation>
+        <translation>Сделать доступным только для чтения</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2872"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3420"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2835"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3352"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл &quot;%1&quot; уже существует. Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2885"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2968"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3454"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2848"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2918"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3386"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл &quot;%1&quot; используется другим процессом. Попробуйте другое имя.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2913"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2876"/>
         <source>Another export in progress. Please wait</source>
-        <translation type="unfinished"></translation>
+        <translation>В данный момент производится другой экспорт. Пожалуйста, подождите.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2940"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2892"/>
         <source>Exporting Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт раскладки</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2946"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3488"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2897"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3420"/>
         <source>Open New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть в новом окне</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3026"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2976"/>
         <source>Could not create output file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать файл %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3151"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3538"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3101"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3470"/>
         <source>Export finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт завершён</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3151"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3538"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3101"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3470"/>
         <source>Export successfully finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт успешно завершён</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3242"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3179"/>
         <source>Exporting %1 to &quot;%2&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспортируется %1 в &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3253"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3188"/>
         <source>Could not export layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно экспортировать раскладку</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3305"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3237"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Для экспорта должен быть выбран строго один элемент, но выбран %n.</numerusform>
+            <numerusform>Для экспорта должен быть выбран строго один элемент, но выбраны %n.</numerusform>
+            <numerusform>Для экспорта должен быть выбран строго один элемент, но выбраны %n.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3323"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3255"/>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы собираетесь экспортировать видеоролик продолжительностью более 30 минут.
+Для этого может потребоваться более гигабайта на жёстком диске и, в зависимости от скорости подключения, может занять неколько минут.
+Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3366"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3298"/>
         <source>Export Video As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспортировать видео как...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3377"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3309"/>
         <source>Include timestamps (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить метки времени (требуется перекодировка)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3382"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3314"/>
         <source>Apply dewarping and image correction (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить развёртку fish-eye и коррекцию изображения (требуется перекодировка)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3384"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3316"/>
         <source>Apply image correction (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить коррекцию изображения (требуется перекодировка)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3386"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3318"/>
         <source>Apply dewarping (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить развёртку fish-eye (требуется перекодировка)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3406"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3338"/>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы собираетесь экспортировать видео с фильтрами, которые требуют перекодировки. Перекодировка может занять длительное время. Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3440"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3372"/>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
-        <translation type="unfinished"></translation>
+        <translation>Формат AVI не рекомендуется применять для экспорта камер с аудиотреком, в котором есть перерывы. Нажмите &quot;Да&quot; чтобы продолжить экспорт, или &quot;Нет&quot;, чтобы выбрать другой формат</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3483"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3415"/>
         <source>Exporting Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3484"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3416"/>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт в &quot;%1&quot;...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3566"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3495"/>
         <source>Could not export video</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно экспортировать видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3688"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3698"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3584"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3594"/>
         <source>Could not get position from camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно получить положение камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3689"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3585"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при получении текущего положения с камеры %1.
+
+Пожалуйста, подождите, пока камера включится.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3699"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3595"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 The camera is probably in continuous movement mode. Please stop the camera and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при получении текущего положения с камеры %1.
+
+Возможно, камера находится в режиме постоянного поворота. Остановите камеру и попробуйте снова.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3711"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3607"/>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить положение</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3743"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3639"/>
         <source>Could not set position from camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно задать положение камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3744"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3640"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при попытке задать положение камере %1.
+
+Пожалуйста, подождите, пока камера включится.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3774"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3670"/>
         <source>Updating background</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновление заднего фона</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3775"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3671"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3809"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3705"/>
         <source>Image cannot be uploaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно загрузить изображение</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3870"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3768"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно сохранить раскладку на Enterprise Controller&apos;e.</numerusform>
+            <numerusform>Невозможно сохранить следующие %n раскладки на Enterprise Controller&apos;e.</numerusform>
+            <numerusform>Невозможно сохранить следующие %n раскладок на Enterprise Controller&apos;e.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3871"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3769"/>
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Вы хотите восстановить эту раскладку?</numerusform>
+            <numerusform>Вы хотите восстановить эти %n раскладки?</numerusform>
+            <numerusform>Вы хотите восстановить эти %n раскладок?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3887"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3785"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно сохранить  элемент на Enterprise Controller&apos;е.</numerusform>
+            <numerusform>Невозможно сохранить следующие %n элемента на Enterprise Controller&apos;е.</numerusform>
+            <numerusform>Невозможно сохранить следующие %n элементов на Enterprise Controller&apos;е.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3910"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3808"/>
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно сохранить изменения для ресурса.</numerusform>
+            <numerusform>Невозможно сохранить изменения для %n следующих ресурсов.</numerusform>
+            <numerusform>Невозможно сохранить изменения для %n следующих ресурсов.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="4048"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3950"/>
         <source>Client v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Клиент v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="4051"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3953"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Enterprise Controller v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="4056"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3958"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Медиа Сервер v%1 на %2&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="4058"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3960"/>
         <source>Media Server v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Медиа Сервер v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="4071"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3973"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые компоненты системы устарели: &lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Пожалуйста, обновите все компоненты до последней версии: %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="4079"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="3981"/>
         <source>Version Mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>Несоответствие версий</translation>
     </message>
 </context>
 <context>
@@ -6237,42 +6241,42 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="560"/>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="602"/>
         <source>Recording in...</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись в...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="596"/>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменено</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="613"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="613"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно начать запись из-за следующей ошибки: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="619"/>
         <source>recorded_video</source>
-        <translation type="unfinished"></translation>
+        <translation>recorded_video</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="626"/>
         <source>Save Recording As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить запись как...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="628"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation type="unfinished"></translation>
+        <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1361"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1360"/>
         <source>Press any key to stop the tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите любую кнопку, чтобы остановить тур</translation>
     </message>
 </context>
 <context>
@@ -6282,62 +6286,66 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="61"/>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="86"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="45"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно сохранить раскладку на Enterprise Controller&apos;e.</numerusform>
+            <numerusform>Невозможно сохранить %n следующие раскладки на Enterprise Controller&apos;e.</numerusform>
+            <numerusform>Невозможно сохранить %n следующих раскладок на Enterprise Controller&apos;e.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="46"/>
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Вы хотите восстановить эту раскладку?</numerusform>
+            <numerusform>Вы хотите восстановить эти %n раскладки?</numerusform>
+            <numerusform>Вы хотите восстановить эти %n раскладок?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="62"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно сохранить элемент на Enterprise Controller&apos;e.</numerusform>
+            <numerusform>Невозможно сохранить %n следующих элемента на Enterprise Controller&apos;e.</numerusform>
+            <numerusform>Невозможно сохранить %n следующих элементов на Enterprise Controller&apos;e.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="63"/>
         <source>Error description: 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание ошибки:
+%1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="76"/>
         <source>Could not delete resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно удалить ресурс с Enterprise Controller&apos;а.
+
+Описание ошибки: &apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="87"/>
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно сохранить изменения ресурса.</numerusform>
+            <numerusform>Невозможно сохранить изменения %n следующих ресурсов.</numerusform>
+            <numerusform>Невозможно сохранить изменения %n следующих ресурсов.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_ecs_handler.cpp" line="88"/>
         <source>Error description:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание ошибки:
+%1</translation>
     </message>
 </context>
 <context>
@@ -6345,13 +6353,13 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="961"/>
         <source>All Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Все камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1186"/>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
+        <translation>&apos;В реальном времени&apos;</translation>
     </message>
 </context>
 <context>
@@ -6359,52 +6367,52 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="62"/>
         <source>PNG Image (*.png)</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображение PNG (*.png)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="63"/>
         <source>JPEG Image(*.jpg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображение JPEG (*.jpg)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="75"/>
         <source>Save Screenshot As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить скриншот как...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="83"/>
         <source>Include Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить отметку времени</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="99"/>
         <source>Save As</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить как</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="100"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл &quot;%1&quot; уже существует. Перезаписать?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="110"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно перезаписать файл</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="111"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл &quot;%1&quot; используется другим процессом. Попробуйте другое имя.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="171"/>
         <source>Could not save screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Нвозможно сохранить скриншот</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="172"/>
         <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при сохранении скриншота &quot;%1&quot;.</translation>
     </message>
 </context>
 <context>
@@ -6412,139 +6420,139 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="14"/>
         <source>Video Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись экрана</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="45"/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Выбрать...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="55"/>
         <source>Capture Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Область записи</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="70"/>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Весь экран</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="83"/>
         <source>Application Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Окно приложения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="112"/>
         <source>Disable Aero</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить интерфейс Aero</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="119"/>
         <source>Capture Cursor</source>
-        <translation type="unfinished"></translation>
+        <translation>Записывать курсор</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="197"/>
         <source>Recording Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество записи:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="225"/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="241"/>
         <source>Audio Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись звука</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="272"/>
         <source>Primary Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Основное устройство:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="322"/>
         <source>External Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Внешнее устройство:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="132"/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="26"/>
         <source>Temporary Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Временная папка</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="103"/>
         <source>Additional Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительные настройки</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="141"/>
         <source>Resolution:</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешение:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="164"/>
         <source>Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Оригинальное</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="169"/>
         <source>Quarter Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Четверть оригинального</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="174"/>
         <source>1920x1080</source>
-        <translation type="unfinished"></translation>
+        <translation>1920х1080</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="179"/>
         <source>1280x720</source>
-        <translation type="unfinished"></translation>
+        <translation>1280х720</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="184"/>
         <source>640x480</source>
-        <translation type="unfinished"></translation>
+        <translation>640х480</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="189"/>
         <source>320x240</source>
-        <translation type="unfinished"></translation>
+        <translation>320х240</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="220"/>
         <source>Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Наилучшее качество</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="230"/>
         <source>Performance</source>
-        <translation type="unfinished"></translation>
+        <translation>Наулучшая производительность</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="253"/>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="303"/>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="289"/>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="336"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="360"/>
         <source>Very powerful machine is required for Best quality and high resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Для записи в наилучшем качестве с высоким разрешением требуется мощный компьютер.</translation>
     </message>
 </context>
 <context>
@@ -6553,23 +6561,23 @@ Error description: &apos;%2&apos;</source>
         <location filename="../src/ui/widgets/resource_browser_widget.ui" line="14"/>
         <location filename="../src/ui/widgets/resource_browser_widget.ui" line="27"/>
         <source>Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Ресурсы</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.ui" line="44"/>
         <location filename="../src/ui/widgets/resource_browser_widget.ui" line="64"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.ui" line="71"/>
         <source>Reset Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить фильтр</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.ui" line="74"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>Х</translation>
     </message>
 </context>
 <context>
@@ -6577,7 +6585,7 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Диалог</translation>
     </message>
 </context>
 <context>
@@ -6585,82 +6593,62 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="14"/>
         <source>Server settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки сервера</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="35"/>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP адрес:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="55"/>
         <source>9000</source>
-        <translation type="unfinished"></translation>
+        <translation>9000</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="25"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="45"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="65"/>
         <source>Panic mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Состояние тревоги:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="94"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="90"/>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверить подключение</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="105"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="101"/>
         <source>Storages</source>
-        <translation type="unfinished"></translation>
+        <translation>Хранилища</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="142"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="138"/>
         <source>In Use</source>
-        <translation type="unfinished"></translation>
+        <translation>Используется</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="147"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="143"/>
         <source>Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="152"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="148"/>
         <source>Capacity</source>
-        <translation type="unfinished"></translation>
+        <translation>Емкость</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="157"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="153"/>
         <source>Video Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="168"/>
-        <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="200"/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="227"/>
-        <source>Rebuild progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="244"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Видеоархив</translation>
     </message>
 </context>
 <context>
@@ -6668,12 +6656,12 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/widgets/settings/server_settings_widget.ui" line="20"/>
         <source>Outgoing E-Mail Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки исходящих сообщений</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/server_settings_widget.ui" line="39"/>
         <source>System Configuration Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование и восстановление настроек системы</translation>
     </message>
 </context>
 <context>
@@ -6681,17 +6669,17 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/dialogs/sign_dialog.ui" line="20"/>
         <source>Watermark check</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка водяного знака</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/sign_dialog.ui" line="34"/>
         <source>Checked file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверенный файл:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/sign_dialog.ui" line="41"/>
         <source>Check result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Результат:</translation>
     </message>
 </context>
 <context>
@@ -6699,180 +6687,180 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="14"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки камеры</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="24"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="35"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Название:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="273"/>
         <source>Enable audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить звук</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="143"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="157"/>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP адрес:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="211"/>
         <source>MAC Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC адрес:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="194"/>
         <source>Web Page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Веб-интерфейс:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="45"/>
         <source>Model:</source>
-        <translation type="unfinished"></translation>
+        <translation>Модель:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="66"/>
         <source>Firmware:</source>
-        <translation type="unfinished"></translation>
+        <translation>Версия прошивки:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="82"/>
         <source>Licensing</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензирование</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="90"/>
         <source>Use an analog license to view this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать аналоговую лицензию для работы с этой камерой</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="117"/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить лицензии...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="185"/>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверить подключение</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="230"/>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторизация</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="244"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Логин:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="254"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="280"/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="360"/>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation type="unfinished"></translation>
+        <translation>Программный (Максимальная частота кадров на Медиа Сервере может быть снижена)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="301"/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="311"/>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Детекция движения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="322"/>
         <source>Motion is not available for this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Для данной камеры недоступна детекция движения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="335"/>
         <source>Motion settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки детекции движения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="341"/>
         <source>Motion detection:</source>
-        <translation type="unfinished"></translation>
+        <translation>Детектор движения:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="350"/>
         <source>Hardware (Camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>Аппаратный (Встроенний в камеру)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="372"/>
         <source>Sensitivity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Чувствительность:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="409"/>
         <source>Motion mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation>Без детекции движения (0)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="419"/>
         <source>Maximum sensitivity (9)</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальная чувствительность (9)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="437"/>
         <source>Camera motion web page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Веб-страница настройки детектора движения камеры:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="453"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="492"/>
         <source>Reset motion regions</source>
-        <translation type="unfinished"></translation>
+        <translation>Сброс регионов детекции движения</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="512"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительные</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="517"/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспертные</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="502"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Наcтройки fish-eye</translation>
     </message>
 </context>
 <context>
     <name>StatisticsOverlayWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="445"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="444"/>
         <source>%1%</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -6880,22 +6868,22 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="14"/>
         <source>Add External Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить внешнее хранилище...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="25"/>
         <source>Protocol:</source>
-        <translation type="unfinished"></translation>
+        <translation>Протокол:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="35"/>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="47"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -6903,52 +6891,52 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="20"/>
         <source>Create New User</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать пользователя</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="35"/>
         <source>User Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки пользователя</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="66"/>
         <source>C&amp;urrent Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Текущий пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="79"/>
         <source>&amp;Confirm Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;одтвердите пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="89"/>
         <source>&amp;Access Rights:</source>
-        <translation type="unfinished"></translation>
+        <translation>П&amp;рава доступа:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="106"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Пароль</translation>
+        <translation>&amp;Пароль:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="131"/>
         <source>&amp;Login:</source>
-        <translation type="unfinished">&amp;Логин</translation>
+        <translation>&amp;Логин:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="157"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Е-mail:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="116"/>
         <source>Access rights</source>
-        <translation type="unfinished"></translation>
+        <translation>Права доступа</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="53"/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Подробнее...</translation>
     </message>
 </context>
 <context>
@@ -6956,32 +6944,32 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="14"/>
         <source>Weekly Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор расписания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="20"/>
         <source>Schedule Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>График планировщика</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="54"/>
         <source>Note: Schedule is based on Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Примечание: Расписание по серверному времени</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="82"/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки расписания</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="139"/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Вкл</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/weektime_schedule_widget.ui" line="193"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Выкл</translation>
     </message>
 </context>
 </TS>

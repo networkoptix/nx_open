@@ -98,7 +98,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     {
     }
 
-    virtual QnAbstractMediaData* clone();
+    virtual QnAbstractMediaData* clone() const;
 
     //!Create media packet using existing data \a data of size \a dataSize. This buffer will not be deleted!
     QnAbstractMediaData(char* data, unsigned int dataSize): 
@@ -127,11 +127,12 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     QnMediaContextPtr context;
     int opaque;
 protected:
-    void assign(QnAbstractMediaData* other);
+    void assign(const QnAbstractMediaData* other);
 private:
     QnAbstractMediaData(): data(0U, 1) {};
 };
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
+typedef QSharedPointer<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
 
 
 struct QnEmptyMediaData : public QnAbstractMediaData
@@ -146,6 +147,8 @@ typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
 struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
+typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
+Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
 
 
@@ -167,7 +170,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
         pts = AV_NOPTS_VALUE;
     }
 
-    virtual QnCompressedVideoData* clone() override;
+    virtual QnCompressedVideoData* clone() const override;
 
 
     int width;
@@ -178,12 +181,14 @@ struct QnCompressedVideoData : public QnAbstractMediaData
     QnMetaDataV1Ptr motion;
     qint64 pts;
 protected:
-    void assign(QnCompressedVideoData* other);
+    void assign(const QnCompressedVideoData* other);
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
+typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
 
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
 
 /** 
 * This structure used for serialized QnMetaDataV1
@@ -236,6 +241,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     */
     void addMotion(const quint8* data, qint64 timestamp);
     void addMotion(QnMetaDataV1Ptr data);
+    void addMotion(QnConstMetaDataV1Ptr data);
 
     // remove part of motion info by motion mask
     void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
@@ -268,10 +274,10 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
-    virtual QnMetaDataV1* clone() override;
+    virtual QnMetaDataV1* clone() const override;
 
     //void deserialize(QIODevice* ioDevice);
-    void serialize(QIODevice* ioDevice);
+    void serialize(QIODevice* ioDevice) const;
 
     static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
@@ -279,7 +285,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     quint8 m_input;
     qint64 m_duration;
 protected:
-    void assign(QnMetaDataV1* other);
+    void assign(const QnMetaDataV1* other);
 private:
     qint64 m_firstTimestamp;
 };
@@ -335,13 +341,14 @@ struct QnCompressedAudioData : public QnAbstractMediaData
         context = ctx;
     }
 
-    virtual QnCompressedAudioData* clone() override;
+    virtual QnCompressedAudioData* clone() const override;
 
     //QnCodecAudioFormat format;
     quint64 duration;
 private:
-    void assign(QnCompressedAudioData* other);
+    void assign(const QnCompressedAudioData* other);
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
+typedef QSharedPointer<const QnCompressedAudioData> QnConstCompressedAudioDataPtr;
 
 #endif //abstract_media_data_h_112

@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 class QnStatisticsColors {
 public:
@@ -35,6 +35,6 @@ private:
 
 Q_DECLARE_METATYPE(QnStatisticsColors)
 
-QN_DECLARE_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
 
 #endif // QN_STATISTICS_COLORS_H

@@ -20,8 +20,8 @@ public:
      *
      * \param shape                     Standard cursor shape.
      * \returns                         Bitmap cursor for the given standard 
-     *                                  cursor shape, or bitmap cursor with a 
-     *                                  null pixmap in case of an error.
+     *                                  cursor shape, or non-bitmap cursor 
+     *                                  in case of an error.
      */
     virtual QCursor bitmapCursor(Qt::CursorShape shape) const = 0;
 

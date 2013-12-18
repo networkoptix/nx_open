@@ -99,7 +99,7 @@ QRectF QnMaskedProxyWidget::paintRect() const {
 }
 
 void QnMaskedProxyWidget::setPaintRect(const QRectF &paintRect) {
-    if(qFuzzyCompare(m_paintRect, paintRect))
+    if(qFuzzyEquals(m_paintRect, paintRect))
         return;
 
     m_paintRect = paintRect;

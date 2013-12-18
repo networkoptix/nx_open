@@ -1,3 +1,5 @@
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_resource.h"
 #include "desktop_camera_reader.h"
 #include "serverutil.h"
@@ -21,8 +23,11 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS)
+bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)
 {
+    Q_UNUSED(outputID)
+    Q_UNUSED(activate)
+    Q_UNUSED(autoResetTimeoutMS)
     return false;
 }
 
@@ -55,7 +60,4 @@ const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbs
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-CameraDiagnostics::Result QnDesktopCameraResource::initInternal()
-{
-    return CameraDiagnostics::NoErrorResult();
-}
+#endif //ENABLE_DESKTOP_CAMERA

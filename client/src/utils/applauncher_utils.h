@@ -14,7 +14,7 @@ namespace applauncher
     /*!
         \note Application may be installed for all users and for current user only, so checking existance of directory with name equal to version is not enough
     */
-    api::ResultType::Value isVersionInstalled( const QnSoftwareVersion& version, bool* const installed );
+    api::ResultType::Value isVersionInstalled( QnSoftwareVersion version, bool* const installed );
 
     /*!
         Send the required version to the applauncher, close the current instance of the client.

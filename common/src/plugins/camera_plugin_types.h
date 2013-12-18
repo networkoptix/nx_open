@@ -22,6 +22,9 @@ namespace nxcip
         CODEC_ID_AAC,
         CODEC_ID_AC3,
         CODEC_ID_DTS,
+        //raw 16-bit little-endian PCM
+        CODEC_ID_PCM_S16LE,
+        CODEC_ID_PCM_MULAW,
         CODEC_ID_VORBIS
     };
 
@@ -35,6 +38,8 @@ namespace nxcip
         PIX_FMT_YUV444P,
         //!1bpp, 0 is black, 1 is white, in each byte pixels are ordered from the msb to the lsb
         PIX_FMT_MONOBLACK,
+        //!Y plane only, 8bpp
+        PIX_FMT_GRAY8,
         //!packed RGB 8:8:8, 24bpp, RGBRGB...
         PIX_FMT_RGB24,
         //!planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)

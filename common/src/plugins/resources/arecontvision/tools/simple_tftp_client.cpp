@@ -173,7 +173,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         else
                         {
                             // this is 3 times we got option ack; need to resend ack0?
-                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logWARNING);
+                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logDEBUG1);
 
                             if (len_recv<13) // unexpected answer
                                 continue;
@@ -204,7 +204,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             if (m_status == time_out)
                 return 0;
 
-        }
+                                                                                                 }
 
 LAST_PACKET:
 

@@ -1,5 +1,8 @@
+cache()
+
 NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
+LIBTYPE = ${libtype}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QT += ${qt.libs}
@@ -8,10 +11,15 @@ ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 ## GLOBAL CONFIGURATIONS
 QMAKE_INFO_PLIST = Info.plist
-CONFIG += precompile_header $$BUILDLIB
+CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
+DEFINES += ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
+
+
+include( optional_functionality.pri )
+
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
@@ -39,14 +47,27 @@ win* {
 isEmpty(BUILDLIB) {
 DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
-  DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+  plugin {
+    win* {
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+    }
+    else {
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+    }
+  }
+  else {
+    DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+  }
 }  
 
 OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib 
+!win* {
+  LIBS += -Wl,-rpath $$OUTPUT_PATH/lib/$$CONFIGURATION
+}
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
@@ -68,10 +89,11 @@ PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 # Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
 QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_INCLUDED -DBOOST_MPL_NOT_HPP_INCLUDED -DBOOST_MPL_VOID_HPP_INCLUDED
 
+CONFIG += ${arch}
+
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${libdir}/icons/hdw_logo.ico	
-  CONFIG += ${arch}
+  ICON = ${child.customization.dir}/icons/hdw_logo.ico	
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
   win32-msvc* {
@@ -96,15 +118,22 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -std=c++0x -fpermissive
+  arm {
+    QMAKE_CXXFLAGS += -std=c++0x
+  } else {
+    QMAKE_CXXFLAGS += -std=c++11
+  }
 }
 
 ## LINUX
 unix:!mac {
   LIBS += ${linux.oslibs}
-  ${arch}:!arm {
+  !arm {
     QMAKE_CXXFLAGS += -msse2
-  }  
+    QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
+  } else {
+    LIBS -= -lssl
+  } 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
@@ -112,7 +141,7 @@ unix:!mac {
 
 ## MAC OS
 mac {
-  QMAKE_CXXFLAGS += -msse4.1
+  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}

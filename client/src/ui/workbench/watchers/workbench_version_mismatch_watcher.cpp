@@ -29,11 +29,24 @@ QList<QnVersionMismatchData> QnWorkbenchVersionMismatchWatcher::mismatchData() c
     return m_mismatchData;
 }
 
-QnSoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion() const {
+QnSoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion(Qn::SystemComponent component) const {
     QnSoftwareVersion result;
-    foreach(const QnVersionMismatchData &data, m_mismatchData)
+    foreach(const QnVersionMismatchData &data, m_mismatchData) {
+        if (component != Qn::AnyComponent && component != data.component)
+            continue;
         result = qMax(data.version, result);
+    }
     return result;
+}
+
+bool QnWorkbenchVersionMismatchWatcher::versionMismatches(QnSoftwareVersion left, QnSoftwareVersion right, bool concernBuild) {
+    return (left.major() != right.major() ||
+            left.minor() != right.minor() ||
+            left.bugfix() != right.bugfix() ||
+            (concernBuild &&
+             (left.build() != right.build())
+             )
+            );
 }
 
 void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
@@ -42,9 +55,24 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     if(m_mismatchData.isEmpty())
         return;
 
-    QnSoftwareVersion version = m_mismatchData[0].version;
+    QnVersionMismatchData firstNonClient;
     foreach(const QnVersionMismatchData &data, m_mismatchData) {
-        if(!isCompatible(data.version, version)) {
+        if (data.component == Qn::ClientComponent)
+            continue;
+        firstNonClient = data;
+        break;
+    }
+
+    if (firstNonClient.component == Qn::AnyComponent) //not found
+        return;
+
+    foreach(const QnVersionMismatchData &second, m_mismatchData) {
+        if (second.component == Qn::ClientComponent)
+            continue;
+
+        if(versionMismatches(firstNonClient.version,
+                             second.version,
+                             firstNonClient.component == Qn::MediaServerComponent && second.component == Qn::MediaServerComponent)) {
             m_hasMismatches = true;
             break;
         }
@@ -54,22 +82,16 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.clear();
 
-    QnVersionMismatchData clientData;
-    clientData.component = Qn::ClientComponent;
-    clientData.version = QnSoftwareVersion(QN_ENGINE_VERSION);
+    QnVersionMismatchData clientData(Qn::ClientComponent, QnSoftwareVersion(QN_ENGINE_VERSION));
     m_mismatchData.push_back(clientData);
 
     if(context()->user()) {
-        QnVersionMismatchData ecData;
-        ecData.component = Qn::EnterpriseControllerComponent;
-        ecData.version = QnAppServerConnectionFactory::currentVersion();
+        QnVersionMismatchData ecData(Qn::EnterpriseControllerComponent, QnAppServerConnectionFactory::currentVersion());
         m_mismatchData.push_back(ecData);
 
         foreach(const QnMediaServerResourcePtr &mediaServerResource, resourcePool()->getResources().filtered<QnMediaServerResource>()) {
-            QnVersionMismatchData msData;
-            msData.component = Qn::MediaServerComponent;
+            QnVersionMismatchData msData(Qn::MediaServerComponent, mediaServerResource->getVersion());
             msData.resource = mediaServerResource;
-            msData.version = mediaServerResource->getVersion();
             m_mismatchData.push_back(msData);
         }
     }

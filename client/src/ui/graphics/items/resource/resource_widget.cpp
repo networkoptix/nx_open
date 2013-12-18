@@ -76,6 +76,9 @@ namespace {
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160);
 
+    /** Static text should be rescaled no more often than once in this period */
+    const qint64 minTextRescaleDelay = 1000;
+
     Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
     void splitFormat(const QString &format, QString *left, QString *right) {
@@ -290,7 +293,7 @@ const QRectF &QnResourceWidget::zoomRect() const {
 }
 
 void QnResourceWidget::setZoomRect(const QRectF &zoomRect) {
-    if(qFuzzyCompare(m_zoomRect, zoomRect))
+    if(qFuzzyEquals(m_zoomRect, zoomRect))
         return;
 
     m_zoomRect = zoomRect;
@@ -423,7 +426,6 @@ void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
 
     m_footerLeftLabel->setText(leftText);
     m_footerRightLabel->setText(rightText);
-    m_footerOverlayWidget->updateScale();
 }
 
 QString QnResourceWidget::calculateInfoText() const {

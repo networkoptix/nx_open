@@ -71,7 +71,6 @@ extern "C"
 #include "plugins/resources/isd/isd_resource_searcher.h"
 //#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
-#include "utils/common/module_resources.h"
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
@@ -102,6 +101,7 @@ extern "C"
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
+#include "core/ptz/client_ptz_controller_pool.h"
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -321,10 +321,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
+#ifdef Q_OS_MACX
+    application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+#endif
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnPlatformAbstraction> clientPlatform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
+
+    QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
+    textToWaveServer->start();
 
 #ifdef Q_WS_X11
     //   QnX11LauncherWorkaround x11LauncherWorkaround;
@@ -350,6 +357,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
+    if (!QDir(qnSettings->mediaFolder()).exists())
+        QDir().mkpath(qnSettings->mediaFolder());
+
     cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
@@ -435,7 +445,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef Q_OS_WIN
     //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
-    QnResourceDiscoveryManager::instance()->start();
 
     // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
     qApp->setStyle(qnSkin->style());
@@ -472,6 +481,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->show();
     if (!noFullScreen)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
+
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
@@ -479,12 +489,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
-    desktopSearcher.setLocal(true);
+    QnDesktopResourceSearcher::instance().setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
 #endif
 
+    QnResourceDiscoveryManager::instance()->start();
+
     //initializing plugin manager. TODO supply plugin dir (from settings)
-    PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
+    //PluginManager::instance()->loadPlugins( PluginManager::QtPlugin );
 
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -504,12 +516,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
+        // show beta version warning message for the main instance only
+        if (!noSingleApplication &&
+                !qnSettings->isDevMode() &&
+                QLatin1String(QN_BETA) == QLatin1String("true"))
+            context->action(Qn::BetaVersionMessageAction)->trigger();
+
     if (argc <= 1) {
         /* If no input files were supplied --- open connection settings dialog. */
         if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ConnectToServerAction,
                                      QnActionParameters().withArgument(Qn::AutoConnectRole, true));
-        } else {
+        } else if (instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ReconnectAction);
         }
     }
@@ -543,7 +561,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         out << autoTester.message();
     }
 
-    QnClientMessageProcessor::instance()->stop();
+    QnCommonMessageProcessor::instance()->stop();
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
@@ -564,7 +582,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
-    win32_exception::install_handler();
+    win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
@@ -579,16 +597,10 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
-    TextToWaveServer::initStaticInstance( new TextToWaveServer() );
-    TextToWaveServer::instance()->start();
-
     int result = runApplication(application.data(), argc, argv);
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
-
-    delete TextToWaveServer::instance();
-    TextToWaveServer::initStaticInstance( NULL );
 
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );

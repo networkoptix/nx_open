@@ -11,10 +11,12 @@
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
+    int encoderNumber,
     unsigned int frameDurationUsec )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
+    m_encoderNumber( encoderNumber ),
     m_frameDurationUsec( frameDurationUsec )
 {
 }
@@ -93,8 +95,14 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
             &m_refManager,
             m_cameraManager->dirContentsManager(),
             m_frameDurationUsec,
-            true ) );
+            true,
+            m_encoderNumber ) );
 
     m_streamReader->addRef();
     return m_streamReader.get();
+}
+
+int MediaEncoder::getAudioFormat( nxcip::AudioFormat* /*format*/ ) const
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
 }

@@ -39,7 +39,7 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
-    virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) = 0;
+    //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) = 0;
     //!Get socket address
     virtual SocketAddress getLocalAddress() const = 0;
     //!Get peer address
@@ -248,6 +248,8 @@ public:
     virtual AbstractStreamSocket* accept() = 0;
 };
 
+static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
+
 //!Interface for connection-less socket
 /*!
     In this case \a AbstractCommunicatingSocket::connect() just rememberes remote address to use with \a AbstractCommunicatingSocket::send()
@@ -257,6 +259,10 @@ class AbstractDatagramSocket
     virtual public AbstractCommunicatingSocket
 {
 public:
+    static const int UDP_HEADER_SIZE = 8;
+    static const int MAX_IP_HEADER_SIZE = 60;
+    static const int MAX_DATAGRAM_SIZE = 64*1024 - 1 - UDP_HEADER_SIZE - MAX_IP_HEADER_SIZE;
+
     virtual ~AbstractDatagramSocket() {}
 
     //!Set destination address for use by \a AbstractCommunicatingSocket::send() method
@@ -305,6 +311,11 @@ public:
         TODO: #ak remove this method, since it requires use of \a select(), which is heavy, use \a MSG_DONTWAIT instead
     */
     virtual bool hasData() const = 0;
+    //!Set the multicast send interface
+    /*!
+        \param multicastIF multicast interface for sending packets
+    */
+    virtual bool setMulticastIF( const QString& multicastIF ) = 0;
 };
 
 #endif  //ABSTRACT_SOCKET_H

@@ -15,7 +15,7 @@
 
 /*! \mainpage
     \par
-    This project demonstrates usage of Network Optix camera integration plugin API to add support for camera with remote archive (e.g., storage is bound directly to camera)\n
+    This project demonstrates usage of Network Optix camera integration plugin API to add support of camera with remote archive (e.g., storage is bound directly to camera)\n
 
     \par Build how-to
     Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
@@ -37,16 +37,18 @@
     absolute path to local directory, containing jpeg file(s). Specified directory will be found as camera with archive and appear in tree menu.
 
     \par Implements following camera integration interfaces:
-    - \a nxcip::CameraDiscoveryManager to enable AXIS camera discovery by MDNS
-    - \a nxcip::BaseCameraManager2 to retrieve camera properties and access other managers
-    - \a nxcip::CameraMediaEncoder2 to receive LIVE media stream from camera
-    - \a nxcip::StreamReader to provide media stream directly from plugin
-    - \a nxcip::DtsArchiveReader to access camera's archive
+    - \a nxcip::CameraDiscoveryManager (\a DiscoveryManager) to find this plugin
+    - \a nxcip::BaseCameraManager2 (\a CameraManager) to retrieve camera properties and access other managers
+    - \a nxcip::CameraMediaEncoder2 (\a MediaEncoder) to receive LIVE media stream from camera
+    - \a nxcip::StreamReader (\a StreamReader) to provide media stream directly from plugin
+    - \a nxcip::DtsArchiveReader (\a ArchiveReader) to access archive
 
     \par Object life-time management:
+    - plugin entry point is \a createNXPluginInstance function
     - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
-        to factory class instance (e.g., \a AxisCameraManager is a factory for \a AxisRelayIOManager, \a AxisMediaEncoder, etc.)
-    - all factory classes (except for \a AxisCameraDiscoveryManager) hold pointer to child class object (e.g., \a AxisRelayIOManager is a child for \a AxisCameraManager)
+        to factory class instance (e.g., \a CameraManager is a factory for \a MediaEncoder). This garantees that \a CameraManager instance 
+        is removed later than \a MediaEncoder instance
+    - all factory classes (except for \a CameraDiscoveryManager) hold pointer to child class object (e.g., \a MediaEncoder is a child for \a CameraManager)
         and delete all children on destruction
 */
 
@@ -66,9 +68,9 @@ public:
         Supports cast to nxcip::CameraDiscoveryManager interface
     */
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     nxpt::CommonRefManager* refManager();

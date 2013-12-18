@@ -90,6 +90,18 @@ public:
         /** Opacity of the raised widget if layout background is present. */
         RAISED_WIDGET_OPACITY,
 
+        /** Background color for common progress bar. */
+        PROGRESS_BAR_BACKGROUND_COLOR,
+
+        /** Background color for highlighted row of a disabled business rule in the rules table. */
+        BUSINESS_RULE_DISABLED_HIGHLIGHT_COLOR,
+
+        /** Background color for an invalid business rule in the rules table. */
+        BUSINESS_RULE_INVALID_BACKGROUND_COLOR,
+
+        /** Background color for an invalid column of the invalid business rule in the rules table. */
+        BUSINESS_RULE_INVALID_COLUMN_BACKGROUND_COLOR,
+
         VARIABLE_COUNT
     };
 
@@ -100,7 +112,7 @@ public:
 
 protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual QVariant readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) override;
+    virtual QVariant readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) override;
 
     static QVector<QColor> defaultZoomWindowColors();
 
@@ -147,6 +159,14 @@ private:
 
         QN_DECLARE_R_PROPERTY(QColor,   raisedConeColor,                RAISED_CONE_COLOR,                      QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(qreal,    raisedWigdetOpacity,            RAISED_WIDGET_OPACITY,                  0.95)
+
+        QN_DECLARE_R_PROPERTY(QColor,   progressBarBackgroundColor,     PROGRESS_BAR_BACKGROUND_COLOR,          QColor(4, 154, 116))
+
+        QN_DECLARE_R_PROPERTY(QColor,   businessRuleDisabledHighlightColor,         BUSINESS_RULE_DISABLED_HIGHLIGHT_COLOR,         QColor(64, 64, 64))
+        QN_DECLARE_R_PROPERTY(QColor,   businessRuleInvalidBackgroundColor,         BUSINESS_RULE_INVALID_BACKGROUND_COLOR,         QColor(150, 0, 0))
+        QN_DECLARE_R_PROPERTY(QColor,   businessRuleInvalidColumnBackgroundColor,   BUSINESS_RULE_INVALID_COLUMN_BACKGROUND_COLOR,  QColor(204, 0, 0))
+
+
     QN_END_PROPERTY_STORAGE()
 };
 

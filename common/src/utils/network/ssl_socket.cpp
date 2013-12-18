@@ -5,10 +5,12 @@
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
+static EVP_PKEY* pkey = 0;
 static SSL_CTX *serverCTX = 0;
 static SSL_CTX *clientCTX = 0;
 
-static int sock_read(BIO *b, char *out, int outl)
+// TODO: public methods are visible to all, quite bad
+int sock_read(BIO *b, char *out, int outl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     int ret=0;
@@ -27,7 +29,7 @@ static int sock_read(BIO *b, char *out, int outl)
     return ret;
 }
 
-static int sock_write(BIO *b, const char *in, int inl)
+int sock_write(BIO *b, const char *in, int inl)
 {
     QnSSLSocket* sslSock = (QnSSLSocket*) BIO_get_app_data(b);
     //clear_socket_error();
@@ -41,6 +43,7 @@ static int sock_write(BIO *b, const char *in, int inl)
     return ret;
 }
 
+namespace {
 static int sock_puts(BIO *bp, const char *str)
 {
     int n = strlen(str);
@@ -117,6 +120,7 @@ static BIO_METHOD Proxy_server_socket =
     sock_free,
     NULL,
 };
+}
 
 // ---------------------------- QnSSLSocket -----------------------------------
 
@@ -138,7 +142,7 @@ void QnSSLSocket::initSSLEngine(const QByteArray& certData)
     BIO_free(bufio);
 
     bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bufio, NULL, serverCTX->default_passwd_callback, serverCTX->default_passwd_callback_userdata);
+    pkey = PEM_read_bio_PrivateKey(bufio, NULL, serverCTX->default_passwd_callback, serverCTX->default_passwd_callback_userdata);
     SSL_CTX_use_PrivateKey(serverCTX, pkey);
     BIO_free(bufio);
 
@@ -151,6 +155,12 @@ void QnSSLSocket::releaseSSLEngine()
     if (serverCTX) {
         SSL_CTX_free(serverCTX);
         serverCTX = 0;
+    }
+
+    if( pkey )
+    {
+        EVP_PKEY_free( pkey );
+        pkey = 0;
     }
 }
 
@@ -336,11 +346,11 @@ bool QnSSLSocket::bind( const SocketAddress& localAddress )
     return d->wrappedSocket->bind(localAddress);
 }
 
-bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->bindToInterface(iface);
-}
+//bool QnSSLSocket::bindToInterface( const QnInterfaceAndAddr& iface )
+//{
+//    Q_D(const QnSSLSocket);
+//    return d->wrappedSocket->bindToInterface(iface);
+//}
 
 SocketAddress QnSSLSocket::getLocalAddress() const
 {

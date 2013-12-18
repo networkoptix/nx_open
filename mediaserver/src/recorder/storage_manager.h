@@ -1,6 +1,7 @@
 #ifndef __STORAGE_MANAGER_H__
 #define __STORAGE_MANAGER_H__
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
@@ -71,7 +72,12 @@ public:
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
-    static const qint64 BIG_STORAGE_THRESHOLD = 1000000000ll * 100; // 100Gb
+#ifdef __arm__
+    static const qint64 DEFAULT_SPACE_LIMIT = 100*1024*1024; // 100MB
+#else
+    static const qint64 DEFAULT_SPACE_LIMIT = 1000000000ll * 5; // 5gb
+#endif
+    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
     void stopAsyncTasks();
@@ -82,6 +88,11 @@ public:
 
     void setRebuildState(RebuildState state);
     RebuildState rebuildState() const;
+    
+    /*
+    * Return full path list from storage_index.csv (include absent in DB storages)
+    */
+    QStringList getAllStoragePathes() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(QnResourcePtr storageRes, QnBusiness::EventReason reason);
@@ -112,6 +123,7 @@ private:
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role);
+    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QString& mac, QnResource::ConnectionRole role);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -132,7 +144,7 @@ private:
     bool m_warnSended;
     bool m_isWritableStorageAvail;
     QTime m_lastTestTime;
-    QTime m_storageWarnTimer;
+    QElapsedTimer m_storageWarnTimer;
     static TestStorageThread* m_testStorageThread;
     QMap<QnId, bool> m_diskFullWarned;
     RebuildState m_rebuildState;

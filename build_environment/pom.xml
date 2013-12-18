@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-		<artifactId>hdwitness</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.0.2-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.0.2-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>build_environment</artifactId>
-	<packaging>pom</packaging>
-	<name>Build Environment for QT projects</name>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>build_environment</artifactId>
+    <packaging>pom</packaging>
+    <name>Build Environment for QT projects</name>
 
     <properties>
         <!-- Change it to point relatively to the root-->
@@ -28,7 +28,7 @@
             <artifactId>protobuf</artifactId>
             <version>${protobuf.version}</version>
             <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${additional.compiler}</classifier>
         </dependency>                           
         <dependency>
             <groupId>org.openssl</groupId>
@@ -38,18 +38,11 @@
             <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>
         <dependency>
-            <groupId>org.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>${ffmpeg.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}</classifier>
-        </dependency>      
-        <dependency>
             <groupId>org</groupId>
             <artifactId>onvif</artifactId>
             <version>${onvif.version}</version>
             <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
+            <classifier>${profile.classifier}-${additional.compiler}</classifier>
         </dependency>		                        
         <dependency>
             <groupId>org.hyperic</groupId>
@@ -144,7 +137,37 @@
                         </configuration>
                     </execution>     
                     <execution>
-                        <id>install-packages</id>
+                        <id>install-packages-x86</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${environment.dir}/python/x86/python.exe</executable>
+                            <arguments>
+                                <argument>install_packages.py</argument>
+                            </arguments>
+                            <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${unix}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-packages-x64</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${environment.dir}/python/x64/python.exe</executable>
+                            <arguments>
+                                <argument>install_packages.py</argument>
+                            </arguments>
+                            <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${unix}</skip>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-packages-unix</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>exec</goal>
@@ -155,8 +178,10 @@
                                 <argument>install_packages.py</argument>
                             </arguments>
                             <workingDirectory>${basedir}/python</workingDirectory>		
+                            <skip>${windows}</skip>
                         </configuration>
-                    </execution>
+
+                    </execution>                    
                 </executions>
             </plugin>	
         </plugins>		
@@ -205,6 +230,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>		
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>      
             </dependencies>	          
         </profile>
         <profile>
@@ -217,13 +249,12 @@
                 </property>
             </activation>            
             <dependencies>
-
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>help</artifactId>
                     <version>${project.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${customization}</classifier>
+                    <classifier>${child.customization}-${help.language}</classifier>
                 </dependency>
 
                 <dependency>
@@ -245,9 +276,48 @@
                     <artifactId>bespin</artifactId>
                     <version>1.2-SNAPSHOT</version>
                     <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>                   
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>      
             </dependencies>	            
         </profile>      
+
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+
+            <dependencies>	            
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>      
+                <dependency>
+                    <groupId>com.isdedge</groupId>
+                    <artifactId>vmux</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>      
+            </dependencies>	            
+        </profile>
     </profiles>	
 </project>

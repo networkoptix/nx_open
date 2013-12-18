@@ -67,7 +67,7 @@ class QnMotionArchive: public QObject
 public:
     QnMotionArchive(QnNetworkResourcePtr resource, int channel);
     virtual ~QnMotionArchive();
-    bool saveToArchive(QnMetaDataV1Ptr data);
+    bool saveToArchive(QnConstMetaDataV1Ptr data);
     QnTimePeriodList mathPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
     QnMotionArchiveConnectionPtr createConnection();
 
@@ -79,7 +79,7 @@ private:
     QString getFilePrefix(const QDate& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
-    bool saveToArchiveInternal(QnMetaDataV1Ptr data);
+    bool saveToArchiveInternal(QnConstMetaDataV1Ptr data);
     QString getChannelPrefix();
 
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);

@@ -344,7 +344,7 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId &id)
     {
         QnServerCameraPtr localCam = resource.dynamicCast<QnServerCamera>();
         if (localCam) {
-            localCam = localCam->findEnabledSubling();
+            localCam = localCam->findEnabledSibling();
             if (localCam)
                 resource = localCam;
         }

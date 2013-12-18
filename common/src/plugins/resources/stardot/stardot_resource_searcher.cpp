@@ -1,8 +1,8 @@
+#ifdef ENABLE_STARDOT
+
 #include "stardot_resource_searcher.h"
 
 #include <QtCore/QCoreApplication>
-
-#include <QtNetwork/QUdpSocket>
 
 #include "stardot_resource.h"
 #include "utils/network/nettools.h"
@@ -34,9 +34,11 @@ QnResourceList QnStardotResourceSearcher::findResources()
         if (shouldStop())
             return QnResourceList();
 
-        QUdpSocket sock;
+        std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
 
-        if (!bindToInterface(sock, iface))
+        //if (!bindToInterface(sock, iface))
+        //    continue;
+        if (!sock->bind(iface.address.toString(), 0))
             continue;
 
         // sending broadcast
@@ -44,7 +46,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
         datagram.append('\0');
         for (int r = 0; r < CL_BROAD_CAST_RETRY; ++r)
         {
-            sock.writeDatagram(datagram.data(), datagram.size(),QHostAddress::Broadcast, STARDOT_DISCOVERY_PORT);
+            sock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, STARDOT_DISCOVERY_PORT);
 
             if (r!=CL_BROAD_CAST_RETRY-1)
                 QnSleep::msleep(5);
@@ -52,20 +54,20 @@ QnResourceList QnStardotResourceSearcher::findResources()
         }
 
         // collecting response
-        QTime time;
-        time.start();
         QnSleep::msleep(300); // to avoid 100% cpu usage
-        //while(time.elapsed()<150)
         {
-            while (sock.hasPendingDatagrams())
+            while (sock->hasData())
             {
                 QByteArray datagram;
-                datagram.resize(sock.pendingDatagramSize());
+                datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-                QHostAddress sender;
+                QString sender;
                 quint16 senderPort;
 
-                sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
+                int readed = sock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
+                if (readed < 1)
+                    continue;
+                datagram = datagram.left(readed);
 
                 if (senderPort != STARDOT_DISCOVERY_PORT || !datagram.startsWith("StarDot")) // minimum response size
                     continue;
@@ -101,7 +103,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                     continue;
                 resource->setTypeId(typeId);
 
-                resource->setHostAddress(sender.toString(), QnDomainMemory);
+                resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(lit(mac));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setModel(lit(model));
@@ -250,3 +252,5 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     resList << res;
     return resList;
 }
+
+#endif // #ifdef ENABLE_STARDOT

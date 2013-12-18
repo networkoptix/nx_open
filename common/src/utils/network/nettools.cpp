@@ -2,7 +2,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtNetwork/QHostInfo>
-#include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QSettings>
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
@@ -20,6 +20,7 @@
 #include <unistd.h>
 #endif
 
+/*
 bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port, QUdpSocket::BindMode mode )
 {
     int res;
@@ -41,11 +42,12 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 
     return true;
 }
+*/
 
 QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 {
     static QList<QnInterfaceAndAddr> lastResult;
-    static QTime timer;
+    static QElapsedTimer timer;
     static QMutex mutex;
 
     {
@@ -59,6 +61,9 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
     {
+        if (!(iface.flags() & QNetworkInterface::IsUp))
+            continue;
+
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         foreach (const QNetworkAddressEntry& address, addresses)
         {

@@ -417,6 +417,22 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
 
+    factory(Qn::QueueAppRestartAction).
+        flags(Qn::NoTarget).
+        text(tr("Restart application"));
+
+    factory(Qn::PtzGoToPresetAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Go To Saved Position")).
+        requiredPermissions(Qn::WritePtzPermission).
+        condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
+
+    factory(Qn::PtzStartTourAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Activate PTZ Tour")).
+        requiredPermissions(Qn::WritePtzPermission).
+        condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+
     /* Context menu actions. */
 
     factory(Qn::FitInViewAction).
@@ -430,7 +446,9 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MainMenuAction).
         flags(Qn::GlobalHotkey).
         text(tr("Main Menu")).
+#ifndef Q_OS_MACX
         shortcut(tr("Alt+Space")).
+#endif
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
@@ -601,6 +619,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
         text(tr("Show Version Mismatch Message"));
+
+    factory(Qn::BetaVersionMessageAction).
+        flags(Qn::NoTarget).
+        text(tr("Show Beta Version Warning Message"));
 
     factory(Qn::BrowseUrlAction).
         flags(Qn::NoTarget).
@@ -832,7 +854,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Resolution...")).
-        condition(new QnLoggedInCondition(this));
+        condition(new QnChangeResolutionActionCondition(this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -856,33 +878,43 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget).
-        text(tr("PTZ..."));
+        childFactory(new QnPtzGoToPresetActionFactory(this)).
+        text(tr("PTZ...")).
+        requiredPermissions(Qn::WritePtzPermission).
+        condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
     factory.beginSubMenu(); {
+
+        factory().
+            flags(Qn::Scene | Qn::SingleTarget).
+            childFactory(new QnPtzStartTourActionFactory(this)).
+            text(tr("Tours...")).
+            requiredPermissions(Qn::WritePtzPermission).
+            condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+
+        factory.beginSubMenu(); {
+
+            factory(Qn::PtzManageToursAction).
+                flags(Qn::Scene | Qn::SingleTarget).
+                text(tr("Manage Tours...")).
+                requiredPermissions(Qn::WritePtzPermission).
+                condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+
+        } factory.endSubMenu();
+
+
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
-
-        factory(Qn::PtzGoToPresetMenu).
-            flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Go to Position...")).
-            requiredPermissions(Qn::WritePtzPermission).
-            childFactory(new QnPtzGoToPresetActionFactory(this)).
-            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
+            condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
         factory(Qn::PtzManagePresetsAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage Saved Positions...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
+            condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
 
-        factory(Qn::PtzGoToPresetAction).
-            flags(Qn::SingleTarget | Qn::ResourceTarget).
-            text(tr("Go To Saved Position")).
-            requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::AbsolutePtzCapability));
     } factory.endSubMenu();
 
 #if 0
@@ -1225,6 +1257,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Clear Selection")).
         condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod | Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
 
+    factory(Qn::ZoomToTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Zoom to Selection")).
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
+
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selected Area...")).
@@ -1507,9 +1544,9 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 }
 
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters) {
-    if(!parent->children().isEmpty()) {
-        QMenu *result = new QMenu();
+    QMenu *result = new QMenu();
 
+    if(!parent->children().isEmpty()) {
         foreach(QnAction *action, parent->children()) {
             Qn::ActionVisibility visibility;
             if(action->flags() & Qn::HotkeyOnly) {
@@ -1559,24 +1596,28 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             if(visibility != Qn::InvisibleAction)
                 result->addAction(newAction);
         }
+    }
 
-        return result;
-    } else if(parent->childFactory()) {
+    if (!result->isEmpty())
+        result->addSeparator();
+
+    if(parent->childFactory()) {
         QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
-            QMenu *result = new QMenu();
             foreach(QAction *action, actions) {
                 action->setParent(result);
                 result->addAction(action);
             }
-            return result;
-        } else {
-            return NULL;
         }
-    } else {
+    }
+
+    if (result->isEmpty()) {
+        delete result;
         return NULL;
     }
+
+    return result;
 }
 
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {

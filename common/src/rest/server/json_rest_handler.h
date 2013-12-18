@@ -2,93 +2,46 @@
 #define QN_JSON_REST_HANDLER_H
 
 #include "request_handler.h"
+#include "json_rest_result.h"
 
-#include <utils/common/json.h>
+#include <utils/common/lexical.h>
+
 
 class QnJsonRestHandler: public QnRestRequestHandler {
     Q_OBJECT
 public:
-    class JsonResult {
-    public:
-        JsonResult(): m_errorId(-1) {}
+    QnJsonRestHandler();
+    virtual ~QnJsonRestHandler();
 
-        const QString &errorText() const {
-            return m_errorText;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
+    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
+
+protected:
+    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override;
+    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) override;
+
+    template<class T>
+    bool requireParameter(const QnRequestParams &params, const QString &key, QnJsonRestResult &result, T *value, bool optional = false) const {
+        auto pos = params.find(key);
+        if(pos == params.end()) {
+            if(optional) {
+                return true;
+            } else {
+                result.setError(QnJsonRestResult::MissingParameter, lit("Parameter '%1' is missing.").arg(key));
+                return false;
+            }
         }
 
-        void setErrorText(const QString &errorText) {
-            m_errorText = errorText;
+        if(!QnLexical::deserialize(*pos, value)) {
+            result.setError(QnJsonRestResult::InvalidParameter, lit("Parameter '%1' has invalid value '%2'. Expected a value of type '%3'.").arg(key).arg(*pos).arg(QLatin1String(typeid(T).name())));
+            return false;
         }
 
-        int errorId() const {
-            return m_errorId;
-        }
-
-        void setErrorId(int errorId) {
-            m_errorId = errorId;
-        }
-
-        void setError(int errorId, const QString &errorText) {
-            m_errorId = errorId;
-            m_errorText = errorText;
-        }
-
-        template<class T>
-        void setReply(const T &reply) {
-            QJson::serialize(reply, &m_reply);
-        }
-
-        QVariant reply() const {
-            return m_reply;
-        }
-
-        QByteArray serialize() {
-            QVariantMap map;
-            if(!m_errorText.isEmpty())
-                map[QLatin1String("errorText")] = m_errorText;
-            if(m_errorId != -1)
-                map[QLatin1String("errorId")] = m_errorId;
-            map[QLatin1String("reply")] = m_reply;
-
-            QByteArray result;
-            QJson::serialize(map, &result);
-            return result;
-        }
-
-    private:
-        QString m_errorText;
-        int m_errorId;
-        QVariant m_reply;
-    };
-
-    QnJsonRestHandler(): m_contentType("application/json") {}
-
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) override {
-        JsonResult jsonResult;
-        int returnCode = executeGet(path, params, jsonResult);
-
-        result = jsonResult.serialize();
-        contentType = m_contentType;
-
-        return returnCode;
+        return true;
     }
 
-    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) override {
-        JsonResult jsonResult;
-        int returnCode = executePost(path, params, body, jsonResult);
-        
-        result = jsonResult.serialize();
-        contentType = m_contentType;
-
-        return returnCode;
-    }
-
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) = 0;
-    
-    virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, JsonResult &result) {
-        Q_UNUSED(body);
-        return executeGet(path, params, result);
-    }
+private:
+    QnRequestParams processParams(const QnRequestParamList &params) const;
 
 private:
     QByteArray m_contentType;

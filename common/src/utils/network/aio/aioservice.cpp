@@ -130,12 +130,7 @@ namespace aio
         if( !threadToUse )
         {
             //creating new thread
-
-#if (GCC_VERSION >= 40700)
             std::unique_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
-#else
-            std::auto_ptr<AIOThread> newThread( new AIOThread(&m_mutex) );
-#endif
             newThread->start();
             if( !newThread->isRunning() )
                 return false;
@@ -156,7 +151,10 @@ namespace aio
     /*!
         Garantees that no \a eventTriggered will be called after return of this method
     */
-    void AIOService::removeFromWatch( const QSharedPointer<AbstractSocket>& sock, PollSet::EventType eventType )
+    void AIOService::removeFromWatch(
+        const QSharedPointer<AbstractSocket>& sock,
+        PollSet::EventType eventType,
+        bool waitForRunningHandlerCompletion )
     {
         QMutexLocker lk( &m_mutex );
 
@@ -164,7 +162,7 @@ namespace aio
         map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
         if( it != m_sockets.end() )
         {
-            if( it->second->removeFromWatch( sock, eventType ) )
+            if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )
                 m_sockets.erase( it );
         }
     }

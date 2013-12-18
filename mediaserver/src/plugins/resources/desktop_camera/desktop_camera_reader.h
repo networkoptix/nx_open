@@ -1,5 +1,9 @@
-#ifndef ACTI_STREAM_REDER_H__
-#define ACTI_STREAM_REDER_H__
+#ifndef DESKTOP_CAMERA_STREAM_REDER_H__
+#define DESKTOP_CAMERA_STREAM_REDER_H__
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
+#include <QtCore/QElapsedTimer>
 
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
@@ -30,9 +34,11 @@ private:
     TCPSocketPtr m_socket;
     quint8 m_recvBuffer[65536];
     QnFfmpegRtpParser m_parsers[2];
-    QTime m_keepaliveTimer;
+    QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayout* m_audioLayout;
     mutable QMutex m_audioLayoutMutex;
 };
 
-#endif // ACTI_STREAM_REDER_H__
+#endif  //ENABLE_DESKTOP_CAMERA
+
+#endif // DESKTOP_CAMERA_STREAM_REDER_H__

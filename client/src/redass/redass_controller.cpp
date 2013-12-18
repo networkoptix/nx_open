@@ -46,7 +46,7 @@ bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
     if (!display)
         return false;
     QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
-    return cam && cam->hasDualStreaming(); // && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
+    return cam && cam->hasDualStreaming();
 }
 
 QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond, int* displaySize)

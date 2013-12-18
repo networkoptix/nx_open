@@ -1,4 +1,5 @@
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QUuid>
 #include <QtCore/QSet>
@@ -40,6 +41,8 @@
 #include "utils/common/synctime.h"
 #include "utils/network/tcp_listener.h"
 #include "network/authenticate_helper.h"
+#include "../settings.h"
+
 
 class QnTcpListener;
 
@@ -164,8 +167,8 @@ public:
         deleteDP();
     }
 
-    QnAbstractMediaStreamDataProviderPtr liveDpHi;
-    QnAbstractMediaStreamDataProviderPtr liveDpLow;
+    QnLiveStreamProviderPtr liveDpHi;
+    QnLiveStreamProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     Mode liveMode;
@@ -200,6 +203,7 @@ public:
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
+    Q_UNUSED(_owner)
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -521,7 +525,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
 {
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -572,11 +576,11 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
     return QnRtspEncoderPtr();
 }
 
-QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaData::DataType dataType)
+QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaData::DataType dataType)
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QnAbstractMediaDataPtr rez;
+    QnConstAbstractMediaDataPtr rez;
     
     bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_ForceHigh;
  
@@ -609,7 +613,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
 
     for (int i = 0; i < 20; ++i)
     {
-        QnAbstractMediaDataPtr media = archive.getNextData();
+        QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
             return rez;
         if (media->dataType == dataType)
@@ -673,14 +677,14 @@ int QnRtspConnectionProcessor::composeDescribe()
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
             if (i >= numVideo) 
             {
-                QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
+                QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
                 if (media)
                     ffmpegEncoder->setCodecContext(media->context);
             }
 
         }
         else {
-            QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
+            QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) 
             {
                 encoder = createEncoderByMediaData(media, d->transcodedVideoSize, d->mediaRes->getVideoLayout(d->getCurrentDP().data()));
@@ -945,7 +949,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-                d->liveDpHi->start();
+                d->liveDpHi->startIfNotRunning(true);
             }
         }
         if (!d->liveDpLow && d->liveDpHi)
@@ -959,7 +963,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
-                    d->liveDpLow->start();
+                    d->liveDpLow->startIfNotRunning(true);
             }
         }
     }
@@ -1410,7 +1414,7 @@ void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);
@@ -1422,29 +1426,36 @@ void QnRtspConnectionProcessor::run()
     
     parseRequest();
     bool authOK = false;
-    for (int i = 0; i < 3 && !m_needStop; ++i)
+    if( MSSettings::roSettings()->value("authenticationEnabled").toBool() )
     {
-        if(!qnAuthHelper->authenticate(d->request, d->response))
+        for (int i = 0; i < 3 && !m_needStop; ++i)
         {
-            sendResponse(CODE_AUTH_REQUIRED);
-            if (readRequest()) 
-                parseRequest();
+            if(!qnAuthHelper->authenticate(d->request, d->response))
+            {
+                sendResponse(CODE_AUTH_REQUIRED);
+                if (readRequest()) 
+                    parseRequest();
+                else {
+                    authOK = false;
+                    break;
+                }
+            }
             else {
-                authOK = false;
+                authOK = true;
                 break;
             }
         }
-        else {
-            authOK = true;
-            break;
-        }
+        if (!authOK)
+            return;
     }
-    if (!authOK)
-        return;
+    else
+    {
+        authOK = true;
+    }
 
     processRequest();
 
-    QTime t;
+    QElapsedTimer t;
     while (!m_needStop && d->socket->isConnected())
     {
         t.restart();

@@ -1,6 +1,8 @@
 #ifndef onvif_resource_searcher_wsdd_h
 #define onvif_resource_searcher_wsdd_h
 
+#ifdef ENABLE_ONVIF
+
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
@@ -93,7 +95,7 @@ private:
     class ProbeContext
     {
     public:
-        std::auto_ptr<AbstractDatagramSocket> sock;
+        std::unique_ptr<AbstractDatagramSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;
@@ -113,5 +115,7 @@ private:
     bool sendProbe( const QnInterfaceAndAddr& iface );
     bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_resource_searcher_wsdd_h

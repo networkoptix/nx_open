@@ -30,7 +30,7 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettings to be defined somewhere...
+QSettings qSettings;    //TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettings to be defined somewhere...
 
 static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
 
@@ -125,9 +125,9 @@ int main( int argc, char* argv[] )
         QnLog::initLog( logLevel );
     }
 
-    NX_LOG( QN_APPLICATION_NAME" started", cl_logALWAYS );
-    NX_LOG( "Software version: "QN_APPLICATION_VERSION, cl_logALWAYS );
-    NX_LOG( "Software revision: "QN_APPLICATION_REVISION, cl_logALWAYS );
+    NX_LOG( QN_APPLICATION_NAME " started", cl_logALWAYS );
+    NX_LOG( "Software version: " QN_APPLICATION_VERSION, cl_logALWAYS );
+    NX_LOG( "Software revision: " QN_APPLICATION_REVISION, cl_logALWAYS );
 
     if( syncMode )
         return syncDir( localDir, remoteUrl );
@@ -151,7 +151,20 @@ int main( int argc, char* argv[] )
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
 
-    return applauncherProcess.run();
+    int status = applauncherProcess.run();
+
+#ifdef _WIN32
+    if( quitMode )
+    {
+        // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
+        while (app.isRunning()) {
+            Sleep(100);
+        } 
+        Sleep(100);
+    }
+#endif
+
+    return status;
 }
 
 int syncDir( const QString& localDir, const QString& remoteUrl )

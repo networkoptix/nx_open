@@ -3,6 +3,10 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/ptz_data.h>
+#include <core/ptz/ptz_preset.h>
+
 #include <utils/common/variant.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -18,71 +22,71 @@ QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlag
 
     connect(ui->nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateOkButtonEnabled()));
 
-    setForbiddenHotkeys(QList<int>(), true);
     updateOkButtonEnabled();
 }
 
 QnPtzPresetDialog::~QnPtzPresetDialog() {
-    return;
 }
 
-QnPtzPreset QnPtzPresetDialog::preset() const {
-    QnPtzPreset result = m_preset;
-    result.name = ui->nameEdit->text();
-    result.hotkey = currentHotkey();
-    return result;
-}
+void QnPtzPresetDialog::loadData(const QnPtzData &data) {
+    ui->nameEdit->setText(tr("Saved Position %1").arg(data.presets.size() + 1));
 
-void QnPtzPresetDialog::setPreset(const QnPtzPreset &preset) {
-    m_preset = preset;
-    ui->nameEdit->setText(preset.name);
-    setCurrentHotkey(preset.hotkey);
-}
-
-const QList<int> &QnPtzPresetDialog::forbiddenHotkeys() const {
-    return m_forbiddenHotkeys;
-}
-
-void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys) {
-    setForbiddenHotkeys(forbiddenHotkeys, false);
-}
-
-void QnPtzPresetDialog::setForbiddenHotkeys(const QList<int> &forbiddenHotkeys, bool force) {
-    if(!force && m_forbiddenHotkeys == forbiddenHotkeys)
+    if (!m_hotkeysDelegate)
         return;
-
-    m_forbiddenHotkeys = forbiddenHotkeys;
 
     QList<int> hotkeys;
     for(int i = 0; i < 10; i++)
         hotkeys.push_back(i);
-    foreach(int forbiddenHotkey, m_forbiddenHotkeys)
-        hotkeys.removeOne(forbiddenHotkey);
 
-    bool haveHotkeys = !hotkeys.isEmpty();
-    ui->hotkeyComboBox->setVisible(haveHotkeys);
-    ui->hotkeyLabel->setVisible(haveHotkeys);
-    if(!haveHotkeys)
-        return;
+    QnHotkeysHash usedHotkeys = m_hotkeysDelegate->hotkeys();
+    foreach (const QnPtzPreset &preset, data.presets) {
+        if (!usedHotkeys.contains(preset.id))
+            continue;
+        hotkeys.removeOne(usedHotkeys[preset.id]);
+    }
 
-    int currentHotkey = this->currentHotkey();
-
+    int currentHotkey = hotkey();
     ui->hotkeyComboBox->clear();
-    ui->hotkeyComboBox->addItem(tr("None"), -1);
+    ui->hotkeyComboBox->addItem(tr("None"), Qn::NoHotkey);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
-
-    setCurrentHotkey(currentHotkey);
+    setHotkey(currentHotkey);
 }
 
-int QnPtzPresetDialog::currentHotkey() const {
-    return qvariant_cast<int>(ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()), -1);
+void QnPtzPresetDialog::saveData() const {
+    //TODO: #GDM PTZ ask to replace if there is a preset with the same name?
+    QString presetId = QUuid::createUuid().toString();
+    if (!ptzController()->createPreset(QnPtzPreset(presetId, ui->nameEdit->text())))
+        return;
+
+    if (!m_hotkeysDelegate || hotkey() < 0)
+        return;
+
+    QnHotkeysHash hotkeys = m_hotkeysDelegate->hotkeys();
+    hotkeys[presetId] = hotkey();
+    m_hotkeysDelegate->updateHotkeys(hotkeys);
 }
 
-void QnPtzPresetDialog::setCurrentHotkey(int hotkey) {
+Qn::PtzDataFields QnPtzPresetDialog::requiredFields() const {
+    return Qn::PresetsPtzField;
+}
+
+QnAbstractPtzHotkeyDelegate* QnPtzPresetDialog::hotkeysDelegate() const {
+    return m_hotkeysDelegate;
+}
+
+void QnPtzPresetDialog::setHotkeysDelegate(QnAbstractPtzHotkeyDelegate *delegate) {
+    m_hotkeysDelegate = delegate;
+}
+
+int QnPtzPresetDialog::hotkey() const {
+    return ui->hotkeyComboBox->itemData(ui->hotkeyComboBox->currentIndex()).toInt();
+}
+
+void QnPtzPresetDialog::setHotkey(int hotkey) {
     int index = ui->hotkeyComboBox->findData(hotkey);
     if(index < 0)
-        index = ui->hotkeyComboBox->findData(-1);
+        index = ui->hotkeyComboBox->findData(Qn::NoHotkey);
     ui->hotkeyComboBox->setCurrentIndex(index);
 }
 

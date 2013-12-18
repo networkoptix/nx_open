@@ -2,7 +2,7 @@
 #define QN_DROP_INSTRUMENT_H
 
 #include "instrument.h"
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include "scene_event_filter.h"
 
 class QnWorkbenchContext;

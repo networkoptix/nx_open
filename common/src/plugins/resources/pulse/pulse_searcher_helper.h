@@ -1,6 +1,8 @@
 #ifndef pulse_searcher_helper_h1338
 #define pulse_searcher_helper_h1338
 
+#ifdef ENABLE_PULSE_CAMERA
+
 #include "core/resource_managment/resource_searcher.h"
 
 
@@ -23,7 +25,8 @@ public:
     QList<WSResult> findResources();
 
 private:
-    WSResult parseReply(QByteArray& datagram);
+    WSResult parseReply(const QByteArray& datagram);
 };
 
+#endif // #ifdef ENABLE_PULSE_CAMERA
 #endif // onvif_ws_searcher_helper_h1338

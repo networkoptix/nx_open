@@ -1,6 +1,8 @@
 #ifndef dlink_stream_reader_h_0251
 #define dlink_stream_reader_h_0251
 
+#ifdef ENABLE_DLINK
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/multicodec_rtp_reader.h"
@@ -42,4 +44,5 @@ private:
 
 };
 
+#endif // ENABLE_DLINK
 #endif //dlink_stream_reader_h_0251

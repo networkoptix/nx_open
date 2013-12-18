@@ -1,5 +1,4 @@
 
-#include <QtCore/QTime>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QRegExp>
@@ -73,7 +72,7 @@ void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     if (d->clientRequest.isEmpty()) {
         if (!readRequest())

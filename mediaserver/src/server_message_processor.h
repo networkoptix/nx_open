@@ -1,40 +1,22 @@
 #ifndef QN_SERVER_MESSAGE_PROCESSOR_H
 #define QN_SERVER_MESSAGE_PROCESSOR_H
 
-#include <QSharedPointer>
+#include <api/common_message_processor.h>
 
-#include "api/message_source.h"
-
-class QnServerMessageProcessor : public QObject
+class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
 
+    typedef QnCommonMessageProcessor base_type;
 public:
-    static QnServerMessageProcessor* instance();
-
     QnServerMessageProcessor();
-
-    void init(const QUrl& url, const QByteArray& authKey, int reconnectTimeout);
-    void stop();
-
-signals:
-    void connectionOpened();
-    void connectionReset();
-    void businessRuleChanged(QnBusinessEventRulePtr bEvent);
-    void businessRuleDeleted(int id);
-    void businessRuleReset(QnBusinessEventRuleList rules);
-    void businessActionReceived(QnAbstractBusinessActionPtr bAction);
-public slots:
-    void run();
-
-private slots:
-    void at_messageReceived(QnMessage message);
-    void at_connectionOpened(QnMessage message);
-    void at_connectionClosed(QString errorString);
-    void at_connectionReset();
-
+protected:
+    virtual void loadRuntimeInfo(const QnMessage &message) override;
+    virtual void handleConnectionOpened(const QnMessage &message) override;
+    virtual void handleConnectionClosed(const QString &errorString) override;
+    virtual void handleMessage(const QnMessage &message) override;
 private:
-    QSharedPointer<QnMessageSource> m_source;
+    bool m_tryDirectConnect;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

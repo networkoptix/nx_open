@@ -10,9 +10,13 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
+
+#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -201,7 +205,8 @@ public:
             if(!bastard)
                 bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
             if(!bastard)
-                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
+                bastard = (m_flags & QnResource::local_media) == QnResource::local_media &&
+                        m_resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); //TODO: #Elric hack hack hack
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);

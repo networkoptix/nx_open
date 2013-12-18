@@ -37,10 +37,11 @@
         </SetProperty>
         <SetProperty Id="APPSERVER_PORT" Value="[APPSERVER_PORT32]" After="AppSearch">
             <![CDATA[ APPSERVER_PORT = "" ]]>
-        </SetProperty>        
-        <SetProperty Id="PROXY_PORT" Value="[PROXY_PORT32]" After="AppSearch">
-            <![CDATA[ PROXY_PORT = "" ]]>
         </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]></SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
+        
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch">
             <![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
         </SetProperty>
@@ -48,6 +49,7 @@
         <Property Id="INSTALL_ECS" Secure="yes"/>
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
+        
 
         <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
@@ -73,9 +75,6 @@
             <![CDATA[ SERVER_APPSERVER_PASSWORD = "" ]]>
         </SetProperty>
 
-        <SetProperty Id="SERVER_PORT" Value="[SERVER_PORT32]" After="AppSearch">
-            <![CDATA[ SERVER_PORT = "" ]]>
-        </SetProperty>
         <SetProperty Id="SERVER_GUID" Value="[SERVER_GUID32]" After="AppSearch">
             <![CDATA[ SERVER_GUID = "" ]]>
         </SetProperty>
@@ -114,6 +113,18 @@
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- AppServer properties-->
+        <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
+            <RegistrySearch Id="EcsAllowCameraChangesReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${appserver.name}"
+                            Name="allowCameraChanges"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+
+        <Property Id="ALLOW_CAMERA_CHANGES_REF1" Value="ALLOW_CAMERA_CHANGES"/>
+        <Property Id="ALLOW_CAMERA_CHANGES_REF2" Value="ALLOW_CAMERA_CHANGES"/>
+        
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
                             Root="HKLM"
@@ -146,24 +157,6 @@
                             Root="HKLM"
                             Key="Software\${company.name}\${appserver.name}"
                             Name="port"
-                            Type="raw"
-                            Win64="no"/>
-        </Property>
-
-        <Property Id="PROXY_PORT" Secure="yes">
-            <RegistrySearch Id="ProxyPortReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${appserver.name}"
-                            Name="proxyPort"
-                            Type="raw"
-                            Win64="yes"/>
-        </Property>
-
-        <Property Id="PROXY_PORT32" Secure="yes">
-            <RegistrySearch Id="ProxyPortReg32"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${appserver.name}"
-                            Name="proxyPort"
                             Type="raw"
                             Win64="no"/>
         </Property>
@@ -264,24 +257,6 @@
                             Win64="no"/>
         </Property>
 
-        <Property Id="SERVER_PORT" Secure="yes">
-            <RegistrySearch Id="ServerPortReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="rtspPort"
-                            Type="raw"
-                            Win64="yes"/>
-        </Property>
-
-        <Property Id="SERVER_PORT32" Secure="yes">
-            <RegistrySearch Id="ServerPortReg32"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="rtspPort"
-                            Type="raw"
-                            Win64="no"/>
-        </Property>
-
         <Property Id="SERVER_GUID" Secure="yes">
             <RegistrySearch Id="ServerGuidReg"
                             Root="HKLM"
@@ -349,15 +324,10 @@
         <CustomAction Id="FixClientFolder" BinaryKey="CustomActions.dll" DllEntry="FixClientFolder"/>
 
         <CustomAction Id="SetNewGuidForEcs" Property="APPSERVER_GUID" Value="[APPSERVER_GUID_NEW]"/>
-        <CustomAction Id="SetNewGuidForServer" Property="SERVER_GUID" Value="[SERVER_GUID_NEW]"/>
 
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
-        <CustomAction Id="AssignOldServerPort" Property="OLD_SERVER_PORT" Value="[SERVER_PORT]"/>
-        <CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
 
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
-        <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT2]"/>
-        <CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
 
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
@@ -430,30 +400,22 @@
         </Upgrade> -->
 
         <?define EcsNeedsGuid="(INSTALL_ECS AND NOT APPSERVER_GUID)"?>
-        <?define ServerNeedsGuid="INSTALL_SERVER AND NOT SERVER_GUID"?>
         <InstallUISequence>
             <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
             <Custom Action="FindFreePorts" Before="AssignOldAppServerPort"/>
-            <Custom Action="AssignOldAppServerPort" Before="AssignOldServerPort">1</Custom>
-            <Custom Action="AssignOldServerPort" Before="AssignOldProxyPort">1</Custom>
-            <Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
-            <Custom Action="AssignAppServerPort" Before="AssignServerPort">NOT APPSERVER_PORT</Custom>
-            <Custom Action="AssignServerPort" Before="AssignProxyPort">NOT SERVER_PORT</Custom>
-            <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
+            <Custom Action="AssignOldAppServerPort" Before="AssignAppServerPort">1</Custom>
+            <Custom Action="AssignAppServerPort" Before="AssignServerAppServerPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">NOT SERVER_APPSERVER_PORT</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs">
-                <![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]>
-            </Custom>
-            <Custom Action="SetNewGuidForEcs" Before="SetNewGuidForServer">
                 <![CDATA[ $(var.EcsNeedsGuid) ]]>
             </Custom>
-            <Custom Action="SetNewGuidForServer" Before="FindConfiguredStorages">
-                <![CDATA[ $(var.ServerNeedsGuid)  ]]>
+            <Custom Action="SetNewGuidForEcs" Before="FindConfiguredStorages">
+                <![CDATA[ $(var.EcsNeedsGuid) ]]>
             </Custom>
             <Custom Action="FindConfiguredStorages" Before="SetClientFolderToDefault"/> 
 
@@ -603,20 +565,21 @@
                                 <File Id="ecs.log" Name="ecs.log" Source="files/ecs.log" KeyPath="yes"/>
                             </Component>
 
-                            <Component Id="AppServerConfigurationGuid" Permanent="yes" NeverOverwrite="yes">
+                            <Component Id="EcsPermanentConfiguration" Permanent="yes" NeverOverwrite="yes">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}">
+                                    <RegistryValue Type="string" Name="allowCameraChanges" Value="[ALLOW_CAMERA_CHANGES]"/>
                                     <RegistryValue Type="string" Name="ecsGuid" Value="[APPSERVER_GUID]" KeyPath="yes"/>
                                 </RegistryKey>
                             </Component>
 
-                            <Component Id="AppServerConfiguration">
+                            <Component Id="EcsConfiguration">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}">
                                     <RegistryValue Type="string" Name="port" Value="[APPSERVER_PORT]"/>
-                                    <RegistryValue Type="string" Name="proxyPort" Value="[PROXY_PORT]"/>
                                     <RegistryValue Type="string" Name="login" Value="[APPSERVER_LOGIN]"/>
                                 </RegistryKey>
+                                <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${appserver.name}\proxyPort" Action="removeOnInstall"/>
                             </Component>
                         </Directory>
 
@@ -695,8 +658,9 @@
                                     <RegistryValue Type="string" Name="appserverPort" Value="[SERVER_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_APPSERVER_PASSWORD]"/>
-                                    <RegistryValue Type="string" Name="rtspPort" Value="[SERVER_PORT]"/>
                                 </RegistryKey>
+                                <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\apiPort" Action="removeOnInstall"/>
+                                <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
                             </Component>
 
                             <Component Id="ServerRtspPlugin">
@@ -802,7 +766,7 @@
                 <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
             <Component>
-                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="$(var.SourceDir)/avdevice-53.dll"/>
+                <File Id="ServerAvdeviceDll" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll"/>
             </Component>
             <Component>
                 <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll"/>
@@ -918,8 +882,8 @@
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.log" />           
-            <ComponentRef Id="AppServerConfiguration"/>
-            <ComponentRef Id="AppServerConfigurationGuid"/>
+            <ComponentRef Id="EcsConfiguration"/>
+            <ComponentRef Id="EcsPermanentConfiguration"/>
 
             <ComponentRef Id="ProxyExecutable" />
             <ComponentGroupRef Id="ProxyQTLibraries" />       
@@ -1212,25 +1176,21 @@
                 <![CDATA[ $(var.VmsInstalling) ]]>
             </Publish>
 
-            <?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
-            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>        
+            <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT)" ?>        
 
             <Publish Dialog="AppServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT] [PROXY_PORT]" Order="1">1</Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg" Order="2">
-                <![CDATA[ NOT $(var.EcsPortsDiffer) ]]>
-            </Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Property="PORTSTOTEST" Value="[APPSERVER_PORT]" Order="1">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2">
-                <![CDATA[ $(var.EcsPortsDiffer) AND NOT $(var.EcsPasswordsEqual) ]]>
+                <![CDATA[ NOT $(var.EcsPasswordsEqual) ]]>
             </Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2">
-                <![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]>
+                <![CDATA[ $(var.EcsPasswordsEqual) AND $(var.EcsNeedCheckPorts) ]]>
             </Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">
-                <![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]>
+                <![CDATA[ $(var.EcsPasswordsEqual) AND BUSYPORT ]]>
             </Publish>
 
-            <?define IsAsSettingsFilled="(APPSERVER_PORT AND PROXY_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+            <?define IsAsSettingsFilled="(APPSERVER_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
             <?define EcsSettingsValid="($(var.IsAsSettingsFilled) AND NOT BUSYPORT)"?>
 
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg">
@@ -1278,38 +1238,29 @@
             </Publish>
 
 
-            <?define IsPortsValid="((INSTALL_ECS AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (NOT INSTALL_ECS))" ?>
-            <?define IsSettingsFilled="(SERVER_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
-            <?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
+            <?define IsSettingsFilled="(SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
+            <?define IsSettingsValid="($(var.IsSettingsFilled))"?>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg">
                 <![CDATA[ NOT $(var.IsSettingsFilled) ]]>
             </Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg">
-                <![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]>
+                <![CDATA[ $(var.IsSettingsFilled) ]]>
             </Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2">
-                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid) AND $(var.Inst_C1) ]]>
+                <![CDATA[$(var.IsSettingsValid) AND $(var.Inst_C1) ]]>
             </Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg" Order="2">
-                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) AND $(var.Remove_E1) ]]>
+                <![CDATA[$(var.IsSettingsValid) AND $(var.Inst_C0) AND $(var.Remove_E1) ]]>
             </Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">
-                <![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) AND NOT $(var.Remove_E1) ]]>
+                <![CDATA[$(var.IsSettingsValid) AND $(var.Inst_C0) AND NOT $(var.Remove_E1) ]]>
             </Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT]" Order="4">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN]" Order="4">1</Publish>
-
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_PORT]" Order="1">
-                <![CDATA[ SERVER_PORT <> OLD_SERVER_PORT]]></Publish>
-
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2">
-                <![CDATA[ SERVER_PORT <> OLD_SERVER_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>

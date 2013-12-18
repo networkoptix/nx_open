@@ -165,11 +165,17 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
     
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
     if( entryProc == NULL )
+    {
+        lib.unload();
         return false;
+    }
 
     nxpl::PluginInterface* obj = entryProc();
     if( !obj )
+    {
+        lib.unload();
         return false;
+    }
 
     cl_log.log( QString::fromLatin1("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
     m_nxPlugins.push_back( obj );

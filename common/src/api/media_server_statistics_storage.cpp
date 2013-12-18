@@ -29,9 +29,9 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServ
     m_listeners(0),
     m_pointsLimit(pointsLimit),
     m_updatePeriod(defaultUpdatePeriod),
+    m_uptimeMs(0),
     m_apiConnection(apiConnection),
-    m_timer(new QTimer()),
-    m_uptimeMs(0)
+    m_timer(new QTimer())
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer->start(m_updatePeriod);

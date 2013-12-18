@@ -15,7 +15,7 @@ public:
 
     virtual QByteArray getAdditionSDP() override;
 
-    virtual void setDataPacket(QnAbstractMediaDataPtr media) override;
+    virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 
@@ -37,7 +37,7 @@ private:
     bool m_gotLivePacket;
     QnMediaContextPtr m_ctxSended;
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
-    QnAbstractMediaDataPtr m_media;
+    QnConstAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;
     int m_liveMarker;

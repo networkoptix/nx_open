@@ -81,7 +81,7 @@ public:
     void setDisplayedRect(const QRectF& rect);
 
     void setHistogramConsumer(QnHistogramConsumer* value);
-    int panoFactor() const;
+    
 private:
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation); // deprecated
     ImageCorrectionResult calcImageCorrection();

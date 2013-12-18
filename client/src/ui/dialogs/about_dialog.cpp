@@ -15,6 +15,7 @@
 #include "api/app_server_connection.h"
 #include "core/resource/resource_type.h"
 #include "core/resource_managment/resource_pool.h"
+#include <core/resource/media_server_resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -76,8 +77,6 @@ void QnAboutDialog::retranslateUi()
     ui->retranslateUi(this);
 
     m_copyButton->setText(tr("Copy to Clipboard"));
-
-    setWindowTitle(tr("About"));
 
     QString version = 
         tr(

@@ -24,6 +24,7 @@ public:
     virtual Qn::ActionScope currentScope() const override;
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
+    void tabTextChanged();
 
 protected:
     virtual QSize minimumSizeHint() const override;

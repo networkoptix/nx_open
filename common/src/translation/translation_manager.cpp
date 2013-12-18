@@ -13,6 +13,8 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
 {
     addPrefix(lit("common"));
     addPrefix(lit("qt"));
+    addPrefix(lit("qtbase"));
+    addPrefix(lit("qtmultimedia"));
     
     addSearchPath(lit(":/translations"));
     if(qApp) {
@@ -83,6 +85,13 @@ void QnTranslationManager::removeSearchPath(const QString &searchPath) {
 }
 
 void QnTranslationManager::installTranslation(const QnTranslation &translation) {
+    QString localeCode = translation.localeCode();
+    localeCode.replace(L'-', L'_'); /* Minus sign is not supported as a separator... */
+
+    QLocale locale(localeCode);
+    if(locale.language() != QLocale::C)
+        QLocale::setDefault(locale);
+
     foreach(const QString &file, translation.filePaths()) {
         QScopedPointer<QTranslator> translator(new QTranslator(qApp));
         if(translator->load(file))

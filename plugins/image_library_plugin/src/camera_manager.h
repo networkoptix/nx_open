@@ -26,9 +26,9 @@ public:
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
-    //!Implementaion of nxpl::PluginInterface::addRef
+    //!Implementation of nxpl::PluginInterface::addRef
     virtual unsigned int addRef() override;
-    //!Implementaion of nxpl::PluginInterface::releaseRef
+    //!Implementation of nxpl::PluginInterface::releaseRef
     virtual unsigned int releaseRef() override;
 
     //!Implementation of nxcip::BaseCameraManager::getEncoderCount
@@ -56,6 +56,8 @@ public:
     virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
     //!Implementation of nxcip::BaseCameraManager2::find
     virtual int find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const override;
+    //!Implementation of nxcip::BaseCameraManager2::setMotionMask
+    virtual int setMotionMask( nxcip::Picture* motionMask ) override;
 
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
@@ -71,7 +73,7 @@ private:
     nxpt::ScopedRef<ImageLibraryPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    std::auto_ptr<MediaEncoder> m_encoder;
+    std::auto_ptr<MediaEncoder> m_encoder[2];
     mutable DirContentsManager m_dirContentsManager;
 };
 

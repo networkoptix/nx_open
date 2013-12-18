@@ -1,4 +1,9 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_archive_delegate.h"
+
+#include <QtCore/QElapsedTimer>
+
 #include "core/resource/resource_media_layout.h"
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
@@ -144,7 +149,7 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
         seekInternal(m_ThumbnailsSeekPoints.begin().key(), true);
     }
 
-    QTime getTimer;
+    QElapsedTimer getTimer;
     getTimer.restart();
     while (m_isOpened) {
         QnAbstractDataPacketPtr tmp = m_maxStream->getNextData(this);
@@ -286,3 +291,5 @@ bool QnVMax480ArchiveDelegate::isStopping() const
 {
     return m_needStop;
 }
+
+#endif // #ifdef ENABLE_VMAX

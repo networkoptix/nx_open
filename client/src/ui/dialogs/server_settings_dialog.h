@@ -52,12 +52,15 @@ private slots:
     void at_storagesTable_cellChanged(int row, int column);
     void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
     void at_pingButton_clicked();
+#ifndef Q_OS_MACX
     void at_rebuildButton_clicked();
 
-    void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
-    void at_archiveRebuildReply(int, const QnRebuildArchiveReply& reply, int);
+    void at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int);
     void sendNextArchiveRequest();
     void at_updateRebuildInfo();
+#endif
+
+    void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
@@ -66,8 +69,9 @@ private:
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
+#ifndef Q_OS_MACX
     QnRebuildArchiveReply m_lastRebuildReply;
-    QTimer m_timer;
+#endif
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

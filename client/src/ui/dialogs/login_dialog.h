@@ -20,7 +20,6 @@ class QUrl;
 
 class QnWorkbenchContext;
 class QnAbstractArchiveReader;
-class QnVideoCamera;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 

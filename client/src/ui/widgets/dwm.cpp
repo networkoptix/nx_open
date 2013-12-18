@@ -420,7 +420,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
                 QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
         }
 
-        if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
+        if(event->type() == QnEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
             d->widget->move(d->widget->pos()); 
     }
 #endif // QN_HAS_DWM
@@ -436,6 +436,9 @@ bool QnDwm::widgetNativeEvent(const QByteArray &eventType, void *message, long *
 
     return d->winEvent(static_cast<MSG *>(message), result);
 #else
+    Q_UNUSED(eventType)
+    Q_UNUSED(message)
+    Q_UNUSED(result)
     return false;
 #endif // QN_HAS_DWM
 }

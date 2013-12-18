@@ -51,6 +51,8 @@ public:
     Options options() const;
     void setOptions(Options options);
 
+    void setAnimationsEnabled(bool enabled = true);
+
     QWidget *viewport() const;
 
 public slots:
@@ -68,6 +70,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
@@ -87,6 +90,10 @@ protected slots:
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
+
+private:
+    void showFullScreen();
+    void showNormal();
 
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
@@ -114,8 +121,10 @@ private:
     Options m_options;
     QMargins m_frameMargins;
 
-    /** This field is used to restore geometry after switching to fullscreen and back */
+#ifndef Q_OS_MACX
+    /** This field is used to restore geometry after switching to fullscreen and back. Do not used in MacOsX due to its fullscreen mode. */
     QRect m_storedGeometry;
+#endif
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

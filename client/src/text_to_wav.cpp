@@ -15,7 +15,7 @@
 static char festivalVoxPath[256];
 
 
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
 #include <stdio.h>
 #else
 namespace
@@ -35,7 +35,7 @@ namespace
         int i;
 
         for (i=0; i<length; i++)
-	    chars[i] = (data[i]/256);
+        chars[i] = (data[i]/256);
         
     }
 
@@ -45,7 +45,7 @@ namespace
         int i;
 
         for (i=0; i<length; i++)
-	    chars[i] = (data[i]/256)+128;
+        chars[i] = (data[i]/256)+128;
         
     }
 
@@ -58,74 +58,74 @@ namespace
         switch (sample_type) 
         {
           case st_unknown:  
-	    word_size = 2;	break;
+        word_size = 2;	break;
           case st_uchar:  
           case st_schar:  
-	    word_size = 1;	break;
+        word_size = 1;	break;
           case st_mulaw:
-	    word_size = 1;	break;
+        word_size = 1;	break;
     #if 0
           case st_adpcm:  /* maybe I mean 0.5 */
-	    word_size = 1;	break;
+        word_size = 1;	break;
     #endif
           case st_short: 
-	    word_size = 2;	break;
+        word_size = 2;	break;
           case st_int: 
-	    /* Yes I mean 4 not sizeof(int) these are machine independent defs */
-	    word_size = 4;	break;
+        /* Yes I mean 4 not sizeof(int) these are machine independent defs */
+        word_size = 4;	break;
           case st_float: 
-	    word_size = 4;	break;
+        word_size = 4;	break;
           case st_double: 
-	    word_size = 8;	break;
+        word_size = 8;	break;
           default:
-	    fprintf(stderr,"Unknown encoding format error\n");
-	    word_size = 2;
+        fprintf(stderr,"Unknown encoding format error\n");
+        word_size = 2;
         }
         return word_size;
     }
 
 
     enum EST_write_status save_raw_data(QIODevice *fp, const short *data, int offset,
-				        int num_samples, int num_channels, 
-				        const enum EST_sample_type_t sample_type, 
-				        int bo)
+                        int num_samples, int num_channels, 
+                        const enum EST_sample_type_t sample_type, 
+                        int bo)
     {
         //int i;
         int n;
 
         if (sample_type == st_short)
         {
-	        if (bo != EST_NATIVE_BO)
-	        {
-	            short *xdata = walloc(short,num_channels*num_samples);
-	            memmove(xdata,data+(offset*num_channels),
-		            num_channels*num_samples*sizeof(short));
-	            swap_bytes_short(xdata,num_channels*num_samples);
-	            //n = fwrite(xdata, sizeof(short),num_channels * num_samples, fp);
-                n = fp->write( (const char*)xdata, sizeof(short) * num_channels * num_samples ) / sizeof(short);
-	            wfree(xdata);
-	        }
-	        else
+            if (bo != EST_NATIVE_BO)
             {
-	            //n = fwrite(&data[offset], sizeof(short), num_channels * num_samples, fp);
+                short *xdata = walloc(short,num_channels*num_samples);
+                memmove(xdata,data+(offset*num_channels),
+                    num_channels*num_samples*sizeof(short));
+                swap_bytes_short(xdata,num_channels*num_samples);
+                //n = fwrite(xdata, sizeof(short),num_channels * num_samples, fp);
+                n = fp->write( (const char*)xdata, sizeof(short) * num_channels * num_samples ) / sizeof(short);
+                wfree(xdata);
+            }
+            else
+            {
+                //n = fwrite(&data[offset], sizeof(short), num_channels * num_samples, fp);
                 n = fp->write( (const char*)&data[offset], sizeof(short) * num_channels * num_samples ) / sizeof(short);
             }
-	        if (n != (num_channels * num_samples))
-	            return misc_write_error;
+            if (n != (num_channels * num_samples))
+                return misc_write_error;
         }
         else
         {
-	        fprintf(stderr,"save data file: unsupported sample type\n");
-	        return misc_write_error;
+            fprintf(stderr,"save data file: unsupported sample type\n");
+            return misc_write_error;
         }
         return write_ok;
     }
 
 
     enum EST_write_status save_wave_riff(QIODevice *fp, const short *data, int offset,
-				         int num_samples, int num_channels, 
-				         int sample_rate,
-				         const enum EST_sample_type_t sample_type, int bo)   
+                         int num_samples, int num_channels, 
+                         int sample_rate,
+                         const enum EST_sample_type_t sample_type, int bo)   
     {
         (void)bo;
         const char *info;
@@ -135,8 +135,8 @@ namespace
         Q_ASSERT(sample_type != st_schar);
      //   if (sample_type == st_schar)
      //     {
-	    //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");
-	    //sample_type=st_uchar; 
+        //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");
+        //sample_type=st_uchar; 
      //     }
         
         info = "RIFF";
@@ -166,7 +166,7 @@ namespace
             case st_adpcm: data_short = WAVE_FORMAT_ADPCM; break;
             default:
               fprintf(stderr,"RIFF format: unsupported data format %d\n",
-	              sample_type);
+                  sample_type);
               return misc_write_error;
         }
         if (EST_BIG_ENDIAN) data_short = SWAPSHORT(data_short);
@@ -201,7 +201,7 @@ namespace
         fp->write( (const char*)&data_size, 4 );
         
         return save_raw_data(fp,data,offset,num_samples,num_channels,
-			     sample_type,bo_little);
+                 sample_type,bo_little);
     }
 }
 #endif
@@ -246,7 +246,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
 
     if( result )
     {
-#if _XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L
+#if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
         //open_memstream is present
         char* buf = NULL;
         size_t bufSize = 0;
@@ -262,7 +262,7 @@ static bool textToWavInternal( const QString& text, QIODevice* const dest )
         else
         {
             result = (buf && (bufSize > 0))
-                ? dest->write( buf, bufSize ) == bufSize
+                ? dest->write( buf, bufSize ) == (qint64)bufSize
                 : false;
             if( buf )
                 free( buf );
@@ -313,21 +313,9 @@ bool TextToWaveServer::generateSoundSync( const QString& text, QIODevice* const 
     return task->result;
 }
 
-static TextToWaveServer* _staticInstance = NULL;
-
-void TextToWaveServer::initStaticInstance( TextToWaveServer* _instance )
-{
-    _staticInstance = _instance;
-}
-
-TextToWaveServer* TextToWaveServer::instance()
-{
-    return _staticInstance;
-}
-
 void TextToWaveServer::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
 
     FestivalInitializer festivalInitializer;
 

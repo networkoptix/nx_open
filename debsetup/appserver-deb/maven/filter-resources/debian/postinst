@@ -2,22 +2,27 @@
 
 . /usr/share/debconf/confmodule
 
-COMPANY_NAME="${deb.customization.company.name}"
-
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
+COMPANY_NAME="${deb.customization.company.name}"
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
-ECS_PORT_DEFAULT=7001
-ECS_PROXY_PORT_DEFAULT=7004
 
-CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
-SSL_DIR="/opt/$COMPANY_NAME/entcontroller/var/ssl"
+BASE_DIR="/opt/$COMPANY_NAME/entcontroller"
+
+ETC_DIR="$BASE_DIR/etc"
+CONFIG_FILE="$ETC_DIR/entcontroller.conf"
+
+VAR_DIR="$BASE_DIR/var"
+SSL_DIR="$VAR_DIR/ssl"
 SSL_CERT="$SSL_DIR/cert.pem"
-BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
+
+BIN_DIR="$BASE_DIR/bin"
+CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
 ECS_PORT_DEFAULT=7001
-ECS_PROXY_PORT_DEFAULT=7004
+PUBLIC_IP_MODE_DEFAULT=auto
+ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
@@ -25,31 +30,6 @@ if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-entcontroller
 fi
     
-function read_config {
-    ECS_PORT=$ECS_PORT_DEFAULT
-    ECS_PROXY_PORT=$ECS_PROXY_PORT_DEFAULT
-
-    [ -f $CONFIG_FILE ] || { true; return; }
-
-    ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid\s*=\s*\(.*\)/\1/g')
-    LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile\s*=\s*\(.*\)/\1/g')
-    ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port\s*=\s*\(.*\)/\1/g')
-    ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
-    ECS_PROXY_AUTH_KEY=$(cat $CONFIG_FILE | grep proxyAuthKey | head -1 | sed 's/proxyAuthKey\s*=\s*\(.*\)/\1/g')
-
-    [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT || true
-    [ -z "$ECS_PROXY_PORT" ] && ECS_PORT=$ECS_PROXY_PORT_DEFAULT || true
-}
-
-function write_config {
-    echo "[General]" > $CONFIG_FILE
-    [ -z "$ECS_GUID" ] || echo "ecsGuid=$ECS_GUID" >> $CONFIG_FILE
-    [ -z "$LOG_FILE" ] || echo "logFile=$LOG_FILE" >> $CONFIG_FILE
-    [ -z "$ECS_PORT" ] || echo "port=$ECS_PORT" >> $CONFIG_FILE
-    [ -z "$ECS_PROXY_PORT" ] || echo "proxyPort=$ECS_PROXY_PORT" >> $CONFIG_FILE
-    [ -z "$ECS_PROXY_AUTH_KEY" ] || echo "proxyAuthKey=$ECS_PROXY_AUTH_KEY" >> $CONFIG_FILE
-}
-
 function to_int {
     local -i num="10#${1}"
     echo "${num}"
@@ -72,15 +52,11 @@ function create_dir {
     mkdir -p "$dir"
 }
 
-function validate_ecsPassword {
+function validate_password {
     [ "$IS_ADMIN_PW_SET" = "true" -o -n "$1" ]
 }
 
-function validate_ecsPort {
-    port_is_ok $1
-}
-
-function valide_ecsProxyPort {
+function validate_port {
     port_is_ok $1
 }
 
@@ -121,33 +97,49 @@ function ask_for_value {
 
 case "$1" in
   configure)
-      read_config
-
       IS_ADMIN_PW_SET="false"
-      [ -f /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db ] && $BINDIR/dbconfig isadminpw && IS_ADMIN_PW_SET="true"
+      [ -f $VAR_DIR/db/ecs.db ] && $BIN_DIR/dbconfig isadminpw && IS_ADMIN_PW_SET="true"
 
-      ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
-      ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
-      ECS_PASSWORD=$(ask_for_value ecsPassword "")
+      ECS_PORT="$($CFG_HELPER port)"
+      [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
+      ECS_PORT=$(ask_for_value port "$ECS_PORT")
+      $CFG_HELPER port "$ECS_PORT"
 
-      write_config
+      ECS_PASSWORD=$(ask_for_value password "")
 
-      dbversion=$("$BINDIR/dbconfig" swversion)
-      if [ $dbversion != "0" ]
+      ECS_ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
+      [ -z "$ECS_ALLOW_CAMERA_CHANGES" ] && ECS_ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
+      ECS_ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ECS_ALLOW_CAMERA_CHANGES")
+      $CFG_HELPER allowCameraChanges "$ECS_ALLOW_CAMERA_CHANGES"
+
+      PUBLIC_IP_MODE="$($CFG_HELPER publicIpMode)"
+      [ -z "$PUBLIC_IP_MODE" ] && PUBLIC_IP_MODE=$PUBLIC_IP_MODE_DEFAULT
+      PUBLIC_IP_MODE=$(ask_for_value publicIpMode "$PUBLIC_IP_MODE")
+      $CFG_HELPER publicIpMode "$PUBLIC_IP_MODE"
+
+      if [ "$PUBLIC_IP_MODE" = "manual" ]
       then
-          cp -p /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db{,.$dbversion}
+          MANUAL_PUBLIC_IP="$($CFG_HELPER manualPublicIp)"
+          MANUAL_PUBLIC_IP=$(ask_for_value manualPublicIp "$MANUAL_PUBLIC_IP")
+          $CFG_HELPER manualPublicIp "$MANUAL_PUBLIC_IP"
       fi
 
-      "$BINDIR/dbsync"
+      dbversion=$("$BIN_DIR/dbconfig" swversion)
+      if [ $dbversion != "0" ]
+      then
+          cp -p $VAR_DIR/db/ecs.db{,.$dbversion}
+      fi
+
+      "$BIN_DIR/dbsync"
 
       if [ -n "$ECS_PASSWORD" ]
       then
-          "$BINDIR/dbconfig" setpw admin "$ECS_PASSWORD"
+          "$BIN_DIR/dbconfig" setpw admin "$ECS_PASSWORD"
       fi
 
-      "$BINDIR/certgen" -i
+      "$BIN_DIR/certgen" -i
 
-      chmod 600 /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db
+      chmod 600 $VAR_DIR/db/ecs.db
       chmod 600 "$SSL_CERT"
   ;;
 

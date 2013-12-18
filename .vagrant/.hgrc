@@ -1,0 +1,11 @@
+[ui]
+username = My Name <my@email.com>
+verbose = True
+
+[extensions]
+eol =
+extdiff = 
+purge = 
+mq =
+fetch = 
+

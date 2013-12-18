@@ -12,6 +12,7 @@
 #include <client/config.h>
 
 #include <utils/common/util.h>
+#include <utils/common/json.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <utils/common/string.h>
@@ -29,7 +30,7 @@ namespace {
         QnConnectionData connection;
         connection.name = settings->value(QLatin1String("name")).toString();
         connection.url = settings->value(QLatin1String("url")).toString();
-        connection.url.setScheme(QLatin1String("https"));
+        connection.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
 
         return connection;
@@ -86,13 +87,11 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Load from internal resource. */
     QFile file(QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.json"));
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-
-        QJsonParseError error;
-        QVariantMap json = QJsonDocument::fromJson(file.readAll(), &error).toVariant().toMap();
-        if (error.error != QJsonParseError::NoError) {
-            qWarning() << error.errorString();
+        QJsonObject jsonObject;
+        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
+            qWarning() << "Client settings file could not be parsed!";
         } else {
-            updateFromJson(json.value(lit("settings")).toMap());
+            updateFromJson(jsonObject.value(lit("settings")).toObject());
         }
     }
 
@@ -115,7 +114,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
-        result.url.setScheme(QLatin1String("https"));
+        result.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
         result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
         result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
@@ -123,7 +122,10 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         result.readOnly = true;
 
         if(!result.isValid())
-            result.url = QUrl(QString(QLatin1String("https://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
+            result.url = QUrl(QString(QLatin1String("%1://admin@%2:%3")).
+                arg(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http")).
+                arg(QLatin1String(DEFAULT_APPSERVER_HOST)).
+                arg(DEFAULT_APPSERVER_PORT));
 
         return QVariant::fromValue<QnConnectionData>(result);
     }
@@ -266,11 +268,11 @@ void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {
         return;
     }
 
-    QVariantMap json;
-    if(!QJson::deserialize(reply->readAll(), &json)) {
+    QJsonObject jsonObject;
+    if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
         qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
     } else {
-        updateFromJson(json.value(lit("settings")).toMap());
+        updateFromJson(jsonObject.value(lit("settings")).toObject());
     }
 
     reply->deleteLater();

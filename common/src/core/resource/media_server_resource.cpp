@@ -228,7 +228,7 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        //TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
+        //TestConnectionTask *task = new TestConnectionTask(::toSharedPointer(this), url);
         //QThreadPool::globalInstance()->start(task);
         int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
         m_runningIfRequests.insert(requestNum, url.toString());
@@ -273,6 +273,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
         m_streamingUrl = localOther->getStreamingUrl();
+        m_version = localOther->getVersion();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         

@@ -1,6 +1,8 @@
 #ifndef av_device_server_h_2107
 #define av_device_server_h_2107
 
+#ifdef ENABLE_ARECONT
+
 #include "core/resource_managment/resource_searcher.h"
 
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
@@ -21,5 +23,7 @@ protected:
     virtual QString manufacture() const;
 
 };
+
+#endif
 
 #endif // av_device_server_h_2107

@@ -6,6 +6,7 @@ import "license.proto";
 import "cameraServerItem.proto";
 import "businessRule.proto";
 import "businessAction.proto";
+import "kvpair.proto";
 
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "MessageProtos";
@@ -36,6 +37,9 @@ message Message {
         
         RuntimeInfoChange       = 14;
         BusinessRuleReset       = 15;
+
+        KvPairChange            = 16;
+        KvPairDelete            = 17;
     }
 
     required Type type = 1;
@@ -96,8 +100,10 @@ message InitialMessage {
     optional string hardwareId2                = 7;
     optional string publicIp                   = 8;
     optional string systemName                 = 9;
-    optional string sessionKey                 = 10;
-    optional string hardwareId3                = 11;
+    optional string hardwareId3                = 10;
+    optional string sessionKey                 = 11;
+    optional bool allowCameraChanges           = 12;
+    repeated KvPair kvPair                     = 13;
 }
 
 message FileAddMessage {
@@ -132,6 +138,7 @@ message RuntimeInfoChangeMessage {
     optional string publicIp = 1;
     optional string systemName = 2;
     optional string sessionKey = 3;
+    optional bool allowCameraChanges = 4;
 }
 
 message BusinessRuleResetMessage {
@@ -141,3 +148,20 @@ message BusinessRuleResetMessage {
 
     repeated BusinessRule businessRule = 1;
 }
+
+message KvPairChangeMessage {
+    extend Message {
+        required KvPairChangeMessage message = 111;
+    }
+
+    repeated KvPair kvPair = 1;
+}
+
+message KvPairDeleteMessage {
+    extend Message {
+        required KvPairDeleteMessage message = 112;
+    }
+
+    repeated KvPair kvPair = 1;
+}
+

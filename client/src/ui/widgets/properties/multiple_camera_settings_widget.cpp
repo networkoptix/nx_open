@@ -176,6 +176,11 @@ void QnMultipleCameraSettingsWidget::reject()
     updateFromResources();
 }
 
+bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
+{
+    return m_hasScheduleEnabledChanges || m_hasScheduleChanges;
+}
+
 void QnMultipleCameraSettingsWidget::updateFromResources() {
     if(m_cameras.empty()) {
         ui->loginEdit->setText(QString());

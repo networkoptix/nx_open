@@ -28,6 +28,7 @@
 
 
 /* Don't use deprecated Qt functions. */
+// TODO: This one causes compilation errors in QObject...
 //#define QT_NO_DEPRECATED
 
 
@@ -40,27 +41,22 @@
 /* Define override specifier. */
 #if defined(_MSC_VER)
 #   define override override
-#elif defined(__GNUC__)
-#   if (GCC_VERSION < 40700)
-#       define override
-#   endif
+#elif defined(__GNUC__) && GCC_VERSION < 40700
+#   define override
 #else
 #   define override
 #endif
 
 
-/* Define noexcept. */
-//#if defined(_MSC_VER) && _MSC_VER < 1700
-//#   define noexcept throw()
-//#elif defined(__GNUC__)
-//#   if (GCC_VERSION >= 40600)
-//#       define noexcept noexcept
-//#   else
-//#       define noexcept throw()
-//#   endif
-////#else
-////#   define noexcept
-//#endif
+/* Define NULL. */
+#ifdef __cplusplus
+#   undef NULL
+#   define NULL nullptr
+#   ifdef __GNUC__
+#       undef __null
+#       define __null nullptr
+#   endif
+#endif
 
 
 /* Define foreach */

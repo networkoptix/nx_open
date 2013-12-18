@@ -1,7 +1,6 @@
 #ifndef __PRACTICALSOCKET_INCLUDED__
 #define __PRACTICALSOCKET_INCLUDED__
 
-#include <QMutex>
 #include <string>
 #include <exception>
 
@@ -24,6 +23,7 @@
 #include "../common/systemerror.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
+
 
 /**
  *   Signals a problem with the execution of a socket call.
@@ -81,7 +81,7 @@ public:
     //!Implementation of AbstractSocket::bind
     virtual bool bind( const SocketAddress& localAddress ) override;
     //!Implementation of AbstractSocket::bindToInterface
-    virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
+    //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) override;
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override;
     //!Implementation of AbstractSocket::getPeerAddress
@@ -215,7 +215,6 @@ private:
     SystemError::ErrorCode m_prevErrorCode;
     unsigned int m_readTimeoutMS;
     unsigned int m_writeTimeoutMS;
-    static QMutex m_createSockMutex;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -421,7 +420,7 @@ public:
      *   Set the multicast send interface
      *   @param multicastIF multicast interface for sending packets
      */
-    bool setMulticastIF(const QString& multicastIF);
+    virtual bool setMulticastIF(const QString& multicastIF) override;
 
     /**
      *   Join the specified multicast group

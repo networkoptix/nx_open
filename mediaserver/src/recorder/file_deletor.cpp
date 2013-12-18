@@ -28,7 +28,7 @@ QnFileDeletor::~QnFileDeletor()
 
 void QnFileDeletor::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     while (!m_needStop)
     {
         if (m_postponeTimer.elapsed() > POSTPONE_FILES_INTERVAL) {

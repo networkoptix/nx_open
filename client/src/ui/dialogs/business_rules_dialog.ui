@@ -22,8 +22,8 @@
         <string>Add</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../x86/build/client-custom.qrc">
-         <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
+        <iconset resource="../../../x64/build/client.qrc">
+         <normaloff>:/skin/buttons/add.png</normaloff>:/skin/buttons/add.png</iconset>
        </property>
       </widget>
      </item>
@@ -33,9 +33,8 @@
         <string>Delete</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normalon>:/skin/titlebar/exit_hovered.png</normalon>
-        </iconset>
+        <iconset resource="../../../x64/build/client.qrc">
+         <normaloff>:/skin/buttons/remove.png</normaloff>:/skin/buttons/remove.png</iconset>
        </property>
       </widget>
      </item>
@@ -97,7 +96,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="rulesFrame">
+    <widget class="QWidget" name="rulesWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>6</number>
@@ -174,7 +173,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../x86/build/client-custom.qrc"/>
+  <include location="../../../x64/build/client.qrc"/>
  </resources>
  <connections/>
 </ui>

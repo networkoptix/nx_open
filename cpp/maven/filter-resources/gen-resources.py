@@ -1,4 +1,5 @@
 import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
+from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 from os import listdir
 
@@ -118,7 +119,7 @@ if __name__ == '__main__':
                 else:
                     os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${libdir}/icons'], [''],'vmsclient.png')  
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${child.customization.dir}/icons'], [''],'vmsclient.png')  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_pro_file, "w")
@@ -138,14 +139,22 @@ if __name__ == '__main__':
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
         print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
+        qmake = os.system('${qt.dir}/bin/qmake -query')
         print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
-        os.system('${qt.dir}/bin/qmake -query')
         if '${platform}' == 'windows':
             vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
             print(vc_path)
             os.environ["path"] += os.pathsep + vc_path
             os.system('echo %PATH%')
-            os.system('${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file)
+            p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file, shell=True, stdout=PIPE)
+            out, err = p.communicate()
+            print out
+            p.wait()
+            if p.returncode:  
+                print "failed with code: %s" % str(p.returncode) 
+                sys.exit(1)
+
+            #os.system('${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file)
             
             #if '${arch}' == 'x64' and '${force_x86}' == 'false':
             #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')

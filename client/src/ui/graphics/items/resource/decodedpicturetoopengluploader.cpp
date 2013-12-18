@@ -168,10 +168,10 @@ public:
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
         QOpenGLFunctions(context->contextHandle()),
         supportsNonPower2Textures(false),
-        functions(new QnGlFunctions(context)),
         forceSoftYUV(false),
         yv12SharedUsed(false),
-        nv12SharedUsed(false)
+        nv12SharedUsed(false),
+        functions(new QnGlFunctions(context))
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -1971,6 +1971,7 @@ ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const
     return m_imageCorrection;
 }
 
+/*
 static QString toString( PixelFormat format )
 {
     switch( format )
@@ -1985,6 +1986,7 @@ static QString toString( PixelFormat format )
             return QString::fromLatin1("unknown");
     }
 }
+*/
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,

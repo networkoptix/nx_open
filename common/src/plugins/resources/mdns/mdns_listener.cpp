@@ -1,4 +1,8 @@
+
 #include "mdns_listener.h"
+
+#include <memory>
+
 #include "utils/network/nettools.h"
 #include "utils/network/mdns.h"
 #include "utils/network/system_socket.h"
@@ -126,16 +130,14 @@ void QnMdnsListener::updateSocketList()
     deleteSocketList();
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        UDPSocket* socket = new UDPSocket();
+        std::unique_ptr<UDPSocket> sock( new UDPSocket() );
         QString localAddress = iface.address.toString();
-        if (socket->bindToInterface(iface))
+        //if (socket->bindToInterface(iface))
+        if (sock->setLocalAddressAndPort(iface.address.toString()))
         {
-            socket->setMulticastIF(localAddress);
-            m_socketList << socket;
+            sock->setMulticastIF(localAddress);
+            m_socketList << sock.release();
             m_localAddressList << localAddress;
-        }
-        else {
-            delete socket;
         }
     }
 

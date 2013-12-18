@@ -8,6 +8,7 @@
 #include "universal_request_processor_p.h"
 #include "authenticate_helper.h"
 
+
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
@@ -49,9 +50,9 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = path != lit("api/ping");
+        bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event")); //TODO: #AK this class (libcommon's) is not supposed to know about api/ping etc.. (it's mediaserver's)
 
-        QTime t;
+        QElapsedTimer t;
         t.restart();
         while (needAuth && !qnAuthHelper->authenticate(d->request, d->response))
         {
@@ -77,7 +78,7 @@ void QnUniversalRequestProcessor::run()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     if (!readRequest()) 
         return;

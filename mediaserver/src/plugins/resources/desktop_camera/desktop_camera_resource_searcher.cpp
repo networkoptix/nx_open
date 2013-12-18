@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
@@ -28,6 +31,9 @@ void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStre
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
+    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 
@@ -158,3 +164,5 @@ void QnDesktopCameraResourceSearcher::releaseConnection(TCPSocketPtr socket)
         }
     }
 }
+
+#endif //ENABLE_DESKTOP_CAMERA

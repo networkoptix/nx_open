@@ -8,16 +8,16 @@
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
+#include <core/ptz/item_dewarping_params.h>
 
 #include <client/client_globals.h>
-#include "camera/resource_display.h" // TODO: #Elric FWD!
-#include "utils/color_space/image_correction.h"
-#include <core/resource/dewarping_params.h>
+#include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <utils/color_space/image_correction.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnAbstractPtzController;
-class QnFisheyePtzController;
+class QnVirtualPtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -44,6 +44,11 @@ public:
      * \returns                         Resource associated with this widget.
      */
     QnMediaResourcePtr resource() const;
+
+    /**
+     * \returns                         Camera associated with this widget (if any).
+     */
+    QnVirtualCameraResourcePtr camera() const;
 
     /**
      * \returns                         Display associated with this widget.
@@ -102,7 +107,18 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-    QnVirtualPtzController* virtualPtzController() const;
+//    QnItemDewarpingParams itemDewarpingParams() const;
+//    void setItemDewarpingParams(const QnItemDewarpingParams &itemDewarpingParams);
+
+    /**
+     * This function returns a PTZ controller associated with this widget.
+     * Note that this function never returns NULL. Also note that several
+     * different widgets may return the same PTZ controller instance.
+     *
+     * \returns                         PTZ controller associated with this widget.
+     */
+    QnPtzControllerPtr ptzController() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -152,8 +168,6 @@ private slots:
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
     void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
-    void at_dewarpingParamsChanged(DewarpingParams params);
-    void updateFisheyeController();
     void at_zoomRectChanged();
 
 private:
@@ -163,6 +177,7 @@ private:
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
+    Q_SLOT void updateFisheye();
 
 private:
     /** Media resource. */
@@ -202,7 +217,9 @@ private:
 
     QStaticText m_sensStaticText[10];
 
-    QnFisheyePtzController* m_fisheyePtz;
+    QnPtzControllerPtr m_ptzController;
 };
+
+Q_DECLARE_METATYPE(QnMediaResourceWidget *)
 
 #endif // QN_MEDIA_RESOURCE_WIDGET_H

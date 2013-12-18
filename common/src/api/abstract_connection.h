@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QEventLoop>
 #include <QtNetwork/QNetworkAccessManager>
 
 #include <utils/common/request_param.h>
@@ -15,6 +16,8 @@
 #include <utils/common/json.h>
 #include <utils/common/connective.h>
 #include <utils/common/enum_name_mapper.h>
+
+#include <rest/server/json_rest_handler.h>
 
 namespace detail {
     template<class T>
@@ -85,8 +88,8 @@ protected:
 
         T reply;
         if(status == 0) {
-            QVariantMap map;
-            if(!QJson::deserialize(response.data, &map) || !QJson::deserialize(map, "reply", &reply)) {
+            QnJsonRestResult result;
+            if(!QJson::deserialize(response.data, &result) || !QJson::deserialize(result.reply(), &reply)) {
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
                 status = 1;
             }
@@ -118,6 +121,19 @@ public:
     const QVariant &reply() const { return m_reply; }
     template<class T>
     T reply() const { return m_reply.value<T>(); }
+
+    /**
+     * Starts an event loop waiting for the reply.
+     * 
+     * \returns                         Received request status.
+     */
+    int exec() {
+        QEventLoop loop;
+        connect(this, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
+        loop.exec();
+
+        return m_status;
+    }
 
 signals:
     void replyProcessed();
@@ -157,13 +173,20 @@ protected:
     QnEnumNameMapper *nameMapper() const;
     void setNameMapper(QnEnumNameMapper *nameMapper);
 
+    const QnRequestHeaderList &extraHeaders() const;
+    void setExtraHeaders(const QnRequestHeaderList &extraHeaders);
+
     int sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
     int sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
+    int sendAsyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot);
 
     int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
     int sendSyncGetRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, QVariant *reply);
     int sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply);
+    int sendSyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
+    int sendSyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, QVariant *reply);
 
     template<class T>
     int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, T *reply) {
@@ -171,7 +194,10 @@ protected:
 
         QVariant replyVariant;
         int status = sendSyncRequest(operation, object, headers, params, data, &replyVariant);
-        
+
+        if (status)
+            return status;
+
         int replyType = qMetaTypeId<T>();
         if(replyVariant.userType() != replyType)
             qnWarning("Invalid return type of request '%1': expected '%2', got '%3'.", m_nameMapper->name(object), QMetaType::typeName(replyType), replyVariant.typeName());
@@ -189,14 +215,14 @@ protected:
     int sendSyncGetRequest(int object, const QnRequestParamList &params, T *reply) {
         return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
-    void setExtraHeaders(const QnRequestHeaderList& headers);
+
 private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
     QUrl m_url;
     QScopedPointer<QnEnumNameMapper> m_nameMapper;
-    QnRequestHeaderList m_headers;
+    QnRequestHeaderList m_extraHeaders;
 };
 
 
