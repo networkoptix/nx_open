@@ -178,7 +178,7 @@ bool QnThreadedPtzController::activatePreset(const QString &presetId, qreal spee
     RUN_COMMAND(Qn::ActivatePresetPtzCommand, void *, presetId, activatePreset, presetId, speed);
 }
 
-bool QnThreadedPtzController::getPresets(QnPtzPresetList *presets) {
+bool QnThreadedPtzController::getPresets(QnPtzPresetList *) {
     RUN_COMMAND(Qn::GetPresetsPtzCommand, QnPtzPresetList, result, getPresets, &result);
 }
 
@@ -194,7 +194,7 @@ bool QnThreadedPtzController::activateTour(const QString &tourId) {
     RUN_COMMAND(Qn::ActivateTourPtzCommand, void *, tourId, activateTour, tourId);
 }
 
-bool QnThreadedPtzController::getTours(QnPtzTourList *tours) {
+bool QnThreadedPtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, result, getTours, &result);
 }
 
