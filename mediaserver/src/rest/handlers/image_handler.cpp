@@ -162,6 +162,9 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
+        else {
+            time = DATETIME_NOW;
+        }
     }
     else {
         // get archive data
@@ -182,7 +185,12 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     bool gotFrame = false;
 
     if (time == DATETIME_NOW) {
-        gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
+        if (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording)
+        {
+            gotFrame = decoder.decode(video, &outFrame);
+            if (!gotFrame)
+                gotFrame = decoder.decode(video, &outFrame); // decode twice
+        }
     }
     else {
         bool precise = roundMethod == Precise;
