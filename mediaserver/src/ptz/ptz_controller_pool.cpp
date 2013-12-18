@@ -76,12 +76,12 @@ void QnPtzControllerPool::at_resource_initAsyncFinished(const QnResourcePtr &res
 
     controller.reset(new QnWorkaroundPtzController(controller));
 
-    resource->setPtzCapabilities(controller->getCapabilities());
+    camera->setPtzCapabilities(controller->getCapabilities());
     QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
 
     PtzData data;
     data.controller = controller;
-	m_dataByResource.insert(resource, data);
+	m_dataByResource.insert(camera, data);
 }
 
 
