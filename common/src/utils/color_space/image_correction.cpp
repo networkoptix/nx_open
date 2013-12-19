@@ -35,7 +35,7 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     return qBound<double>(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
 }
 
-void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int height, int stride, 
+void ImageCorrectionResult::analyseImage(const quint8* yPlane, int width, int height, int stride, 
                                          const ImageCorrectionParams& data, const QRectF& srcRect)
 {
     if (!data.enabled || yPlane == 0)

@@ -70,7 +70,7 @@ void QnFisheyePtzController::updateLimits() {
         m_unlimitedPan = true;
         m_limits.minPan = 0.0;
         m_limits.maxPan = 360.0;
-        m_limits.minTilt = -45.0;
+        m_limits.minTilt = 0.0;
         m_limits.maxTilt = 90.0;
     }
 }
@@ -117,11 +117,12 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
     float hFov = result.z();
     float vFov = result.z() / m_aspectRatio;
 
-    if (!m_unlimitedPan)
+    if(!m_unlimitedPan)
         result.setX(qBound<float>(m_limits.minPan + hFov / 2.0, result.x(), m_limits.maxPan - hFov / 2.0));
-    result.setY(qBound<float>(m_limits.minTilt + vFov / 2.0, result.y(), m_limits.maxTilt - vFov / 2.0));
-
-    // Note: For non-horizontal view mode it was: return qBound(m_yRange.min, value, m_yRange.max - yFov);
+    if(!m_unlimitedPan || !qFuzzyEquals(m_limits.minTilt, -90))
+        result.setY(qMax(m_limits.minTilt + vFov / 2.0, result.y()));
+    if(!m_unlimitedPan || !qFuzzyEquals(m_limits.maxTilt, 90))
+        result.setY(qMin(m_limits.maxTilt - vFov / 2.0, result.y()));
 
     return result;
 }

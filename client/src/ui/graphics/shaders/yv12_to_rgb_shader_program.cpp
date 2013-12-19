@@ -124,7 +124,7 @@ void QnFisheyeShaderProgram::setDewarpingParams(const QnMediaDewarpingParams &me
             setUniformValue(m_fovRotLocation, (float) fovRot);
         }
         else {
-            setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0));
+            setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0));
             setUniformValue(m_yPos, (float) 1.0);
             setUniformValue(m_xShiftLocation, (float) fovRot);
             setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
