@@ -7,10 +7,10 @@
 #include <ui/style/globals.h>
 
 namespace {
-    static const qreal speedLowest  = 0.1;
-    static const qreal speedLow     = 0.325;
-    static const qreal speedNormal  = 0.55;
-    static const qreal speedHigh    = 0.775;
+    static const qreal speedLowest  = 0.03;
+    static const qreal speedLow     = 0.25;
+    static const qreal speedNormal  = 0.5;
+    static const qreal speedHigh    = 0.75;
     static const qreal speedHighest = 1.0;
 
     static const QList<qreal> allSpeedValues(QList<qreal>()

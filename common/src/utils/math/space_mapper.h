@@ -57,8 +57,7 @@ public:
 private:
     void init(const QVector<QPair<qreal, qreal> > &sourceToTarget, Qn::ExtrapolationMode extrapolationMode) {
         QVector<QPair<qreal, qreal> > targetToSource;
-        typedef QPair<qreal, qreal> PairType; // TODO: #Elric #C++11 replace with auto
-        foreach(const PairType &point, sourceToTarget)
+        foreach(const auto &point, sourceToTarget)
             targetToSource.push_back(qMakePair(point.second, point.first));
 
         m_sourceToTarget.setPoints(sourceToTarget);
