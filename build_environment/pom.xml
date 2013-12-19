@@ -218,14 +218,13 @@
             </activation>            
             <dependencies>
 
-<!--
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>help</artifactId>
                     <version>${project.version}</version>
                     <type>tar.gz</type>
                     <classifier>${child.customization}-${help.language}</classifier>
-                </dependency> -->
+                </dependency>
 
                 <dependency>
                     <groupId>org</groupId>
