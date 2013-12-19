@@ -22,6 +22,7 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     connect(ui->horizontalRadioButton,  SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
     connect(ui->viewDownButton,         SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
     connect(ui->viewUpButton,           SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
+    connect(ui->calibrateButton, SIGNAL(clicked()), this, SLOT(at_calibrateButton_clicked()));
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget() {
@@ -78,3 +79,15 @@ void QnFisheyeSettingsWidget::at_dataChanged() {
         return;
     emit dataChanged();
 }
+
+void QnFisheyeSettingsWidget::at_calibrateButton_clicked() {
+    // TODO: #VASILENKO
+    // 
+    // What we need to do here:
+    // 
+    // menu()->trigger(Qn::PtzCalibrateFisheyeAction, widget);
+    // 
+    // Unfortunately, that's not easy. TODO.
+
+}
+

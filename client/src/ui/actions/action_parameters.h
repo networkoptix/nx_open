@@ -73,7 +73,7 @@ public:
 
     template<class WidgetClass>
     WidgetClass *widget(int key = -1) const { 
-        return dynamic_cast<WidgetClass *>(widget());
+        return dynamic_cast<WidgetClass *>(widget(key));
     }
 
     QnResourceWidgetList widgets(int key = -1) const;

@@ -19,13 +19,19 @@ public:
 
     void setMediaDewarpingParams(const QnMediaDewarpingParams &params);
     QnMediaDewarpingParams getMediaDewarpingParams() const;
+
 signals:
     void dataChanged();
+
+
 private slots:
     void at_dataChanged();
 
     void updateSliderFromSpinbox(double value);
     void updateSpinboxFromSlider(int value);
+    
+    void at_calibrateButton_clicked();
+
 private:
     QScopedPointer<Ui::FisheyeSettingsWidget> ui;
     bool m_updating;

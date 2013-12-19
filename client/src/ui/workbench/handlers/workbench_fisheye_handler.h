@@ -13,7 +13,6 @@ public:
 
 private slots:
     void at_ptzCalibrateFisheyeAction_triggered();
-
 };
 
 

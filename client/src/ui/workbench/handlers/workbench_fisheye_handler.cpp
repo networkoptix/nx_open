@@ -4,7 +4,28 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+// -------------------------------------------------------------------------- //
+// FisheyeCalibrationWidget
+// -------------------------------------------------------------------------- //
+class FisheyeCalibrationWidget: public GraphicsWidget {
+    typedef GraphicsWidget base_type;
 
+public:
+    FisheyeCalibrationWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+        base_type(parent, windowFlags)
+    {
+        setAcceptedMouseButtons(0);
+    }
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+        // TODO: #VASILENKO
+    }
+};
+
+
+// -------------------------------------------------------------------------- //
+// QnWorkbenchFisheyeHandler
+// -------------------------------------------------------------------------- //
 QnWorkbenchFisheyeHandler::QnWorkbenchFisheyeHandler(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
@@ -22,5 +43,15 @@ void QnWorkbenchFisheyeHandler::at_ptzCalibrateFisheyeAction_triggered() {
         return;
 
     // TODO: #VASILENKO
+
+    /*
+     
+     This is how we install an overlay:
+
+     widget->addOverlayWidget(new FisheyeCalibrationWidget(widget), QnResourceWidget::Visible);
+
+     Don't forget to delete it when done. 
+
+     */
 }
 
