@@ -8,8 +8,9 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/threaded_image_loader.h>
+#include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
+#include <utils/threaded_image_loader.h>
 #include <utils/local_file_cache.h>
 #include <utils/app_server_image_cache.h>
 

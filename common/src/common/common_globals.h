@@ -6,7 +6,8 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <utils/math/limits.h> /* For INT64_MAX. */
+#include <utils/math/defines.h> /* For INT64_MAX. */
+#include <utils/common/unused.h>
 #include <utils/common/lexical_fwd.h>
 #include <utils/common/json_fwd.h>
 

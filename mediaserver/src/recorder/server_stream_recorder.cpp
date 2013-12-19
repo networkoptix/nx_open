@@ -6,7 +6,7 @@
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
-#include "utils/common/util.h"
+#include "utils/math/math.h"
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"

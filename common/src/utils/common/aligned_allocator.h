@@ -54,8 +54,7 @@ public:
     }
 
     inline void destroy(pointer p) {
-        (void) p; /* Silence MSVC unused variable warnings. */
-
+        unused(p); /* Silence MSVC unused variable warnings. */
         p->~value_type();
     }
 

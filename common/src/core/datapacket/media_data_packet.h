@@ -8,6 +8,7 @@ extern "C"
 {
     #include "libavcodec/avcodec.h"
 }
+
 #include "abstract_data_packet.h"
 #include <plugins/camera_plugin.h>
 #include "utils/common/byte_array.h"
@@ -19,10 +20,11 @@ extern "C"
 #   include <QtMultimedia/QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
-#include "utils/math/math.h"
+
 #include "utils/network/socket.h"
 #include "utils/common/aligned_allocator.h"
 #include "utils/common/util.h"
+#include <utils/math/math.h>
 
 struct AVCodecContext;
 

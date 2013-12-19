@@ -1,18 +1,16 @@
-
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
 #include "motion_estimation.h"
 
 #include <cmath>
 
-#include "utils/media/sse_helper.h"
-
 #include <QtGui/QImage>
 #include <QtGui/QColor>
 #include <QtCore/QDebug>
-#include "utils/network/socket.h"
-#include "utils/common/synctime.h"
-#include "utils/math/math.h"
+
+#include <utils/media/sse_helper.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
 
 static const unsigned char BitReverseTable256[] = 
 {

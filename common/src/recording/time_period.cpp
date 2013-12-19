@@ -3,6 +3,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
+#include <utils/math/math.h>
 #include <utils/common/util.h>
 #include <utils/common/json.h>
 

@@ -12,6 +12,12 @@
 
 #include "threaded_ptz_controller.h"
 
+namespace {
+    int pingTimeout = 333;
+    int samePositionTimeout = 5000;
+}
+
+
 // -------------------------------------------------------------------------- //
 // Model Data
 // -------------------------------------------------------------------------- //
@@ -54,7 +60,7 @@ public:
 
     void startMoving();
     void processMoving();
-    void processMoving(const QVector3D &position);
+    void processMoving(bool status, const QVector3D &position);
     void tryStartWaiting();
     void startWaiting();
     void processWaiting();
@@ -79,9 +85,10 @@ public:
     int currentSize;
     int currentIndex;
     State currentState;
-    bool pendingMoveTimerRestart;
-    bool pendingGetPosition;
-    bool waitingForPosition;
+    
+    bool usingDefaultMoveTimer;
+    bool needPositionUpdate;
+    bool waitingForNewPosition;
     
     QElapsedTimer spotTimer;
     QVector3D startPosition;
@@ -164,15 +171,15 @@ void QnPtzTourExecutorPrivate::startMoving() {
     baseController->activatePreset(spot.presetId, spot.speed);
     baseController->getPosition(defaultSpace, &tmp);
 
-    pendingGetPosition = false;
-    waitingForPosition = true;
+    needPositionUpdate = false;
+    waitingForNewPosition = true;
 
-    if(currentState == Moving && spotData.moveTime > 200) {
-        moveTimer.start(spotData.moveTime - 200, q);
-        pendingMoveTimerRestart = true;
+    if(currentState == Moving && spotData.moveTime > pingTimeout) {
+        moveTimer.start(spotData.moveTime - pingTimeout, q);
+        usingDefaultMoveTimer = false;
     } else {
-        moveTimer.start(200, q);
-        pendingMoveTimerRestart = false;
+        moveTimer.start(pingTimeout, q);
+        usingDefaultMoveTimer = true;
     }
 }
 
@@ -180,23 +187,23 @@ void QnPtzTourExecutorPrivate::processMoving() {
     if(currentState != Entering && currentState != Moving)
         return;
 
-    if(pendingMoveTimerRestart) {
-        moveTimer.start(200, q);
-        pendingMoveTimerRestart = false;
+    if(!usingDefaultMoveTimer) {
+        moveTimer.start(pingTimeout, q);
+        usingDefaultMoveTimer = true;
     }
 
-    if(waitingForPosition) {
-        pendingGetPosition = true;
+    if(waitingForNewPosition) {
+        needPositionUpdate = true;
     } else {
         QVector3D tmp;
         baseController->getPosition(defaultSpace, &tmp);
         
-        pendingGetPosition = false;
-        waitingForPosition = true;
+        needPositionUpdate = false;
+        waitingForNewPosition = true;
     }
 }
 
-void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
+void QnPtzTourExecutorPrivate::processMoving(bool status, const QVector3D &position) {
     if(currentState != Entering && currentState != Moving)
         return;
 
@@ -205,20 +212,27 @@ void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(currentPosition, position);
 
-    if(stopped && (moved || spotTimer.elapsed() > 5000)) {
+    if(status && stopped && (moved || spotTimer.elapsed() > samePositionTimeout)) {
+        if(currentState == Moving) {
+            QnPtzTourSpotData &spotData = currentSpotData();
+            spotData.moveTime = spotTimer.elapsed();
+            spotData.position = position;
+        }
+
         moveTimer.stop();
         startWaiting();
     } else {
-        currentPosition = position;
+        if(status)
+            currentPosition = position;
 
-        if(pendingGetPosition) {
+        if(needPositionUpdate) {
             QVector3D tmp;
             baseController->getPosition(defaultSpace, &tmp);
 
-            waitingForPosition = true;
-            pendingGetPosition = false;
+            waitingForNewPosition = true;
+            needPositionUpdate = false;
         } else {
-            waitingForPosition = false;
+            waitingForNewPosition = false;
         }
     }
 }
@@ -258,8 +272,8 @@ bool QnPtzTourExecutorPrivate::handleTimer(int timerId) {
 }
 
 void QnPtzTourExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
-    if(command == defaultCommand && data.isValid())
-        processMoving(data.value<QVector3D>());
+    if(command == defaultCommand)
+        processMoving(data.isValid(), data.value<QVector3D>());
 }
 
 

@@ -1,15 +1,16 @@
-
 #include "fisheye_image_filter.h"
 
 #include <QtGui/QMatrix4x4>
 
+#include <utils/math/math.h>
+
 extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-#undef AVPixFmtDescriptor
+#   undef AVPixFmtDescriptor
 #endif
 };
 

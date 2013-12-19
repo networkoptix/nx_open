@@ -15,6 +15,21 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QImageWriter>
 
+#include <utils/license_usage_helper.h>
+#include <utils/app_server_image_cache.h>
+#include <utils/app_server_notification_cache.h>
+#include <utils/applauncher_utils.h>
+#include <utils/local_file_cache.h>
+#include <utils/common/environment.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/mime_data.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/string.h>
+#include <utils/common/time.h>
+#include <utils/common/email.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+
 #include <api/session_manager.h>
 
 #include <business/business_action_parameters.h>
@@ -98,21 +113,6 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-
-#include <utils/license_usage_helper.h>
-#include <utils/app_server_image_cache.h>
-#include <utils/app_server_notification_cache.h>
-#include <utils/applauncher_utils.h>
-#include <utils/local_file_cache.h>
-#include <utils/common/environment.h>
-#include <utils/common/delete_later.h>
-#include <utils/common/mime_data.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/string.h>
-#include <utils/common/time.h>
-#include <utils/common/email.h>
-#include <utils/common/synctime.h>
-#include <utils/common/util.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"

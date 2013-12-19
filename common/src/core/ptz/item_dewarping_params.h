@@ -5,7 +5,7 @@
 
 #include <boost/operators.hpp>
 
-#include <utils/math/math.h>
+#include <utils/math/defines.h>
 
 struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarpingParams> {
     /** Whether dewarping is currently enabled. */

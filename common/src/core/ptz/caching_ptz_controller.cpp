@@ -2,16 +2,34 @@
 
 #include <common/common_meta_types.h>
 
+#include <core/resource/resource.h>
+
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
-	base_type(baseController)
+	base_type(baseController),
+    m_initialized(false)
 {
 	connect(baseController.data(), &QnAbstractPtzController::finished, this, &QnCachingPtzController::at_baseController_finished);
 
-	synchronize(Qn::AllPtzFields);
+    if(!initialize()) {
+        /* Well, this is hacky. Sync can fail because we're behind a remote
+         * PTZ controller for an offline camera. But strictly speaking, 
+         * we don't know that. Should probably be fixed by adding a signal to
+         * PTZ controller. */ // TODO: #Elric
+        connect(resource(), &QnResource::statusChanged, this, &QnCachingPtzController::initialize);
+    }
 }
 
 QnCachingPtzController::~QnCachingPtzController() {
 	return;
+}
+
+bool QnCachingPtzController::initialize() {
+    /* Note that this field is accessed from this object's thread only,
+     * so there is no need to lock. */
+    if(m_initialized)
+        return true;
+
+    return synchronize(Qn::AllPtzFields);
 }
 
 bool QnCachingPtzController::extends(const QnPtzControllerPtr &baseController) {
@@ -178,6 +196,9 @@ bool QnCachingPtzController::synchronize(Qn::PtzDataFields query) {
 }
 
 void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
+    if(data.query == Qn::AllPtzFields)
+        m_initialized = true;
+
 	Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
 	if(fields == Qn::NoPtzFields)
 		return;

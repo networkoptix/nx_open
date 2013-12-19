@@ -6,7 +6,6 @@
 #include <QtCore/QSize>
 #include <QtGui/QPolygonF>
 
-#include <utils/math/math.h>
 #include <common/common_globals.h>
 
 #include "margins.h"

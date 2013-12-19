@@ -1,5 +1,7 @@
 #include "contrast_image_filter.h"
 
+#include <utils/math/math.h>
+
 QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
     m_params(params),
     m_lastGamma(-1.0)

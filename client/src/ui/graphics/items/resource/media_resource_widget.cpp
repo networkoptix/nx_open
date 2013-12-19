@@ -961,6 +961,7 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     updateAspectRatio();
     updateIconButton();
 
+    // TODO: #PTZ? Do we allow zoom boxes on fisheye cams? I don't think we should, at least at this point.
     /*if (m_fisheyePtz) {
         m_fisheyePtz->setEnabled(true);
         m_fisheyePtz->moveToRect(zoomRect());
