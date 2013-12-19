@@ -78,10 +78,6 @@ void QnFisheyePtzController::updateCapabilities() {
     Qn::PtzCapabilities capabilities;
     if(m_mediaDewarpingParams.enabled) {
         capabilities = Qn::FisheyePtzCapabilities;
-//            Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities |
-//            Qn::FlipPtzCapability | Qn::LimitsPtzCapability |
-//            Qn::LogicalPositioningPtzCapability |
-//            Qn::VirtualPtzCapability; //TODO: #GDM PTZ compare with QnMediaResource's method
     } else {
         capabilities = Qn::NoPtzCapabilities;
     }
