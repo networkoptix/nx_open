@@ -104,6 +104,9 @@ void QnFisheyeCalibrator::findCircleParams()
     int rightEdge = m_width-1;
     for (int y = 0; y < m_height; ++y)
     {
+        if (needToStop())
+            return;
+
         int xLeft = findPixel(y, 0, 1);
         if (xLeft == -1)
             continue;
@@ -126,6 +129,9 @@ void QnFisheyeCalibrator::findCircleParams()
     int bottomEdge = m_height-1;
     for (int y = m_height-1; y > 0; --y)
     {
+        if (needToStop())
+            return;
+
         int xLeft = findPixel(y, 0, 1);
         if (xLeft == -1)
             continue;
@@ -183,6 +189,8 @@ void QnFisheyeCalibrator::findCircleParams()
 
     m_center = QPointF(centerX / (qreal) m_width, centerY / (qreal)m_height);
     m_radius = radius / (qreal) m_width;
+
+    emit finished();
 }
 
 int QnFisheyeCalibrator::findYThreshold(QSharedPointer<CLVideoDecoderOutput> frame)
@@ -287,6 +295,9 @@ void QnFisheyeCalibrator::analizeFrame(QImage frame)
 
     for (int y = 1; y < m_height - 1; ++y)
     {
+        if (needToStop())
+            return;
+
         *dstPtr++ = 0;
         curPtr++;
         for (int x = 1; x < m_width - 1; ++x)

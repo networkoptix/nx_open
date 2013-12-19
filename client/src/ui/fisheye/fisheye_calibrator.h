@@ -10,6 +10,7 @@
  */
 class QnFisheyeCalibrator: public QnLongRunnable
 {
+    Q_OBJECT
 public:
     QnFisheyeCalibrator();
     ~QnFisheyeCalibrator();
@@ -21,6 +22,8 @@ public:
     void analyseFrameAsync(QImage frame);
     QPointF center() const { return m_center; }
     qreal radius() const { return m_radius; }
+signals:
+    void finished();
 protected:
     virtual void run();
 private:
