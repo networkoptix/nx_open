@@ -653,6 +653,11 @@ namespace Qn {
          */
         PtzManageToursAction,
 
+        /**
+         * Starts fisheye calibration for the given widget.
+         */
+        PtzCalibrateFisheyeAction,
+
 
         /* Layout actions. */
 

@@ -2067,10 +2067,11 @@ QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
 
 void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *w = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    if(!widget)
+        return;
 
-    adjustVideoDialog()->setWidget(w);
+    adjustVideoDialog()->setWidget(widget);
     adjustVideoDialog()->show();
 }
 
@@ -2193,36 +2194,24 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
 
 
 void QnWorkbenchActionHandler::at_setCurrentItemAspectRatioAutoAction_triggered() {
-
-    QnActionParameters params = menu()->currentParameters(sender());
-
-    QnResourceWidget *widget = params.widget();
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-    if(!mediaWidget)
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    if(!widget)
         return;
-    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(0.0);
+    widget->display()->camDisplay()->setOverridenAspectRatio(0.0);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio4x3Action_triggered() {
-
-    QnActionParameters params = menu()->currentParameters(sender());
-
-    QnResourceWidget *widget = params.widget();
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-    if(!mediaWidget)
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    if(!widget)
         return;
-    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(4.0 / 3.0);
+    widget->display()->camDisplay()->setOverridenAspectRatio(4.0 / 3.0);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio16x9Action_triggered() {
-
-    QnActionParameters params = menu()->currentParameters(sender());
-
-    QnResourceWidget *widget = params.widget();
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-    if(!mediaWidget)
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    if(!widget)
         return;
-    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
+    widget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {

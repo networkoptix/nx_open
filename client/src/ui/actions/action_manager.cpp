@@ -917,6 +917,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     } factory.endSubMenu();
 
+    factory(Qn::PtzCalibrateFisheyeAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Calibrate Fisheye"));
+        //condition(hasPtzCapabilities(Qn::)) // TODO: #Elric VirtualPtz?
+
 #if 0
     factory(Qn::ToggleRadassAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
