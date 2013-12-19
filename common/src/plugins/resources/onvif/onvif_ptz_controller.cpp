@@ -206,7 +206,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 }
 
 bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::DevicePtzCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace || m_resource->getPtzfUrl().isEmpty())
         return false;
 
     QAuthenticator auth(m_resource->getAuth());
