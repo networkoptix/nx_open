@@ -69,6 +69,36 @@ Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
     return baseController()->getCapabilities() | Qn::ToursPtzCapability;
 }
 
+bool QnTourPtzController::continuousMove(const QVector3D &speed) {
+    if(!supports(Qn::ContinuousMovePtzCommand))
+        return false;
+
+    m_executor->stopTour();
+    return base_type::continuousMove(speed);
+}
+
+bool QnTourPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+    if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
+        return false;
+    
+    m_executor->stopTour();
+    return base_type::absoluteMove(space, position, speed);
+}
+
+bool QnTourPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
+    if(!supports(Qn::ViewportMovePtzCommand))
+        return false;
+
+    m_executor->stopTour();
+    return base_type::viewportMove(aspectRatio, viewport, speed);
+}
+
+bool QnTourPtzController::activatePreset(const QString &presetId, qreal speed) {
+    /* This one is 100% supported, no need to check. */
+    m_executor->stopTour();
+    return base_type::activatePreset(presetId, speed);
+}
+
 bool QnTourPtzController::createTour(const QnPtzTour &tour) {
     return createTourInternal(tour);
 }
@@ -82,7 +112,7 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     if (!tour.isValid(presets))
         return false;
 
-    /* No so important so fix and continue. */
+    /* Not so important so fix and continue. */
     tour.optimize();
 
     /* Tour is fine, save it. */
