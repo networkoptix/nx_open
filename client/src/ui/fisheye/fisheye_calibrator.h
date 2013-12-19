@@ -35,6 +35,7 @@ private:
     QPointF m_center;
     qreal m_radius;
     quint8* m_filteredFrame;
+    quint8* m_grayImageBuffer;
     int m_width;
     int m_height;
 

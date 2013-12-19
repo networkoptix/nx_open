@@ -25,6 +25,7 @@ struct Distance
 QnFisheyeCalibrator::QnFisheyeCalibrator()
 {
     m_filteredFrame = 0;
+    m_grayImageBuffer = 0;
     m_width = 0;
     m_height = 0;
     m_center = QPointF(0.5, 0.5);
@@ -33,7 +34,8 @@ QnFisheyeCalibrator::QnFisheyeCalibrator()
 
 QnFisheyeCalibrator::~QnFisheyeCalibrator()
 {
-    delete [] m_filteredFrame;
+    delete []m_filteredFrame;
+    qFreeAligned(m_grayImageBuffer);
 }
 
 #define PIX_SORT(a,b) { if ((a)>(b)) PIX_SWAP((a),(b)); }
@@ -272,6 +274,35 @@ void QnFisheyeCalibrator::run()
 
 void QnFisheyeCalibrator::analizeFrame(QImage frame)
 {
+    if (frame.format() != QImage::Format_Indexed8) 
+    {
+        // copy data to the tmp buffer because source buffer may be unaligned
+        int inputNumBytes = frame.bytesPerLine()*frame.height();
+        uchar* inputData[4];
+        inputData[0] = static_cast<uchar*>(qMallocAligned(inputNumBytes, 32));
+        inputData[1] = inputData[2] = inputData[3] = 0;
+        memcpy(inputData[0], frame.bits(), inputNumBytes);
+
+        int numBytes = avpicture_get_size(PIX_FMT_GRAY8, frame.width(), frame.height());
+        qFreeAligned(m_grayImageBuffer);
+        m_grayImageBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
+
+        SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), PIX_FMT_RGBA, 
+            frame.width(), frame.height(), PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL);
+
+        AVPicture dstPict;
+        avpicture_fill(&dstPict, m_grayImageBuffer, PIX_FMT_GRAY8, frame.width(), frame.height());
+
+        int inputLinesize[4];
+        inputLinesize[0] = frame.bytesPerLine();
+        inputLinesize[1] = inputLinesize[2] = inputLinesize[3] = 0;
+
+        QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), QImage::Format_Indexed8);
+        sws_scale(scaleContext, inputData, inputLinesize, 0, frame.height(), dstPict.data, dstPict.linesize);
+        sws_freeContext(scaleContext);
+        qFreeAligned(inputData[0]);
+    }
+
     const int Y_THRESHOLD = 64;
     //const int Y_THRESHOLD = findYThreshold(frame);
 
