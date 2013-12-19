@@ -24,6 +24,7 @@ extern "C"
 #include "utils/network/socket.h"
 #include "utils/common/aligned_allocator.h"
 #include "utils/common/util.h"
+#include <utils/math/math.h>
 
 struct AVCodecContext;
 
