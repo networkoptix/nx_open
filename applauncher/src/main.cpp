@@ -301,7 +301,6 @@ int testHttpClient()
         return 1;
     }
 
-    httpClient.startReadMessageBody();
     while( !httpClient.eof() )
     {
         const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();

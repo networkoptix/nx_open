@@ -79,41 +79,19 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
     if( ipToCheck > m_endIpv4 )
         return false;  //all ip addresses are being scanned at the moment
 
-    nx_http::AsyncHttpClient* httpClient = new nx_http::AsyncHttpClient();
+    std::shared_ptr<nx_http::AsyncHttpClient> httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect(
-        httpClient, SIGNAL(tcpConnectionEstablished( nx_http::AsyncHttpClient* )),
-        this, SLOT(onTcpConnectionEstablished( nx_http::AsyncHttpClient* )),
+        httpClient.get(), SIGNAL(responseReceived( nx_http::AsyncHttpClientPtr )),
+        this, SLOT(onDone( nx_http::AsyncHttpClientPtr )),
         Qt::DirectConnection );
     connect(
-        httpClient, SIGNAL(responseReceived( nx_http::AsyncHttpClient* )),
-        this, SLOT(onDone( nx_http::AsyncHttpClient* )),
-        Qt::DirectConnection );
-    connect(
-        httpClient, SIGNAL(done( nx_http::AsyncHttpClient* )),
-        this, SLOT(onDone( nx_http::AsyncHttpClient* )),
+        httpClient.get(), SIGNAL(done( nx_http::AsyncHttpClientPtr )),
+        this, SLOT(onDone( nx_http::AsyncHttpClientPtr )),
         Qt::DirectConnection );
     if( !httpClient->doGet( QUrl( QString::fromLatin1("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan) ) ) )
-    {
-        httpClient->scheduleForRemoval();
         return true;
-    }
-
-    ////starting scan
-    //QSharedPointer<TCPSocket> sock( new TCPSocket() );
-    //if( !sock->setNonBlockingMode( true ) ||
-    //    !sock->setWriteTimeOut( SOCKET_CONNECT_TIMEOUT_MILLIS ) ||
-    //    !sock->connect(QHostAddress(ip).toString(), portToScan) ||
-    //    !aio::AIOService::instance()->watchSocket( sock.staticCast<Socket>(), PollSet::etWrite, this ) )
-    //{
-    //    NX_LOG( QString::fromLatin1("Failed to scan %1:%2. %3").arg(QHostAddress(ip).toString()).arg(portToScan).
-    //        arg(SystemError::getLastOSErrorText()), cl_logWARNING );
-    //}
-
-    //QMutexLocker lk( &m_mutex );
-    //m_socketsBeingScanned[sock.data()] = sock;
-
-    //QMutexLocker lk( &m_mutex );
-    m_socketsBeingScanned[httpClient] = sInit;
+ 
+    m_socketsBeingScanned.insert( httpClient );
 
     return true;
 }
@@ -126,27 +104,16 @@ void QnIpRangeCheckerAsync::waitForScanToFinish()
         m_cond.wait( lk.mutex() );
 }
 
-void QnIpRangeCheckerAsync::onTcpConnectionEstablished( nx_http::AsyncHttpClient* httpClient )
-{
-    //QMutexLocker lk( &m_mutex );
-    //m_socketsBeingScanned[httpClient] = sPortOpened;
-}
-
-void QnIpRangeCheckerAsync::onResponseReceived( nx_http::AsyncHttpClient* httpClient )
-{
-}
-
-void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClient* httpClient )
+void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     QMutexLocker lk( &m_mutex );
 
-    std::map<nx_http::AsyncHttpClient*, Status>::iterator it = m_socketsBeingScanned.find( httpClient );
+    std::set<std::shared_ptr<nx_http::AsyncHttpClient> >::iterator it = m_socketsBeingScanned.find( httpClient );
     Q_ASSERT( it != m_socketsBeingScanned.end() );
     if( httpClient->totalBytesRead() > 0 )
         m_openedIPs.push_back( httpClient->url().host() );
 
     m_socketsBeingScanned.erase( it );
-    httpClient->scheduleForRemoval();
 
     launchHostCheck();
 

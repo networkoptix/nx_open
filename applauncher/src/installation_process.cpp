@@ -31,7 +31,6 @@ InstallationProcess::InstallationProcess(
     m_module( module ),
     m_installationDirectory( installationDirectory ),
     m_state( State::init ),
-    m_httpClient( nullptr ),
     m_status( applauncher::api::InstallationStatus::init ),
     m_totalBytesDownloaded( 0 ),
     m_totalBytesToDownload( 0 )
@@ -61,8 +60,11 @@ bool InstallationProcess::start( const QSettings& settings )
 {
     if( !m_httpClient )
     {
-        m_httpClient = new nx_http::AsyncHttpClient();
-        connect( m_httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onHttpDone(nx_http::AsyncHttpClient*)), Qt::DirectConnection );
+        m_httpClient.reset( new nx_http::AsyncHttpClient() );
+        connect(
+            m_httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onHttpDone(nx_http::AsyncHttpClientPtr)),
+            Qt::DirectConnection );
     }
 
     m_state = State::downloadMirrorList;
@@ -161,15 +163,14 @@ void InstallationProcess::failed(
     //TODO/IMPL
 }
 
-void InstallationProcess::onHttpDone( nx_http::AsyncHttpClient* httpClient )
+void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     assert( m_httpClient == httpClient );
 
     auto scopedExitFunc = [this](InstallationProcess* /*pThis*/)
     {
         m_httpClient->terminate();
-        m_httpClient->scheduleForRemoval();
-        m_httpClient = nullptr;
+        m_httpClient.reset();
         if( m_status == applauncher::api::InstallationStatus::failed )
         {
             NX_LOG( m_errorText, cl_logERROR );

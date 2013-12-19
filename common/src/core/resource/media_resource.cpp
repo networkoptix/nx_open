@@ -143,7 +143,19 @@ void QnMediaResource::initMediaResource()
 
 QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
 {
-    return m_dewarpingParams;
+#if 1
+    if (toResource()->flags() & QnResource::still_image)
+    {
+        QnMediaDewarpingParams params;
+        params.enabled = true;
+        params.viewMode = QnMediaDewarpingParams::VerticalUp;
+        return params;
+    }
+    else 
+#endif
+    {
+        return m_dewarpingParams;
+    }
 }
 
 
@@ -164,7 +176,7 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
 
 bool QnMediaResource::isFisheye() const
 {
-    return m_dewarpingParams.enabled;
+    return getDewarpingParams().enabled;
 }
 
 void QnMediaResource::updateInner(QnResourcePtr other)
