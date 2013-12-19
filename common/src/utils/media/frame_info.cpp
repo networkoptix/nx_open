@@ -1,18 +1,17 @@
-
 #include "frame_info.h"
-#include "../common/util.h"
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
+#include <utils/math/math.h>
 
 extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-#undef AVPixFmtDescriptor
+#   undef AVPixFmtDescriptor
 #endif
 };
 

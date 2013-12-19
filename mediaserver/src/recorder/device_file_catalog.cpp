@@ -6,6 +6,7 @@
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
+#include <utils/math/math.h>
 #include "recorder/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"

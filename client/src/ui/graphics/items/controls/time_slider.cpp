@@ -14,10 +14,10 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
-#include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/math/math.h>
 
 #include <camera/thumbnails_loader.h>
 

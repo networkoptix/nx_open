@@ -1,5 +1,6 @@
 #include "workaround_ptz_controller.h"
 
+#include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
 
 #include <common/common_module.h>

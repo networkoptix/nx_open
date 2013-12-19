@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "decoders/video/abstractdecoder.h"
-#include "utils/common/util.h"
+#include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
 #include "abstract_renderer.h"

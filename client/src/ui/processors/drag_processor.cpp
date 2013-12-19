@@ -12,6 +12,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/math/fuzzy.h>
 
 #include "drag_process_handler.h"
 

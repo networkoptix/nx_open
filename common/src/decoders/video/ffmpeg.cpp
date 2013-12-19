@@ -7,7 +7,8 @@
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
-#include "utils/math/math.h"
+
+#include <utils/math/math.h>
 
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;

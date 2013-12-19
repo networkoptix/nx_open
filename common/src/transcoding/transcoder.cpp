@@ -1,6 +1,9 @@
 #include "transcoder.h"
+
+#include <utils/math/math.h>
+#include <core/resource/media_resource.h>
+
 #include "ffmpeg_transcoder.h"
-#include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 

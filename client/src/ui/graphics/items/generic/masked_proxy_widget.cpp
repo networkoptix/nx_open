@@ -7,6 +7,8 @@
 #include <QtGui/QPaintEngine>
 #include <QStyleOptionGraphicsItem>
 
+#include <utils/math/fuzzy.h>
+
 #include <ui/common/geometry.h>
 
 

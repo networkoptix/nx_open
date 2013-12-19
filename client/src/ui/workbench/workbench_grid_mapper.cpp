@@ -1,5 +1,8 @@
 #include "workbench_grid_mapper.h"
+
 #include <cmath>
+
+#include <utils/math/fuzzy.h>
 
 QnWorkbenchGridMapper::QnWorkbenchGridMapper(QObject *parent):
     QObject(parent),
