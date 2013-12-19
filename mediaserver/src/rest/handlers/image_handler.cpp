@@ -232,27 +232,27 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         return CODE_INTERNAL_ERROR;
     }
 
-    PixelFormat inputColorFormat = PIX_FMT_RGBA;
-    QImage::Format outputColorFormat = QImage::Format_ARGB32_Premultiplied;
+    PixelFormat ffmpegColorFormat = PIX_FMT_RGBA;
+    QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
     int pixelBytes = 4;
-    if (colorSpace == "gray8") {
-        inputColorFormat = PIX_FMT_YUYV422;
-        outputColorFormat = QImage::Format_Indexed8;
+    if (colorSpace == "gray8" || 1) {
+        ffmpegColorFormat = PIX_FMT_GRAY8;
+        qtColorFormat = QImage::Format_Indexed8;
         pixelBytes = 1;
     }
 
     const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
     const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
-    int numBytes = avpicture_get_size(inputColorFormat, roundedWidth, roundedHeight);
+    int numBytes = avpicture_get_size(ffmpegColorFormat, roundedWidth, roundedHeight);
     uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
     SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-                               dstSize.width(), dstSize.height(), inputColorFormat, SWS_BICUBIC, NULL, NULL, NULL);
+                               dstSize.width(), dstSize.height(), ffmpegColorFormat, SWS_BICUBIC, NULL, NULL, NULL);
 
     AVPicture dstPict;
-    avpicture_fill(&dstPict, scaleBuffer, (PixelFormat) inputColorFormat, roundedWidth, roundedHeight);
+    avpicture_fill(&dstPict, scaleBuffer, (PixelFormat) ffmpegColorFormat, roundedWidth, roundedHeight);
     
-    QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstPict.linesize[0], outputColorFormat);
+    QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstPict.linesize[0], qtColorFormat);
     sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
 
     QBuffer output(&result);
