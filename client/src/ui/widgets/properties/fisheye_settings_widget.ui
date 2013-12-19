@@ -15,42 +15,31 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0">
+    <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QRadioButton" name="horizontalRadioButton">
-         <property name="text">
-          <string>Horizontal mount (camera on the wall)</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="viewDownButton">
-         <property name="text">
-          <string>Vertical mount (camera on the ceiling)</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="viewUpButton">
-         <property name="text">
-          <string>Vertical mount (camera on the floor)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QRadioButton" name="viewUpButton">
+       <property name="text">
+        <string>Vertical mount (camera on the floor)</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="calibrateButton">
+      <widget class="QRadioButton" name="viewDownButton">
        <property name="text">
-        <string>Calibrate</string>
+        <string>Vertical mount (camera on the ceiling)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="horizontalRadioButton">
+       <property name="text">
+        <string>Horizontal mount (camera on the wall)</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -100,6 +89,9 @@
     </layout>
    </item>
    <item>
+    <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true"/>
+   </item>
+   <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -114,6 +106,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnFisheyeCalibrationWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/fisheye_calibration_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

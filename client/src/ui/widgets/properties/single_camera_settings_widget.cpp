@@ -357,8 +357,9 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         }
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
+        ui->fisheyeSettingsWidget->submitToResource(m_camera);
 
-        QnMediaDewarpingParams dewarping = ui->fisheyeSettingsWidget->getMediaDewarpingParams();
+        QnMediaDewarpingParams dewarping = m_camera->getDewarpingParams();
         dewarping.enabled = ui->checkBoxDewarping->isChecked();
         m_camera->setDewarpingParams(dewarping);
 
@@ -482,7 +483,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
-            ui->fisheyeSettingsWidget->setMediaDewarpingParams(m_camera->getDewarpingParams());
+            ui->fisheyeSettingsWidget->updateFromResource(m_camera);
         }
     }
 

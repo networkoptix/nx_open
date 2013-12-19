@@ -1,13 +1,17 @@
 #include "fisheye_settings_widget.h"
 #include "ui_fisheye_settings_widget.h"
 
-#include <ui/style/skin.h>
-#include "core/resource/resource_type.h"
+#include <camera/single_thumbnail_loader.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/media_resource.h>
+
+#include <ui/widgets/fisheye_calibration_widget.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
 QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::FisheyeSettingsWidget),
     m_updating(false)
 {
@@ -22,13 +26,18 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     connect(ui->horizontalRadioButton,  SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
     connect(ui->viewDownButton,         SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
     connect(ui->viewUpButton,           SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
-    connect(ui->calibrateButton, SIGNAL(clicked()), this, SLOT(at_calibrateButton_clicked()));
+
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget() {
 }
 
-void QnFisheyeSettingsWidget::setMediaDewarpingParams(const QnMediaDewarpingParams &params) {
+void QnFisheyeSettingsWidget::updateFromResource(const QnResourcePtr &resource) {
+    QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
+    if (!media)
+        return;
+
+    QnMediaDewarpingParams params = media->getDewarpingParams();
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     switch (params.viewMode) {
         case QnMediaDewarpingParams::Horizontal:
@@ -46,10 +55,18 @@ void QnFisheyeSettingsWidget::setMediaDewarpingParams(const QnMediaDewarpingPara
 
     ui->angleSpinBox->setValue(params.fovRot);
     ui->horizontalSlider->setValue(params.fovRot * 10);
+
+    ui->calibrateWidget->setRadius(params.radius);
+    ui->calibrateWidget->setCenter(QPointF(params.xCenter, params.yCenter));
+    ui->calibrateWidget->setImageProvider(QnSingleThumbnailLoader::newInstance(resource, -1, QSize(), this));
 }
 
-QnMediaDewarpingParams QnFisheyeSettingsWidget::getMediaDewarpingParams() const {
-    QnMediaDewarpingParams result;
+void QnFisheyeSettingsWidget::submitToResource(const QnResourcePtr &resource) {
+    QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
+    if (!media)
+        return;
+
+    QnMediaDewarpingParams result = media->getDewarpingParams();
     result.fovRot = ui->horizontalSlider->value() / 10.0;
     if (ui->horizontalRadioButton->isChecked())
         result.viewMode = QnMediaDewarpingParams::Horizontal;
@@ -57,7 +74,10 @@ QnMediaDewarpingParams QnFisheyeSettingsWidget::getMediaDewarpingParams() const 
         result.viewMode = QnMediaDewarpingParams::VerticalDown;
     else
         result.viewMode = QnMediaDewarpingParams::VerticalUp;
-    return result;
+    result.xCenter = ui->calibrateWidget->center().x();
+    result.yCenter = ui->calibrateWidget->center().y();
+    result.radius = ui->calibrateWidget->radius();
+    media->setDewarpingParams(result);
 }
 
 void QnFisheyeSettingsWidget::updateSliderFromSpinbox(double value) {
@@ -79,15 +99,3 @@ void QnFisheyeSettingsWidget::at_dataChanged() {
         return;
     emit dataChanged();
 }
-
-void QnFisheyeSettingsWidget::at_calibrateButton_clicked() {
-    // TODO: #VASILENKO
-    // 
-    // What we need to do here:
-    // 
-    // menu()->trigger(Qn::PtzCalibrateFisheyeAction, widget);
-    // 
-    // Unfortunately, that's not easy. TODO.
-
-}
-

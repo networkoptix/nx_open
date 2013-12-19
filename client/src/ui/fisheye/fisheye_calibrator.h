@@ -20,9 +20,16 @@ public:
     */
     void analizeFrame(QImage frame);
     void analyseFrameAsync(QImage frame);
-    QPointF center() const { return m_center; }
-    qreal radius() const { return m_radius; }
+
+    void setCenter(const QPointF &center);
+    QPointF center() const;
+
+    void setRadius(qreal radius);
+    qreal radius() const;
 signals:
+    void centerChanged(const QPointF &center);
+    void radiusChanged(qreal radius);
+
     void finished();
 protected:
     virtual void run();

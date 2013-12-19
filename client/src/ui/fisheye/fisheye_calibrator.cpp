@@ -36,6 +36,28 @@ QnFisheyeCalibrator::~QnFisheyeCalibrator()
     delete [] m_filteredFrame;
 }
 
+void QnFisheyeCalibrator::setCenter(const QPointF &center) {
+    if (qFuzzyEquals(m_center, center))
+        return;
+    m_center = center;
+    emit centerChanged(center);
+}
+
+QPointF QnFisheyeCalibrator::center() const {
+    return m_center;
+}
+
+void QnFisheyeCalibrator::setRadius(qreal radius) {
+    if (qFuzzyEquals(m_radius, radius))
+        return;
+    m_radius = radius;
+    emit radiusChanged(radius);
+}
+
+qreal QnFisheyeCalibrator::radius() const {
+    return m_radius;
+}
+
 #define PIX_SORT(a,b) { if ((a)>(b)) PIX_SWAP((a),(b)); }
 #define PIX_SWAP(a,b) { quint8 temp=(a);(a)=(b);(b)=temp; }
 
