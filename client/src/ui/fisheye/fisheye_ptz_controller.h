@@ -48,7 +48,6 @@ private:
 
     Q_SLOT void updateMediaDewarpingParams();
     Q_SLOT void updateItemDewarpingParams();
-    Q_SLOT void at_fisheyeCenterChanged(QPointF center, qreal radius);
 
     QVector3D boundedPosition(const QVector3D &position);
     QVector3D getPositionInternal();

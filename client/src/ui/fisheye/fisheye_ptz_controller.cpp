@@ -33,7 +33,6 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     connect(m_widget->item(),       &QnWorkbenchItem::dewarpingParamsChanged,               this, &QnFisheyePtzController::updateItemDewarpingParams);
     if (m_widget->camera())
         connect(m_widget->camera(), &QnVirtualCameraResource::mediaDewarpingParamsChanged,  this, &QnFisheyePtzController::updateMediaDewarpingParams);
-    connect(m_renderer, SIGNAL(fisheyeCenterChanged(QPointF, qreal)), this, SLOT(at_fisheyeCenterChanged(QPointF, qreal)));
 
     updateAspectRatio();
     updateItemDewarpingParams();
@@ -322,12 +321,4 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
     
     *position = getPositionInternal();
     return true;
-}
-
-void QnFisheyePtzController::at_fisheyeCenterChanged(QPointF center, qreal radius)
-{
-    m_mediaDewarpingParams.xCenter = center.x();
-    m_mediaDewarpingParams.yCenter = center.y();
-    m_mediaDewarpingParams.radius = radius;
-    m_widget->resource()->setDewarpingParams(m_mediaDewarpingParams);
 }

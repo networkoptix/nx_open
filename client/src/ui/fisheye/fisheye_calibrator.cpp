@@ -249,35 +249,47 @@ int QnFisheyeCalibrator::findYThreshold(QSharedPointer<CLVideoDecoderOutput> fra
     return left;
 }
 
-void QnFisheyeCalibrator::analizeFrame(QSharedPointer<CLVideoDecoderOutput> frame)
+void QnFisheyeCalibrator::analyseFrameAsync(QImage frame)
+{
+    if (isRunning())
+        stop();
+    m_analysedFrame = frame;
+    start();
+}
+
+void QnFisheyeCalibrator::run()
+{
+    analizeFrame(m_analysedFrame);
+}
+
+void QnFisheyeCalibrator::analizeFrame(QImage frame)
 {
     const int Y_THRESHOLD = 64;
     //const int Y_THRESHOLD = findYThreshold(frame);
 
-    quint8* curPtr = frame->data[0];
-    if (m_filteredFrame == 0) {
-        m_filteredFrame = new quint8[frame->width * frame->height];
-        m_width = frame->width;
-        m_height = frame->height;
-    }
+    const quint8* curPtr = (const quint8*) frame.bits();
+    delete m_filteredFrame;
+    m_filteredFrame = new quint8[frame.width() * frame.height()];
+    m_width = frame.width();
+    m_height = frame.height();
     
     quint8* dstPtr = m_filteredFrame;
-    int srcYStep = frame->linesize[0];
+    int srcYStep = frame.bytesPerLine();
 
     std::vector<quint8> data;
     data.resize(9);
 
-    for (int x = 0; x < frame->width ; ++x) {
+    for (int x = 0; x < m_width ; ++x) {
         *dstPtr++ = 0;
         curPtr++;
     }
-    curPtr += srcYStep - frame->width;
+    curPtr += srcYStep - m_width;
 
-    for (int y = 1; y < frame->height - 1; ++y)
+    for (int y = 1; y < m_height - 1; ++y)
     {
         *dstPtr++ = 0;
         curPtr++;
-        for (int x = 1; x < frame->width - 1; ++x)
+        for (int x = 1; x < m_width - 1; ++x)
         {
             data[0] = curPtr[srcYStep-1];
             data[1] = curPtr[-srcYStep];
@@ -293,10 +305,10 @@ void QnFisheyeCalibrator::analizeFrame(QSharedPointer<CLVideoDecoderOutput> fram
             curPtr++;
         }
         *dstPtr++ = 0;
-        curPtr += srcYStep - frame->width + 1;
+        curPtr += srcYStep - m_width + 1;
     }
 
-    for (int x = 0; x < frame->width ; ++x) {
+    for (int x = 0; x < m_width ; ++x) {
         *dstPtr++ = 0;
     }
 
