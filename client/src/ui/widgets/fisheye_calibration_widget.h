@@ -34,9 +34,6 @@ public slots:
     void setCenter(const QPointF &center);
     void setRadius(qreal radius);
 
-protected:
-    virtual void paintEvent(QPaintEvent *event) override;
-
 private slots:
     void at_imageLoaded(const QImage &image);
 

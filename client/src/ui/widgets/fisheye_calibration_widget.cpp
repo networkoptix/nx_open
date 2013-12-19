@@ -82,16 +82,9 @@ void QnFisheyeCalibrationWidget::setRadius(qreal radius) {
     update();
 }
 
-void QnFisheyeCalibrationWidget::paintEvent(QPaintEvent *event) {
-    base_type::paintEvent(event);
-
-
-
-}
-
 void QnFisheyeCalibrationWidget::at_imageLoaded(const QImage &image) {
     m_image = image;
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(300, 300, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(this->width(), 400, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
     update();
 }
 
