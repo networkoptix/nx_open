@@ -33,52 +33,55 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         return;
     }
 
-    QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-
-    _onvifPtz__GetConfigurations request;
-    _onvifPtz__GetConfigurationsResponse response;
-    if (ptz.doGetConfigurations(request, response) != SOAP_OK || response.PTZConfiguration.size() > 0) {
-        //qCritical() << "!!!";
-    }
-
-    _onvifPtz__GetNode nodeRequest;
-    _onvifPtz__GetNodeResponse nodeResponse;
-    nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken; //m_resource->getPtzConfigurationToken().toStdString(); // response.PTZConfiguration[0]->NodeToken;
-
-    if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK)
+    if (!m_resource->getPtzfUrl().isEmpty())
     {
-        //qCritical() << "reading PTZ token success";
-        if (nodeResponse.PTZNode) 
-        {
-            //qCritical() << "reading PTZ token success and data exists";
+        QAuthenticator auth(m_resource->getAuth());
+        PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
-            onvifXsd__PTZNode* ptzNode = nodeResponse.PTZNode;
-            //m_ptzToken = QString::fromStdString(ptzNode[0].token);
-            if (ptzNode[0].SupportedPTZSpaces) 
+        _onvifPtz__GetConfigurations request;
+        _onvifPtz__GetConfigurationsResponse response;
+        if (ptz.doGetConfigurations(request, response) != SOAP_OK || response.PTZConfiguration.size() > 0) {
+            //qCritical() << "!!!";
+        }
+
+        _onvifPtz__GetNode nodeRequest;
+        _onvifPtz__GetNodeResponse nodeResponse;
+        nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken; //m_resource->getPtzConfigurationToken().toStdString(); // response.PTZConfiguration[0]->NodeToken;
+
+        if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK)
+        {
+            //qCritical() << "reading PTZ token success";
+            if (nodeResponse.PTZNode) 
             {
-                onvifXsd__PTZSpaces* spaces = ptzNode[0].SupportedPTZSpaces;
-                if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
-                    if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
-                        m_xNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
-                        m_xNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
+                //qCritical() << "reading PTZ token success and data exists";
+
+                onvifXsd__PTZNode* ptzNode = nodeResponse.PTZNode;
+                //m_ptzToken = QString::fromStdString(ptzNode[0].token);
+                if (ptzNode[0].SupportedPTZSpaces) 
+                {
+                    onvifXsd__PTZSpaces* spaces = ptzNode[0].SupportedPTZSpaces;
+                    if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
+                        if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
+                            m_xNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
+                            m_xNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
+                        }
+                        if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
+                            m_yNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
+                            m_yNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
+                        }
                     }
-                    if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
-                        m_yNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
-                        m_yNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
-                    }
-                }
-                if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
-                    if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
-                        m_zoomNativeVelocityCoeff.first = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
-                        m_zoomNativeVelocityCoeff.second = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
+                    if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
+                        if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
+                            m_zoomNativeVelocityCoeff.first = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
+                            m_zoomNativeVelocityCoeff.second = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
+                        }
                     }
                 }
             }
         }
-    }
-    else {
-        //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
+        else {
+            //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
+        }
     }
 
     /* Sane onvif default. */
@@ -203,7 +206,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 }
 
 bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::DevicePtzCoordinateSpace)
+    if(space != Qn::DevicePtzCoordinateSpace || m_resource->getPtzfUrl().isEmpty())
         return false;
 
     QAuthenticator auth(m_resource->getAuth());

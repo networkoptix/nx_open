@@ -72,6 +72,8 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.minTilt = 0.0;
         m_limits.maxTilt = 90.0;
     }
+
+    absoluteMoveInternal(boundedPosition(getPositionInternal()));
 }
 
 void QnFisheyePtzController::updateCapabilities() {
