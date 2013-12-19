@@ -18,8 +18,8 @@ public:
     /*
     *   analize frame. Can be called several times for different video frames to improve quality
     */
-    void analizeFrame(QImage frame);
     void analyseFrameAsync(QImage frame);
+    void analyseFrame(QImage frame);
 
     void setCenter(const QPointF &center);
     QPointF center() const;
@@ -37,7 +37,7 @@ private:
     quint32 drawCircle(QSharedPointer<CLVideoDecoderOutput> frame, const QPoint& center, int radius);
     void findCircleParams();
     int findPixel(int y, int x, int xDelta);
-    int findYThreshold(QSharedPointer<CLVideoDecoderOutput> frame);
+    int findYThreshold(QImage frame);
 private:
     QPointF m_center;
     qreal m_radius;

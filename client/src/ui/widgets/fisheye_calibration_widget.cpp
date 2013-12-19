@@ -42,7 +42,7 @@ void QnFisheyeCalibrationWidget::delegatedPaint(const QWidget *widget, QPainter 
     QRect targetRect = widget->rect().adjusted(frame, frame, -frame, -frame);
     QPointF center(m_calibrator->center().x() * targetRect.width(), m_calibrator->center().y() * targetRect.height());
 //    center += ui->imageLabel->pos();
-    radius *= qMin(targetRect.width(), targetRect.height());
+    radius *= targetRect.width();
 
     QPen pen;
     pen.setWidth(4);

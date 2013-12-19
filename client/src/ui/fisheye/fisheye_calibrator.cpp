@@ -217,7 +217,8 @@ void QnFisheyeCalibrator::findCircleParams()
     emit finished();
 }
 
-int QnFisheyeCalibrator::findYThreshold(QSharedPointer<CLVideoDecoderOutput> frame)
+/*
+int QnFisheyeCalibrator::findYThreshold(QImage frame)
 {
     // Use adaptive binarisation to find optimal YThreshold value
     
@@ -225,10 +226,10 @@ int QnFisheyeCalibrator::findYThreshold(QSharedPointer<CLVideoDecoderOutput> fra
     
     int hystogram[256];
     memset(hystogram, 0, sizeof(hystogram));
-    for (int y = 0; y < frame->height; ++y)
+    for (int y = 0; y < m_width; ++y)
     {
-        quint32* curPtr = (quint32*) (frame->data[0] + y * frame->linesize[0]);
-        for (int x = 0; x < frame->width/4; ++x)
+        quint32* curPtr = (quint32*) (frame.bits() + y * frame.bytesPerLine());
+        for (int x = 0; x < frame.width()/4; ++x)
         {
             quint32 value = *curPtr++;
 
@@ -280,6 +281,58 @@ int QnFisheyeCalibrator::findYThreshold(QSharedPointer<CLVideoDecoderOutput> fra
     }
     return left;
 }
+*/
+
+int QnFisheyeCalibrator::findYThreshold(QImage frame)
+{
+    // Use adaptive binarisation to find optimal YThreshold value
+
+    // 1. build hystogram
+
+    int hystogram[256];
+    memset(hystogram, 0, sizeof(hystogram));
+    for (int y = 0; y < m_height; ++y)
+    {
+        quint32* curPtr = (quint32*) (frame.bits() + y * frame.bytesPerLine());
+        for (int x = 0; x < frame.width()/4; ++x)
+        {
+            quint32 value = *curPtr++;
+
+            hystogram[(quint8) value]++;
+            value >>= 8;
+
+            hystogram[(quint8) value]++;
+            value >>= 8;
+
+            hystogram[(quint8) value]++;
+            value >>= 8;
+
+            hystogram[(quint8) value]++;
+        }
+    }
+
+
+    // 2.1 calculate initial range
+    int left = 0;
+    int right = 255;
+    while (hystogram[left] == 0 && left < 256)
+        left++;
+    while (hystogram[right] == 0 && right > 0)
+        right--;
+
+    int midPoint = 0;
+    qint64 sum = 0;
+    qint64 halfSquare = m_width * m_height / 2;
+    int midPos = left;
+    for (; midPos <= right; ++midPos)
+    {
+        sum += hystogram[midPos];
+        if (sum >= halfSquare)
+            break;
+    }
+    int result = midPos / 2 + left;
+    return qBound(28, result, 64);
+}
 
 void QnFisheyeCalibrator::analyseFrameAsync(QImage frame)
 {
@@ -291,10 +344,10 @@ void QnFisheyeCalibrator::analyseFrameAsync(QImage frame)
 
 void QnFisheyeCalibrator::run()
 {
-    analizeFrame(m_analysedFrame);
+    analyseFrame(m_analysedFrame);
 }
 
-void QnFisheyeCalibrator::analizeFrame(QImage frame)
+void QnFisheyeCalibrator::analyseFrame(QImage frame)
 {
     if (frame.format() != QImage::Format_Indexed8) 
     {
@@ -305,7 +358,7 @@ void QnFisheyeCalibrator::analizeFrame(QImage frame)
         inputData[1] = inputData[2] = inputData[3] = 0;
         memcpy(inputData[0], frame.bits(), inputNumBytes);
 
-        int numBytes = avpicture_get_size(PIX_FMT_GRAY8, frame.width(), frame.height());
+        int numBytes = avpicture_get_size(PIX_FMT_GRAY8, qPower2Ceil((unsigned)frame.width(),32), frame.height());
         qFreeAligned(m_grayImageBuffer);
         m_grayImageBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
 
@@ -323,16 +376,18 @@ void QnFisheyeCalibrator::analizeFrame(QImage frame)
         sws_scale(scaleContext, inputData, inputLinesize, 0, frame.height(), dstPict.data, dstPict.linesize);
         sws_freeContext(scaleContext);
         qFreeAligned(inputData[0]);
+
+        frame = newFrame;
     }
 
-    const int Y_THRESHOLD = 64;
-    //const int Y_THRESHOLD = findYThreshold(frame);
+    m_width = frame.width();
+    m_height = frame.height();
+
+    const int Y_THRESHOLD = findYThreshold(frame);
 
     const quint8* curPtr = (const quint8*) frame.bits();
     delete m_filteredFrame;
     m_filteredFrame = new quint8[frame.width() * frame.height()];
-    m_width = frame.width();
-    m_height = frame.height();
     
     quint8* dstPtr = m_filteredFrame;
     int srcYStep = frame.bytesPerLine();
