@@ -60,7 +60,7 @@ public:
 
     void startMoving();
     void processMoving();
-    void processMoving(const QVector3D &position);
+    void processMoving(bool status, const QVector3D &position);
     void tryStartWaiting();
     void startWaiting();
     void processWaiting();
@@ -203,7 +203,7 @@ void QnPtzTourExecutorPrivate::processMoving() {
     }
 }
 
-void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
+void QnPtzTourExecutorPrivate::processMoving(bool status, const QVector3D &position) {
     if(currentState != Entering && currentState != Moving)
         return;
 
@@ -212,11 +212,18 @@ void QnPtzTourExecutorPrivate::processMoving(const QVector3D &position) {
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(currentPosition, position);
 
-    if(stopped && (moved || spotTimer.elapsed() > samePositionTimeout)) {
+    if(status && stopped && (moved || spotTimer.elapsed() > samePositionTimeout)) {
+        if(currentState == Moving) {
+            QnPtzTourSpotData &spotData = currentSpotData();
+            spotData.moveTime = spotTimer.elapsed();
+            spotData.position = position;
+        }
+
         moveTimer.stop();
         startWaiting();
     } else {
-        currentPosition = position;
+        if(status)
+            currentPosition = position;
 
         if(needPositionUpdate) {
             QVector3D tmp;
@@ -265,8 +272,8 @@ bool QnPtzTourExecutorPrivate::handleTimer(int timerId) {
 }
 
 void QnPtzTourExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
-    if(command == defaultCommand && data.isValid())
-        processMoving(data.value<QVector3D>());
+    if(command == defaultCommand)
+        processMoving(data.isValid(), data.value<QVector3D>());
 }
 
 
