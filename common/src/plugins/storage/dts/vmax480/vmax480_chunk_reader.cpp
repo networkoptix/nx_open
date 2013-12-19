@@ -31,7 +31,7 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 
 void QnVMax480ChunkReader::run()
 {
-    saveSysThreadID();
+    //saveSysThreadID();
     bool registered = false;
     while (!needToStop() && !registered)
         registered = m_streamFetcher->registerConsumer(this);

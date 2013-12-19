@@ -11,6 +11,9 @@
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
 
+#ifdef TEST_FISHEYE_CALIBRATOR
+#include "ui/fisheye/fisheye_calibrator.h"
+#endif
 
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* context )
 :
@@ -37,6 +40,10 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
     setChannelCount(1);
 
     connect(this, SIGNAL(canBeDestroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection);
+
+#ifdef TEST_FISHEYE_CALIBRATOR
+    m_isCircleDetected = false;
+#endif
 }
 
 void QnResourceWidgetRenderer::setChannelCount(int channelCount)
@@ -239,6 +246,20 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         RenderingTools& ctx = m_channelRenderers[image->channel];
         if( !ctx.uploader )
             return;
+
+#ifdef TEST_FISHEYE_CALIBRATOR
+        if (!m_isCircleDetected) {
+            m_isCircleDetected = true;
+            QnFisheyeCalibrator calibrator;
+            calibrator.analizeFrame(image);
+            emit fisheyeCenterChanged(calibrator.center(), calibrator.radius());
+            //QnMediaDewarpingParams mediaDewarpingParams = resource()->getDewarpingParams();
+            //mediaDewarpingParams.radius = calibrator.radius();
+            //mediaDewarpingParams.xCenter = calibrator.center().x();
+            //mediaDewarpingParams.yCenter = calibrator.center().y();
+            //resource()->setDewarpingParams(mediaDewarpingParams);
+        }
+#endif // for debug purpose only
 
         ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
         ++ctx.framesSinceJump;

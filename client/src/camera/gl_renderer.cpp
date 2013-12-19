@@ -286,7 +286,7 @@ ImageCorrectionResult QnGLRenderer::calcImageCorrection()
 {
     if (m_screenshotInterface) {
         QImage img = m_screenshotInterface->getGrayscaleScreenshot();
-        m_imageCorrector.analizeImage((quint8*)img.constBits(), img.width(), img.height(), img.bytesPerLine(), m_imgCorrectParam, m_displayedRect);
+        m_imageCorrector.analyseImage((quint8*)img.constBits(), img.width(), img.height(), img.bytesPerLine(), m_imgCorrectParam, m_displayedRect);
     }
 
     return m_imageCorrector;
@@ -331,7 +331,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     float ar = 1.0;
     if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
     {
-        //ar = picLock->width()/(float)picLock->height();
+        ar = picLock->width()/(float)picLock->height();
         m_fisheyeController->tick();
         mediaParams = m_fisheyeController->mediaDewarpingParams();
         itemParams = m_fisheyeController->itemDewarpingParams();

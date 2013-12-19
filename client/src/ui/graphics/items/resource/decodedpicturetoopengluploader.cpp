@@ -598,7 +598,7 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
 {
-    m_imgCorrection.analizeImage(yPlane, width, height, stride, data, m_displayedRect);
+    m_imgCorrection.analyseImage(yPlane, width, height, stride, data, m_displayedRect);
 }
 
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const
