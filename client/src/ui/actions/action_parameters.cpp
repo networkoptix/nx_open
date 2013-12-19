@@ -113,10 +113,6 @@ QnResourceWidget *QnActionParameters::widget(int key) const {
     return widgets.isEmpty() ? NULL : widgets.front();
 }
 
-QnMediaResourceWidget *QnActionParameters::mediaWidget(int key) const {
-    return dynamic_cast<QnMediaResourceWidget *>(widget(key));
-}
-
 QnResourceWidgetList QnActionParameters::widgets(int key) const {
     return QnActionParameterTypes::widgets(argument(key));
 }

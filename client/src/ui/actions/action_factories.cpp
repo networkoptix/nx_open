@@ -68,7 +68,7 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
     QList<QAction *> result;
     QnPtzPresetList presets;
 
-    QnMediaResourceWidget* widget = parameters.mediaWidget();
+    QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->camera() || !widget->ptzController() || !widget->ptzController()->getPresets(&presets))
         return result;
 
@@ -112,7 +112,7 @@ QList<QAction *> QnPtzStartTourActionFactory::newActions(const QnActionParameter
     QList<QAction *> result;
     QnPtzTourList tours;
 
-    QnMediaResourceWidget* widget = parameters.mediaWidget();
+    QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
     if (!widget || !widget->camera() || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
         return result;
 

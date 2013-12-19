@@ -67,7 +67,7 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent) :
 }
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
-    QnMediaResourceWidget* widget = menu()->currentParameters(sender()).mediaWidget();
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
@@ -92,7 +92,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
 
 void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.mediaWidget();
+    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     QString id = parameters.argument<QString>(Qn::PtzPresetIdRole).trimmed();
 
     if(!widget || !widget->ptzController() || !widget->camera() || id.isEmpty())
@@ -118,7 +118,7 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
 }
 
 void QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).mediaWidget();
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
 
@@ -132,7 +132,7 @@ void QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered() {
 
 void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.mediaWidget();
+    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
 
     if(!widget || !widget->ptzController() || !widget->camera())
         return;
@@ -162,7 +162,7 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
 
 void QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *widget = parameters.mediaWidget();
+    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     QnPtzTourList tours;
 
     if(!widget || !widget->ptzController() || !widget->camera() || !widget->ptzController()->getTours(&tours))
@@ -174,7 +174,7 @@ void QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered() {
 }
 
 void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).mediaWidget();
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if(!widget)
         return;
     QPointer<QnResourceWidget> guard(widget);
