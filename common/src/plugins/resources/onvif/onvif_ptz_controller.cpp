@@ -21,11 +21,17 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_resource(resource),
     m_capabilities(0)
 {
+    m_limits.minPan = -1.0;
+    m_limits.maxPan = 1.0;
+    m_limits.minTilt = -1.0;
+    m_limits.maxTilt = 1.0;
+    m_limits.minFov = 0.0;
+    m_limits.maxFov = 1.0;
+
     m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
 
-    // TODO: #PTZ #Elric actually implement flip!
-
     QnResourceData resourceData = qnCommon->dataPool()->data(resource);
+    
     m_stopBroken = resourceData.value<bool>(lit("onvifPtzStopBroken"), false);
 
     if(resourceData.value<bool>(lit("onvifPtzBroken"), false)) {
@@ -33,65 +39,59 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         return;
     }
 
-    if (!m_resource->getPtzfUrl().isEmpty())
-    {
-        QAuthenticator auth(m_resource->getAuth());
-        PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    initCoefficients();
 
-        _onvifPtz__GetConfigurations request;
-        _onvifPtz__GetConfigurationsResponse response;
-        if (ptz.doGetConfigurations(request, response) != SOAP_OK || response.PTZConfiguration.size() > 0) {
-            //qCritical() << "!!!";
-        }
+    // TODO: #PTZ #Elric actually implement flip!
+}
 
-        _onvifPtz__GetNode nodeRequest;
-        _onvifPtz__GetNodeResponse nodeResponse;
-        nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken; //m_resource->getPtzConfigurationToken().toStdString(); // response.PTZConfiguration[0]->NodeToken;
+QnOnvifPtzController::~QnOnvifPtzController() {
+    return;
+}
 
-        if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK)
-        {
-            //qCritical() << "reading PTZ token success";
-            if (nodeResponse.PTZNode) 
-            {
-                //qCritical() << "reading PTZ token success and data exists";
+void QnOnvifPtzController::initCoefficients() {
+    QString ptzUrl = m_resource->getPtzfUrl();
+    if(ptzUrl.isEmpty())
+        return;
 
-                onvifXsd__PTZNode* ptzNode = nodeResponse.PTZNode;
-                //m_ptzToken = QString::fromStdString(ptzNode[0].token);
-                if (ptzNode[0].SupportedPTZSpaces) 
-                {
-                    onvifXsd__PTZSpaces* spaces = ptzNode[0].SupportedPTZSpaces;
-                    if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
-                        if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
-                            m_xNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
-                            m_xNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
-                        }
-                        if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
-                            m_yNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
-                            m_yNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
-                        }
+    QAuthenticator auth = m_resource->getAuth();
+    PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    _onvifPtz__GetConfigurations request;
+    _onvifPtz__GetConfigurationsResponse response;
+    if (ptz.doGetConfigurations(request, response) != SOAP_OK || response.PTZConfiguration.size() > 0) {
+        //qCritical() << "!!!";
+    }
+
+    _onvifPtz__GetNode nodeRequest;
+    _onvifPtz__GetNodeResponse nodeResponse;
+    nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken; //m_resource->getPtzConfigurationToken().toStdString(); // response.PTZConfiguration[0]->NodeToken;
+
+    if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK) {
+        if (nodeResponse.PTZNode) {
+            onvifXsd__PTZNode* ptzNode = nodeResponse.PTZNode;
+            if (ptzNode[0].SupportedPTZSpaces) {
+                onvifXsd__PTZSpaces* spaces = ptzNode[0].SupportedPTZSpaces;
+                if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
+                    if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
+                        m_xNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
+                        m_xNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
                     }
-                    if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
-                        if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
-                            m_zoomNativeVelocityCoeff.first = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
-                            m_zoomNativeVelocityCoeff.second = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
-                        }
+                    if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
+                        m_yNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
+                        m_yNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
+                    }
+                }
+                if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
+                    if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
+                        m_zoomNativeVelocityCoeff.first = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
+                        m_zoomNativeVelocityCoeff.second = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
                     }
                 }
             }
         }
-        else {
-            //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
-        }
     }
-
-    /* Sane onvif default. */
-    m_limits.minPan = -1.0;
-    m_limits.maxPan = 1.0;
-    m_limits.minTilt = -1.0;
-    m_limits.maxTilt = 1.0;
-    m_limits.minFov = 0.0;
-    m_limits.maxFov = 1.0;
 }
+
 
 Qn::PtzCapabilities QnOnvifPtzController::getCapabilities() {
     return m_capabilities;
@@ -105,8 +105,12 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
 }
 
 bool QnOnvifPtzController::stopInternal() {
+    QString ptzUrl = m_resource->getPtzfUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
     bool stopValue = true;
 
@@ -125,8 +129,12 @@ bool QnOnvifPtzController::stopInternal() {
 }
 
 bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
+    QString ptzUrl = m_resource->getPtzfUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
     QVector3D localSpeed = speed;
 
@@ -166,8 +174,12 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
+    QString ptzUrl = m_resource->getPtzfUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     
     onvifXsd__Vector2D onvifPanTilt;
     onvifPanTilt.x = position.x();
@@ -206,11 +218,15 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 }
 
 bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::DevicePtzCoordinateSpace || m_resource->getPtzfUrl().isEmpty())
+    if(space != Qn::DevicePtzCoordinateSpace)
+        return false;
+
+    QString ptzUrl = m_resource->getPtzfUrl();
+    if(ptzUrl.isEmpty())
         return false;
 
     QAuthenticator auth(m_resource->getAuth());
-    PtzSoapWrapper ptz (m_resource->getPtzfUrl().toStdString().c_str(), auth.user(), auth.password(), m_resource->getTimeDrift());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     
     _onvifPtz__GetStatus request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();

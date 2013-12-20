@@ -16,6 +16,7 @@ class QnOnvifPtzController: public QnBasicPtzController {
 
 public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
+    virtual ~QnOnvifPtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;
     
@@ -29,6 +30,7 @@ public:
 private:
     double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
     
+    void initCoefficients();
     bool stopInternal();
     bool moveInternal(const QVector3D &speed);
 
