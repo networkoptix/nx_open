@@ -39,10 +39,12 @@ public:
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
     virtual bool synchronize(Qn::PtzDataFields query) override;
 
+protected:
+    virtual void baseFinished(Qn::PtzCommand command, const QVariant &data) override;
+
 private:
-    Q_SLOT bool initialize();
-    Q_SLOT void updateCacheLocked(const QnPtzData &data);
-    Q_SLOT void at_baseController_finished(Qn::PtzCommand command, const QVariant &data);
+    bool initialize();
+    void updateCacheLocked(const QnPtzData &data);
 
 private:
     bool m_initialized;

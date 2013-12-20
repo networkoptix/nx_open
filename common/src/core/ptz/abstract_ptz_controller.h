@@ -264,7 +264,7 @@ public:
     virtual bool synchronize(Qn::PtzDataFields query) = 0;
 
 signals:
-    void capabilitiesChanged(); // TODO: #Elric handle in proxy?
+    void capabilitiesChanged();
     void finished(Qn::PtzCommand command, const QVariant &data);
 
 protected:

@@ -49,8 +49,6 @@ private:
     template<class Functor>
     void runCommand(Qn::PtzCommand command, const Functor &functor) const;
 
-    Q_SLOT void at_command_finished(Qn::PtzCommand command, const QVariant &data);
-
 private:
     QScopedPointer<QnThreadedPtzControllerPrivate> d;
 };

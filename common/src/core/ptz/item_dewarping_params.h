@@ -7,6 +7,7 @@
 
 #include <utils/math/defines.h>
 
+// TODO: #Elric doesn't really belong in this folder
 struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarpingParams> {
     /** Whether dewarping is currently enabled. */
     bool enabled;

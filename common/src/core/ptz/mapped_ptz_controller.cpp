@@ -3,7 +3,9 @@
 QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController):
     QnProxyPtzController(baseController),
     m_mapper(mapper)
-{}
+{
+    // TODO: #Elric proper finished handling.
+}
 
 bool QnMappedPtzController::extends(const QnPtzControllerPtr &baseController) {
     return 

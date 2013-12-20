@@ -17,6 +17,8 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         return;
 
     m_octagonal = qnCommon->dataPool()->data(camera).value<bool>(lit("octagonalPtz"), false);
+
+    // TODO: #Elric propert finished handling.
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {

@@ -9,6 +9,8 @@
 QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController)
 {
+    // TODO: #Elric handle finished properly
+
     if(!baseController->hasCapabilities(Qn::FlipPtzCapability))
         qnWarning("Base controller doesn't have a Qn::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
     if(!baseController->hasCapabilities(Qn::LimitsPtzCapability))

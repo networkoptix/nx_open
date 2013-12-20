@@ -425,13 +425,13 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Go To Saved Position")).
         requiredPermissions(Qn::WritePtzPermission).
-        condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
+        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
     factory(Qn::PtzStartTourAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Activate PTZ Tour")).
         requiredPermissions(Qn::WritePtzPermission).
-        condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+        condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
 
     /* Context menu actions. */
 
@@ -881,7 +881,7 @@ QnActionManager::QnActionManager(QObject *parent):
         childFactory(new QnPtzGoToPresetActionFactory(this)).
         text(tr("PTZ...")).
         requiredPermissions(Qn::WritePtzPermission).
-        condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
+        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
     factory.beginSubMenu(); {
 
@@ -890,7 +890,7 @@ QnActionManager::QnActionManager(QObject *parent):
             childFactory(new QnPtzStartTourActionFactory(this)).
             text(tr("Tours...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
 
         factory.beginSubMenu(); {
 
@@ -898,7 +898,7 @@ QnActionManager::QnActionManager(QObject *parent):
                 flags(Qn::Scene | Qn::SingleTarget).
                 text(tr("Manage Tours...")).
                 requiredPermissions(Qn::WritePtzPermission).
-                condition(hasPtzCapabilities(Qn::ToursPtzCapability));
+                condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
 
         } factory.endSubMenu();
 
@@ -907,20 +907,20 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
+            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
         factory(Qn::PtzManagePresetsAction).
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Manage Saved Positions...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(hasPtzCapabilities(Qn::PresetsPtzCapability));
+            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
     } factory.endSubMenu();
 
     factory(Qn::PtzCalibrateFisheyeAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
-        text(tr("Calibrate Fisheye"));
-        //condition(hasPtzCapabilities(Qn::)) // TODO: #Elric VirtualPtz?
+        text(tr("Calibrate Fisheye")).
+        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, this)); // TODO: #Elric fisheye cap
 
 #if 0
     factory(Qn::ToggleRadassAction).

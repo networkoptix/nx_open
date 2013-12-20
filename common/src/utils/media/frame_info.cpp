@@ -159,7 +159,6 @@ void CLVideoDecoderOutput::fillRightEdge()
 void CLVideoDecoderOutput::memZerro()
 {
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
-    quint8 filler = 0;
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int w = linesize[i];

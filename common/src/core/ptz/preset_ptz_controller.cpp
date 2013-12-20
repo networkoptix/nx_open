@@ -40,7 +40,9 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), this))
-{}
+{
+    // TODO: #Elric proper finished handling
+}
 
 QnPresetPtzController::~QnPresetPtzController() {
     return;
@@ -54,7 +56,7 @@ bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
-    /* Note that this controller preserves the Qn::NonBlockingPtzCapability. */
+    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
     return base_type::getCapabilities() | Qn::PresetsPtzCapability;
 }
 

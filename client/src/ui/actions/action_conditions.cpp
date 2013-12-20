@@ -6,6 +6,8 @@
 #include <core/resource_managment/resource_criterion.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_resource.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
 #include <camera/resource_display.h>
 
@@ -534,4 +536,29 @@ Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParam
 
 Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
     return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        if(!check(qnPtzPool->controller(resource)))
+            return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QnResourceWidget *widget, widgets) {
+        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+        if(!mediaWidget)
+            return Qn::InvisibleAction;
+        
+        if(!check(mediaWidget->ptzController()))
+            return Qn::InvisibleAction;
+    }
+
+    return Qn::EnabledAction;
+}
+
+bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
+    return controller && controller->hasCapabilities(m_capabilities);
 }

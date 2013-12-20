@@ -87,6 +87,7 @@ public:
 // -------------------------------------------------------------------------- //
 // QnThreadedPtzController
 // -------------------------------------------------------------------------- //
+// TODO: #Elric get rid of this macro hell
 #define RUN_COMMAND(COMMAND, RESULT_TYPE, RETURN_VALUE, FUNCTION, ... /* PARAMS */) \
     {                                                                           \
         Qn::PtzCommand command = COMMAND;                                       \
@@ -129,7 +130,7 @@ template<class Functor>
 void QnThreadedPtzController::runCommand(Qn::PtzCommand command, const Functor &functor) const {
     QnPtzCommand<Functor> *runnable = new QnPtzCommand<Functor>(baseController(), command, functor);
     runnable->setAutoDelete(true);
-    connect(runnable, &QnAbstractPtzCommand::finished, this, &QnThreadedPtzController::at_command_finished, Qt::QueuedConnection);
+    connect(runnable, &QnAbstractPtzCommand::finished, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 
     d->threadPool->start(runnable);
 }
@@ -204,10 +205,6 @@ bool QnThreadedPtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
 
 bool QnThreadedPtzController::synchronize(Qn::PtzDataFields query) {
     RUN_COMMAND(Qn::SynchronizePtzCommand, QnPtzData, (controller->getData(query, &result) ? result : QnPtzData(query, Qn::NoPtzFields)), synchronize, query);
-}
-
-void QnThreadedPtzController::at_command_finished(Qn::PtzCommand command, const QVariant &data) {
-    emit finished(command, data);
 }
 
 
