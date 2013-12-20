@@ -6,7 +6,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 
-#include <ui/widgets/fisheye_calibration_widget.h>
+#include <ui/widgets/fisheye/fisheye_calibration_widget.h>
 
 #include <utils/common/scoped_value_rollback.h>
 

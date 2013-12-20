@@ -39,11 +39,6 @@ void QnFramedLabel::setFrameColor(const QColor color) {
     repaint();
 }
 
-void QnFramedLabel::addPaintDelegate(QPaintDelegate *delegate) {
-    m_paintDelegates << delegate;
-    repaint();
-}
-
 void QnFramedLabel::paintEvent(QPaintEvent *event) {
     bool pixmapExists = pixmap() && !pixmap()->isNull();
     if (!pixmapExists) {
@@ -71,9 +66,5 @@ void QnFramedLabel::paintEvent(QPaintEvent *event) {
     pen.setColor(m_frameColor);
     QnScopedPainterPenRollback penRollback(painter.data(), pen);
     painter->drawRect(fullRect);
-
-    foreach (QPaintDelegate* delegate, m_paintDelegates) {
-        delegate->delegatedPaint(this, painter.data());
-    }
 }
 

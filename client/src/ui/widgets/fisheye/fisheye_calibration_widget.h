@@ -14,7 +14,7 @@ class QnFisheyeCalibrationWidget;
 
 class QnFisheyeCalibrator;
 
-class QnFisheyeCalibrationWidget : public Connective<QWidget>, public QPaintDelegate
+class QnFisheyeCalibrationWidget : public Connective<QWidget>
 {
     Q_OBJECT
 
@@ -26,8 +26,6 @@ public:
     QPointF center() const;
     qreal radius() const;
 
-    virtual void delegatedPaint(const QWidget* widget, QPainter *painter) override;
-
 public slots:
     void setImageProvider(QnImageProvider *provider);
 
@@ -37,7 +35,7 @@ public slots:
 private slots:
     void at_imageLoaded(const QImage &image);
 
-    void at_calibrator_finished();
+    void at_calibrator_finished(int errorCode);
     void at_startButton_clicked();
 
 private:

@@ -4,6 +4,7 @@
 #include <QtGui/QPainter>
 
 #include <ui/fisheye/fisheye_calibrator.h>
+#include <ui/widgets/fisheye/fisheye_calibration_image_widget.h>
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -14,10 +15,9 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     m_calibrator(new QnFisheyeCalibrator())
 {
     ui->setupUi(this);
-    ui->imageLabel->addPaintDelegate(this);
 
-//    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  ui->calibrateWidget,    &QnFisheyeCalibrateWidget::setCenter);
-//    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  ui->calibrateWidget,    &QnFisheyeCalibrateWidget::setRadius);
+    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
+    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
     connect(m_calibrator, &QnFisheyeCalibrator::finished,       this,   &QnFisheyeCalibrationWidget::at_calibrator_finished);
 
     connect(ui->startButton, &QPushButton::clicked, this, &QnFisheyeCalibrationWidget::at_startButton_clicked);
@@ -25,42 +25,16 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
 
 QnFisheyeCalibrationWidget::~QnFisheyeCalibrationWidget() {}
 
-void QnFisheyeCalibrationWidget::delegatedPaint(const QWidget *widget, QPainter *painter) {
-    if (widget != ui->imageLabel)
-       return;
-
-    qreal radius = m_calibrator->radius();
-
-    if (qFuzzyIsNull(radius))
-        return;
-
-    bool pixmapExists = !m_image.isNull();
-    if (!pixmapExists)
-        return;
-
-    int frame = ui->imageLabel->lineWidth() / 2;
-    QRect targetRect = widget->rect().adjusted(frame, frame, -frame, -frame);
-    QPointF center(m_calibrator->center().x() * targetRect.width(), m_calibrator->center().y() * targetRect.height());
-//    center += ui->imageLabel->pos();
-    radius *= targetRect.width();
-
-    QPen pen;
-    pen.setWidth(4);
-    pen.setColor(Qt::red);
-
-    QnScopedPainterPenRollback penRollback(painter, pen);
-    painter->setClipRect(targetRect.adjusted(frame, frame, -frame, -frame));
-    painter->drawEllipse(center, radius, radius);
-    painter->drawEllipse(center, 4, 4);
-    painter->setClipping(false);
-}
-
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
     if (!provider)
         return;
 
     connect(provider, &QnImageProvider::imageChanged, this, &QnFisheyeCalibrationWidget::at_imageLoaded);
     at_imageLoaded(provider->image());
+
+    connect(provider, &QnImageProvider::imageChanged, ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setImage);
+    ui->imageWidget->setImage(provider->image());
+
     provider->loadAsync();
 }
 
@@ -84,12 +58,11 @@ void QnFisheyeCalibrationWidget::setRadius(qreal radius) {
 
 void QnFisheyeCalibrationWidget::at_imageLoaded(const QImage &image) {
     m_image = image;
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(this->width(), 400, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-    update();
 }
 
-void QnFisheyeCalibrationWidget::at_calibrator_finished() {
-    ui->imageLabel->repaint();
+void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
+    //TODO: #GDM PTZ handle errorCode
+    ui->imageWidget->repaint();
 }
 
 

@@ -15,50 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QnFramedLabel" name="imageLabel">
-       <property name="lineWidth">
-        <number>4</number>
-       </property>
-       <property name="text">
-        <string>Loading image...</string>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+    <widget class="QnFisheyeCalibrationImageWidget" name="imageWidget" native="true"/>
    </item>
    <item>
     <widget class="QStackedWidget" name="controlWidget">
@@ -153,9 +110,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnFramedLabel</class>
-   <extends>QLabel</extends>
-   <header location="global">ui/widgets/framed_label.h</header>
+   <class>QnFisheyeCalibrationImageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/fisheye/fisheye_calibration_image_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

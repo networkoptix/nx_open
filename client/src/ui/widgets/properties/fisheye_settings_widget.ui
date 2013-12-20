@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
      <item>
@@ -91,26 +91,13 @@
    <item>
     <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true"/>
    </item>
-   <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QnFisheyeCalibrationWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/fisheye_calibration_widget.h</header>
+   <header location="global">ui/widgets/fisheye/fisheye_calibration_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

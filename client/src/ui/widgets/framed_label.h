@@ -3,11 +3,6 @@
 
 #include <QLabel>
 
-class QPaintDelegate {
-public:
-    virtual void delegatedPaint(const QWidget* widget, QPainter *painter) = 0;
-};
-
 /**
  * The QnFramedLabel class implements the label control that can draw frame around
  * the pixmap. If pixmap is not set, it is painted as a usual QLabel.
@@ -42,15 +37,12 @@ public:
 
     QColor frameColor() const;
     void setFrameColor(const QColor color);
-
-    void addPaintDelegate(QPaintDelegate *delegate);
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
     qreal m_opacity;
     QColor m_frameColor;
-    QList<QPaintDelegate*> m_paintDelegates; //minor(?) hack --gdm
 };
 
 #endif // FRAMED_LABEL_H
