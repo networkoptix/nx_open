@@ -15,7 +15,8 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     ui(new Ui::QnFisheyeCalibrationWidget),
     m_calibrator(new QnFisheyeCalibrator()),
     m_imageProvider(NULL),
-    m_manualMode(false)
+    m_manualMode(false),
+    m_updating(false)
 {
     ui->setupUi(this);
 
@@ -29,6 +30,8 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     connect(ui->xCenterSlider,  &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged);
     connect(ui->yCenterSlider,  &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged);
     connect(ui->radiusSlider,   &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged);
+    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
+    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
 
     updateManualMode();
 }
@@ -100,13 +103,42 @@ void QnFisheyeCalibrationWidget::at_manualButton_clicked() {
 }
 
 void QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged(int value) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     setCenter(QPointF(0.01 * value, center().y()));
 }
 
 void QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged(int value) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     setCenter(QPointF(center().x(), 1.0 - 0.01 * value));
 }
 
 void QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged(int value) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     setRadius(0.01 * value);
+}
+
+void QnFisheyeCalibrationWidget::at_calibrator_centerChanged(const QPointF &center) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    ui->xCenterSlider->setValue(center.x() * 100);
+    ui->yCenterSlider->setValue((1.0 - center.y()) * 100);
+}
+
+void QnFisheyeCalibrationWidget::at_calibrator_radiusChanged(qreal radius) {
+    if (m_updating)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    ui->radiusSlider->setValue(radius * 100);
 }

@@ -40,6 +40,9 @@ private slots:
     void at_xCenterSlider_valueChanged(int value);
     void at_yCenterSlider_valueChanged(int value);
     void at_radiusSlider_valueChanged(int value);
+
+    void at_calibrator_centerChanged(const QPointF &center);
+    void at_calibrator_radiusChanged(qreal radius);
 private:
     void updateManualMode();
 
@@ -49,6 +52,7 @@ private:
     QnImageProvider* m_imageProvider;
 
     bool m_manualMode;
+    bool m_updating;
 
 };
 
