@@ -10,11 +10,11 @@
 #   include <winsock2.h>
 #endif
 
-#include <QByteArray>
-
+#include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
 #include "../common/byte_array.h"
+#include "../common/systemerror.h"
 
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
@@ -183,6 +183,20 @@ public:
         TODO/IMPL give up this method, since it's unreliable
     */
     virtual bool isConnected() const = 0;
+
+    template<class HandlerType>
+        bool readSomeAsync( nx::Buffer* const /*dst*/, HandlerType /*handler*/ )
+        {
+            //TODO/IMPL
+            return false;
+        }
+
+    template<class HandlerType>
+        bool sendAsync( const nx::Buffer& /*src*/, HandlerType /*handler*/ )
+        {
+            //TODO/IMPL
+            return false;
+        }
 };
 
 //!Interface for connection-orientied sockets
@@ -227,7 +241,10 @@ public:
         /*!
             \param newConnection Object ownership is passed to \a AbstractStreamServerSocket::AsyncAcceptHandler instance
         */
-        virtual void newConnectionAccepted( AbstractStreamServerSocket* serverSocket, AbstractStreamSocket* newConnection ) = 0;
+        virtual void newConnectionAccepted(
+            SystemError::ErrorCode errorCode,
+            AbstractStreamServerSocket* serverSocket,
+            AbstractStreamSocket* newConnection ) = 0;
     };
 
     virtual ~AbstractStreamServerSocket() {}
@@ -246,6 +263,13 @@ public:
         \note Uses read timeout
     */
     virtual AbstractStreamSocket* accept() = 0;
+    //!Starts async accept operation
+    template<class HandlerType>
+        bool acceptAsync( HandlerType /*handler*/ )
+        {
+            //TODO/IMPL
+            return false;
+        }
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
