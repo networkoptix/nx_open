@@ -104,6 +104,8 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
 
     painter->drawImage(targetRect, m_image);
 
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
+
     if (m_lineWidth == 0)
         return;
 
