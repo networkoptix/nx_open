@@ -41,6 +41,7 @@ public:
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
+
 private:
     Q_SLOT void updateLimits();
     Q_SLOT void updateCapabilities();

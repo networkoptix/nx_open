@@ -50,6 +50,9 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_executor(new QnPtzTourExecutor(baseController))
 {
     m_executor->moveToThread(qn_ptzTourExecutorThread_instance());
+
+    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
+    connect(this, &QnTourPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 }
 
 QnTourPtzController::~QnTourPtzController() {
@@ -122,6 +125,9 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     records.insert(tour.id, tour);
     
     m_adaptor->setValue(records);
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::CreateTourPtzCommand, QVariant::fromValue(tour));
     return true;
 }
 
@@ -133,6 +139,9 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
         return false;
     
     m_adaptor->setValue(records);
+    
+    if(m_asynchronous)
+        emit finishedLater(Qn::RemoveTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -147,6 +156,9 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
     }
 
     m_executor->startTour(tour);
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::ActivateTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -154,5 +166,8 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
     QMutexLocker locker(&m_mutex);
 
     *tours = m_adaptor->value().values();
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::GetToursPtzCommand, QVariant::fromValue(*tours));
     return true;
 }
