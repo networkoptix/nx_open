@@ -235,7 +235,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     PixelFormat ffmpegColorFormat = PIX_FMT_RGBA;
     QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
     int pixelBytes = 4;
-    if (colorSpace == "gray8" || 1) {
+    if (colorSpace == "gray8") {
         ffmpegColorFormat = PIX_FMT_GRAY8;
         qtColorFormat = QImage::Format_Indexed8;
         pixelBytes = 1;
