@@ -1,5 +1,5 @@
-#ifndef PTZ_HOTKEY_H
-#define PTZ_HOTKEY_H
+#ifndef QN_PTZ_HOTKEY_H
+#define QN_PTZ_HOTKEY_H
 
 #include <QtCore/QString>
 #include <QtCore/QHash>
@@ -11,12 +11,12 @@ namespace Qn {
     static const int NoHotkey = -1;
 }
 
-struct PtzPresetHotkey {
+struct QnPtzPresetHotkey {
     QString id;
     int hotkey;
 
-    PtzPresetHotkey(): hotkey(Qn::NoHotkey) {}
-    PtzPresetHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
+    QnPtzPresetHotkey(): hotkey(Qn::NoHotkey) {}
+    QnPtzPresetHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
 };
 
 typedef QHash<QString, int> QnHotkeysHash;
@@ -27,6 +27,6 @@ public:
     virtual void updateHotkeys(const QnHotkeysHash &value) = 0;
 };
 
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(PtzPresetHotkey)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetHotkey)
 
-#endif // PTZ_HOTKEY_H
+#endif // QN_PTZ_HOTKEY_H
