@@ -411,7 +411,9 @@ public:
 
 class QnPtzActionCondition: public QnActionCondition {
 public:
-    QnPtzActionCondition(Qn::PtzCapabilities capabilities, QObject* parent = NULL): m_capabilities(capabilities), QnActionCondition(parent) {}
+    QnPtzActionCondition(Qn::PtzCapabilities capabilities, QObject* parent = NULL):
+        QnActionCondition(parent),
+        m_capabilities(capabilities) {}
     
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;

@@ -802,7 +802,8 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result |= MotionSearchButton;
 
     if(m_camera
-        && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities)
+        && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
     ) {
         result |= PtzButton;
@@ -970,7 +971,8 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
 }
 
 void QnMediaResourceWidget::updateFisheye() {
-    bool enabled = item()->dewarpingParams().enabled;
+    QnItemDewarpingParams itemParams = item()->dewarpingParams();
+    bool enabled = itemParams.enabled;
 
     bool fisheyeEnabled = enabled
             && m_resource
@@ -978,14 +980,22 @@ void QnMediaResourceWidget::updateFisheye() {
 
     setOption(ControlPtz, fisheyeEnabled);
     setOption(DisplayCrosshair, fisheyeEnabled);
-    if (fisheyeEnabled)
+    if (fisheyeEnabled && buttonBar()->button(FishEyeButton))
         buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
     if(enabled)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
 
     bool flip = fisheyeEnabled
             && m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown;
+
+    //hack due to roma's strange architect --gdm
+    if (m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::Horizontal && itemParams.panoFactor == 4) {
+        itemParams.panoFactor = 2;  //TODO: #GDM PTZ fix asap
+        item()->setDewarpingParams(itemParams);
+    }
     item()->setData(Qn::ItemFlipRole, flip);
+
+    emit optionsChanged(); //hack to force updating overlay widget --gdm
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

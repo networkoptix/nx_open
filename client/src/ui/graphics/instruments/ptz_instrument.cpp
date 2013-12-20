@@ -32,6 +32,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
@@ -61,6 +62,21 @@ namespace {
     const double minPtzZoomRectSize = 0.08;
 
     const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
+
+    static const int panoLow      = 1;
+    static const int panoNormal   = 2;
+    static const int panoWide     = 4;
+
+    static const QList<int> horizontalPano(QList<int>()
+                                           << panoLow
+                                           << panoNormal
+                                           );
+
+    static const QList<int> verticalPano(QList<int>()
+                                         << panoLow
+                                         << panoNormal
+                                         << panoWide
+                                         );
 }
 
 
@@ -302,7 +318,6 @@ public:
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setText(lit("90"));
         m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
         updateLayout();
@@ -523,15 +538,17 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     if(data.overlayWidget)
         return data.overlayWidget;
 
+    bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
+    bool isFisheyeEnabled = widget->resource()->getDewarpingParams().enabled;
+
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
-    //overlay->modeButton()->setTarget(widget);
-    //overlay->modeButton()->setVisible(widget->virtualPtzController() != NULL);
-    //overlay->setMarkersVisible(widget->virtualPtzController() == NULL);
-    overlay->modeButton()->setVisible(false); // TODO: #PTZ
+    overlay->modeButton()->setTarget(widget);
+    overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
+    overlay->setMarkersVisible(!isFisheye);
 
     data.overlayWidget = overlay;
 
@@ -597,14 +614,20 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
 
         const PtzData &data = m_dataByWidget[widget];
 
+        bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
+        bool isFisheyeEnabled = widget->resource()->getDewarpingParams().enabled;
+
         overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
         overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         
-        overlayWidget->modeButton()->setVisible(data.hasCapabilities(Qn::VirtualPtzCapability)); // TODO: #PTZ
-        overlayWidget->setMarkersVisible(!data.hasCapabilities(Qn::VirtualPtzCapability));
-
-        //if (widget->virtualPtzController())
-            //overlayWidget->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
+        if (isFisheye) {
+            int panoAngle = widget->item()
+                    ? 90 * widget->item()->dewarpingParams().panoFactor
+                    : 90;
+            overlayWidget->modeButton()->setText(QString::number(panoAngle));
+        }
+        overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
+        overlayWidget->setMarkersVisible(!isFisheye);
     }
 }
 
@@ -1033,9 +1056,20 @@ void PtzInstrument::at_modeButton_clicked() {
     PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
 
     if(QnMediaResourceWidget *widget = button->target()) {
-        //m_ptzController->changePanoMode(widget);
         ensureOverlayWidget(widget);
-        //overlayWidget(widget)->setModeButtonText(m_ptzController->getPanoModeText(widget));
+
+        QnItemDewarpingParams iparams = widget->item()->dewarpingParams();
+        QnMediaDewarpingParams mparams = widget->resource()->getDewarpingParams();
+
+        QList<int> allowed = (mparams.viewMode == QnMediaDewarpingParams::Horizontal)
+                ? horizontalPano
+                : verticalPano;
+
+        int idx = (allowed.indexOf(iparams.panoFactor) + 1) % allowed.size();
+        iparams.panoFactor = allowed[idx];
+        widget->item()->setDewarpingParams(iparams);
+
+        updateOverlayWidget(widget);
     }
 }
 
