@@ -37,20 +37,21 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     if(!controller)
         return QnPtzControllerPtr();
 
-    if(QnMappedPtzController::extends(controller))
+    if(QnMappedPtzController::extends(controller->getCapabilities()))
         if(QnPtzMapperPtr mapper = qnCommon->dataPool()->data(camera).ptzMapper())
             controller.reset(new QnMappedPtzController(mapper, controller));
 
-    if(QnViewportPtzController::extends(controller))
+    if(QnViewportPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnViewportPtzController(controller));
 
-    if(QnPresetPtzController::extends(controller))
+    if(QnPresetPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnPresetPtzController(controller));
 
-    if(QnTourPtzController::extends(controller))
+    if(QnTourPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnTourPtzController(controller));
 
-    controller.reset(new QnWorkaroundPtzController(controller));
+    if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnWorkaroundPtzController(controller));
 
     camera->setPtzCapabilities(controller->getCapabilities());
     QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);

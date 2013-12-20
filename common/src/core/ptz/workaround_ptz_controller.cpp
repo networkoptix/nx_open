@@ -38,3 +38,8 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
         return base_type::continuousMove(QVector3D(cartesianSpeed, speed.z()));
     }
 }
+
+bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {
+    return true; // TODO: #Elric
+}
+

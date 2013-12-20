@@ -15,7 +15,7 @@ class QnMappedPtzController: public QnProxyPtzController {
 public:
     QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController);
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;

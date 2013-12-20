@@ -10,6 +10,8 @@ class QnWorkaroundPtzController: public QnProxyPtzController {
 public:
     QnWorkaroundPtzController(const QnPtzControllerPtr &baseController);
 
+    static bool extends(Qn::PtzCapabilities capabilities);
+
     virtual bool continuousMove(const QVector3D &speed) override;
 
 private:

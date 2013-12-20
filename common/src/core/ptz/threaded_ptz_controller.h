@@ -19,7 +19,7 @@ public:
     QnThreadedPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnThreadedPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 

@@ -48,16 +48,17 @@ QnPresetPtzController::~QnPresetPtzController() {
     return;
 }
 
-bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
+bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities) {
     return 
-        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
-        (baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) || baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability)) &&
-        !baseController->hasCapabilities(Qn::PresetsPtzCapability);
+        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Qn::PresetsPtzCapability);
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
     /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
-    return base_type::getCapabilities() | Qn::PresetsPtzCapability;
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::PresetsPtzCapability) : capabilities;
 }
 
 bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {

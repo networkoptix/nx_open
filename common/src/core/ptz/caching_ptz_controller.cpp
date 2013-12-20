@@ -21,14 +21,15 @@ QnCachingPtzController::~QnCachingPtzController() {
 	return;
 }
 
-bool QnCachingPtzController::extends(const QnPtzControllerPtr &baseController) {
+bool QnCachingPtzController::extends(Qn::PtzCapabilities capabilities) {
 	return 
-        baseController->hasCapabilities(Qn::AsynchronousPtzCapability) &&
-		!baseController->hasCapabilities(Qn::SynchronizedPtzCapability);
+        (capabilities & Qn::AsynchronousPtzCapability) &&
+		!(capabilities & Qn::SynchronizedPtzCapability);
 }
 
 Qn::PtzCapabilities QnCachingPtzController::getCapabilities() {
-	return baseController()->getCapabilities() | Qn::SynchronizedPtzCapability;
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::SynchronizedPtzCapability) : capabilities;
 }
 
 bool QnCachingPtzController::continuousMove(const QVector3D &speed) {

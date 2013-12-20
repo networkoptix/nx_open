@@ -13,7 +13,7 @@ public:
     QnCachingPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnCachingPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 

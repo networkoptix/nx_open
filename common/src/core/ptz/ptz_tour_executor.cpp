@@ -74,7 +74,7 @@ public:
     QnPtzTourExecutor *q;
 
     QnPtzControllerPtr baseController;
-    QnPtzControllerPtr threadController;
+    bool usingThreadController;
     Qn::PtzCoordinateSpace defaultSpace;
     Qn::PtzDataField defaultDataField;
     Qn::PtzCommand defaultCommand;
@@ -96,26 +96,27 @@ public:
 };
 
 QnPtzTourExecutorPrivate::QnPtzTourExecutorPrivate(): 
-    currentState(Stopped) 
+    currentState(Stopped),
+    usingThreadController(false)
 {}
 
 QnPtzTourExecutorPrivate::~QnPtzTourExecutorPrivate() {
     /* It's important to release the QObject ownership here as thread controller 
      * is also owned by a QSharedPointer. */
-    if(threadController)
-        threadController->setParent(NULL); 
+    if(usingThreadController)
+        baseController->setParent(NULL); 
 }
 
 void QnPtzTourExecutorPrivate::init(const QnPtzControllerPtr &controller) {
-    baseController = controller;
-    if(QnThreadedPtzController::extends(baseController)) {
-        threadController.reset(new QnThreadedPtzController(baseController));
-        baseController = threadController;
+    baseController = controller; 
+    if(QnThreadedPtzController::extends(baseController->getCapabilities())) {
+        baseController.reset(new QnThreadedPtzController(baseController));
+        usingThreadController = true;
 
         /* This call makes sure that thread controller lives in the same thread
          * as tour executor. Both need an event loop to function properly,
          * and tour executor can be moved between threads after construction. */
-        threadController->setParent(q); 
+        baseController->setParent(q); 
     }
 
     defaultSpace = baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;

@@ -17,7 +17,7 @@ public:
     QnTourPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnTourPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 

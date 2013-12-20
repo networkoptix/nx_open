@@ -19,7 +19,7 @@ public:
     QnPresetPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnPresetPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 

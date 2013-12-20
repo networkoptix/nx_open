@@ -56,17 +56,18 @@ QnTourPtzController::~QnTourPtzController() {
     return;
 }
 
-bool QnTourPtzController::extends(const QnPtzControllerPtr &baseController) {
+bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
     return 
-        baseController->hasCapabilities(Qn::PresetsPtzCapability) &&
-        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
-        (baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) || baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability)) &&
-        !baseController->hasCapabilities(Qn::ToursPtzCapability);
+        (capabilities & Qn::PresetsPtzCapability) &&
+        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Qn::ToursPtzCapability);
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
     /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
-    return baseController()->getCapabilities() | Qn::ToursPtzCapability;
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::ToursPtzCapability) : capabilities;
 }
 
 bool QnTourPtzController::continuousMove(const QVector3D &speed) {
