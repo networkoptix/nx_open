@@ -1,5 +1,5 @@
 TEMPLATE = app
 CONFIG += console
 
-include(${environment.dir}/qt5/qt-custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
-include(${environment.dir}/qt5/qt-custom/qtservice/src/qtservice.pri)
+include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
+include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
