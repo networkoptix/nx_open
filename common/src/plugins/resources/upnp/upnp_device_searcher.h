@@ -136,7 +136,7 @@ private:
     quint64 m_timerID;
     std::list<UPNPSearchHandler*> m_handlers;
     //map<local interface ip, socket>
-    std::map<QString, QSharedPointer<AbstractDatagramSocket> > m_socketList;
+    std::map<QString, std::shared_ptr<AbstractDatagramSocket> > m_socketList;
     char* m_readBuf;
     HttpClientsDict m_httpClients;
     std::list<DiscoveredDeviceInfo> m_discoveredDevices;
@@ -151,7 +151,7 @@ private:
     virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
 
     void dispatchDiscoverPackets();
-    QSharedPointer<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
+    std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml( const QByteArray& uuidStr, const QUrl& descriptionUrl, const QString& sender );
     void processDeviceXml( const DiscoveredDeviceInfo& devInfo, const QByteArray& foundDeviceDescription );
     //QByteArray getDeviceDescription( const QByteArray& uuidStr, const QUrl& url );

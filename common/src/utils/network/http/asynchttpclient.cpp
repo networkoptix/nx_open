@@ -69,7 +69,7 @@ namespace nx_http
 
         QMutexLocker lk( &m_mutex );
 
-        Q_ASSERT( sock == m_socket.data() );
+        Q_ASSERT( sock == m_socket.get() );
         while( !m_terminated )
         {
             switch( m_state )
@@ -411,19 +411,19 @@ namespace nx_http
         {
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-            m_socket.clear();
+            m_socket.reset();
         }
         m_state = sInit;
 
         m_httpStreamReader.resetState();
 
-        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
+        m_socket.reset( SocketFactory::createStreamSocket() );
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
         {
             NX_LOG( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
+            m_socket.reset();
             return false;
         }
 
@@ -432,7 +432,7 @@ namespace nx_http
         {
             NX_LOG( QString::fromLatin1("Failed to perform async connect to %1:%2. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
+            m_socket.reset();
             return false;
         }
 
@@ -444,7 +444,7 @@ namespace nx_http
         {
             NX_LOG( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
+            m_socket.reset();
             return false;
         }
 

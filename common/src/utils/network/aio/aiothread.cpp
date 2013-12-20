@@ -35,14 +35,14 @@ namespace aio
             tAll
         };
 
-        QSharedPointer<AbstractSocket> socket;
+        std::shared_ptr<AbstractSocket> socket;
         PollSet::EventType eventType;
         AIOEventHandler* eventHandler;
         TaskType type;
         int timeout;
 
         SocketAddRemoveTask(
-            const QSharedPointer<AbstractSocket>& _socket,
+            const std::shared_ptr<AbstractSocket>& _socket,
             PollSet::EventType _eventType,
             AIOEventHandler* const _eventHandler,
             TaskType _type,
@@ -79,7 +79,7 @@ namespace aio
     class AIOEventHandlingDataHolder
     {
     public:
-        QSharedPointer<AIOEventHandlingData> data;
+        std::shared_ptr<AIOEventHandlingData> data;
 
         AIOEventHandlingDataHolder( AIOEventHandler* _eventHandler )
         :
@@ -91,7 +91,7 @@ namespace aio
     class PeriodicTaskData
     {
     public:
-        QSharedPointer<AIOEventHandlingData> data;
+        std::shared_ptr<AIOEventHandlingData> data;
         AbstractSocket* socket;
 
         PeriodicTaskData()
@@ -101,7 +101,7 @@ namespace aio
         }
 
         PeriodicTaskData(
-            const QSharedPointer<AIOEventHandlingData>& _data,
+            const std::shared_ptr<AIOEventHandlingData>& _data,
             AbstractSocket* _socket )
         :
             data( _data ),
@@ -163,7 +163,7 @@ namespace aio
                 }
                 else    //task.type == SocketAddRemoveTask::tRemoving
                 {
-                    void* userData = pollSet.remove( task.socket.data(), task.eventType );
+                    void* userData = pollSet.remove( task.socket.get(), task.eventType );
                     if( userData )
                         delete static_cast<AIOEventHandlingDataHolder*>(userData);
                 }
@@ -172,13 +172,13 @@ namespace aio
         }
 
         bool addSockToPollset(
-            QSharedPointer<AbstractSocket> socket,
+            std::shared_ptr<AbstractSocket> socket,
             PollSet::EventType eventType,
             int timeout,
             AIOEventHandler* eventHandler )
         {
             std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( eventHandler ) );
-            if( !pollSet.add( socket.data(), eventType, handlingData.get() ) )
+            if( !pollSet.add( socket.get(), eventType, handlingData.get() ) )
             {
                 NX_LOG( QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
                 return false;
@@ -188,7 +188,7 @@ namespace aio
             {
                 //adding periodic task associated with socket
                 handlingData->data->timeout = timeout;
-                addPeriodicTask( getSystemTimerVal() + timeout, handlingData.get()->data, socket.data() );
+                addPeriodicTask( getSystemTimerVal() + timeout, handlingData.get()->data, socket.get() );
             }
             handlingData.release();
 
@@ -201,7 +201,7 @@ namespace aio
         }
 
         bool removeReverseTask(
-            const QSharedPointer<AbstractSocket>& sock,
+            const std::shared_ptr<AbstractSocket>& sock,
             PollSet::EventType eventType,
             SocketAddRemoveTask::TaskType taskType,
             AIOEventHandler* const eventHandler,
@@ -220,7 +220,7 @@ namespace aio
                     if( it->type == SocketAddRemoveTask::tRemoving )
                     {
                         //cancelling remove task
-                        void* userData = pollSet.getUserData( sock.data(), eventType );
+                        void* userData = pollSet.getUserData( sock.get(), eventType );
                         Q_ASSERT( userData );
                         static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval.store(0);
                     }
@@ -241,7 +241,7 @@ namespace aio
                 ++it )
             {
                 //no need to lock mutex, since data is removed in this thread only
-                QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(it.userData())->data;
+                std::shared_ptr<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(it.userData())->data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
                 if( handlingData->markedForRemoval.load() > 0 ) //socket has been removed from watch
@@ -272,7 +272,7 @@ namespace aio
                 }
 
                 //no need to lock mutex, since data is removed in this thread only
-                QSharedPointer<AIOEventHandlingData> handlingData = periodicTaskData.data;
+                std::shared_ptr<AIOEventHandlingData> handlingData = periodicTaskData.data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
                 if( handlingData->markedForRemoval.load() > 0 ) //task has been removed from watch
@@ -311,7 +311,7 @@ namespace aio
 
         void addPeriodicTask(
             const qint64 taskClock,
-            const QSharedPointer<AIOEventHandlingData>& handlingData,
+            const std::shared_ptr<AIOEventHandlingData>& handlingData,
             AbstractSocket* _socket )
         {
             QMutexLocker lk( &periodicTasksMutex );
@@ -351,7 +351,7 @@ namespace aio
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
     bool AIOThread::watchSocket(
-        const QSharedPointer<AbstractSocket>& sock,
+        const std::shared_ptr<AbstractSocket>& sock,
         PollSet::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         int timeoutMs )
@@ -384,7 +384,7 @@ namespace aio
     }
 
     bool AIOThread::removeFromWatch(
-        const QSharedPointer<AbstractSocket>& sock,
+        const std::shared_ptr<AbstractSocket>& sock,
         PollSet::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
@@ -394,10 +394,10 @@ namespace aio
         if( m_impl->removeReverseTask(sock, eventType, SocketAddRemoveTask::tRemoving, NULL, 0) )
             return true;    //ignoring task
 
-        void* userData = m_impl->pollSet.getUserData( sock.data(), eventType );
+        void* userData = m_impl->pollSet.getUserData( sock.get(), eventType );
         if( userData == NULL )
             return false;   //assert ???
-        QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(userData)->data;
+        std::shared_ptr<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(userData)->data;
         if( handlingData->markedForRemoval.load() > 0 )
             return false; //socket already marked for removal
         handlingData->markedForRemoval.ref();

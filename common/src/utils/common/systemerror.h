@@ -29,11 +29,15 @@ namespace SystemError
     static const ErrorCode inProgress = WSAEWOULDBLOCK;
     static const ErrorCode timedOut = WSAETIMEDOUT;
     static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
+    static const ErrorCode connectionReset = WSAECONNRESET;
+    static const ErrorCode notConnected = WSAENOTCONN;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
     static const ErrorCode timedOut = ETIMEDOUT;
     static const ErrorCode fileNotFound = ENOENT;
+    static const ErrorCode connectionReset = ECONNRESET;
+    static const ErrorCode notConnected = ENOTCONN;
 #endif
 
     //!Returns error code of previous system call

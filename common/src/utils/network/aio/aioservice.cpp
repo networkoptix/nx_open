@@ -75,7 +75,7 @@ namespace aio
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
     bool AIOService::watchSocket(
-        const QSharedPointer<AbstractSocket>& sock,
+        const std::shared_ptr<AbstractSocket>& sock,
         PollSet::EventType eventToWatch,
         AIOEventHandler* const eventHandler )
     {
@@ -98,7 +98,7 @@ namespace aio
         //    : (eventToWatch == PollSet::etWrite ? sock->getWriteTimeOut() : 0);
 
         //checking, if that socket is already monitored
-        const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock.data(), eventToWatch );
+        const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock.get(), eventToWatch );
         map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.lower_bound( sockCtx );
         if( it != m_sockets.end() && it->first == sockCtx )
             return true;    //socket already monitored for eventToWatch
@@ -152,13 +152,13 @@ namespace aio
         Garantees that no \a eventTriggered will be called after return of this method
     */
     void AIOService::removeFromWatch(
-        const QSharedPointer<AbstractSocket>& sock,
+        const std::shared_ptr<AbstractSocket>& sock,
         PollSet::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
         QMutexLocker lk( &m_mutex );
 
-        const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock.data(), eventType );
+        const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock.get(), eventType );
         map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
         if( it != m_sockets.end() )
         {

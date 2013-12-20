@@ -6,6 +6,8 @@
 #ifndef AIOTHREAD_H
 #define AIOTHREAD_H
 
+#include <memory>
+
 #include <QtCore/QMutex>
 
 #include "aioeventhandler.h"
@@ -42,7 +44,7 @@ namespace aio
             \note MUST be called with \a mutex locked
         */
         bool watchSocket(
-            const QSharedPointer<AbstractSocket>& sock,
+            const std::shared_ptr<AbstractSocket>& sock,
             PollSet::EventType eventToWatch,
             AIOEventHandler* const eventHandler,
             int timeoutMS = 0 );
@@ -56,7 +58,7 @@ namespace aio
             \note MUST be called with \a mutex locked
         */
         bool removeFromWatch(
-            const QSharedPointer<AbstractSocket>& sock,
+            const std::shared_ptr<AbstractSocket>& sock,
             PollSet::EventType eventType,
             bool waitForRunningHandlerCompletion );
         //!Returns number of sockets monitored for \a eventToWatch event

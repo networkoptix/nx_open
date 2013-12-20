@@ -109,7 +109,7 @@ void UPNPDeviceSearcher::pleaseStop()
         TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
-    for( std::map<QString, QSharedPointer<AbstractDatagramSocket> >::const_iterator
+    for( std::map<QString, std::shared_ptr<AbstractDatagramSocket> >::const_iterator
         it = m_socketList.begin();
         it != m_socketList.end();
         ++it )
@@ -204,16 +204,16 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventTyp
 {
     if( eventType == PollSet::etError )
     {
-        QSharedPointer<AbstractDatagramSocket> udpSock;
+        std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QMutexLocker lk( &m_mutex );
             //removing socket from m_socketList
-            for( map<QString, QSharedPointer<AbstractDatagramSocket> >::iterator
+            for( map<QString, std::shared_ptr<AbstractDatagramSocket> >::iterator
                 it = m_socketList.begin();
                 it != m_socketList.end();
                 ++it )
             {
-                if( it->second.data() == sock ) {
+                if( it->second.get() == sock ) {
                     udpSock = it->second;
                     m_socketList.erase( it );
                     break;
@@ -266,7 +266,7 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
 {
     foreach( QnInterfaceAndAddr iface, getAllIPv4Interfaces() )
     {
-        const QSharedPointer<AbstractDatagramSocket>& sock = getSockByIntf(iface);
+        const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
         if( !sock )
             continue;
 
@@ -282,20 +282,20 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
     }
 }
 
-QSharedPointer<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
+std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
     const QString& localAddress = iface.address.toString();
 
-    pair<map<QString, QSharedPointer<AbstractDatagramSocket> >::iterator, bool> p;
+    pair<map<QString, std::shared_ptr<AbstractDatagramSocket> >::iterator, bool> p;
     {
         QMutexLocker lk( &m_mutex );
-        p = m_socketList.insert( make_pair( localAddress, QSharedPointer<AbstractDatagramSocket>() ) );
+        p = m_socketList.insert( make_pair( localAddress, std::shared_ptr<AbstractDatagramSocket>() ) );
     }
     if( !p.second )
         return p.first->second;
 
     //creating new socket
-    QSharedPointer<UDPSocket> sock( new UDPSocket() );
+    std::shared_ptr<UDPSocket> sock( new UDPSocket() );
 
     p.first->second = sock;
     if( !sock->setReuseAddrFlag( true ) ||
@@ -307,7 +307,7 @@ QSharedPointer<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const 
     {
         QMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );
-        return QSharedPointer<AbstractDatagramSocket>();
+        return std::shared_ptr<AbstractDatagramSocket>();
     }
 
     return sock;

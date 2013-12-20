@@ -128,7 +128,7 @@ namespace nx_http
     private:
         State m_state;
         HttpRequest m_request;
-        QSharedPointer<AbstractStreamSocket> m_socket;
+        std::shared_ptr<AbstractStreamSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
         QUrl m_url;
