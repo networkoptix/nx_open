@@ -56,7 +56,6 @@ private:
     QVector3D boundedPosition(const QVector3D &position);
     QVector3D getPositionInternal();
     void absoluteMoveInternal(const QVector3D &position);
-
 private:
     enum AnimationMode {
         NoAnimation,
