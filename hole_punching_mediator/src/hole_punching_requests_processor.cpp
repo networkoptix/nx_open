@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #include "hole_punching_requests_processor.h"
 
 #include <QtCore/QList>
@@ -64,3 +66,5 @@ void HolePunchingClientConnection::processConnectRequest(
 
 
 }
+
+#endif

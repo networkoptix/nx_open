@@ -16,10 +16,9 @@
 #include <utils/common/stoppable.h>
 
 #include "hole_punching_requests_processor.h"
-#include "stream_socket_server.h"
+#include "stun_stream_socket_server.h"
+#include "stun_server_connection.h"
 
-
-class StreamSocketServer;
 
 class HolePuncherProcess
 :
@@ -41,8 +40,7 @@ private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
-    std::unique_ptr<HolePunchingRequestsProcessor> m_requestsProcessor;
-    std::list<std::unique_ptr<StreamSocketServer> > m_listeners;
+    std::list<std::unique_ptr<StunStreamSocketServer> > m_listeners;
 
     bool initialize();
     void deinitialize();

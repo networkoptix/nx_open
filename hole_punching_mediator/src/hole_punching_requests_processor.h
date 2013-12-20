@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #ifndef HOLE_PUNCHING_REQUESTS_PROCESSOR_H
 #define HOLE_PUNCHING_REQUESTS_PROCESSOR_H
 
@@ -39,3 +41,5 @@ private:
 };
 
 #endif  //HOLE_PUNCHING_REQUESTS_PROCESSOR_H
+
+#endif

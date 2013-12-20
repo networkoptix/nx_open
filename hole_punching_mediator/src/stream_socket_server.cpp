@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #include "stream_socket_server.h"
 
 
@@ -31,3 +33,5 @@ void StreamSocketServer::newConnectionAccepted(
     //TODO/IMPL
     m_newConnectionHandler->newConnectionAccepted( serverSocket, acceptedConnection );
 }
+
+#endif

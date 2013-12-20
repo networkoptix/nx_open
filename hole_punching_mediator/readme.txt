@@ -27,7 +27,7 @@ reveals its name to the nameserver                               |
                                                                  |
                                           (all operations above are totally independent)
                                                                  |
-nameserver notifies that client wishes to                        |   nameserver reponses with server's ip:port (external address of server_sock1)
+nameserver notifies that client wishes to                        |   nameserver responses with server's ip:port (external address of server_sock1)
 establish connection and reports client's ip:port                |   
 (external address of client_sock1)                               |   
                                                                  |
@@ -53,15 +53,6 @@ GET /bind?host_id=host_sweet_host HTTP/1.1
 
 S->H1:
 HTTP/1.1 200 OK
-
-1.2
-H1->S:
-GET /listen?host_id=host_sweet_host HTTP/1.1
-
-S->H1:
-HTTP/1.1 200 OK
-Content-Type: multipart/x-mixed-replace;boundary=--hx_hole_punching
-Transfer-Encoding: chunked
 
 
 # H1 <-> S connection is kept opened
