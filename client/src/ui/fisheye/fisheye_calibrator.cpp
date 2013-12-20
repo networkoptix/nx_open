@@ -178,8 +178,10 @@ void QnFisheyeCalibrator::findCircleParams()
     }
 
     qSort(distances);
-    if (distances[3].distance == INT64_MAX)
+    if (distances[3].distance == INT64_MAX || distances[0].distance == 0) {
+        emit finished (ErrorNotFisheyeImage);
         return; // not found
+    }
 
     // remove most far point
     int leftDistance = distances[1].distance - distances[0].distance;
@@ -200,8 +202,10 @@ void QnFisheyeCalibrator::findCircleParams()
     qreal ma = (a2.y() - a1.y()) / (a2.x() - a1.x());
     qreal mb = (a3.y() - a2.y()) / (a3.x() - a2.x());
 
-    if (ma == 0 || mb == 0 || ma > 1e9 || mb > 1e9 || ma < -1e9 || mb < -1e9)
+    if (ma == 0 || mb == 0 || ma > 1e9 || mb > 1e9 || ma < -1e9 || mb < -1e9) {
+        emit finished (ErrorNotFisheyeImage);
         return;
+    }
 
     qreal centerX = ma * mb * (a1.y() - a3.y()) + mb * (a1.x() + a2.x()) - ma * (a2.x() + a3.x());
     centerX /= 2 * (mb - ma);
@@ -214,7 +218,7 @@ void QnFisheyeCalibrator::findCircleParams()
     m_center = QPointF(centerX / (qreal) m_width, centerY / (qreal)m_height);
     m_radius = radius / (qreal) m_width;
 
-    emit finished();
+    emit finished(NoError);
 }
 
 /*
@@ -331,7 +335,10 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
             break;
     }
     int result = midPos / 2 + left;
-    return qBound(28, result, 64);
+    if (result < 28)
+        return -1;
+    else
+        return qBound(28, result, 64);
 }
 
 void QnFisheyeCalibrator::analyseFrameAsync(QImage frame)
@@ -349,6 +356,9 @@ void QnFisheyeCalibrator::run()
 
 void QnFisheyeCalibrator::analyseFrame(QImage frame)
 {
+    m_center = QPointF(0.5, 0.5);
+    m_radius = 0.5;
+
     if (frame.format() != QImage::Format_Indexed8) 
     {
         // copy data to the tmp buffer because source buffer may be unaligned
@@ -384,6 +394,12 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
     m_height = frame.height();
 
     const int Y_THRESHOLD = findYThreshold(frame);
+
+    if (Y_THRESHOLD == -1) {
+        emit finished (ErrorTooLowLight);
+        return;
+    }
+
 
     const quint8* curPtr = (const quint8*) frame.bits();
     delete m_filteredFrame;

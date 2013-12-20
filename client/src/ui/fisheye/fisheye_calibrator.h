@@ -12,6 +12,14 @@ class QnFisheyeCalibrator: public QnLongRunnable
 {
     Q_OBJECT
 public:
+
+    enum Error
+    {
+        NoError,
+        ErrorNotFisheyeImage,
+        ErrorTooLowLight
+    };
+
     QnFisheyeCalibrator();
     ~QnFisheyeCalibrator();
 
@@ -30,7 +38,7 @@ signals:
     void centerChanged(const QPointF &center);
     void radiusChanged(qreal radius);
 
-    void finished();
+    void finished(int errorCode);
 protected:
     virtual void run();
 private:
