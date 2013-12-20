@@ -955,7 +955,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
             
             qreal speed = 0.5 * position.z();
             QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
-            target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 1.0);
+            target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
         }
         break;
     default:

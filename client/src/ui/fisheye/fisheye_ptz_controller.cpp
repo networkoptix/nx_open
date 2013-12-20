@@ -3,6 +3,7 @@
 #include <QtCore/QEasingCurve>
 
 #include <utils/math/math.h>
+#include <utils/math/linear_combination.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -18,14 +19,13 @@
 // -------------------------------------------------------------------------- //
 QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     base_type(widget->resource()->toResourcePtr()),
-    m_animating(false)
+    m_animationMode(NoAnimation)
 {
     m_widget = widget;
-    
+    m_widget->registerAnimation(this);
+
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
-
-    m_timer.start();
 
     connect(m_widget,           &QnResourceWidget::aspectRatioChanged,      this, &QnFisheyePtzController::updateAspectRatio);
     connect(resource(),         &QnResource::mediaDewarpingParamsChanged,   this, &QnFisheyePtzController::updateMediaDewarpingParams);
@@ -121,13 +121,19 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
     return result;
 }
 
-void QnFisheyePtzController::tick() {
-    if(!m_animating)
-        return;
-
-    qint64 elapsed = m_timer.restart();
-    QVector3D speed = m_speed * QVector3D(60.0, 60.0, -30.0);
-    absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * elapsed / 1000.0));
+void QnFisheyePtzController::tick(int deltaMSecs) {
+    if(m_animationMode == SpeedAnimation) {
+        QVector3D speed = m_speed * QVector3D(60.0, 60.0, -30.0);
+        absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * deltaMSecs / 1000.0));
+    } else if(m_animationMode == PositionAnimation) {
+        m_progress += m_relativeSpeed * deltaMSecs / 1000.0;
+        if(m_progress >= 1.0) {
+            absoluteMoveInternal(m_endPosition);
+            stopListening();
+        } else {
+            absoluteMoveInternal(boundedPosition(linearCombine(1.0 - m_progress, m_startPosition, m_progress, m_endPosition)));
+        }
+    }
 }
 
 #if 0
@@ -294,10 +300,10 @@ bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;
 
     if(qFuzzyIsNull(speed)) {
-        m_animating = false;
+        stopListening();
     } else {
-        m_animating = true;
-        m_timer.restart();
+        m_animationMode = SpeedAnimation;
+        startListening();
     }
 
     return true;
@@ -308,9 +314,19 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         return false;
 
     m_speed = QVector3D();
-    m_animating = false;
+    stopListening();
 
-    absoluteMoveInternal(boundedPosition(position));
+    if(!qFuzzyEquals(speed, 1.0) && speed > 1.0) {
+        absoluteMoveInternal(boundedPosition(position));
+    } else {
+        m_animationMode = PositionAnimation;
+        m_startPosition = getPositionInternal();
+        m_endPosition = boundedPosition(position);
+        m_progress = 0.0;
+        m_relativeSpeed = qBound<qreal>(0.0, speed, 1.0); // TODO: #Elric this is wrong. We need to take distance into account.
+        
+        startListening();
+    }
     return true;
 }
 

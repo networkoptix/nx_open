@@ -11,10 +11,12 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
+#include <ui/animation/animation_timer_listener.h>
+
 class QnResourceWidgetRenderer;
 class QnMediaResourceWidget;
 
-class QnFisheyePtzController: public QnBasicPtzController {
+class QnFisheyePtzController: public QnBasicPtzController, public AnimationTimerListener {
     Q_OBJECT
     typedef QnBasicPtzController base_type;
 
@@ -34,13 +36,14 @@ public:
     /*virtual bool getProjection(Qn::Projection *projection) override;
     virtual bool setProjection(Qn::Projection projection) override;*/
 
-    void tick();
-
     ///virtual void changePanoMode() override;
     ///virtual QString getPanoModeText() const override;
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
+
+protected:
+    virtual void tick(int deltaMSecs) override;
 
 private:
     Q_SLOT void updateLimits();
@@ -55,6 +58,12 @@ private:
     void absoluteMoveInternal(const QVector3D &position);
 
 private:
+    enum AnimationMode {
+        NoAnimation,
+        SpeedAnimation,
+        PositionAnimation
+    };
+
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Qn::PtzCapabilities m_capabilities;
@@ -64,9 +73,12 @@ private:
     
     qreal m_aspectRatio;
 
-    QElapsedTimer m_timer;
-    bool m_animating;
+    AnimationMode m_animationMode;
     QVector3D m_speed;
+    QVector3D m_startPosition;
+    QVector3D m_endPosition;
+    qreal m_relativeSpeed;
+    qreal m_progress;
 
     QnMediaDewarpingParams m_mediaDewarpingParams;
     QnItemDewarpingParams m_itemDewarpingParams;
