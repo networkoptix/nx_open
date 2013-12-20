@@ -89,7 +89,28 @@
     </layout>
    </item>
    <item>
-    <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true"/>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Calibration</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QnFisheyeCalibrationWidget" name="calibrateWidget" native="true"/>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

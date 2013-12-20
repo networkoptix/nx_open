@@ -93,6 +93,9 @@ void QnFisheyePtzController::updateAspectRatio() {
 }
 
 void QnFisheyePtzController::updateMediaDewarpingParams() {
+    if (!m_widget->resource())
+        return;
+
     m_mediaDewarpingParams = m_widget->resource()->getDewarpingParams();
 
     updateLimits();
