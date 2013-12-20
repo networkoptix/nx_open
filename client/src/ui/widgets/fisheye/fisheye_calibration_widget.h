@@ -11,6 +11,7 @@ namespace Ui {
 class QnFisheyeCalibrationWidget;
 }
 
+class QTimer;
 class QnFisheyeCalibrator;
 class QnImageProvider;
 
@@ -53,6 +54,7 @@ private:
     QScopedPointer<Ui::QnFisheyeCalibrationWidget> ui;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
     QnImageProvider* m_imageProvider;
+    QTimer* m_updateTimer;
 
     bool m_manualMode;
     bool m_updating;

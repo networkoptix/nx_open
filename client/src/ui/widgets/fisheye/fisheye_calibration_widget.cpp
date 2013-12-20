@@ -1,6 +1,7 @@
 #include "fisheye_calibration_widget.h"
 #include "ui_fisheye_calibration_widget.h"
 
+#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #include <ui/fisheye/fisheye_calibrator.h>
@@ -10,15 +11,21 @@
 #include <utils/math/fuzzy.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+namespace {
+    int refreshInterval = 5000; //update image every interval (in ms)
+}
+
 QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnFisheyeCalibrationWidget),
     m_calibrator(new QnFisheyeCalibrator()),
     m_imageProvider(NULL),
+    m_updateTimer(new QTimer(this)),
     m_manualMode(false),
     m_updating(false)
 {
     ui->setupUi(this);
+    m_updateTimer->setInterval(refreshInterval);
 
     connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
     connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
@@ -43,17 +50,19 @@ QnFisheyeCalibrationWidget::~QnFisheyeCalibrationWidget() {}
 
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
     if (m_imageProvider) {
-        disconnect(ui->refreshButton, NULL, m_imageProvider, NULL);
+        disconnect(m_updateTimer, &QTimer::timeout, m_imageProvider, NULL);
         disconnect(m_imageProvider, NULL, ui->imageWidget, NULL);
     }
 
+    m_updateTimer->stop();
     m_imageProvider = provider;
 
     if (!m_imageProvider)
         return;
 
     connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setImage);
-    connect(ui->refreshButton, &QPushButton::clicked, m_imageProvider, &QnImageProvider::loadAsync);
+    connect(m_updateTimer, &QTimer::timeout, m_imageProvider, &QnImageProvider::loadAsync);
+    m_updateTimer->start();
 
     if (!m_imageProvider->image().isNull())
         ui->imageWidget->setImage(provider->image());
