@@ -176,7 +176,14 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
         QnScopedPainterPenRollback penRollback(painter.data(), pen);
         Q_UNUSED(penRollback)
 
-        QnScopedPainterBrushRollback brushRollback(painter.data(), toTransparent(m_lineColor, 0.5));
+        QColor brushColor1(toTransparent(m_lineColor, 0.6));
+        QColor brushColor2(toTransparent(m_lineColor, 0.3));
+        QRadialGradient gradient(center * 0.66, radius);
+        gradient.setColorAt(0, brushColor1);
+        gradient.setColorAt(1, brushColor2);
+        QBrush brush(gradient);
+
+        QnScopedPainterBrushRollback brushRollback(painter.data(), brush);
         Q_UNUSED(brushRollback)
 
         QPainterPath path;
