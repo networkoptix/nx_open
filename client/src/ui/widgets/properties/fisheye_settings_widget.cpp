@@ -58,7 +58,7 @@ void QnFisheyeSettingsWidget::updateFromResource(const QnResourcePtr &resource) 
 
     ui->calibrateWidget->setRadius(params.radius);
     ui->calibrateWidget->setCenter(QPointF(params.xCenter, params.yCenter));
-    ui->calibrateWidget->setImageProvider(QnSingleThumbnailLoader::newInstance(resource, -1, QSize(), this));
+    ui->calibrateWidget->setImageProvider(QnSingleThumbnailLoader::newInstance(resource, -1, QSize(), ui->calibrateWidget));
 }
 
 void QnFisheyeSettingsWidget::submitToResource(const QnResourcePtr &resource) {

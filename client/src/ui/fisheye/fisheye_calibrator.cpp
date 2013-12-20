@@ -215,8 +215,8 @@ void QnFisheyeCalibrator::findCircleParams()
     qreal dy = centerY - a1.y();
     int radius = sqrt(dx*dx + dy*dy) + 0.5;
 
-    m_center = QPointF(centerX / (qreal) m_width, centerY / (qreal)m_height);
-    m_radius = radius / (qreal) m_width;
+    setCenter(QPointF(centerX / (qreal) m_width, centerY / (qreal)m_height));
+    setRadius(radius / (qreal) m_width);
 
     emit finished(NoError);
 }

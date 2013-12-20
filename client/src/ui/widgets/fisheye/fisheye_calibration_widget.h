@@ -3,7 +3,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <utils/image_provider.h>
 #include <utils/common/connective.h>
 
 #include <ui/widgets/framed_label.h>
@@ -13,6 +12,7 @@ class QnFisheyeCalibrationWidget;
 }
 
 class QnFisheyeCalibrator;
+class QnImageProvider;
 
 class QnFisheyeCalibrationWidget : public Connective<QWidget>
 {
@@ -33,16 +33,23 @@ public slots:
     void setRadius(qreal radius);
 
 private slots:
-    void at_imageLoaded(const QImage &image);
-
     void at_calibrator_finished(int errorCode);
-    void at_startButton_clicked();
+    void at_autoButton_clicked();
+    void at_manualButton_clicked();
+
+    void at_xCenterSlider_valueChanged(int value);
+    void at_yCenterSlider_valueChanged(int value);
+    void at_radiusSlider_valueChanged(int value);
+private:
+    void updateManualMode();
 
 private:
     QScopedPointer<Ui::QnFisheyeCalibrationWidget> ui;
-
-    QImage m_image;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
+    QnImageProvider* m_imageProvider;
+
+    bool m_manualMode;
+
 };
 
 #endif // FISHEYE_CALIBRATION_WIDGET_H
