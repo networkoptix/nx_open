@@ -39,10 +39,12 @@ QnFisheyeCalibrator::~QnFisheyeCalibrator()
 }
 
 void QnFisheyeCalibrator::setCenter(const QPointF &center) {
-    if (qFuzzyEquals(m_center, center))
+    QPointF fixed(qBound(0.0, center.x(), 1.0), qBound(0.0, center.y(), 1.0));
+
+    if (qFuzzyEquals(m_center, fixed))
         return;
-    m_center = center;
-    emit centerChanged(center);
+    m_center = fixed;
+    emit centerChanged(fixed);
 }
 
 QPointF QnFisheyeCalibrator::center() const {
@@ -50,10 +52,11 @@ QPointF QnFisheyeCalibrator::center() const {
 }
 
 void QnFisheyeCalibrator::setRadius(qreal radius) {
-    if (qFuzzyEquals(m_radius, radius))
+    qreal fixed = qBound(0.25, radius, 0.75);
+    if (qFuzzyEquals(m_radius, fixed))
         return;
-    m_radius = radius;
-    emit radiusChanged(radius);
+    m_radius = fixed;
+    emit radiusChanged(fixed);
 }
 
 qreal QnFisheyeCalibrator::radius() const {

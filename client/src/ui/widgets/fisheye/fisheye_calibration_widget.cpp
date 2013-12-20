@@ -92,10 +92,16 @@ void QnFisheyeCalibrationWidget::updateManualMode() {
     ui->yCenterSlider->setVisible(m_manualMode);
     ui->radiusSlider->setVisible(m_manualMode);
 
-    if (m_manualMode)
+    if (m_manualMode) {
         ui->manualButton->setText(tr("Manual Calibration: On"));
-    else
+        connect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::centerModified, this, &QnFisheyeCalibrationWidget::setCenter);
+        connect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::radiusModified, this, &QnFisheyeCalibrationWidget::setRadius);
+    }
+    else {
         ui->manualButton->setText(tr("Manual Calibration: Off"));
+        disconnect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::centerModified, this, &QnFisheyeCalibrationWidget::setCenter);
+        disconnect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::radiusModified, this, &QnFisheyeCalibrationWidget::setRadius);
+    }
 }
 
 void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {

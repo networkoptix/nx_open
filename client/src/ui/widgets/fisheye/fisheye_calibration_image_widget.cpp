@@ -1,8 +1,11 @@
 #include "fisheye_calibration_image_widget.h"
 
-#include <QtCore/QEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QWheelEvent>
 #include <QtGui/QPainter>
 
+#include <ui/processors/drag_info.h>
+#include <ui/processors/drag_processor.h>
 #include <ui/style/globals.h>
 
 #include <utils/common/scoped_painter_rollback.h>
@@ -12,12 +15,15 @@
 
 QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent) :
     QWidget(parent),
+    m_dragProcessor(new DragProcessor(this)),
     m_frameColor(Qt::lightGray),
     m_lineColor(qnGlobals->ptzColor()),
     m_center(0.5, 0.5),
     m_radius(0.5),
     m_lineWidth(4)
 {
+    m_dragProcessor->setHandler(this);
+    setMouseTracking(true);
 }
 
 QnFisheyeCalibrationImageWidget::~QnFisheyeCalibrationImageWidget() {
@@ -87,6 +93,39 @@ void QnFisheyeCalibrationImageWidget::setLineWidth(int width) {
     repaint();
 }
 
+
+void QnFisheyeCalibrationImageWidget::mousePressEvent(QMouseEvent *event) {
+    base_type::mousePressEvent(event);
+    m_dragProcessor->widgetMousePressEvent(this, event);
+}
+
+void QnFisheyeCalibrationImageWidget::mouseMoveEvent(QMouseEvent *event) {
+    base_type::mouseMoveEvent(event);
+    m_dragProcessor->widgetMouseMoveEvent(this, event);
+}
+
+void QnFisheyeCalibrationImageWidget::mouseReleaseEvent(QMouseEvent *event) {
+    base_type::mouseReleaseEvent(event);
+    m_dragProcessor->widgetMouseReleaseEvent(this, event);
+}
+
+void QnFisheyeCalibrationImageWidget::wheelEvent(QWheelEvent *event) {
+    qreal radius = m_radius;
+    radius += 0.01 / 120 * (event->angleDelta().y());   // one wheel point is about 15 degrees, angleDelta is returned as eighths of a degree
+    emit radiusModified(radius);
+}
+
+void QnFisheyeCalibrationImageWidget::dragMove(DragInfo *info) {
+    if (m_cachedImage.isNull())
+        return;
+
+    qreal xOffset = (qreal)(info->mouseScreenPos().x() - info->lastMouseScreenPos().x()) / m_cachedImage.width();
+    qreal yOffset = (qreal)(info->mouseScreenPos().y() - info->lastMouseScreenPos().y()) / m_cachedImage.height();
+
+    QPointF newCenter(m_center.x() + xOffset, m_center.y() + yOffset);
+    emit centerModified(newCenter);
+}
+
 void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
     if (m_image.isNull())
         return;
@@ -96,13 +135,17 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
     int halfLineWidth = m_lineWidth / 2;
     QRect targetRect = event->rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
 
+    if (targetRect != m_cachedRect) {
+        m_cachedRect = targetRect;
+        m_cachedImage = m_image.scaled(targetRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+
     /* Update target rect to be in the center of the source rect and match the image size */
-    QImage targetImage = m_image.scaled(targetRect.size(), Qt::KeepAspectRatio, Qt::FastTransformation);
-    targetRect.setSize(targetImage.size());
+    targetRect.setSize(m_cachedImage.size());
     targetRect.moveLeft( (event->rect().width() - targetRect.width()) / 2 );
     targetRect.moveTop( (event->rect().height() - targetRect.height()) / 2 );
 
-    painter->drawImage(targetRect, m_image);
+    painter->drawImage(targetRect, m_cachedImage);
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
 
