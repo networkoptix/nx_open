@@ -26,6 +26,9 @@ public:
     QPointF center() const;
     qreal radius() const;
 
+signals:
+    void dataChanged();
+
 public slots:
     void setImageProvider(QnImageProvider *provider);
 

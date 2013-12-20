@@ -33,6 +33,9 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
     connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
 
+    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
+
     updateManualMode();
 }
 

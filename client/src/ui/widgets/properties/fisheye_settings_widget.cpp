@@ -27,6 +27,7 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
     connect(ui->viewDownButton,         SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
     connect(ui->viewUpButton,           SIGNAL(clicked(bool)),          this, SLOT(at_dataChanged()));
 
+    connect(ui->calibrateWidget,        &QnFisheyeCalibrationWidget::dataChanged,   this, &QnFisheyeSettingsWidget::at_dataChanged);
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget() {
@@ -36,9 +37,9 @@ void QnFisheyeSettingsWidget::updateFromResource(const QnResourcePtr &resource) 
     QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
     if (!media)
         return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     QnMediaDewarpingParams params = media->getDewarpingParams();
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     switch (params.viewMode) {
         case QnMediaDewarpingParams::Horizontal:
             ui->horizontalRadioButton->setChecked(true);

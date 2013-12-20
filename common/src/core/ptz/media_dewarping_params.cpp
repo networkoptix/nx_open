@@ -5,7 +5,7 @@
 #include <utils/common/json.h>
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams::ViewMode, static)
-QN_DEFINE_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq),    (enabled)(viewMode)(fovRot))
+QN_DEFINE_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))
 
 QnMediaDewarpingParams QnMediaDewarpingParams::deserialized(const QByteArray &data) {
     if(data.startsWith('0') || data.startsWith('1')) {
