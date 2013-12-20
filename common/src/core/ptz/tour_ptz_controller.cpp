@@ -35,7 +35,7 @@ public:
         /* Default implementation is OK, but we want to see this function on 
          * the stack when debugging. */
         return base_type::run(); 
-        //DOES NOT STOPS ON CLIENT EXIT --gdm
+        //DOES NOT STOP ON CLIENT EXIT --gdm
         //TODO: #Elric fix ASAP
     }
 };
