@@ -58,36 +58,39 @@ void QnOnvifPtzController::initCoefficients() {
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
-    if (ptz.doGetConfigurations(request, response) != SOAP_OK || response.PTZConfiguration.size() > 0) {
-        //qCritical() << "!!!";
-    }
+    if (ptz.doGetConfigurations(request, response) != SOAP_OK)
+        return;
+    if(response.PTZConfiguration.empty())
+        return;
 
     _onvifPtz__GetNode nodeRequest;
     _onvifPtz__GetNodeResponse nodeResponse;
-    nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken; //m_resource->getPtzConfigurationToken().toStdString(); // response.PTZConfiguration[0]->NodeToken;
+    nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken;
 
-    if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK) {
-        if (nodeResponse.PTZNode) {
-            onvifXsd__PTZNode* ptzNode = nodeResponse.PTZNode;
-            if (ptzNode[0].SupportedPTZSpaces) {
-                onvifXsd__PTZSpaces* spaces = ptzNode[0].SupportedPTZSpaces;
-                if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
-                    if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
-                        m_xNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
-                        m_xNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
-                    }
-                    if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
-                        m_yNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
-                        m_yNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
-                    }
-                }
-                if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
-                    if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
-                        m_zoomNativeVelocityCoeff.first = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
-                        m_zoomNativeVelocityCoeff.second = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
-                    }
-                }
-            }
+    if (ptz.doGetNode(nodeRequest, nodeResponse) != SOAP_OK)
+        return;
+
+    onvifXsd__PTZNode *ptzNode = nodeResponse.PTZNode;
+    if (!ptzNode) 
+        return;
+    onvifXsd__PTZSpaces *spaces = ptzNode->SupportedPTZSpaces;
+    if (!spaces)
+        return;
+        
+    if (spaces->ContinuousPanTiltVelocitySpace.size() > 0 && spaces->ContinuousPanTiltVelocitySpace[0]) {
+        if (spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
+            m_xNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Max;
+            m_xNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->XRange->Min;
+        }
+        if (spaces->ContinuousPanTiltVelocitySpace[0]->YRange) {
+            m_yNativeVelocityCoeff.first = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Max;
+            m_yNativeVelocityCoeff.second = spaces->ContinuousPanTiltVelocitySpace[0]->YRange->Min;
+        }
+    }
+    if (spaces->ContinuousZoomVelocitySpace.size() > 0 && spaces->ContinuousZoomVelocitySpace[0]) {
+        if (spaces->ContinuousZoomVelocitySpace[0]->XRange) {
+            m_zoomNativeVelocityCoeff.first = spaces->ContinuousZoomVelocitySpace[0]->XRange->Max;
+            m_zoomNativeVelocityCoeff.second = spaces->ContinuousZoomVelocitySpace[0]->XRange->Min;
         }
     }
 }
