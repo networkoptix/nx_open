@@ -18,10 +18,9 @@ class StatisticsOverlayWidget;
 class QnGlFunctions;
 
 
-class QnServerResourceWidget: public Animated<QnResourceWidget>, AnimationTimerListener {
+class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerListener {
     Q_OBJECT
-
-    typedef Animated<QnResourceWidget> base_type;
+    typedef QnResourceWidget base_type;
 
 public:
     static const Button PingButton = static_cast<Button>(0x08);

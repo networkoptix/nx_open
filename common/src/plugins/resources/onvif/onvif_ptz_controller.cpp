@@ -29,6 +29,8 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_limits.maxFov = 1.0;
 
     m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
+    if(m_resource->getPtzfUrl().isEmpty())
+        m_capabilities = Qn::NoPtzCapabilities;
 
     QnResourceData resourceData = qnCommon->dataPool()->data(resource);
     

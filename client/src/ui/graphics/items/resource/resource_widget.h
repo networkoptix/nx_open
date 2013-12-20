@@ -13,6 +13,7 @@
 #include <ui/common/fixed_rotation.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/help_topic_queryable.h>
+#include <ui/animation/animated.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -29,7 +30,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Animated<Instrumented<GraphicsWidget> > >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -40,7 +41,7 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Shaded<Instrumented<GraphicsWidget> > base_type;
+    typedef Shaded<Animated<Instrumented<GraphicsWidget> > > base_type;
 
 public:
     enum Option {
