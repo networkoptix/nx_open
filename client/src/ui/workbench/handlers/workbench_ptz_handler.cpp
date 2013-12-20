@@ -98,7 +98,7 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->camera() || id.isEmpty())
         return;
 
-    if (widget->ptzController()->hasCapabilities(Qn::PresetsPtzCapability)) {
+    if (!widget->ptzController()->hasCapabilities(Qn::PresetsPtzCapability)) {
         //TODO: #GDM PTZ show appropriate error message?
         return;
     }
