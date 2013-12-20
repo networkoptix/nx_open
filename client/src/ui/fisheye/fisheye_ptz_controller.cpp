@@ -97,12 +97,11 @@ void QnFisheyePtzController::updateMediaDewarpingParams() {
 
     updateLimits();
     updateCapabilities();
+    m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
 void QnFisheyePtzController::updateItemDewarpingParams() {
     m_itemDewarpingParams = m_widget->item()->dewarpingParams();
-
-    updateLimits();
 }
 
 QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
@@ -245,6 +244,7 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
     m_itemDewarpingParams.xAngle = qDegreesToRadians(position.x());
     m_itemDewarpingParams.yAngle = qDegreesToRadians(position.y());
     m_itemDewarpingParams.fov = qDegreesToRadians(position.z());
+    m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
 

@@ -978,7 +978,8 @@ void QnMediaResourceWidget::updateFisheye() {
 
     setOption(ControlPtz, fisheyeEnabled);
     setOption(DisplayCrosshair, fisheyeEnabled);
-    buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
+    if (fisheyeEnabled)
+        buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
     if(enabled)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
 
