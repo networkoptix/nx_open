@@ -16,6 +16,9 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/preset_ptz_controller.h>
+#include <core/ptz/tour_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -49,7 +52,6 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
-#include "core/ptz/ptz_controller_pool.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -77,11 +79,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
-    connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
-    connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
-    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
-    connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
+    connect(m_renderer,                 &QnResourceWidgetRenderer::sourceSizeChanged,   this, &QnMediaResourceWidget::updateAspectRatio);
+    connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
+    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
+    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
+    connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
     updateDisplay();
 
     /* Set up static text. */
@@ -92,8 +94,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up PTZ controller. */
     m_ptzController = qnPtzPool->controller(m_camera);
-    if(!m_ptzController)
+    if(!m_ptzController) {
         m_ptzController.reset(new QnFisheyePtzController(this));
+        m_ptzController.reset(new QnPresetPtzController(m_ptzController));
+        m_ptzController.reset(new QnTourPtzController(m_ptzController));
+    }
     connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
 
     /* Set up info updates. */
@@ -204,10 +209,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
-}
-
-QnVirtualCameraResourcePtr QnMediaResourceWidget::camera() const {
-    return m_camera;
 }
 
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {

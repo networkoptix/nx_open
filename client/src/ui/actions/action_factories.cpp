@@ -68,15 +68,15 @@ QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParamete
     QList<QAction *> result;
     QnPtzPresetList presets;
 
-    QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
-    if (!widget || !widget->camera() || !widget->ptzController() || !widget->ptzController()->getPresets(&presets))
+    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    if (!widget || !widget->ptzController() || !widget->ptzController()->getPresets(&presets))
         return result;
 
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
 
-    QnPtzHotkeyKvPairAdapter adapter(widget->camera());
+    QnPtzHotkeyKvPairAdapter adapter(widget->resource()->toResourcePtr());
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
@@ -113,7 +113,7 @@ QList<QAction *> QnPtzStartTourActionFactory::newActions(const QnActionParameter
     QnPtzTourList tours;
 
     QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
-    if (!widget || !widget->camera() || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
+    if (!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
         return result;
 
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {

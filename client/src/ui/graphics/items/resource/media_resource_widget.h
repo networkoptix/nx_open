@@ -46,11 +46,6 @@ public:
     QnMediaResourcePtr resource() const;
 
     /**
-     * \returns                         Camera associated with this widget (if any).
-     */
-    QnVirtualCameraResourcePtr camera() const;
-
-    /**
      * \returns                         Display associated with this widget.
      */
     QnResourceDisplayPtr display() const {

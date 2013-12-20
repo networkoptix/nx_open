@@ -54,7 +54,6 @@ private:
     void absoluteMoveInternal(const QVector3D &position);
 
 private:
-    QnMediaResourcePtr m_resource;
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Qn::PtzCapabilities m_capabilities;

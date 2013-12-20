@@ -764,12 +764,12 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_8:
     case Qt::Key_9: {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-        if(!widget || !widget->ptzController() || !widget->camera())
+        if(!widget || !widget->ptzController())
             break;
 
         int hotkey = e->key() - Qt::Key_0;
 
-        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->camera(), hotkey);
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->resource()->toResourcePtr(), hotkey);
         if (presetId.isEmpty())
             break;
 

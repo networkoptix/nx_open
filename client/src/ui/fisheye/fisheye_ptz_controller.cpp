@@ -21,18 +21,15 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_animating(false)
 {
     m_widget = widget;
-
-    m_resource = widget->resource();
-
+    
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
 
     m_timer.start();
 
-    connect(m_widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateAspectRatio()));
-    connect(m_widget->item(),       &QnWorkbenchItem::dewarpingParamsChanged,               this, &QnFisheyePtzController::updateItemDewarpingParams);
-    if (m_widget->camera())
-        connect(m_widget->camera(), &QnVirtualCameraResource::mediaDewarpingParamsChanged,  this, &QnFisheyePtzController::updateMediaDewarpingParams);
+    connect(m_widget,           &QnResourceWidget::aspectRatioChanged,      this, &QnFisheyePtzController::updateAspectRatio);
+    connect(resource(),         &QnResource::mediaDewarpingParamsChanged,   this, &QnFisheyePtzController::updateMediaDewarpingParams);
+    connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,   this, &QnFisheyePtzController::updateItemDewarpingParams);
 
     updateAspectRatio();
     updateItemDewarpingParams();
