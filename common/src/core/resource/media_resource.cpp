@@ -148,7 +148,7 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
     {
         QnMediaDewarpingParams params;
         params.enabled = true;
-        params.viewMode = QnMediaDewarpingParams::VerticalUp;
+        params.viewMode = QnMediaDewarpingParams::Horizontal;
         return params;
     }
     else 
