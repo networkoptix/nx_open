@@ -28,11 +28,18 @@ public:
     }
 
     friend bool operator==(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
+    friend QDebug &operator<<(QDebug &stream, const QnMediaDewarpingParams &params);
 
     /**
      * Compatibility function to support reading data from previous software version.
      */
     static QnMediaDewarpingParams deserialized(const QByteArray &data);
+
+    /** List of all possible panoFactor values for the resource with this dewarping parameters. */
+    const QList<int>& allowedPanoFactorValues() const;
+
+    /** List of all possible panoFactor values for the selected view mode. */
+    static const QList<int>& allowedPanoFactorValues(ViewMode mode);
 public:
     /** Whether dewarping is currently enabled. */
     bool enabled;

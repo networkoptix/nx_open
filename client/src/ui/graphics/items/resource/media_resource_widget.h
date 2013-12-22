@@ -117,6 +117,7 @@ public:
 signals:
     void motionSelectionChanged();
     void displayChanged();
+    void fisheyeChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;

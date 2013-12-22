@@ -63,20 +63,6 @@ namespace {
 
     const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
 
-    static const int panoLow      = 1;
-    static const int panoNormal   = 2;
-    static const int panoWide     = 4;
-
-    static const QList<int> horizontalPano(QList<int>()
-                                           << panoLow
-                                           << panoNormal
-                                           );
-
-    static const QList<int> verticalPano(QList<int>()
-                                         << panoLow
-                                         << panoNormal
-                                         << panoWide
-                                         );
 }
 
 
@@ -759,6 +745,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
         if(widget->resource()) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
+            connect(widget, SIGNAL(fisheyeChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
             // TODO: #5.2 remove executor, use context in QObject::connect
@@ -1061,9 +1048,7 @@ void PtzInstrument::at_modeButton_clicked() {
         QnItemDewarpingParams iparams = widget->item()->dewarpingParams();
         QnMediaDewarpingParams mparams = widget->resource()->getDewarpingParams();
 
-        QList<int> allowed = (mparams.viewMode == QnMediaDewarpingParams::Horizontal)
-                ? horizontalPano
-                : verticalPano;
+        const QList<int> allowed = mparams.allowedPanoFactorValues();
 
         int idx = (allowed.indexOf(iparams.panoFactor) + 1) % allowed.size();
         iparams.panoFactor = allowed[idx];

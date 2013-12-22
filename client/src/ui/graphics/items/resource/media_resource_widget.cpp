@@ -875,8 +875,9 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
-        sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
+    if (!sourceSize.isEmpty())
+        if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
+            sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     QString resourceId;
     if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
@@ -988,14 +989,15 @@ void QnMediaResourceWidget::updateFisheye() {
     bool flip = fisheyeEnabled
             && m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown;
 
-    //hack due to roma's strange architect --gdm
-    if (m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::Horizontal && itemParams.panoFactor == 4) {
-        itemParams.panoFactor = 2;  //TODO: #GDM PTZ fix asap
+    const QList<int> allowedPanoFactorValues = m_resource->getDewarpingParams().allowedPanoFactorValues();
+    if (!allowedPanoFactorValues.contains(itemParams.panoFactor)) {
+        itemParams.panoFactor = allowedPanoFactorValues.last();
         item()->setDewarpingParams(itemParams);
+        emit fisheyeChanged();
     }
     item()->setData(Qn::ItemFlipRole, flip);
 
-    emit optionsChanged(); //hack to force updating overlay widget --gdm
+    updateAspectRatio();
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
