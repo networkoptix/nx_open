@@ -40,6 +40,8 @@ public:
     int     lineWidth() const;
     Q_SLOT  void setLineWidth(int width);
 
+    void    beginSearchAnimation();
+    void    endSearchAnimation();
 signals:
     void centerModified(const QPointF &center);
     void radiusModified(qreal radius);
@@ -55,9 +57,26 @@ protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 
 private:
+    void paintCircle(QPainter* painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius, bool paintCenter = false);
+
     DragProcessor *m_dragProcessor;
     QImage  m_cachedImage;
     QRect   m_cachedRect;
+
+    enum AnimationStage {
+        Idle,
+        Searching,
+        Radius,
+        Center
+    };
+
+    struct {
+        AnimationStage stage;
+        QPointF center;
+        qreal radius;
+        QList<qreal> waves;
+        qint64 timestamp;
+    } m_animation;
 
     QImage  m_image;
     QColor  m_frameColor;

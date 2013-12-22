@@ -1,5 +1,8 @@
 #include "fisheye_calibration_image_widget.h"
 
+#include <QtCore/QDateTime>
+#include <QtCore/QTimer>
+
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>
 #include <QtGui/QPainter>
@@ -24,6 +27,8 @@ QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent
 {
     m_dragProcessor->setHandler(this);
     setMouseTracking(true);
+
+    m_animation.stage = Idle;
 }
 
 QnFisheyeCalibrationImageWidget::~QnFisheyeCalibrationImageWidget() {
@@ -94,6 +99,56 @@ void QnFisheyeCalibrationImageWidget::setLineWidth(int width) {
 }
 
 
+void QnFisheyeCalibrationImageWidget::beginSearchAnimation() {
+    m_animation.stage = Searching;
+    m_animation.timestamp = QDateTime::currentMSecsSinceEpoch();
+//    m_animation.center = m_ce
+}
+
+void QnFisheyeCalibrationImageWidget::endSearchAnimation() {
+    m_animation.stage = Idle;
+}
+
+void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius, bool paintCenter) {
+    if (qFuzzyIsNull(relativeRadius))
+        return;
+
+    int halfLineWidth = m_lineWidth / 2;
+    qreal radius = relativeRadius * targetRect.width();
+    QPointF center(relativeCenter.x() * targetRect.width(), relativeCenter.y() * targetRect.height());
+    center += targetRect.topLeft();
+
+    {   /* Drawing circles */
+        QPen pen;
+        pen.setWidth(m_lineWidth);
+        pen.setColor(m_lineColor);
+        QnScopedPainterPenRollback penRollback(painter, pen);
+        Q_UNUSED(penRollback)
+
+        QColor brushColor1(toTransparent(m_lineColor, 0.6));
+        QColor brushColor2(toTransparent(m_lineColor, 0.3));
+        QRadialGradient gradient(center * 0.66, radius);
+        gradient.setColorAt(0, brushColor1);
+        gradient.setColorAt(1, brushColor2);
+        QBrush brush(gradient);
+
+        QnScopedPainterBrushRollback brushRollback(painter, brush);
+        Q_UNUSED(brushRollback)
+
+        QPainterPath path;
+        path.addEllipse(center, radius, radius);
+        if (paintCenter)
+            path.addEllipse(center, m_lineWidth, m_lineWidth);
+
+        /* Adjust again to not draw over frame */
+        painter->setClipRect(targetRect.adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth));
+        painter->drawPath(path);
+        painter->setClipping(false);
+    }
+}
+
+/* Handlers */
+
 void QnFisheyeCalibrationImageWidget::mousePressEvent(QMouseEvent *event) {
     base_type::mousePressEvent(event);
     m_dragProcessor->widgetMousePressEvent(this, event);
@@ -162,37 +217,41 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
         painter->drawRect(targetRect);
     }
 
-    if (qFuzzyIsNull(m_radius))
-        return;
+    switch (m_animation.stage) {
+    case Idle:
+        paintCircle(painter.data(), targetRect, m_center, m_radius, true);
+        break;
+    case Searching:
+        const qreal speed = 0.5;
+        const qreal space = 0.3;
 
-    qreal radius = m_radius * targetRect.width();
-    QPointF center(m_center.x() * targetRect.width(), m_center.y() * targetRect.height());
-    center += targetRect.topLeft();
+        qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+        qint64 elapsed = timestamp - m_animation.timestamp;
+        qreal step = (speed * elapsed / 1e-3);
 
-    {   /* Drawing circles */
-        QPen pen;
-        pen.setWidth(m_lineWidth);
-        pen.setColor(m_lineColor);
-        QnScopedPainterPenRollback penRollback(painter.data(), pen);
-        Q_UNUSED(penRollback)
+        qreal outerWave = 0;
+        QList<qreal> waves;
+        foreach (qreal prevRadius, m_animation.waves) {
+            qreal newRadius = prevRadius - step;
+            if (newRadius > 0) {
+                waves << newRadius;
+                outerWave = newRadius;
+            }
+        }
 
-        QColor brushColor1(toTransparent(m_lineColor, 0.6));
-        QColor brushColor2(toTransparent(m_lineColor, 0.3));
-        QRadialGradient gradient(center * 0.66, radius);
-        gradient.setColorAt(0, brushColor1);
-        gradient.setColorAt(1, brushColor2);
-        QBrush brush(gradient);
+        qreal nextWave = outerWave + space;
+        while (nextWave < 1.0) {
+            waves << nextWave;
+            nextWave += space;
+        }
+        m_animation.waves = waves;
+        foreach (qreal radius, m_animation.waves)
+            paintCircle(painter.data(), targetRect, QPointF(0.5, 0.5), radius);
 
-        QnScopedPainterBrushRollback brushRollback(painter.data(), brush);
-        Q_UNUSED(brushRollback)
-
-        QPainterPath path;
-        path.addEllipse(center, radius, radius);
-        path.addEllipse(center, m_lineWidth, m_lineWidth);
-
-        /* Adjust again to not draw over frame */
-        painter->setClipRect(targetRect.adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth));
-        painter->drawPath(path);
-        painter->setClipping(false);
+        m_animation.timestamp = timestamp;
+        QTimer::singleShot(16, Qt::PreciseTimer, this, SLOT(repaint()));
+        break;
     }
+
+
 }

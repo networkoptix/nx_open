@@ -3,6 +3,7 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
+#include <QtWidgets/QMessageBox>
 
 #include <ui/fisheye/fisheye_calibrator.h>
 #include <ui/widgets/fisheye/fisheye_calibration_image_widget.h>
@@ -105,13 +106,27 @@ void QnFisheyeCalibrationWidget::updateManualMode() {
 }
 
 void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
-    //TODO: #GDM PTZ handle errorCode
-    qDebug() << "calibrated, err code" << errorCode;
-    ui->imageWidget->repaint();
+    ui->imageWidget->endSearchAnimation();
+    ui->autoButton->setEnabled(true);
+
+    //TODO: #Elric review these text pls.
+    switch (errorCode) {
+    case QnFisheyeCalibrator::ErrorNotFisheyeImage:
+        QMessageBox::warning(this, tr("Error"), tr("Auto-detection failed. Image is not round."));
+        break;
+    case QnFisheyeCalibrator::ErrorTooLowLight:
+        QMessageBox::warning(this, tr("Error"), tr("Auto-detection failed. Possibly, image is too dim. Try to increase light level."));
+        break;
+    default:
+        break;
+    }
+//    ui->imageWidget->repaint();
 }
 
 
 void QnFisheyeCalibrationWidget::at_autoButton_clicked() {
+    ui->imageWidget->beginSearchAnimation();
+    ui->autoButton->setEnabled(false);
     m_calibrator->analyseFrameAsync(ui->imageWidget->image());
 }
 
