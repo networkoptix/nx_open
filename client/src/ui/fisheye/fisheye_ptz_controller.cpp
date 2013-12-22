@@ -56,12 +56,35 @@ void QnFisheyePtzController::updateLimits() {
     m_limits.minFov = 20.0;
     m_limits.maxFov = 90.0 * m_itemDewarpingParams.panoFactor;
 
+    qreal imageAR = m_aspectRatio / (qreal) m_itemDewarpingParams.panoFactor;
+    qreal radiusY = m_mediaDewarpingParams.radius * imageAR;
+    
+    qreal minY = m_mediaDewarpingParams.yCenter - radiusY;
+    qreal maxY = m_mediaDewarpingParams.yCenter + radiusY;
+
+    qreal minX = m_mediaDewarpingParams.xCenter - m_mediaDewarpingParams.radius;
+    qreal maxX = m_mediaDewarpingParams.xCenter + m_mediaDewarpingParams.radius;
+
     if(m_mediaDewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal) {
         m_unlimitedPan = false;
         m_limits.minPan = -90.0;
         m_limits.maxPan = 90.0;
+        
         m_limits.minTilt = -90.0;
         m_limits.maxTilt = 90.0;
+
+        // If circle edge is out of picture, reduce maxumum angle
+        if (maxY > 1.0)
+            m_limits.minTilt += (maxY - 1.0) * 180.0;
+        if (minY < 0.0)
+            m_limits.maxTilt += minY * 180.0;
+        /*
+        // not tested yet. Also, I am not sure that it need for real cameras
+        if (maxX > 1.0)
+            m_limits.maxPan -= (maxX - 1.0) * 180.0;
+        if (minX < 0.0)
+            m_limits.minPan -= minX * 180.0;
+        */
     } else {
         m_unlimitedPan = true;
         m_limits.minPan = 0.0;
