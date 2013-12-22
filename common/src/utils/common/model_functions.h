@@ -131,7 +131,7 @@ __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         
  */
 #define QN_DEFINE_STRUCT_DEBUG_STREAM_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
 __VA_ARGS__ QDebug &operator<<(QDebug &stream, const TYPE &value) {   \
-    return stream.nospace() << BOOST_PP_STRINGIZE(TYPE) \
+    return stream.space() << BOOST_PP_STRINGIZE(TYPE) \
             BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DEBUG_STREAM_STEP_I, <<, FIELD_SEQ); \
 }
 
