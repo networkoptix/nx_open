@@ -108,9 +108,9 @@ void QnFisheyePtzController::updateItemDewarpingParams() {
     m_itemDewarpingParams = m_widget->item()->dewarpingParams();
     int newPanoFactor = m_itemDewarpingParams.panoFactor;
     if (newPanoFactor != oldPanoFactor) {
-        updateLimits();
         if (newPanoFactor > oldPanoFactor)
             m_itemDewarpingParams.fov *= newPanoFactor / oldPanoFactor;
+        updateLimits();
     }
 }
 
