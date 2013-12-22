@@ -104,7 +104,14 @@ void QnFisheyePtzController::updateMediaDewarpingParams() {
 }
 
 void QnFisheyePtzController::updateItemDewarpingParams() {
+    int oldPanoFactor = m_itemDewarpingParams. panoFactor;
     m_itemDewarpingParams = m_widget->item()->dewarpingParams();
+    int newPanoFactor = m_itemDewarpingParams.panoFactor;
+    if (newPanoFactor != oldPanoFactor) {
+        updateLimits();
+        if (newPanoFactor > oldPanoFactor)
+            m_itemDewarpingParams.fov *= newPanoFactor / oldPanoFactor;
+    }
 }
 
 QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
