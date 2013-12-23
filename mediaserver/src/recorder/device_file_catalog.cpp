@@ -318,6 +318,12 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
         qint64 startTimeMs = avi->startTime()/1000;
         qint64 endTimeMs = avi->endTime()/1000;
         int fileIndex = QnFile::baseName(fileName).toInt();
+
+        if (startTimeMs < 1 || endTimeMs - startTimeMs < 1) {
+            delete avi;
+            return chunk;
+        }
+
         chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
     }
     delete avi;
@@ -337,7 +343,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
         else {
             Chunk chunk = chunkFromFile(storage, fi.absoluteFilePath());
             
-            if (chunk.durationMs > 0) {
+            if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
                 if (itr != allChunks.begin())
                 {
