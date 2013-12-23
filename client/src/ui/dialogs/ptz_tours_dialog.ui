@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnPtzToursDialog</class>
- <widget class="QDialog" name="QnPtzToursDialog">
+ <class>PtzToursDialog</class>
+ <widget class="QDialog" name="PtzToursDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -96,7 +96,7 @@
         <item>
          <widget class="QStackedWidget" name="stackedWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tourPage">
            <layout class="QVBoxLayout" name="verticalLayout_2">

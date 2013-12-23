@@ -6,7 +6,7 @@
 #include <ui/dialogs/abstract_ptz_dialog.h>
 
 namespace Ui {
-class QnPtzToursDialog;
+    class PtzToursDialog;
 }
 
 class QnPtzTourListModel;
@@ -30,7 +30,7 @@ private slots:
     void at_deleteTourButton_clicked();
 
 private:
-    QScopedPointer<Ui::QnPtzToursDialog> ui;
+    QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
     QnPtzTourList m_oldTours;
 };

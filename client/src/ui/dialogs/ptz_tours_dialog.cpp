@@ -14,7 +14,7 @@
 
 QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnPtzToursDialog),
+    ui(new Ui::PtzToursDialog),
     m_model(new QnPtzTourListModel(this))
 {
     ui->setupUi(this);
