@@ -32,7 +32,6 @@
 
 #include <camera/camera_pool.h>
 
-#include <common/customization.h>
 #include <common/global_settings.h>
 
 #include <core/misc/schedule_task.h>

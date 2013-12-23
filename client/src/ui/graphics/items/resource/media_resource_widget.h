@@ -100,9 +100,6 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-//    QnItemDewarpingParams itemDewarpingParams() const;
-//    void setItemDewarpingParams(const QnItemDewarpingParams &itemDewarpingParams);
-
     /**
      * This function returns a PTZ controller associated with this widget.
      * Note that this function never returns NULL. Also note that several
