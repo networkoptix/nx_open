@@ -1,6 +1,7 @@
 import os, sys, posixpath
 sys.path.insert(0, '${basedir}/../common')
 #sys.path.insert(0, os.path.join('..', '..', 'common'))
+from os import listdir
 
 from gencomp import gencomp_cpp
 #os.makedirs('${project.build.directory}/build/release/generated/')
@@ -49,7 +50,7 @@ def genqrc(qrcname, qrcprefix, path, extensions, exclusion, additions=''):
 
 
 if __name__ == '__main__':
-  os.system('mkdir build')
+    os.system('mkdir build')
     if not os.path.exists(translations_target_dir):
         os.makedirs(translations_target_dir) 
 
@@ -62,9 +63,8 @@ if __name__ == '__main__':
                     else:
 	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-  genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${basedir}/translations', ['.qm'],'.ts')  
-  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'],'.psd')
-  genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''],'.psd')
-  genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''],'.pdb')
-  genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''],'.pdb')  
-  
+    genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${project.build.directory}/resources/translations', ['.qm'],'.ts')  
+    genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'],'.psd')
+    genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''],'.psd')
+    genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''],'.pdb')
+    genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''],'.pdb')  

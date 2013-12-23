@@ -180,6 +180,7 @@
                 <compiler>msvc2008</compiler>
                 <arch>x86</arch>
                 <platform>windows</platform>
+                <qt.dir>${env.ENVIRONMENT}/qt</qt.dir>
             </properties>
             <build>
                 <plugins>
