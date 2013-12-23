@@ -16,6 +16,8 @@
 #include <QtCore/QDebug>
 #include "recording_manager.h"
 #include "serverutil.h"
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource/resource.h"
 
 DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
 
@@ -330,7 +332,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
     return chunk;
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks)
+void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
 {
     QDir dir(folder);
     foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
@@ -339,7 +341,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
             return; // cancceled
 
         if (fi.isDir())
-            scanMediaFiles(fi.absoluteFilePath(), storage, allChunks);
+            scanMediaFiles(fi.absoluteFilePath(), storage, allChunks, emptyFileList);
         else {
             Chunk chunk = chunkFromFile(storage, fi.absoluteFilePath());
             
@@ -358,17 +360,18 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
 
             }
             else {
-                qnFileDeletor->deleteFile(fi.absoluteFilePath());
+                //qnFileDeletor->deleteFile(fi.absoluteFilePath());
+                emptyFileList << fi.absoluteFilePath();
             }
         }
 
     }
 }
 
-void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks)
+void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
 {
     QString rootFolder = closeDirPath(storage->getUrl()) + prefixForRole(role) + QString('/') + m_macAddress;
-    scanMediaFiles(rootFolder, storage, allChunks);
+    scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
 bool DeviceFileCatalog::doRebuildArchive()
@@ -383,7 +386,18 @@ bool DeviceFileCatalog::doRebuildArchive()
         if (m_rebuildArchive == Rebuild_None) {
             return false;
         }
-        readStorageData(storage, m_role, allChunks);
+        QStringList emptyFileList;
+        readStorageData(storage, m_role, allChunks, emptyFileList);
+
+        int lastIndex = emptyFileList.size();
+        QnResourcePtr res = qnResPool->getResourceByUniqId(m_macAddress);
+        if (res && res->getStatus() == QnResource::Recording)
+            lastIndex--; // do not delete last empty file because of it can be written 
+        for (int i = 0; i < lastIndex; ++i)
+        {
+            qnFileDeletor->deleteFile(emptyFileList[i]);
+        }
+        
     }
 
     /*
@@ -561,6 +575,29 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
         str << chunk.durationMs  << '\n';
     m_lastRecordRecording = chunk.durationMs < 0;
     str.flush();
+}
+
+qint64 DeviceFileCatalog::getLatRecordingTime() const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_lastAddIndex >= 0)
+        return m_chunks[m_lastAddIndex].startTimeMs;
+    return -1;
+}
+
+void DeviceFileCatalog::setLatRecordingTime(qint64 value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_lastAddIndex = -1;
+    m_lastRecordRecording = false;
+    for (int i = 0; i < m_chunks.size(); ++i)
+    {
+        if (m_chunks[i].startTimeMs == value) {
+            m_lastAddIndex = i;
+            m_lastRecordRecording = true;
+            break;
+        }
+    }
 }
 
 void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
