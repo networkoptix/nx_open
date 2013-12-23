@@ -22,37 +22,49 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     m_calibrator(new QnFisheyeCalibrator()),
     m_imageProvider(NULL),
     m_updateTimer(new QTimer(this)),
-    m_manualMode(false),
-    m_updating(false)
+    m_updating(false),
+    m_lastError(QnFisheyeCalibrator::NoError)
 {
     ui->setupUi(this);
     m_updateTimer->setInterval(refreshInterval);
 
-    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
-    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
-    connect(m_calibrator, &QnFisheyeCalibrator::finished,       this,   &QnFisheyeCalibrationWidget::at_calibrator_finished);
+    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
+    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
+    connect(m_calibrator,       &QnFisheyeCalibrator::finished,       this,   &QnFisheyeCalibrationWidget::at_calibrator_finished);
 
     connect(ui->autoButton,     &QPushButton::clicked,  this, &QnFisheyeCalibrationWidget::at_autoButton_clicked);
-    connect(ui->manualButton,   &QPushButton::clicked,  this, &QnFisheyeCalibrationWidget::at_manualButton_clicked);
 
     connect(ui->xCenterSlider,  &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged);
     connect(ui->yCenterSlider,  &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged);
     connect(ui->radiusSlider,   &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged);
-    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
-    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
 
-    connect(m_calibrator, &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
-    connect(m_calibrator, &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
 
-    updateManualMode();
+    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::centerModified, this, &QnFisheyeCalibrationWidget::setCenter);
+    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::radiusModified, this, &QnFisheyeCalibrationWidget::setRadius);
+    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::animationFinished, this, &QnFisheyeCalibrationWidget::at_image_animationFinished);
+
+    init();
 }
 
 QnFisheyeCalibrationWidget::~QnFisheyeCalibrationWidget() {}
+
+void QnFisheyeCalibrationWidget::init() {
+    ui->imageWidget->abortSearchAnimation();
+    ui->imageWidget->setImage(QImage());
+    setImageProvider(NULL);
+
+    at_imageProvider_imageChanged();
+}
 
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
     if (m_imageProvider) {
         disconnect(m_updateTimer, &QTimer::timeout, m_imageProvider, NULL);
         disconnect(m_imageProvider, NULL, ui->imageWidget, NULL);
+        disconnect(m_imageProvider, NULL, this, NULL);
     }
 
     m_updateTimer->stop();
@@ -62,6 +74,8 @@ void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
         return;
 
     connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setImage);
+    connect(m_imageProvider, &QnImageProvider::imageChanged, this,    &QnFisheyeCalibrationWidget::at_imageProvider_imageChanged);
+
     connect(m_updateTimer, &QTimer::timeout, m_imageProvider, &QnImageProvider::loadAsync);
     m_updateTimer->start();
 
@@ -88,29 +102,23 @@ void QnFisheyeCalibrationWidget::setRadius(qreal radius) {
     update();
 }
 
-void QnFisheyeCalibrationWidget::updateManualMode() {
-    ui->xCenterSlider->setVisible(m_manualMode);
-    ui->yCenterSlider->setVisible(m_manualMode);
-    ui->radiusSlider->setVisible(m_manualMode);
-
-    if (m_manualMode) {
-        ui->manualButton->setText(tr("Manual Calibration: On"));
-        connect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::centerModified, this, &QnFisheyeCalibrationWidget::setCenter);
-        connect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::radiusModified, this, &QnFisheyeCalibrationWidget::setRadius);
-    }
-    else {
-        ui->manualButton->setText(tr("Manual Calibration: Off"));
-        disconnect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::centerModified, this, &QnFisheyeCalibrationWidget::setCenter);
-        disconnect(ui->imageWidget, &QnFisheyeCalibrationImageWidget::radiusModified, this, &QnFisheyeCalibrationWidget::setRadius);
-    }
+void QnFisheyeCalibrationWidget::at_imageProvider_imageChanged() {
+    bool imageLoaded = m_imageProvider && !m_imageProvider->image().isNull();
+    ui->autoButton->setVisible(imageLoaded);
+    ui->xCenterSlider->setVisible(imageLoaded);
+    ui->yCenterSlider->setVisible(imageLoaded);
+    ui->radiusSlider->setVisible(imageLoaded);
 }
 
 void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
+    m_lastError = errorCode;
     ui->imageWidget->endSearchAnimation();
-    ui->autoButton->setEnabled(true);
+}
 
+void QnFisheyeCalibrationWidget::at_image_animationFinished() {
+    ui->autoButton->setEnabled(true);
     //TODO: #Elric review these text pls.
-    switch (errorCode) {
+    switch (m_lastError) {
     case QnFisheyeCalibrator::ErrorNotFisheyeImage:
         QMessageBox::warning(this, tr("Error"), tr("Auto-detection failed. Image is not round."));
         break;
@@ -120,19 +128,12 @@ void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
     default:
         break;
     }
-//    ui->imageWidget->repaint();
 }
-
 
 void QnFisheyeCalibrationWidget::at_autoButton_clicked() {
     ui->imageWidget->beginSearchAnimation();
     ui->autoButton->setEnabled(false);
     m_calibrator->analyseFrameAsync(ui->imageWidget->image());
-}
-
-void QnFisheyeCalibrationWidget::at_manualButton_clicked() {
-    m_manualMode = !m_manualMode;
-    updateManualMode();
 }
 
 void QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged(int value) {

@@ -57,6 +57,7 @@ void QnFisheyeSettingsWidget::updateFromResource(const QnResourcePtr &resource) 
     ui->angleSpinBox->setValue(params.fovRot);
     ui->horizontalSlider->setValue(params.fovRot * 10);
 
+    ui->calibrateWidget->init();
     ui->calibrateWidget->setRadius(params.radius);
     ui->calibrateWidget->setCenter(QPointF(params.xCenter, params.yCenter));
     ui->calibrateWidget->setImageProvider(QnSingleThumbnailLoader::newInstance(resource, -1, QSize(), ui->calibrateWidget));

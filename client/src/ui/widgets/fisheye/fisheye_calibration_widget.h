@@ -27,6 +27,8 @@ public:
     QPointF center() const;
     qreal radius() const;
 
+    void init();
+
 signals:
     void dataChanged();
 
@@ -39,7 +41,9 @@ public slots:
 private slots:
     void at_calibrator_finished(int errorCode);
     void at_autoButton_clicked();
-    void at_manualButton_clicked();
+    void at_image_animationFinished();
+
+    void at_imageProvider_imageChanged();
 
     void at_xCenterSlider_valueChanged(int value);
     void at_yCenterSlider_valueChanged(int value);
@@ -47,8 +51,6 @@ private slots:
 
     void at_calibrator_centerChanged(const QPointF &center);
     void at_calibrator_radiusChanged(qreal radius);
-private:
-    void updateManualMode();
 
 private:
     QScopedPointer<Ui::QnFisheyeCalibrationWidget> ui;
@@ -56,8 +58,8 @@ private:
     QnImageProvider* m_imageProvider;
     QTimer* m_updateTimer;
 
-    bool m_manualMode;
     bool m_updating;
+    int m_lastError;
 
 };
 
