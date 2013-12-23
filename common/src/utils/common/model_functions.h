@@ -121,23 +121,23 @@ __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         
 
 
 /**
- * This macro generates <tt>QDebug</tt> (de)serialization functions for
+ * This macro generates <tt>QDebug</tt> stream functions for
  * the given struct type.
  *
- * \param TYPE                          Struct type to define (de)serialization functions for.
+ * \param TYPE                          Struct type to define <tt>QDebug</tt> stream functions for.
  * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
- *                                      given type that are to be (de)serialized.
+ *                                      given type that are to be streamed.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
 #define QN_DEFINE_STRUCT_DEBUG_STREAM_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-__VA_ARGS__ QDebug &operator<<(QDebug &stream, const TYPE &value) {   \
-    stream.nospace() << BOOST_PP_STRINGIZE(TYPE) << " {"; \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DEBUG_STREAM_STEP_I, ~, FIELD_SEQ); \
-    stream.nospace() << '}'; \
-    return stream.space(); \
+__VA_ARGS__ QDebug &operator<<(QDebug &stream, const TYPE &value) {             \
+    stream.nospace() << BOOST_PP_STRINGIZE(TYPE) << " {";                       \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DEBUG_STREAM_STEP_I, ~, FIELD_SEQ);  \
+    stream.nospace() << '}';                                                    \
+    return stream.space();                                                      \
 }
 
-#define QN_DEFINE_STRUCT_DEBUG_STREAM_STEP_I(R, DATA, FIELD) \
+#define QN_DEFINE_STRUCT_DEBUG_STREAM_STEP_I(R, DATA, FIELD)                    \
     stream.nospace() << BOOST_PP_STRINGIZE(FIELD) << ": " << value.FIELD << "; ";
 
 #endif // Q_MOC_RUN
