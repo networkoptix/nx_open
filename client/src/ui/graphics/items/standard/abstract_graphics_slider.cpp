@@ -1,9 +1,6 @@
 #include "abstract_graphics_slider.h"
 #include "abstract_graphics_slider_p.h"
 
-#ifndef QT_NO_ACCESSIBILITY
-#  include <QtGui/QAccessible>
-#endif
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneEvent>
 #include <QtWidgets/QStyleOption>
@@ -178,10 +175,6 @@ void AbstractGraphicsSlider::setValue(qint64 value) {
         if (d->pressed)
             Q_EMIT sliderMoved(d->position);
     }
-#ifndef QT_NO_ACCESSIBILITY
-    //QAccessible::updateAccessibility(this, 0, QAccessible::ValueChange);
-    QAccessible::updateAccessibility(new QAccessibleValueChangeEvent(this, 0));
-#endif
     sliderChange(SliderValueChange);
     Q_EMIT valueChanged(d->value);
 }
