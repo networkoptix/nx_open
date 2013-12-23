@@ -15,8 +15,8 @@
 typedef QColor QnColorGroup[QPalette::NColorRoles];
 typedef QnColorGroup QnPaletteColors[QPalette::NColorGroups + 1];
 
-bool deserialize(const QVariant &value, QnColorGroup *target) {
-    QVariantMap map;
+bool deserialize(const QJsonValue &value, QnColorGroup *target) {
+    QJsonObject map;
     if(!QJson::deserialize(value, &map))
         return false;
 
@@ -42,8 +42,8 @@ bool deserialize(const QVariant &value, QnColorGroup *target) {
         QJson::deserialize(map, "toolTipText",      &(*target)[QPalette::ToolTipText],      true);
 }
 
-bool deserialize(const QVariant &value, QnPaletteColors *target) {
-    QVariantMap map;
+bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
+    QJsonObject map;
     if(!QJson::deserialize(value, &map))
         return false;
 
@@ -54,7 +54,7 @@ bool deserialize(const QVariant &value, QnPaletteColors *target) {
         QJson::deserialize(map, "default",          &(*target)[QPalette::NColorGroups],     true);
 }
 
-bool deserialize(const QVariant &value, QPalette *target) {
+bool deserialize(const QJsonValue &value, QPalette *target) {
     QnPaletteColors colors;
     if(!QJson::deserialize(value, &colors))
         return false;
@@ -76,7 +76,7 @@ bool deserialize(const QVariant &value, QPalette *target) {
     return true;
 }
 
-void serialize(const QPalette &value, QVariant *target) {
+void serialize(const QPalette &value, QJsonValue *target) {
     assert(false);
 }
 
@@ -101,16 +101,16 @@ public:
     }
 
 protected:
-    virtual void serializeInternal(const void *, QVariant *) const override {
+    virtual void serializeInternal(const void *, QJsonValue *) const override {
         assert(false); /* We should never get here. */
     }
 
-    virtual bool deserializeInternal(const QVariant &value, void *target) const override {
+    virtual bool deserializeInternal(const QJsonValue &value, void *target) const override {
         QObject *object = *static_cast<QObject **>(target);
         if(!object)
             return false;
 
-        QVariantMap map;
+        QJsonObject map;
         if(!QJson::deserialize(value, &map))
             return false;
 
@@ -123,9 +123,9 @@ protected:
 
         const QMetaObject *metaObject = object->metaObject();
 
-        for(QVariantMap::const_iterator pos = map.begin(); pos != map.end(); pos++) {
+        for(auto pos = map.begin(); pos != map.end(); pos++) {
             const QString &key = pos.key();
-            const QVariant &jsonValue = *pos;
+            const QJsonValue &jsonValue = *pos;
 
             int index = metaObject->indexOfProperty(key.toLatin1());
             if(index != -1) {
@@ -225,8 +225,8 @@ void QnCustomizer::customize(QObject *object) {
         customize(object, m_customization.data(), QLatin1String(metaObjects[i]->className()));
 }
 
-void QnCustomizer::customize(QObject *object, const QVariantMap &customization, const QString &key) {
-    QVariantMap::const_iterator pos = customization.find(key);
+void QnCustomizer::customize(QObject *object, const QJsonObject &customization, const QString &key) {
+    auto pos = customization.find(key);
     if(pos == customization.end())
         return;
     

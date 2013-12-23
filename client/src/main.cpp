@@ -306,7 +306,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
-        commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
@@ -322,15 +322,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
-        QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
-        QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
-        customizer->customize(qnGlobals);
+    QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
+    QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
+    customizer->customize(qnGlobals);
 
     /* Initialize application instance. */
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
-    customizer->customize(application.data());
+    customizer->customize(application);
     application->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);

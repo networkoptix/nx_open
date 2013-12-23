@@ -19,6 +19,7 @@
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
+#include <QtGui/QFont>
 
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
@@ -300,6 +301,7 @@ QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QRegion)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QVector2D)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QVector3D)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QVector4D)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QFont)
 
 void qnJsonFunctionsUnitTest();
 

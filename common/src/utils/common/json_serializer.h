@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json.h>
+#include "json.h"
 
 class QnJsonSerializer {
 public:
@@ -21,34 +21,34 @@ public:
         return m_type;
     }
 
-    void serialize(const QVariant &value, QVariant *target) const {
+    void serialize(const QVariant &value, QJsonValue *target) const {
         assert(value.userType() == m_type && target);
 
         serializeInternal(value.constData(), target);
     }
 
-    void serialize(const void *value, QVariant *target) const {
+    void serialize(const void *value, QJsonValue *target) const {
         assert(value && target);
 
         serializeInternal(value, target);
     }
 
-    bool deserialize(const QVariant &value, QVariant *target) const {
+    bool deserialize(const QJsonValue &value, QVariant *target) const {
         assert(target);
 
         *target = QVariant(m_type, static_cast<const void *>(NULL));
         return deserializeInternal(value, target->data());
     }
 
-    bool deserialize(const QVariant &value, void *target) const {
+    bool deserialize(const QJsonValue &value, void *target) const {
         assert(target);
 
         return deserializeInternal(value, target);
     }
 
 protected:
-    virtual void serializeInternal(const void *value, QVariant *target) const = 0;
-    virtual bool deserializeInternal(const QVariant &value, void *target) const = 0;
+    virtual void serializeInternal(const void *value, QJsonValue *target) const = 0;
+    virtual bool deserializeInternal(const QJsonValue &value, void *target) const = 0;
 
 private:
     int m_type;
@@ -61,11 +61,11 @@ public:
     QnAdlJsonSerializer(): QnJsonSerializer(qMetaTypeId<T>()) {}
 
 protected:
-    virtual void serializeInternal(const void *value, QVariant *target) const override {
+    virtual void serializeInternal(const void *value, QJsonValue *target) const override {
         QJson::serialize(*static_cast<const T *>(value), target);
     }
 
-    virtual bool deserializeInternal(const QVariant &value, void *target) const override {
+    virtual bool deserializeInternal(const QJsonValue &value, void *target) const override {
         return QJson::deserialize(value, static_cast<T *>(target));
     }
 };

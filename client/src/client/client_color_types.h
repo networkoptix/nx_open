@@ -34,7 +34,7 @@ public:
 };
 
 Q_DECLARE_METATYPE(QnTimeSliderColors)
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
@@ -51,7 +51,7 @@ struct QnBackgroundColors {
 };
 
 Q_DECLARE_METATYPE(QnBackgroundColors)
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(QnBackgroundColors, (normal)(panic), inline)
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnBackgroundColors, (normal)(panic), inline)
 
 
 struct QnCalendarColors {
@@ -70,7 +70,7 @@ struct QnCalendarColors {
 };
 
 Q_DECLARE_METATYPE(QnCalendarColors)
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(
     QnCalendarColors, 
     (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), 
     inline

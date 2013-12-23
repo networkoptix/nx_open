@@ -3,10 +3,6 @@
 #include <utils/common/json.h>
 #include <utils/common/warnings.h>
 
-namespace {
-    const char *customizationPropertyName = "_qn_customization";
-}
-
 QnCustomization::QnCustomization() {
     return;
 }

@@ -107,6 +107,33 @@ bool deserialize(const QJsonValue &value, QColor *target) {
     return true;
 }
 
+void serialize(const QFont &value, QJsonValue *target) {
+    assert(false); /* Won't need for now. */ // TODO: #Elric
+}
+
+bool deserialize(const QJsonValue &value, QFont *target) {
+    if(value.type() == QJsonValue::String) {
+        *target = QFont(value.toString());
+        return true;
+    } else if(value.type() == QJsonValue::Object) {
+        QJsonObject map = value.toObject();
+        
+        QString family;
+        int pointSize = -1;
+        if(
+            !QJson::deserialize(map, "family", &family) ||
+            !QJson::deserialize(map, "pointSize", &pointSize, true)
+        ) {
+            return false;
+        }
+
+        *target = QFont(family, pointSize);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 #define TEST_VALUE(TYPE)                                            \
 void testValue(const TYPE &value) {                                 \
     QByteArray json;                                                \
@@ -138,9 +165,8 @@ void testRegion(int len) {
 
     QByteArray json;
     QJson::serialize(region, &json);
-    QString result = QString::fromUtf8(json);
     QRegion newValue;
-    QJson::deserialize(result.toUtf8(), &newValue);
+    QJson::deserialize(json, &newValue);
     Q_ASSERT(region == newValue);
 }
 

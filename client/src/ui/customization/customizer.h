@@ -22,7 +22,7 @@ public:
     void customize(QObject *object);
 
 private:
-    void customize(QObject *object, const QVariantMap &customization, const QString &key);
+    void customize(QObject *object, const QJsonObject &customization, const QString &key);
 
 private:
     QScopedPointer<QnJsonSerializer> m_serializer;

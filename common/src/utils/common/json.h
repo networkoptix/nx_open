@@ -256,6 +256,14 @@ namespace QJsonDetail {
     (&TYPE::FIELD, &TYPE::FIELD, BOOST_PP_STRINGIZE(FIELD))
 
 
+/**
+ * This macro generates the necessary boilerplate to (de)serialize class types.
+ * 
+ * \param TYPE                          Class type to define (de)serialization functions for.
+ * \param FIELD_SEQ                     Preprocessor sequence of field descriptions for
+ *                                      the given class type.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
+ */
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
 __VA_ARGS__ void serialize(const TYPE &value, QJsonValue *target) {             \
     using namespace QJsonAccessors;                                             \
@@ -270,7 +278,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
         return false;                                                           \
     QJsonObject object = value.toObject();                                      \
                                                                                 \
-    TYPE result;                                                                \
+    TYPE result = *target; /* This allows for partial deserialization if the user wants it. */ \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
     *target = result;                                                           \
     return true;                                                                \
@@ -278,10 +286,6 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_I(R, DATA, FIELD)               \
     QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II FIELD
-class QFont;
-void serialize(const QFont &value, QVariant *target);
-bool deserialize(const QVariant &value, QFont *target);
-
 
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II(GETTER, SETTER, NAME)        \
     QJson::serialize(getMember(value, GETTER), QStringLiteral(NAME), &result);
@@ -325,39 +329,6 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(...)
 
 #endif // Q_MOC_RUN
-
-
-
-
-
-
-
-// TODO: #Elric implement properly in default
-#define QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS_OPTIONAL(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-__VA_ARGS__ void serialize(const TYPE &value, QVariant *target) {               \
-    QVariantMap result;                                                         \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_SERIALIZATION_OPTIONAL_STEP_I, ~, FIELD_SEQ) \
-    *target = result;                                                           \
-}                                                                               \
-                                                                                \
-__VA_ARGS__ bool deserialize(const QVariant &value, TYPE *target) {             \
-    if(value.type() != QVariant::Map)                                           \
-        return false;                                                           \
-    QVariantMap map = value.toMap();                                            \
-                                                                                \
-    TYPE result = *target; /* TODO: #Elric note the copy here */                \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_STRUCT_DESERIALIZATION_OPTIONAL_STEP_I, ~, FIELD_SEQ) \
-    *target = result;                                                           \
-    return true;                                                                \
-}
-
-#define QN_DEFINE_STRUCT_SERIALIZATION_OPTIONAL_STEP_I(R, DATA, FIELD)          \
-    QJson::serialize(value.FIELD, BOOST_PP_STRINGIZE(FIELD), &result);
-
-#define QN_DEFINE_STRUCT_DESERIALIZATION_OPTIONAL_STEP_I(R, DATA, FIELD)        \
-    if(!QJson::deserialize(map, BOOST_PP_STRINGIZE(FIELD), &result.FIELD, true)) \
-        return false;
-
 
 #include "json_functions.h"
 

@@ -2,7 +2,7 @@
 #define QN_CALENDAR_ITEM_DELEGATE_H
 
 #include <QtCore/QMetaType>
-#include <QtGui/QStyledItemDelegate>
+#include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_color_types.h>
 

@@ -15,12 +15,12 @@ public:
         return m_data.isEmpty();
     }
 
-    const QVariantMap &data() {
+    const QJsonObject &data() {
         return m_data;
     }
 
 private:
-    QVariantMap m_data;
+    QJsonObject m_data;
 };
 
 Q_DECLARE_METATYPE(QnCustomization)
