@@ -37,7 +37,7 @@ public:
 
     template<class T>
     void insert() {
-        insert(new QnAdlJsonSerializer<T>());
+        insert(new QnDefaultJsonSerializer<T>());
     }
 };
 

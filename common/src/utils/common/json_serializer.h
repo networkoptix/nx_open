@@ -56,9 +56,9 @@ private:
 
 
 template<class T>
-class QnAdlJsonSerializer: public QnJsonSerializer {
+class QnDefaultJsonSerializer: public QnJsonSerializer {
 public:
-    QnAdlJsonSerializer(): QnJsonSerializer(qMetaTypeId<T>()) {}
+    QnDefaultJsonSerializer(): QnJsonSerializer(qMetaTypeId<T>()) {}
 
 protected:
     virtual void serializeInternal(const void *value, QJsonValue *target) const override {
@@ -73,7 +73,7 @@ protected:
 
 template<class T>
 void QnJsonSerializer::registerSerializer() {
-    registerSerializer(new QnAdlJsonSerializer<T>());
+    registerSerializer(new QnDefaultJsonSerializer<T>());
 }
 
 

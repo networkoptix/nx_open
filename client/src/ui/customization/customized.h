@@ -1,5 +1,5 @@
-#ifndef QN_CUSTOMIZABLE_H
-#define QN_CUSTOMIZABLE_H
+#ifndef QN_CUSTOMIZED_H
+#define QN_CUSTOMIZED_H
 
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -12,17 +12,17 @@
 #include "customizer.h"
 
 
-// TODO: #Elric check if the name is correct
-namespace QnEvent {
-    static const QEvent::Type Customize = static_cast<QEvent::Type>(QEvent::User + 0x8A5E);
-}
-
-
 template<class Base, bool baseIsCustomized>
 class Customized;
 
 
-// TODO: #Elric docz
+/**
+ * Base class for objects that are to be passed through customization subsystem
+ * after construction. Note that this can be done automatically for <tt>QApplication</tt>
+ * and <tt>QWidget</tt>s from <tt>QStyle</tt> implementation.
+ * 
+ * Not really useful for anything, but can be <tt>dynamic_cast</tt>ed to.
+ */
 class CustomizedBase {
 private:
     CustomizedBase() {}
@@ -33,7 +33,10 @@ private:
 };
 
 
-// TODO: #Elric docz
+/**
+ * Convenience base class for objects that need to be processed through 
+ * customization subsystem. 
+ */
 template<class Base, bool baseIsCustomized = boost::is_base_of<CustomizedBase, Base>::value>
 class Customized: public Base, public CustomizedBase {
 public:
@@ -57,5 +60,9 @@ public:
     QN_FORWARD_CONSTRUCTOR(Customized, Base, {});
 };
 
+namespace QnEvent {
+    static const QEvent::Type Customize = static_cast<QEvent::Type>(QEvent::User + 0x8A5E);
+}
 
-#endif // QN_CUSTOMIZABLE_H
+
+#endif // QN_CUSTOMIZED_H

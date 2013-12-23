@@ -80,7 +80,7 @@ void serialize(const QPalette &value, QJsonValue *target) {
     assert(false);
 }
 
-typedef QnAdlJsonSerializer<QPalette> QnPaletteCustomizationSerializer;
+typedef QnDefaultJsonSerializer<QPalette> QnPaletteCustomizationSerializer;
 
 
 // --------------------------------------------------------------------------- //
