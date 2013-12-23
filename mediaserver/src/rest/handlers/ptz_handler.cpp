@@ -216,7 +216,7 @@ int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzPresetList presets;
     if(!controller->getPresets(&presets))
         return CODE_INTERNAL_ERROR;
@@ -258,7 +258,7 @@ int QnPtzHandler::executeActivateTour(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzTourList tours;
     if(!controller->getTours(&tours))
         return CODE_INTERNAL_ERROR;

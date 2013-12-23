@@ -126,7 +126,7 @@ void QnActiPtzController::init() {
 
 bool QnActiPtzController::query(const QString &request, QByteArray *body, bool keepAllData) const {
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=STOP"), status, keepAllData);
+    QByteArray data = m_resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body)
         *body = data;
     return status == CL_HTTP_SUCCESS;
@@ -275,10 +275,6 @@ bool QnActiPtzController::getFlip(Qt::Orientations *flip) {
         *flip |= Qt::Horizontal;
 
     return true;
-}
-
-bool QnActiPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    return false;
 }
 
 #endif // ENABLE_ACTI
