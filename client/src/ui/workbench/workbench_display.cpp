@@ -762,9 +762,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
-
-    if (m_widgets.size() >= maxItemCount) { // TODO: #Elric item limit must be changeable.
+    if (m_widgets.size() >= qnSettings->maxVideoItems()) {
         qnDeleteLater(item);
         return false;
     }
