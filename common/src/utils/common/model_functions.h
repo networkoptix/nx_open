@@ -18,6 +18,7 @@
 #define QN_DEFINE_STRUCT_HASH_FUNCTION(...)
 #define QN_DEFINE_STRUCT_OPERATOR_EQ(...)
 #define QN_DEFINE_STRUCT_DATA_STREAM_FUNCTIONS(...)
+#define QN_DEFINE_STRUCT_DEBUG_STREAM_FUNCTIONS(...)
 #else // Q_MOC_RUN
 
 namespace QnModelFunctionsDetail {
@@ -38,6 +39,7 @@ namespace QnModelFunctionsDetail {
  * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
  * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
  * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
+ * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
  * </ul>
  * 
  * \param TYPE                          Struct type to define functions for.
@@ -48,7 +50,9 @@ namespace QnModelFunctionsDetail {
  */
 #define QN_DEFINE_STRUCT_FUNCTIONS(TYPE, FUNCTION_SEQ, FIELD_SEQ, ... /* PREFIX */) \
     BOOST_PP_LIST_FOR_EACH(QN_DEFINE_STRUCT_FUNCTIONS_STEP_I, (TYPE, FIELD_SEQ, ##__VA_ARGS__), BOOST_PP_SEQ_TO_LIST(FUNCTION_SEQ))
-// TODO: #Elric ^^^ HACK
+/* Note this ^^^. We're converting sequence to a list because this is the only way 
+ * to make nested sequence iterations work. The other option would be to use BOOST_PP_FOR directly
+ * in all macros, which is just too messy. */
 
 #define QN_DEFINE_STRUCT_FUNCTIONS_STEP_I(R, DATA, FUNCTION)                    \
     BOOST_PP_CAT(QN_DEFINE_STRUCT_FUNCTIONS_STEP_I_, FUNCTION) DATA
