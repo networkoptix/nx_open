@@ -6,6 +6,14 @@ from gencomp import gencomp_cpp
 #os.makedirs('${project.build.directory}/build/release/generated/')
 gencomp_cpp(open('${project.build.sourceDirectory}/compatibility_info.cpp', 'w'))
 
+translations_dir='${basedir}/translations'
+translations_target_dir='${project.build.directory}/resources/translations'
+ldpath='${qt.dir}/lib'
+translations=['${translation1}','${translation2}','${translation3}','${translation4}','${translation5}','${translation6}','${translation7}']
+os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
+os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
+os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
+
 def platform():
     if sys.platform == 'win32':
         return 'win32'
@@ -42,8 +50,17 @@ def genqrc(qrcname, qrcprefix, path, extensions, exclusion, additions=''):
 
 if __name__ == '__main__':
   os.system('mkdir build')
-  
-  os.system('lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
+    if not os.path.exists(translations_target_dir):
+        os.makedirs(translations_target_dir) 
+
+    if os.path.exists(translations_dir):    
+        for f in listdir(translations_dir):
+    	    for translation in translations:
+    	        if f.endswith('_%s.ts' % translation):
+        	    if '${platform}' == 'windows':
+            	        os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                    else:
+	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
   genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${basedir}/translations', ['.qm'],'.ts')  
   genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'],'.psd')
