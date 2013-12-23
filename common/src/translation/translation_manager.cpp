@@ -14,11 +14,12 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
     addPrefix(lit("qt"));
     
     addSearchPath(lit(":/translations"));
-    if(qApp) {
+    // Closing a backdoor for custom translations --Elric
+    /*if(qApp) {
         addSearchPath(qApp->applicationDirPath() + lit("/translations"));
     } else {
         qnWarning("QApplication instance does not exist, executable-relative translations will not be loaded.");
-    }
+    }*/
 }
 
 QnTranslationManager::~QnTranslationManager() {
