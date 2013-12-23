@@ -350,6 +350,9 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
+    if (layout->getItems().size() >= qnSettings->maxVideoItems())
+        return;
+
     {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
@@ -824,8 +827,12 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
                 pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
 
         /* Add to layout. */
-        foreach(const QnLayoutItemData &data, itemDataByUuid)
+        foreach(const QnLayoutItemData &data, itemDataByUuid) {
+            if (layout->getItems().size() >= qnSettings->maxVideoItems())
+                return;
+
             layout->addItem(data);
+        }
 
         return;
     }
@@ -1513,7 +1520,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 16; // TODO: #Elric take it from config?
+
+    const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
         QMessageBox::warning(mainWindow(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
@@ -1684,10 +1692,10 @@ void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
     if (!media)
         return;
 
-    QnPictureSettingsDialog dialog(mainWindow());
-    dialog.updateFromResource(media);
-    if (dialog.exec())
-        dialog.submitToResource(media);
+    QScopedPointer<QnPictureSettingsDialog> dialog(new QnPictureSettingsDialog(mainWindow()));
+    dialog->updateFromResource(media);
+    if (dialog->exec())
+        dialog->submitToResource(media);
 }
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()

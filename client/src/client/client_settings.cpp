@@ -63,6 +63,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Set default values. */
     setMediaFolder(getMoviesDirectory());
     setBackgroundsFolder(getBackgroundsDirectory());
+    setMaxVideoItems(sizeof(void *) == sizeof(qint32) ? 24 : 64);
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
