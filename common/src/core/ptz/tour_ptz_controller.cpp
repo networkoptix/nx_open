@@ -18,6 +18,7 @@ class QnPtzTourExecutorThread: public QnLongRunnable {
     typedef QnLongRunnable base_type;
 public:
     QnPtzTourExecutorThread() {
+        setObjectName(lit("QnPtzTourExecutorThread")); /* So that we see this thread's name in debug. */
         start();
     }
 
@@ -27,16 +28,14 @@ public:
 
     virtual void pleaseStop() override {
         base_type::pleaseStop();
-
-        QMetaObject::invokeMethod(this, "quit", Qt::QueuedConnection);
+        
+        quit(); /* This call is thread-safe. */
     }
 
     virtual void run() override {
         /* Default implementation is OK, but we want to see this function on 
          * the stack when debugging. */
         return base_type::run(); 
-        //DOES NOT STOP ON CLIENT EXIT --gdm
-        //TODO: #Elric fix ASAP
     }
 };
 
