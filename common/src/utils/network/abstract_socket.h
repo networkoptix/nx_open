@@ -184,13 +184,32 @@ public:
     */
     virtual bool isConnected() const = 0;
 
+    //!Reads bytes from socket asynchronously
+    /*!
+        \param dst Buffer to read to. Maximum \a dst->capacity() bytes read to this buffer
+        \param handler functor with following signature:
+            \code{.cpp}
+                ( SystemError::ErrorCode errorCode, size_t bytesRead )
+            \endcode
+            \a bytesRead is indefined, if errorCode is not SystemError::noError
+        \return true, if asynchronous read has been issued
+        \warning If \a dst->capacity() == 0, \a false is returned and no bytes read
+        \warning Multiple concurrent asynchronous write operations result in undefined behavour
+    */
     template<class HandlerType>
-        bool readSomeAsync( nx::Buffer* const /*dst*/, HandlerType /*handler*/ )
+        bool readSomeAsync( nx::Buffer* const dst, HandlerType /*handler*/ )
         {
             //TODO/IMPL
             return false;
         }
 
+    /*!
+        \param handler functor with following signature:
+            \code{.cpp}
+                ( SystemError::ErrorCode errorCode, size_t bytesWritten )
+            \endcode
+            \a bytesWritten is indefined, if errorCode is not SystemError::noError
+    */
     template<class HandlerType>
         bool sendAsync( const nx::Buffer& /*src*/, HandlerType /*handler*/ )
         {
@@ -264,6 +283,13 @@ public:
     */
     virtual AbstractStreamSocket* accept() = 0;
     //!Starts async accept operation
+    /*!
+        \param handler functor with following signature:
+            \code{.cpp}
+                ( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection )
+            \endcode
+            \a newConnection is NULL, if errorCode is not SystemError::noError
+    */
     template<class HandlerType>
         bool acceptAsync( HandlerType /*handler*/ )
         {

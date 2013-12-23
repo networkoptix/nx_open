@@ -114,7 +114,7 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        aio::AIOService::instance()->removeFromWatch( it->second, PollSet::etRead );
+        aio::AIOService::instance()->removeFromWatch( it->second.get(), PollSet::etRead );
     }
     m_socketList.clear();
 
@@ -221,7 +221,7 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventTyp
             }
         }
         if( udpSock )
-            aio::AIOService::instance()->removeFromWatch( udpSock, PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( udpSock.get(), PollSet::etRead );
         return;
     }
 
@@ -303,7 +303,7 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !aio::AIOService::instance()->watchSocket( sock, PollSet::etRead, this ) )
+        !aio::AIOService::instance()->watchSocket( sock.get(), PollSet::etRead, this ) )
     {
         QMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );

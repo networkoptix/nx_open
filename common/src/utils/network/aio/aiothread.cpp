@@ -35,14 +35,14 @@ namespace aio
             tAll
         };
 
-        std::shared_ptr<AbstractSocket> socket;
+        AbstractSocket* socket;
         PollSet::EventType eventType;
         AIOEventHandler* eventHandler;
         TaskType type;
         int timeout;
 
         SocketAddRemoveTask(
-            const std::shared_ptr<AbstractSocket>& _socket,
+            AbstractSocket* const _socket,
             PollSet::EventType _eventType,
             AIOEventHandler* const _eventHandler,
             TaskType _type,
@@ -163,7 +163,7 @@ namespace aio
                 }
                 else    //task.type == SocketAddRemoveTask::tRemoving
                 {
-                    void* userData = pollSet.remove( task.socket.get(), task.eventType );
+                    void* userData = pollSet.remove( task.socket, task.eventType );
                     if( userData )
                         delete static_cast<AIOEventHandlingDataHolder*>(userData);
                 }
@@ -172,13 +172,13 @@ namespace aio
         }
 
         bool addSockToPollset(
-            std::shared_ptr<AbstractSocket> socket,
+            AbstractSocket* socket,
             PollSet::EventType eventType,
             int timeout,
             AIOEventHandler* eventHandler )
         {
             std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( eventHandler ) );
-            if( !pollSet.add( socket.get(), eventType, handlingData.get() ) )
+            if( !pollSet.add( socket, eventType, handlingData.get() ) )
             {
                 NX_LOG( QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
                 return false;
@@ -188,7 +188,7 @@ namespace aio
             {
                 //adding periodic task associated with socket
                 handlingData->data->timeout = timeout;
-                addPeriodicTask( getSystemTimerVal() + timeout, handlingData.get()->data, socket.get() );
+                addPeriodicTask( getSystemTimerVal() + timeout, handlingData.get()->data, socket );
             }
             handlingData.release();
 
@@ -201,7 +201,7 @@ namespace aio
         }
 
         bool removeReverseTask(
-            const std::shared_ptr<AbstractSocket>& sock,
+            AbstractSocket* const sock,
             PollSet::EventType eventType,
             SocketAddRemoveTask::TaskType taskType,
             AIOEventHandler* const eventHandler,
@@ -220,7 +220,7 @@ namespace aio
                     if( it->type == SocketAddRemoveTask::tRemoving )
                     {
                         //cancelling remove task
-                        void* userData = pollSet.getUserData( sock.get(), eventType );
+                        void* userData = pollSet.getUserData( sock, eventType );
                         Q_ASSERT( userData );
                         static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval.store(0);
                     }
@@ -351,7 +351,7 @@ namespace aio
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
     bool AIOThread::watchSocket(
-        const std::shared_ptr<AbstractSocket>& sock,
+        AbstractSocket* const sock,
         PollSet::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         int timeoutMs )
@@ -384,7 +384,7 @@ namespace aio
     }
 
     bool AIOThread::removeFromWatch(
-        const std::shared_ptr<AbstractSocket>& sock,
+        AbstractSocket* const sock,
         PollSet::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
@@ -394,7 +394,7 @@ namespace aio
         if( m_impl->removeReverseTask(sock, eventType, SocketAddRemoveTask::tRemoving, NULL, 0) )
             return true;    //ignoring task
 
-        void* userData = m_impl->pollSet.getUserData( sock.get(), eventType );
+        void* userData = m_impl->pollSet.getUserData( sock, eventType );
         if( userData == NULL )
             return false;   //assert ???
         std::shared_ptr<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(userData)->data;

@@ -53,8 +53,8 @@ namespace nx_http
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
 
             //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
         }
@@ -97,7 +97,7 @@ namespace nx_http
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
-                            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
                             lk.unlock();
                             emit done( sharedThis );
                             lk.relock();
@@ -134,7 +134,7 @@ namespace nx_http
                     {
                         NX_LOG( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         m_state = sFailed;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
@@ -144,9 +144,9 @@ namespace nx_http
                     {
                         NX_LOG( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
                         m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT );
-                        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
+                        aio::AIOService::instance()->watchSocket( m_socket.get(), PollSet::etRead, this );
                     }
                     break;
 
@@ -279,7 +279,7 @@ namespace nx_http
                     int bytesRead = readAndParseHttp();
                     //TODO/IMPL reconnect in case of error
                     if( m_state != sReadingMessageBody )
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etRead );
                     if( bytesRead > 0 )
                     {
                         lk.unlock();
@@ -309,8 +309,8 @@ namespace nx_http
 
         if( m_state == sFailed || m_state == sDone )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
         }
     }
 
@@ -409,8 +409,8 @@ namespace nx_http
     {
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
             m_socket.reset();
         }
         m_state = sInit;
@@ -440,7 +440,7 @@ namespace nx_http
         m_state = sWaitingConnectToHost;
 
         //connect is done if socket is available for write
-        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )
+        if( !aio::AIOService::instance()->watchSocket( m_socket.get(), PollSet::etWrite, this ) )
         {
             NX_LOG( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );

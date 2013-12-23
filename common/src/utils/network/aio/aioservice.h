@@ -48,7 +48,7 @@ namespace aio
             \note If not called from aio thread \a sock can be added to event loop with some delay
         */
         bool watchSocket(
-            const std::shared_ptr<AbstractSocket>& sock,
+            AbstractSocket* const sock,
             PollSet::EventType eventToWatch,
             AIOEventHandler* const eventHandler );
         //!Cancel monitoring \a sock for event \a eventType
@@ -62,7 +62,7 @@ namespace aio
                 this method does not block and always works like \a waitForRunningHandlerCompletion has been set to \a true
         */
         void removeFromWatch(
-            const std::shared_ptr<AbstractSocket>& sock,
+            AbstractSocket* const sock,
             PollSet::EventType eventType,
             bool waitForRunningHandlerCompletion = true );
 

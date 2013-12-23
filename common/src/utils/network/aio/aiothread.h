@@ -44,7 +44,7 @@ namespace aio
             \note MUST be called with \a mutex locked
         */
         bool watchSocket(
-            const std::shared_ptr<AbstractSocket>& sock,
+            AbstractSocket* const sock,
             PollSet::EventType eventToWatch,
             AIOEventHandler* const eventHandler,
             int timeoutMS = 0 );
@@ -58,7 +58,7 @@ namespace aio
             \note MUST be called with \a mutex locked
         */
         bool removeFromWatch(
-            const std::shared_ptr<AbstractSocket>& sock,
+            AbstractSocket* const sock,
             PollSet::EventType eventType,
             bool waitForRunningHandlerCompletion );
         //!Returns number of sockets monitored for \a eventToWatch event
