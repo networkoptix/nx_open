@@ -16,8 +16,6 @@
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
-class QnAbstractPtzController;
-class QnVirtualPtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
