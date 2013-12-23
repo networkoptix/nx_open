@@ -1684,10 +1684,10 @@ void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
     if (!media)
         return;
 
-    QnPictureSettingsDialog dialog(mainWindow());
-    dialog.updateFromResource(media);
-    if (dialog.exec())
-        dialog.submitToResource(media);
+    QScopedPointer<QnPictureSettingsDialog> dialog(new QnPictureSettingsDialog(mainWindow()));
+    dialog->updateFromResource(media);
+    if (dialog->exec())
+        dialog->submitToResource(media);
 }
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
