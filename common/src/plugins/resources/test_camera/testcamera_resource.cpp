@@ -1,3 +1,5 @@
+#ifdef ENABLE_TEST_CAMERA
+
 #include "testcamera_resource.h"
 #include "testcamera_stream_reader.h"
 
@@ -8,7 +10,7 @@ QnTestCameraResource::QnTestCameraResource()
 {
 }
 
-int QnTestCameraResource::getMaxFps()
+int QnTestCameraResource::getMaxFps() const
 {
     return 30;
 }
@@ -32,12 +34,6 @@ QnAbstractStreamDataProvider* QnTestCameraResource::createLiveDataProvider()
 {
     return new QnTestCameraStreamReader(toSharedPointer());
 }
-
-void QnTestCameraResource::setCropingPhysical(QRect /*croping*/)
-{
-
-}
-
 
 QString QnTestCameraResource::getHostAddress() const
 {
@@ -63,3 +59,4 @@ bool QnTestCameraResource::shoudResolveConflicts() const
     return false;
 }
 
+#endif // #ifdef ENABLE_TEST_CAMERA

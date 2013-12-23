@@ -1,7 +1,7 @@
 #ifndef TABLE_VIEW_H
 #define TABLE_VIEW_H
 
-#include <QtGui/QTableView>
+#include <QtWidgets/QTableView>
 
 /**
  * This class fixes a bug in <tt>QTableView</tt> related to editor triggers.

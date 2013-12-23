@@ -4,7 +4,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 #include "core/resource/resource.h"
 

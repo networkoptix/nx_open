@@ -1,246 +1,195 @@
 #include "manual_camera_addition_handler.h"
 
 #include <QtNetwork/QAuthenticator>
+#include <QtConcurrent/QtConcurrentRun>
 
-#include "utils/network/tcp_connection_priv.h"
-#include "core/resource_managment/resource_discovery_manager.h"
-#include "core/resource/resource.h"
-#include "core/resource_managment/resource_searcher.h"
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource/camera_resource.h"
+#include <api/model/manual_camera_seach_reply.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+
+#include <utils/common/json.h>
+#include <utils/network/tcp_connection_priv.h>
+
+
+namespace {
+    static const int searchThreadCount = 4;
+}
 
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {
-
 }
 
-QHostAddress QnManualCameraAdditionHandler::parseAddrParam(const QString &param, QString &errStr)
-{
-    int ip4Addr = inet_addr(param.toAscii().data());
-    if (ip4Addr != 0 && ip4Addr != -1)
-        return QHostAddress(param);
-    else {
-        QHostInfo hi = QHostInfo::fromName(param);
-        if (!hi.addresses().isEmpty())
-            return hi.addresses()[0];
-        else
-            errStr = tr("Can't resolve domain name %1").arg(param);
+QnManualCameraAdditionHandler::~QnManualCameraAdditionHandler() {
+    foreach (QnManualCameraSearcher* process, m_searchProcesses) {
+        process->cancel();
+        delete process;
     }
-    return QHostAddress();
 }
 
-int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType)
-{
-    Q_UNUSED(contentType)
+static void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
+    searcher->run(startAddr, endAddr, auth, port);
+}
 
-    int port = 0;
+int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &params,  QnJsonRestResult &result)
+{
     QAuthenticator auth;
-    auth.setUser("admin");
-    auth.setPassword("admin"); // default values
+    auth.setUser(params.value("user", "admin"));
+    auth.setPassword(params.value("password", "admin"));
 
-    QString addr1;
-    QString addr2;
-    QString errStr;
+    QString addr1 = params.value("start_ip");
+    QString addr2 = params.value("end_ip");
 
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "start_ip") 
-            addr1 = param.second;
-        else if (param.first == "end_ip")
-            addr2 = param.second;
-        else if (param.first == "user")
-            auth.setUser(param.second);
-        else if (param.first == "password")
-            auth.setPassword(param.second);
-        else if (param.first == "port")
-            port = param.second.toInt();
-    }
+    int port = params.value("port").toInt();
 
-    if (addr1.isNull() && errStr.isEmpty())
-        errStr = tr("Parameter 'start_ip' missed");
-
-    if (!errStr.isEmpty()) {
-        resultByteArray.append("<?xml version=\"1.0\"?>\n");
-        resultByteArray.append("<root>\n");
-        resultByteArray.append(errStr.toUtf8());
-        resultByteArray.append("</root>\n");
+    if (addr1.isNull())
         return CODE_INVALID_PARAMETER;
-    }
 
     if (addr2 == addr1)
         addr2.clear();
-    //if (addr2.isNull())
-    //    addr2 = addr1;
 
-    QnResourceList resources = QnResourceDiscoveryManager::instance()->findResources(addr1, addr2, auth, port);
+    QUuid processUuid = QUuid::createUuid();
 
-    resultByteArray.append("<?xml version=\"1.0\"?>\n");
-    // TODO #GDM implement simple XML-builder, will be quite useful
-
-    resultByteArray.append("<root>\n");
+    QnManualCameraSearcher* searcher = new QnManualCameraSearcher();
     {
-        resultByteArray.append("<query>\n");
-        {
-            resultByteArray.append(QString("<start_ip>%1</start_ip>\n").arg(addr1));
-            resultByteArray.append(QString("<end_ip>%1</end_ip>\n").arg(addr2));
-            resultByteArray.append(QString("<port>%1</port>\n").arg(port));
-            resultByteArray.append(QString("<user>%1</user>\n").arg(auth.user()));
-            resultByteArray.append(QString("<password>%1</password>\n").arg(auth.password()));
-        }
-        resultByteArray.append("</query>\n");
-
-        resultByteArray.append("<reply>\n");
-        {
-            foreach(const QnResourcePtr &resource, resources){
-                QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resource->getTypeId());
-
-                resultByteArray.append("<resource>\n");
-                resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
-                resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
-                resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getName()));
-
-                bool existResource = false;
-                if (qnResPool->hasSuchResource(resource->getUniqueId())) { 
-                    existResource = true; // already in resource pool 
-                }
-                else {
-                    // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
-                    QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
-                    if (netRes) {
-                        QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-                        foreach(QnNetworkResourcePtr existRes, existResList) 
-                        {
-                            if (existRes->getTypeId() != netRes->getTypeId())
-                                existResource = true; // camera found by different drivers
-
-                            QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
-                            if (!existCam->isManuallyAdded())
-                                existResource = true; // block manual and auto add in same time
-                        }
-                    }
-                }
-                resultByteArray.append(QString("<exists>%1</exists>\n").arg(existResource ? 1 : 0));
-
-                resultByteArray.append("</resource>\n");
-            }
-        }
-        resultByteArray.append("</reply>\n");
+        QMutexLocker lock(&m_searchProcessMutex);
+        m_searchProcesses.insert(processUuid, searcher);
     }
-    resultByteArray.append("</root>\n");
+
+    m_searchProcessRuns.insert(processUuid, QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port));
+
+    QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
+    result.setReply(reply);
 
     return CODE_OK;
 }
 
-int QnManualCameraAdditionHandler::addAction(const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType)
-{
-    Q_UNUSED(contentType)
+int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result) {
+    QUuid processUuid = QUuid(params.value("uuid"));
 
-    QAuthenticator auth;
-    QString resType;
-    QUrl url;
-
-    QnManualCamerasMap cameras;
-    QString errStr;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "user")
-            auth.setUser(param.second);
-        else if (param.first == "password")
-            auth.setPassword(param.second);
-    }
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        QPair<QString, QString> param = params[i];
-        if (param.first == "url") 
-        {
-            if (!url.isEmpty()) {
-                QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
-                if (itr.value().resType == 0) {
-                    errStr = QString("Unknown resource type %1").arg(resType);
-                    break;
-                }
-            }
-            url = param.second;
-        }
-        else if (param.first == "manufacturer")
-            resType = param.second;
-    }
-    if (!url.isEmpty()) {
-        QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
-        if (itr.value().resType == 0) {
-            errStr = QString("Unknown resource type %1").arg(resType);
-        }
-    }
-    
-    if (!errStr.isEmpty())
-    {
-        resultByteArray.append("<?xml version=\"1.0\"?>\n");
-        resultByteArray.append("<root>\n");
-        resultByteArray.append(errStr).append("\n");
-        resultByteArray.append("</root>\n");
+    if (processUuid.isNull())
         return CODE_INVALID_PARAMETER;
+
+    if (!isSearchActive(processUuid))
+        return CODE_NOT_FOUND;
+
+    QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
+    result.setReply(reply);
+
+    return CODE_OK;
+}
+
+
+int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &params, QnJsonRestResult &result) {
+    QUuid processUuid = QUuid(params.value("uuid"));
+
+    if (processUuid.isNull())
+        return CODE_INVALID_PARAMETER;
+
+    QnManualCameraSearcher* process(NULL);
+    if (isSearchActive(processUuid)) {
+        QMutexLocker lock(&m_searchProcessMutex);
+        process = m_searchProcesses[processUuid];
+        process->cancel();
+        m_searchProcesses.remove(processUuid);
     }
 
+    m_searchProcessRuns[processUuid].waitForFinished();
+    m_searchProcessRuns.remove(processUuid);
 
-    resultByteArray.append("<?xml version=\"1.0\"?>\n");
-    resultByteArray.append("<root>\n");
-    bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(cameras);
-    if (registered) {
-        //QnResourceDiscoveryManager::instance().processManualAddedResources();
-        resultByteArray.append("OK\n");
+    QnManualCameraSearchReply reply;
+    reply.processUuid = processUuid;
+    if (process) {
+        QnManualCameraSearchProcessStatus processStatus = process->status();
+        reply.status = processStatus.status;
+        reply.cameras = processStatus.cameras;
+
+        delete process;
     }
-    else
-        resultByteArray.append("FAILED\n");
-    resultByteArray.append("</root>\n");
+    result.setReply(reply);
 
+    return CODE_OK;
+}
+
+
+int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result)
+{
+    QAuthenticator auth;
+    auth.setUser(params.value("user"));
+    auth.setPassword(params.value("password"));
+
+    QnManualCameraInfoMap infos;
+    for(int i = 0, skipped = 0; skipped < 5; i++) {
+        QString url = params.value("url" + QString::number(i));
+        QString manufacturer = params.value("manufacturer" + QString::number(i));
+
+        if(url.isEmpty() || manufacturer.isEmpty()) {
+            skipped++;
+            continue;
+        }
+
+        QnManualCameraInfo info(url, auth, manufacturer);
+        if(info.resType.isNull()) {
+            result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid camera manufacturer '%1'.").arg(manufacturer));
+            return CODE_INVALID_PARAMETER;
+        }
+
+        infos.insert(url, info);
+    }
+
+    bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);
+    result.setReply(registered);
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &resultByteArray, QByteArray &contentType)
-{
-    Q_UNUSED(contentType)
-
-    QString localPath = path;
-    while(localPath.endsWith('/'))
-        localPath.chop(1);
-    QString action = localPath.mid(localPath.lastIndexOf('/') + 1);
+int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString action = extractAction(path);
     if (action == "search")
-        return searchAction(params, resultByteArray, contentType);
+        return searchStartAction(params, result);
+    else if (action == "status")
+        return searchStatusAction(params, result);
+    else if (action == "stop")
+        return searchStopAction(params, result);
     else if (action == "add")
-        return addAction(params, resultByteArray, contentType);
-    else {
-        resultByteArray.append("<?xml version=\"1.0\"?>\n");
-        resultByteArray.append("<root>\n");
-        resultByteArray.append("Action not found\n");
-        resultByteArray.append("<root>\n");
+        return addCamerasAction(params, result);
+    else
         return CODE_NOT_FOUND;
-    }
 }
 
-int QnManualCameraAdditionHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &, QByteArray &result, QByteArray &contentType)
-{
-    return executeGet(path, params, result, contentType);
+QnManualCameraSearchProcessStatus QnManualCameraAdditionHandler::getSearchStatus(const QUuid &searchProcessUuid) {
+    QMutexLocker lock(&m_searchProcessMutex);
+
+    if (!m_searchProcesses.contains(searchProcessUuid))
+        return QnManualCameraSearchProcessStatus();
+
+    return m_searchProcesses[searchProcessUuid]->status();
+}
+
+bool QnManualCameraAdditionHandler::isSearchActive(const QUuid &searchProcessUuid) {
+    QMutexLocker lock(&m_searchProcessMutex);
+    return m_searchProcesses.contains(searchProcessUuid);
 }
 
 QString QnManualCameraAdditionHandler::description() const
 {
     return 
-        "Search or manual add cameras found in the specified range.<BR>\n"
-        "<BR><b>api/manualCamera/search</b> - start camera searching"
-        "<BR>Param <b>start_ip</b> - first ip address in range."
-        "<BR>Param <b>end_ip</b> - end ip address in range. Can be omitted - then only start ip address will be used"
-        "<BR>Param <b>port</b> - Port to scan. Can be omitted"
-        "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-        "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
-        "<BR><b>Return</b> XML with camera names, manufacturer and urls"
-        "<BR>"
-        "<BR><b>api/manualCamera/add</b> - manual add camera(s). If several cameras are added, parameters 'ip' and 'manufacturer' must be defined several times"
-        "<BR>Param <b>url</b> - camera url returned by scan request."
-        "<BR>Param <b>manufacturer</b> - camera manufacturer.</i>"
-        "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-        "<BR>Param <b>password</b> - password for the cameras. Can be omitted.";
+            "Search or manual add cameras found in the specified range.<BR>\n"
+            "<BR><b>api/manualCamera/search</b> - start camera searching"
+            "<BR>Param <b>start_ip</b> - first ip address in range."
+            "<BR>Param <b>end_ip</b> - end ip address in range. Can be omitted - only start ip address will be used"
+            "<BR>Param <b>port</b> - Port to scan. Can be omitted"
+            "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
+            "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
+            "<BR><b>Return</b> XML with camera names, manufacturer and urls"
+            "<BR>"
+            "<BR><b>api/manualCamera/status</b> - get manual addition progress."
+            "<BR>Param <b>uuid</b> - process uuid."
+            "<BR>"
+            "<BR><b>api/manualCamera/stop</b> - stop manual addition progress."
+            "<BR>Param <b>uuid</b> - process uuid."
+            "<BR>"
+            "<BR><b>api/manualCamera/add</b> - manual add camera(s). If several cameras are added, parameters 'url' and 'manufacturer' must be defined several times"
+            "<BR>Param <b>url</b> - camera url returned by scan request."
+            "<BR>Param <b>manufacturer</b> - camera manufacturer.</i>"
+            "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
+            "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
+            ;
 }

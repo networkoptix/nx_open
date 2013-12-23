@@ -1,3 +1,5 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
@@ -5,7 +7,9 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/network/simple_http_client.h"
 
-#include <QXmlDefaultHandler>
+#include <QtXml/QXmlDefaultHandler>
+#include <QtCore/QUrlQuery>
+
 #include "core/resource_managment/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
 
@@ -86,7 +90,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         if (existsRes && (existsRes->getStatus() == QnResource::Online || existsRes->getStatus() == QnResource::Recording)) 
         {
             resource->setName(existsRes->getName());
-            int existHttpPort = QUrl(existsRes->getUrl()).queryItemValue(lit("http_port")).toInt();
+            int existHttpPort = QUrlQuery(QUrl(existsRes->getUrl()).query()).queryItemValue(lit("http_port")).toInt();
             existHttpPort = existHttpPort ? existHttpPort : 80;
             apiPort = QUrl(existsRes->getUrl()).port(VMAX_API_PORT);
             // Prevent constant http pullig. But if http port is changed update api port as well.
@@ -270,8 +274,8 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     int channels = -1;
     int apiPort = VMAX_API_PORT;
     int httpPort = 80;
-    QString httpPortStr = url.queryItemValue(lit("http_port"));
-    int channelNum = url.queryItemValue(lit("channel")).toInt();
+    QString httpPortStr = QUrlQuery(url.query()).queryItemValue(lit("http_port"));
+    int channelNum = QUrlQuery(url.query()).queryItemValue(lit("channel")).toInt();
 
     if (httpPortStr.isEmpty())
     {
@@ -303,7 +307,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
             channels = extractChannelCount(existsRes->getModel().toUtf8()); // avoid real requests
             QUrl url(existsRes->getUrl());
             apiPort = url.port(VMAX_API_PORT);
-            int existHttpPort = url.queryItemValue(lit("http_port")).toInt();
+            int existHttpPort = QUrlQuery(url.query()).queryItemValue(lit("http_port")).toInt();
             if (existHttpPort > 0)
                 httpPort = existHttpPort;
         }
@@ -386,4 +390,4 @@ QString QnPlVmax480ResourceSearcher::manufacture() const
     return QLatin1String(QnPlVmax480Resource::MANUFACTURE);
 }
 
-
+#endif // #ifdef ENABLE_VMAX

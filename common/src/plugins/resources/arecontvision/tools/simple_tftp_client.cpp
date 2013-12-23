@@ -2,6 +2,7 @@
 #include "utils/network/socket.h"
 #include "utils/common/log.h"
 #include "utils/common/byte_array.h"
+#include "utils/common/systemerror.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 
 static const int SERVER_TFTP_PORT = 69;
@@ -9,16 +10,19 @@ static const int SERVER_TFTP_PORT = 69;
 using namespace std;
 
 CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout, unsigned int retry):
-m_retry(retry),
-m_hostAddress(host),
-m_timeout(timeout)
+    m_retry(retry),
+    m_hostAddress(host),
+    m_timeout(timeout),
+    m_resolvedAddress(resolveAddress(host).toString())
 {
+    m_sock.reset( SocketFactory::createDatagramSocket() );
+
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
-    m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
-    if (!m_sock.setDestAddr(resolveAddress(host).toString(), SERVER_TFTP_PORT))
+    m_sock->setRecvTimeout(max(m_timeout,1000)); // minimum timeout is 1000 ms
+    if (!m_sock->setDestAddr(m_resolvedAddress, SERVER_TFTP_PORT))
     {
-        qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << m_sock.lastError();
+        qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << SystemError::getLastOSErrorText();
     }
 }
 
@@ -32,7 +36,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
         int len_recv;
         int i, len = 0;
 
-        m_sock.setDestPort(SERVER_TFTP_PORT);
+        m_sock->setDestAddr( m_resolvedAddress, SERVER_TFTP_PORT );
 
         len_send = form_read_request(fn, buff_send);
 
@@ -46,7 +50,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
         for (i = 0; i < m_retry; ++i)
         {
             m_prevResult = CameraDiagnostics::NoErrorResult();
-            if (!m_sock.sendTo(buff_send,len_send))
+            if (!m_sock->send(buff_send,len_send))
             {
                 m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                 return 0;
@@ -55,14 +59,14 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             while(1)
             {
                 m_prevResult = CameraDiagnostics::NoErrorResult();
-                len_recv = m_sock.recvFrom(buff_recv, sizeof(buff_recv),temp_cam_addr, cam_dst_port);
+                len_recv = m_sock->recvFrom(buff_recv, sizeof(buff_recv),temp_cam_addr, cam_dst_port);
                 if (len_recv < 0)
                 {
                     m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                     m_status = time_out; 
                     break;
                 }
-                m_sock.setDestPort(cam_dst_port);
+                m_sock->setDestAddr(m_resolvedAddress, cam_dst_port);
 
                 if (len_recv<13) // unexpected answer
                     continue;
@@ -113,7 +117,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                 //cl_log.log("sending... ", blk_cam_sending, cl_logWARNING);
 
                 m_prevResult = CameraDiagnostics::NoErrorResult();
-                if (!m_sock.sendTo(buff_send,len_send))
+                if (!m_sock->send(buff_send,len_send))
                 {
                     m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
                     return 0;
@@ -124,7 +128,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                 while(1)
                 {
                     m_prevResult = CameraDiagnostics::NoErrorResult();
-                    len_recv = m_sock.recv(buff_recv, sizeof(buff_recv));
+                    len_recv = m_sock->recv(buff_recv, sizeof(buff_recv), 0);
 
                     if (len_recv < 4)// unexpected answer or did not get anything
                     {
@@ -169,7 +173,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         else
                         {
                             // this is 3 times we got option ack; need to resend ack0?
-                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logWARNING);
+                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logDEBUG1);
 
                             if (len_recv<13) // unexpected answer
                                 continue;
@@ -200,14 +204,14 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             if (m_status == time_out)
                 return 0;
 
-        }
+                                                                                                 }
 
 LAST_PACKET:
 
         // need to send ack to last pack;
         len_send = form_ack(last_pack_number, buff_send);
         m_prevResult = CameraDiagnostics::NoErrorResult();
-        if( !m_sock.sendTo(buff_send,len_send) ) // send ack
+        if( !m_sock->send(buff_send,len_send) ) // send ack
             m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
 
         return len;
@@ -229,7 +233,7 @@ int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
     int len = 2;
     int req_len = fn.length();
 
-    memcpy(buff+len, fn.toAscii(), req_len);    len+=req_len;
+    memcpy(buff+len, fn.toLatin1(), req_len);    len+=req_len;
     buff[len] = 0;    len++;
 
     memcpy(buff+len, "netascii", 8); len+=8;

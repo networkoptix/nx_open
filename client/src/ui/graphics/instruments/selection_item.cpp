@@ -2,8 +2,8 @@
 
 #include <cassert>
 
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -22,7 +22,7 @@ SelectionItem::SelectionItem(QGraphicsItem *parent):
     /* Initialize colors with some sensible defaults. Calculations are taken from XP style. */
     QPalette palette = QApplication::style()->standardPalette();
     QColor highlight = palette.color(QPalette::Active, QPalette::Highlight);
-    setPen(highlight.darker(120));
+    setPen(QPen(highlight.darker(120), 0.0));
     setBrush(QColor(
         qMin(highlight.red() / 2 + 110, 255),
         qMin(highlight.green() / 2 + 110, 255),

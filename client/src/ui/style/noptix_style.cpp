@@ -3,29 +3,30 @@
 #include <cmath> /* For std::fmod. */
 
 #include <QtCore/QSet>
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QImage>
-#include <QtGui/QStyleOption>
-#include <QtGui/QMenu>
-#include <QtGui/QAction>
-#include <QtGui/QToolBar>
-#include <QtGui/QAbstractItemView>
+#include <QtWidgets/QStyleOption>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QAbstractItemView>
+
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/common/geometry.h>
+#include <ui/style/noptix_style_animator.h>
+#include <ui/style/globals.h>
+#include <ui/style/skin.h>
+#include <ui/widgets/palette_widget.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
 #include <utils/common/util.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
-
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/geometry.h>
 #include <ui/customization/customizer.h>
-#include <ui/widgets/palette_widget.h>
-
-#include "noptix_style_animator.h"
-#include "globals.h"
-#include "skin.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -230,7 +231,6 @@ void QnNoptixStyle::polish(QApplication *application) {
     application->setFont(font);
 
     QFont menuFont;
-    menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
     application->setFont(menuFont, "QMenu");
 }
@@ -418,7 +418,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
 
     /* Draw progress indicator. */
     if (progress > 0.0) { 
-        const QColor baseColor(4, 154, 116); // TODO: #GDM take color from config?
+        const QColor baseColor = qnGlobals->progressBarBackgroundColor();
         const QColor glareColor = pb->palette.color(QPalette::WindowText);
 
         QLinearGradient gradient(x, y, x + w, y);

@@ -1,82 +1,19 @@
 #include "universal_tcp_listener.h"
 #include "utils/network/tcp_connection_priv.h"
-#include <QUrl>
+#include <QtCore/QUrl>
+#include "universal_request_processor.h"
+#include "proxy_sender_connection_processor.h"
+#include "utils/network/socket.h"
 
-class QnUniversalRequestProcessorPrivate;
 
-class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
-{
-public:
-    QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner);
-    virtual ~QnUniversalRequestProcessor();
-
-protected:
-    virtual void run() override;
-    virtual void pleaseStop() override;
-
-private:
-    Q_DECLARE_PRIVATE(QnUniversalRequestProcessor);
-};
-
-class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate
-{
-public:
-    QnTCPConnectionProcessor* processor;
-    QMutex mutex;
-};
-
-QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
-{
-    stop();
-}
-
-QnUniversalRequestProcessor::QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
-{
-    Q_D(QnUniversalRequestProcessor);
-    d->processor = 0;
-
-    setObjectName( QLatin1String("QnUniversalRequestProcessor") );
-}
-
-void QnUniversalRequestProcessor::run()
-{
-    Q_D(QnUniversalRequestProcessor);
-    saveSysThreadID();
-    if (readRequest()) 
-    {
-        QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
-        if (header.size() > 2) 
-        {
-            QByteArray protocol = header[2].split('/')[0].toUpper();
-            QMutexLocker lock(&d->mutex);
-            d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])).path());
-            if (d->processor && !needToStop()) 
-            {
-                copyClientRequestTo(*d->processor);
-                d->ssl = 0;
-                d->socket = 0;
-                d->processor->execute(d->mutex);
-            }
-            delete d->processor;
-            d->processor = 0;
-        }
-    }
-}
-
-void QnUniversalRequestProcessor::pleaseStop()
-{
-    Q_D(QnUniversalRequestProcessor);
-    QMutexLocker lock(&d->mutex);
-    QnTCPConnectionProcessor::pleaseStop();
-    if (d->processor)
-        d->processor->pleaseStop();
-}
+static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
 QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port, int maxConnections):
-    QnTcpListener(address, port, maxConnections)
+    QnTcpListener(address, port, maxConnections),
+    m_proxyPoolSize(0),
+    m_needAuth(true)
 {
 
 }
@@ -86,7 +23,7 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
     stop();
 }
 
-QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocket* clientSocket, const QByteArray& protocol, const QString& path)
+QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QString& path)
 {
     QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
     for (int i = 0; i < m_handlers.size(); ++i)
@@ -113,7 +50,93 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(TCPSocke
     return 0;
 }
 
-QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
-    return new QnUniversalRequestProcessor(clientSocket, owner);
+    return new QnUniversalRequestProcessor(clientSocket, owner, m_needAuth);
+}
+
+void QnUniversalTcpListener::setProxyParams(const QUrl& proxyServerUrl, const QString& selfId)
+{
+    m_proxyServerUrl = proxyServerUrl;
+    m_selfIdForProxy = selfId;
+}
+
+void QnUniversalTcpListener::addProxySenderConnections(int size)
+{
+    if (m_needStop)
+        return;
+
+    for (int i = 0; i < size; ++i) {
+        QnProxySenderConnection* connect = new QnProxySenderConnection(m_proxyServerUrl, m_selfIdForProxy, this);
+        connect->start();
+        addOwnership(connect);
+    }
+}
+
+QSharedPointer<AbstractStreamSocket> QnUniversalTcpListener::getProxySocket(const QString& guid, int timeout)
+{
+    QMutexLocker lock(&m_proxyMutex);
+    ProxyList::iterator itr = m_awaitingProxyConnections.find(guid);
+    while (itr == m_awaitingProxyConnections.end() && m_proxyConExists.contains(guid)) {
+        if (!m_proxyWaitCond.wait(&m_proxyMutex, timeout))
+            break;
+        itr = m_awaitingProxyConnections.find(guid);
+    }
+
+    if (itr == m_awaitingProxyConnections.end())
+        return QSharedPointer<AbstractStreamSocket>();
+    QSharedPointer<AbstractStreamSocket> result = itr.value().socket;
+    result->setNonBlockingMode(false);
+    m_awaitingProxyConnections.erase(itr);
+    return result;
+}
+
+void QnUniversalTcpListener::setProxyPoolSize(int value)
+{
+    m_proxyPoolSize = value;
+}
+
+bool QnUniversalTcpListener::registerProxyReceiverConnection(const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
+{
+    QMutexLocker lock(&m_proxyMutex);
+    if (m_awaitingProxyConnections.size() < m_proxyPoolSize * 2) {
+        m_awaitingProxyConnections.insert(guid, AwaitProxyInfo(socket));
+        socket->setNonBlockingMode(true);
+        m_proxyConExists << guid;
+        m_proxyWaitCond.wakeAll();
+        return true;
+    }
+    return false;
+}
+
+void QnUniversalTcpListener::doPeriodicTasks()
+{
+    QnTcpListener::doPeriodicTasks();
+
+    QMutexLocker lock(&m_proxyMutex);
+
+    for (ProxyList::Iterator itr = m_awaitingProxyConnections.begin(); itr != m_awaitingProxyConnections.end();)
+    {
+        AwaitProxyInfo& info = itr.value();
+        if (!info.socket->isConnected()) {
+            itr = m_awaitingProxyConnections.erase(itr);
+            continue;
+        }
+        else if (info.timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
+        {
+            info.timer.restart();
+            int sended = info.socket->send(QByteArray("PROXY 200 OK\r\n\r\n"));
+            if (sended < 1)
+            {
+                itr = m_awaitingProxyConnections.erase(itr);
+                continue;
+            }
+        }
+        ++itr;
+    }
+}
+
+void QnUniversalTcpListener::disableAuth()
+{
+    m_needAuth = false;
 }

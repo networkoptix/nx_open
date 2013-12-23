@@ -1,18 +1,17 @@
-
 #include "frame_info.h"
-#include "../common/util.h"
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
+#include <utils/math/math.h>
 
 extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-#undef AVPixFmtDescriptor
+#   undef AVPixFmtDescriptor
 #endif
 };
 
@@ -160,7 +159,6 @@ void CLVideoDecoderOutput::fillRightEdge()
 void CLVideoDecoderOutput::memZerro()
 {
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
-    quint8 filler = 0;
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int w = linesize[i];
@@ -186,6 +184,7 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     int roundWidth = qPower2Ceil((unsigned) width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
+        numBytes += FF_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
         avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
         fillRightEdge();
     }

@@ -2,7 +2,7 @@
 #define QN_PROXY_LABEL_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/connective.h>
 

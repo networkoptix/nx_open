@@ -56,6 +56,14 @@ bool QnByteArrayConstRef::isEmpty() const
     return m_count == 0;
 }
 
+int QnByteArrayConstRef::indexOf( char sep ) const
+{
+    const value_type* sepPos = static_cast<const value_type*>(memchr( constData(), sep, size() ));
+    if( sepPos == NULL )
+        return -1;
+    return sepPos - constData();
+}
+
 bool QnByteArrayConstRef::startsWith( const_pointer str, size_type len ) const
 {
     if( len == npos )
@@ -68,7 +76,46 @@ bool QnByteArrayConstRef::startsWith( const_pointer str, size_type len ) const
 uint QnByteArrayConstRef::toUInt() const
 {
     //TODO/IMPL effective implementation
-    return ((QByteArray)*this).toUInt();
+    return toByteArrayWithRawData().toUInt();
+}
+
+float QnByteArrayConstRef::toFloat() const
+{
+    //TODO/IMPL effective implementation
+    return toByteArrayWithRawData().toFloat();
+}
+
+QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const
+{
+    QList<QnByteArrayConstRef> tokenList;
+    const value_type* dataEnd = constData() + size();
+    const value_type* curTokenStart = constData();
+    for( ; curTokenStart < dataEnd; )
+    {
+        const value_type* sepPos = static_cast<const value_type*>(memchr( curTokenStart, sep, dataEnd-curTokenStart ));
+        if( sepPos == NULL )
+            break;
+        tokenList.append( QnByteArrayConstRef( *m_src, m_offset + (curTokenStart-constData()), sepPos-curTokenStart ) );
+        curTokenStart = sepPos+1;
+    }
+    if( curTokenStart <= dataEnd )
+        tokenList.append( QnByteArrayConstRef( *m_src, m_offset + curTokenStart-constData(), dataEnd-curTokenStart ) );
+    return tokenList;
+}
+
+bool QnByteArrayConstRef::isEqualCaseInsensitive( const char* str, size_t strLength ) const
+{
+    if( strLength == (size_t)-1 )
+        strLength = strlen( str );
+    if( isEmpty() )
+        return strLength == 0;
+    if( size() != strLength )
+        return false;
+#ifdef _WIN32
+    return strnicmp( constData(), str, strLength ) == 0;
+#else
+    return strncasecmp( constData(), str, strLength ) == 0;
+#endif
 }
 
 const QnByteArrayConstRef::value_type& QnByteArrayConstRef::operator[]( size_type index ) const
@@ -79,7 +126,7 @@ const QnByteArrayConstRef::value_type& QnByteArrayConstRef::operator[]( size_typ
 
 QnByteArrayConstRef::operator QByteArray() const
 {
-    return m_src->mid( m_offset, (int) m_count );
+    return m_src ? m_src->mid( m_offset, (int) m_count ) : QByteArray();
 }
 
 QByteArray QnByteArrayConstRef::toByteArrayWithRawData() const
@@ -120,7 +167,7 @@ bool operator==( const QnByteArrayConstRef::const_pointer& left, const QnByteArr
     const size_t leftLen = strlen( left );
     if( leftLen != right.size() )
         return false;
-    return memcmp( left, right.data(), leftLen ) == 0;
+    return memcmp( left, right.constData(), leftLen ) == 0;
 }
 
 bool operator!=( const QnByteArrayConstRef::const_pointer& left, const QnByteArrayConstRef& right )

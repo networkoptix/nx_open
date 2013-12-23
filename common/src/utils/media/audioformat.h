@@ -75,8 +75,6 @@ public:
 
     bool isValid() const;
 
-    void setFrequency(int frequency);
-    int frequency() const;
     void setSampleRate(int sampleRate);
     int sampleRate() const;
 

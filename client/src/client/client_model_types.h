@@ -11,7 +11,7 @@
 #include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
 
-#include <utils/common/struct_functions.h>
+#include <utils/common/model_functions_fwd.h>
 #include <recording/time_period.h>
 
 
@@ -55,8 +55,6 @@ public:
     QList<QString> layoutUuids;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnWorkbenchState, (qdatastream), (currentLayoutIndex)(layoutUuids), inline);
-
 /**
  * Mapping from user name to workbench state.
  */
@@ -64,6 +62,7 @@ typedef QHash<QString, QnWorkbenchState> QnWorkbenchStateHash;
 
 Q_DECLARE_METATYPE(QnWorkbenchState);
 Q_DECLARE_METATYPE(QnWorkbenchStateHash);
+QN_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream));
 
 
 // -------------------------------------------------------------------------- //
@@ -77,12 +76,11 @@ struct QnServerStorageKey {
     QString storagePath;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnServerStorageKey, (qdatastream)(eq)(qhash), (serverUuid)(storagePath), inline);
-
 typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
 
 Q_DECLARE_METATYPE(QnServerStorageKey);
 Q_DECLARE_METATYPE(QnServerStorageStateHash);
+QN_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash));
 
 
 // -------------------------------------------------------------------------- //
@@ -96,8 +94,6 @@ struct QnLicenseWarningState {
     bool ignore;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (qdatastream), (lastWarningTime)(ignore), inline);
-
 /**
  * Mapping from license key to license warning state.
  */
@@ -105,23 +101,14 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 
 Q_DECLARE_METATYPE(QnLicenseWarningState);
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
+QN_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream));
 
 
-// -------------------------------------------------------------------------- //
-// QnPtzPreset
-// -------------------------------------------------------------------------- //
-struct QnPtzPreset {
-    QnPtzPreset(): hotkey(-1) {};
-    QnPtzPreset(int hotkey, const QString &name, const QVector3D &logicalPosition): hotkey(hotkey), name(name), logicalPosition(logicalPosition) {}
-
-    bool isNull() const { return name.isEmpty(); }
-
-    int hotkey;
-    QString name;
-    QVector3D logicalPosition;
-};
-
-Q_DECLARE_METATYPE(QnPtzPreset);
+/**
+ * Mapping from resource physical id to aspect ratio.
+ */
+typedef QHash<QString, qreal> QnAspectRatioHash;
+Q_DECLARE_METATYPE(QnAspectRatioHash)
 
 
 

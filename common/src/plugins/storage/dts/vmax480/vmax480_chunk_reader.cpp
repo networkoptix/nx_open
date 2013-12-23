@@ -1,4 +1,6 @@
-#include <QDateTime>
+#ifdef ENABLE_VMAX
+
+#include <QtCore/QDateTime>
 
 #include "vmax480_chunk_reader.h"
 #include "utils/common/synctime.h"
@@ -29,7 +31,7 @@ QnVMax480ChunkReader::~QnVMax480ChunkReader()
 
 void QnVMax480ChunkReader::run()
 {
-    saveSysThreadID();
+    //saveSysThreadID();
     bool registered = false;
     while (!needToStop() && !registered)
         registered = m_streamFetcher->registerConsumer(this);
@@ -250,3 +252,5 @@ void QnVMax480ChunkReader::addChunk(QnTimePeriodList& chunks, const QnTimePeriod
     else
         chunks << period;
 }
+
+#endif // #ifdef ENABLE_VMAX

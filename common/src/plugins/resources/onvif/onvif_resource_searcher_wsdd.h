@@ -1,12 +1,14 @@
 #ifndef onvif_resource_searcher_wsdd_h
 #define onvif_resource_searcher_wsdd_h
 
+#ifdef ENABLE_ONVIF
+
 #include "onvif_resource_information_fetcher.h"
 
 #include <map>
 #include <memory>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include "onvif/soapwsddProxy.h"
 
@@ -93,17 +95,17 @@ private:
     class ProbeContext
     {
     public:
-        std::auto_ptr<UDPSocket> sock;
+        std::unique_ptr<AbstractDatagramSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
         wsa__EndpointReferenceType replyTo;
 
-        ProbeContext()
-        :
-            sock( NULL ),
-            soapWsddProxy( SOAP_IO_UDP )
-        {
-        }
+        ProbeContext();
+        ~ProbeContext();
+
+    private:
+        ProbeContext( const ProbeContext& );
+        ProbeContext& operator=( const ProbeContext& );
     };
 
     bool m_shouldStop;
@@ -113,5 +115,7 @@ private:
     bool sendProbe( const QnInterfaceAndAddr& iface );
     bool readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_resource_searcher_wsdd_h

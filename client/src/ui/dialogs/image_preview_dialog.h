@@ -1,7 +1,7 @@
 #ifndef IMAGE_PREVIEW_DIALOG_H
 #define IMAGE_PREVIEW_DIALOG_H
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace Ui {
     class QnImagePreviewDialog;

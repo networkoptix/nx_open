@@ -1,7 +1,7 @@
 #ifndef X11_LAUNCHER_WORKAROUND_H
 #define X11_LAUNCHER_WORKAROUND_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 /**
  * This class implements a workaround for Linux X11 Gnome Launcher
@@ -9,7 +9,7 @@
  * This class hides launcher when application activates and
  * resores launcher when application loses focus.
  */
-class QnX11LauncherWorkaround: public QObject{
+class QnX11LauncherWorkaround: public QObject {
     Q_OBJECT
 
 public:

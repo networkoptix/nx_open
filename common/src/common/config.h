@@ -2,18 +2,6 @@
 #define QN_COMMON_CONFIG_H
 
 // -------------------------------------------------------------------------- //
-// Application settings. OK to change.
-// -------------------------------------------------------------------------- //
-/** 
- * \def QN_HAS_PRIVATE_INCLUDES
- * 
- * Define if Qt private headers are available on your system.
- */
-#define QN_HAS_PRIVATE_INCLUDES
-
-
-
-// -------------------------------------------------------------------------- //
 // Application globals. Do not change.
 // -------------------------------------------------------------------------- //
 
@@ -40,7 +28,8 @@
 
 
 /* Don't use deprecated Qt functions. */
-#define QT_NO_DEPRECATED
+// TODO: This one causes compilation errors in QObject...
+//#define QT_NO_DEPRECATED
 
 
 /* Use variadic macros in boost even for older GCC versions. */
@@ -52,26 +41,21 @@
 /* Define override specifier. */
 #if defined(_MSC_VER)
 #   define override override
-#elif defined(__GNUC__)
-#   if (GCC_VERSION < 40700)
-#       define override
-#   endif
+#elif defined(__GNUC__) && GCC_VERSION < 40700
+#   define override
 #else
 #   define override
 #endif
 
 
-/* Define noexcept. */
-#if defined(_MSC_VER)
-#   define noexcept throw()
-#elif defined(__GNUC__)
-#   if (GCC_VERSION >= 40600)
-#       define noexcept noexcept
-#   else
-#       define noexcept throw()
+/* Define NULL. */
+#ifdef __cplusplus
+#   undef NULL
+#   define NULL nullptr
+#   ifdef __GNUC__
+#       undef __null
+#       define __null nullptr
 #   endif
-#else
-#   define noexcept
 #endif
 
 

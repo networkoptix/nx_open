@@ -1,7 +1,7 @@
 #ifndef QN_UI_DISPLAY_H
 #define QN_UI_DISPLAY_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include <core/resource/resource_consumer.h>
 #include <core/resource/media_resource.h>
 
@@ -12,7 +12,7 @@ class QnResourceVideoLayout;
 class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
-class QnVideoCamera;
+class QnClientVideoCamera;
 class QnCounter;
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
@@ -74,7 +74,7 @@ public:
     /**
      * \returns                         Video camera associated with this display, if any.
      */
-    QnVideoCamera *camera() const {
+    QnClientVideoCamera *camera() const {
         return m_camera;
     }
 
@@ -112,6 +112,8 @@ public:
 
     void play();
 
+    void pause();
+
     bool isStillImage() const;
 
     /**
@@ -142,7 +144,7 @@ private:
     QnAbstractArchiveReader *m_archiveReader;
 
     /** Video camera. */
-    QnVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.
+    QnClientVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;

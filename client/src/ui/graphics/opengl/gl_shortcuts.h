@@ -1,7 +1,7 @@
 #ifndef QN_GL_SHORTCUTS_H
 #define QN_GL_SHORTCUTS_H
 
-#include <QtOpenGL>
+#include <QtOpenGL/QtOpenGL>
 
 #include <utils/math/coordinate_transformations.h>
 

@@ -1,7 +1,11 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#include <memory>
+#include <vector>
+
 #include <QAuthenticator>
+
 #include "socket.h"
 
 extern "C"
@@ -77,7 +81,7 @@ private:
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
-    QTime m_statsTimer;
+    QElapsedTimer m_statsTimer;
     double m_minJitter;
     double m_maxJitter;
     double m_jitterSum;
@@ -94,8 +98,8 @@ public:
     
     const RtspStatistic& getStatistic() { return m_statistic;}
     void setStatistic(const RtspStatistic& value) { m_statistic = value; }
-    CommunicatingSocket* getMediaSocket();
-    UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    AbstractCommunicatingSocket* getMediaSocket();
+    AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
@@ -109,8 +113,8 @@ private:
     RTPSession* m_owner;
     bool m_tcpMode;
     RtspStatistic m_statistic;
-    UDPSocket* m_mediaSocket;
-    UDPSocket* m_rtcpSocket;
+    AbstractDatagramSocket* m_mediaSocket;
+    AbstractDatagramSocket* m_rtcpSocket;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
 };
@@ -119,6 +123,11 @@ class RTPSession: public QObject
 {
     Q_OBJECT;
 public:
+    enum DefaultAuthScheme {
+        authNone,
+        authBasic,
+        authDigest // generate nonce as current time in usec
+    };
 
     //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
 
@@ -222,7 +231,11 @@ public:
 
     void parseRangeHeader(const QString& rangeStr);
 
-    void setAuth(const QAuthenticator& auth);
+    /*
+    * Client will use any AuthScheme corresponding to server requirements (authenticate server request)
+    * defaultAuthScheme is used for first client request only
+    */
+    void setAuth(const QAuthenticator& auth, DefaultAuthScheme defaultAuthScheme);
     QAuthenticator getAuth() const;
 
     void setProxyAddr(const QString& addr, int port);
@@ -253,7 +266,7 @@ public:
     * @param channelNumber buffer number
     * @return amount of readed bytes
     */
-    int readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber);
+    int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
 
     void sendBynaryResponse(quint8* buffer, int size);
@@ -263,7 +276,7 @@ public:
 
     void setUsePredefinedTracks(int numOfVideoChannel);
 
-    static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
+    static quint8* prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve);
 
     bool setTCPReadBufferSize(int value);
 
@@ -293,11 +306,13 @@ private:
     void updateResponseStatus(const QByteArray& response);
 
     // in case of error return false
-    bool checkIfDigestAuthIsneeded(const QByteArray& response);
+    bool isDigestAuthRequired(const QByteArray& response);
     void usePredefinedTracks();
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
+    QByteArray calcDefaultNonce() const;
+    bool sendPlayInternal(qint64 startPos, qint64 endPos);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
@@ -323,7 +338,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    TCPSocket m_tcpSock;
+    std::auto_ptr<AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
     QUrl mUrl;
@@ -333,7 +348,7 @@ private:
     // format: key - track number, value - codec name
     TrackMap m_sdpTracks;
 
-    QTime m_keepAliveTime;
+    QElapsedTimer m_keepAliveTime;
 
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
@@ -351,6 +366,15 @@ private:
     QVector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
     QString m_videoLayout;
+
+    char* m_additionalReadBuffer;
+    int m_additionalReadBufferPos;
+    int m_additionalReadBufferSize;
+
+    /*!
+        \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
+    */
+    int readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome );
 };
 
 #endif //rtp_session_h_1935_h

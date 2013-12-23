@@ -4,7 +4,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QWeakPointer>
 
 #include <utils/common/json.h>
 
@@ -17,7 +16,6 @@
 
 class VariantAnimator;
 
-class QnGlFunctions;
 class QnClientSettings;
 class QnRadialGradientPainter;
 
@@ -59,7 +57,6 @@ protected slots:
     void updateBackgroundColor(bool animate = true);
 
 private:
-    QScopedPointer<QnGlFunctions> m_gl;
     QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
 
     VariantAnimator *m_backgroundColorAnimator;

@@ -1,5 +1,5 @@
 #include "grid_highlight_item.h"
-#include <QPainter>
+#include <QtGui/QPainter>
 
 QnGridHighlightItem::QnGridHighlightItem(QGraphicsItem *parent):
     QGraphicsObject(parent),

@@ -17,7 +17,8 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_forceDownmix(qnSettings->isAudioDownmixed()),
     m_sampleConvertMethod(SampleConvert_None),
     m_isConvertMethodInitialized(false),
-    m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE)
+    m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
+    m_startBufferingTime(AV_NOPTS_VALUE)
 {}
 
 QnAudioStreamDisplay::~QnAudioStreamDisplay()
@@ -39,7 +40,9 @@ int QnAudioStreamDisplay::msInBuffer() const
     //cl_log.log("compressedBufferSize = ", msInQueue(), cl_logALWAYS);
     //cl_log.log("tptalaudio = ", msInQueue() + internalBufferSize, cl_logALWAYS);
 
-    return msInQueue() + internalBufferSize;
+    int rez = msInQueue() + internalBufferSize;
+
+    return rez;
 }
 
 void QnAudioStreamDisplay::suspend()
@@ -58,9 +61,9 @@ void QnAudioStreamDisplay::resume()
         m_audioSound->resume();
 }
 
-bool QnAudioStreamDisplay::isBuffering() const
+qint64 QnAudioStreamDisplay::startBufferingTime() const
 {
-    return m_tooFewDataDetected;
+    return m_tooFewDataDetected ? m_startBufferingTime : AV_NOPTS_VALUE;
 }
 
 bool QnAudioStreamDisplay::isFormatSupported() const
@@ -170,11 +173,13 @@ void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     if (bufferSize < m_bufferMs / 10)
     {
         m_tooFewDataDetected = true;
+        m_startBufferingTime = data->timestamp - bufferSize;
     }
 
     if (m_tooFewDataDetected && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
+        m_startBufferingTime = data->timestamp;
         return;
     }
 
@@ -255,7 +260,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             audioFormat = QnAudioProcessor::float2int16(m_decodedAudioBuffer, audioFormat);
         else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
             audioFormat = QnAudioProcessor::int32Toint16(m_decodedAudioBuffer, audioFormat);
-        if (audioFormat.channels() > 2 && m_downmixing)
+        if (audioFormat.channelCount() > 2 && m_downmixing)
             audioFormat = QnAudioProcessor::downmix(m_decodedAudioBuffer, audioFormat);
 
         //resume(); // does nothing if resumed already

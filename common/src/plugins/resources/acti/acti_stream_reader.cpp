@@ -1,4 +1,6 @@
-#include <QTextStream>
+#ifdef ENABLE_ACTI
+
+#include <QtCore/QTextStream>
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 #include "utils/common/sleep.h"
@@ -46,6 +48,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     QString SET_ENCODER(QLatin1String("CHANNEL=%1&VIDEO_ENCODER=%2"));
     QString SET_AUDIO(QLatin1String("CHANNEL=%1&V2_AUDIO_ENABLED=%2"));
 
+    m_multiCodec.setRole(m_role);
     int fps = m_actiRes->roundFps(getFps(), m_role);
     int ch = getActiChannelNum();
     QSize resolution = m_actiRes->getResolution(m_role);
@@ -56,7 +59,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     QString encoderStr(QLatin1String("H264"));
     QString audioStr = m_actiRes->isAudioEnabled() ? QLatin1String("1") : QLatin1String("0");
 
-    if (!m_actiRes->isCameraControlDisabled())
+    if (!isCameraControlDisabled())
     {
         CLHttpStatus status;
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
@@ -148,3 +151,5 @@ const QnResourceAudioLayout* QnActiStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }
+
+#endif // #ifdef ENABLE_ACTI

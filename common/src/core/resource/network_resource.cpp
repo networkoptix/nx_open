@@ -1,4 +1,9 @@
+
 #include "network_resource.h"
+
+#include <memory>
+
+#include <QtCore/QElapsedTimer>
 
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
@@ -226,7 +231,7 @@ bool QnNetworkResource::conflicting()
     if (checkNetworkStatus(QnNetworkResource::BadHostAddr))
         return false;
 
-    QTime time;
+    QElapsedTimer time;
     time.restart();
     CL_LOG(cl_logDEBUG2) cl_log.log("begining of QnNetworkResource::conflicting() ",  cl_logDEBUG2);
 
@@ -281,8 +286,8 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    TCPSocket sock;
-    return sock.connect( getHostAddress(), httpPort() );
+    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    return sock->connect( getHostAddress(), httpPort() );
 }
 
 /*

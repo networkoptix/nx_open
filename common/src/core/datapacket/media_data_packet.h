@@ -1,27 +1,30 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
-#include <QVector>
-#include <QRect>
+#include <QtCore/QVector>
+#include <QtCore/QRect>
 
 extern "C"
 {
     #include "libavcodec/avcodec.h"
 }
+
 #include "abstract_data_packet.h"
+#include <plugins/camera_plugin.h>
 #include "utils/common/byte_array.h"
 #include "utils/media/sse_helper.h"
 
 #ifndef Q_OS_WIN
 #   include "utils/media/audioformat.h"
 #else
-#   include <QAudioFormat>
+#   include <QtMultimedia/QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
-#include "utils/math/math.h"
+
 #include "utils/network/socket.h"
 #include "utils/common/aligned_allocator.h"
 #include "utils/common/util.h"
+#include <utils/math/math.h>
 
 struct AVCodecContext;
 
@@ -97,7 +100,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     {
     }
 
-    virtual QnAbstractMediaData* clone();
+    virtual QnAbstractMediaData* clone() const;
 
     //!Create media packet using existing data \a data of size \a dataSize. This buffer will not be deleted!
     QnAbstractMediaData(char* data, unsigned int dataSize): 
@@ -126,11 +129,12 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     QnMediaContextPtr context;
     int opaque;
 protected:
-    void assign(QnAbstractMediaData* other);
+    void assign(const QnAbstractMediaData* other);
 private:
     QnAbstractMediaData(): data(0U, 1) {};
 };
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
+typedef QSharedPointer<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
 
 
 struct QnEmptyMediaData : public QnAbstractMediaData
@@ -145,13 +149,19 @@ typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
 struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
+typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
+Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
 
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
-    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
-        : QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
+    QnCompressedVideoData(
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    :
+        QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
     {
         dataType = VIDEO;
         //useTwice = false;
@@ -162,7 +172,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
         pts = AV_NOPTS_VALUE;
     }
 
-    virtual QnCompressedVideoData* clone() override;
+    virtual QnCompressedVideoData* clone() const override;
 
 
     int width;
@@ -173,12 +183,14 @@ struct QnCompressedVideoData : public QnAbstractMediaData
     QnMetaDataV1Ptr motion;
     qint64 pts;
 protected:
-    void assign(QnCompressedVideoData* other);
+    void assign(const QnCompressedVideoData* other);
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
+typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
 
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
 
 /** 
 * This structure used for serialized QnMetaDataV1
@@ -231,9 +243,10 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     */
     void addMotion(const quint8* data, qint64 timestamp);
     void addMotion(QnMetaDataV1Ptr data);
+    void addMotion(QnConstMetaDataV1Ptr data);
 
     // remove part of motion info by motion mask
-    void removeMotion(const __m128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
+    void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
 
     // ti check if we've got motion at 
     static bool isMotionAt(int x, int y, char* mask);
@@ -257,21 +270,24 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     /** returns true if no motion detected */
     bool isEmpty() const;
 
+    //!Copies \a motionPicture data
+    void assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration );
+
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
-    virtual QnMetaDataV1* clone() override;
+    virtual QnMetaDataV1* clone() const override;
 
     //void deserialize(QIODevice* ioDevice);
-    void serialize(QIODevice* ioDevice);
+    void serialize(QIODevice* ioDevice) const;
 
-    static bool mathImage(const __m128i* data, const __m128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
 
     quint8 m_input;
     qint64 m_duration;
 protected:
-    void assign(QnMetaDataV1* other);
+    void assign(const QnMetaDataV1* other);
 private:
     qint64 m_firstTimestamp;
 };
@@ -285,7 +301,8 @@ public:
         bitrate(0),
         channel_layout(0),
         block_align(0),
-        m_bitsPerSample(0)
+        m_bitsPerSample(0),
+        m_frequency(0)
     {}
 
     QnCodecAudioFormat(QnMediaContextPtr ctx)
@@ -299,79 +316,41 @@ public:
         return *this;
     }
 
-    void fromAvStream(AVCodecContext* c)
-    {
-        if (c->sample_rate)
-            setFrequency(c->sample_rate);
-
-        if (c->channels) 
-            setChannels(c->channels);
-
-        //setCodec("audio/pcm");
-        setByteOrder(QnAudioFormat::LittleEndian);
-
-        switch(c->sample_fmt)
-        {
-        case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
-            setSampleSize(8);
-            setSampleType(QnAudioFormat::UnSignedInt);
-            break;
-
-        case AV_SAMPLE_FMT_S16: ///< signed 16 bits
-            setSampleSize(16);
-            setSampleType(QnAudioFormat::SignedInt);
-            break;
-
-        case AV_SAMPLE_FMT_S32:///< signed 32 bits
-            setSampleSize(32);
-            setSampleType(QnAudioFormat::SignedInt);
-            break;
-
-        case AV_SAMPLE_FMT_FLT:
-            setSampleSize(32);
-            setSampleType(QnAudioFormat::Float);
-            break;
-
-        default:
-            break;
-        }
-
-        if (c->extradata_size > 0)
-        {
-            extraData.resize(c->extradata_size);
-            memcpy(&extraData[0], c->extradata, c->extradata_size);
-        }
-        bitrate = c->bit_rate;
-        channel_layout = c->channel_layout;
-        block_align = c->block_align;
-        m_bitsPerSample = c->bits_per_coded_sample;
-    }
+    void fromAvStream(AVCodecContext* c);
 
     QVector<quint8> extraData; // codec extra data
     int bitrate;
     int channel_layout;
     int block_align;
     int m_bitsPerSample;
+
+private:
+    int m_frequency;
 };
 
 
 struct QnCompressedAudioData : public QnAbstractMediaData
 {
-    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
-        : QnAbstractMediaData(alignment, capacity)
+    QnCompressedAudioData (
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0))
+    :
+        QnAbstractMediaData(alignment, capacity)
     {
         dataType = AUDIO;
         duration = 0;
         context = ctx;
     }
 
-    virtual QnCompressedAudioData* clone() override;
+    virtual QnCompressedAudioData* clone() const override;
 
     //QnCodecAudioFormat format;
     quint64 duration;
 private:
-    void assign(QnCompressedAudioData* other);
+    void assign(const QnCompressedAudioData* other);
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
+typedef QSharedPointer<const QnCompressedAudioData> QnConstCompressedAudioDataPtr;
 
 #endif //abstract_media_data_h_112

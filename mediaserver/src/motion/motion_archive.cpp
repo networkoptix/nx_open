@@ -1,6 +1,6 @@
 #include "motion_archive.h"
-#include <QDateTime>
-#include <QDir>
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
@@ -176,7 +176,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
     QnTimePeriodList rez;
     QFile motionFile, indexFile;
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
-    __m128i mask[MD_WIDTH * MD_HEIGHT / 128];
+    simd128i mask[MD_WIDTH * MD_HEIGHT / 128];
     int maskStart, maskEnd;
 
     Q_ASSERT(((unsigned long)mask)%16 == 0);
@@ -223,7 +223,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
             quint8* curData = buffer;
             while (i < endItr && curData < dataEnd)
             {
-                if (QnMetaDataV1::mathImage((__m128i*) curData, mask, maskStart, maskEnd))
+                if (QnMetaDataV1::mathImage((simd128i*) curData, mask, maskStart, maskEnd))
                 {
                     qint64 fullStartTime = i->start + indexHeader.startTime;
                     if (fullStartTime > msEndTime) {
@@ -307,7 +307,7 @@ int QnMotionArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
     return indexIterator - m_index.begin();
 }
 
-bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
+bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
 {
     qint64 timestamp = data->timestamp/1000;
     if (timestamp > m_lastDateForCurrentFile || timestamp < m_firstTime)
@@ -406,7 +406,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     return true;
 }
 
-bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
+bool QnMotionArchive::saveToArchive(QnConstMetaDataV1Ptr data)
 {
     bool rez = true;
 
@@ -435,7 +435,7 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
         // save to disk
         if (!m_lastDetailedData->isEmpty())
             rez = saveToArchiveInternal(m_lastDetailedData);
-        m_lastDetailedData = data;
+        m_lastDetailedData = QnMetaDataV1Ptr(data->clone());
         m_lastDetailedData->m_duration = 0;
         //qDebug() << "start new Motion" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz");
     }

@@ -2,7 +2,7 @@
 #define QN_WHEEL_ZOOM_INSTRUMENT_H
 
 #include "instrument.h"
-#include <QtCore/QWeakPointer>
+
 #include <ui/processors/kinetic_processor.h>
 
 /**
@@ -28,7 +28,7 @@ protected:
     virtual void finishKinetic() override;
 
 private:
-    QWeakPointer<QWidget> m_currentViewport;
+    QPointer<QWidget> m_currentViewport;
     QPoint m_viewportAnchor;
 };
 

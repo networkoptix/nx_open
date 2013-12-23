@@ -177,6 +177,17 @@ namespace Qn {
         OpenBusinessRulesAction,
 
 
+        /**
+         * Tries to restart the application as soon as all modal dialogs are closed.
+         * Parameters:
+         * <tt>QnSoftwareVersion  SoftwareVersionRole</tt>  --- application version that should be started.
+         *                                                      If not provided, current version will be used.
+         * <tt>QUrl UrlRole</tt>                            --- url the application should connect to.
+         *                                                      If not provided, current connection info will be used.
+         */
+        QueueAppRestartAction,
+
+
         /* Main menu actions. */
 
         /**
@@ -604,6 +615,8 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /* PTZ Actions */
+
         /**
          * Opens preset name editing dialog and saves current position as a new PTZ preset.
          */
@@ -618,7 +631,7 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          *
          * Parameters:
-         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
+         * <tt>QString PtzPresetIdRole</tt> --- id of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -628,12 +641,30 @@ namespace Qn {
         PtzManagePresetsAction,
 
         /**
-         * Sets the current picture as a layout background.
+         * Starts given PTZ tour.
+         *
+         * Parameters:
+         * <tt>QString PtzTourIdRole</tt> --- id of the PTZ tour.
          */
-        SetAsBackgroundAction,
+        PtzStartTourAction,
+
+        /**
+         * Opens PTZ tours management dialog.
+         */
+        PtzManageToursAction,
+
+        /**
+         * Starts fisheye calibration for the given widget.
+         */
+        PtzCalibrateFisheyeAction,
 
 
         /* Layout actions. */
+
+        /**
+         * Sets the current picture as a layout background.
+         */
+        SetAsBackgroundAction,
 
         /**
          * Deletes the file from disk.
@@ -669,6 +700,11 @@ namespace Qn {
          * Opens a layout creation dialog.
          */
         NewUserLayoutAction,
+
+
+        SetCurrentItemAspectRatioAutoAction,
+        SetCurrentItemAspectRatio4x3Action,
+        SetCurrentItemAspectRatio16x9Action,
 
         /**
          * Sets aspect ratio of current layout's cells to 16x9.
@@ -710,11 +746,6 @@ namespace Qn {
          */
         ToggleTourModeAction,
 
-        /**
-         * Toggles tour mode. Used only as hotkey.
-         */
-        ToggleTourModeHotkeyAction,
-
         /* Slider actions. */
 
         /**
@@ -731,6 +762,11 @@ namespace Qn {
          * Clears selection.
          */
         ClearTimeSelectionAction,
+
+        /**
+         * Scale timeline to match the selection.
+         */
+        ZoomToTimeSelectionAction,
 
         /**
          * Exports selected range.
@@ -893,6 +929,9 @@ namespace Qn {
          * Action can be executed from any scope, and its target will be taken from its scope. */
         ScopelessHotkey         = 0x00200000,
 
+        /** When the action is activated via hotkey, it will be executed with an empty target. */
+        TargetlessHotkey        = 0x04000000,
+
         /** Action can be pulled into enclosing menu if it is the only one in
          * its submenu. It may have different text in this case. */
         Pullable                = 0x00400000,
@@ -906,23 +945,25 @@ namespace Qn {
         /** Action can be executed only in dev-mode. */
         DevMode                 = 0x02000000,
 
+        GlobalHotkey            = NoTarget | ScopelessHotkey | TargetlessHotkey,
+
 
         /** Action can appear in main menu. */
-        Main                    = Qn::MainScope | NoTarget,
+        Main                    = MainScope | NoTarget,
 
         /** Action can appear in scene context menu. */
-        Scene                   = Qn::SceneScope | WidgetTarget,
+        Scene                   = SceneScope | WidgetTarget,
 
         /** Action can appear in tree context menu. */
-        Tree                    = Qn::TreeScope,
+        Tree                    = TreeScope,
 
         /** Action can appear in slider context menu. */
-        Slider                  = Qn::SliderScope | WidgetTarget,
+        Slider                  = SliderScope | WidgetTarget,
 
         /** Action can appear in title bar context menu. */
-        TitleBar                = Qn::TitleBarScope | LayoutTarget,
+        TitleBar                = TitleBarScope | LayoutTarget,
 
-        Notifications           = Qn::NotificationsScope | WidgetTarget
+        Notifications           = NotificationsScope | WidgetTarget
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag)

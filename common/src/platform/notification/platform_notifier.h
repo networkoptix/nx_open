@@ -9,8 +9,6 @@ public:
     QnPlatformNotifier(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformNotifier() {}
 
-    static QnPlatformNotifier *newInstance(QObject *parent = NULL);
-
 signals:
     /**
      * This signal is emitted whenever system time changes. 

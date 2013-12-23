@@ -1,6 +1,8 @@
 #ifndef av_singlesensor_h_1252
 #define av_singlesensor_h_1252
 
+#ifdef ENABLE_ARECONT
+
 #include "av_resource.h"
 
 
@@ -16,5 +18,7 @@ protected:
 	
 
 };
+
+#endif
 
 #endif // av_singlesensor_h_1252

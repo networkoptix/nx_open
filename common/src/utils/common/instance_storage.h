@@ -1,11 +1,11 @@
 #ifndef QN_INSTANCE_STORAGE_H
 #define QN_INSTANCE_STORAGE_H
 
-#include <QObject>
-#include <QByteArray>
-#include <QWeakPointer>
-#include <QList>
-#include <QHash>
+#include <QtCore/QObject>
+#include <QtCore/QByteArray>
+#include <QtCore/QPointer>
+#include <QtCore/QList>
+#include <QtCore/QHash>
 
 class QnInstanceStorage {
 public:
@@ -46,7 +46,7 @@ private:
     Q_DISABLE_COPY(QnInstanceStorage);
 
     bool m_thisInitialized;
-    QWeakPointer<QObject> m_this;
+    QPointer<QObject> m_this;
     
     QHash<QByteArray, QObject *> m_instanceByTypeName; // TODO: #Elric use std::type_index
     QList<QObject *> m_instances;

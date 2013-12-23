@@ -3,6 +3,7 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QPair>
+#include <QtCore/QString>
 
 class QnTimeStep {
 public:

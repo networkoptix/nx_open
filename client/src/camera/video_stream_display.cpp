@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "decoders/video/abstractdecoder.h"
-#include "utils/common/util.h"
+#include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
 #include "abstract_renderer.h"
@@ -48,7 +48,8 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_prevSrcWidth(0),
     m_prevSrcHeight(0),
     m_lastIgnoreTime(AV_NOPTS_VALUE),
-    m_isPaused(false)
+    m_isPaused(false),
+    m_overridenAspectRatio(0.0)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
@@ -326,7 +327,8 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
     while (dec->decode(emptyData, &tmpFrame)) 
     {
-        outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+        calcSampleAR(outFrame, dec);
+
         pixFmt = dec->GetPixelFormat();
 
         if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
@@ -371,6 +373,18 @@ void QnVideoStreamDisplay::updateRenderList()
     }
 };
 
+void QnVideoStreamDisplay::calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec)
+{
+    if (qFuzzyIsNull(m_overridenAspectRatio))
+    {
+        outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+    }
+    else {
+        qreal realAR = outFrame->height > 0 ? (qreal) outFrame->width / (qreal) outFrame->height : 1.0;
+        outFrame->sample_aspect_ratio = m_overridenAspectRatio / realAR;
+    }
+}
+
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
     updateRenderList();
@@ -384,7 +398,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_lastIgnoreTime = data->timestamp;
 
     const bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
-    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
+    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
             //QMutexLocker lock(&m_timeMutex);
@@ -447,7 +461,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 QnClientSettings::instance()->isHardwareDecodingUsed() );
         dec->setSpeed( m_speed );
         if (dec == 0) {
-            cl_log.log(QString::fromAscii("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
+            cl_log.log(QString::fromLatin1("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
             return Status_Displayed;
         }
 
@@ -541,7 +555,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             if (outFrame->data[0])
                 m_reverseSizeInBytes -= avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
 
-            outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+            calcSampleAR(outFrame, dec);
+
             if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
                 return Status_Displayed;
             else
@@ -557,17 +572,17 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
     m_mtx.unlock();
     if (decodeToFrame->width) {
-        /*
-        if (decodeToFrame->width == 2592) {
-            decodeToFrame->width = 1920;
-            decodeToFrame->data[0] += (2592-1920)/2;
-            decodeToFrame->data[1] += (2592-1920)/4;
-            decodeToFrame->data[2] += (2592-1920)/4;
+        if (qFuzzyIsNull(m_overridenAspectRatio)) {
+            //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
+            QSize imageSize(decodeToFrame->width * dec->getSampleAspectRatio(), decodeToFrame->height);
+            QMutexLocker lock(&m_imageSizeMtx);
+            m_imageSize = imageSize;
         }
-        */
-        QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
-        QMutexLocker lock(&m_imageSizeMtx);
-        m_imageSize = imageSize;
+        else {
+            QSize imageSize(decodeToFrame->height*m_overridenAspectRatio, decodeToFrame->height);
+            QMutexLocker lock(&m_imageSizeMtx);
+            m_imageSize = imageSize;
+        }
     }
 
     /*
@@ -650,7 +665,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             m_reverseSizeInBytes -= avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
     }
 
-    outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+    calcSampleAR(outFrame, dec);
 
     //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
@@ -707,7 +722,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     }
     outFrame->pkt_dts = m_tmpFrame->pkt_dts;
     outFrame->metadata = m_tmpFrame->metadata;
-    outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+
+    calcSampleAR(outFrame, dec);
 
     if (processDecodedFrame(dec, outFrame, false, false))
         return Status_Displayed;
@@ -772,6 +788,10 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
 bool QnVideoStreamDisplay::selfSyncUsed() const
 {
     return m_bufferedFrameDisplayer;
+}
+
+void QnVideoStreamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
+    m_overridenAspectRatio = aspectRatio;
 }
 
 void QnVideoStreamDisplay::flushFramesToRenderer()
@@ -883,6 +903,13 @@ qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const
 {
     if (m_renderList.isEmpty())
         return AV_NOPTS_VALUE;
+    foreach(QnAbstractRenderer* renderer, m_renderList)
+    {
+        QnResourceWidgetRenderer* r = dynamic_cast<QnResourceWidgetRenderer*>(renderer);
+        if (r && r->isEnabled(m_channelNumber)) 
+            return r->getTimestampOfNextFrameToRender(m_channelNumber);
+    }
+
     QnAbstractRenderer* renderer = *m_renderList.begin();
     return renderer->getTimestampOfNextFrameToRender(m_channelNumber);
 }
@@ -982,8 +1009,9 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping)
-{
+QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
+                                           const QnMediaDewarpingParams& mediaDewarping,
+                                           const QnItemDewarpingParams& itemDewarping) {
     if (m_decoder.isEmpty())
         return QImage();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
@@ -1000,13 +1028,13 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
     srcFrame->setUseExternalData(false);
 
     QSize srcSize(QSize(lastFrame->width, lastFrame->height));
-    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, dewarping);
+    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, itemDewarping);
 
     srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
 
-    if (frameCopySize == srcSize)
+    if (frameCopySize == srcSize) {
         av_picture_copy((AVPicture*) srcFrame.data(), (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
-    else {
+    } else {
         // resize frame
         SwsContext* convertor = sws_getContext(
             lastFrame->width,       lastFrame->height,  (PixelFormat) lastFrame->format,
@@ -1023,7 +1051,7 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
     QnContrastImageFilter filter(params);
     filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
 
-    QnFisheyeImageFilter filter2(dewarping);
+    QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
     filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
 
     // convert colorSpace
@@ -1034,13 +1062,16 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
         return QImage();
 
     int numBytes = avpicture_get_size(PIX_FMT_RGBA, srcFrame->width, srcFrame->height);
+
     AVPicture outPicture; 
     avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, srcFrame->width, srcFrame->height);
+    outPicture.data[4] = outPicture.data[5] = outPicture.data[6] = outPicture.data[7] = 0;
 
     sws_scale(convertor, srcFrame->data, srcFrame->linesize, 
               0, srcFrame->height, 
               outPicture.data, outPicture.linesize);
     sws_freeContext(convertor);
+
     // convert to QImage
     QImage tmp(outPicture.data[0], srcFrame->width, srcFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
     QImage rez( srcFrame->width, srcFrame->height, QImage::Format_ARGB32);

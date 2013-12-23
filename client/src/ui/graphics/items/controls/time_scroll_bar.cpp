@@ -1,6 +1,6 @@
 #include "time_scroll_bar.h"
 
-#include <QtGui/QStyleOptionSlider>
+#include <QtWidgets/QStyleOptionSlider>
 
 #include <utils/common/scoped_painter_rollback.h>
 

@@ -1,17 +1,7 @@
 #ifndef QN_WARNINGS_H
 #define QN_WARNINGS_H
 
-#if defined(_MSC_VER) && _MSC_VER<1600 
-// TODO: msvc2008, remove this hell after transition to msvc2010
-#   ifdef _WIN64
-namespace std { typedef __int64 intptr_t; }
-#   else
-namespace std { typedef __int32 intptr_t; }
-#   endif
-#else
-#   include <cstdint> /* For std::intptr_t. */
-#endif
-
+#include <cstdint> /* For std::intptr_t. */
 #include <sstream>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -21,6 +11,7 @@ namespace std { typedef __int32 intptr_t; }
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
+#include <QtCore/QUuid>
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -46,6 +37,10 @@ namespace detail {
         template<class T>
         QString operator<<(const QString &s, const T &arg) {
             return s.arg(arg);
+        }
+
+        inline QString operator<<(const QString &s, const QUuid &arg) {
+            return s.arg(arg.toString());
         }
 
         inline QString operator<<(const QString &s, const QUrl &arg) {

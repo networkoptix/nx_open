@@ -1,6 +1,10 @@
 #ifndef onvif_resource_information_fetcher_h
 #define onvif_resource_information_fetcher_h
 
+#ifdef ENABLE_ONVIF
+
+#include <QtCore/QCoreApplication>
+
 #include "core/resource_managment/resource_searcher.h"
 #include "onvif_helper.h"
 #include "soap_wrapper.h"
@@ -79,5 +83,7 @@ private:
     NameHelper &camersNamesData;
     bool m_shouldStop;
 };
+
+#endif //ENABLE_ONVIF
 
 #endif // onvif_resource_information_fetcher_h

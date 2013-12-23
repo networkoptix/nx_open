@@ -33,6 +33,7 @@ namespace BusinessEventType
         case Storage_Failure:
         case MediaServer_Failure:
         case MediaServer_Conflict:
+        case MediaServer_Started:
             return AnyServerIssue;
 
         case AnyBusinessEvent:
@@ -53,7 +54,7 @@ namespace BusinessEventType
             result << BusinessEventType::Camera_Disconnect << BusinessEventType::Network_Issue << BusinessEventType::Camera_Ip_Conflict;
             break;
         case AnyServerIssue:
-            result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict;
+            result << BusinessEventType::Storage_Failure << BusinessEventType::MediaServer_Failure << BusinessEventType::MediaServer_Conflict << BusinessEventType::MediaServer_Started;
             break;
         case AnyBusinessEvent:
             result << BusinessEventType::Camera_Motion << BusinessEventType::Camera_Input <<

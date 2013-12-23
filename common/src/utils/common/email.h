@@ -1,8 +1,8 @@
 #ifndef EMAIL_H
 #define EMAIL_H
 
-#include <QString>
-#include <QStringList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 #include <boost/preprocessor/stringize.hpp>
 
@@ -84,17 +84,20 @@ private:
     QString m_email;
 };
 
-inline void serialize(const QnEmail::ConnectionType &value, QVariant *target) {
-    *target = (int)value;
+inline void serialize(const QnEmail::ConnectionType &value, QJsonValue *target) {
+    QJson::serialize(static_cast<int>(value), target);
 }
 
-inline bool deserialize(const QVariant &value, QnEmail::ConnectionType *target) {
-    *target = (QnEmail::ConnectionType)value.toInt();
+inline bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target) {
+    int tmp;
+    if(!QJson::deserialize(value, &tmp))
+        return false;
+    
+    *target = static_cast<QnEmail::ConnectionType>(tmp);
     return true;
 }
 
 Q_DECLARE_METATYPE(QnEmail::SmtpServerPreset)
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port), inline)
-
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port), inline)
 
 #endif // EMAIL_H

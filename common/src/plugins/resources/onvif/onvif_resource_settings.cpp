@@ -1,7 +1,10 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "onvif_resource_settings.h"
 #include "onvif/soapImagingBindingProxy.h"
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
 enum onvifXsd__WideDynamicMode;
 
@@ -10,7 +13,7 @@ enum onvifXsd__WideDynamicMode;
 //
 
 OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl,
-        const std::string& login, const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift):
+        const QString& login, const QString& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift):
     m_deviceSoapWrapper(deviceUrl.empty()? 0: new DeviceSoapWrapper(deviceUrl, login, passwd, _timeDrift)),
     m_rangesSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
     m_valsSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
@@ -87,7 +90,7 @@ bool OnvifCameraSettingsResp::makeSetRequest()
     QString login = getLogin();
     QString passwd = getPassword();
 
-    ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login.toStdString(), passwd.toStdString(), getTimeDrift());
+    ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login, passwd, getTimeDrift());
     SetImagingSettingsResp response;
     SetImagingSettingsReq request;
     request.ImagingSettings = m_valsResponse->ImagingSettings;
@@ -125,12 +128,12 @@ QString OnvifCameraSettingsResp::getImagingUrl() const
 
 QString OnvifCameraSettingsResp::getLogin() const
 {
-    return m_rangesSoapWrapper? QString::fromStdString(m_rangesSoapWrapper->getLogin()): QString();
+    return m_rangesSoapWrapper? m_rangesSoapWrapper->getLogin(): QString();
 }
 
 QString OnvifCameraSettingsResp::getPassword() const
 {
-    return m_rangesSoapWrapper? QString::fromStdString(m_rangesSoapWrapper->getPassword()): QString();
+    return m_rangesSoapWrapper? m_rangesSoapWrapper->getPassword(): QString();
 }
 
 int OnvifCameraSettingsResp::getTimeDrift() const
@@ -1251,3 +1254,5 @@ void OnvifCameraSettingReader::parentOfRootElemFound(const QString& /*parentId*/
 {
 
 }
+
+#endif //ENABLE_ONVIF

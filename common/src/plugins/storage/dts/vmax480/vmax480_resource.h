@@ -1,6 +1,8 @@
 #ifndef vmax480_resource_2047_h
 #define vmax480_resource_2047_h
 
+#ifdef ENABLE_VMAX
+
 #include "core/resource/camera_resource.h"
 #include "recording/time_period_list.h"
 
@@ -17,7 +19,7 @@ public:
     QnPlVmax480Resource();
     virtual ~QnPlVmax480Resource();
 
-    virtual int getMaxFps() override; 
+    virtual int getMaxFps() const override;
     virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
@@ -48,7 +50,6 @@ public:
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual void setCropingPhysical(QRect croping) override;
     virtual CameraDiagnostics::Result initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
     QnPhysicalCameraResourcePtr getOtherResource(int channel);
@@ -71,4 +72,5 @@ private:
 
 typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
 
+#endif // #ifdef ENABLE_VMAX
 #endif //vmax480_resource_2047_h

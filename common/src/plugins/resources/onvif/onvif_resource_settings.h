@@ -1,6 +1,8 @@
 #ifndef onvif_resource_settings_h_2250
 #define onvif_resource_settings_h_2250
 
+#ifdef ENABLE_ONVIF
+
 #include "../camera_settings/camera_settings.h"
 #include "soap_wrapper.h"
 
@@ -27,8 +29,8 @@ class OnvifCameraSettingsResp
 
 public:
 
-    OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl, const std::string& login,
-        const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift);
+    OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl, const QString &login,
+        const QString &passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift);
 
     ~OnvifCameraSettingsResp();
 
@@ -372,5 +374,7 @@ private:
 
     OnvifCameraSettingReader();
 };
+
+#endif //ENABLE_ONVIF
 
 #endif //onvif_resource_settings_h_2250

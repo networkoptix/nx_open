@@ -8,6 +8,7 @@
 /* Windows headers. */
 #ifdef _WIN32
 #   include <winsock2.h>
+#   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
 #endif
@@ -23,25 +24,27 @@
 #include <boost/array.hpp>
 
 /* QT headers. */
-#include <QAction>
+#include <QtWidgets/QAction>
 
+/*
 #ifdef Q_OS_WIN
-#include <QAudio>
-#include <QAudioFormat>
-#include <QAudioOutput>
+
+#include <QtMultimedia/QAudio>
+#include <QtMultimedia/QAudioFormat>
+#include <QtMultimedia/QAudioOutput>
 #endif
 
-#include <QAuthenticator>
-#include <QBuffer>
-#include <QCheckBox>
-#include <QCloseEvent>
-#include <QColor>
-#include <QCompleter>
+#include <QtNetwork/QAuthenticator>
+#include <QtCore/QBuffer>
+#include <QtWidgets/QCheckBox>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QColor>
+#include <QtWidgets/QCompleter>
 #include <QDataStream>
 #include <QDateTime>
 #include <QDesktopServices>
-#include <QDialog>
-#include <QDialogButtonBox>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
 #include <QDir>
 #include <QDomDocument>
 #include <QDomElement>
@@ -51,25 +54,24 @@
 #include <QFileInfoList>
 #include <QFont>
 #include <QFontMetrics>
-#include <QGraphicsItem>
-#include <QGraphicsProxyWidget>
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsView>
-#include <QGroupBox>
-#include <QHBoxLayout>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
 #include <QHostAddress>
-#include <QHttp>
 #include <QIODevice>
-#include <QInputDialog>
+#include <QtWidgets/QInputDialog>
 #include <QKeyEvent>
-#include <QLayout>
-#include <QLineEdit>
-#include <QList>
-#include <QListView>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QList>
+#include <QtWidgets/QListView>
 #include <QMap>
-#include <QMenu>
-#include <QMessageBox>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
 #include <QMouseEvent>
 #include <QMutex>
 #include <QMutexLocker>
@@ -124,5 +126,6 @@
 #include <QtGui>
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
+*/
 
 #endif

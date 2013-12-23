@@ -1,7 +1,10 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_tcp_server.h"
 
-#include <QElapsedTimer>
-#include <QUuid>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QUuid>
+#include <QtCore/QString>
 
 #include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
@@ -25,15 +28,17 @@ public:
     VMaxStreamFetcher* streamFetcher;
     int openedChannels;
     static QMutex connectMutex;
+    QnTcpListener* owner;
 };
 QMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
-QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner)
+QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket)
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
     d->openedChannels = 0;
+    d->owner = _owner;
 }
 
 QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()
@@ -75,7 +80,7 @@ void QnVMax480ConnectionProcessor::vMaxDisconnect()
         quint8 dummy[1];
         d->socket->recv(dummy, sizeof(dummy));
     }
-    int waitTime = t.elapsed();
+//    int waitTime = t.elapsed();
     d->socket->close();
 }
 
@@ -195,7 +200,7 @@ bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
 void QnVMax480ConnectionProcessor::run()
 {
     Q_D(QnVMax480ConnectionProcessor);
-    saveSysThreadID();
+    //saveSysThreadID();
 
     char uuidBuffer[UUID_LEN+1];
 
@@ -211,9 +216,6 @@ void QnVMax480ConnectionProcessor::run()
     while (!needToStop())
     {
         quint8 vMaxHeader[16];
-
-        QTime t;
-        t.restart();
 
         if (!readBuffer(vMaxHeader, sizeof(vMaxHeader)))
         {
@@ -366,7 +368,7 @@ QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("12
 QString QnVMax480Server::registerProvider(VMaxStreamFetcher* provider)
 {
     QMutexLocker lock(&m_mutexProvider);
-    QString result = QUuid::createUuid();
+    QString result = QUuid::createUuid().toString();
     m_providers.insert(result, provider);
     return result;
 }
@@ -395,7 +397,9 @@ VMaxStreamFetcher* QnVMax480Server::bindConnection(const QString& tcpID, QnVMax4
 }
 
 
-QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnVMax480Server::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     return new QnVMax480ConnectionProcessor(clientSocket, owner);
 }
+
+#endif // #ifdef ENABLE_VMAX

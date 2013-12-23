@@ -1,3 +1,5 @@
+#ifdef ENABLE_TEST_CAMERA
+
 #include "testcamera_resource_searcher.h"
 #include "testcamera_resource.h"
 #include "utils/network/nettools.h"
@@ -38,8 +40,8 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         clearSocketList();
         foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
         {
-            DiscoveryInfo info(new UDPSocket(), iface.address);
-            if (info.sock->setLocalAddressAndPort(iface.address.toString(), 0))
+            DiscoveryInfo info(SocketFactory::createDatagramSocket(), iface.address);
+            if (info.sock->bind(iface.address.toString(), 0))
                 m_sockList << info;
             else
                 delete info.sock;
@@ -70,11 +72,11 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
     foreach(const DiscoveryInfo& info, m_sockList)
     {
-        UDPSocket* sock = info.sock;
+        AbstractDatagramSocket* sock = info.sock;
         while (sock->hasData())
         {
             QByteArray responseData;
-            responseData.resize(MAX_DATAGRAM_SIZE);
+            responseData.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
 
             QString sender;
@@ -164,3 +166,4 @@ QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url
     return QList<QnResourcePtr>();
 }
 
+#endif // #ifdef ENABLE_TEST_CAMERA

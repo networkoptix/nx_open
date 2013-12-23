@@ -51,7 +51,9 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    virtual QImage getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping) override;
+    virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
+                                 const QnMediaDewarpingParams& mediaDewarping,
+                                 const QnItemDewarpingParams& itemDewarping) override;
     virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);
@@ -61,6 +63,7 @@ public:
     QSize getMaxScreenSize() const;
     bool selfSyncUsed() const;
 
+    void setOverridenAspectRatio(qreal aspectRatio);
 private:
     friend class QnCamDisplay;
 
@@ -134,6 +137,7 @@ private:
     qint64 m_lastIgnoreTime;
     mutable QMutex m_renderListMtx;
     bool m_isPaused;
+    qreal m_overridenAspectRatio;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -155,6 +159,8 @@ private:
             to another frame and not copy data to this object (TODO)
     */
     bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+
+    void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H

@@ -37,6 +37,14 @@ QnStatisticsHistory QnMediaServerStatisticsManager::history(const QnMediaServerR
     return m_statistics[id]->history();
 }
 
+qint64 QnMediaServerStatisticsManager::uptimeMs(const QnMediaServerResourcePtr &resource) const
+{
+    QString id = resource->getGuid();
+    if (!m_statistics.contains(id))
+        return 0;
+    return m_statistics[id]->uptimeMs();
+}
+
 qint64 QnMediaServerStatisticsManager::historyId(const QnMediaServerResourcePtr &resource) const {
     QString id = resource->getGuid();
     if (!m_statistics.contains(id))

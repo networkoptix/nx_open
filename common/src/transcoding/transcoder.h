@@ -1,7 +1,7 @@
 #ifndef __TRANSCODER_H
 #define __TRANSCODER_H
 
-#include <QString>
+#include <QtCore/QString>
 #include <QSharedPointer>
 
 extern "C"
@@ -65,7 +65,7 @@ public:
         \param result Coded picture of the output stream. If NULL, only decoding is done
         \return return Return error code or 0 if no error
     */
-    virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
+    virtual int transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
     void setSrcRect(const QRectF& srcRect);
@@ -99,7 +99,7 @@ public:
     QSize getResolution() const;
     void setVideoLayout(const QnResourceVideoLayout* layout);
 
-    virtual bool open(QnCompressedVideoDataPtr video);
+    virtual bool open(QnConstCompressedVideoDataPtr video);
 
     virtual void addFilter(QnAbstractImageFilter* filter);
 protected:
@@ -119,7 +119,7 @@ class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(QnCompressedAudioDataPtr video) { Q_UNUSED(video) return true; }
+    virtual bool open(QnConstCompressedAudioDataPtr video) { Q_UNUSED(video) return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
@@ -178,7 +178,7 @@ public:
     * @param result transcoded data block. If NULL, only decoding is done
     * @return Returns 0 if no error or error code
     */
-    int transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result);
+    int transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray* const result);
     //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
     /*!
         This implementation always returns \a false
@@ -215,9 +215,9 @@ protected:
     * Destionation codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
     * @return true if successfull opened
     */
-    virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) = 0;
+    virtual int open(QnConstCompressedVideoDataPtr video, QnConstCompressedAudioDataPtr audio) = 0;
 
-    virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result) = 0;
+    virtual int transcodePacketInternal(QnConstAbstractMediaDataPtr media, QnByteArray* const result) = 0;
 
     QnVideoTranscoderPtr m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
@@ -234,8 +234,8 @@ protected:
     const QnResourceVideoLayout* m_vLayout;
 private:
     QString m_lastErrMessage;
-    QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
-    QQueue<QnCompressedAudioDataPtr> m_delayedAudioQueue;
+    QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
+    QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter;
     bool m_packetizedMode;
 };

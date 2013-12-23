@@ -7,21 +7,24 @@
 
 #include <algorithm>
 
-#include <QMutexLocker>
 
 #ifdef _WIN32
 #include <D3D9.h>
 #include <DXerr.h>
 #endif
 #define GL_GLEXT_PROTOTYPES 1
+#ifdef Q_OS_MACX
+#include <glext.h>
+#else
 #include <GL/glext.h>
+#endif
 
 extern "C"
 {
     #include <libavcodec/avcodec.h>
 }
 
-#include <utils/common/util.h>
+#include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -126,7 +129,7 @@ public:
         const unsigned int currentTick = GetTickCount();
         if( currentTick - m_startCalcTick > 5000 )
         {
-            NX_LOG( QString::fromAscii("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second").
+            NX_LOG( QString::fromLatin1("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second").
                 arg(currentTick - m_startCalcTick).arg(m_bytes/1000000.0).arg(m_bytes /1000.0 / (currentTick - m_startCalcTick)), cl_logDEBUG1 );
             m_startCalcTick = currentTick;
             m_bytes = 0;
@@ -150,14 +153,25 @@ static BitrateCalculator bitrateCalculator;
 // -------------------------------------------------------------------------- //
 class DecodedPictureToOpenGLUploaderPrivate
 :
-    public QnGlFunctions
+    public QOpenGLFunctions
 {
-    Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate);
+    Q_DECLARE_TR_FUNCTIONS(DecodedPictureToOpenGLUploaderPrivate)
 
 public:
+    GLint clampConstant;
+    bool supportsNonPower2Textures;
+    bool forceSoftYUV;
+    bool yv12SharedUsed;
+    bool nv12SharedUsed;
+    QScopedPointer<QnGlFunctions> functions;
+
     DecodedPictureToOpenGLUploaderPrivate(const QGLContext *context):
-        QnGlFunctions(context),
-        supportsNonPower2Textures(false)
+        QOpenGLFunctions(context->contextHandle()),
+        supportsNonPower2Textures(false),
+        forceSoftYUV(false),
+        yv12SharedUsed(false),
+        nv12SharedUsed(false),
+        functions(new QnGlFunctions(context))
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -207,9 +221,22 @@ public:
         return filler.data;
     }
 
-public:
-    GLint clampConstant;
-    bool supportsNonPower2Textures;
+    bool usingShaderYuvToRgb() const
+    {
+        return 
+            !(functions->features() & QnGlFunctions::ShadersBroken)
+            && yv12SharedUsed
+            && !forceSoftYUV;
+    }
+
+    bool usingShaderNV12ToRgb() const
+    {
+        return 
+            !(functions->features() & QnGlFunctions::ShadersBroken)
+            && nv12SharedUsed
+            && !forceSoftYUV;
+    }
+
 private:
     struct Filler
     {
@@ -235,15 +262,22 @@ private:
 // QnGlRendererTexture
 // -------------------------------------------------------------------------- //
 class QnGlRendererTexture {
+
+#ifdef _DEBUG
+    friend class DecodedPictureToOpenGLUploader;
+#endif
+
 public:
     QnGlRendererTexture( const QSharedPointer<DecodedPictureToOpenGLUploaderPrivate>& renderer )
     : 
         m_allocated(false),
+        m_pixelSize(-1),
         m_internalFormat(-1),
+        m_internalFormatPixelSize(-1),
+        m_fillValue(-1),
         m_textureSize(QSize(0, 0)),
         m_contentSize(QSize(0, 0)),
         m_id(std::numeric_limits<GLuint>::max()),
-        m_fillValue(-1),
         m_renderer(renderer)
     {}
 
@@ -264,15 +298,26 @@ public:
         return m_id;
     }
 
-    void ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
+    /*!
+        \return true, If uinitialized texture, false is already initialized
+    */
+    bool ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
         Q_ASSERT(m_renderer.data() != NULL);
 
         ensureAllocated();
 
         QSize contentSize = QSize(width, height);
 
-        if(m_internalFormat == internalFormat && m_fillValue == fillValue && m_contentSize == contentSize)
-            return;
+        if( m_contentSize == contentSize
+            && m_pixelSize == pixelSize
+            && m_internalFormat == internalFormat
+            && m_fillValue == fillValue )
+        {
+            return false;
+        }
+
+        m_pixelSize = pixelSize;
+        m_internalFormatPixelSize = internalFormatPixelSize;
 
         m_contentSize = contentSize;
 
@@ -281,6 +326,7 @@ public:
             m_renderer->supportsNonPower2Textures ? height                                   : minPow2(height)
         );
 
+        bool result = false;
         if(m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat) {
             m_textureSize = textureSize;
             m_internalFormat = internalFormat;
@@ -291,6 +337,8 @@ public:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_renderer->clampConstant);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_renderer->clampConstant);
+
+            result = true;
         } else {
             textureSize = m_textureSize;
         }
@@ -351,6 +399,8 @@ public:
                 glCheckError("glTexSubImage2D");
             }
         }
+
+        return result;
     }
 
     void ensureAllocated() {
@@ -363,16 +413,115 @@ public:
         m_allocated = true;
     }
 
+    void deinitialize()
+    {
+        //not destroying texture, because it is unknown whether correct gl-context is current
+        m_pixelSize = -1;
+        m_internalFormat = -1;
+        m_internalFormatPixelSize = -1;
+        m_fillValue = -1;
+        m_textureSize = QSize(0, 0);
+        m_contentSize = QSize(0, 0);
+    }
+
 private:
     bool m_allocated;
+    int m_pixelSize;
     int m_internalFormat;
+    int m_internalFormatPixelSize;
+    int m_fillValue;
     QSize m_textureSize;
     QSize m_contentSize;
     QVector2D m_texCoords;
     GLubyte m_fillColor;
     GLuint m_id;
-    int m_fillValue;
     QSharedPointer<DecodedPictureToOpenGLUploaderPrivate> m_renderer;
+};
+
+
+//////////////////////////////////////////////////////////
+// QnGlRendererTexturePack
+//////////////////////////////////////////////////////////
+static const size_t MAX_PLANE_COUNT = 4;
+static const size_t Y_PLANE_INDEX = 0;
+static const size_t A_PLANE_INDEX = 3;
+
+
+//!Set of gl textures containing planes of single picture
+class QnGlRendererTexturePack
+{
+public:
+    QnGlRendererTexturePack( const QSharedPointer<DecodedPictureToOpenGLUploaderPrivate>& renderer )
+    :
+        m_format( PIX_FMT_NONE )
+    {
+        //TODO/IMPL allocate textures when needed, because not every format require 3 planes
+        for( size_t i = 0; i < MAX_PLANE_COUNT; ++i )
+            m_textures[i].reset( new QnGlRendererTexture(renderer) );
+    }
+
+    ~QnGlRendererTexturePack()
+    {
+    }
+
+    void setPictureFormat( PixelFormat format )
+    {
+        if( m_format == format )
+            return;
+
+        for( size_t i = 0; i < MAX_PLANE_COUNT; ++i )
+            m_textures[i]->deinitialize();
+    }
+
+    const std::vector<GLuint>& glTextures() const
+    {
+#ifdef GL_COPY_AGGREGATION
+        Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
+        return m_surfaceRect->surface()->glTextures();
+#else
+        //TODO/IMPL
+        m_picTextures.resize( MAX_PLANE_COUNT );
+        for( size_t i = 0; i < MAX_PLANE_COUNT; ++i )
+            m_picTextures[i] = m_textures[i]->id();
+        return m_picTextures;
+#endif
+    }
+
+    QnGlRendererTexture* texture( int index ) const
+    {
+        return m_textures[index].data();
+    }
+
+    QRectF textureRect() const
+    {
+#ifdef GL_COPY_AGGREGATION
+        Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
+        return m_surfaceRect->texCoords();
+#else
+        const QVector2D& v = m_textures[0]->texCoords();
+        return QRectF( 0, 0, v.x(), v.y() );
+#endif
+    }
+
+#ifdef GL_COPY_AGGREGATION
+    void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect )
+    {
+        m_surfaceRect = surfaceRect;
+    }
+
+    const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const
+    {
+        return m_surfaceRect;
+    }
+#endif
+
+private:
+    mutable std::vector<GLuint> m_picTextures;
+    QScopedPointer<QnGlRendererTexture> m_textures[MAX_PLANE_COUNT];
+    PixelFormat m_format;
+#ifdef GL_COPY_AGGREGATION
+    QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
+#endif
 };
 
 
@@ -407,35 +556,14 @@ int DecodedPictureToOpenGLUploader::UploadedPicture::height() const
     return m_height;
 }
 
-//const QVector2D& DecodedPictureToOpenGLUploader::UploadedPicture::texCoords() const
-//{
-//    //TODO/IMPL
-//    return m_textures[0]->texCoords();
-//}
-
 QRectF DecodedPictureToOpenGLUploader::UploadedPicture::textureRect() const
 {
-#ifdef GL_COPY_AGGREGATION
-    Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
-    return m_surfaceRect->texCoords();
-#else
-    const QVector2D& v = m_textures[0]->texCoords();
-    return QRectF( 0, 0, v.x(), v.y() );
-#endif
+    return m_texturePack->textureRect();
 }
 
 const std::vector<GLuint>& DecodedPictureToOpenGLUploader::UploadedPicture::glTextures() const
 {
-#ifdef GL_COPY_AGGREGATION
-    Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
-    return m_surfaceRect->surface()->glTextures();
-#else
-    //TODO/IMPL
-    m_picTextures.resize( MAX_TEXTURE_COUNT );
-    for( size_t i = 0; i < MAX_TEXTURE_COUNT; ++i )
-        m_picTextures[i] = m_textures[i]->id();
-    return m_picTextures;
-#endif
+    return m_texturePack->glTextures();
 }
 
 unsigned int DecodedPictureToOpenGLUploader::UploadedPicture::sequence() const
@@ -453,9 +581,14 @@ QnMetaDataV1Ptr DecodedPictureToOpenGLUploader::UploadedPicture::metadata() cons
     return m_metadata;
 }
 
+QnGlRendererTexturePack* DecodedPictureToOpenGLUploader::UploadedPicture::texturePack()
+{
+    return m_texturePack;
+}
+
 QnGlRendererTexture* DecodedPictureToOpenGLUploader::UploadedPicture::texture( int index ) const
 {
-    return m_textures[index].data();
+    return m_texturePack->texture( index );
 }
 
 const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::imageCorrectionResult() const
@@ -465,7 +598,7 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
 {
-    m_imgCorrection.analizeImage(yPlane, width, height, stride, data, m_displayedRect);
+    m_imgCorrection.analyseImage(yPlane, width, height, stride, data, m_displayedRect);
 }
 
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const
@@ -481,17 +614,15 @@ int DecodedPictureToOpenGLUploader::UploadedPicture::flags() const
 #ifdef GL_COPY_AGGREGATION
 void DecodedPictureToOpenGLUploader::UploadedPicture::setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect )
 {
-    m_surfaceRect = surfaceRect;
+    m_texturePack->setAggregationSurfaceRect( surfaceRect );
 }
 
 const QSharedPointer<AggregationSurfaceRect>& DecodedPictureToOpenGLUploader::UploadedPicture::aggregationSurfaceRect() const
 {
-    return m_surfaceRect;
+    return m_texturePack->aggregationSurfaceRect();
 }
 #endif
 
-
-//const int DecodedPictureToOpenGLUploader::UploadedPicture::MAX_TEXTURE_COUNT;
 
 DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPictureToOpenGLUploader* const uploader )
 :
@@ -502,17 +633,16 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pts( 0 ),
     m_skippingForbidden( false ),
     m_flags( 0 ),
-    m_glFence( uploader->d.data() ),
-    m_displayedRect(0.0, 0.0, 1.0, 1.0)
+    m_glFence(),
+    m_displayedRect( 0.0, 0.0, 1.0, 1.0 ),
+    m_texturePack( new QnGlRendererTexturePack(uploader->d) )
 {
-    //TODO/IMPL allocate textures when needed, because not every format require 3 planes
-    for( size_t i = 0; i < MAX_TEXTURE_COUNT; ++i )
-        m_textures[i].reset( new QnGlRendererTexture(uploader->d) );
 }
 
 DecodedPictureToOpenGLUploader::UploadedPicture::~UploadedPicture()
 {
-    //TODO/IMPL
+    delete m_texturePack;
+    m_texturePack = NULL;
 }
 
 
@@ -646,25 +776,6 @@ inline void streamLoadAndDeinterleaveNV12UVPlane(
 }
 #endif
 
-class ScopedAtomicLock
-{
-public:
-    ScopedAtomicLock( QAtomicInt* const refCounter )
-    :
-        m_refCounter( refCounter )
-    {
-        m_refCounter->ref();
-    }
-
-    ~ScopedAtomicLock()
-    {
-        m_refCounter->deref();
-    }
-
-private:
-    QAtomicInt* const m_refCounter;
-};
-
 /*!
     For now, it supports only DXVA textures with NV12 format
 */
@@ -696,7 +807,7 @@ public:
 
     virtual void run()
     {
-        DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf;
+        DecodedPictureToOpenGLUploader::UploadedPicture* const pictureBuf = m_pictureBuf.load();
 
         {
             QMutexLocker lk( &m_mutex );
@@ -705,7 +816,7 @@ public:
                 return; //m_pictureBuf has been changed (running has been cancelled?)
             if( pictureBuf == NULL )
             {
-                NX_LOG( QString::fromAscii("AsyncPicDataUploader. Picture upload has been cancelled..."), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Picture upload has been cancelled..."), cl_logDEBUG1 );
                 m_picDataRef.clear();
                 m_uploader->pictureDataUploadCancelled( this );
                 return; //running has been cancelled from outside
@@ -740,7 +851,7 @@ public:
                 m_lineSizes,
                 true ) )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Failed to move to opengl memory frame (pts %1) data. Skipping frame...").arg(pictureBuf->pts()), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Failed to move to opengl memory frame (pts %1) data. Skipping frame...").arg(pictureBuf->pts()), cl_logDEBUG1 );
             m_picDataRef.clear();
             m_uploader->pictureDataUploadFailed( this, pictureBuf );
             return;
@@ -781,17 +892,17 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        if( !m_pictureBuf )
+        if( !m_pictureBuf.load() )
             return false;
 
         if( prevPicPts )
-            *prevPicPts = m_pictureBuf->m_pts;
-        m_pictureBuf->m_sequence = picSequence;
-        m_pictureBuf->m_pts = decodedPicture->pkt_dts;
-        m_pictureBuf->m_width = decodedPicture->width;
-        m_pictureBuf->m_height = decodedPicture->height;
-        m_pictureBuf->m_metadata = decodedPicture->metadata;
-        m_pictureBuf->m_displayedRect = displayedRect;
+            *prevPicPts = m_pictureBuf.load()->m_pts;
+        m_pictureBuf.load()->m_sequence = picSequence;
+        m_pictureBuf.load()->m_pts = decodedPicture->pkt_dts;
+        m_pictureBuf.load()->m_width = decodedPicture->width;
+        m_pictureBuf.load()->m_height = decodedPicture->height;
+        m_pictureBuf.load()->m_metadata = decodedPicture->metadata;
+        m_pictureBuf.load()->m_displayedRect = displayedRect;
         m_picDataRef = picDataRef;
 
         return true;
@@ -815,10 +926,13 @@ private:
     {
 #ifdef _WIN32
         //checking, if m_picDataRef ref has not been marked for released
-        ScopedAtomicLock picUsageCounterLock( &m_picDataRef->syncCtx()->usageCounter );
+        auto decAtomicLambda = []( std::atomic<int>* pInt ){ --(*pInt); };
+        std::unique_ptr<std::atomic<int>, decltype(decAtomicLambda)> picUsageCounterLock(
+            &m_picDataRef->syncCtx()->usageCounter,
+            decAtomicLambda );
         if( !m_picDataRef->isValid() )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -830,13 +944,13 @@ private:
         HRESULT res = surf->GetDesc( &surfDesc );
         if( res != D3D_OK )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Failed to get dxva surface info (%1). Ignoring decoded picture...").arg(res), cl_logERROR );
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Failed to get dxva surface info (%1). Ignoring decoded picture...").arg(res), cl_logERROR );
             return false;
         }
 
         if( surfDesc.Format != (D3DFORMAT)MAKEFOURCC('N','V','1','2') )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Dxva surface format %1 while only NV12 (%2) is supported. Ignoring decoded picture...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Dxva surface format %1 while only NV12 (%2) is supported. Ignoring decoded picture...").
                 arg(surfDesc.Format).arg(MAKEFOURCC('N','V','1','2')), cl_logERROR );
             return false;
         }
@@ -855,7 +969,7 @@ private:
         res = surf->LockRect( &lockedRect, &rectToLock, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY );
         if( res != D3D_OK )
         {
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Failed to map dxva surface (%1). Ignoring decoded picture...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Failed to map dxva surface (%1). Ignoring decoded picture...").
                 arg(QString::fromWCharArray(DXGetErrorDescription(res))), cl_logERROR );
             return false;
         }
@@ -877,7 +991,7 @@ private:
 #ifndef DISABLE_FRAME_DOWNLOAD
                 surf->UnlockRect();
 #endif
-                NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) could not be uploaded due to memory allocation error. Releasing...").
+                NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) could not be uploaded due to memory allocation error. Releasing...").
                     arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
                 return false;
             }
@@ -909,7 +1023,7 @@ private:
                 lockedRect.Pitch ) )
         {
             surf->UnlockRect();
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (2). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (2). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -924,7 +1038,7 @@ private:
                 lockedRect.Pitch ) )
         {
             surf->UnlockRect();
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (3). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (3). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -940,7 +1054,7 @@ private:
                 targetPitch / 2 ) )
         {
             surf->UnlockRect();
-            NX_LOG( QString::fromAscii("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (4). Releasing...").
+            NX_LOG( QString::fromLatin1("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (4). Releasing...").
                 arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
             return false;
         }
@@ -1158,12 +1272,9 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_format( PIX_FMT_NONE ),
     m_yuv2rgbBuffer( NULL ),
     m_yuv2rgbBufferLen( 0 ),
-    m_forceSoftYUV( false ),
     m_painterOpacity( 1.0 ),
     m_previousPicSequence( 1 ),
     m_terminated( false ),
-    m_yv12SharedUsed( false ),
-    m_nv12SharedUsed( false ),
     m_uploadThread( NULL ),
     m_rgbaBuf( NULL ),
     m_fileNumber( 0 ),
@@ -1275,7 +1386,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
     const QRectF displayedRect )
 {
-    NX_LOG( QString::fromAscii( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
+    NX_LOG( QString::fromLatin1( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
 
     m_hardwareDecoderUsed = decodedPicture->flags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 
@@ -1305,7 +1416,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //this condition allows to use single PictureBuffer for rendering
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                NX_LOG( QString::fromLatin1( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else
@@ -1314,7 +1425,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
             {
                 emptyPictureBuf = m_emptyBuffers.front();
                 m_emptyBuffers.pop_front();
-                NX_LOG( QString::fromAscii( "Found empty buffer" ), cl_logDEBUG2 );
+                NX_LOG( QString::fromLatin1( "Found empty buffer" ), cl_logDEBUG2 );
             }
             else if( (!m_asyncUploadUsed && !m_renderedPictures.empty())
                   || (m_asyncUploadUsed && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1U : 0U))) )  //reserving one uploaded picture (preferring picture 
@@ -1324,7 +1435,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( QString::fromAscii( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
+                NX_LOG( QString::fromLatin1( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
                     arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
             }
             else if( ((!m_asyncUploadUsed && !m_picturesWaitingRendering.empty())
@@ -1334,7 +1445,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
                 emptyPictureBuf = m_picturesWaitingRendering.front();
                 m_picturesWaitingRendering.pop_front();
-                NX_LOG( QString::fromAscii( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
+                NX_LOG( QString::fromLatin1( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
                     arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
             }
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
@@ -1347,7 +1458,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 {
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
-                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
+                    NX_LOG( QString::fromLatin1( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
                         arg((*it)->picture()->m_pts).arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts/1000).toString(QLatin1String("hh:mm:ss.zzz"))), cl_logDEBUG2 );
                     emptyPictureBuf = (*it)->picture();
                     delete (*it);
@@ -1367,7 +1478,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                         quint64 prevPicPts = 0;
                         if( m_usedAsyncUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
                         {
-                            NX_LOG( QString::fromAscii( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
+                            NX_LOG( QString::fromLatin1( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
                                 arg(prevPicPts).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
                             decodedPicture->picData.clear();
                             return;
@@ -1375,11 +1486,11 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                     }
 
                     //ignoring decoded picture so that not to stop decoder
-                    NX_LOG( QString::fromAscii( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
+                    NX_LOG( QString::fromLatin1( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
                     decodedPicture->picData.clear();
                     return;
                 }
-                NX_LOG( QString::fromAscii( "Waiting for a picture gl buffer to get free" ), cl_logDEBUG1 );
+                NX_LOG( QString::fromLatin1( "Waiting for a picture gl buffer to get free" ), cl_logDEBUG1 );
                 //waiting for a picture buffer to get free
                 m_cond.wait( lk.mutex() );
                 continue;
@@ -1513,7 +1624,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
             return NULL;
 #endif
         m_picturesWaitingRendering.pop_front();
-        NX_LOG( QString::fromAscii( "Taking uploaded picture (pts %1, seq %2) for first-time rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1( "Taking uploaded picture (pts %1, seq %2) for first-time rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
     }
     else if( !m_renderedPictures.empty() )
     {
@@ -1524,11 +1635,11 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
             return NULL;
 #endif
         m_renderedPictures.pop_back();
-        NX_LOG( QString::fromAscii( "Taking previously shown uploaded picture (pts %1, seq %2) for rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1( "Taking previously shown uploaded picture (pts %1, seq %2) for rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
     }
     else
     {
-        NX_LOG( QString::fromAscii( "Failed to find picture for rendering. No data from decoder?" ), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1( "Failed to find picture for rendering. No data from decoder?" ), cl_logDEBUG2 );
         return NULL;
     }
 
@@ -1625,9 +1736,9 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
     cancelUploadingInGUIThread();
 #endif
 
-	for( std::deque<UploadedPicture*>::iterator
-		it = m_picturesWaitingRendering.begin();
-		it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
+    for( std::deque<UploadedPicture*>::iterator
+        it = m_picturesWaitingRendering.begin();
+        it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
          )
     {
         m_emptyBuffers.push_back( *it );
@@ -1682,7 +1793,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 
     QMutexLocker lk( &m_mutex );
 
-    NX_LOG( QString::fromAscii( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
+    NX_LOG( QString::fromLatin1( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
 
     //m_picturesBeingRendered holds only one picture
     std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
@@ -1704,12 +1815,12 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 
 void DecodedPictureToOpenGLUploader::setForceSoftYUV( bool value )
 {
-    m_forceSoftYUV = value;
+    d->forceSoftYUV = value;
 }
 
 bool DecodedPictureToOpenGLUploader::isForcedSoftYUV() const
 {
-    return m_forceSoftYUV;
+    return d->forceSoftYUV;
 }
 
 qreal DecodedPictureToOpenGLUploader::opacity() const
@@ -1729,12 +1840,12 @@ void DecodedPictureToOpenGLUploader::beforeDestroy()
 
 void DecodedPictureToOpenGLUploader::setYV12ToRgbShaderUsed( bool yv12SharedUsed )
 {
-    m_yv12SharedUsed = yv12SharedUsed;
+    d->yv12SharedUsed = yv12SharedUsed;
 }
 
 void DecodedPictureToOpenGLUploader::setNV12ToRgbShaderUsed( bool nv12SharedUsed )
 {
-    m_nv12SharedUsed = nv12SharedUsed;
+    d->nv12SharedUsed = nv12SharedUsed;
 }
 
 void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUploader* const uploader, UploadedPicture* const picture )
@@ -1860,6 +1971,22 @@ ImageCorrectionParams DecodedPictureToOpenGLUploader::getImageCorrection() const
     return m_imageCorrection;
 }
 
+/*
+static QString toString( PixelFormat format )
+{
+    switch( format )
+    {
+        case PIX_FMT_YUV444P:
+            return QString::fromLatin1("PIX_FMT_YUV444P");
+        case PIX_FMT_YUV422P:
+            return QString::fromLatin1("PIX_FMT_YUV422P");
+        case PIX_FMT_YUV420P:
+            return QString::fromLatin1("PIX_FMT_YUV420P");
+        default:
+            return QString::fromLatin1("unknown");
+    }
+}
+*/
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
@@ -1893,27 +2020,23 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     }
 #endif
 
-    static const int MAX_PLANE_COUNT = 4;
-    static const int Y_PLANE_INDEX = 0;
-    static const int A_PLANE_INDEX = 3;
-
     const int planeCount = format == PIX_FMT_YUVA420P ? 4 : 3;
 
     unsigned int r_w[MAX_PLANE_COUNT];
-    r_w[0] = (width/2)*2;
+    r_w[Y_PLANE_INDEX] = width & (std::numeric_limits<unsigned int>::max() - 1);    //using only odd width to simplify some things
     r_w[1] = width / 2;
     r_w[2] = width / 2;
-    r_w[3] = width; //alpha plane
+    r_w[A_PLANE_INDEX] = width; //alpha plane
     unsigned int h[MAX_PLANE_COUNT];
-    h[0] = height;
+    h[Y_PLANE_INDEX] = height;
     h[1] = height / 2;
     h[2] = height / 2;
-    h[3] = height; //alpha plane
+    h[A_PLANE_INDEX] = height; //alpha plane
 
     switch( format )
     {
         case PIX_FMT_YUV444P:
-            r_w[1] = r_w[2] = width;
+            r_w[1] = r_w[2] = r_w[0];
         // fall through
         case PIX_FMT_YUV422P:
             h[1] = h[2] = height;
@@ -1922,13 +2045,17 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             break;
     }
 
+    emptyPictureBuf->texturePack()->setPictureFormat( format );
+
     if( (format == PIX_FMT_YUV420P || format == PIX_FMT_YUV422P || format == PIX_FMT_YUV444P || format == PIX_FMT_YUVA420P) && usingShaderYuvToRgb() )
     {
         //using pixel shader for yuv->rgb conversion
         for( int i = 0; i < planeCount; ++i )
         {
             QnGlRendererTexture* texture = emptyPictureBuf->texture(i);
-            texture->ensureInitialized( r_w[i], h[i], lineSizes[i], 1, GL_LUMINANCE, 1, /*-1*/ i == Y_PLANE_INDEX ? 0x10 : (i == A_PLANE_INDEX ? 0x00 : 0x80) );
+            texture->ensureInitialized(
+                r_w[i], h[i], lineSizes[i],
+                1, GL_LUMINANCE, 1, /*-1*/ i == Y_PLANE_INDEX ? 0x10 : (i == A_PLANE_INDEX ? 0x00 : 0x80) );
 
 #ifdef USE_PBO
 #ifdef USE_SINGLE_PBO_PER_FRAME
@@ -2009,11 +2136,11 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         for( int i = 0; i < 2; ++i )
         {
             QnGlRendererTexture* texture = emptyPictureBuf->texture(i);
-            //void ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
-            if( i == 0 )    //Y-plane
+            if( i == Y_PLANE_INDEX )
                 texture->ensureInitialized( width, height, lineSizes[i], 1, GL_LUMINANCE, 1, -1 );
             else
                 texture->ensureInitialized( width / 2, height / 2, lineSizes[i], 2, GL_LUMINANCE_ALPHA, 2, -1 );
+
             glBindTexture( GL_TEXTURE_2D, texture->id() );
             const uchar* pixels = planes[i];
             glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? lineSizes[0] : (lineSizes[1]/2) );
@@ -2037,7 +2164,6 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         QMutexLocker lk( &m_uploadMutex );
 
         //software conversion data to rgb
-        QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
 
         int bytesPerPixel = 1;
         if( !isYuvFormat(format) )
@@ -2048,7 +2174,9 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 bytesPerPixel = 4;
         }
 
-        texture->ensureInitialized(r_w[0], h[0], lineSizes[0], bytesPerPixel, GL_RGBA, 4, 0);
+        QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
+        texture->ensureInitialized( r_w[0], h[0], lineSizes[0], bytesPerPixel, GL_RGBA, 4, 0 );
+
         glBindTexture(GL_TEXTURE_2D, texture->id());
 
         uchar* pixels = planes[0];
@@ -2070,7 +2198,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV420P:
                 if (useSSE2())
                 {
-                    yuv420_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv420_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2084,7 +2212,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV422P:
                 if (useSSE2())
                 {
-                    yuv422_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv422_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2098,7 +2226,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             case PIX_FMT_YUV444P:
                 if (useSSE2())
                 {
-                    yuv444_argb32_sse2_intr(pixels, planes[0], planes[2], planes[1],
+                    yuv444_argb32_simd_intr(pixels, planes[0], planes[2], planes[1],
                         qPower2Ceil(r_w[0],ROUND_COEFF),
                         h[0],
                         4 * lineSizes[0],
@@ -2200,20 +2328,12 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGlWithAggregation(
 
 bool DecodedPictureToOpenGLUploader::usingShaderYuvToRgb() const
 {
-    return (d->features() & QnGlFunctions::ArbPrograms)
-        && (d->features() & QnGlFunctions::OpenGL1_3)
-        && !(d->features() & QnGlFunctions::ShadersBroken)
-        && m_yv12SharedUsed
-        && !m_forceSoftYUV;
+    return d->usingShaderYuvToRgb();
 }
 
 bool DecodedPictureToOpenGLUploader::usingShaderNV12ToRgb() const
 {
-    return (d->features() & QnGlFunctions::ArbPrograms)
-        && (d->features() & QnGlFunctions::OpenGL1_3)
-        && !(d->features() & QnGlFunctions::ShadersBroken)
-        && m_nv12SharedUsed
-        && !m_forceSoftYUV;
+    return d->usingShaderNV12ToRgb();
 }
 
 void DecodedPictureToOpenGLUploader::releaseDecodedPicturePool( std::deque<UploadedPicture*>* const pool )
@@ -2338,12 +2458,12 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
         pic->data[3], pic->linesize[3],
         m_rgbaBuf );
 
-	QImage img(
-		m_rgbaBuf,
-		pic->width,
-		pic->height,
+    QImage img(
+        m_rgbaBuf,
+        pic->width,
+        pic->height,
         QImage::Format_ARGB32 );	//QImage::Format_ARGB4444_Premultiplied );
-    const QString& fileName = QString::fromAscii("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
+    const QString& fileName = QString::fromLatin1("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
     img.save(fileName, "png");
     /*if( !img.save( fileName, "bmp" ) )
         int x = 0;*/

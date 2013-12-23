@@ -2,12 +2,8 @@
 
 #include <limits>
 
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsLinearLayout>
-
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/math/color_transformations.h>
-#include <utils/image_provider.h>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -17,6 +13,11 @@
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
+
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/color_transformations.h>
+#include <utils/media/audio_player.h>
+#include <utils/image_provider.h>
 
 namespace {
     const char *actionIndexPropertyName = "_qn_actionIndex";
@@ -215,6 +216,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
 }
 
 QnNotificationWidget::~QnNotificationWidget() {
+    //TODO: #GDM if our sound is playing at the moment - stop it
     return;
 }
 
@@ -228,6 +230,14 @@ void QnNotificationWidget::setText(const QString &text) {
 
 void QnNotificationWidget::setTooltipText(const QString &text) {
     m_tooltipWidget->setText(text);
+}
+
+void QnNotificationWidget::setSound(const QString &soundPath, bool loop) {
+    m_soundPath = soundPath;
+    if (loop)
+        AudioPlayer::playFileAsync(soundPath, this, SLOT(at_loop_sound()));
+    else
+        AudioPlayer::playFileAsync(soundPath);
 }
 
 Qn::NotificationLevel QnNotificationWidget::notificationLevel() const {
@@ -259,7 +269,7 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
 
     base_type::setGeometry(geometry);
 
-    if(!qFuzzyCompare(size(), oldSize))
+    if(!qFuzzyEquals(size(), oldSize))
         updateOverlayGeometry();
 }
 
@@ -298,6 +308,8 @@ void QnNotificationWidget::paint(QPainter *painter, const QStyleOptionGraphicsIt
     painter->setPen(QPen(QColor(110, 110, 110, 255), 0.5));
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
     painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
+
+    //TODO: #GDM draw corresponding image
 }
 
 void QnNotificationWidget::hideToolTip() {
@@ -321,7 +333,7 @@ void QnNotificationWidget::updateToolTipPosition() {
     if(m_inToolTipPositionUpdate)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inToolTipPositionUpdate, true); /* Prevent stack overflow. */
+    QN_SCOPED_VALUE_ROLLBACK(&m_inToolTipPositionUpdate, true); /* Prevent stack overflow. */
 
     m_tooltipWidget->updateTailPos();
     m_tooltipWidget->pointTo(QPointF(0, qRound(geometry().height() / 2 )));
@@ -384,3 +396,6 @@ void QnNotificationWidget::at_thumbnail_clicked() {
     emit actionTriggered(data.action, data.params);
 }
 
+void QnNotificationWidget::at_loop_sound() {
+    AudioPlayer::playFileAsync(m_soundPath, this, SLOT(at_loop_sound()));
+}

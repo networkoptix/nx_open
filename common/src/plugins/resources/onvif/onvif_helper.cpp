@@ -1,10 +1,13 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "onvif_helper.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "utils/common/log.h"
 #include "core/resource/resource_type.h"
 
-#include <QDebug>
-#include <QRegExp>
+#include <QtCore/QDebug>
+#include <QtCore/QRegExp>
 
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
 const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp(QLatin1String("[^\\d\\w]+"));
@@ -364,3 +367,5 @@ bool NameHelper::isManufacturerSupported(const QString& manufacturer) const
 
     return true;
 }
+
+#endif //ENABLE_ONVIF

@@ -1,10 +1,12 @@
 #ifndef upnp_resource_searcher_h_1806
 #define upnp_resource_searcher_h_1806
 
+#include <QtCore/QAtomicInt>
+#include <QtCore/QElapsedTimer>
+
 #include "core/resource_managment/resource_searcher.h"
 #include "utils/network/nettools.h"
 #include "utils/network/socket.h"
-#include <QAtomicInt>
 
 #include "upnp_device_searcher.h"
 
@@ -43,17 +45,17 @@ protected:
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const QString& host);
-    void processSocket(UDPSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
+    void processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
 protected:
     void readDeviceXml(const QByteArray& uuidStr, const QUrl& descritionUrl, const QString& sender, QnResourceList& result);
     void processDeviceXml(const QByteArray& foundDeviceDescription, const QString& host, const QString& sender, QnResourceList& result);
 private:
-    QMap<QString, UDPSocket*> m_socketList;
-    UDPSocket* sockByName(const QnInterfaceAndAddr& iface);
+    QMap<QString, AbstractDatagramSocket*> m_socketList;
+    AbstractDatagramSocket* sockByName(const QnInterfaceAndAddr& iface);
 
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
-    QTime m_cacheLivetime;
-    UDPSocket* m_receiveSocket;
+    QElapsedTimer m_cacheLivetime;
+    AbstractDatagramSocket* m_receiveSocket;
 };
 
 

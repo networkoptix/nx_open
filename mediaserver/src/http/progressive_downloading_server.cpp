@@ -1,7 +1,9 @@
 
 #include <memory>
 
-#include <QSettings>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSettings>
+#include <QtCore/QUrlQuery>
 #include "progressive_downloading_server.h"
 #include <utils/fs/file.h>
 #include "utils/network/tcp_connection_priv.h"
@@ -17,6 +19,8 @@
 #include "utils/common/util.h"
 #include "core/resource/camera_resource.h"
 #include "cached_output_stream.h"
+#include "network/authenticate_helper.h"
+#include "../settings.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -32,7 +36,7 @@ QnProgressiveDownloadingServer::~QnProgressiveDownloadingServer()
 
 }
 
-QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     return new QnProgressiveDownloadingConsumer(clientSocket, owner);
 }
@@ -165,8 +169,8 @@ protected:
         QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
         if( !resultPtr )
         {
-            NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1:%2. Skipping frame...").
-                arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()), cl_logDEBUG2 );
+            NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1. Skipping frame...").
+                arg(m_owner->socket()->getForeignAddress().toString()), cl_logDEBUG2 );
         }
         int errCode = m_owner->getTranscoder()->transcodePacket(
             media,
@@ -237,8 +241,8 @@ protected:
         }
         else
         {
-            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2:%3 due to transcode error (%4)").
-                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress()).arg(m_owner->socket()->getForeignPort()).arg(errCode), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress().toString()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
         }
 
@@ -318,24 +322,23 @@ static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
 static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
-extern QSettings qSettings;
-
-QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
+QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
 {
+    Q_UNUSED(_owner)
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
     d->streamingFormat = "webm";
     d->videoCodec = CODEC_ID_VP8;
 
-    d->foreignAddress = socket->getForeignAddress();
-    d->foreignPort = socket->getForeignPort();
+    d->foreignAddress = socket->getForeignAddress().address.toString();
+    d->foreignPort = socket->getForeignAddress().port;
 
     NX_LOG( QString::fromLatin1("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = qSettings.value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = TimerManager::instance()->addTimer(
             this,
@@ -403,12 +406,12 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    saveSysThreadID();
+    initSystemThreadId();
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
-    d->socket->setReadTimeOut(CONNECTION_TIMEOUT);
-    d->socket->setWriteTimeOut(CONNECTION_TIMEOUT);
+    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
+    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
 
     bool ready = true;
     if (d->clientRequest.isEmpty())
@@ -417,6 +420,7 @@ void QnProgressiveDownloadingConsumer::run()
     if (ready)
     {
         parseRequest();
+
         d->responseBody.clear();
 
         //NOTE not using QFileInfo, because QFileInfo::completeSuffix returns suffix after FIRST '.'. So, unique ID cannot contain '.', but VMAX resource does contain
@@ -433,8 +437,10 @@ void QnProgressiveDownloadingConsumer::run()
         }
         updateCodecByFormat(d->streamingFormat);
 
+        const QUrlQuery decodedUrlQuery( getDecodedUrl() );
+
         QSize videoSize(640,480);
-        QByteArray resolutionStr = getDecodedUrl().queryItemValue("resolution").toLocal8Bit().toLower();
+        QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLocal8Bit().toLower();
         if (resolutionStr.endsWith('p'))
             resolutionStr = resolutionStr.left(resolutionStr.length()-1);
         QList<QByteArray> resolution = resolutionStr.split('x');
@@ -451,11 +457,11 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         Qn::StreamQuality quality = Qn::QualityNormal;
-        if( getDecodedUrl().hasQueryItem(QnCodecParams::quality) )
-            quality = Qn::fromString<Qn::StreamQuality>(getDecodedUrl().queryItemValue(QnCodecParams::quality));
+        if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
+            quality = Qn::fromString<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality));
 
         QnCodecParams::Value codecParams;
-        QList<QPair<QString, QString> > queryItems = getDecodedUrl().queryItems();
+        QList<QPair<QString, QString> > queryItems = decodedUrlQuery.queryItems();
         for( QList<QPair<QString, QString> >::const_iterator
             it = queryItems.begin();
             it != queryItems.end();
@@ -496,16 +502,16 @@ void QnProgressiveDownloadingConsumer::run()
         //taking max send queue size from url
         bool dropLateFrames = d->streamingFormat == "mpjpeg";
         unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
-        if( getDecodedUrl().hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
+        if( decodedUrlQuery.hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
         {
-            maxFramesToCacheBeforeDrop = getDecodedUrl().queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
+            maxFramesToCacheBeforeDrop = decodedUrlQuery.queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
             dropLateFrames = true;
         }
 
-        const bool standFrameDuration = getDecodedUrl().hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
+        const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
-        QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
-        bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
+        QByteArray position = decodedUrlQuery.queryItemValue("pos").toLocal8Bit();
+        bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
 
         //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
@@ -541,10 +547,11 @@ void QnProgressiveDownloadingConsumer::run()
                 sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
-            if (dataProvider) {
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            dataProvider = liveReader;
+            if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
-                dataProvider->start();
+                liveReader->startIfNotRunning(true);
                 camera->inUse(this);
             }
         }
@@ -554,6 +561,7 @@ void QnProgressiveDownloadingConsumer::run()
             if (!utcFormatOK)
                 timeMs = QDateTime::fromString(position, Qt::ISODate).toMSecsSinceEpoch(); // try ISO format
             timeMs *= 1000;
+
 
             if (isUTCRequest)
             {
@@ -568,28 +576,28 @@ void QnProgressiveDownloadingConsumer::run()
                     archive->open(resource);
                     archive->seek(timeMs, true);
                     qint64 timestamp = AV_NOPTS_VALUE;
-					int counter = 0;
+                    int counter = 0;
                     while (counter < 20)
                     {
                         QnAbstractMediaDataPtr data = archive->getNextData();
                         if (data)
                         {
-							if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
-							{
-								timestamp = data->timestamp;
-								break;
-							}
-							else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
-								continue; // ignore filler packet
-							counter++;
+                            if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 
+                            {
+                                timestamp = data->timestamp;
+                                break;
+                            }
+                            else if (data->dataType == QnAbstractMediaData::EMPTY_DATA && data->timestamp < DATETIME_NOW)
+                                continue; // ignore filler packet
+                            counter++;
                         }
-						else {
-							counter++;
-						}
+                        else {
+                            counter++;
+                        }
                     }
 
                     QByteArray ts("\"now\"");
-                    QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                    QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLocal8Bit();
                     if (timestamp != (qint64)AV_NOPTS_VALUE)
                     {
                         if (utcFormatOK)
@@ -634,7 +642,11 @@ void QnProgressiveDownloadingConsumer::run()
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
+#ifdef USE_NX_HTTP
+        d->response.headers["Cache-Control"] = "no-cache";
+#else
         d->responseHeaders.setValue("Cache-Control", "no-cache");
+#endif
         sendResponse("HTTP", CODE_OK, mimeType);
 
         //dataConsumer.sendResponse();
@@ -642,8 +654,8 @@ void QnProgressiveDownloadingConsumer::run()
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
 
-        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2:%3. Reason: %4").
-            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress()).arg(socket()->getForeignPort()).
+        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2. Reason: %3").
+            arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress().toString()).
             arg((!dataConsumer.isRunning() ? QString::fromLatin1("Data consumer stopped") : 
                 (!d->socket->isConnected() ? QString::fromLatin1("Connection has been closed") :
                  QString::fromLatin1("Terminated")))), cl_logDEBUG1 );
@@ -657,7 +669,7 @@ void QnProgressiveDownloadingConsumer::run()
             camera->notInUse(this);
     }
 
-    d->socket->close();
+    //d->socket->close();
 }
 
 void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )

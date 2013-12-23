@@ -1,10 +1,10 @@
 #ifndef QN_RUBBER_BAND_INSTRUMENT_H
 #define QN_RUBBER_BAND_INSTRUMENT_H
 
-#include <QScopedPointer>
-#include <QPoint>
-#include <QRect>
-#include <QSet>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
+#include <QtCore/QSet>
 #include "drag_processing_instrument.h"
 
 class QGraphicsItem;
@@ -48,16 +48,14 @@ protected:
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 
-    RubberBandItem *rubberBand() const {
-        return m_rubberBand.data();
-    }
+    RubberBandItem *rubberBand() const;
 
 private slots:
     void at_scene_selectionChanged();
 
 private:
     /* Rubber band item. */
-    QWeakPointer<RubberBandItem> m_rubberBand;
+    QPointer<RubberBandItem> m_rubberBand;
 
     /** Set of items that were selected when rubber banding has started. 
      *

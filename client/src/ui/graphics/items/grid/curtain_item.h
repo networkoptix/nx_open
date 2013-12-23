@@ -1,7 +1,7 @@
 #ifndef QN_CURTAIN_ITEM
 #define QN_CURTAIN_ITEM
 
-#include <QGraphicsObject>
+#include <QtWidgets/QGraphicsObject>
 
 /**
  * Item that fills the whole view with the given color. 

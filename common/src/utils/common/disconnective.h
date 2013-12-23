@@ -7,39 +7,33 @@
 
 #include "connective.h"
 
-template<class Base, bool baseIsDisconnective>
-class Disconnective;
-
-
 class DisconnectiveBase {
 public:
-    DisconnectiveBase() {}
-
-    template<class T1, class T2>
-    bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection) {
-        Connection connection;
-        if(ConnectiveBase::connect(sender, signal, receiver, method, type, &connection)) {
-            m_connections.push_back(connection);
-            return true;
-        } else {
-            return false;
-        }
+    template<class T1, class S1, class T2, class S2>
+    QMetaObject::Connection connect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method, Qt::ConnectionType type = Qt::AutoConnection) {
+        QMetaObject::Connection result = ConnectiveBase::connect(sender, signal, receiver, method, type);
+        if(result)
+            m_connections.push_back(result);
+        return result;
     }
 
-    template<class T1, class T2>
-    bool disconnect(const T1 &sender, const char *signal, const T2 &receiver, const char *method) {
-        return ConnectiveBase::disconnect(sender, signal, receiver, method, NULL);
+    template<class T1, class S1, class T2, class S2>
+    bool disconnect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method) {
+        return ConnectiveBase::disconnect(sender, signal, receiver, method);
     }
 
     void disconnectAll() {
-        foreach(const Connection &connection, m_connections)
-            if(connection.sender && connection.receiver)
-                disconnect(connection.sender, connection.signal, connection.receiver, connection.method);
+        foreach(const QMetaObject::Connection &connection, m_connections)
+            QObject::disconnect(connection);
         m_connections.clear();
     }
 
+protected:
+    DisconnectiveBase() {}
+    virtual ~DisconnectiveBase() {}
+
 private:
-    QList<Connection> m_connections;
+    QList<QMetaObject::Connection> m_connections;
 };
 
 

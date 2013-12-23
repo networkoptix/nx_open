@@ -2,8 +2,8 @@
 
 #include <cmath> /* For std::sqrt. */
 
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsScale>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsScale>
 
 #include <utils/math/fuzzy.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -35,7 +35,7 @@ const QSizeF &QnViewportBoundWidget::fixedSize() {
 }
 
 void QnViewportBoundWidget::setFixedSize(const QSizeF &fixedSize) {
-    if(qFuzzyCompare(m_fixedSize, fixedSize))
+    if(qFuzzyEquals(m_fixedSize, fixedSize))
         return;
 
     m_fixedSize = fixedSize;
@@ -58,7 +58,7 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     if(!isVisible())
         return;
 
-    QnScopedValueRollback<bool> guard(&m_inUpdateScale, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_inUpdateScale, true);
 
     /* Assume affine transform that does not change x/y scale separately. */
     QTransform sceneToViewport = view->viewportTransform();
@@ -113,8 +113,16 @@ QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVar
     return base_type::itemChange(change, value);
 }
 
-void QnViewportBoundWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    base_type::resizeEvent(event);
-    if(!m_inUpdateScale)
-        updateScale();
+void QnViewportBoundWidget::setGeometry(const QRectF &geometry) {
+    if(m_inUpdateScale) {
+        base_type::setGeometry(geometry);
+    } else {
+        QSizeF oldSize = size();
+
+        base_type::setGeometry(geometry);
+
+        if(!qFuzzyEquals(size(), oldSize))
+            updateScale();
+    }
 }
+

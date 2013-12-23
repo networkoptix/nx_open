@@ -1,7 +1,7 @@
 #ifndef QN_CAMERA_SETTINGS_WIDGET_H
 #define QN_CAMERA_SETTINGS_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -58,6 +58,9 @@ public:
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;
+
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
 
     void updateFromResources();
     void submitToResources();

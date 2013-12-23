@@ -1,5 +1,5 @@
 #include "resizing_instrument.h"
-#include <QGraphicsWidget>
+#include <QtWidgets/QGraphicsWidget>
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/frame_section_queryable.h>
 #include "resize_hover_instrument.h"

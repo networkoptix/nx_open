@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/layout_resource.h>
 #include <api/app_server_connection.h>
 
 #include <client/client_globals.h>
@@ -33,7 +34,7 @@ signals:
 private:
     friend class QnAbstractReplyProcessor;
 
-    QWeakPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
+    QPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
     QnLayoutResourceList m_resources;
 };
 

@@ -13,8 +13,9 @@
 #include <openssl/err.h>
 
 #include "version.h"
-#include "common/customization.h"
-#include "utils/common/synctime.h"
+#include <common/customization.h>
+#include <common/common_globals.h>
+#include <utils/common/synctime.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = QN_RSA_PUBLIC_KEY;
@@ -216,7 +217,7 @@ qint64 QnLicense::expirationTime() const {
 }
 
 QnLicense::Type QnLicense::type() const {
-    if (key() == qnProductFeatures().freeLicenseKey.toAscii())
+    if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return FreeLicense;
 
     if (!expiration().isEmpty())

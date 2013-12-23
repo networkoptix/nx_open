@@ -1,9 +1,9 @@
 #ifndef QN_LAYOUT_NAME_DIALOG_H
 #define QN_LAYOUT_NAME_DIALOG_H
 
-#include <QDialog>
-#include <QScopedPointer>
-#include <QDialogButtonBox>
+#include <QtWidgets/QDialog>
+#include <QtCore/QScopedPointer>
+#include <QtWidgets/QDialogButtonBox>
 
 #include "button_box_dialog.h"
 

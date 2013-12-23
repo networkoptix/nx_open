@@ -34,7 +34,7 @@ QnBusinessRulesViewModel::~QnBusinessRulesViewModel() {
 }
 
 QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelIndex &parent) const {
-    return hasIndex(row, column, parent) ? createIndex(row, column, 0) : QModelIndex();
+    return hasIndex(row, column, parent) ? createIndex(row, column, (void*)0) : QModelIndex();
 }
 
 QModelIndex QnBusinessRulesViewModel::parent(const QModelIndex &child) const {
@@ -123,6 +123,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
                         || BusinessActionType::requiresUserResource(actionType)
                         || actionType == BusinessActionType::ShowPopup
                         || actionType == BusinessActionType::PlaySound
+                        || actionType == BusinessActionType::PlaySoundRepeated
                         || actionType == BusinessActionType::SayText)
                     flags |= Qt::ItemIsEditable;
             }
@@ -143,8 +144,9 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
 }
 
 void QnBusinessRulesViewModel::clear() {
+    beginResetModel();
     m_rules.clear();
-    reset();
+    endResetModel();
 }
 
 void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessRules) {
@@ -238,7 +240,8 @@ void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *sour
 
 void QnBusinessRulesViewModel::at_soundModel_listChanged() {
     for (int i = 0; i < m_rules.size(); i++) {
-        if (m_rules[i]->actionType() != BusinessActionType::PlaySound)
+        if (m_rules[i]->actionType() != BusinessActionType::PlaySound &&
+                m_rules[i]->actionType() != BusinessActionType::PlaySoundRepeated)
             continue;
         QModelIndex index = this->index(i, QnBusiness::TargetColumn, QModelIndex());
         emit dataChanged(index, index);
@@ -247,7 +250,8 @@ void QnBusinessRulesViewModel::at_soundModel_listChanged() {
 
 void QnBusinessRulesViewModel::at_soundModel_itemChanged(const QString &filename) {
     for (int i = 0; i < m_rules.size(); i++) {
-        if (m_rules[i]->actionType() != BusinessActionType::PlaySound)
+        if (m_rules[i]->actionType() != BusinessActionType::PlaySound &&
+                m_rules[i]->actionType() != BusinessActionType::PlaySoundRepeated)
             continue;
         if (m_rules[i]->actionParams().getSoundUrl() != filename)
             continue;

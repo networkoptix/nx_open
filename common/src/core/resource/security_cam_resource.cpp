@@ -1,10 +1,23 @@
 
 #include "security_cam_resource.h"
-
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include <business/business_event_connector.h>
+#include "api/app_server_connection.h"
 
+
+#define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
+
+namespace {
+    static const int defaultMaxFps = 15;
+    static const int defaultReservedSecondStreamFps = 2;
+    static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::sharePixels;
+    static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
+
+    static const int defaultSecondStreamFpsLow = 2;
+    static const int defaultSecondStreamFpsMedium = 7;
+    static const int defaultSecondStreamFpsHigh = 12;
+}
 
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
@@ -12,12 +25,18 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_recActionCnt(0),
     m_secondaryQuality(Qn::SSQualityMedium),
     m_cameraControlDisabled(false),
-    m_statusFlags(0)
+    m_statusFlags(0),
+    m_scheduleDisabled(true),
+    m_audioEnabled(false),
+    m_advancedWorking(false),
+    m_manuallyAdded(false)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
 
     addFlags(live_cam);
+
+    m_cameraControlDisabled = !QnAppServerConnectionFactory::allowCameraChanges();
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 
@@ -32,49 +51,40 @@ QnSecurityCamResource::QnSecurityCamResource():
     }
 }
 
-bool QnSecurityCamResource::isGroupPlayOnly() const
-{
+bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
 }
 
-const QnResource* QnSecurityCamResource::toResource() const
-{
+const QnResource* QnSecurityCamResource::toResource() const {
     return this;
 }
 
-QnResource* QnSecurityCamResource::toResource()
-{
+QnResource* QnSecurityCamResource::toResource() {
     return this;
 }
 
-const QnResourcePtr QnSecurityCamResource::toResourcePtr() const
-{
+const QnResourcePtr QnSecurityCamResource::toResourcePtr() const {
     return toSharedPointer();
 }
 
-QnResourcePtr QnSecurityCamResource::toResourcePtr()
-{
+QnResourcePtr QnSecurityCamResource::toResourcePtr() {
     return toSharedPointer();
 }
 
-QnSecurityCamResource::~QnSecurityCamResource()
-{
+QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(QnResourcePtr other)
-{
+void QnSecurityCamResource::updateInner(QnResourcePtr other) {
     QnNetworkResource::updateInner(other);
     QnMediaResource::updateInner(other);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-
         const QnResourceVideoLayout* layout = getVideoLayout();
         int numChannels = layout->channelCount();
 
         m_motionType = other_casted->m_motionType;
-
         for (int i = 0; i < numChannels; ++i) 
             setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
         m_scheduleTasks = other_casted->m_scheduleTasks;
@@ -83,73 +93,46 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
         m_secondaryQuality = other_casted->m_secondaryQuality;
         m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
         m_statusFlags = other_casted->m_statusFlags;
+        m_scheduleDisabled = other_casted->isScheduleDisabled();
+        m_audioEnabled = other_casted->isAudioEnabled();
+        m_manuallyAdded = other_casted->isManuallyAdded();
+        m_model = other_casted->m_model;
+        m_firmware = other_casted->m_firmware;
+        m_vendor = other_casted->m_vendor;
     }
 }
 
-QString QnSecurityCamResource::getVendorName() const
-{
+QString QnSecurityCamResource::getVendorInternal() const {
     return getDriverName();
 }
 
-int QnSecurityCamResource::getMaxFps()
-{
-    if (!hasParam(lit("MaxFPS")))
-    {
-        //Q_ASSERT(false);
-        return 15;
-    }
-
+int QnSecurityCamResource::getMaxFps() const {
     QVariant val;
-    getParam(lit("MaxFPS"), val, QnDomainMemory);
+    if (!getParam(lit("MaxFPS"), val, QnDomainMemory))
+        return defaultMaxFps;
     return val.toInt();
 }
 
-int QnSecurityCamResource::reservedSecondStreamFps()
-{
-    if (!hasParam(lit("reservedSecondStreamFps")))
-    {
-        //Q_ASSERT(false);
-        return 2;
-    }
-
+int QnSecurityCamResource::reservedSecondStreamFps() const {
     QVariant val;
-    getParam(lit("reservedSecondStreamFps"), val, QnDomainMemory);
+    if (!getParam(lit("reservedSecondStreamFps"), val, QnDomainMemory))
+        return defaultReservedSecondStreamFps;
     return val.toInt();
 }
 
-QSize QnSecurityCamResource::getMaxSensorSize()
-{
-
-    if (!hasParam(lit("MaxSensorWidth")) || !hasParam(lit("MaxSensorHeight")))
-    {
-        Q_ASSERT(false);
-        return QSize(0,0);
-    }
-
+QSize QnSecurityCamResource::getMaxSensorSize() const {
     QVariant val_w, val_h;
-    getParam(lit("MaxSensorWidth"), val_w, QnDomainMemory);
-    getParam(lit("MaxSensorHeight"), val_h, QnDomainMemory);
-
+    if (!getParam(lit("MaxSensorWidth"), val_w, QnDomainMemory) ||
+            !getParam(lit("MaxSensorHeight"), val_h, QnDomainMemory))
+        return QSize(0, 0);
     return QSize(val_w.toInt(), val_h.toInt());
-
 }
 
-QRect QnSecurityCamResource::getCroping(QnDomain /*domain*/)
-{
-    return QRect(0, 0, 100, 100);
-}
-
-void QnSecurityCamResource::setCroping(QRect croping, QnDomain /*domain*/)
-{
-    setCropingPhysical(croping);
-}
-
-QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role)
-{
+QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role) {
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
     {
 
-        if (role == QnResource::Role_SecondaryLiveVideo && !hasDualStreaming())
+        if (role == QnResource::Role_SecondaryLiveVideo && !hasDualStreaming2())
             return 0;
 
         QnAbstractStreamDataProvider* result = createLiveDataProvider();
@@ -168,51 +151,39 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     return 0;
 }
 
-void QnSecurityCamResource::initializationDone()
-{
-    if( m_inputPortListenerCount > 0 )
+void QnSecurityCamResource::initializationDone() {
+    if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoring();
 }
 
-bool QnSecurityCamResource::startInputPortMonitoring()
-{
+bool QnSecurityCamResource::startInputPortMonitoring() {
     return false;
 }
 
-void QnSecurityCamResource::stopInputPortMonitoring()
-{
+void QnSecurityCamResource::stopInputPortMonitoring() {
 }
 
-bool QnSecurityCamResource::isInputPortMonitored() const
-{
+bool QnSecurityCamResource::isInputPortMonitored() const {
     return false;
 }
 
-void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
-{
+void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory) {
     m_dpFactory = dpFactory;
 }
 
-QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_motionMaskList;
+QList<QnMotionRegion> QnSecurityCamResource::getMotionRegionList() const {
+    SAFE(return m_motionMaskList)
 }
 
-QRegion QnSecurityCamResource::getMotionMask(int channel) const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_motionMaskList[channel].getMotionMask();
+QRegion QnSecurityCamResource::getMotionMask(int channel) const {
+    SAFE(return m_motionMaskList[channel].getMotionMask())
 }
 
-QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_motionMaskList[channel];
+QnMotionRegion QnSecurityCamResource::getMotionRegion(int channel) const {
+    SAFE(return m_motionMaskList[channel])
 }
 
-void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel)
-{
+void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel) {
     {
         QMutexLocker mutexLocker(&m_mutex);
         if (m_motionMaskList[channel] == mask)
@@ -220,20 +191,11 @@ void QnSecurityCamResource::setMotionRegion(const QnMotionRegion& mask, QnDomain
         m_motionMaskList[channel] = mask;
     }
 
-    if (domain == QnDomainPhysical) 
-    {
-        if (m_motionType == Qn::MT_SoftwareGrid)
-        {
-            ;
-        }
-        else {
-            setMotionMaskPhysical(channel);
-        }
-    }
+    if (domain == QnDomainPhysical && m_motionType != Qn::MT_SoftwareGrid)
+        setMotionMaskPhysical(channel);
 }
 
-void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain)
-{
+void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain) {
     {
         QMutexLocker mutexLocker(&m_mutex);
         bool sameMask = maskList.size() == m_motionMaskList.size();
@@ -245,115 +207,75 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
         m_motionMaskList = maskList;
     }
 
-    if (domain == QnDomainPhysical)
-    {
-        if (m_motionType == Qn::MT_SoftwareGrid)
-        {
-            ;
-        }
-        else 
-        {
-            for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
-                setMotionMaskPhysical(i);
-        }
+    if (domain == QnDomainPhysical && m_motionType != Qn::MT_SoftwareGrid) {
+        for (int i = 0; i < getVideoLayout()->channelCount(); ++i)
+            setMotionMaskPhysical(i);
     }
 }
 
-void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
-{
-    {
-        QMutexLocker lock(&m_mutex);
-        m_scheduleTasks = scheduleTasks;
-    }
-
+void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks) {
+    SAFE(m_scheduleTasks = scheduleTasks)
     emit scheduleTasksChanged(::toSharedPointer(this));
 }
 
-const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_scheduleTasks;
+const QnScheduleTaskList QnSecurityCamResource::getScheduleTasks() const {
+    SAFE(return m_scheduleTasks)
 }
 
-bool QnSecurityCamResource::hasDualStreaming() const
-{
-    if (!hasParam(lit("hasDualStreaming")))
-    {
-        //Q_ASSERT(false);
-        return false;
-    }
+bool QnSecurityCamResource::hasDualStreaming2() const {
+    return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
+}
 
+bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(lit("hasDualStreaming"), val, QnDomainMemory);
+    if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
+        return false;
     return val.toInt();
 }
 
-bool QnSecurityCamResource::isDtsBased() const
-{
-    if (!hasParam(lit("dts")))
-        return false;
-
+bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(lit("dts"), val, QnDomainMemory);
+    if (!getParam(lit("dts"), val, QnDomainMemory))
+        return false;
     return val.toInt();
 }
 
-bool QnSecurityCamResource::isAnalog() const
-{
-    if (!hasParam(lit("analog")))
-        return false;
-
+bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(lit("analog"), val, QnDomainMemory);
+    if (!getParam(lit("analog"), val, QnDomainMemory))
+        return false;
     return val.toInt();
 }
 
-Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
-{
-    if (!hasParam(lit("streamFpsSharing")))
-    {
-        //Q_ASSERT(false);
-        return Qn::sharePixels;
-    }
-
+Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(lit("streamFpsSharing"), val, QnDomainMemory);
+    if (!getParam(lit("streamFpsSharing"), val, QnDomainMemory))
+        return defaultStreamFpsSharingMethod;
 
     QString sval = val.toString();
-
     if (sval == lit("shareFps"))
         return Qn::shareFps;
-
     if (sval == lit("noSharing"))
         return Qn::noSharing;
-
     return Qn::sharePixels;
 }
 
-QStringList QnSecurityCamResource::getRelayOutputList() const
-{
+QStringList QnSecurityCamResource::getRelayOutputList() const {
     return QStringList();
 }
 
-QStringList QnSecurityCamResource::getInputPortList() const
-{
+QStringList QnSecurityCamResource::getInputPortList() const {
     return QStringList();
 }
 
-bool QnSecurityCamResource::setRelayOutputState(
-    const QString& /*ouputID*/,
-    bool /*activate*/,
-    unsigned int /*autoResetTimeout*/ )
-{
+bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeout) {
+    Q_UNUSED(ouputID)
+    Q_UNUSED(activate)
+    Q_UNUSED(autoResetTimeout)
     return false;
 }
 
-void QnSecurityCamResource::inputPortListenerAttached()
-{
+void QnSecurityCamResource::inputPortListenerAttached() {
     QMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
@@ -361,11 +283,10 @@ void QnSecurityCamResource::inputPortListenerAttached()
         startInputPortMonitoring();
 }
 
-void QnSecurityCamResource::inputPortListenerDetached()
-{
+void QnSecurityCamResource::inputPortListenerDetached() {
     QMutexLocker lk( &m_initMutex );
  
-    if( m_inputPortListenerCount <= 0 )
+    if( m_inputPortListenerCount.load() <= 0 )
         return;
 
     int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );
@@ -375,126 +296,7 @@ void QnSecurityCamResource::inputPortListenerDetached()
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
-Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const
-{
-    Qn::MotionTypes rez = supportedMotionType();
-    if (rez & Qn::MT_HardwareGrid)
-        return Qn::MT_HardwareGrid;
-    else if (rez & Qn::MT_MotionWindow)
-        return Qn::MT_MotionWindow;
-    else
-        return Qn::MT_NoMotion;
-}
-
-Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const
-{
-    QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(lit("supportedMotion"), val, QnDomainMemory))
-    {
-        QStringList vals = val.toString().split(QLatin1Char(','));
-        for (int i = 0; i < vals.size(); ++i)
-        {
-            QString s1 = vals[i].toLower();
-            if (s1 == lit("hardwaregrid"))
-                return Qn::MT_HardwareGrid;
-            else if (s1 == lit("softwaregrid") && hasDualStreaming())
-                return Qn::MT_SoftwareGrid;
-            else if (s1 == lit("motionwindow"))
-                return Qn::MT_MotionWindow;
-        }
-        return Qn::MT_NoMotion;
-    }
-    else {
-        return Qn::MT_MotionWindow;
-    }
-}
-
-int QnSecurityCamResource::motionWindowCount() const
-{
-    QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(lit("motionWindowCnt"), val, QnDomainMemory))
-    {
-        return val.toInt();
-    }
-    return 0;
-}
-
-int QnSecurityCamResource::motionMaskWindowCount() const
-{
-    QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(lit("motionMaskWindowCnt"), val, QnDomainMemory))
-    {
-        return val.toInt();
-    }
-    return 0;
-}
-
-int QnSecurityCamResource::motionSensWindowCount() const
-{
-    QVariant val;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam(lit("motionSensWindowCnt"), val, QnDomainMemory))
-    {
-        return val.toInt();
-    }
-    return 0;
-}
-
-bool QnSecurityCamResource::isAudioSupported() const
-{
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    QVariant val;
-    if (this_casted->getParam(lit("isAudioSupported"), val, QnDomainMemory))
-        return val.toUInt() > 0;
-    else
-        return false;
-}
-
-Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const
-{
-    QVariant val;
-    Qn::MotionTypes result = Qn::MT_Default;
-    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-
-    if (this_casted->getParam(lit("supportedMotion"), val, QnDomainMemory))
-    {
-        QStringList vals = val.toString().split(QLatin1Char(','));
-        foreach(const QString& str, vals)
-        {
-            QString s1 = str.toLower().trimmed();
-            if (s1 == lit("hardwaregrid"))
-                result |= Qn::MT_HardwareGrid;
-            else if (s1 == lit("softwaregrid"))
-                result |= Qn::MT_SoftwareGrid;
-            else if (s1 == lit("motionwindow"))
-                result |= Qn::MT_MotionWindow;
-        }
-        if (!hasDualStreaming() && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
-            result &= ~Qn::MT_SoftwareGrid;
-    }
-    else {
-        result = Qn::MT_NoMotion;
-    }
-    return result;
-}
-
-Qn::MotionType QnSecurityCamResource::getMotionType()
-{
-    if (m_motionType == Qn::MT_Default)
-        m_motionType = getDefaultMotionType();
-    return m_motionType;
-}
-
-void QnSecurityCamResource::setMotionType(Qn::MotionType value)
-{
-    m_motionType = value;
-}
-
-void QnSecurityCamResource::at_disabledChanged()
-{
+void QnSecurityCamResource::at_disabledChanged() {
     if(hasFlags(QnResource::foreigner))
         return; // we do not own camera
 
@@ -504,15 +306,100 @@ void QnSecurityCamResource::at_disabledChanged()
         startInputPortMonitoring();
 }
 
-Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
-{
-    QVariant mediaVariant;
-    const_cast<QnSecurityCamResource *>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory); // TODO: #Elric const_cast? get rid of it!
-    return static_cast<Qn::CameraCapabilities>(mediaVariant.toInt());
+int QnSecurityCamResource::motionWindowCount() const {
+    QVariant val;
+    if (!getParam(lit("motionWindowCnt"), val, QnDomainMemory))
+        return 0;
+    return val.toInt();
 }
 
-bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const
-{
+int QnSecurityCamResource::motionMaskWindowCount() const {
+    QVariant val;
+    if (!getParam(lit("motionMaskWindowCnt"), val, QnDomainMemory))
+        return 0;
+    return val.toInt();
+}
+
+int QnSecurityCamResource::motionSensWindowCount() const {
+    QVariant val;
+    if (!getParam(lit("motionSensWindowCnt"), val, QnDomainMemory))
+        return 0;
+    return val.toInt();
+}
+
+bool QnSecurityCamResource::isAudioSupported() const {
+    QVariant val;
+    if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
+        return false;
+    return val.toUInt() > 0;
+}
+
+Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {
+    Qn::MotionTypes rez = supportedMotionType();
+    if (rez & Qn::MT_HardwareGrid)
+        return Qn::MT_HardwareGrid;
+    else if (rez & Qn::MT_MotionWindow)
+        return Qn::MT_MotionWindow;
+    else
+        return Qn::MT_NoMotion;
+}
+
+Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const {
+    QVariant val;
+    if (!getParam(lit("supportedMotion"), val, QnDomainMemory))
+        return defaultMotionType;
+
+    foreach(const QString &s, val.toString().split(QLatin1Char(','))) {
+        QString s1 = s.toLower();
+        if (s1 == lit("hardwaregrid"))
+            return Qn::MT_HardwareGrid;
+        else if (s1 == lit("softwaregrid") && hasDualStreaming2())
+            return Qn::MT_SoftwareGrid;
+        else if (s1 == lit("motionwindow"))
+            return Qn::MT_MotionWindow;
+    }
+    return Qn::MT_NoMotion;
+}
+
+Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
+    QVariant val;
+    if (!getParam(lit("supportedMotion"), val, QnDomainMemory))
+        return Qn::MT_NoMotion;
+
+    Qn::MotionTypes result = Qn::MT_Default;
+    foreach(const QString& str, val.toString().split(QLatin1Char(','))) {
+        QString s1 = str.toLower().trimmed();
+        if (s1 == lit("hardwaregrid"))
+            result |= Qn::MT_HardwareGrid;
+        else if (s1 == lit("softwaregrid"))
+            result |= Qn::MT_SoftwareGrid;
+        else if (s1 == lit("motionwindow"))
+            result |= Qn::MT_MotionWindow;
+    }
+    if ((!hasDualStreaming() || secondaryStreamQuality() == Qn::SSQualityDontUse) && !(getCameraCapabilities() &  Qn::PrimaryStreamSoftMotionCapability))
+        result &= ~Qn::MT_SoftwareGrid;
+
+    return result;
+}
+
+Qn::MotionType QnSecurityCamResource::getMotionType() {
+    if (m_motionType == Qn::MT_Default)
+        m_motionType = getDefaultMotionType();
+    return m_motionType;
+}
+
+void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
+    m_motionType = value;
+}
+
+Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
+    QVariant val;
+    if (!getParam(QLatin1String("cameraCapabilities"), val, QnDomainMemory))
+        return Qn::NoCapabilities;
+    return static_cast<Qn::CameraCapabilities>(val.toInt());
+}
+
+bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
     return getCameraCapabilities() & capabilities;
 }
 
@@ -524,124 +411,179 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
     setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
 }
 
-bool QnSecurityCamResource::setParam(const QString &name, const QVariant &val, QnDomain domain) {
-    bool result = QnResource::setParam(name, val, domain);
-    if(result && (name == lit("cameraCapabilities")))
-        emit cameraCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
-    return result;
+void QnSecurityCamResource::parameterValueChangedNotify(const QnParam &param) {
+    if (param.name() == lit("cameraCapabilities"))
+        emit cameraCapabilitiesChanged(::toSharedPointer(this));
+
+    base_type::parameterValueChangedNotify(param);
 }
 
-bool QnSecurityCamResource::isRecordingEventAttached() const
-{
+bool QnSecurityCamResource::isRecordingEventAttached() const {
     return m_recActionCnt > 0;
 }
 
-void QnSecurityCamResource::recordingEventAttached()
-{
+void QnSecurityCamResource::recordingEventAttached() {
     m_recActionCnt++;
 }
 
-void QnSecurityCamResource::recordingEventDetached()
-{
+void QnSecurityCamResource::recordingEventDetached() {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
 }
 
-QString QnSecurityCamResource::getGroupName() const
-{
-    QMutexLocker lk( &m_mutex );
-    return m_groupName;
+QString QnSecurityCamResource::getGroupName() const {
+    SAFE(return m_groupName)
 }
 
-void QnSecurityCamResource::setGroupName(const QString& value)
-{
-    QMutexLocker lk( &m_mutex );
-    m_groupName = value;
+void QnSecurityCamResource::setGroupName(const QString& value) {
+    SAFE(m_groupName = value)
 }
 
-QString QnSecurityCamResource::getGroupId() const
-{
-    QMutexLocker lk( &m_mutex );
-    return m_groupId;
+QString QnSecurityCamResource::getGroupId() const {
+    SAFE(return m_groupId)
 }
 
-void QnSecurityCamResource::setGroupId(const QString& value)
-{
-    QMutexLocker lk( &m_mutex );
-    m_groupId = value;
+void QnSecurityCamResource::setGroupId(const QString& value) {
+    SAFE(m_groupId = value)
 }
 
-void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality  quality)
-{
+QString QnSecurityCamResource::getModel() const {
+    SAFE(return m_model)
+}
+
+void QnSecurityCamResource::setModel(const QString &model) {
+    SAFE(m_model = model)
+}
+
+QString QnSecurityCamResource::getFirmware() const {
+    SAFE(return m_firmware)
+}
+
+void QnSecurityCamResource::setFirmware(const QString &firmware) {
+    SAFE(m_firmware = firmware)
+}
+
+QString QnSecurityCamResource::getVendor() const {
+    SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
+
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
+    return resourceType ? resourceType->getManufacture() : QString(); //estimated value
+}
+
+void QnSecurityCamResource::setVendor(const QString& value) {
+    SAFE(m_vendor = value)
+}
+
+void QnSecurityCamResource::setScheduleDisabled(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_scheduleDisabled == value)
+            return;
+        m_scheduleDisabled = value;
+    }
+
+    emit scheduleDisabledChanged(::toSharedPointer(this));
+}
+
+bool QnSecurityCamResource::isScheduleDisabled() const {
+    return m_scheduleDisabled;
+}
+
+void QnSecurityCamResource::setAudioEnabled(bool enabled) {
+    m_audioEnabled = enabled;
+}
+
+bool QnSecurityCamResource::isAudioEnabled() const {
+    return m_audioEnabled;
+}
+
+bool QnSecurityCamResource::isAdvancedWorking() const {
+    return m_advancedWorking;
+}
+
+void QnSecurityCamResource::setAdvancedWorking(bool value) {
+    m_advancedWorking = value;
+}
+
+bool QnSecurityCamResource::isManuallyAdded() const {
+    return m_manuallyAdded;
+}
+
+void QnSecurityCamResource::setManuallyAdded(bool value) {
+    m_manuallyAdded = value;
+}
+
+void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {
     m_secondaryQuality = quality;
 }
 
-Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const
-{
+Qn::SecondStreamQuality QnSecurityCamResource::secondaryStreamQuality() const {
     return m_secondaryQuality;
 }
 
-void QnSecurityCamResource::setCameraControlDisabled(bool value)
-{
+void QnSecurityCamResource::setCameraControlDisabled(bool value) {
     m_cameraControlDisabled = value;
 }
 
-bool QnSecurityCamResource::isCameraControlDisabled() const
-{
+bool QnSecurityCamResource::isCameraControlDisabled() const {
     return m_cameraControlDisabled;
 }
 
-int QnSecurityCamResource::desiredSecondStreamFps() const
-{
-    switch (secondaryStreamQuality())
-    {
+int QnSecurityCamResource::desiredSecondStreamFps() const {
+    switch (secondaryStreamQuality()) {
     case Qn::SSQualityMedium:
-        return 7;
+        return defaultSecondStreamFpsMedium;
     case Qn::SSQualityLow: 
-        return 2;
+        return defaultSecondStreamFpsLow;
     case Qn::SSQualityHigh:
-        return 12;
+        return defaultSecondStreamFpsHigh;
     default:
         break;
     }
-
-    return 7;
+    return defaultSecondStreamFpsMedium;
 }
 
-Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const
-{
+Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const {
     if (secondaryStreamQuality() != Qn::SSQualityHigh)
         return Qn::QualityLowest;
     else
         return Qn::QualityNormal;
 }
 
-QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const
-{
+QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const {
     return m_statusFlags;
 }
 
-bool QnSecurityCamResource::hasStatusFlags(StatusFlags value) const
-{
+bool QnSecurityCamResource::hasStatusFlags(StatusFlags value) const {
     return m_statusFlags & value;
 }
 
-void QnSecurityCamResource::setStatusFlags(StatusFlags value)
-{
+void QnSecurityCamResource::setStatusFlags(StatusFlags value) {
     m_statusFlags = value;
 }
 
-void QnSecurityCamResource::addStatusFlags(StatusFlags value)
-{
+void QnSecurityCamResource::addStatusFlags(StatusFlags value) {
     m_statusFlags |= value;
 }
 
-void QnSecurityCamResource::removeStatusFlags(StatusFlags value)
-{
+void QnSecurityCamResource::removeStatusFlags(StatusFlags value) {
     m_statusFlags &= ~value;
 }
 
 
-bool QnSecurityCamResource::needCheckIpConflicts() const
-{
+bool QnSecurityCamResource::needCheckIpConflicts() const {
     return getChannel() == 0 && !hasCameraCapabilities(Qn::shareIpCapability);
+}
+
+QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
+    const QList<QRegion>& regions,
+    qint64 msStartTime,
+    qint64 msEndTime,
+    int detailLevel )
+{
+    Q_UNUSED( regions );
+    Q_UNUSED( msStartTime );
+    Q_UNUSED( msEndTime );
+    Q_UNUSED( detailLevel );
+
+    return QnTimePeriodList();
 }

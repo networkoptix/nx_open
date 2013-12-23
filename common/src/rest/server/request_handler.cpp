@@ -1,16 +1,16 @@
-#include <QDebug>
-#include <QDateTime>
-#include <QStringList>
+#include <QtCore/QDebug>
+#include <QtCore/QDateTime>
+#include <QtCore/QStringList>
 #include "request_handler.h"
 #include "utils/common/util.h"
 
-qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime)
+qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime) const
 {
     if (dateTime.toLower().trimmed() == QLatin1String("now"))
     {
         return DATETIME_NOW;
     }
-    else if (dateTime.contains(L'T') || dateTime.contains(L'-') && !dateTime.startsWith(L'-'))
+    else if( dateTime.contains(L'T') || (dateTime.contains(L'-') && !dateTime.startsWith(L'-')) )
     {
         QStringList dateTimeParts = dateTime.split(L'.');
         QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
@@ -20,6 +20,13 @@ qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime)
     }
     else
         return dateTime.toLongLong();
+}
+
+QString QnRestRequestHandler::extractAction(const QString &path) const {
+    QString localPath = path;
+    while(localPath.endsWith(L'/'))
+        localPath.chop(1);
+    return localPath.mid(localPath.lastIndexOf(L'/') + 1);
 }
 
 class QnRestGUIRequestHandlerPrivate {

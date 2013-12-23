@@ -1,4 +1,9 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_stream_fetcher.h"
+
+#include <QtCore/QCoreApplication>
+
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
 #include "core/resource/network_resource.h"
@@ -76,6 +81,7 @@ qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const
 
 bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed)
 {
+    Q_UNUSED(consumer)
     m_lastSpeed = speed;
 
     if (!safeOpen())
@@ -143,7 +149,10 @@ bool VMaxStreamFetcher::vmaxConnect()
     vmaxDisconnect();
 
     QStringList args;
-    args << QString::number(QnVMax480Server::instance()->getPort());
+    int port = QnVMax480Server::instance()->getPort();
+    if (port == -1)
+        return false;
+    args << QString::number(port);
     m_tcpID = QnVMax480Server::instance()->registerProvider(this);
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
@@ -157,7 +166,7 @@ bool VMaxStreamFetcher::vmaxConnect()
     if (m_vMaxProxy->waitForStarted(PROCESS_TIMEOUT) || true)
 #endif
     {
-        QTime t;
+        QElapsedTimer t;
         t.restart();
         QMutexLocker lock(&m_connectMtx);
         while (!m_vmaxConnection && t.elapsed() < PROCESS_TIMEOUT && !m_needStop)
@@ -301,7 +310,7 @@ void VMaxStreamFetcher::onGotData(QnAbstractMediaDataPtr mediaData)
 
     int ch = mediaData->channelNumber & 0xff;
 
-    QTime t;
+    QElapsedTimer t;
     t.restart();
 
     bool needWait = false;
@@ -378,7 +387,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         foreach(QnVmax480DataConsumer* c, m_dataConsumers.keys())
         {
             if (!c->isStopping())
-                *count++;
+                (*count)++;
         }
     }
 
@@ -567,3 +576,5 @@ void VMaxStreamFetcher::pleaseStopAll()
     foreach(VMaxStreamFetcher* fetcher, m_instances.values())
         fetcher->pleaseStop();
 }
+
+#endif // #ifdef ENABLE_VMAX

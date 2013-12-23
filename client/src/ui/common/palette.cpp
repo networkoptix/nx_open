@@ -1,7 +1,7 @@
 #include "palette.h"
 
-#include <QtGui/QWidget>
-#include <QtGui/QGraphicsWidget>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 QPalette withColor(const QPalette &palette, QPalette::ColorRole colorRole, const QColor &color) {
     QPalette result = palette;

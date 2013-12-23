@@ -2,11 +2,12 @@
 
 #include <cassert>
 
-#include <QMetaEnum>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QUrl>
 #include <QtCore/QBuffer>
 #include <QtCore/QThread>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
@@ -14,6 +15,7 @@
 #include "utils/common/delete_later.h"
 #include "utils/common/object_thread_puller.h"
 #include "common/common_module.h"
+#include "app_server_connection.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -30,7 +32,9 @@ void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();
     }
-    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toAscii()), m_handle);
+    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), m_handle);
+    disconnect(reply, NULL, this, NULL);
+    disconnect(reply, NULL, reply, NULL);
 
     qnDeleteLater(reply);
     qnDeleteLater(this);
@@ -125,13 +129,15 @@ QByteArray QnSessionManager::formatNetworkError(int error) {
 QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params) const {
     QUrl url(baseUrl);
 
-    QString path = QLatin1String("api/") + objectName + QLatin1Char('/');
+    QString path = QLatin1String("/api/") + objectName + QLatin1Char('/');
     url.setPath(path);
 
+    QUrlQuery urlQuery(url.query());
     for (int i = 0; i < params.count(); i++){
         QPair<QString, QString> param = params[i];
-        url.addQueryItem(param.first, param.second);
+        urlQuery.addQueryItem(param.first, param.second);
     }
+    url.setQuery( urlQuery );
     return url;
 }
 
@@ -231,6 +237,10 @@ void QnSessionManager::at_aboutToBeStarted() {
         return;
 
     m_accessManager = new QNetworkAccessManager(this);
+
+    //m_accessManager->moveToThread(m_thread.data());
+    connect(m_accessManager, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
+    connect(m_accessManager, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), this, SLOT(at_proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), Qt::DirectConnection);
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
@@ -246,12 +256,46 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * )
+{
+    // not used
+}
+
+
+
+void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
+{
+    // QnSessionManager instance can be used with different instances of QnAppServerConnection simultaneously
+    // so we first checking the reply url for login and password - they are present in case of EC connections
+    // otherwise - mediaserver connections do not include login and password in the url, but we can have
+    // mediaserver connections only within one EC session so we can use defaultUrl() method
+
+    bool useDefaultValues = reply->url().userName().isEmpty();
+    QString user = useDefaultValues
+            ? QnAppServerConnectionFactory::defaultUrl().userName()
+            :reply->url().userName();
+    QString password = useDefaultValues
+            ? QnAppServerConnectionFactory::defaultUrl().password()
+            : reply->url().password();
+
+    // if current values are already present in authenticator, do not send them again -
+    // it will cause an infinite loop until a timeout
+    if ((authenticator->user() == user && authenticator->password() == password))
+        return;
+
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
+}
+
 void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {
     assert(QThread::currentThread() == this->thread());
 
-    if (!m_accessManager) {
-        qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
-        return;
+    {
+        QMutexLocker lock(&m_accessManagerMutex);
+        if (!m_accessManager) {
+            qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
+            return;
+        }
     }
 
     QNetworkRequest request;
@@ -261,10 +305,12 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
     foreach (QnRequestHeader header, headers) {
         if (header.first == QLatin1String("Content-Type"))
             skipContentType = true;
-        request.setRawHeader(header.first.toAscii(), header.second.toUtf8());
+        request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());
     }
 
-    request.setRawHeader("Authorization", "Basic " + url.userInfo().toLatin1().toBase64());
+    QString userInfo = url.userInfo();
+    if (!userInfo.isEmpty())
+        request.setRawHeader("Authorization", "Basic " + userInfo.toLatin1().toBase64());
     if (!skipContentType)
         request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("text/xml"));
 
@@ -281,7 +327,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
         break;
     default:
         qnWarning("Unknown HTTP operation '%1'.", static_cast<int>(operation));
-        break;
+        return;
     }
 
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));

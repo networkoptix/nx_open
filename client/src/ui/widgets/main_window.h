@@ -1,11 +1,14 @@
 #ifndef QN_MAIN_WINDOW_H
 #define QN_MAIN_WINDOW_H
 
-#include <QWidget>
-#include <QScopedPointer>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
+#include <QtCore/QScopedPointer>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/graphics/view/graphics_scene.h>
+
 #include "emulated_frame_widget.h"
 
 class QTabBar;
@@ -38,7 +41,7 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WFlags flags = 0);
+    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnMainWindow();
 
     bool isTitleVisible() const {
@@ -47,6 +50,10 @@ public:
 
     Options options() const;
     void setOptions(Options options);
+
+    void setAnimationsEnabled(bool enabled = true);
+
+    QWidget *viewport() const;
 
 public slots:
     void handleMessage(const QString &message);
@@ -63,12 +70,11 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void resizeEvent(QResizeEvent *event) override;
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
-#ifdef Q_OS_WIN
-    virtual bool winEvent(MSG *message, long *result) override;
-#endif
+    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
 protected slots:
     void setTitleVisible(bool visible);
@@ -86,10 +92,14 @@ protected slots:
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
+    void showFullScreen();
+    void showNormal();
+
+private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QScopedPointer<QnGraphicsView> m_view;
-    QScopedPointer<QGraphicsScene> m_scene;
+    QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
     QScopedPointer<QnWorkbenchUi> m_ui;
 
@@ -111,8 +121,10 @@ private:
     Options m_options;
     QMargins m_frameMargins;
 
-    /** This field is used to restore geometry after switching to fullscreen and back */
+#ifndef Q_OS_MACX
+    /** This field is used to restore geometry after switching to fullscreen and back. Do not used in MacOsX due to its fullscreen mode. */
     QRect m_storedGeometry;
+#endif
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

@@ -1,6 +1,8 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
+//#define TEST_FISHEYE_CALIBRATOR
+
 #include <vector>
 
 #include <QtCore/QObject>
@@ -28,7 +30,7 @@ public:
     /*!
         \param context MUST not be NULL
     */
-    QnResourceWidgetRenderer(QObject* parent, const QGLContext* context );
+    QnResourceWidgetRenderer(QObject* parent, QGLContext* context );
     void setChannelCount(int channelCount);
 
 
@@ -100,6 +102,7 @@ signals:
      */
     void sourceSizeChanged();
     void beforeDestroy();
+    void fisheyeCenterChanged(QPointF center, qreal radius);
 private:
     struct RenderingTools
     {
@@ -132,12 +135,16 @@ private:
     /** Current screen size of a single channel, in pixels. */
     QSize m_channelScreenSize;
 
-    const QGLContext* m_glContext;
+    QGLContext* m_glContext;
     
     QRectF m_displayRect[CL_MAX_CHANNELS];
 
     std::vector<bool> m_renderingEnabled;
     ScreenshotInterface* m_screenshotInterface;
+
+#ifdef TEST_FISHEYE_CALIBRATOR
+    bool m_isCircleDetected;
+#endif
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H

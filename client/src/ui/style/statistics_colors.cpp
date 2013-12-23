@@ -1,20 +1,20 @@
 #include "statistics_colors.h"
 
-#include <utils/common/json.h>
 #include <utils/math/math.h>
+#include <utils/common/json.h>
 
 namespace {
     int asciisum(const QString &value) {
         int result = 0;
         foreach (QChar c, value)
-            result += c.toAscii();
+            result += c.toLatin1();
         return result;
     }
 
 } // anonymous namespace
 
 namespace detail {
-    QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), static)
+    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors, (grid)(frame)(cpu)(ram)(hdds), static)
 }
 
 QnStatisticsColors::QnStatisticsColors():
@@ -43,7 +43,7 @@ QColor QnStatisticsColors::hddByKey(const QString &key) const {
     int id = 0;
     if (key.contains(QLatin1Char(':'))) {
         // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
-        id = key.at(0).toAscii() - 'C';
+        id = key.at(0).toLatin1() - 'C';
     }
     else if (key.startsWith(QLatin1String("sd")))
         id = asciisum(key) - sda;
@@ -85,12 +85,12 @@ void QnStatisticsColors::ensureVectors() {
     }
 }
 
-void serialize(const QnStatisticsColors &value, QVariant *target) {
+void serialize(const QnStatisticsColors &value, QJsonValue *target) {
     detail::serialize(value, target);
 }
 
-bool deserialize(const QVariant &value, QnStatisticsColors *target) {
-    if(value.type() == QVariant::Invalid) {
+bool deserialize(const QJsonValue &value, QnStatisticsColors *target) {
+    if(value.type() == QJsonValue::Null) {
         /* That's null color storage. */
         *target = QnStatisticsColors();
         return true;

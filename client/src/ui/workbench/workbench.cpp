@@ -205,10 +205,10 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         newCellAspectRatio = m_currentLayout->cellAspectRatio();
         newCellSpacing = m_currentLayout->cellSpacing();
 
-        if(!qFuzzyCompare(newCellAspectRatio, oldCellAspectRatio))
+        if(!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
             at_layout_cellAspectRatioChanged();
 
-        if(!qFuzzyCompare(newCellSpacing, oldCellSpacing))
+        if(!qFuzzyEquals(newCellSpacing, oldCellSpacing))
             at_layout_cellSpacingChanged();
 
         updateActiveRoleItem();

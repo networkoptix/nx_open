@@ -37,9 +37,9 @@ static const int jpeg_chroma_quantizer[64] = {
 };
 
 /*
- * Call MakeTables with the Q factor and two u_char[64] return arrays
+ * Call MakeTables with the Q factor and two quint8[64] return arrays
  */
-void MakeTables(int q, u_char *lqt, u_char *cqt)
+void MakeTables(int q, quint8 *lqt, quint8 *cqt)
 {
   int i;
   int factor = q;
@@ -65,19 +65,19 @@ void MakeTables(int q, u_char *lqt, u_char *cqt)
   }
 }
 
-u_char lum_dc_codelens[] = {
+quint8 lum_dc_codelens[] = {
     0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
 };
 
-u_char lum_dc_symbols[] = {
+quint8 lum_dc_symbols[] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 };
 
-u_char lum_ac_codelens[] = {
+quint8 lum_ac_codelens[] = {
     0, 2, 1, 3, 3, 2, 4, 3, 5, 5, 4, 4, 0, 0, 1, 0x7d,
 };
 
-u_char lum_ac_symbols[] = {
+quint8 lum_ac_symbols[] = {
     0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12,
     0x21, 0x31, 0x41, 0x06, 0x13, 0x51, 0x61, 0x07,
     0x22, 0x71, 0x14, 0x32, 0x81, 0x91, 0xa1, 0x08,
@@ -101,19 +101,19 @@ u_char lum_ac_symbols[] = {
     0xf9, 0xfa,
 };
 
-u_char chm_dc_codelens[] = {
+quint8 chm_dc_codelens[] = {
     0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
 };
 
-u_char chm_dc_symbols[] = {
+quint8 chm_dc_symbols[] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 };
 
-u_char chm_ac_codelens[] = {
+quint8 chm_ac_codelens[] = {
         0, 2, 1, 2, 4, 4, 3, 4, 7, 5, 4, 4, 0, 1, 2, 0x77,
 };
 
-u_char chm_ac_symbols[] = {
+quint8 chm_ac_symbols[] = {
         0x00, 0x01, 0x02, 0x03, 0x11, 0x04, 0x05, 0x21,
         0x31, 0x06, 0x12, 0x41, 0x51, 0x07, 0x61, 0x71,
         0x13, 0x22, 0x32, 0x81, 0x08, 0x14, 0x42, 0x91,
@@ -137,8 +137,8 @@ u_char chm_ac_symbols[] = {
         0xf9, 0xfa,
 };
 
-u_char *
-MakeQuantHeader(u_char *p, u_char *qt, int tableNo)
+quint8 *
+MakeQuantHeader(quint8 *p, const quint8 *qt, int tableNo)
 {
         *p++ = 0xff;
         *p++ = 0xdb;            /* DQT */
@@ -149,9 +149,9 @@ MakeQuantHeader(u_char *p, u_char *qt, int tableNo)
         return (p + 64);
 }
 
-u_char *
-MakeHuffmanHeader(u_char *p, u_char *codelens, int ncodes,
-                  u_char *symbols, int nsymbols, int tableNo,
+quint8 *
+MakeHuffmanHeader(quint8 *p, quint8 *codelens, int ncodes,
+                  quint8 *symbols, int nsymbols, int tableNo,
                   int tableClass)
 {
         *p++ = 0xff;
@@ -166,7 +166,7 @@ MakeHuffmanHeader(u_char *p, u_char *codelens, int ncodes,
         return (p);
 }
 
-u_char * MakeDRIHeader(u_char *p, u_short dri) {
+quint8 * MakeDRIHeader(quint8 *p, u_short dri) {
         *p++ = 0xff;
         *p++ = 0xdd;            /* DRI */
         *p++ = 0x0;             /* length msb */
@@ -194,9 +194,9 @@ u_char * MakeDRIHeader(u_char *p, u_short dri) {
  *    interchange format (except for possible trailing garbage and
  *    absence of an EOI marker to terminate the scan).
  */
-int QnMjpegRtpParser::makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt, u_char *cqt, u_short dri)
+int QnMjpegRtpParser::makeHeaders(quint8 *p, int type, int w, int h, const quint8 *lqt, const quint8 *cqt, u_short dri)
 {
-        u_char *start = p;
+        quint8 *start = p;
 
         /* convert from blocks to pixels */
         w <<= 3;
@@ -268,7 +268,7 @@ int QnMjpegRtpParser::makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt
         return (p - start);
 };
 
-void QnMjpegRtpParser::updateHeaderTables(quint8* lummaTable, quint8* chromaTable)
+void QnMjpegRtpParser::updateHeaderTables(const quint8* lummaTable, const quint8* chromaTable)
 {
     memcpy(m_lummaTablePos, lummaTable, 64*1);
     memcpy(m_chromaTablePos, chromaTable, 64*1);
@@ -323,7 +323,7 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
 {
-    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
+    const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
@@ -333,7 +333,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     }
     
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
-    quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
+    const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
 
     if (rtpHeader->extension)
@@ -382,8 +382,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (fragmentOffset == 0)
     {
         //3. Quantization Table header
-        quint8* lummaTable = 0;
-        quint8* chromaTable = 0;
+        const quint8* lummaTable = 0;
+        const quint8* chromaTable = 0;
         if (jpegQ >= 128)
         {
             if (bytesLeft < 4)
@@ -453,7 +453,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     {
         m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? PIX_FMT_YUV420P : PIX_FMT_YUV422P;
-        //m_jpegHeader.Initialize(qApp->organizationName().toAscii().constData(), qApp->applicationName().toAscii().constData(), "");
+        //m_jpegHeader.Initialize(qApp->organizationName().toLatin1().constData(), qApp->applicationName().toLatin1().constData(), "");
     }
 
 
@@ -465,7 +465,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     bool lastPacketReceived = rtpHeader->marker;
     if (lastPacketReceived)
     {
-        quint8* EOI_marker = curPtr + bytesLeft - 2;
+        const quint8* EOI_marker = curPtr + bytesLeft - 2;
         //if (m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1])
         //    m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
         bool needAddMarker = m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];

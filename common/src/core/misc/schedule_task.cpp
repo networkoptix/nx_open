@@ -1,6 +1,6 @@
 #include "schedule_task.h"
 
-#include "utils/common/util.h"
+#include <utils/math/math.h>
 
 bool QnScheduleTask::containTimeMs(int weekTimeMs) const
 {

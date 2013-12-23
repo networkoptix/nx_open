@@ -1,3 +1,5 @@
+#ifdef ENABLE_TEST_CAMERA
+
 #include "testcamera_stream_reader.h"
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
@@ -7,7 +9,8 @@ static const int TESTCAM_TIMEOUT = 5 * 1000;
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
     CLServerPushStreamReader(res)
 {
-    m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
+    m_tcpSock.reset( SocketFactory::createStreamSocket() );
+    m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
 }
 
 QnTestCameraStreamReader::~QnTestCameraStreamReader()
@@ -20,7 +23,7 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
     int done = 0;
     while (done < size)
     {
-        int readed = m_tcpSock.recv(buffer + done, size - done);
+        int readed = m_tcpSock->recv(buffer + done, size - done);
         if (readed < 1)
             return readed;
         done += readed;
@@ -112,31 +115,31 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStream()
     QUrl url(urlStr);
 
 
-    if (m_tcpSock.isClosed())
-        m_tcpSock.reopen();
+    if (m_tcpSock->isClosed())
+        m_tcpSock->reopen();
 
-    m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
-    m_tcpSock.setWriteTimeOut(TESTCAM_TIMEOUT);
+    m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
+    m_tcpSock->setSendTimeout(TESTCAM_TIMEOUT);
 
-    if (!m_tcpSock.connect(url.host(), url.port()))
+    if (!m_tcpSock->connect(url.host(), url.port()))
     {
         closeStream();
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
     }
     QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
-    m_tcpSock.send(path.data(), path.size());
+    m_tcpSock->send(path.data(), path.size());
 
     return CameraDiagnostics::NoErrorResult();
 }
 
 void QnTestCameraStreamReader::closeStream()
 {
-    m_tcpSock.close();
+    m_tcpSock->close();
 }
 
 bool QnTestCameraStreamReader::isStreamOpened() const
 {
-    return m_tcpSock.isConnected();
+    return m_tcpSock->isConnected();
 }
 
 void QnTestCameraStreamReader::updateStreamParamsBasedOnQuality()
@@ -148,3 +151,5 @@ void QnTestCameraStreamReader::updateStreamParamsBasedOnFps()
 {
     pleaseReOpen();
 }
+
+#endif // #ifdef ENABLE_TEST_CAMERA

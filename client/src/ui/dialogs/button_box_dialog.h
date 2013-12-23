@@ -1,9 +1,9 @@
 #ifndef QN_BUTTON_BOX_DIALOG_H
 #define QN_BUTTON_BOX_DIALOG_H
 
-#include <QtCore/QWeakPointer>
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
+
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
 
 #include <utils/common/connective.h>
 
@@ -34,7 +34,7 @@ private:
 
 private:
     QDialogButtonBox::StandardButton m_clickedButton;
-    QWeakPointer<QDialogButtonBox> m_buttonBox;
+    QPointer<QDialogButtonBox> m_buttonBox;
 };
 
 #endif // QN_BUTTON_BOX_DIALOG_H

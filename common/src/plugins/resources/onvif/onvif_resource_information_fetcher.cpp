@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "onvif_resource_information_fetcher.h"
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
@@ -15,8 +18,9 @@ const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 static const char* ANALOG_CAMERAS[][2] =
 {
     {"AXIS", "Q7404"},
-	{"vivo_ironman", "VS8801"},
-    {"VIVOTEK", "VS8801"}
+    {"vivo_ironman", "VS8801"},
+    {"VIVOTEK", "VS8801"},
+    {"*", "DW-CP04"}
 };
 
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
@@ -31,7 +35,8 @@ bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendo
 {
     for (uint i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
     {
-        if (vendor.compare(QString(lit(ANALOG_CAMERAS[i][0])), Qt::CaseInsensitive) == 0 && 
+        QString vendorAnalog = lit(ANALOG_CAMERAS[i][0]);
+        if ((vendor.compare(vendorAnalog, Qt::CaseInsensitive) == 0 || vendorAnalog == lit("*")) && 
             model.compare(QString(lit(ANALOG_CAMERAS[i][1])), Qt::CaseInsensitive) == 0)
             return true;
     }
@@ -89,8 +94,8 @@ bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, 
 {
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
-        QRegExp rxVendor(QLatin1String(IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
-        QRegExp rxName(QLatin1String(IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
+        QRegExp rxVendor(QLatin1String((const char*)IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);
+        QRegExp rxName(QLatin1String((const char*)IGNORE_VENDORS[i][1]), Qt::CaseInsensitive, QRegExp::Wildcard);
 
         if (rxVendor.exactMatch(manufacturer) && rxName.exactMatch(name))
             return true;
@@ -126,13 +131,17 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
     //TODO: #vasilenko UTF unuse std::string
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
+    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
-    if (existResource)
-        soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
-    else if (!info.defaultLogin.isEmpty())
-        soapWrapper.setLoginPassword(info.defaultLogin.toStdString(), info.defaultPassword.toStdString());
+    if (existResource) {
+        soapWrapper.setLogin(existResource->getAuth().user());
+        soapWrapper.setPassword(existResource->getAuth().password());
+    }
+    else if (!info.defaultLogin.isEmpty()) {
+        soapWrapper.setLogin(info.defaultLogin);
+        soapWrapper.setPassword(info.defaultPassword);
+    }
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
     //qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
@@ -168,8 +177,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             if (!response.FirmwareVersion.empty())
                 firmware = QString::fromStdString(response.FirmwareVersion);
 
-            if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString())) ||
-                ignoreCamera(manufacturer, model))
+            if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
+                ignoreCamera(manufacturer, model) )
             {
                 qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
                 return;
@@ -184,7 +193,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
 
     QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                              model, mac, info.uniqId, QString::fromStdString(soapWrapper.getLogin()), QString::fromStdString(soapWrapper.getPassword()), endpoint);
+                                              model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
     if (res)
         result << res;
     else
@@ -213,7 +222,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
         {
             res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                model, mac, info.uniqId, QString::fromStdString(soapWrapper.getLogin()), QString::fromStdString(soapWrapper.getPassword()), endpoint);
+                model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
             if (res) {
                 QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
                 res->setUrl(endpoint + suffix);
@@ -318,8 +327,10 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
+#ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
+#endif
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
@@ -332,3 +343,5 @@ void OnvifResourceInformationFetcher::pleaseStop()
 {
     m_shouldStop = true;
 }
+
+#endif //ENABLE_ONVIF

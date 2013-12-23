@@ -30,7 +30,7 @@ public:
     virtual ~QnThirdPartyResource();
 
     //!Implementation of QnResource::getPtzController
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
     //!Implementation of QnNetworkResource::ping
@@ -44,8 +44,6 @@ public:
     virtual void setIframeDistance( int frames, int timems ) override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    //!Implementation of QnSecurityCamResource::setCropingPhysical
-    virtual void setCropingPhysical( QRect croppingRect ) override;
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
 
@@ -55,6 +53,19 @@ public:
     virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
+    //!Implementation of QnSecurityCamResource::createArchiveDataProvider
+    virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
+    //!Implementation of QnSecurityCamResource::createArchiveDelegate
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    //!Implementation of QnSecurityCamResource::getDtsTimePeriodsByMotionRegion
+    virtual QnTimePeriodList getDtsTimePeriodsByMotionRegion(
+        const QList<QRegion>& regions,
+        qint64 msStartTime,
+        qint64 msEndTime,
+        int detailLevel ) override;
+
+    //!Implementation of QnNetworkResource::getDtsTimePeriods
+    virtual QnTimePeriodList getDtsTimePeriods( qint64 startTimeMs, qint64 endTimeMs, int detailLevel ) override;
 
     //!Implementation of nxpl::NXPluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -71,7 +82,7 @@ public:
         unsigned long int timestamp ) override;
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
-
+    virtual bool hasDualStreaming() const override;
 protected:
     //!Implementation of QnResource::initInternal
     virtual CameraDiagnostics::Result initInternal() override;
@@ -97,6 +108,7 @@ private:
     std::auto_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
     QAtomicInt m_refCounter;
     QString m_defaultOutputID;
+    int m_encoderCount;
 
     bool initializeIOPorts();
 };

@@ -1,7 +1,7 @@
 #ifndef QN_ABSOLUTE_PTZ_INSTRUMENT_H
 #define QN_ABSOLUTE_PTZ_INSTRUMENT_H
 
-#include <QtCore/QWeakPointer>
+
 #include <QtCore/QBasicTimer>
 #include <QtCore/QVector>
 #include <QtGui/QVector3D>
@@ -13,16 +13,14 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "drag_processing_instrument.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
+#include "core/ptz/abstract_ptz_controller.h"
 
 class FixedArSelectionItem;
-class QnSplashItem;
 class PtzOverlayWidget;
 class PtzElementsWidget;
 class PtzManipulatorWidget;
 
-class QnWorkbenchPtzController;
-class QnWorkbenchPtzMapperWatcher;
+class QnSplashItem;
 class QnMediaResourceWidget;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
@@ -54,7 +52,6 @@ protected:
     virtual bool animationEvent(AnimationEvent *event) override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
@@ -64,11 +61,6 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private slots:
-    void at_display_resourceAdded(const QnResourcePtr &resource);
-    void at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource);
-    void at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource);
-    void at_ptzController_positionChanged(const QnMediaResourceWidget* widget);
-
     void at_splashItem_destroyed();
 
     void at_modeButton_clicked();
@@ -80,28 +72,18 @@ private slots:
 
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
-    void updateCapabilities(const QnResourcePtr &resource);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:
-    QnMediaResourceWidget *target() const {
-        return m_target.data();
-    }
-
-    PtzManipulatorWidget *manipulator() const {
-        return m_manipulator.data();
-    }
+    QnMediaResourceWidget *target() const;
+    PtzManipulatorWidget *targetManipulator() const;
 
     QnSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
-    FixedArSelectionItem *selectionItem() const {
-        return m_selectionItem.data();
-    }
+    FixedArSelectionItem *selectionItem() const;
     void ensureSelectionItem();
 
-    PtzElementsWidget *elementsWidget() const {
-        return m_elementsWidget.data();
-    }
+    PtzElementsWidget *elementsWidget() const;
     void ensureElementsWidget();
 
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
@@ -117,41 +99,18 @@ private:
     void processPtzDrag(const QRectF &rect);
     void processPtzDoubleClick();
 
-    QVector3D physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect);
-    QVector3D physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos);
-
 private:
     struct PtzData {
         PtzData(): capabilities(0), overlayWidget(NULL) {}
 
+        bool hasCapabilities(Qn::PtzCapabilities capabilities) const { return (this->capabilities & capabilities) == capabilities; }
+
         Qn::PtzCapabilities capabilities;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
-        QRectF pendingAbsoluteMove;
         PtzOverlayWidget *overlayWidget;
+        QMetaObject::Connection capabilitiesConnection;
     };
-
-    QnWorkbenchPtzController *m_ptzController;
-    QnWorkbenchPtzMapperWatcher *m_mapperWatcher;
-
-    int m_clickDelayMSec;
-    qreal m_expansionSpeed;
-
-    QWeakPointer<FixedArSelectionItem> m_selectionItem;
-    QWeakPointer<PtzElementsWidget> m_elementsWidget;
-    QWeakPointer<QWidget> m_viewport;
-    QWeakPointer<QnMediaResourceWidget> m_target;
-    QWeakPointer<PtzManipulatorWidget> m_manipulator;
-    QHash<QObject *, PtzData> m_dataByWidget;
-    QBasicTimer m_movementTimer;
-
-    bool m_isClick;
-    bool m_isDoubleClick;
-    bool m_ptzStartedEmitted;
-    bool m_skipNextAction;
-
-    QBasicTimer m_clickTimer;
-    QPointF m_clickPos;
 
     struct SplashItemAnimation {
         SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
@@ -165,6 +124,33 @@ private:
 
         friend bool operator==(const SplashItemAnimation &l, const SplashItemAnimation &r) { return l.item == r.item; }
     };
+
+    enum Movement {
+        NoMovement,
+        ContinuousMovement,
+        ViewportMovement,
+        VirtualMovement
+    };
+
+    int m_clickDelayMSec;
+    qreal m_expansionSpeed;
+
+    QPointer<FixedArSelectionItem> m_selectionItem;
+    QPointer<PtzElementsWidget> m_elementsWidget;
+    QPointer<QWidget> m_viewport;
+    QPointer<QnMediaResourceWidget> m_target;
+    QHash<QObject *, PtzData> m_dataByWidget;
+    QBasicTimer m_movementTimer;
+
+    Movement m_movement;
+
+    bool m_isClick;
+    bool m_isDoubleClick;
+    bool m_ptzStartedEmitted;
+    bool m_skipNextAction;
+
+    QBasicTimer m_clickTimer;
+    QPointF m_clickPos;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };

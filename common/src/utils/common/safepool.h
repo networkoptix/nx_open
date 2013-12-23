@@ -8,9 +8,9 @@
 
 #include <map>
 
-#include <QMutex>
-#include <QMutexLocker>
-#include <QWaitCondition>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QWaitCondition>
 
 
 //!Associative thread-safe container, which allows to lock elements from accessing from other threads

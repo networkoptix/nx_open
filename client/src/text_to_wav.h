@@ -1,14 +1,15 @@
 #ifndef TEXT_TO_WAV_H
 #define TEXT_TO_WAV_H
 
-#include <QIODevice>
-#include <QMutex>
-#include <QSharedPointer>
-#include <QString>
-#include <QWaitCondition>
+#include <QtCore/QIODevice>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QString>
+#include <QtCore/QWaitCondition>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
+#include <utils/common/singleton.h>
 
 
 //!Synthesizes wav based on \a text. Uses festival engine
@@ -18,7 +19,8 @@
 */
 class TextToWaveServer
 :
-    public QnLongRunnable
+    public QnLongRunnable, 
+    public Singleton<TextToWaveServer>
 {
     Q_OBJECT
 
@@ -40,9 +42,6 @@ public slots:
         \note This method is synchronous and reenterable
     */
     bool generateSoundSync( const QString& text, QIODevice* const dest );
-
-    static void initStaticInstance( TextToWaveServer* );
-    static TextToWaveServer* instance();
 
 signals:
     //!Emmitted in any case on text generation done (successfull or not)

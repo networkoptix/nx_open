@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "openssl/evp.h"
 
 #include <quuid.h>
@@ -6,22 +9,11 @@
 #include "core/resource/camera_resource.h"
 #include "onvif_resource.h"
 #include "onvif_helper.h"
-//#include "onvif/Onvif.nsmap"
 #include "onvif/wsaapi.h"
 
-//#include "onvif_ws_searcher_helper.h"
-//#include "../digitalwatchdog/digital_watchdog_resource.h"
-//#include "../brickcom/brickcom_resource.h"
-//#include "../sony/sony_resource.h"
-
 #include "utils/network/nettools.h"
-//#include "utils/common/sleep.h"
-//#include "utils/network/mac_address.h"
-//#include "../digitalwatchdog/digital_watchdog_resource.h"
-//#include "../brickcom/brickcom_resource.h"
-//#include "utils/common/rand.h"
-//#include "../sony/sony_resource.h"
 #include "utils/common/string.h"
+
 
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
 static const int SOAP_DISCOVERY_TIMEOUT = -500; // "+" in seconds, "-" in mseconds
@@ -47,6 +39,18 @@ const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
 #define WSDD_GROUP_ADDRESS QHostAddress(QLatin1String(WSDD_MULTICAST_ADDRESS))
 
 
+
+OnvifResourceSearcherWsdd::ProbeContext::ProbeContext()
+:
+    soapWsddProxy( SOAP_IO_UDP )
+{
+}
+
+OnvifResourceSearcherWsdd::ProbeContext::~ProbeContext()
+{
+}
+
+
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
     m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
     m_shouldStop(false),
@@ -66,7 +70,6 @@ OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
         it != m_ifaceToSock.end();
         ++it )
     {
-        it->second->sock.reset();
         delete it->second;
     }
     m_ifaceToSock.clear();
@@ -98,8 +101,8 @@ int nullGsoapFdisconnect(struct soap*)
 //Socket send through UdpSocket
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
-    UDPSocket& qSocket = *reinterpret_cast<UDPSocket*>(soap->user);
-    qSocket.sendTo(s, n, lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+    AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+    qSocket->sendTo(s, n, lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -128,8 +131,8 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 // avoid SOAP select call
 size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
 {
-    UDPSocket* qSocket = reinterpret_cast<UDPSocket*>(soap->user);
-    int readed = qSocket->recv(data, maxSize);
+    AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+    int readed = qSocket->recv(data, maxSize, 0);
     return (size_t) qMax(0, readed);
 }
 
@@ -146,13 +149,13 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
     Q_UNUSED(s)
     Q_UNUSED(n)
     QString msgId;
-    UDPSocket& qSocket = *reinterpret_cast<UDPSocket*>(soap->user);
+    AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
     QString guid = QUuid::createUuid().toString();
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
     QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
-    qSocket.sendTo(data.data(), data.size(), lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+    qSocket->sendTo(data.data(), data.size(), lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -167,7 +170,7 @@ int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
     Q_UNUSED(s)
     Q_UNUSED(n)
     QString msgId;
-    UDPSocket& socket = *reinterpret_cast<UDPSocket*>(soap->user);
+    AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
 
     QString guid = QUuid::createUuid().toString();
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
@@ -175,7 +178,7 @@ int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
 
     //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
     //socket.write(data);
-    socket.sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
+    socket->sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -317,8 +320,6 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
     // if interface list is changed, remove old sockets
     std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
     for(; itr != m_ifaceToSock.end() ; ++itr) {
-        ProbeContext& ctx = *itr->second;
-        ctx.sock.reset();
         delete itr->second;
     }
     m_ifaceToSock.clear();
@@ -643,7 +644,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     //UDPSocket socket;
     //if (!socket.bindToInterface(iface))
     //    return;
-    //socket.setReadTimeOut(SOAP_DISCOVERY_TIMEOUT * 1000);
+    //socket.setRecvTimeout(SOAP_DISCOVERY_TIMEOUT * 1000);
 
     QStringList addrPrefixes = getAddrPrefixes(iface.address.toString());
     wsddProxy soapWsddProxy(SOAP_IO_UDP);
@@ -744,11 +745,10 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     if( p.second )
     {
         ctx = new ProbeContext();
-        ctx->sock.reset( new UDPSocket() );
+        ctx->sock.reset( SocketFactory::createDatagramSocket() );
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
-        if( !ctx->sock->setLocalAddressAndPort(iface.address.toString()) || !ctx->sock->setNonBlockingMode( true ) )
+        if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
-            ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
@@ -797,7 +797,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         return true;
 
     //removing socket for it to be recreated on next sendProbe call
-    ctx->sock.reset();
     delete ctx;
     m_ifaceToSock.erase( p.first );
     return false;
@@ -836,9 +835,9 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
             }
             soap_destroy(ctx.soapWsddProxy.soap);
             soap_end(ctx.soapWsddProxy.soap);
-            ctx.sock.reset();
-            delete it->second;
-            m_ifaceToSock.erase( it );
+            //ctx.sock.reset();
+            //delete it->second;
+            //m_ifaceToSock.erase( it );
             return true;
         }
 
@@ -861,3 +860,5 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         //soap_end(ctx.soapWsddProxy.soap);
     }
 }
+
+#endif //ENABLE_ONVIF

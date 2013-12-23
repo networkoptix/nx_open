@@ -1,7 +1,7 @@
 #ifndef __RTP_FFMPEG_ENCODER_H__
 #define __RTP_FFMPEG_ENCODER_H__
 
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "utils/common/byte_array.h"
@@ -15,12 +15,12 @@ public:
     * param transcodeToCodec - if codec specified, all media packets are transcoded to specified codec.
     * param videoSize - transcoded video size
     */
-    QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, CodecID transcodeToCodec = CODEC_ID_NONE, const QSize& videoSize = QSize(640,480),
+    QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec = CODEC_ID_NONE, const QSize& videoSize = QSize(640,480),
                           const QnResourceVideoLayout* layout = 0);
 
     virtual QByteArray getAdditionSDP() override;
 
-    virtual void setDataPacket(QnAbstractMediaDataPtr media) override;
+    virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 

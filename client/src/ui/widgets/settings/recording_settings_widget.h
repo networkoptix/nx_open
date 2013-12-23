@@ -2,9 +2,12 @@
 #define VIDEORECORDINGDIALOG_H
 
 #include <QtCore/QScopedPointer>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
-#include "ui/screen_recording/video_recorder_settings.h"
+#include <ui/screen_recording/video_recorder_settings.h>
+#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
+
 
 namespace Ui {
     class RecordingSettings;
@@ -12,9 +15,10 @@ namespace Ui {
 
 class QnDwm;
 
-class QnRecordingSettingsWidget : public QWidget
+class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget, protected QnWorkbenchContextAware
 {
     Q_OBJECT
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
     explicit QnRecordingSettingsWidget(QWidget *parent = NULL);
@@ -38,9 +42,10 @@ public:
     QString secondaryAudioDeviceName() const;
     void setSecondaryAudioDeviceName(const QString &name);
 
-    void updateFromSettings();
-    void submitToSettings();
-
+    virtual void submitToSettings() override;
+    virtual void updateFromSettings() override;
+signals:
+    void recordingSettingsChanged();
 private:
     void additionalAdjustSize();
 

@@ -1,15 +1,15 @@
-
-#include <QBuffer>
+#include "image_handler.h"
 
 extern "C"
 {
     #include <libswscale/swscale.h>
 }
 
-#include "image_handler.h"
+#include <QtCore/QBuffer>
+
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
-#include "utils/common/util.h"
+#include <utils/math/math.h>
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
@@ -39,7 +39,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     }
 
     // if ceilTime specified try frame with time > requested time (round time to ceil)
-    if (ceilTime != AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
+    if (ceilTime != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
     {
         for (int i = 0; i < MAX_GOP_LEN; ++i) 
         {
@@ -47,7 +47,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
             if (!media2 || media2->timestamp == DATETIME_NOW)
                 break;
             QnCompressedVideoDataPtr video2 = media2.dynamicCast<QnCompressedVideoData>();
-            if (video2->flags & AV_PKT_FLAG_KEY)
+            if (video2 && (video2->flags & AV_PKT_FLAG_KEY))
                 return video2;
         }
     }
@@ -77,6 +77,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     qint64 time = AV_NOPTS_VALUE;
     RoundMethod roundMethod = IFrameBeforeTime;
     QByteArray format("jpg");
+    QByteArray colorSpace("argb");
     QSize dstSize;
 
     for (int i = 0; i < params.size(); ++i)
@@ -110,6 +111,10 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             else if (format == "tif")
                 format = "tiff";
         }
+        else if (params[i].first == "colorspace") 
+        {
+            colorSpace = params[i].second.toUtf8();
+        }
         else if (params[i].first == "height")
             dstSize.setHeight(params[i].second.toInt());
         else if (params[i].first == "width")
@@ -139,7 +144,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     if (!useHQ)
         serverDelegate.setQuality(MEDIA_Quality_Low, true);
 
-    QnCompressedVideoDataPtr video;
+    QnConstCompressedVideoDataPtr video;
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
 
@@ -158,6 +163,8 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
                 video = camera->getLastVideoFrame(!useHQ);
         }
         if (!video) {
+            video = camera->getLastVideoFrame(!useHQ);
+
             serverDelegate.open(res);
             serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
@@ -225,18 +232,28 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         return CODE_INTERNAL_ERROR;
     }
 
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(dstSize.width()), 8), dstSize.height());
+    PixelFormat ffmpegColorFormat = PIX_FMT_RGBA;
+    QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
+    int pixelBytes = 4;
+    if (colorSpace == "gray8") {
+        ffmpegColorFormat = PIX_FMT_GRAY8;
+        qtColorFormat = QImage::Format_Indexed8;
+        pixelBytes = 1;
+    }
+
+    const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
+    const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
+
+    int numBytes = avpicture_get_size(ffmpegColorFormat, roundedWidth, roundedHeight);
     uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
     SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-        dstSize.width(), dstSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
+                               dstSize.width(), dstSize.height(), ffmpegColorFormat, SWS_BICUBIC, NULL, NULL, NULL);
 
-    int dstLineSize[4];
-    quint8* dstBuffer[4];
-    dstLineSize[0] = qPower2Ceil(static_cast<quint32>(dstSize.width() * 4), 32);
-    dstLineSize[1] = dstLineSize[2] = dstLineSize[3] = 0;
-    QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstLineSize[0], QImage::Format_ARGB32_Premultiplied);
-    dstBuffer[0] = dstBuffer[1] = dstBuffer[2] = dstBuffer[3] = scaleBuffer;
-    sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstBuffer, dstLineSize);
+    AVPicture dstPict;
+    avpicture_fill(&dstPict, scaleBuffer, (PixelFormat) ffmpegColorFormat, roundedWidth, roundedHeight);
+    
+    QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstPict.linesize[0], qtColorFormat);
+    sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
 
     QBuffer output(&result);
     image.save(&output, format);

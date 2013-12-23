@@ -89,7 +89,7 @@ namespace stree
 
         bool wildcardMatch( const QString& mask, const QString& str ) const
         {
-            return wildcardMatch( mask.toAscii().data(), str.toAscii().data() );
+            return wildcardMatch( mask.toLatin1().data(), str.toLatin1().data() );
         }
 
         //!Validates \a str for appliance to wild-card expression \a mask

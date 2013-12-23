@@ -9,11 +9,18 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/mpl/bool.hpp>
 
-#include <QMetaEnum>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QMetaObject>
 
 #include <utils/common/warnings.h>
 #include <utils/common/forward.h>
+
+#include "adl_wrapper.h"
+
+
+template<class Enum>
+class QnTypedEnumNameMapper;
+
 
 /**
  * <tt>QnEnumNameMapper</tt> supplies routines for fast <tt>QString</tt>-<tt>enum</tt> conversion.
@@ -44,19 +51,36 @@ public:
     }
 
     void addValue(int value, const QString &name) {
-        assert(m_valueByName.contains(name) ? m_valueByName.value(name) == value : true);
-        
-        m_valueByName[name] = value;
+        if(!m_valueByName.contains(name))
+            m_valueByName[name] = value;
         if(!m_nameByValue.contains(value))
             m_nameByValue[value] = name;
     }
 
-    int value(const QString &name, int defaultValue = -1) const {
+    int value(const QString &name, int defaultValue) const {
         return m_valueByName.value(name, defaultValue);
+    }
+
+    int value(const QString &name, bool *ok) const {
+        auto pos = m_valueByName.find(name);
+        if(pos == m_valueByName.end()) {
+            if(ok)
+                *ok = false;
+            return -1;
+        } else {
+            if(ok)
+                *ok = true;
+            return *pos;
+        }
     }
 
     QString name(int value, const QString &defaultValue = QString()) const {
         return m_nameByValue.value(value, defaultValue);
+    }
+
+    template<class Enum>
+    static QnTypedEnumNameMapper<Enum> create() {
+        return createEnumNameMapper(adlWrap<Enum *>(NULL));
     }
 
 private:
@@ -83,23 +107,20 @@ public:
         return static_cast<Enum>(base_type::value(name, defaultValue));
     }
 
+    Enum value(const QString &name, bool *ok) const {
+        return static_cast<Enum>(base_type::value(name, ok));
+    }
+
     QString name(Enum value, const QString &defaultValue = QString()) const {
         return base_type::name(value, defaultValue);
     }
 };
 
 
-namespace Qn { namespace detail {
+namespace QnEnumDetail {
     inline bool isNullString(const char *s) { return s == NULL; }
     inline bool isNullString(const QString &s) { return s.isNull(); }
-}} // namespace Qn::detail
-
-#define QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I(R, DATA, ELEMENT)                    \
-    BOOST_PP_TUPLE_ELEM(0, ELEMENT),
-
-#define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I(R, DATA, ELEMENT)          \
-    if(!Qn::detail::isNullString(BOOST_PP_TUPLE_ELEM(1, ELEMENT)))              \
-        result.addValue ELEMENT;
+} // namespace QnEnumDetail
 
 
 /**
@@ -116,22 +137,26 @@ namespace Qn { namespace detail {
  *                                      their string representation.
  */
 #define QN_DEFINE_NAME_MAPPED_ENUM(ENUM, ELEMENTS, ... /* PREFIX */)            \
-    enum ENUM {                                                                 \
-        BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I, ~, ELEMENTS)  \
-    };                                                                          \
-    QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ##__VA_ARGS__)
+enum ENUM {                                                                     \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I, ~, ELEMENTS)      \
+};                                                                              \
+QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ##__VA_ARGS__)
 
 
 #define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ... /* PREFIX */)  \
-    template<class Enum>                                                        \
-    __VA_ARGS__ inline QnTypedEnumNameMapper<Enum> createEnumNameMapper();      \
-                                                                                \
-    template<>                                                                  \
-    __VA_ARGS__ inline QnTypedEnumNameMapper<ENUM> createEnumNameMapper<ENUM>() { \
-        QnTypedEnumNameMapper<ENUM> result;                                     \
-        BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
-        return result;                                                          \
-    }
+__VA_ARGS__ QnTypedEnumNameMapper<ENUM> createEnumNameMapper(ENUM *) {          \
+    QnTypedEnumNameMapper<ENUM> result;                                         \
+    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
+    return result;                                                              \
+}
+
+
+#define QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I(R, DATA, ELEMENT)                    \
+    BOOST_PP_TUPLE_ELEM(0, ELEMENT),
+
+#define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I(R, DATA, ELEMENT)          \
+    if(!QnEnumDetail::isNullString(BOOST_PP_TUPLE_ELEM(1, ELEMENT)))            \
+        result.addValue ELEMENT;
 
 
 /**
@@ -139,16 +164,13 @@ namespace Qn { namespace detail {
  * that returns <tt>QnEnumNameMapper</tt> for a given enumeration registered
  * with the scope's metaobject.
  *
+ * \param SCOPE                         Enumeration's scope.
  * \param ENUM                          Name of the enumeration.
  */
-#define QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(ENUM)                            \
-    template<class Enum>                                                        \
-    static inline QnTypedEnumNameMapper<Enum> createEnumNameMapper();           \
-                                                                                \
-    template<>                                                                  \
-    static inline QnTypedEnumNameMapper<Enum> createEnumNameMapper<ENUM>() {    \
-        return QnTypedEnumNameMapper<Enum>(&staticMetaObject, BOOST_PP_STRINGIZE(ENUM)); \
-    }
+#define QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(SCOPE, ENUM, ... /* PREFIX */)   \
+__VA_ARGS__ QnTypedEnumNameMapper<SCOPE::ENUM> createEnumNameMapper(SCOPE::ENUM *) { \
+    return QnTypedEnumNameMapper<SCOPE::ENUM>(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM)); \
+}
 
 
 #endif // QN_ENUM_NAME_MAPPER_H

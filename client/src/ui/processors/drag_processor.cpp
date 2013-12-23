@@ -2,16 +2,17 @@
 
 #include <cassert>
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QGraphicsSceneMouseEvent>
-#include <QtGui/QGraphicsScene>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsItem>
-#include <QtGui/QGraphicsObject>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsObject>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/math/fuzzy.h>
 
 #include "drag_process_handler.h"
 
@@ -381,7 +382,7 @@ void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &
 
     if(!m_firstDragSent) {
         m_firstDragSent = true;
-    } else if(!(m_flags & DONT_COMPRESS) && m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyCompare(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos)) {
+    } else if(!(m_flags & DONT_COMPRESS) && m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyEquals(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos)) {
         return;
     }
 

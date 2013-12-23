@@ -3,7 +3,7 @@
 
 #include "workbench_panic_handler.h"
 
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 #include <api/app_server_connection.h>
 

@@ -18,6 +18,7 @@ enum BusinessActionType
     CameraOutputInstant = 8;    // same as Camera Output but has not toggle state
     PlaySound           = 9;    // play sound on the client
     SayText             = 10;   // say text on the client
+    PlaySoundRepeated   = 11;   // play sound until the event stops
 }
 
 message BusinessAction {

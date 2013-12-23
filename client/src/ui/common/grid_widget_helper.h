@@ -1,6 +1,8 @@
 #ifndef __GRID_WIDGET_HELPER_H__
 #define __GRID_WIDGET_HELPER_H__
 
+#include <QtCore/QLatin1Char>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QTableView;

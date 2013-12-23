@@ -8,11 +8,11 @@
 #include <map>
 #include <string>
 
-#include <QAtomicInt>
-#include <QDateTime>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QWaitCondition>
+#include <QtCore/QAtomicInt>
+#include <QtCore/QDateTime>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QWaitCondition>
 
 #include <utils/common/log.h>
 

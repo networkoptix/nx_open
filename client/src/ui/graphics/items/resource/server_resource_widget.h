@@ -18,10 +18,9 @@ class StatisticsOverlayWidget;
 class QnGlFunctions;
 
 
-class QnServerResourceWidget: public Animated<QnResourceWidget>, AnimationTimerListener {
+class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerListener {
     Q_OBJECT
-
-    typedef Animated<QnResourceWidget> base_type;
+    typedef QnResourceWidget base_type;
 
 public:
     static const Button PingButton = static_cast<Button>(0x08);
@@ -53,8 +52,10 @@ protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
+
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void tick(int deltaMSecs) override;
 

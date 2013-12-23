@@ -1,7 +1,7 @@
 #ifndef QN_DRAG_PROCESS_HANDLER_H
 #define QN_DRAG_PROCESS_HANDLER_H
 
-#include <QtGlobal> /* For Q_UNUSED. */
+#include <QtCore/QtGlobal> /* For Q_UNUSED. */
 
 class DragProcessor;
 class DragInfo;
@@ -23,7 +23,7 @@ protected:
      * 
      * \param info                      Information on the drag operation.
      */
-    virtual void startDragProcess(DragInfo *info) { Q_UNUSED(info); };
+    virtual void startDragProcess(DragInfo *info) { Q_UNUSED(info); }
 
     /**
      * This function is called whenever drag starts. It usually happens when
@@ -38,7 +38,7 @@ protected:
      * 
      * \param info                      Information on the drag operation.
      */
-    virtual void startDrag(DragInfo *info) { Q_UNUSED(info); };
+    virtual void startDrag(DragInfo *info) { Q_UNUSED(info); }
 
     /**
      * This function is called each time a mouse position changes while drag is
@@ -46,7 +46,7 @@ protected:
      * 
      * \param info                      Information on the drag operation.
      */
-    virtual void dragMove(DragInfo *info) { Q_UNUSED(info); };
+    virtual void dragMove(DragInfo *info) { Q_UNUSED(info); }
 
     /**
      * This function is called whenever drag ends. It usually happens when the
@@ -57,7 +57,7 @@ protected:
      * 
      * \param info                      Information on the drag operation.
      */
-    virtual void finishDrag(DragInfo *info) { Q_UNUSED(info); };
+    virtual void finishDrag(DragInfo *info) { Q_UNUSED(info); }
 
     /**
      * This function is called whenever drag process ends. It usually happens 
@@ -68,7 +68,7 @@ protected:
      * 
      * \param info                      Information on the drag operation.
      */
-    virtual void finishDragProcess(DragInfo *info) { Q_UNUSED(info); };
+    virtual void finishDragProcess(DragInfo *info) { Q_UNUSED(info); }
 
     /**
      * \returns                         Drag processor associated with this handler. 

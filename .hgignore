@@ -1,5 +1,6 @@
 syntax: glob
-
+*.cache
+*make.cache
 *-build*
 *.idb
 *.log
@@ -10,23 +11,35 @@ syntax: glob
 *.sdf
 *.sln
 *.suo
+*.ipch
 *.user
 *.orig
+*.xcodeproj/xcuserdata
+*.xcworkspace/xcuserdata
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters
-*.xcodeproj
 *.qm
 *.vcproj
+*.tlog
+*.lastbuildstate
 !launcher*.vcproj
 compatibility_info.cpp
+*_tmp.py*
 
 .DS_Store
 Debug
 Release
 
+x86
+x64
+target
+build_environment/python/packages/*/build
+build_environment/python/packages/llutil/llutil.egg-info
+build_environment/target
 build_environment/x86
 build_environment/x64
+build_environment/arm
 
 appserver/.idea
 appserver/env
@@ -39,14 +52,10 @@ appserver/test/executions
 appserver/static
 appserver/setup/static
 appserver/setup/stage-env
-appserver/version.py
-appserver/setup/version.py
 appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
-appserver/packages/llutil/build
-appserver/packages/llutil/dist
-appserver/packages/llutil/llutil.egg-info
+appserver/version.py
 
 applauncher/bin
 applauncher/build
@@ -59,9 +68,11 @@ applauncher/src/client.vcproj
 applauncher/client.mak*
 applauncher/x86
 applauncher/x64
+applauncher/arm
 
 axiscamplugin/x86
 axiscamplugin/x64
+axiscamplugin/arm
 
 client/bin
 client/build
@@ -74,6 +85,7 @@ client/src/client.vcproj
 client/client.mak*
 client/x86
 client/x64
+client/arm
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
@@ -100,6 +112,7 @@ common/src/common.pri
 common/common.mak*
 common/x86
 common/x64
+common/arm
 common/src/version.h
 
 cpp/x86
@@ -126,6 +139,7 @@ mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
 mediaserver/x86
 mediaserver/x64
+mediaserver/arm
 
 mediaproxy/bin
 mediaproxy/build
@@ -135,6 +149,7 @@ mediaproxy/src/mediaproxy.pro
 mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
+mediaproxy/arm
 
 vmaxproxy/bin
 vmaxproxy/build
@@ -144,6 +159,10 @@ vmaxproxy/src/mediaproxy.pro
 vmaxproxy/mediaproxy.mak*
 vmaxproxy/x86
 vmaxproxy/x64
+vmaxproxy/arm
+
+xvbadecoder/x86
+xvbadecoder/x64
 
 quicksyncdecoder/x86
 quicksyncdecoder/x64
@@ -157,6 +176,7 @@ testcamera/testcamera.mak*
 testcamera/build
 testcamera/x86
 testcamera/x64
+testcamera/arm
 
 help/target
 
@@ -166,6 +186,7 @@ traytool/src/traytool.vcproj
 traytool/traytool.mak*
 traytool/x86
 traytool/x64
+traytool/arm
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
@@ -186,19 +207,26 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
+android-client/android-main/libs/protobuf-classes*.jar
 
 ios-client/build
 ios-client/dist
 ios-client/target
+ios-client/ihdwitness.xcworkspace/xcuserdata
+ios-client/deploy.plist
+ios-client/deploy_index.html
 
 ios-client/Settings.bundle/Root.plist
-ios-client/HDWitness/HDWitness-Info.plist
-ios-client/HDWitness/HDWCompatibilityItems.m
-ios-client/HDWitness/version.h
+ios-client/HDWitness/HDWitness/HDWitness-Info.plist
+ios-client/HDWitness/HDWitness/HDWCompatibilityItems.m
 ios-client/Podfile
+ios-client/Pods
+ios-client/HDWitness/Settings.bundle/Root.plist
+ios-client/Podfile.lock
 
 launcher/x86
 launcher/x64
+launcher/arm
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 android-client/android-dw/**
@@ -206,11 +234,18 @@ android-client/android-dw/**
 
 axiscamplugin/x86
 axiscamplugin/x64
+axiscamplugin/arm
 axiscamplugin/docs/
 appserver/hostedfiles/*
 
 genericrtspplugin/x86
 genericrtspplugin/x64
+genericrtspplugin/arm
+
+
+image_library_plugin/x86
+image_library_plugin/x64
+image_library_plugin/arm
 
 
 nx_sdk/nx_sdk 
@@ -219,3 +254,4 @@ nx_sdk/nx_sdk
 libonvif/.build/
 
 .vagrant
+**/Makefile

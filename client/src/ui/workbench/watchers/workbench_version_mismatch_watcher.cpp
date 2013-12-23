@@ -55,11 +55,24 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     if(m_mismatchData.isEmpty())
         return;
 
-    QnVersionMismatchData first = m_mismatchData[0];
+    QnVersionMismatchData firstNonClient;
+    foreach(const QnVersionMismatchData &data, m_mismatchData) {
+        if (data.component == Qn::ClientComponent)
+            continue;
+        firstNonClient = data;
+        break;
+    }
+
+    if (firstNonClient.component == Qn::AnyComponent) //not found
+        return;
+
     foreach(const QnVersionMismatchData &second, m_mismatchData) {
-        if(versionMismatches(first.version,
+        if (second.component == Qn::ClientComponent)
+            continue;
+
+        if(versionMismatches(firstNonClient.version,
                              second.version,
-                             first.component == Qn::MediaServerComponent && second.component == Qn::MediaServerComponent)) {
+                             firstNonClient.component == Qn::MediaServerComponent && second.component == Qn::MediaServerComponent)) {
             m_hasMismatches = true;
             break;
         }

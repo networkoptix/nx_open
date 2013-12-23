@@ -4,9 +4,9 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
-#include <qglobal.h>
+#ifdef __linux__
 
-#ifdef Q_OS_LINUX
+#include <qglobal.h>
 
 #include "pollset.h"
 
@@ -65,7 +65,7 @@ public:
     };
 
     //!map<fd, pair<events mask, user data> >
-    typedef std::map<Socket*, SockData> MonitoredEventMap;
+    typedef std::map<AbstractSocket*, SockData> MonitoredEventMap;
 
     int epollSetFD;
     MonitoredEventMap monitoredEvents;
@@ -229,12 +229,12 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-const Socket* PollSet::const_iterator::socket() const
+const AbstractSocket* PollSet::const_iterator::socket() const
 {
     return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
 }
 
-Socket* PollSet::const_iterator::socket()
+AbstractSocket* PollSet::const_iterator::socket()
 {
     return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
 }
@@ -325,7 +325,7 @@ void PollSet::interrupt()
 }
 
 //!Add socket to set. Does not take socket ownership
-bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
+bool PollSet::add( AbstractSocket* const sock, EventType eventType, void* userData )
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
 
@@ -372,7 +372,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
 }
 
 //!Remove socket from set
-void* PollSet::remove( Socket* const sock, EventType eventType )
+void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
     PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
@@ -419,7 +419,7 @@ size_t PollSet::size( EventType /*eventType*/ ) const
     return m_impl->monitoredEvents.size();
 }
 
-void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
+void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
     PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
@@ -473,4 +473,5 @@ unsigned int PollSet::maxPollSetSize()
     return 16*1024;
 }
 
-#endif
+#endif  //__linux__
+

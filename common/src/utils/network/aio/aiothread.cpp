@@ -8,8 +8,8 @@
 #include <deque>
 #include <memory>
 
-#include <QAtomicInt>
-#include <QDateTime>
+#include <QtCore/QAtomicInt>
+#include <QtCore/QDateTime>
 
 #include "../../common/log.h"
 #include "../../common/systemerror.h"
@@ -35,14 +35,14 @@ namespace aio
             tAll
         };
 
-        QSharedPointer<Socket> socket;
+        QSharedPointer<AbstractSocket> socket;
         PollSet::EventType eventType;
         AIOEventHandler* eventHandler;
         TaskType type;
         int timeout;
 
         SocketAddRemoveTask(
-            const QSharedPointer<Socket>& _socket,
+            const QSharedPointer<AbstractSocket>& _socket,
             PollSet::EventType _eventType,
             AIOEventHandler* const _eventHandler,
             TaskType _type,
@@ -92,7 +92,7 @@ namespace aio
     {
     public:
         QSharedPointer<AIOEventHandlingData> data;
-        Socket* socket;
+        AbstractSocket* socket;
 
         PeriodicTaskData()
         :
@@ -102,7 +102,7 @@ namespace aio
 
         PeriodicTaskData(
             const QSharedPointer<AIOEventHandlingData>& _data,
-            Socket* _socket )
+            AbstractSocket* _socket )
         :
             data( _data ),
             socket( _socket )
@@ -152,22 +152,8 @@ namespace aio
                 }
 
                 if( task.type == SocketAddRemoveTask::tAdding )
-                {
-                    std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( task.eventHandler ) );
-                    if( !pollSet.add( task.socket.data(), task.eventType, handlingData.get() ) )
-                    {
-                        NX_LOG( QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
-                    }
-                    else
-                    {
-                        if( task.timeout > 0 )
-                        {
-                            //adding periodic task associated with socket
-                            handlingData->data->timeout = task.timeout;
-                            addPeriodicTask( getSystemTimerVal() + task.timeout, handlingData.get()->data, task.socket.data() );
-                        }
-                        handlingData.release();
-                    }
+                { 
+                    addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
                     if( task.eventType == PollSet::etRead )
                         --newReadMonitorTaskCount;
                     else if( task.eventType == PollSet::etWrite )
@@ -185,13 +171,37 @@ namespace aio
             }
         }
 
+        bool addSockToPollset(
+            QSharedPointer<AbstractSocket> socket,
+            PollSet::EventType eventType,
+            int timeout,
+            AIOEventHandler* eventHandler )
+        {
+            std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( eventHandler ) );
+            if( !pollSet.add( socket.data(), eventType, handlingData.get() ) )
+            {
+                NX_LOG( QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
+                return false;
+            }
+
+            if( timeout > 0 )
+            {
+                //adding periodic task associated with socket
+                handlingData->data->timeout = timeout;
+                addPeriodicTask( getSystemTimerVal() + timeout, handlingData.get()->data, socket.data() );
+            }
+            handlingData.release();
+
+            return true;
+        }
+
         void removeSocketsFromPollSet()
         {
             processPollSetModificationQueue( SocketAddRemoveTask::tRemoving );
         }
 
         bool removeReverseTask(
-            const QSharedPointer<Socket>& sock,
+            const QSharedPointer<AbstractSocket>& sock,
             PollSet::EventType eventType,
             SocketAddRemoveTask::TaskType taskType,
             AIOEventHandler* const eventHandler,
@@ -212,7 +222,7 @@ namespace aio
                         //cancelling remove task
                         void* userData = pollSet.getUserData( sock.data(), eventType );
                         Q_ASSERT( userData );
-                        static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval = 0;
+                        static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval.store(0);
                     }
                     pollSetModificationQueue.erase( it );
                     return true;
@@ -234,7 +244,7 @@ namespace aio
                 QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(it.userData())->data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
-                if( handlingData->markedForRemoval > 0 ) //socket has been removed from watch
+                if( handlingData->markedForRemoval.load() > 0 ) //socket has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
                     continue;
@@ -265,7 +275,7 @@ namespace aio
                 QSharedPointer<AIOEventHandlingData> handlingData = periodicTaskData.data;
                 QMutexLocker lk( &processEventsMutex );
                 handlingData->beingProcessed.ref();
-                if( handlingData->markedForRemoval > 0 ) //task has been removed from watch
+                if( handlingData->markedForRemoval.load() > 0 ) //task has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
                     continue;
@@ -302,7 +312,7 @@ namespace aio
         void addPeriodicTask(
             const qint64 taskClock,
             const QSharedPointer<AIOEventHandlingData>& handlingData,
-            Socket* _socket )
+            AbstractSocket* _socket )
         {
             QMutexLocker lk( &periodicTasksMutex );
             periodicTasksByClock.insert( std::make_pair(
@@ -312,11 +322,13 @@ namespace aio
     };
 
 
-    AIOThread::AIOThread( QMutex* const mutex )
+    AIOThread::AIOThread( QMutex* const mutex ) //TODO: #ak give up using single mutex for all aio threads
     :
         m_impl( new AIOThreadImpl() )
     {
         m_impl->mutex = mutex;
+
+        setObjectName( lit("AIOThread") );
     }
 
     AIOThread::~AIOThread()
@@ -339,7 +351,7 @@ namespace aio
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
     bool AIOThread::watchSocket(
-        const QSharedPointer<Socket>& sock,
+        const QSharedPointer<AbstractSocket>& sock,
         PollSet::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         int timeoutMs )
@@ -353,6 +365,12 @@ namespace aio
         if( !canAcceptSocket( eventToWatch ) )
             return false;
 
+        if( QThread::currentThread() == this )
+        {
+            //adding socket to pollset right away
+            return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
+        }
+
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventToWatch, eventHandler, SocketAddRemoveTask::tAdding, timeoutMs) );
         if( eventToWatch == PollSet::etRead )
             ++m_impl->newReadMonitorTaskCount;
@@ -361,10 +379,14 @@ namespace aio
         else
             Q_ASSERT( false );
         m_impl->pollSet.interrupt();
+
         return true;
     }
 
-    bool AIOThread::removeFromWatch( const QSharedPointer<Socket>& sock, PollSet::EventType eventType )
+    bool AIOThread::removeFromWatch(
+        const QSharedPointer<AbstractSocket>& sock,
+        PollSet::EventType eventType,
+        bool waitForRunningHandlerCompletion )
     {
         //NOTE m_impl->mutex is locked up the stack
 
@@ -376,19 +398,20 @@ namespace aio
         if( userData == NULL )
             return false;   //assert ???
         QSharedPointer<AIOEventHandlingData> handlingData = static_cast<AIOEventHandlingDataHolder*>(userData)->data;
-        if( handlingData->markedForRemoval > 0 )
+        if( handlingData->markedForRemoval.load() > 0 )
             return false; //socket already marked for removal
         handlingData->markedForRemoval.ref();
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventType, NULL, SocketAddRemoveTask::tRemoving, 0) );
-        if( QThread::currentThread() != this )
+
+        if( waitForRunningHandlerCompletion && (QThread::currentThread() != this) )
         {
             m_impl->pollSet.interrupt();
 
-            if( handlingData->beingProcessed > 0 )
+            if( handlingData->beingProcessed.load() > 0 )
             {
                 m_impl->mutex->unlock();
                 //waiting for event handler to return
-                while( handlingData->beingProcessed > 0 )
+                while( handlingData->beingProcessed.load() > 0 )
                 {
                     m_impl->processEventsMutex.lock();
                     m_impl->processEventsMutex.unlock();
@@ -417,7 +440,7 @@ namespace aio
 
     void AIOThread::run()
     {
-        saveSysThreadID();
+        initSystemThreadId();
         NX_LOG( QLatin1String("AIO thread started"), cl_logDEBUG1 );
 
         while( !needToStop() )

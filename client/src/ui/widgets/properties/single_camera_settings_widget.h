@@ -1,15 +1,13 @@
 #ifndef CAMERA_SETTINGS_DIALOG_H
 #define CAMERA_SETTINGS_DIALOG_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
-#include "core/resource/dewarping_params.h"
-
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -79,6 +77,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    //!Return true, if some parameter(s), requiring license validation has(-ve) been changed
+    bool licensedParametersModified() const;
     void updateFromResource();
     void reject();
     void submitToResource();
@@ -139,6 +139,7 @@ private:
 
     void updateMotionWidgetNeedControlMaxRect();
     void updateMotionAvailability();
+    void updateRecordingParamsAvailability();
 
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
@@ -160,6 +161,7 @@ private:
     bool m_anyCameraChanges;
     bool m_hasDbChanges;
 
+    bool m_scheduleEnabledChanged;
     /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
 
@@ -180,7 +182,6 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
-    DewarpingParams m_dewarpingParamsBackup;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

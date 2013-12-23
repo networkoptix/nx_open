@@ -1,7 +1,7 @@
 #ifndef QN_CAM_DISPLAY_H
 #define QN_CAM_DISPLAY_H
 
-#include <QTime>
+#include <QtCore/QTime>
 
 #include "decoders/video/abstractdecoder.h"
 #include "video_stream_display.h"
@@ -78,7 +78,9 @@ public:
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(int channel, const ImageCorrectionParams& params, const DewarpingParams& dewarping);
+    QImage getScreenshot(int channel, const ImageCorrectionParams& params,
+                         const QnMediaDewarpingParams& mediaDewarping,
+                         const QnItemDewarpingParams& itemDewarping);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
@@ -97,6 +99,8 @@ public:
     void setFullScreen(bool fullScreen);
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
+
+    void setOverridenAspectRatio(qreal aspectRatio);
 
 public slots:
     void onBeforeJump(qint64 time);
@@ -153,6 +157,7 @@ private:
     void waitForFramesDisplayed();
     void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
+    bool needBuffering(qint64 vTime) const;
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -214,7 +219,8 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
-    bool m_useMTRealTimeDecode;
+    bool m_useMTRealTimeDecode; // multi thread decode for live temporary allowed
+    bool m_forceMtDecoding; // force multi thread decode in any case
 
     mutable QMutex m_timeMutex;
     QnMediaResourcePtr m_resource;

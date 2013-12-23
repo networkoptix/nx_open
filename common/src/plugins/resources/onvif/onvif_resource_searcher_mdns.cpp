@@ -13,7 +13,7 @@
 #include "utils/network/mdns.h"
 #include "utils/common/sleep.h"
 
-#include <QUdpSocket>
+#include <QtNetwork/QUdpSocket>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>

@@ -4,7 +4,7 @@
 #include <limits>
 
 #include <QtGui/QPainter>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -44,6 +44,10 @@ QnGridItem::QnGridItem(QGraphicsItem *parent):
 
 QnGridItem::~QnGridItem() {
     return;
+}
+
+QnWorkbenchGridMapper* QnGridItem::mapper() const {
+    return m_mapper.data();
 }
 
 void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {

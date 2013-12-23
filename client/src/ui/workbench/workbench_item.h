@@ -9,8 +9,8 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
+#include <core/ptz/item_dewarping_params.h>
 #include <utils/color_space/image_correction.h>
-#include <core/resource/dewarping_params.h>
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;
@@ -19,7 +19,7 @@ class QnLayoutItemData;
  * Layout item. Video, image, server, or anything else.
  */
 class QnWorkbenchItem : public QObject {
-    Q_OBJECT;
+    Q_OBJECT
     Q_PROPERTY(QString resourceUid READ resourceUid);
     Q_PROPERTY(QUuid uuid READ uuid);
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation);
@@ -220,15 +220,15 @@ public:
     /**
      * \param                           New dewarping enhancement params for this item.
      */
-    void setDewarpingParams(const DewarpingParams& params);
+    void setDewarpingParams(const QnItemDewarpingParams& params);
 
     
     const ImageCorrectionParams &imageEnhancement() const {
         return m_imageEnhancement;
     }
 
-    const DewarpingParams &dewarpingParams() const {
-        return m_dewarpingParams;
+    const QnItemDewarpingParams &dewarpingParams() const {
+        return m_itemDewarpingParams;
     }
 
     QnWorkbenchItem *zoomTargetItem() const;
@@ -334,14 +334,14 @@ private:
     /** Item image enhancement params. */
     ImageCorrectionParams m_imageEnhancement;
 
-    /** Fisheye dewarping params. */
-    DewarpingParams m_dewarpingParams;
-
     /** Item flags. */
     Qn::ItemFlags m_flags;
 
     /** Rotation, in degrees. */
     qreal m_rotation;
+
+    /** Current item dewarping parameters. */
+    QnItemDewarpingParams m_itemDewarpingParams;
 
     /** User data by role. */
     QHash<int, QVariant> m_dataByRole;

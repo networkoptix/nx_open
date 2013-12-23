@@ -6,7 +6,7 @@
 #include <functional> /* For std::binary_function. */
 
 #include <QtCore/QtAlgorithms>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 #include <QtOpenGL/QGLContext>
 #include <QtOpenGL/QGLWidget>
 
@@ -25,7 +25,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
 #include <camera/resource_display.h>
-#include <camera/video_camera.h>
+#include <camera/client_video_camera.h>
 
 #include <ui/common/notification_levels.h>
 
@@ -50,14 +50,13 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
-
-#include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/workaround/gl_widget_factory.h>
 
@@ -80,7 +79,6 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
 #include "camera/thumbnails_loader.h" // TODO: remove?
-#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "watchers/workbench_server_time_watcher.h"
 
 
@@ -363,7 +361,6 @@ void QnWorkbenchDisplay::initSceneView() {
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
-        QnGlHardwareChecker::checkCurrentContext(true);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
@@ -377,7 +374,7 @@ void QnWorkbenchDisplay::initSceneView() {
         /* All our items save and restore painter state. */
         m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */
 
-#ifndef __APPLE__
+#ifndef Q_OS_MACX
         /* On macos, this flag results in QnMaskedProxyWidget::paint never called. */
         m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 #endif
@@ -692,7 +689,7 @@ QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     return NULL;
 }
 
-QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
+QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
     QnResourceDisplay *display = this->display(item);
     if(display == NULL)
         return NULL;
@@ -701,7 +698,7 @@ QnVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const {
 }
 
 QnCamDisplay *QnWorkbenchDisplay::camDisplay(QnWorkbenchItem *item) const {
-    QnVideoCamera *camera = this->camera(item);
+    QnClientVideoCamera *camera = this->camera(item);
     if(camera == NULL)
         return NULL;
 
@@ -1450,10 +1447,14 @@ void QnWorkbenchDisplay::updateFrameWidths() {
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
+#ifdef Q_OS_MACX
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
+#else
     bool curtained = m_curtainAnimator->isCurtained();
-
     if(m_view != NULL)
         m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+#endif
 }
 
 
@@ -1882,13 +1883,15 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         QRectF rect = widget->rect();
         qreal expansion = qMin(rect.width(), rect.height()) / 2.0;
 
-        QnSplashItem *splashItem = new QnSplashItem(widget);
+        QnSplashItem *splashItem = new QnSplashItem();
         splashItem->setSplashType(QnSplashItem::Rectangular);
-        splashItem->setPos(rect.center());
+        splashItem->setPos(rect.center() + widget->pos());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
         splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<BusinessEventType::Value>(type)), 128));
         splashItem->setOpacity(0.0);
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
+        scene()->addItem(splashItem);
+        setLayer(splashItem, Qn::EffectsLayer);
     }
 }
 

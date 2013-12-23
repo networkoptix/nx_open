@@ -3,10 +3,10 @@
 #include <cassert>
 
 #include <QtCore/QMetaObject>
-#include <QtGui/QWidget>        /* Compiler needs to know that this one is polymorphic. */
-#include <QtGui/QGraphicsItem>  /* Same here. */
-#include <QtGui/QGraphicsScene> /* And here. */
-#include <QtGui/QGraphicsView>  /* And here. */
+#include <QtWidgets/QWidget>        /* Compiler needs to know that this one is polymorphic. */
+#include <QtWidgets/QGraphicsItem>  /* Same here. */
+#include <QtWidgets/QGraphicsScene> /* And here. */
+#include <QtWidgets/QGraphicsView>  /* And here. */
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -44,7 +44,7 @@ bool InstrumentEventDispatcher<T>::registeredNotify(Instrument *instrument, QGra
 
 template<class T>
 void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode, Instrument *reference) {
-    assert(!dispatching()); /* Can't install while dispatching as it will invalidate the iterators. */
+//    assert(!dispatching()); /* Can install while dispatching - iterators are not used, see comments in dispatch(). */
 
     if(!registeredNotify(instrument, target))
         return;

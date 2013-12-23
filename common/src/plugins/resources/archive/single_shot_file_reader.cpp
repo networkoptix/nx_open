@@ -49,7 +49,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 
 void QnSingleShotFileStreamreader::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     QnAbstractMediaDataPtr data;
     try {
         data = getNextData();

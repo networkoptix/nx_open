@@ -21,7 +21,7 @@
 	<name>HD Witness Help</name>
 
 	<properties>
-		<arch>x86</arch>
+        <root.dir>${basedir}/..</root.dir>
 	</properties>
 
 	<build>
@@ -29,54 +29,6 @@
 		<directory>target</directory>
 
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>../build-${customization}.properties</file>
-								<file>../build_environment/${arch}/libdir.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>auto-clean</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<filesets>
-								<fileset>
-									<directory>${ClientHelpSourceDir}</directory>
-									<followSymlinks>false</followSymlinks>
-									<useDefaultExcludes>true</useDefaultExcludes>
-								</fileset>								
-								<fileset>
-									<directory>${project.build.directory}</directory>
-								</fileset>									
-							</filesets>
-							<skip>${clean-skip}</skip>							
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>		
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>

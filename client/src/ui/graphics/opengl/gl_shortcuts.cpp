@@ -1,7 +1,9 @@
 #include "gl_shortcuts.h"
 
-#ifdef __APPLE__
-#   include <Glu.h>
+#ifdef Q_OS_MACX
+#include <glu.h>
+#else
+#include <GL/glu.h>
 #endif
 
 #include <utils/common/warnings.h>

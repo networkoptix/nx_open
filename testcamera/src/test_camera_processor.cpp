@@ -15,8 +15,8 @@ public:
       }
 };
 
-QnTestCameraProcessor::QnTestCameraProcessor(TCPSocket* socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(socket, owner)
+QnTestCameraProcessor::QnTestCameraProcessor(const QSharedPointer<AbstractStreamSocket>& socket, QnTcpListener* owner):
+    QnTCPConnectionProcessor(socket)
 {
 }
 
@@ -63,6 +63,6 @@ void QnTestCameraProcessor::run()
             else if (paramVal[0] == "fps" && paramVal.size() == 2)
                 fps = paramVal[1].toInt();
         }
-        camera->startStreaming(d->socket, isSecondary, fps);
+        camera->startStreaming(d->socket.data(), isSecondary, fps);
     }
 }

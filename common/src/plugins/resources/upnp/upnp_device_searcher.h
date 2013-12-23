@@ -5,12 +5,12 @@
 #include <list>
 #include <map>
 
-#include <QByteArray>
-#include <QElapsedTimer>
-#include <QHostAddress>
-#include <QObject>
-#include <QMutex>
-#include <QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QElapsedTimer>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
@@ -115,6 +115,8 @@ private:
         QByteArray xmlDevInfo;
     };
 
+    typedef std::map<std::shared_ptr<nx_http::AsyncHttpClient>, DiscoveredDeviceInfo> HttpClientsDict;
+
     class UPNPDescriptionCacheItem
     {
     public:
@@ -134,9 +136,9 @@ private:
     quint64 m_timerID;
     std::list<UPNPSearchHandler*> m_handlers;
     //map<local interface ip, socket>
-    std::map<QString, QSharedPointer<UDPSocket> > m_socketList;
+    std::map<QString, QSharedPointer<AbstractDatagramSocket> > m_socketList;
     char* m_readBuf;
-    std::map<nx_http::AsyncHttpClient*, DiscoveredDeviceInfo> m_httpClients;
+    HttpClientsDict m_httpClients;
     std::list<DiscoveredDeviceInfo> m_discoveredDevices;
     std::list<DiscoveredDeviceInfo> m_discoveredDevicesToProcess;
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;
@@ -146,10 +148,10 @@ private:
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
     //!Implementation of \a aio::AIOEventHandler::eventTriggered
-    virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) throw() override;
+    virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
 
     void dispatchDiscoverPackets();
-    QSharedPointer<UDPSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
+    QSharedPointer<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml( const QByteArray& uuidStr, const QUrl& descriptionUrl, const QString& sender );
     void processDeviceXml( const DiscoveredDeviceInfo& devInfo, const QByteArray& foundDeviceDescription );
     //QByteArray getDeviceDescription( const QByteArray& uuidStr, const QUrl& url );
@@ -164,8 +166,7 @@ private:
     void updateItemInCache( const DiscoveredDeviceInfo& devInfo );
 
 private slots:
-    void onDeviceDescriptionXmlResponseReceived( nx_http::AsyncHttpClient* httpClient );
-    void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient* httpClient );
+    void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
 };
 
 #endif  //UPNP_DEVICE_SEARCHER_H

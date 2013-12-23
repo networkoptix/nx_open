@@ -1,38 +1,39 @@
 #ifndef POPUP_SETTINGS_WIDGET_H
 #define POPUP_SETTINGS_WIDGET_H
 
-#include <QWidget>
-#include <QtGui/QCheckBox>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QCheckBox>
 
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class QnPopupSettingsWidget;
 }
 
-class QnShowBusinessEventsHelper;
+class QnBusinessEventsFilterKvPairAdapter;
 
-class QnPopupSettingsWidget : public QWidget, public QnWorkbenchContextAware
+class QnPopupSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
+    typedef QnAbstractPreferencesWidget base_type;
 
 public:
-    explicit QnPopupSettingsWidget(QnWorkbenchContext *context, QWidget *parent = 0);
+    explicit QnPopupSettingsWidget(QWidget *parent = 0);
     ~QnPopupSettingsWidget();
 
-    void submit();
+    virtual void submitToSettings() override;
+    virtual void updateFromSettings() override;
 
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
     void at_showBusinessEvents_valueChanged(quint64 value);
-    void at_context_userChanged();
 
 private:
     QScopedPointer<Ui::QnPopupSettingsWidget> ui;
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
-
-    QnShowBusinessEventsHelper* m_showBusinessEventsHelper;
+    QScopedPointer<QnBusinessEventsFilterKvPairAdapter> m_adapter;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H

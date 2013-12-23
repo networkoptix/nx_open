@@ -33,8 +33,7 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *
     if (!model)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField)
         ui->adminsCheckBox->setChecked(model->actionParams().getUserGroup() == QnBusinessActionParameters::AdminOnly);

@@ -2,6 +2,7 @@
 #define QN_WEAK_GRAPHICS_ITEM_POINTER_H
 
 #include <QtCore/QWeakPointer>
+#include <QtCore/QPointer>
 #include <QtCore/QVector>
 #include <QtCore/QList>
 
@@ -55,7 +56,7 @@ public:
     }
     
 private:
-    QWeakPointer<QObject> m_guard;
+    QPointer<QObject> m_guard;
     QGraphicsItem *m_item;
 };
 

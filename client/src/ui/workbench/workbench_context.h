@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
@@ -23,6 +23,9 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnWorkbenchLayoutWatcher;
+#ifdef Q_OS_WIN
+class QnWorkbenchDesktopCameraWatcher;
+#endif
 class QnActionManager;
 
 /**
@@ -109,10 +112,13 @@ private:
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
     
-    QWeakPointer<QWidget> m_mainWindow;
+    QPointer<QWidget> m_mainWindow;
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QnWorkbenchLayoutWatcher *m_layoutWatcher;
+#ifdef Q_OS_WIN
+    QnWorkbenchDesktopCameraWatcher* m_desktopCameraWatcher;
+#endif
 };
 
 

@@ -1,8 +1,9 @@
-#include "isd_resource.h"
-#include "../onvif/dataprovider/rtp_stream_provider.h"
-#include "utils/math/math.h"
-#include "api/app_server_connection.h"
+#ifdef ENABLE_ISD
+
+#include <utils/math/math.h>
+
 #include "isd_stream_reader.h"
+#include "isd_resource.h"
 
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
@@ -52,6 +53,7 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
+    QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
     QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
 
@@ -208,7 +210,7 @@ QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
     return new QnISDStreamReader(toSharedPointer());
 }
 
-void QnPlIsdResource::setCropingPhysical(QRect /*croping*/)
+void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
 
@@ -231,7 +233,7 @@ void QnPlIsdResource::setMaxFps(int f)
     setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
-int QnPlIsdResource::getMaxFps()
+int QnPlIsdResource::getMaxFps() const
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlIsdResource*>(this);
@@ -244,3 +246,5 @@ int QnPlIsdResource::getMaxFps()
     this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toInt();
 }
+
+#endif // #ifdef ENABLE_ISD

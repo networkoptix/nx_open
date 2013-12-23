@@ -1,11 +1,13 @@
 #ifndef clabstractvideodecoder_h_2155
 #define clabstractvideodecoder_h_2155
 
-#include <QGLContext>
+//#include <QtOpenGL/QGLContext>
 
 #include "core/datapacket/media_data_packet.h"
 #include "utils/media/frame_info.h"
 
+
+class QGLContext;
 
 //!Abstract interface. Every video decoder MUST implement this interface
 /*!
@@ -53,7 +55,7 @@ public:
       * \return true If \a outFrame is filled, false if no output frame
       * \note No error information is returned!
       */
-    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) = 0;
+    virtual bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) = 0;
 
     virtual void setLightCpuMode( DecodeMode val ) = 0;
 
@@ -83,7 +85,7 @@ public:
     /*!
         \param data First encoded frame of new stream. It is recommended that this frame be IDR and contain sequence header
     */
-    virtual void resetDecoder( QnCompressedVideoDataPtr data ) = 0;
+    virtual void resetDecoder( QnConstCompressedVideoDataPtr data ) = 0;
     //!Establish picture resize during decoding
     /*!
         \param outSize Out picture size. If (0, 0) no resizing will be done.

@@ -2,10 +2,10 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QCoreApplication>
-#include <QtGui/QAction>
-#include <QtGui/QGraphicsLinearLayout>
-#include <QtGui/QMessageBox>
-#include <QtGui/QGraphicsProxyWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
@@ -331,7 +331,7 @@ void QnNavigationItem::updateSpeedSliderParametersFromNavigator() {
     }
 
     /* The calls that follow may change speed */
-    QnScopedValueRollback<bool> guard(&m_updatingSpeedSliderFromNavigator, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
 
     m_speedSlider->setSpeedRange(minimalSpeed, maximalSpeed);
     m_speedSlider->setMinimalSpeedStep(speedStep);
@@ -342,7 +342,7 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator() {
     if(m_updatingNavigatorFromSpeedSlider)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updatingSpeedSliderFromNavigator, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
     m_speedSlider->setSpeed(navigator()->speed());
     updatePlaybackButtonsPressed();
     updatePlayButtonChecked();
@@ -352,7 +352,7 @@ void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider() {
     if(m_updatingSpeedSliderFromNavigator)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_updatingNavigatorFromSpeedSlider, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_updatingNavigatorFromSpeedSlider, true);
     navigator()->setSpeed(m_speedSlider->roundedSpeed());
     updatePlaybackButtonsPressed();
 }

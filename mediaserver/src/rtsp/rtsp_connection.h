@@ -1,13 +1,13 @@
 #ifndef __RTSP_CONNECTION_H_
 #define __RTSP_CONNECTION_H_
 
-#include <QHostAddress>
-#include <QMutex>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QMutex>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "rtsp_encoder.h"
+#include "rtsp/rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
 
@@ -33,8 +33,8 @@ struct RtspServerTrackInfo
     int clientRtcpPort;
     quint16 sequence;
     qint64 firstRtpTime;
-    UDPSocket* mediaSocket;
-    UDPSocket* rtcpSocket;
+    AbstractDatagramSocket* mediaSocket;
+    AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
     static QMutex m_createSocketMutex;
 };
@@ -47,7 +47,7 @@ class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 public:
-    QnRtspConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
@@ -101,8 +101,8 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout);
-    QnAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
+    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout);
+    QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(const QnResourceVideoLayout* videoLayout);

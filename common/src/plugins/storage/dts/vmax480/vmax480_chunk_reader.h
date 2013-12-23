@@ -1,6 +1,8 @@
 #ifndef __VMAX480_CHUNK_READER_H__
 #define __VMAX480_CHUNK_READER_H__
 
+#ifdef ENABLE_VMAX
+
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "vmax480_stream_fetcher.h"
 #include "utils/common/long_runnable.h"
@@ -35,13 +37,14 @@ private:
     QQueue<int> m_daysToRequest;
     bool m_waitingAnswer;
     State m_state;
-    QTime m_updateTimer;
+    QElapsedTimer m_updateTimer;
     bool m_firstRange;
     QnTimePeriod m_archiveRange;
-    QTime m_waitTimer;
+    QElapsedTimer m_waitTimer;
     VMaxStreamFetcher* m_streamFetcher;
     QnResource* m_res;
     bool m_gotAllData;
 };
 
+#endif // #ifdef ENABLE_VMAX
 #endif // __VMAX480_CHUNK_READER_H__

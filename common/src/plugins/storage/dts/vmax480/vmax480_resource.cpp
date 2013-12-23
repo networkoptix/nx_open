@@ -1,9 +1,13 @@
+#ifdef ENABLE_VMAX
+
 #include "vmax480_resource.h"
 #include "vmax480_live_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "vmax480_archive_delegate.h"
 #include "vmax480_chunk_reader.h"
 #include "core/resource_managment/resource_pool.h"
+
+#include <QtCore/QUrlQuery>
 
 QMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
@@ -28,7 +32,7 @@ QnPlVmax480Resource::~QnPlVmax480Resource()
     }
 }
 
-int QnPlVmax480Resource::getMaxFps() 
+int QnPlVmax480Resource::getMaxFps() const
 {
     return 30;
 }
@@ -136,15 +140,9 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-
-void QnPlVmax480Resource::setCropingPhysical(QRect croping)
-{
-    Q_UNUSED(croping)
-}
-
 CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
-
+    QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
     save();
@@ -212,13 +210,15 @@ void QnPlVmax480Resource::setStatus(Status newStatus, bool silenceMode)
 QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
-    QList<QPair<QString, QString> > items = url.queryItems();
+    QUrlQuery urlQuery(url.query());
+    QList<QPair<QString, QString> > items = urlQuery.queryItems();
     for (int i = 0; i < items.size(); ++i)
     {
         if (items[i].first == lit("channel"))
             items[i].second = QString::number(channel+1);
     }
-    url.setQueryItems(items);
+    urlQuery.setQueryItems(items);
+    url.setQuery(urlQuery);
     QString urlStr = url.toString();
     return qnResPool->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
 }
@@ -262,3 +262,6 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
 
     return m_chunks.intersected(period);
 }
+
+#endif // #ifdef ENABLE_VMAX
+

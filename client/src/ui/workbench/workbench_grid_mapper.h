@@ -1,10 +1,11 @@
 #ifndef QN_WORKBENCH_GRID_MAPPER_H
 #define QN_WORKBENCH_GRID_MAPPER_H
 
-#include <QObject>
-#include <QSize>
-#include <QRect>
-#include <QPoint>
+#include <QtCore/QObject>
+#include <QtCore/QSize>
+#include <QtCore/QRect>
+#include <QtCore/QPoint>
+
 #include <ui/common/geometry.h>
 
 /**

@@ -1,5 +1,7 @@
 #include "contrast_image_filter.h"
 
+#include <utils/math/math.h>
+
 QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
     m_params(params),
     m_lastGamma(-1.0)
@@ -7,12 +9,18 @@ QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params
     memset(m_gammaCorrection, 0, sizeof(m_gammaCorrection));
 }
 
-static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
-
 bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
 {
     return frame->data[1]; // if several video planes are present, format is supprted
 }
+
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
+static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000000);
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO: C fallback routine
+#endif
 
 void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
 {
@@ -23,7 +31,7 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
     if (!isFormatSupported(frame))
         return;
 
-    m_gamma.analizeImage(frame->data[0], frame->width, frame->height, frame->linesize[0], m_params, updateRect);
+    m_gamma.analyseImage(frame->data[0], frame->width, frame->height, frame->linesize[0], m_params, updateRect);
 
     if (qAbs(m_gamma.gamma - m_lastGamma) > GAMMA_EPS && m_gamma.gamma != 1.0)
     {
@@ -40,6 +48,7 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
 
     int xSteps = (right - left) / 16;
 
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
     quint16 aCoeff = quint16(m_gamma.aCoeff * 256.0f + 0.5);
     __m128i  aFactorIntr  = _mm_setr_epi16(aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff, aCoeff);
 
@@ -110,4 +119,9 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
             srcY += strideCoeff;
         }
     }
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO: C fallback routine
+#endif
 }

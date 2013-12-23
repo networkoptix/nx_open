@@ -1,6 +1,8 @@
 #ifndef pulse_resource_searcher_h
 #define pulse_resource_searcher_h
 
+#ifdef ENABLE_PULSE_CAMERA
+
 #include "core/resource_managment/resource_searcher.h"
 
 
@@ -27,4 +29,5 @@ private:
     
 };
 
+#endif // #ifdef ENABLE_PULSE_CAMERA
 #endif // pulse

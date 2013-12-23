@@ -7,23 +7,28 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/id.h>
+
+#include <api/api_fwd.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
+#include <api/model/rebuild_archive_reply.h>
+#include <api/model/manual_camera_seach_reply.h>
 
-#include <utils/camera/camera_diagnostics.h>
-#include <utils/common/id.h>
+#include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_data.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
 
-#include "api_fwd.h"
 #include "abstract_connection.h"
-#include "media_server_cameras_data.h"
 
-class QnPtzSpaceMapper;
+class QnMediaServerResource;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -41,31 +46,42 @@ public:
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
 signals:
+    void finished(int status, const QnRebuildArchiveReply &reply, int handle);
     void finished(int status, const QnStorageStatusReply &reply, int handle);
     void finished(int status, const QnStorageSpaceReply &reply, int handle);
     void finished(int status, const QnTimePeriodList &reply, int handle);
     void finished(int status, const QnStatisticsReply &reply, int handle);
-    void finished(int status, const QnPtzSpaceMapper &reply, int handle);
     void finished(int status, const QVector3D &reply, int handle);
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnCamerasFoundInfoList &reply, int handle);
+    void finished(int status, const QnManualCameraSearchReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
     void finished(int status, const QImage &reply, int handle);
+    void finished(int status, const QString &reply, int handle);
+    void finished(int status, const QnPtzPresetList &reply, int handle);
+    void finished(int status, const QnPtzTourList &reply, int handle);
+    void finished(int status, const QnPtzData &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
 };
 
 
+enum RebuildAction
+{
+    RebuildAction_ShowProgress,
+    RebuildAction_Start,
+    RebuildAction_Cancel
+};
+
 class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(const QUrl &mediaServerApiUrl, QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
@@ -155,14 +171,29 @@ public:
      */
     int getStatisticsAsync(QObject *target, const char *slot);
 
-    int searchCameraAsync(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot); 
+    int searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot);
+    int searchCameraAsyncStatus(const QUuid &processUuid, QObject *target, const char *slot);
+    int searchCameraAsyncStop(const QUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
+
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
-    int ptzMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int ptzStopAsync(const QnNetworkResourcePtr &camera, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int ptzMoveToAsync(const QnNetworkResourcePtr &camera, const QVector3D &pos, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
-    int ptzGetPosAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
-    int ptzGetSpaceMapperAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
+
+    int ptzCreatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
+    int ptzUpdatePresetAsync(const QnNetworkResourcePtr &camera, const QnPtzPreset &preset, QObject *target, const char *slot);
+    int ptzRemovePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, QObject *target, const char *slot);
+    int ptzActivatePresetAsync(const QnNetworkResourcePtr &camera, const QString &presetId, qreal speed, QObject *target, const char *slot);
+    int ptzGetPresetsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int ptzCreateTourAsync(const QnNetworkResourcePtr &camera, const QnPtzTour &tour, QObject *target, const char *slot);
+    int ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
+    int ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
+    int ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
     int getStorageSpaceAsync(QObject *target, const char *slot);
 
@@ -178,6 +209,12 @@ public:
     int doCameraDiagnosticsStepAsync(
         const QnId& cameraID, CameraDiagnostics::Step::Value previousStep,
         QObject* target, const char* slot );
+
+    /**
+        \param slot Slot MUST have signature (int, QnRebuildArchiveReply, int)
+        \returns Request handle
+     */
+    int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

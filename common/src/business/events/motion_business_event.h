@@ -10,13 +10,13 @@ class QnMotionBusinessEvent: public QnProlongedBusinessEvent
 {
     typedef QnProlongedBusinessEvent base_type;
 public:
-    QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, QnAbstractDataPacketPtr metadata);
+    QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata);
 
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static bool isResourcesListValid(const QnResourceList &resources);
     static int  invalidResourcesCount(const QnResourceList &resources);
 private:
-    QnAbstractDataPacketPtr m_metadata;
+    QnConstAbstractDataPacketPtr m_metadata;
 };
 
 typedef QSharedPointer<QnMotionBusinessEvent> QnMotionBusinessEventPtr;

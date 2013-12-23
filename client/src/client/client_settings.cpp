@@ -7,7 +7,10 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include <QtCore/QJsonDocument>
+
 #include <utils/common/util.h>
+#include <utils/common/json.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <utils/common/string.h>
@@ -25,7 +28,7 @@ namespace {
         QnConnectionData connection;
         connection.name = settings->value(QLatin1String("name")).toString();
         connection.url = settings->value(QLatin1String("url")).toString();
-        connection.url.setScheme(QLatin1String("https"));
+        connection.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         connection.readOnly = (settings->value(QLatin1String("readOnly")).toString() == QLatin1String("true"));
 
         return connection;
@@ -47,8 +50,8 @@ namespace {
 
 QnClientSettings::QnClientSettings(QObject *parent):
     base_type(parent),
-    m_settings(new QSettings(this)),
     m_accessManager(new QNetworkAccessManager(this)),
+    m_settings(new QSettings(this)),
     m_loading(true)
 {
     connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_accessManager_finished(QNetworkReply *)));
@@ -82,11 +85,11 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Load from internal resource. */
     QFile file(QLatin1String(":/skin") + QLatin1String("/globals.json")); // TODO: #Elric
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QVariantMap json;
-        if(!QJson::deserialize(file.readAll(), &json)) {
-            qnWarning("Could not parse client settings file.");
+        QJsonObject jsonObject;
+        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
+            qWarning() << "Client settings file could not be parsed!";
         } else {
-            updateFromJson(json.value(lit("settings")).toMap());
+            updateFromJson(jsonObject.value(lit("settings")).toObject());
         }
     }
 
@@ -109,7 +112,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
     switch(id) {
     case DEFAULT_CONNECTION: {
         QnConnectionData result;
-        result.url.setScheme(QLatin1String("https"));
+        result.url.setScheme(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http"));
         result.url.setHost(settings->value(QLatin1String("appserverHost"), QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
         result.url.setPort(settings->value(QLatin1String("appserverPort"), DEFAULT_APPSERVER_PORT).toInt());
         result.url.setUserName(settings->value(QLatin1String("appserverLogin"), QLatin1String("admin")).toString());
@@ -117,7 +120,10 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         result.readOnly = true;
 
         if(!result.isValid())
-            result.url = QUrl(QString(QLatin1String("https://admin@%1:%2")).arg(QLatin1String(DEFAULT_APPSERVER_HOST)).arg(DEFAULT_APPSERVER_PORT));
+            result.url = QUrl(QString(QLatin1String("%1://admin@%2:%3")).
+                arg(settings->value(lit("secureAppserverConnection"), true).toBool() ? lit("https") : lit("http")).
+                arg(QLatin1String(DEFAULT_APPSERVER_HOST)).
+                arg(DEFAULT_APPSERVER_PORT));
 
         return QVariant::fromValue<QnConnectionData>(result);
     }
@@ -223,7 +229,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 }
 
 void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    QnScopedValueRollback<bool> guard(&m_loading, true);
+    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }
@@ -260,11 +266,11 @@ void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {
         return;
     }
 
-    QVariantMap json;
-    if(!QJson::deserialize(reply->readAll(), &json)) {
+    QJsonObject jsonObject;
+    if(!QJson::deserialize(reply->readAll(), &jsonObject)) {
         qnWarning("Could not parse client settings downloaded from '%1'.", reply->url().toString());
     } else {
-        updateFromJson(json.value(lit("settings")).toMap());
+        updateFromJson(jsonObject.value(lit("settings")).toObject());
     }
 
     reply->deleteLater();

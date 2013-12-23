@@ -1,0 +1,33 @@
+
+Template: ${deb.customization.company.name}-mediaserver/ecsHost
+Type: string
+Default:
+Description: Enterprise Controller host:
+
+Template: ${deb.customization.company.name}-mediaserver/ecsPort
+Type: string
+Default:
+Description: Enterprise Controller port:
+
+Template: ${deb.customization.company.name}-mediaserver/ecsPort_invalid
+Type: error
+Description: Enterprise Controller port is invalid. Please try again.
+
+Template: ${deb.customization.company.name}-mediaserver/ecsLogin
+Type: string
+Default:
+Description: Enterprise Controller login:
+
+Template: ${deb.customization.company.name}-mediaserver/ecsPassword
+Type: string
+Default: 
+Description: Enterprise Controller password:
+
+Template: ${deb.customization.company.name}-mediaserver/ecsPassword_invalid
+Type: error
+Description: Enterprise Controller can't be empty
+
+Template: ${deb.customization.company.name}-mediaserver/transport
+Type: select
+Choices: auto, tcp, udp
+Description: Select preferred transport. If unsure leave default value.

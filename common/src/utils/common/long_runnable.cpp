@@ -7,14 +7,12 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
-#ifdef _WIN32
-#include "common/systemexcept_win32.h"
-#elif defined(__APPLE__)
-  #include <pthread.h>
-#else
-  #include <sys/types.h>
-  #include <linux/unistd.h>
-  static pid_t gettid(void) { return syscall(__NR_gettid); }
+#include <common/systemexcept_win32.h>
+
+#ifdef Q_OS_LINUX
+#   include <sys/types.h>
+#   include <linux/unistd.h>
+static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
 
@@ -111,20 +109,19 @@ void QnLongRunnablePool::waitAll() {
 QnLongRunnable::QnLongRunnable(): 
     m_needStop(false),
     m_onPause(false),
-    m_sysThreadID(0)
+    m_systemThreadId(0)
 {
     DEBUG_CODE(m_type = NULL);
 
     if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
         m_pool = pool->d;
         m_pool->createdNotify(this);
-
-        connect(this, SIGNAL(started()), this, SLOT(at_started()), Qt::DirectConnection);
-        connect(this, SIGNAL(finished()), this, SLOT(at_finished()), Qt::DirectConnection);
     } else {
-        // todo: #Roman add QnLongRunnable initialization to mediaServer and mediaProxy
-        //qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
     }
+
+    connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
+    connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 }
 
 QnLongRunnable::~QnLongRunnable() {
@@ -158,9 +155,22 @@ void QnLongRunnable::pauseDelay() {
         m_semaphore.tryAcquire(1, 50);
 }
 
-size_t QnLongRunnable::sysThreadID() const
-{
-    return m_sysThreadID;
+std::uintptr_t QnLongRunnable::systemThreadId() const {
+    return m_systemThreadId;
+}
+
+void QnLongRunnable::initSystemThreadId() {
+    if(m_systemThreadId)
+        return;
+
+#if defined(Q_OS_LINUX)
+    /* This one is purely for debugging purposes. 
+     * QThread::currentThreadId is implemented via pthread_self, 
+     * which is not an identifier you see in GDB. */
+    m_systemThreadId = gettid();
+#else
+    m_systemThreadId = reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
+#endif
 }
 
 void QnLongRunnable::smartSleep(int ms) {
@@ -216,15 +226,4 @@ void QnLongRunnable::at_started() {
 void QnLongRunnable::at_finished() {
     if(m_pool)
         m_pool->finishedNotify(this);
-}
-
-void QnLongRunnable::saveSysThreadID()
-{
-#ifdef _WIN32
-    //TODO
-#elif defined(__APPLE__)
-    m_sysThreadID = (size_t)pthread_self();
-#else
-    m_sysThreadID = gettid();
-#endif
 }

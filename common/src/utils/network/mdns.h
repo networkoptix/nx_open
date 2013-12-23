@@ -1,8 +1,8 @@
 #ifndef uniclient_mdns_h
 #define uniclient_mdns_h
 
-#include <QByteArray>
-#include <QVector>
+#include <QtCore/QByteArray>
+#include <QtCore/QVector>
 
 
 struct MDNSPacket

@@ -1,6 +1,6 @@
 #include "multicodec_rtp_reader.h"
 
-#include <QSettings>
+#include <QtCore/QSettings>
 
 #ifdef __GNUC__
 #include <sys/select.h>
@@ -33,7 +33,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_audioParser(0),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
-    m_gotSomeFrame(false)
+    m_gotSomeFrame(false),
+    m_role(QnResource::Role_Default)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -132,9 +133,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     // int readed;
     int audioRetryCount = 0;
     int videoRetryCount = 0;
-    int channelNum = 0;
+    int channelNum = -1;
 
-    QTime dataTimer;
+    QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
@@ -145,6 +146,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             break; // error
         RTPSession::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(channelNum);
         int rtpBufferOffset = m_demuxedData[channelNum]->size() - readed;
+
         if (format == RTPSession::TT_VIDEO && m_videoParser) 
         {
             if (!m_videoParser->processData((quint8*)m_demuxedData[channelNum]->data(), rtpBufferOffset+4, readed-4, m_videoIO->getStatistic(), m_lastVideoData)) 
@@ -201,8 +203,9 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     if (m_lastVideoData)
     {
         result = m_lastVideoData;
-		m_lastVideoData.clear();
-        m_demuxedData[channelNum]->clear();
+        m_lastVideoData.clear();
+        if (channelNum >= 0)
+            m_demuxedData[channelNum]->clear();
         m_gotSomeFrame = true;
         return result;
     }
@@ -210,7 +213,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     {
         result = m_lastAudioData[0];
         m_lastAudioData.removeAt(0);
-        m_demuxedData[channelNum]->clear();
+        if (channelNum >= 0)
+            m_demuxedData[channelNum]->clear();
         result->channelNumber += m_numberOfVideoChannels;
 
         m_gotSomeFrame = true;
@@ -221,11 +225,23 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
 
         int elapsed = dataTimer.elapsed();
-        QnBusiness::EventReason reason = elapsed > MAX_FRAME_DURATION*2 ? QnBusiness::NetworkIssueNoFrame : QnBusiness::NetworkIssueConnectionClosed;
+        QString reasonText;
+        QnBusiness::EventReason reason;
+        if (elapsed > MAX_FRAME_DURATION*2) {
+            reason = QnBusiness::NetworkIssueNoFrame;
+            reasonText = QString::number((qlonglong) elapsed/1000);
+        }
+        else {
+            reason = QnBusiness::NetworkIssueConnectionClosed;
+            if (m_role == QnResource::Role_LiveVideo)
+                reasonText = tr("(primary video)");
+            else if (m_role == QnResource::Role_SecondaryLiveVideo)
+                reasonText = tr("(secondary video)");
+        }
         emit networkIssue(getResource(),
                           qnSyncTime->currentUSecsSinceEpoch(),
                           reason,
-                          QString::number((qlonglong) elapsed/1000));
+                          reasonText);
         QnVirtualCameraResourcePtr cam = getResource().dynamicCast<QnVirtualCameraResource>();
         if (cam)
             cam->issueOccured();
@@ -248,8 +264,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     timeVal.tv_sec  = 0;
     timeVal.tv_usec = 100*1000;
 
-
-    QTime dataTimer;
+    QElapsedTimer dataTimer;
     dataTimer.restart();
 
     while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
@@ -259,11 +274,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
         if(m_videoIO)  {
             FD_SET(m_videoIO->getMediaSocket()->handle(), &read_set);
-            nfds = qMax(m_videoIO->getMediaSocket()->handle(), nfds);
+            nfds = qMax<int>(m_videoIO->getMediaSocket()->handle(), nfds);
         }
         if(m_audioIO) {
             FD_SET(m_audioIO->getMediaSocket()->handle(), &read_set);
-            nfds = qMax(m_audioIO->getMediaSocket()->handle(), nfds);
+            nfds = qMax<int>(m_audioIO->getMediaSocket()->handle(), nfds);
         }
         nfds++;
 
@@ -453,7 +468,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     else
         QTextStream(&url) << "rtsp://" << nres->getHostAddress();
 
-    m_RtpSession.setAuth(nres->getAuth());
+    m_RtpSession.setAuth(nres->getAuth(), RTPSession::authBasic);
 
     delete m_videoParser;
     m_videoParser = 0;
@@ -525,4 +540,9 @@ void QnMulticodecRtpReader::pleaseStop()
 void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _defaultTransportToUse )
 {
     defaultTransportToUse = _defaultTransportToUse;
+}
+
+void QnMulticodecRtpReader::setRole(QnResource::ConnectionRole role)
+{
+    m_role = role;
 }

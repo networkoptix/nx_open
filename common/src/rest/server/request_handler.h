@@ -1,11 +1,11 @@
 #ifndef __REQUEST_HANDLER_H__
 #define __REQUEST_HANDLER_H__
 
-#include <QObject>
-#include <QPair>
-#include <QString>
-#include <QList>
-#include <QByteArray>
+#include <QtCore/QObject>
+#include <QtCore/QPair>
+#include <QtCore/QString>
+#include <QtCore/QList>
+#include <QtCore/QByteArray>
 #include "utils/common/request_param.h"
 #include <QSharedPointer>
 
@@ -34,8 +34,11 @@ public:
     friend class QnRestConnectionProcessor;
 
 protected:
-    void setPath(const QString& path) { m_path = path; }
-    qint64 parseDateTime(const QString& dateTime);
+    void setPath(const QString &path) { m_path = path; }
+    
+    qint64 parseDateTime(const QString &dateTime) const;
+    QString extractAction(const QString &path) const;
+
 protected:
     QString m_path;
 };

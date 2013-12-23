@@ -26,12 +26,12 @@ public:
 protected:
     virtual void run() override
     {
-        std::auto_ptr<UDPSocket> discoverySock;
+        std::auto_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket() );
         if( m_localInterfacesToListen.isEmpty() )
-            discoverySock.reset( new UDPSocket(TestCamConst::DISCOVERY_PORT) );
+            discoverySock->bind( SocketAddress( HostAddress::anyHost, TestCamConst::DISCOVERY_PORT ) );
         else
-            discoverySock.reset( new UDPSocket(m_localInterfacesToListen[0], TestCamConst::DISCOVERY_PORT) );
-        discoverySock->setReadTimeOut(100);
+            discoverySock->bind( SocketAddress( m_localInterfacesToListen[0], TestCamConst::DISCOVERY_PORT ) );
+        discoverySock->setRecvTimeout(100);
         quint8 buffer[1024*8];
         QString peerAddress;
         unsigned short peerPort;
@@ -48,7 +48,7 @@ protected:
                     rez.append(';');
                     rez.append(camResponse);
                     discoverySock->setDestAddr(peerAddress, peerPort);
-                    discoverySock->sendTo(rez.data(), rez.size());
+                    discoverySock->send(rez.data(), rez.size());
                 }
             }
         }
@@ -105,7 +105,7 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
     }
 }
 
-QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     QMutexLocker lock(&m_mutex);
     return new QnTestCameraProcessor(clientSocket, owner);

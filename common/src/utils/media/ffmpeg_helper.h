@@ -8,7 +8,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <QIODevice>
+#include <QtCore/QIODevice>
 
 
 QString codecIDToString(CodecID codecID);
@@ -48,7 +48,8 @@ private:
 class QnFfmpegHelper
 {
 private:
-    enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX, Field_OVERRIDE, Field_Channels, Field_SampleRate, Field_Sample_Fmt, Field_BitsPerSample };
+    enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX, Field_OVERRIDE, Field_Channels, Field_SampleRate, Field_Sample_Fmt, Field_BitsPerSample,
+                         Field_CodedWidth, Field_CodedHeight};
     static void appendCtxField(QByteArray *dst, CodecCtxField field, const char* data, int size);
 public:
     static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);
@@ -58,6 +59,7 @@ public:
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
+    static void deleteCodecContext(AVCodecContext* ctx);
 };
 
 #endif // __FFMPEG_HELPER_H

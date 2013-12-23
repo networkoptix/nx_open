@@ -1,22 +1,21 @@
 #ifndef __RTSP_DATA_CONSUMER_H__
 #define __RTSP_DATA_CONSUMER_H__
 
-#include <QHostAddress>
-#include <QTime>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QElapsedTimer>
+
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "utils/network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
-#include "rtsp_ffmpeg_encoder.h"
+#include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "utils/common/adaptive_sleep.h"
 
 class QnRtspConnectionProcessor;
 
 static const int MAX_RTP_CHANNELS = 32;
 static const int CLOCK_FREQUENCY = 1000000;
-static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
-static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 
 static const quint8 RTP_METADATA_CODE = 126;
 static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");
@@ -62,14 +61,13 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
 protected:
-    void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
 
     void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
 
     // delay streaming. Used for realtime mode streaming
-    void doRealtimeDelay(QnAbstractMediaDataPtr media);
+    void doRealtimeDelay(QnConstAbstractMediaDataPtr media);
 
     bool isMediaTimingsSlow() const;
     void setLiveQualityInternal(MediaQuality quality);
@@ -81,7 +79,7 @@ private:
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;
-    QTime m_timer;
+    QElapsedTimer m_timer;
     //quint16 m_sequence[MAX_RTP_CHANNELS];
     //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
@@ -115,7 +113,7 @@ private:
     
     qint64 m_firstLiveTime;
     qint64 m_lastLiveTime;
-    QTime m_liveTimer;
+    QElapsedTimer m_liveTimer;
     mutable QMutex m_liveTimingControlMtx;
     bool m_allowAdaptiveStreaming;
 

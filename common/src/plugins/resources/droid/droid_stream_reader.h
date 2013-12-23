@@ -1,6 +1,8 @@
 #ifndef droid_stream_reader_h_1756
 #define droid_stream_reader_h_1756
 
+#ifdef ENABLE_DROID
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "droid_resource.h"
@@ -31,7 +33,7 @@ private:
     void setSDPInfo(QByteArray sdpInfo);
 private:
     QMutex m_controlPortSync;
-    TCPSocket m_tcpSock;
+    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     //UDPSocket* m_videoSock;
     //UDPSocket* m_audioSock;
 
@@ -48,4 +50,5 @@ private:
     bool m_gotSDP;
 };
 
+#endif // #ifdef ENABLE_DROID
 #endif //dlink_stream_reader_h_0251

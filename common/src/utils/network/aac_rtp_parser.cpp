@@ -1,8 +1,12 @@
 #include "aac_rtp_parser.h"
+
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+
+#include <core/datapacket/media_data_packet.h>
+
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-#include "utils/common/synctime.h"
-#include "core/datapacket/media_data_packet.h"
 
 QnAacRtpParser::QnAacRtpParser():
     QnRtpAudioStreamParser()
@@ -84,7 +88,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
-    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
+    const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     result.clear();
     QVector<int> auSize;
     QVector<int> auIndex;
@@ -94,8 +98,8 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     //int streamStateValue = 0;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
-    quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
-    quint8* end = rtpBuffer + bufferSize;
+    const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
+    const quint8* end = rtpBuffer + bufferSize;
 
     //bool isLastPacket = rtpHeader->marker;
     try 

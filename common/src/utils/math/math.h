@@ -6,8 +6,9 @@
 #include <cassert>
 #include <limits>
 
+#include <QtCore/QtEndian>
 #include <QtCore/QtGlobal>
-#include <QtCore/qnumeric.h>
+#include <QtCore/QtNumeric>
 #include <QtGui/QVector2D>
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
@@ -15,20 +16,7 @@
 #include <common/config.h>
 
 #include "fuzzy.h"
-#include "limits.h"
-
-#ifndef M_E
-#   define M_E 2.71828182845904523536
-#endif
-
-#ifndef M_LN2
-#   define M_LN2 0.693147180559945309417
-#endif
-
-#ifndef M_PI
-#   define M_PI 3.14159265358979323846
-#endif
-
+#include "defines.h"
 
 inline bool qIsNaN(const QVector2D &vector) {
     return qIsNaN(vector.x()) || qIsNaN(vector.y());
@@ -73,38 +61,13 @@ bool qBetween(const T &value, const T &min, const T &max) {
     return min <= value && value < max;
 }
 
+inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
+inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
 
-#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-/**
- * Converts the given 64-bit number from host byte order to network byte order.
- * 
- * \param x                             Value to convert, in host byte order.
- * \returns                             Converted value, in network byte order.
- */
-inline quint64 htonll(quint64 x) {
-    return
-        ((((x) & 0xff00000000000000ULL) >> 56) | 
-        (((x) & 0x00ff000000000000ULL) >> 40) | 
-        (((x) & 0x0000ff0000000000ULL) >> 24) | 
-        (((x) & 0x000000ff00000000ULL) >> 8) | 
-        (((x) & 0x00000000ff000000ULL) << 8) | 
-        (((x) & 0x0000000000ff0000ULL) << 24) | 
-        (((x) & 0x000000000000ff00ULL) << 40) | 
-        (((x) & 0x00000000000000ffULL) << 56));
-}
-
-/**
- * Converts the given 64-bit number from network byte order to host byte order.
- * 
- * \param x                             Value to convert, in network byte order.
- * \returns                             Converted value, in host byte order.
- */
-inline quint64 ntohll(quint64 x) { return htonll(x); }
-
-#else
-inline quint64 htonll(quint64 x) { return x;}
-inline quint64 ntohll(quint64 x)  { return x;}
-#endif
+/* Note that we have to use #defines here so that these functions work even if
+ * they are also defined in system network headers. */
+#define htonll qn_htonll
+#define ntohll qn_ntohll
 
 
 /**
@@ -166,6 +129,7 @@ inline double qMod(double l, double r) {
         result += r;
     return result;
 }
+
 
 /**
  * \param value                         Value to round up.
@@ -247,5 +211,32 @@ inline int qIntegerLog2(quint32 value) {
     return result;
 }
 #endif
+
+/* Overloads for double-float interop. */
+
+inline double qMod(double l, float r) {
+    return qMod(l, static_cast<double>(r));
+}
+
+inline double qMod(float l, double r) {
+    return qMod(static_cast<double>(l), r);
+}
+
+inline double qMin(double l, float r) {
+    return qMin(l, static_cast<double>(r));
+}
+
+inline double qMin(float l, double r) {
+    return qMin(static_cast<double>(l), r);
+}
+
+inline double qMax(double l, float r) {
+    return qMax(l, static_cast<double>(r));
+}
+
+inline double qMax(float l, double r) {
+    return qMax(static_cast<double>(l), r);
+}
+
 
 #endif // QN_MATH_H

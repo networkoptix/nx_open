@@ -1,8 +1,9 @@
 #include "business_rule_processor.h"
 
-#include <QList>
+#include <QtCore/QList>
 
 #include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
 
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
@@ -11,6 +12,8 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include "mustache/mustache_helper.h"
@@ -20,6 +23,9 @@
 #include <utils/common/email.h>
 #include "business_strings_helper.h"
 #include "version.h"
+
+#include <QtCore/QBuffer>
+#include <QtGui/QImage>
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -44,6 +50,13 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
     connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
+
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
+            this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(int)),
+            this, SLOT(at_businessRuleDeleted(int)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
+            this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()));
     m_timer.start(1000);
@@ -82,12 +95,12 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
                 QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
 #if 0
                 // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
 #else
                 // do proxy via CPP media proxy
                 proxyUrl.setScheme(QLatin1String("http"));
                 proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction")).arg(serverUrl.host()).arg(serverUrl.port()));
+                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
 #endif
 
                 QString url = proxyUrl.toString();
@@ -132,6 +145,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     case BusinessActionType::ShowPopup:
     case BusinessActionType::PlaySound:
+    case BusinessActionType::PlaySoundRepeated:
     case BusinessActionType::SayText:
         return broadcastBusinessAction(action);
 
@@ -289,12 +303,13 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
 
     QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
-    if (!aggInfo.initialized())
+    bool isFirstCall = !aggInfo.initialized();
+    if (isFirstCall)
         aggInfo.init(bEvent, rule, currentTime);
 
     aggInfo.append(bEvent->getRuntimeParams());
 
-    if (currentTime > aggInfo.estimatedEnd())
+    if (isFirstCall || currentTime > aggInfo.estimatedEnd())
     {
         QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
                                                                                         aggInfo.event(),
@@ -490,7 +505,7 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int 
     cl_log.log(QString::fromLatin1("Error processing action SendMail."), cl_logWARNING);
 }
 
-void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle)
+void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle)
 {
     if (response.status == 0)
         return;

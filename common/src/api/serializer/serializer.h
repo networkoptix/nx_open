@@ -3,17 +3,20 @@
 
 #include <QtCore/QByteArray>
 
+#include <api/model/kvpair.h>
+#include <api/model/email_attachment.h>
+
+#include <business/business_fwd.h>
+
+#include <core/resource/resource_fwd.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/layout_item_data.h>
+#include <core/resource/motion_window.h>
+
+#include <licensing/license.h>
+
 #include <utils/common/exception.h>
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/camera_history.h"
-#include <business/business_event_rule.h>
-#include "api/model/kvpair.h"
-#include "api/model/email_attachment.h"
-#include "licensing/license.h"
+
 #include "connectinfo.h"
 
 /*
@@ -53,8 +56,8 @@ public:
     virtual const char* format() const = 0;
     virtual void deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
-    virtual void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) = 0;
-    virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) = 0;
+    virtual void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) = 0;
+    virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) = 0;
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;
     virtual void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
@@ -64,7 +67,7 @@ public:
     virtual void deserializeBusinessRules(QnBusinessEventRuleList&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
     virtual void deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data) = 0;
-    virtual void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data) = 0;
+    virtual void deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data) = 0;
     virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
@@ -79,7 +82,7 @@ public:
     virtual void serializeBusinessAction(const QnAbstractBusinessActionPtr&, QByteArray& data) = 0;
     virtual void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) = 0;
     virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;
-    virtual void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data) = 0;
+    virtual void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data) = 0;
     virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
 
 protected:

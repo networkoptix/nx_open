@@ -1,3 +1,4 @@
+#ifdef ENABLE_VMAX
 
 #include "vmax480_live_reader.h"
 
@@ -6,12 +7,15 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
+#include <QtCore/QUrlQuery>
+
 #include "core/resource/network_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
 #include "vmax480_resource.h"
+
 
 
 static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
@@ -43,7 +47,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
         return getMetaData();
 
     QnAbstractDataPacketPtr result;
-    QTime getTimer;
+    QElapsedTimer getTimer;
     getTimer.restart();
     while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
     {
@@ -80,7 +84,7 @@ CameraDiagnostics::Result QnVMax480LiveProvider::openStream()
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 
-    int channel = QUrl(m_resource->getUrl()).queryItemValue(QLatin1String("channel")).toInt();
+    int channel = QUrlQuery(QUrl(m_resource->getUrl()).query()).queryItemValue(QLatin1String("channel")).toInt();
     if (channel > 0)
         channel--;
 
@@ -143,3 +147,5 @@ int QnVMax480LiveProvider::getChannel() const
 {
     return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();
 }
+
+#endif // #ifdef ENABLE_VMAX

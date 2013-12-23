@@ -11,9 +11,9 @@
 			<includes>
 				<include>${artifactId}.exe</include>
 				<include>acs_*.dll</include>
-				<include>qtcore4.dll</include>
+				<include>qt5core.dll</include>
 				<include>pid.dat</include>
 			</includes>
 		</fileSet>			
 	</fileSets>
-</assembly>
+</assembly> 

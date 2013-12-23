@@ -1,8 +1,6 @@
 #include "instrumented.h"
 #include "instrument_manager.h"
 
-InstrumentedBase::InstrumentedBase(): m_scene(NULL) {}
-
 InstrumentedBase::~InstrumentedBase() {}
 
 void InstrumentedBase::updateScene(QGraphicsScene *scene, QGraphicsItem *item) {

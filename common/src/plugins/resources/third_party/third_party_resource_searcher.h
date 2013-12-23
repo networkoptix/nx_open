@@ -6,8 +6,8 @@
 #ifndef THIRD_PARTY_RESOURCE_SEARCHER_H
 #define THIRD_PARTY_RESOURCE_SEARCHER_H
 
-#include <QList>
-#include <QVector>
+#include <QtCore/QList>
+#include <QtCore/QVector>
 
 #include "third_party_resource.h"
 #include "../mdns/mdns_device_searcher.h"
@@ -68,7 +68,6 @@ protected:
 
 private:
     QList<nxcip_qt::CameraDiscoveryManager> m_thirdPartyCamPlugins;
-    QVector<nxcip::CameraInfo> m_cameraInfoTempArray;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList;
 
     //!Searchers resources using custom search method

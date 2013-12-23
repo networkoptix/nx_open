@@ -5,7 +5,7 @@
 
 #include <QtCore/QString>
 
-#include <utils/math/math.h> /* For INT64_MAX. */
+#include <utils/math/defines.h> /* For INT64_MAX. */
 
 template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
@@ -99,6 +99,11 @@ int random(int min, int max);
  * \returns                             Random floating point number in range [0.0, 1.0).
  */
 qreal frandom();
+
+/**
+ * \returns                             has of string. Added for compatibility with QT4 code
+ */
+uint qt4Hash(const QString& key);
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

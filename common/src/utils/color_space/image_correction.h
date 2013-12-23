@@ -3,11 +3,11 @@
 
 #include <cstring>
 
-#include <QtGlobal>
-#include <QByteArray>
-#include <QList>
-#include <QRectF>
-#include <QMetaType>
+#include <QtCore/QtGlobal>
+#include <QtCore/QByteArray>
+#include <QtCore/QList>
+#include <QtCore/QRectF>
+#include <QtCore/QMetaType>
 
 struct ImageCorrectionParams
 {
@@ -58,7 +58,7 @@ struct ImageCorrectionResult
     int hystogram[256];
     bool filled;
 
-    void analizeImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect = QRectF(0.0, 0.0, 1.0, 1.0));
+    void analyseImage( const quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data, const QRectF& srcRect = QRectF(0.0, 0.0, 1.0, 1.0));
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
 };

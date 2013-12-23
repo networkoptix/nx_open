@@ -1,0 +1,273 @@
+/**********************************************************
+* 27 sep 2013
+* a.kolesnikov
+***********************************************************/
+
+#include "installation_process.h"
+
+#include <QtCore/QBuffer>
+#include <QtCore/QDir>
+#include <QtCore/QSettings>
+#include <QtXml/QXmlInputSource>
+#include <QtXml/QXmlSimpleReader>
+
+#include <plugins/videodecoders/stree/streesaxhandler.h>
+#include <utils/common/log.h>
+
+#include "mirror_list_xml_parse_handler.h"
+#include "version.h"
+
+
+InstallationProcess::InstallationProcess(
+    const QString& productName,
+    const QString& customization,
+    const QString& version,
+    const QString& module,
+    const QString& installationDirectory )
+:
+    m_productName( productName ),
+    m_customization( customization ),
+    m_version( version ),
+    m_module( module ),
+    m_installationDirectory( installationDirectory ),
+    m_state( State::init ),
+    m_status( applauncher::api::InstallationStatus::init ),
+    m_totalBytesDownloaded( 0 ),
+    m_totalBytesToDownload( 0 )
+{
+}
+
+InstallationProcess::~InstallationProcess()
+{
+    pleaseStop();
+    wait();
+}
+
+void InstallationProcess::pleaseStop()
+{
+    //TODO/IMPL
+}
+
+void InstallationProcess::wait()
+{
+    //TODO/IMPL
+}
+
+static const QString MIRROR_LIST_URL_PARAM_NAME( "mirrorListUrl" );
+static const QString DEFAULT_MIRROR_LIST_URL( "http://networkoptix.com/archive/hdw_mirror_list.xml" );
+
+bool InstallationProcess::start( const QSettings& settings )
+{
+    if( !m_httpClient )
+    {
+        m_httpClient.reset( new nx_http::AsyncHttpClient() );
+        connect(
+            m_httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onHttpDone(nx_http::AsyncHttpClientPtr)),
+            Qt::DirectConnection );
+    }
+
+    m_state = State::downloadMirrorList;
+    m_status = applauncher::api::InstallationStatus::inProgress;
+    QString mirrorListUrl = settings.value(MIRROR_LIST_URL_PARAM_NAME, DEFAULT_MIRROR_LIST_URL).toString();
+    if( !m_httpClient->doGet(QUrl(mirrorListUrl)) )
+    {
+        m_state = State::init;
+        m_status = applauncher::api::InstallationStatus::failed;
+        return false;
+    }
+
+    return true;
+}
+
+applauncher::api::InstallationStatus::Value InstallationProcess::getStatus() const
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+    return m_status;
+}
+
+//!Returns installation progress (percents)
+float InstallationProcess::getProgress() const
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    if( m_totalBytesToDownload == 0 )
+        return -1;   //unknown
+
+    int64_t totalBytesDownloaded = m_totalBytesDownloaded;
+    for( auto fileBytesPair: m_unfinishedFilesBytesDownloaded )
+        totalBytesDownloaded += fileBytesPair.second;
+    const float percentCompleted = (float)totalBytesDownloaded / m_totalBytesToDownload * 100.0;
+    return percentCompleted > 100.0 ? 100.0 : percentCompleted;
+}
+
+QString InstallationProcess::errorText() const
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+    return m_errorText;
+}
+
+void InstallationProcess::overrallDownloadSizeKnown(
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    int64_t totalBytesToDownload )
+{
+    m_totalBytesToDownload = totalBytesToDownload;
+}
+
+void InstallationProcess::fileProgress(
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    const QString& filePath,
+    int64_t /*remoteFileSize*/,
+    int64_t bytesDownloaded )
+{
+    //NOTE multiple files can be downloaded simultaneously
+    std::unique_lock<std::mutex> lk( m_mutex );
+    m_unfinishedFilesBytesDownloaded[filePath] = bytesDownloaded;
+}
+
+void InstallationProcess::fileDone(
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    const QString& filePath )
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    auto it = m_unfinishedFilesBytesDownloaded.find( filePath );
+    if( it == m_unfinishedFilesBytesDownloaded.end() )
+        return;
+
+    m_totalBytesDownloaded += it->second;
+    m_unfinishedFilesBytesDownloaded.erase( it );
+}
+
+void InstallationProcess::finished(
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    bool result )
+{
+    m_state = State::finished;
+    if( result )
+    {
+        m_status = applauncher::api::InstallationStatus::success;
+        emit installationSucceeded();
+    }
+    else
+    {
+        m_status = applauncher::api::InstallationStatus::failed;
+    }
+}
+
+void InstallationProcess::failed(
+    const std::shared_ptr<RDirSyncher>& syncher,
+    const QString& failedFilePath,
+    const QString& errorText )
+{
+    //TODO/IMPL
+}
+
+void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
+{
+    assert( m_httpClient == httpClient );
+
+    auto scopedExitFunc = [this](InstallationProcess* /*pThis*/)
+    {
+        m_httpClient->terminate();
+        m_httpClient.reset();
+        if( m_status == applauncher::api::InstallationStatus::failed )
+        {
+            NX_LOG( m_errorText, cl_logERROR );
+        }
+    };
+    std::unique_ptr<InstallationProcess, decltype(scopedExitFunc)> removeHttpClientGuard( this, scopedExitFunc );
+
+    if( (m_httpClient->state() != nx_http::AsyncHttpClient::sDone) ||
+        !m_httpClient->response() )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_errorText = QString::fromLatin1("Failed to download %1. I/O issue").arg(m_httpClient->url().toString());
+        m_state = State::finished;
+        m_status = applauncher::api::InstallationStatus::failed;
+        return;
+    }
+
+    if( m_httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_errorText = QString::fromLatin1("Failed to download %1. %2").arg(m_httpClient->url().toString()).
+            arg(QLatin1String(nx_http::StatusCode::toString(m_httpClient->response()->statusLine.statusCode)));
+        m_state = State::finished;
+        m_status = applauncher::api::InstallationStatus::failed;
+        return;
+    }
+
+    //reading message body and parsing mirror list
+    nx_http::BufferType msgBody = m_httpClient->fetchMessageBodyBuffer();
+
+    stree::SaxHandler xmlHandler( m_rns );
+
+    QXmlSimpleReader reader;
+    reader.setContentHandler( &xmlHandler );
+    reader.setErrorHandler( &xmlHandler );
+
+    QBuffer xmlFile( &msgBody );
+    if( !xmlFile.open( QIODevice::ReadOnly ) )
+        assert( false );
+    QXmlInputSource input( &xmlFile );
+    if( !reader.parse( &input ) )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_errorText = QString::fromLatin1( "Failed to parse mirror_list.xml received from %1. %2" ).arg(m_httpClient->url().toString()).arg(xmlHandler.errorString());
+        m_state = State::finished;
+        m_status = applauncher::api::InstallationStatus::failed;
+        return;
+    }
+    m_currentTree.reset( xmlHandler.releaseTree() );
+
+    stree::ResourceContainer inputData;
+    inputData.put( ProductParameters::product, m_productName );
+    inputData.put( ProductParameters::customization, m_customization );
+    inputData.put( ProductParameters::module, m_module );
+    inputData.put( ProductParameters::version, m_version );
+    stree::ResourceContainer result;
+    m_currentTree->get( inputData, &result );
+
+    std::forward_list<QUrl> mirrorList;
+    {
+        QString urlStr;
+        for( result.goToBeginning(); result.next(); )
+            if( result.resID() == ProductParameters::mirrorUrl )
+                mirrorList.push_front( QUrl(result.value().toString()) );
+    }
+
+    if( mirrorList.empty() )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_errorText = QString::fromLatin1( "Could not find mirror for [%1; %2; %3; %4]" ).arg(m_productName).arg(m_customization).arg(m_module).arg(m_version);
+        m_state = State::finished;
+        m_status = applauncher::api::InstallationStatus::failed;
+        return;
+    }
+
+    if( !QDir().mkpath(m_installationDirectory) )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_errorText = QString::fromLatin1( "Failed to start installation from %1 to %2. Cannot create target directory" ).
+            arg(mirrorList.front().toString()).arg(m_installationDirectory);
+        m_state = State::finished;
+        m_status = applauncher::api::InstallationStatus::failed;
+        return;
+    }
+
+    m_state = State::installing;
+
+    m_syncher.reset( new RDirSyncher( mirrorList, m_installationDirectory, this ) );
+    //syncher->setFileProgressNotificationStep(  );
+
+    if( !m_syncher->startAsync() )
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        m_errorText = QString::fromLatin1( "Failed to start installation from %1 to %2. %3" ).
+            arg(mirrorList.front().toString()).arg(m_installationDirectory).arg(m_syncher->lastErrorText());
+        m_syncher.reset();
+        m_state = State::finished;
+        m_status = applauncher::api::InstallationStatus::failed;
+    }
+}

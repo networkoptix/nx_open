@@ -6,106 +6,74 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
-#include <QtCore/QWeakPointer>
+#include <QtCore/QPointer>
 
 #include "forward.h"
 
-struct Connection {
-    Connection(QObject *sender, const char *signal, QObject *receiver, const char *method): sender(sender), signal(signal), receiver(receiver), method(method) {}
-    Connection(): signal(NULL), method(NULL) {}
-
-    bool disconnect() {
-        if(sender && receiver) {
-            return QObject::disconnect(sender.data(), signal, receiver.data(), method);
-        } else {
-            return false;
-        }
-    }
-
-    QWeakPointer<QObject> sender;
-    const char *signal;
-    QWeakPointer<QObject> receiver;
-    const char *method;
-};
-
 namespace Qn {
-    inline QObject *connector(QObject *object) {
+    template<class T>
+    inline const T *connector(const T *object) {
         return object;
     }
 
     template<class T>
-    inline QObject *connector(const QScopedPointer<T> &object) {
+    inline const T *connector(const QScopedPointer<T> &object) {
         return connector(object.data());
     }
 
     template<class T>
-    inline QObject *connector(const QSharedPointer<T> &object) {
+    inline const T *connector(const QSharedPointer<T> &object) {
         return connector(object.data());
     }
 
     template<class T>
-    inline QObject *connector(const QWeakPointer<T> &object) {
+    inline const T *connector(const QPointer<T> &object) {
         return connector(object.data());
     }
 
-    inline bool connect(QObject *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection, Connection *connection = NULL) {
-        if(QObject::connect(sender, signal, receiver, method, type)) {
-            if(connection) 
-                *connection = Connection(sender, signal, receiver, method);
-            return true;
-        } else {
-            return false;
-        }
+    template<class T1, class S1, class T2, class S2>
+    inline QMetaObject::Connection connect(const T1 *sender, const S1 &signal, const T2 *receiver, const S2 &method, Qt::ConnectionType type = Qt::AutoConnection) {
+        return QObject::connect(sender, signal, receiver, method, type);
     }
 
-    inline bool disconnect(QObject *sender, const char *signal, QObject *receiver, const char *method, Connection *connection = NULL) {
-        if(QObject::disconnect(sender, signal, receiver, method)) {
-            if(connection) 
-                *connection = Connection(sender, signal, receiver, method);
-            return true;
-        } else {
-            return false;
-        }
+    template<class T1, class S1, class T2, class S2>
+    inline bool disconnect(const T1 *sender, const S1 &signal, const T2 *receiver, const S2 &method) {
+        unused(method, signal); /* Silence the spurious MSVC warning. */
+        return QObject::disconnect(sender, signal, receiver, method);
     }
 
-    template<class T1, class T2>
-    inline bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection, Connection *connection = NULL) {
-        return connect(connector(sender), signal, connector(receiver), method, type, connection);
+    template<class T1, class S1, class T2, class S2>
+    inline QMetaObject::Connection connect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method, Qt::ConnectionType type = Qt::AutoConnection) {
+        return connect(connector(sender), signal, connector(receiver), method, type);
     }
 
-    template<class T1, class T2>
-    inline bool disconnect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Connection *connection = NULL) {
-        return disconnect(connector(sender), signal, connector(receiver), method, connection);
+    template<class T1, class S1, class T2, class S2>
+    inline bool disconnect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method) {
+        return disconnect(connector(sender), signal, connector(receiver), method);
     }
 
 } // namespace Qn
 
 
-template<class Base, bool baseIsConnective>
-class Connective;
-
-
 class ConnectiveBase {
 public:
-    template<class T1, class T2>
-    static bool connect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Qt::ConnectionType type = Qt::AutoConnection, Connection *connection = NULL) {
+    template<class T1, class S1, class T2, class S2>
+    static QMetaObject::Connection connect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method, Qt::ConnectionType type = Qt::AutoConnection) {
         using Qn::connect; /* Let ADL kick in. */
 
-        return connect(sender, signal, receiver, method, type, connection);
+        return connect(sender, signal, receiver, method, type);
     }
 
-    template<class T1, class T2>
-    static bool disconnect(const T1 &sender, const char *signal, const T2 &receiver, const char *method, Connection *connection = NULL) {
+    template<class T1, class S1, class T2, class S2>
+    static bool disconnect(const T1 &sender, const S1 &signal, const T2 &receiver, const S2 &method) {
         using Qn::disconnect; /* Let ADL kick in. */
 
-        return disconnect(sender, signal, receiver, method, connection);
+        return disconnect(sender, signal, receiver, method);
     }
 
-private:
+protected:
     ConnectiveBase() {}
-
-    template<class Base, bool baseIsConnective>
-    friend class ::Connective; /* So that only this class can access our methods. */
+    virtual ~ConnectiveBase() {}
 };
 
 

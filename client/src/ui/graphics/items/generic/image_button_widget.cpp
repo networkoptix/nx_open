@@ -4,8 +4,8 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QIcon>
-#include <QtGui/QAction>
-#include <QtGui/QStyle>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QStyle>
 #include <QtGui/QPixmapCache>
 #include <QtOpenGL/QGLContext>
 
@@ -17,7 +17,6 @@
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/common/geometry.h>
 #include <ui/common/accessor.h>
 #include <ui/common/palette.h>
@@ -210,7 +209,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
-    setAcceptsHoverEvents(true);
+    setAcceptHoverEvents(true);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton));
 
     m_animator = new VariantAnimator(this);
@@ -309,7 +308,7 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
     if(isDisabled())
         return;
 
-    QWeakPointer<QObject> self(this);
+    QPointer<QObject> self(this);
 
     if(m_action != NULL) {
         m_action->trigger();
@@ -355,7 +354,7 @@ void QnImageButtonWidget::click() {
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     if(m_shader.isNull()) {
         m_shader = qn_textureTransitionShaderProgramStorage()->get(QGLContext::currentContext());
-        m_gl.reset(new QnGlFunctions(QGLContext::currentContext()));
+        initializeOpenGLFunctions();
     }
 
     StateFlags hoverState = m_state | HOVERED;
@@ -393,9 +392,10 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
         glDrawTexturedRect(rect);
     } else {
-        m_gl->glActiveTexture(GL_TEXTURE1);
+
+        glActiveTexture(GL_TEXTURE1);
         checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
-        m_gl->glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
         checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
@@ -768,7 +768,7 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
 
         base_type::setGeometry(geometry);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             setFrameWidth(qMin(size().height(), size().width()) * m_relativeFrameWidth);
     }
 }

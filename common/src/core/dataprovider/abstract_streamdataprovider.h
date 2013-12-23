@@ -30,6 +30,7 @@ public:
 
     void addDataProcessor(QnAbstractDataConsumer* dp);
     void removeDataProcessor(QnAbstractDataConsumer* dp);
+    int processorsCount() const;
 
     virtual bool isReverseMode() const { return false;}
 

@@ -5,7 +5,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QMetaType>
 
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 #include "storage_status_reply.h"
 
@@ -14,8 +14,7 @@ struct QnStorageSpaceReply {
     QList<QString> storageProtocols;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storageProtocols), inline)
-
 Q_DECLARE_METATYPE(QnStorageSpaceReply);
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply)
 
 #endif // QN_STORAGE_SPACE_DATA_H

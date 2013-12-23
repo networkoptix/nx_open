@@ -12,7 +12,7 @@
 #include <QtGui/QColor>
 
 #include <utils/common/color.h>
-#include <utils/common/module_resources.h>
+#include <utils/common/json.h>
 
 
 Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
@@ -23,17 +23,17 @@ QnGlobals::QnGlobals(QObject *parent):
     /* Ensure that default skin resource is loaded. 
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
-    QN_INIT_MODULE_RESOURCES(client);
+    Q_INIT_RESOURCE(client);
 
     init();
 
     QFile file(QLatin1String(":/skin") + QLatin1String("/globals.json")); // TODO: #Elric
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QVariantMap json;
-        if(!QJson::deserialize(file.readAll(), &json)) {
+        QJsonObject jsonObject;
+        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
             qWarning() << "Client settings file could not be parsed!";
         } else {
-            updateFromJson(json.value(QLatin1String("style")).toMap());
+            updateFromJson(jsonObject.value(QLatin1String("style")).toObject());
         }
     }
 }
@@ -69,7 +69,7 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
     }
 }
 
-QVariant QnGlobals::readValueFromJson(const QVariantMap &json, int id, const QVariant &defaultValue) {
+QVariant QnGlobals::readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) {
     int type = this->type(id);
     if(type == qMetaTypeId<QnStatisticsColors>()) {
         QnStatisticsColors value;

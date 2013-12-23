@@ -34,7 +34,7 @@ extern "C"
 #include <limits.h>
 //#include <dirent.h>
 
-#include <QDir>
+#include <QtCore/QDir>
 
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(Q_OS_MAC) || defined(__DragonFly__)

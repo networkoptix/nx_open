@@ -3,7 +3,7 @@
 
 #include <QAuthenticator>
 #include <QtCore/QHash>
-#include <QString>
+#include <QtCore/QString>
 #include <QSharedPointer>
 
 #include "socket.h"
@@ -16,10 +16,13 @@ enum CLHttpStatus
     CL_HTTP_AUTH_REQUIRED = 401,
     CL_HTTP_NOT_FOUND,
 
-    CL_TRANSPORT_ERROR = -1
+    CL_TRANSPORT_ERROR = -1,
+    CL_NOT_HTTP = -2
 };
 
 QString toString( CLHttpStatus status );
+
+typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
 class CLSimpleHTTPClient
 {
@@ -30,6 +33,8 @@ public:
         \param timeout Timeout in milliseconds to be used as socket's read and write timeout
     */
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth);
+
     /*!
         \param timeout Timeout in milliseconds to be used as socket's read and write timeout
     */
@@ -53,6 +58,8 @@ public:
     int read(char* data, int max_len);
 
     void close();
+
+    TCPSocketPtr getSocket() { return m_sock; }
 
     QHash<QByteArray, QByteArray> header() const
     {
@@ -94,8 +101,6 @@ private:
     QHash<QByteArray, QByteArray> m_header;
     unsigned int m_contentLen;
     unsigned int m_readed;
-
-    typedef QSharedPointer<TCPSocket> TCPSocketPtr;
 
     TCPSocketPtr m_sock;
     bool m_connected;

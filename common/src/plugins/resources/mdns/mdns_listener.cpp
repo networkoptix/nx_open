@@ -1,6 +1,11 @@
+
 #include "mdns_listener.h"
+
+#include <memory>
+
 #include "utils/network/nettools.h"
 #include "utils/network/mdns.h"
+#include "utils/network/system_socket.h"
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -82,7 +87,7 @@ void QnMdnsListener::readDataFromSocket()
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        UDPSocket* sock = m_socketList[i];
+        AbstractDatagramSocket* sock = m_socketList[i];
         
         // send request for next read
         MDNSPacket request;
@@ -93,7 +98,7 @@ void QnMdnsListener::readDataFromSocket()
     }
 }
 
-void QnMdnsListener::readSocketInternal(UDPSocket* socket, QString localAddress)
+void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString localAddress)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
@@ -125,17 +130,14 @@ void QnMdnsListener::updateSocketList()
     deleteSocketList();
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
-        UDPSocket* socket = new UDPSocket();
+        std::unique_ptr<UDPSocket> sock( new UDPSocket() );
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
-        if (socket->setLocalAddressAndPort(iface.address.toString()))
+        if (sock->setLocalAddressAndPort(iface.address.toString()))
         {
-            socket->setMulticastIF(localAddress);
-            m_socketList << socket;
+            sock->setMulticastIF(localAddress);
+            m_socketList << sock.release();
             m_localAddressList << localAddress;
-        }
-        else {
-            delete socket;
         }
     }
 

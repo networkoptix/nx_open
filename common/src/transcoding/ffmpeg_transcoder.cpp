@@ -1,5 +1,5 @@
 #include "ffmpeg_transcoder.h"
-#include <QDebug>
+#include <QtCore/QDebug>
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
@@ -120,7 +120,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     return 0;
 }
 
-int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio)
+int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompressedAudioDataPtr audio)
 {
     if (m_videoCodec != CODEC_ID_NONE)
     {
@@ -261,7 +261,7 @@ bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
     return av_dict_set( &m_formatCtx->metadata, name.toUtf8().constData(), value.toUtf8().constData(), 0 ) >= 0;
 }
 
-int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray* const result)
+int QnFfmpegTranscoder::transcodePacketInternal(QnConstAbstractMediaDataPtr media, QnByteArray* const result)
 {
     Q_UNUSED(result)
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
@@ -279,7 +279,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     AVPacket packet;
     av_init_packet(&packet);
 
-    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
+    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
     QnAbstractMediaDataPtr transcodedData;
     
 

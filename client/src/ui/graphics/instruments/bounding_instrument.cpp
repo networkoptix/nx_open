@@ -4,12 +4,12 @@
 #include <cmath> /* For std::log, std::exp, std::abs. */
 #include <limits>
 
-#include <QtGui/QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 #include <QtCore/QDateTime>
 #include <QtGui/QMatrix4x4>
 
+#include <utils/math/fuzzy.h>
 #include <utils/common/warnings.h>
-#include <utils/common/util.h>
 #include <ui/animation/animation_event.h>
 
 namespace {
@@ -299,7 +299,7 @@ public:
 
             /* Apply center correction. */
             QRectF centerPositionBounds = calculateCenterPositionBounds();
-            if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyCompare(m_sceneViewportCenter, oldCenter)) {
+            if(!centerPositionBounds.contains(m_sceneViewportCenter) && !qFuzzyEquals(m_sceneViewportCenter, oldCenter)) {
                 QPointF correction = calculateCorrection(oldCenter, m_sceneViewportCenter, centerPositionBounds);
 
                 moveViewportScene(m_view, correction);

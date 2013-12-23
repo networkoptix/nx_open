@@ -1,19 +1,19 @@
-
 #include "time_image_filter.h"
 
-#include <QDateTime>
-#include <QFontMetrics>
-#include <QImage>
-#include <QPainter>
+#include <QtCore/QDateTime>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
-#include "utils/color_space/yuvconvert.h"
+#include <utils/math/math.h>
+#include <utils/color_space/yuvconvert.h>
 
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
 static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(OnScreenDatePos datePos, qint64 timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -41,19 +41,19 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
 
     switch(m_dateTextPos)
     {
-    case Date_LeftTop:
+    case Qn::TopLeftCorner:
         m_bufYOffs = 0;
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
-    case Date_RightTop:
+    case Qn::TopRightCorner:
         m_bufYOffs = 0;
         m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
         break;
-    case Date_RightBottom:
+    case Qn::BottomRightCorner:
         m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
         break;
-    case Date_LeftBottom:
+    case Qn::BottomLeftCorner:
     default:
         m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = metric.averageCharWidth()/2;
@@ -77,19 +77,19 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
 {
     switch(m_dateTextPos)
     {
-    case Date_LeftTop:
+    case Qn::TopLeftCorner:
         if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
-    case Date_RightTop:
+    case Qn::TopRightCorner:
         if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
             return;
         break;
-    case Date_RightBottom:
+    case Qn::BottomRightCorner:
         if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
         break;
-    case Date_LeftBottom:
+    case Qn::BottomLeftCorner:
     default:
         if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
             return;
@@ -110,7 +110,7 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
 
     // copy and convert frame buffer to image
-    yuv420_argb32_sse2_intr(m_imageBuffer,
+    yuv420_argb32_simd_intr(m_imageBuffer,
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         m_timeImg->width(), m_timeImg->height(),
         m_timeImg->bytesPerLine(), 
@@ -125,7 +125,7 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     p.strokePath(path, QPen(QColor(32,32,32,80)));
 
     // copy and convert RGBA32 image back to frame buffer
-    bgra_to_yv12_sse2_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
+    bgra_to_yv12_simd_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);

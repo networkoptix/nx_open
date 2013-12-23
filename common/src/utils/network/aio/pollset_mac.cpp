@@ -15,8 +15,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "../socket.h"
-#include "../socket_impl.h"
+#include "../system_socket.h"
+#include "../system_socket_impl.h"
 
 
 using namespace std;
@@ -27,7 +27,7 @@ class PollSetImpl
 {
 public:
     //!map<pair<socket, event type> >
-    typedef std::set<std::pair<Socket*, PollSet::EventType> > MonitoredEventSet;
+    typedef std::set<std::pair<AbstractSocket*, PollSet::EventType> > MonitoredEventSet;
 
     int kqueueFD;
     MonitoredEventSet monitoredEvents;
@@ -78,7 +78,7 @@ public:
     {
         pollSetImpl = right.pollSetImpl;
         currentIndex = right.currentIndex;
-		return *this;
+        return *this;
     }
 };
 
@@ -130,14 +130,14 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     return *this;
 }
 
-Socket* PollSet::const_iterator::socket()
+AbstractSocket* PollSet::const_iterator::socket()
 {
-    return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+    return static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
 }
 
-const Socket* PollSet::const_iterator::socket() const
+const AbstractSocket* PollSet::const_iterator::socket() const
 {
-    return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+    return static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
 }
 
 /*!
@@ -156,7 +156,7 @@ PollSet::EventType PollSet::const_iterator::eventType() const
 
 void* PollSet::const_iterator::userData()
 {
-    return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->getUserData(eventType());
+    return dynamic_cast<Socket*>(static_cast<AbstractSocket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata))->impl()->getUserData(eventType());
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -215,7 +215,7 @@ void PollSet::interrupt()
 }
 
 //!Add socket to set. Does not take socket ownership
-bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
+bool PollSet::add( AbstractSocket* const sock, EventType eventType, void* userData )
 {
     pair<PollSetImpl::MonitoredEventSet::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, eventType ) );
     if( !p.second )
@@ -228,7 +228,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
     EV_SET( &_newEvent, sock->handle(), kfilterType, EV_ADD, 0, 0, sock );
     if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
     {
-        sock->impl()->getUserData(eventType) = userData;
+        dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType) = userData;
         return true;
     }
 
@@ -237,7 +237,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
 }
 
 //!Remove socket from set
-void* PollSet::remove( Socket* const sock, EventType eventType )
+void* PollSet::remove( AbstractSocket* const sock, EventType eventType )
 {
     PollSetImpl::MonitoredEventSet::iterator it = m_impl->monitoredEvents.find( make_pair( sock, eventType ) );
     if( it == m_impl->monitoredEvents.end() )
@@ -250,8 +250,8 @@ void* PollSet::remove( Socket* const sock, EventType eventType )
     kevent( m_impl->kqueueFD, &_eventChange, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
     m_impl->monitoredEvents.erase( it );
 
-    void* userData = sock->impl()->getUserData(eventType);
-    sock->impl()->getUserData(eventType) = NULL;
+    void* userData = dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
+    dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType) = NULL;
     return userData;
 }
 
@@ -260,9 +260,9 @@ size_t PollSet::size( EventType /*eventType*/ ) const
     return m_impl->monitoredEvents.size();
 }
 
-void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
+void* PollSet::getUserData( AbstractSocket* const sock, EventType eventType ) const
 {
-    return sock->impl()->getUserData(eventType);
+    return dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
 }
 
 static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;

@@ -3,10 +3,10 @@
 #include <cmath>
 
 #include <QtGui/QPainter>
-#include <QtGui/QGraphicsSceneEvent>
-#include <QtGui/QApplication>
-#include <QtGui/QStyle>
-#include <QtGui/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsSceneEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -52,10 +52,10 @@ namespace  {
         QPointF pos0 = path->currentPosition();
         QPointF pos1 = QPointF(x, y);
 
-        if(qFuzzyCompare(pos0, pos1))
+        if(qFuzzyEquals(pos0, pos1))
             return;
 
-        if(qFuzzyCompare(pos0.x(), pos1.x()) || qFuzzyCompare(pos0.y(), pos1.y())) {
+        if(qFuzzyEquals(pos0.x(), pos1.x()) || qFuzzyEquals(pos0.y(), pos1.y())) {
             path->lineTo(x, y);
             return;
         }
@@ -120,7 +120,7 @@ Qn::Border QnToolTipWidget::tailBorder() const {
 }
 
 void QnToolTipWidget::setTailPos(const QPointF &tailPos) {
-    if(qFuzzyCompare(tailPos, m_tailPos))
+    if(qFuzzyEquals(tailPos, m_tailPos))
         return;
 
     m_tailPos = tailPos;
@@ -200,6 +200,15 @@ QRectF QnToolTipWidget::boundingRect() const {
     return m_boundingRect;
 }
 
+void QnToolTipWidget::setGeometry(const QRectF &rect) {
+    QSizeF oldSize = size();
+
+    base_type::setGeometry(rect);
+
+    if(!qFuzzyEquals(size(), oldSize))
+        invalidateShape();
+}
+
 void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShape();
 
@@ -215,12 +224,6 @@ void QnToolTipWidget::updateGeometry() {
 
     if(m_autoSize)
         resize(effectiveSizeHint(Qt::PreferredSize));
-}
-
-void QnToolTipWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
-    base_type::resizeEvent(event);
-
-    invalidateShape();
 }
 
 void QnToolTipWidget::wheelEvent(QGraphicsSceneWheelEvent *event) {

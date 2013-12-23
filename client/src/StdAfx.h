@@ -8,6 +8,7 @@
 /* Windows headers. */
 #ifdef _WIN32
 #   include <winsock2.h>
+#   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
 #   include <ws2tcpip.h>
 #   include <iphlpapi.h>
 
@@ -50,105 +51,104 @@ extern "C" {
 #include <boost/array.hpp>
 
 /* QT headers. */
-#include <QAction>
+#include <QtWidgets/QAction>
 
 #ifdef Q_OS_WIN
-#   include <QAudio>
-#   include <QAudioFormat>
-#   include <QAudioOutput>
+#   include <QtMultimedia/QAudio>
+#   include <QtMultimedia/QAudioFormat>
+#   include <QtMultimedia/QAudioOutput>
 #endif
 
 #include <QAuthenticator>
-#include <QBuffer>
-#include <QCheckBox>
-#include <QCloseEvent>
-#include <QColor>
-#include <QCompleter>
-#include <QDataStream>
-#include <QDateTime>
-#include <QDesktopServices>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QDir>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QEasingCurve>
-#include <QFile>
-#include <QFileInfo>
-#include <QFileInfoList>
-#include <QFont>
-#include <QFontMetrics>
-#include <QGraphicsItem>
-#include <QGraphicsProxyWidget>
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsView>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QHostAddress>
-#include <QHttp>
-#include <QIODevice>
-#include <QInputDialog>
-#include <QKeyEvent>
-#include <QLayout>
-#include <QLineEdit>
-#include <QList>
-#include <QListView>
-#include <QMap>
-#include <QMenu>
-#include <QMessageBox>
-#include <QMouseEvent>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QNetworkAddressEntry>
-#include <QNetworkInterface>
-#include <QObject>
-#include <QPaintEngine>
-#include <QPainter>
-#include <QPainterPath>
-#include <QPair>
-#include <QParallelAnimationGroup>
-#include <QPixmap>
+#include <QtCore/QBuffer>
+#include <QtWidgets/QCheckBox>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QColor>
+#include <QtWidgets/QCompleter>
+#include <QtCore/QDataStream>
+#include <QtCore/QDateTime>
+#include <QtGui/QDesktopServices>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtCore/QDir>
+#include <QtXml/QDomDocument>
+#include <QtXml/QDomElement>
+#include <QtCore/QEasingCurve>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QFileInfoList>
+#include <QtGui/QFont>
+#include <QtGui/QFontMetrics>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QIODevice>
+#include <QtWidgets/QInputDialog>
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtCore/QList>
+#include <QtWidgets/QListView>
+#include <QtCore/QMap>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtGui/QMouseEvent>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+#include <QtNetwork/QNetworkAddressEntry>
+#include <QtNetwork/QNetworkInterface>
+#include <QtCore/QObject>
+#include <QtGui/QPaintEngine>
+#include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
+#include <QtCore/QPair>
+#include <QtCore/QParallelAnimationGroup>
+#include <QtGui/QPixmap>
 #include <QPixmapCache>
-#include <QPoint>
-#include <QPointF>
-#include <QPropertyAnimation>
-#include <QPushButton>
-#include <QQueue>
-#include <QRadialGradient>
-#include <QRadioButton>
-#include <QRect>
-#include <QRectF>
-#include <QScrollBar>
-#include <QSemaphore>
-#include <QSet>
-#include <QSize>
-#include <QSlider>
-#include <QString>
-#include <QStringList>
-#include <QStringListModel>
-#include <QStyle>
-#include <QStyleOption>
+#include <QtCore/QPoint>
+#include <QtCore/QPointF>
+#include <QtCore/QPropertyAnimation>
+#include <QtWidgets/QPushButton>
+#include <QtCore/QQueue>
+#include <QtGui/QRadialGradient>
+#include <QtWidgets/QRadioButton>
+#include <QtCore/QRect>
+#include <QtCore/QRectF>
+#include <QtWidgets/QScrollBar>
+#include <QtCore/QSemaphore>
+#include <QtCore/QSet>
+#include <QtCore/QSize>
+#include <QtWidgets/QSlider>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QStringListModel>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOption>
 #include <QStyleOptionGraphicsItem>
-#include <QTabWidget>
-#include <QTextStream>
-#include <QThread>
-#include <QThreadPool>
-#include <QTime>
-#include <QTimer>
-#include <QUdpSocket>
-#include <QVBoxLayout>
-#include <QWaitCondition>
-#include <QWheelEvent>
-#include <QWidget>
-#include <QtConcurrentMap>
+#include <QtWidgets/QTabWidget>
+#include <QtCore/QTextStream>
+#include <QtCore/QThread>
+#include <QtCore/QThreadPool>
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
+#include <QtNetwork/QUdpSocket>
+#include <QtWidgets/QVBoxLayout>
+#include <QtCore/QWaitCondition>
+#include <QtGui/QWheelEvent>
+#include <QtWidgets/QWidget>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/qmath.h>
-#include <QtDebug>
-#include <QtGui/QApplication>
-#include <QtGui/QMainWindow>
+#include <QtCore/QtDebug>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
 #include <QtGui/QPainter>
 #include <QtGui/QResizeEvent>
-#include <QtGui>
+#include <QtWidgets/QtWidgets>
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
 

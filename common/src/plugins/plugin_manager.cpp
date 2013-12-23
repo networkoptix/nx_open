@@ -10,9 +10,9 @@
 #include <algorithm>
 #include <set>
 
-#include <QAtomicPointer>
-#include <QCoreApplication>
-#include <QDir>
+#include <QtCore/QAtomicPointer>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
 
 #include "../decoders/abstractclientplugin.h"
 #include "../decoders/abstractvideodecoderplugin.h"
@@ -31,13 +31,13 @@ public:
 
     ~PluginManagerWrapper()
     {
-        delete m_pluginManager;
-        m_pluginManager = NULL;
+        delete m_pluginManager.load();
+        m_pluginManager.store(NULL);
     }
 
     PluginManager* getPluginManager( const QString& pluginDir )
     {
-        if( !m_pluginManager )
+        if( !m_pluginManager.load() )
         {
             PluginManager* newInstance = new PluginManager( pluginDir );
             if( !m_pluginManager.testAndSetOrdered( NULL, newInstance ) )
@@ -45,7 +45,7 @@ public:
             //else
             //    newInstance->loadPlugins();
         }
-        return m_pluginManager;
+        return m_pluginManager.load();
     }
 
 private:
@@ -94,9 +94,9 @@ void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
         directoriesToSearchForPlugins.insert( QDir(m_pluginDir).absolutePath() );
 
 #ifndef Q_OS_WIN32
-    char* netOptixPluginDir = getenv("VMS_PLUGIN_DIR");
-    if( netOptixPluginDir )
-        directoriesToSearchForPlugins.insert( QString::fromLatin1(netOptixPluginDir) );
+    char* vmsPluginDir = getenv("VMS_PLUGIN_DIR");
+    if( vmsPluginDir )
+        directoriesToSearchForPlugins.insert( QString::fromLatin1(vmsPluginDir) );
 #endif
 
     //directoriesToSearchForPlugins.insert( QDir(QDir::currentPath()).absolutePath() );
@@ -123,10 +123,10 @@ void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType
             continue;
 
         if( pluginsToLoad & QtPlugin )
-            loadQtPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
+            loadQtPlugin( pluginDir.path() + QString::fromLatin1("/") + entry );
 
         if( pluginsToLoad & NxPlugin )
-            loadNxPlugin( pluginDir.path() + QString::fromAscii("/") + entry );
+            loadNxPlugin( pluginDir.path() + QString::fromLatin1("/") + entry );
     }
 }
 
@@ -135,7 +135,7 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     QSharedPointer<QPluginLoader> plugin( new QPluginLoader( fullFilePath ) );
     if( !plugin->load() )
     {
-        cl_log.log( QString::fromAscii("Library %1 is not plugin").arg(fullFilePath), cl_logDEBUG1 );
+        cl_log.log( QString::fromLatin1("Library %1 is not plugin").arg(fullFilePath), cl_logDEBUG1 );
         return false;
     }
 
@@ -146,11 +146,11 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     clientPlugin->initializeLog( QnLog::instance() );
     if( !clientPlugin->initialized() )
     {
-        cl_log.log( QString::fromAscii("Failed to initialize plugin %1").arg(fullFilePath), cl_logERROR );
+        cl_log.log( QString::fromLatin1("Failed to initialize plugin %1").arg(fullFilePath), cl_logERROR );
         return false;
     }
 
-    cl_log.log( QString::fromAscii("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
+    cl_log.log( QString::fromLatin1("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
     m_qtPlugins.push_back( plugin );
 
     emit pluginLoaded();
@@ -165,13 +165,19 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
     
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
     if( entryProc == NULL )
+    {
+        lib.unload();
         return false;
+    }
 
     nxpl::PluginInterface* obj = entryProc();
     if( !obj )
+    {
+        lib.unload();
         return false;
+    }
 
-    cl_log.log( QString::fromAscii("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
+    cl_log.log( QString::fromLatin1("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
     m_nxPlugins.push_back( obj );
 
     emit pluginLoaded();

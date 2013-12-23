@@ -1,7 +1,7 @@
 #ifndef LOCAL_FILE_CACHE_H
 #define LOCAL_FILE_CACHE_H
 
-#include <QObject>
+#include <QtCore/QObject>
 #include <utils/app_server_image_cache.h>
 
 class QnLocalFileCache : public QnAppServerImageCache

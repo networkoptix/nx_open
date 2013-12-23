@@ -1,6 +1,8 @@
 #ifndef vmax480_resource_searcher_h_1806
 #define vmax480_resource_searcher_h_1806
 
+#ifdef ENABLE_VMAX
+
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
 
 class CLSimpleHTTPClient;
@@ -35,5 +37,5 @@ private:
     int getApiPort(const QByteArray& answer) const;
 };
 
-
+#endif // #ifdef ENABLE_VMAX480
 #endif //vmax480_resource_searcher_h_1806

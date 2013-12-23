@@ -1,23 +1,20 @@
 #include "ptz_handler.h"
 
-#include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
-#include "utils/common/util.h"
-#include "utils/common/json.h"
-#include "utils/math/space_mapper.h"
-#include "core/resource/network_resource.h"
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource/camera_resource.h"
+#include <utils/common/json.h>
+#include <utils/common/lexical.h>
+#include <utils/network/tcp_connection_priv.h>
+
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/ptz_data.h>
+#include <core/ptz/ptz_controller_pool.h>
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
-QMap<QString, QnPtzHandler::SequenceInfo> QnPtzHandler::m_sequencedRequests;
-QMutex QnPtzHandler::m_sequenceMutex;
 
-
-QnPtzHandler::QnPtzHandler()
-{
-
+QnPtzHandler::QnPtzHandler() {
+    return;
 }
 
 void QnPtzHandler::cleanupOldSequence()
@@ -37,7 +34,7 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
 {
     QMutexLocker lock(&m_sequenceMutex);
     cleanupOldSequence();
-    if (id.isEmpty())
+    if (id.isEmpty() || sequence == -1)
         return true; // do not check if empty
 
     if (m_sequencedRequests[id].sequence > sequence)
@@ -47,192 +44,240 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(contentType)
-
-    QnVirtualCameraResourcePtr res;
-    QnAbstractPtzController* ptz = 0;
-    QString errStr;
-
-    QString localPath = path;
-    while(localPath.endsWith('/'))
-        localPath.chop(1);
-
-    QString action = localPath.mid(localPath.lastIndexOf('/') + 1);
-    
-    qreal xSpeed = 0;
-    qreal ySpeed = 0;
-    qreal zoomSpeed = 0;
-    qreal xPos = INT_MAX;
-    qreal yPos = INT_MAX;
-    qreal zoomPos = INT_MAX;
-    QString seqId;
-    int seqNum = 0;
-    
-    bool resParamFound = false;
-
-    for (int i = 0; i < params.size(); ++i)
-    {
-        if (params[i].first == "res_id")
-        {
-            resParamFound = true;
-            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
-            if (res) {
-                errStr.clear();
-                ptz = res->getPtzController();
-                if (res->getStatus() == QnResource::Offline || res->getStatus() == QnResource::Unauthorized) {
-                    errStr = QString("Resource %1 is not ready yet").arg(params[i].second);
-                }
-                else
-                {
-                    if (ptz == 0) {
-                        errStr = QString("PTZ control not supported by resource %1").arg(params[i].second);
-                    }
-                }
-            }
-            else {
-                errStr = QString("Camera resource %1 not found").arg(params[i].second);
-            }
-        }
-        else if (params[i].first == "xSpeed")
-            xSpeed = params[i].second.toDouble();
-        else if (params[i].first == "ySpeed")
-            ySpeed = params[i].second.toDouble();
-        else if (params[i].first == "zoomSpeed")
-            zoomSpeed = params[i].second.toDouble();
-        else if (params[i].first == "xPos")
-            xPos = params[i].second.toDouble();
-        else if (params[i].first == "yPos")
-            yPos = params[i].second.toDouble();
-        else if (params[i].first == "zoomPos")
-            zoomPos = params[i].second.toDouble();
-        else if (params[i].first == "seqId")
-            seqId = params[i].second;
-        else if (params[i].first == "seqNum")
-            seqNum = params[i].second.toInt();
-    }
-    if (!resParamFound)
-        errStr = QLatin1String("parameter 'res_id' is absent");
-    else if (action.isEmpty())
-    {
-        errStr = QLatin1String("PTZ action is not defined. Use api/ptz/<action> in HTTP path");
-    }
-
-    if (res)
-    {
-        // ignore other errors (resource status for example)
-        if (action == "calibrate") 
-        {
-            if (QnAbstractPtzController::calibrate(res, xSpeed, ySpeed, zoomSpeed))
-            {
-                result.append("<root>\n");
-                result.append("SUCCESS");
-                result.append("</root>\n");
-                return CODE_OK;
-            }
-            else {
-                errStr = "Can not save PTZ parameters to database";
-            }
-        }
-        else if (action == "getCalibrate") {
-            QnAbstractPtzController::getCalibrate(res, xSpeed, ySpeed, zoomSpeed);
-            result.append("<root>\n");
-            result.append("<velocity>\n");
-            QString velocity("<velocity xSpeed=\"%1\" ySpeed=\"%2\" zoomSpeed=\"%3\" />\n");
-            result.append(QString("<xSpeed>%1</xSpeed>").arg(xSpeed).toUtf8());
-            result.append(QString("<ySpeed>%1</ySpeed>").arg(ySpeed).toUtf8());
-            result.append(QString("<zoomSpeed>%1</zoomSpeed>").arg(zoomSpeed).toUtf8());
-            result.append("</velocity>\n");
-            result.append("</root>\n");
-            return CODE_OK;
-        }
-    }
-
-
-    if (!errStr.isEmpty()) {
-        result.append("<root>\n");
-        result.append(errStr);
-        result.append("</root>\n");
+int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+    QString sequenceId;
+    int sequenceNumber = -1;
+    Qn::PtzCommand command;
+    QString resourceId;
+    if(
+        !requireParameter(params, lit("command"), result, &command) || 
+        !requireParameter(params, lit("resourceId"), result, &resourceId) ||
+        !requireParameter(params, lit("sequenceId"), result, &sequenceId, true) ||
+        !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true)
+    ) {
         return CODE_INVALID_PARAMETER;
     }
 
-
-    if (action == "move")
-    {
-        if (checkSequence(seqId, seqNum)) {
-            if (ptz->startMove(xSpeed, ySpeed, zoomSpeed) != 0)
-                errStr = "Error executing PTZ command";
-        }
-    }
-    else if (action == "moveTo")
-    {
-        if (xPos == INT_MAX || yPos == INT_MAX) {
-            errStr = "Paremeters 'xPos', 'yPos' MUST be provided\n";
-        }
-        else if (checkSequence(seqId, seqNum)) {
-            if (ptz->moveTo(xPos, yPos, zoomPos) != 0)
-                errStr = "Error executing PTZ command";
-        }
-    }
-    else if (action == "getPosition")
-    {
-        if (ptz->getPosition(&xPos, &yPos, &zoomPos) != 0) {
-            errStr = "Error executing PTZ command";
-        }
-        else {
-            result.append("<root>\n");
-            result.append("<position>\n");
-            result.append(QString("<xPos>%1</xPos>").arg(xPos).toUtf8());
-            result.append(QString("<yPos>%1</yPos>").arg(yPos).toUtf8());
-            result.append(QString("<zoomPos>%1</zoomPos>").arg(zoomPos).toUtf8());
-            result.append("</position>\n");
-            result.append("</root>\n");
-            return CODE_OK;
-        }
-    }
-    else if (action == "stop")
-    {
-        if (checkSequence(seqId, seqNum)) {
-            if (ptz->stopMove() != 0)
-                errStr = "Error executing PTZ command";
-        }
-    }
-    else if (action == "getSpaceMapper")
-    {
-        QnAbstractPtzController *ptzController = res->getPtzController();
-        const QnPtzSpaceMapper *spaceMapper = ptzController ? ptzController->getSpaceMapper() : NULL;
-        if(spaceMapper) {
-            QVariantMap map;
-            QJson::serialize(*spaceMapper, "reply", &map);
-            QJson::serialize(map, &result);
-        } else {
-            result = "{ \"reply\": null }";
-        }
-        contentType = "application/json";
-    }
-    else 
-    {
-        errStr = QByteArray("Unknown ptz command ").append(action.toUtf8()).append("\n");
-    } 
-
-    if(contentType != "application/json") { // TODO: hack!
-        result.append("<root>\n");
-        if (errStr.isEmpty())
-            result.append("SUCCESS");
-        else
-            result.append(errStr);
-        result.append("</root>\n");
+    QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(resourceId).dynamicCast<QnVirtualCameraResource>();
+    if(!camera) {
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' not found.").arg(resourceId));
+        return CODE_INVALID_PARAMETER;
     }
 
-    return errStr.isEmpty() ? CODE_OK : CODE_INVALID_PARAMETER;
+    if (camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
+        result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' is not ready yet.").arg(resourceId));
+        return CODE_INVALID_PARAMETER;
+    }
 
+    QnPtzControllerPtr controller = qnPtzPool->controller(camera);
+    if (!controller) {
+        result.setError(QnJsonRestResult::InvalidParameter, lit("PTZ is not supported by camera '%1'.").arg(resourceId));
+        return CODE_INVALID_PARAMETER;
+    }
+
+    if(!checkSequence(sequenceId, sequenceNumber))
+        return CODE_OK;
+
+    switch(command) {
+    case Qn::ContinuousMovePtzCommand:      return executeContinuousMove(controller, params, result);
+    case Qn::AbsoluteDeviceMovePtzCommand:
+    case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
+    case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);
+    case Qn::GetDevicePositionPtzCommand:
+    case Qn::GetLogicalPositionPtzCommand:  return executeGetPosition(controller, params, result);
+    case Qn::CreatePresetPtzCommand:        return executeCreatePreset(controller, params, result);
+    case Qn::UpdatePresetPtzCommand:        return executeUpdatePreset(controller, params, result);
+    case Qn::RemovePresetPtzCommand:        return executeRemovePreset(controller, params, result);
+    case Qn::ActivatePresetPtzCommand:      return executeActivatePreset(controller, params, result);
+    case Qn::GetPresetsPtzCommand:          return executeGetPresets(controller, params, result);
+    case Qn::CreateTourPtzCommand:          return executeCreateTour(controller, params, body, result);
+    case Qn::RemoveTourPtzCommand:          return executeRemoveTour(controller, params, result);
+    case Qn::ActivateTourPtzCommand:        return executeActivateTour(controller, params, result);
+    case Qn::GetToursPtzCommand:            return executeGetTours(controller, params, result);
+    case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
+    default:                                return CODE_INVALID_PARAMETER;
+    }
 }
 
-int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
+int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    qreal xSpeed, ySpeed, zSpeed;
+    if(
+        !requireParameter(params, lit("xSpeed"), result, &xSpeed) || 
+        !requireParameter(params, lit("ySpeed"), result, &ySpeed) || 
+        !requireParameter(params, lit("zSpeed"), result, &zSpeed)
+    ) {
+        return CODE_INVALID_PARAMETER;
+    }
+
+    QVector3D speed(xSpeed, ySpeed, zSpeed);
+    if(!controller->continuousMove(speed))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Qn::PtzCommand command;
+    qreal xPos, yPos, zPos, speed;
+    if(
+        !requireParameter(params, lit("command"), result, &command) || 
+        !requireParameter(params, lit("xPos"), result, &xPos) || 
+        !requireParameter(params, lit("yPos"), result, &yPos) || 
+        !requireParameter(params, lit("zPos"), result, &zPos) ||
+        !requireParameter(params, lit("speed"), result, &speed)
+    ) {
+        return CODE_INVALID_PARAMETER;
+    }
+    
+    QVector3D position(xPos, yPos, zPos);
+    if(!controller->absoluteMove(command == Qn::AbsoluteDeviceMovePtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, position, speed))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio, speed;
+    if(
+        !requireParameter(params, lit("viewportTop"),       result, &viewportTop) || 
+        !requireParameter(params, lit("viewportLeft"),      result, &viewportLeft) || 
+        !requireParameter(params, lit("viewportBottom"),    result, &viewportBottom) ||
+        !requireParameter(params, lit("viewportRight"),     result, &viewportRight) || 
+        !requireParameter(params, lit("aspectRatio"),       result, &aspectRatio) ||
+        !requireParameter(params, lit("speed"),             result, &speed)
+    ) {
+        return CODE_INVALID_PARAMETER;
+    }
+    
+    QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
+    if(!controller->viewportMove(aspectRatio, viewport, speed))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Qn::PtzCommand command;
+    if(!requireParameter(params, lit("command"), result, &command))
+        return CODE_INVALID_PARAMETER;
+
+    QVector3D position;
+    if(!controller->getPosition(command == Qn::GetDevicePositionPtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, &position))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(position);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString presetId, presetName;
+    if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
+        return CODE_INVALID_PARAMETER;
+
+    QnPtzPreset preset(presetId, presetName);
+    if(!controller->createPreset(preset))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString presetId, presetName;
+    if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
+        return CODE_INVALID_PARAMETER;
+
+    QnPtzPreset preset(presetId, presetName);
+    if(!controller->updatePreset(preset))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString presetId;
+    if(!requireParameter(params, lit("presetId"), result, &presetId))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->removePreset(presetId))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString presetId;
+    qreal speed;
+    if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("speed"), result, &speed))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->activatePreset(presetId, speed))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
+    QnPtzPresetList presets;
+    if(!controller->getPresets(&presets))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(presets);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+    QnPtzTour tour;
+    if(!QJson::deserialize(body, &tour))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->createTour(tour))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeRemoveTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString tourId;
+    if(!requireParameter(params, lit("tourId"), result, &tourId))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->removeTour(tourId))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QString tourId;
+    if(!requireParameter(params, lit("tourId"), result, &tourId))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->activateTour(tourId))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
+    QnPtzTourList tours;
+    if(!controller->getTours(&tours))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(tours);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Qn::PtzDataFields query;
+    if(!requireParameter(params, lit("query"), result, &query))
+        return CODE_INVALID_PARAMETER;
+
+    QnPtzData data;
+    if(!controller->getData(query, &data))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(data);
+    return CODE_OK;
 }
 
 QString QnPtzHandler::description() const

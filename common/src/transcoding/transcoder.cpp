@@ -1,6 +1,9 @@
 #include "transcoder.h"
+
+#include <utils/math/math.h>
+#include <core/resource/media_resource.h>
+
 #include "ffmpeg_transcoder.h"
-#include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
@@ -103,7 +106,7 @@ QSize QnVideoTranscoder::getResolution() const
     return m_resolution;
 }
 
-bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
+bool QnVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
 {
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
@@ -337,7 +340,7 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
     return m_lastErrMessage.isEmpty();
 }
 
-int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* const result)
+int QnTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray* const result)
 {
     m_internalBuffer.clear();
     m_outputPacketSize.clear();
@@ -359,16 +362,16 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray* con
     if (!m_initialized)
     {
         if (media->dataType == QnAbstractMediaData::VIDEO)
-            m_delayedVideoQueue << qSharedPointerDynamicCast<QnCompressedVideoData> (media);
+            m_delayedVideoQueue << qSharedPointerDynamicCast<const QnCompressedVideoData> (media);
         else
-            m_delayedAudioQueue << qSharedPointerDynamicCast<QnCompressedAudioData> (media);
+            m_delayedAudioQueue << qSharedPointerDynamicCast<const QnCompressedAudioData> (media);
         media.clear();
         if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
             return 0; // not ready to init
         if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
             return 0; // not ready to init
-        int rez = open(m_delayedVideoQueue.isEmpty() ? QnCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
-                       m_delayedAudioQueue.isEmpty() ? QnCompressedAudioDataPtr() : m_delayedAudioQueue.first());
+        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
+                       m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
             return rez;
         m_initialized = true;

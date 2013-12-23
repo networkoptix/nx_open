@@ -7,8 +7,8 @@
 
 #include <memory>
 
-#include <QBuffer>
-#include <QMutexLocker>
+#include <QtCore/QBuffer>
+#include <QtCore/QMutexLocker>
 
 #include <core/resource/resource.h>
 #include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
@@ -70,11 +70,7 @@ AudioPlayer::ResultCode AudioPlayer::playbackResultCode() const
 
 bool AudioPlayer::playAsync( QIODevice* dataSource )
 {
-#if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#else
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#endif
     if( !audioPlayer->open( dataSource ) )
         return false;
 
@@ -87,11 +83,7 @@ bool AudioPlayer::playAsync( QIODevice* dataSource )
 
 bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const char *slot)
 {
-#if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#else
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#endif
     if( !audioPlayer->open( filePath ) )
         return false;
 
@@ -106,11 +98,7 @@ bool AudioPlayer::playFileAsync( const QString& filePath, QObject* target, const
 
 bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char *slot)
 {
-#if (GCC_VERSION >= 40700)
     std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#else
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
-#endif
     if( !audioPlayer->prepareTextPlayback( text ) )
         return false;
 
@@ -308,7 +296,7 @@ void AudioPlayer::closeNonSafe()
 bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 {
     const QString& temporaryFilePath = QString::number(rand());
-    const QString& temporaryResUrl = QString::fromAscii("%1://%2").arg(QLatin1String("qiodev")).arg(temporaryFilePath);
+    const QString& temporaryResUrl = QString::fromLatin1("%1://%2").arg(QLatin1String("qiodev")).arg(temporaryFilePath);
     m_storage->registerResourceData( temporaryFilePath, dataSource );
 
     std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );

@@ -1,7 +1,7 @@
 #ifndef QN_GRAPHICS_VIEW_H
 #define QN_GRAPHICS_VIEW_H
 
-#include <QGraphicsView>
+#include <QtWidgets/QGraphicsView>
 
 //#define QN_GRAPHICS_VIEW_DEBUG_PERFORMANCE
 
@@ -71,6 +71,7 @@ public:
 
     enum BehaviorFlag {
         CenterOnShow = 0x1,
+        InvokeInheritedMouseWheel = 0x2
     };
     Q_DECLARE_FLAGS(BehaviorFlags, BehaviorFlag);
 
@@ -97,8 +98,12 @@ public:
 protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
+    virtual void wheelEvent(QWheelEvent *event) override;
     virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
     virtual void drawForeground(QPainter *painter, const QRectF &rect) override;
+
+private:
+    bool isInRedirectedPaint() const;
 
 private:
     PaintFlags m_paintFlags;

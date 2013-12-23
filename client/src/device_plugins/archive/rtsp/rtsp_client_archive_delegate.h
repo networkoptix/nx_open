@@ -8,7 +8,7 @@
 #include "utils/common/util.h"
 #include "recording/time_period.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-
+#include "utils/network/ffmpeg_rtp_parser.h"
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
@@ -59,7 +59,7 @@ public:
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
-    QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum);
+    QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal(QnResourcePtr resource);
     void reopen();
@@ -78,14 +78,10 @@ private:
     RTPIODevice* m_rtpData;
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
-    QMap<int, QnMediaContextPtr> m_contextMap;
-    //QMap<quint32, quint32> m_timeStampCycles;
     QMap<quint32, quint16> m_prevTimestamp;
-    QMap<int, QnAbstractDataPacketPtr> m_nextDataPacket;
     qint64 m_position;
     QnDefaultResourceVideoLayout m_defaultVideoLayout;
     bool m_opened;
-    qint64 m_lastRtspTime;
     QnResourcePtr m_resource;
     //bool m_waitBOF;
     int m_lastPacketFlags;
@@ -109,6 +105,8 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayout* m_customVideoLayout;
+    
+    QMap<int, QnFfmpegRtpParserPtr> m_parsers;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

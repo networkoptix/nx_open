@@ -1,10 +1,10 @@
 #ifndef __EVENT_LOG_DIALOG_H__
 #define __EVENT_LOG_DIALOG_H__
 
-#include <QDialog>
-#include <QStandardItem>
-#include <QAbstractItemModel>
-#include <QModelIndex>
+#include <QtWidgets/QDialog>
+#include <QtGui/QStandardItem>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QModelIndex>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>

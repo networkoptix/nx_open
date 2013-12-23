@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <QMutex>
+#include <QtCore/QMutex>
 
 #include "core/resource/storage_resource.h"
 

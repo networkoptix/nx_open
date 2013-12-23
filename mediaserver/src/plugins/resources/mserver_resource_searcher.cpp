@@ -1,13 +1,20 @@
 #include "mserver_resource_searcher.h"
-#include "core/resource/resource.h"
-#include "utils/network/nettools.h"
-#include "utils/common/sleep.h"
-#include "serverutil.h"
-#include "utils/common/synctime.h"
+
 #include <business/business_event_connector.h>
-#include "settings.h"
-#include "core/resource_managment/resource_pool.h"
+
 #include "core/dataprovider/live_stream_provider.h"
+
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource/resource.h"
+#include <core/resource/media_server_resource.h>
+
+#include "utils/network/nettools.h"
+#include "utils/network/system_socket.h"
+#include "utils/common/sleep.h"
+#include "utils/common/synctime.h"
+
+#include "settings.h"
+#include "serverutil.h"
 
 static quint16 DISCOVERY_PORT = 54013;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
@@ -16,7 +23,7 @@ static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost()
 {
-    QByteArray result = qSettings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
+    QByteArray result = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
     if (result == "localhost" || result == "127.0.0.1")
     {
         QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
@@ -159,7 +166,7 @@ QnMServerResourceSearcher::QnMServerResourceSearcher():
 
 void QnMServerResourceSearcher::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     updateSocketList();
 
     while (!m_needStop)
@@ -220,7 +227,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
 
     for (int i = 0; i < m_socketList.size(); ++i)
     {
-        UDPSocket* sock = m_socketList[i];
+        AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
         QByteArray datagram = DiscoveryPacket::getRequest(m_appServerGuid);
@@ -241,7 +248,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
     }
 }
 
-void QnMServerResourceSearcher::readSocketInternal(UDPSocket* socket, QSet<QByteArray>& conflictList)
+void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QSet<QByteArray>& conflictList)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())

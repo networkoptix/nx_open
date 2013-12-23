@@ -84,6 +84,6 @@ private:
 
 #define cl_log (*QnLog::instance())
 
-QN_EXPORT void qnLogMsgHandler(QtMsgType type, const char *msg);
+QN_EXPORT void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
 
 #endif // QN_LOG_H

@@ -1,6 +1,7 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include "camera_plugin_types.h"
 #include "plugin_api.h"
 
 
@@ -22,6 +23,9 @@
 */
 namespace nxcip
 {
+    typedef unsigned long long int UsecUTCTimestamp;
+    static const UsecUTCTimestamp INVALID_TIMESTAMP_VALUE = (UsecUTCTimestamp)-1LL;
+
     static const int MAX_TEXT_LEN = 1024;
 
     //Error codes. Interface implementation MUST use these error codes when appropriate
@@ -30,11 +34,18 @@ namespace nxcip
     static const int NX_NOT_AUTHORIZED = -1;
     static const int NX_INVALID_ENCODER_NUMBER = -2;
     static const int NX_UNKNOWN_PORT_NAME = -3;
+    static const int NX_UNSUPPORTED_CODEC = -8;
     static const int NX_UNSUPPORTED_RESOLUTION = -9;
     static const int NX_UNDEFINED_BEHAVOUR = -20;
     static const int NX_NOT_IMPLEMENTED = -21;
     static const int NX_NETWORK_ERROR = -22;
     static const int NX_MORE_DATA = -23;
+    static const int NX_NO_DATA = -24;
+    static const int NX_IO_ERROR = -25;
+    //!Operation could not be completed now, but it may still be available later
+    static const int NX_TRY_AGAIN = -26;
+    //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
+    static const int NX_INTERRUPTED = -27;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -154,6 +165,9 @@ namespace nxcip
         virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, CameraInfo* cameraInfo ) = 0;
 
         //!Instanciates camera manager instance based on \a info
+        /*!
+            \note This method MUST be thread-safe (can be called by multiple threads using same interface pointer)
+        */
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
         //!Get model model names, reserved by the plugin
@@ -175,7 +189,7 @@ namespace nxcip
     {
         //!Width in pixels
         int width;
-        //!Hidth in pixels
+        //!Height in pixels
         int height;
 
         Resolution( int _width = 0, int _height = 0 )
@@ -200,6 +214,9 @@ namespace nxcip
         {
         }
     };
+
+
+    class StreamReader;
 
     // {528FD641-52BB-4f8b-B279-6C21FEF5A2BB}
     static const nxpl::NX_GUID IID_CameraMediaEncoder = { { 0x52, 0x8f, 0xd6, 0x41, 0x52, 0xbb, 0x4f, 0x8b, 0xb2, 0x79, 0x6c, 0x21, 0xfe, 0xf5, 0xa2, 0xbb } };
@@ -266,11 +283,77 @@ namespace nxcip
     };
 
 
+    struct AudioFormat
+    {
+        enum SampleType
+        {
+            stU8,   ///< unsigned 8 bits
+            stS16,  ///< signed 16 bits
+            stS32,  ///< signed 32 bits
+            stFLT
+        };
+
+        enum ByteOrderType
+        {
+            boLittleEndian,
+            boBigEndian
+        };
+
+        CompressionType compressionType;
+        int sampleRate;
+        //!in bps
+        int bitrate;
+        ByteOrderType byteOrder;
+        int channels;
+        SampleType sampleFmt;
+        int channelLayout;
+        int blockAlign;
+        int bitsPerCodedSample;
+
+        AudioFormat()
+        :
+            compressionType(CODEC_ID_NONE),
+            sampleRate(0),
+            bitrate(0),
+            byteOrder(boLittleEndian),
+            channels(0),
+            sampleFmt(stU8),
+            channelLayout(0),
+            blockAlign(0),
+            bitsPerCodedSample(0)
+        {
+        }
+    };
+
+        // {9A1BDA18-563C-42de-8E23-B9244FD00658}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
+
+    //!Extends \a CameraMediaEncoder by adding funtionality for plugin to directly provide live media stream
+    class CameraMediaEncoder2
+    :
+        public CameraMediaEncoder
+    {
+    public:
+        virtual ~CameraMediaEncoder2() {}
+
+        //!Returns stream reader, providing live data stream
+        /*!
+            This method is only used if \a BaseCameraManager::nativeMediaStreamCapability is present, otherwise \a CameraMediaEncoder::getMediaUrl is used
+
+            Can be used if camera uses some proprietary media stream control protocol or wants to provide motion information
+        */
+        virtual StreamReader* getLiveStreamReader() = 0;
+        //!Returns audio format, if audio is supported
+        virtual int getAudioFormat( AudioFormat* audioFormat ) const = 0;
+    };
+
+
     class CameraPTZManager;
     class CameraMotionDataProvider;
     class CameraRelayIOManager;
+    class DtsArchiveReader;
 
-        // {B7AA2FE8-7592-4459-A52F-B05E8E089AFE}
+    // {B7AA2FE8-7592-4459-A52F-B05E8E089AFE}
     static const nxpl::NX_GUID IID_BaseCameraManager = { { 0xb7, 0xaa, 0x2f, 0xe8, 0x75, 0x92, 0x44, 0x59, 0xa5, 0x2f, 0xb0, 0x5e, 0x8e, 0x8, 0x9a, 0xfe } };
 
     //!Provides base camera operations: getting/settings fps, resolution, bitrate, media stream url(s). Also provides pointer to other camera-management interfaces
@@ -305,7 +388,7 @@ namespace nxcip
         /*!
             Most likely will return same pointer on multiple requests with same \a encoderIndex
 
-            \param[in] encoderIndex
+            \param[in] encoderIndex encoder index starts with 0
             \param[out] encoderPtr
             \return \a NX_NO_ERROR on success, otherwise - error code:\n
                 - \a NX_INVALID_ENCODER_NUMBER wrong \a encoderIndex value
@@ -324,14 +407,17 @@ namespace nxcip
         //!Enumeration of supported camera capabilities (bit flags)
         enum CameraCapability
         { 
-            hardwareMotionCapability    = 0x01, //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a CameraMotionDataProvider interface
-            relayInputCapability        = 0x02, //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
-            relayOutputCapability       = 0x04, //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
-            ptzCapability               = 0x08, //!< if this flag is enabled, \a CameraPTZManager MUST be implemented
-            audioCapability             = 0x10, //!< if set, camera supports audio
-            shareFpsCapability          = 0x20, //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-            sharePixelsCapability       = 0x40, //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-            shareIpCapability           = 0x80  //!< allow multiple instances on a same IP address
+            hardwareMotionCapability            = 0x0001,     //!< camera supports hardware motion. Plugin, returning this flag, MUST implement \a BaseCameraManager::nativeMediaStreamCapability also
+            relayInputCapability                = 0x0002,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            relayOutputCapability               = 0x0004,     //!< if this flag is enabled, \a CameraRelayIOManager MUST be implemented
+            ptzCapability                       = 0x0008,     //!< if this flag is enabled, \a CameraPTZManager MUST be implemented
+            audioCapability                     = 0x0010,     //!< if set, camera supports audio
+            shareFpsCapability                  = 0x0020,     //!< if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
+            sharePixelsCapability               = 0x0040,     //!< if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+            shareIpCapability                   = 0x0080,     //!< allow multiple instances on a same IP address
+            dtsArchiveCapability                = 0x0100,     //!< camera has archive storage and provides access to its archive
+            nativeMediaStreamCapability         = 0x0200,     //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
+            primaryStreamSoftMotionCapability   = 0x0400      //!< it is allowed to detect motion by primary stream (if no dual streaming on camera)
         };
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
@@ -360,9 +446,10 @@ namespace nxcip
         /*!
             \note Increases \a CameraMotionDataProvider instance reference counter
             \note Most likely will return same pointer on multiple requests
+            \deprecated To receive motion data, use 
         */
         virtual CameraMotionDataProvider* getCameraMotionDataProvider() const = 0;
-        //!MUST return not-NULL if \a relayInputCapability is present
+        //!MUST return not-NULL if \a BaseCameraManager::relayInputCapability is present
         /*!
             \note Increases \a CameraRelayIOManager instance reference counter
             \note Most likely will return same pointer on multiple requests
@@ -374,6 +461,176 @@ namespace nxcip
             \param[out] errorString Buffer of size \a MAX_TEXT_LEN
         */
         virtual void getLastErrorString( char* errorString ) const = 0;
+    };
+
+
+    // {A2017C29-CE9E-4829-87BE-9287598A1358}
+    static const nxpl::NX_GUID IID_Picture = { { 0xa2, 0x01, 0x7c, 0x29, 0xce, 0x9e, 0x48, 0x29, 0x87, 0xbe, 0x92, 0x87, 0x59, 0x8a, 0x13, 0x58 } };
+
+    //!Picture
+    class Picture
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        virtual ~Picture() {}
+
+        //!Returns pixel format
+        virtual PixelFormat pixelFormat() const = 0;
+        //!Returns number of planes in picture (this depends on format)
+        virtual int planeCount() const = 0;
+        //!Width (pixels)
+        virtual int width() const = 0;
+        //!Height (pixels)
+        virtual int height() const = 0;
+        //!Length of horizontal line (in bytes) of plane \a planeNumber
+        virtual int xStride( int planeNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0) of plane \a planeNumber
+        virtual const void* scanLine( int planeNumber, int lineNumber ) const = 0;
+        //!Returns pointer to horizontal line \a lineNumber (starting with 0) of plane \a planeNumber
+        virtual void* scanLine( int planeNumber, int lineNumber ) = 0;
+        /*!
+            \return Picture data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
+                \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+        */
+        virtual void* data() = 0;
+        virtual const void* data() const = 0;
+    };
+
+
+    // {B0F07EAF-A59E-41fc-8F9E-86C323218554}
+    static const nxpl::NX_GUID IID_Iteratable = { { 0xb0, 0xf0, 0x7e, 0xaf, 0xa5, 0x9e, 0x41, 0xfc, 0x8f, 0x9e, 0x86, 0xc3, 0x23, 0x21, 0x85, 0x54 } };
+
+    //!Interface for class-container with element iterating support
+    /*!
+        \code{.cpp}
+        Iteratable* it;
+        for( it->goToBeginning(); !it->atEnd(); it->next() )
+        {
+            //processing data ...
+        }
+        \endcode
+    */
+    class Iteratable
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        //!Move cursor to the first position
+        virtual void goToBeginning() = 0;
+        /*!
+            \return true, if cursor is set to the next position. false, if already at the end of data
+        */
+        virtual bool next() = 0;
+        /*!
+            \return false, if cursor is already at end
+        */
+        virtual bool atEnd() const = 0;
+    };
+
+
+    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
+    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
+
+    //!Array of time periods
+    class TimePeriods
+    :
+        public Iteratable
+    {
+    public:
+        /*!
+            \param[out] start Start of time period (usec since 1970-01-01, UTC)
+            \param[out] end End of time period (usec since 1970-01-01, UTC)
+            \return \a true, if data present (cursor is on valid position)
+        */
+        virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) const = 0;
+    };
+
+
+    //!Set of options, used to search archive
+    struct ArchiveSearchOptions
+    {
+    public:
+        /*!
+            monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
+                the same as those of video picture. Motion data just designates video frame regions that are of interest.
+                If \a motionMask is NULL, then whole picture is of interest
+            \note Can be NULL
+            \note Motion mask is OPTIONAL. It is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is set
+                If plugin does not support \a BaseCameraManager2::searchByMotionMaskCapability capabilitym it MUST ignore this value
+        */
+        Picture* motionMask;
+        //!Min data timestamp that is of interest
+        UsecUTCTimestamp startTime;
+        //!Max data timestamp that is of interest
+        UsecUTCTimestamp endTime;
+        /*!
+            Requried period detalization level.
+            E.g., if two time periods have gap between them less than this value, those time periods SHOULD be reported as one.
+            0 means that all time periods MUST be returned
+            \note This parameter is used only if \a BaseCameraManager2::searchByMotionMaskCapability capability is supported
+            \note Support of this parameter is OPTIONAL. Implementation is allowed to ignore this value. Although, implementing it helps for better performance
+        */
+        unsigned long long periodDetailLevel;
+
+        ArchiveSearchOptions()
+        :
+            motionMask( 0 ),
+            startTime( INVALID_TIMESTAMP_VALUE ),
+            endTime( INVALID_TIMESTAMP_VALUE ),
+            periodDetailLevel( 0 )
+        {
+        }
+    };
+
+
+    // {1181F23B-071C-4608-89E3-648E1A735B54}
+    static const nxpl::NX_GUID IID_BaseCameraManager2 = { { 0x11, 0x81, 0xf2, 0x3b, 0x07, 0x1c, 0x46, 0x08, 0x89, 0xe3, 0x64, 0x8e, 0x1a, 0x73, 0x5b, 0x54 } };
+
+    //!Extends \a BaseCameraManager by adding remote archive storage support (e.g., storage is mounted directly to camera)
+    class BaseCameraManager2
+    :
+        public BaseCameraManager
+    {
+    public:
+        //!Enumeration of supported camera capabilities (bit flags)
+        enum CameraCapability2
+        { 
+            searchByMotionMaskCapability = 0x1000,  //!<if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            motionRegionCapability = 0x2000         //!<if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
+        };
+
+        virtual ~BaseCameraManager2() {}
+
+        //!Returns not NULL if \a BaseCameraManager::dtsArchiveCapability is supported
+        /*!
+            Always creates new object (to allow simultaneous multiple connections to archive)
+            \param[out] dtsArchiveReader Used to return archive reader on success
+            \return \b NX_NO_ERROR on success, otherwise - error code (in this case \a *dtsArchiveReader set to NULL)
+        */
+        virtual int createDtsArchiveReader( DtsArchiveReader** dtsArchiveReader ) const = 0;
+        //!Find regions of archive, satisfying given conditions
+        /*!
+            \param[in] searchOptions Conditions filtering archive. Implementation MUST support filtering by
+                \a ArchiveSearchOptions::startTime and \a ArchiveSearchOptions::endTime
+            \param[out] timePeriods
+            \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code
+            \note If nothing found, \a NX_NO_ERROR is returned and \a timePeriods is set to \a NULL
+        */
+        virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
+        //!If camera plugin implements this method, it MUST report motion only on for region specified (\a motionMask)
+        /*!
+            \param motionMask 8bpp (format \a nxcip::PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                pixel value designates motion sensitivity for pixel position.
+                255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
+                For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
+                If difference is less then value in a mask, motion is not detected.
+            \warning motion mask is rotated by 90 degrees clock-wise! That means, \a motionMask is actually \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
+                \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels in height
+            \return \b NX_NO_ERROR on success, otherwise - error code
+        */
+        virtual int setMotionMask( Picture* motionMask ) = 0;
     };
 
 
@@ -414,9 +671,9 @@ namespace nxcip
             AbsoluteTiltCapability              = 0x020,    //!< Camera supports absolute tilt.
             AbsoluteZoomCapability              = 0x040,    //!< Camera supports absolute zoom.
             LogicalPositionSpaceCapability      = 0x080,    //!< Camera supports absolute positioning in logical space ---
-                                                            //! degrees for pan and tilt and width-based 35mm-equivalent focal length for zoom.
+                                                            //! degrees for pan, tilt and fov (zoom).
 
-            AutomaticStateUpdateCapability      = 0x100,    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
+            AutomaticStateUpdateCapability      = 0x100    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
                                                             //! the user doesn't have to call \a updateState when it changes.
         };
 
@@ -453,37 +710,37 @@ namespace nxcip
 
         //!Move to absolute logical position
         /*!
-            Pan and tilt values are in degrees, zoom is in width-based 35mm-equivalent focal length. 
+            Pan, tilt and fov values are in degrees. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
-        virtual int setLogicalPosition( double pan, double tilt, double zoom ) = 0;
+        virtual int setLogicalPosition( double pan, double tilt, double fov ) = 0;
 
-        //!Get absolute logical position.
+        //!Get absolute logical position
         /*!
-            Pan and tilt values are in degrees, zoom is in 35mm equivalent.
+            Pan, tilt and fov values are in degrees. 
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
-        virtual int getLogicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
+        virtual int getLogicalPosition( double* pan, double* tilt, double* fov ) const = 0;
 
         struct LogicalPtzLimits {
             double minPan;
             double maxPan;
             double minTilt;
             double maxTilt;
-            double minZoom;
-            double maxZoom;
+            double minFov;
+            double maxFov;
         };
 
-        //!Get PTZ limits in logical space.
+        //!Get PTZ limits in logical space
         /*!
             This function must be implemented if \a LogicalPositionSpaceCapability is present.
             \return 0 on success, otherwise - error code
         */
         virtual int getLogicalLimits(LogicalPtzLimits *limits) = 0;
         
-        //!Updates stored camera state (e.g. flip & mirror) so that movement commands work properly.
+        //!Updates stored camera state (e.g. flip & mirror) so that movement commands work properly
         /*!
             This function is needed mainly for cameras that do not automatically
             adjust for flip, mirror and other changes in settings. 
@@ -493,6 +750,334 @@ namespace nxcip
             This function must be implemented if \a AutomaticStateUpdateCapability is not present.
         */
         virtual int updateState() = 0;
+    };
+
+
+    //!Type of packets provided by \a StreamReader
+    enum DataPacketType
+    {
+        //!Audio packet. Can contain mutiple audio frames
+        dptAudio,
+        //!Video packet. Usually contains one frame. Video packet class MUST inherit \a nxcip::VideoDataPacket
+        dptVideo,
+        //!Packet containing no data (e.g., signals end of stream)
+        /*!
+            Packet of this type MUST have \a MediaDataPacket::fReverseStream flag set properly
+        */
+        dptEmpty
+    };
+
+
+    // {763C93DC-A77D-41ff-8071-B64C4D3AFCFF}
+    static const nxpl::NX_GUID IID_MediaDataPacket = { { 0x76, 0x3c, 0x93, 0xdc, 0xa7, 0x7d, 0x41, 0xff, 0x80, 0x71, 0xb6, 0x4c, 0x4d, 0x3a, 0xfc, 0xff } };
+    //!Required alignment of \a MediaDataPacket::data() buffer
+    static const unsigned int MEDIA_DATA_BUFFER_ALIGNMENT = 32;
+
+    //!Portion of media data
+    class MediaDataPacket
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        enum Flags
+        {
+            //!e.g., h.264 IDR frame
+            fKeyPacket          = 0x01,
+            //!packet has been generated during playback of reverse stream. Packets of type \a dptEmpty MUST have this flag set if end-of-stream has been reached with reverse mode
+            fReverseStream      = 0x02,
+            //!set in first packet of gop block of reverse stream (see \a nxcip::DtsArchiveReader::setReverseMode)
+            fReverseBlockStart  = 0x04,
+            //!packet belongs to low-quality stream. If unset, assuming frame is in high quality
+            fLowQuality         = 0x08,
+            /*!
+                MUST be set after each \a nxcip::DtsArchiveReader::seek, \a nxcip::DtsArchiveReader::reverseModeCapability, 
+                \a nxcip::DtsArchiveReader::setQuality to signal discontinuity in timestamp
+            */
+            fStreamReset        = 0x10
+        };
+
+        //!Packet's timestamp (usec since 1970-01-01, UTC)
+        virtual UsecUTCTimestamp timestamp() const = 0;
+        //!Packet type
+        virtual DataPacketType type() const = 0;
+        //!Coded media stream data
+        /*!
+            Data format for different codecs:\n
+                - h.264 (\a nxcip::CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
+                    It is recommended that SPS and PPS are repeated before each group of pictures
+                - motion jpeg (\a nxcip::CODEC_ID_MJPEG): Each packet is a complete jpeg picture
+                - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
+            \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
+                \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+        */
+        virtual const void* data() const = 0;
+        //!Returns size (in bytes) of packet's data
+        virtual unsigned int dataSize() const = 0;
+        /*!
+            For video packet data contains number of camera sensor starting with 0 (e.g., panoramic camera has multiple sensors).\n
+            For audio, this is audio track number (in case of multiple microphones on camera device)
+        */
+        virtual unsigned int channelNumber() const = 0;
+        //!Constant from \a nxcip::CompressionType enumeration
+        virtual CompressionType codecType() const = 0;
+        //!Returns combination of values from \a MediaDataPacket::Flags enumeration
+        virtual unsigned int flags() const = 0;
+        //!Returns sequence number of command this packet belongs to
+        /*!
+            Command - it is a call to \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange.
+            In case of live stream \a cSeq is ignored
+        */
+        virtual unsigned int cSeq() const = 0;
+    };
+
+
+    static const unsigned int DEFAULT_MOTION_DATA_PICTURE_WIDTH = 44;
+    static const unsigned int DEFAULT_MOTION_DATA_PICTURE_HEIGHT = 32;
+
+
+    // {A85D884B-F05E-4fff-8B5A-E36570E73067}
+    static const nxpl::NX_GUID IID_VideoDataPacket = { { 0xa8, 0x5d, 0x88, 0x4b, 0xf0, 0x5e, 0x4f, 0xff, 0x8b, 0x5a, 0xe3, 0x65, 0x70, 0xe7, 0x30, 0x67 } };
+
+    //!Video packet. MUST contain complete frame (or field in case of interlaced video)
+    class VideoDataPacket
+    :
+        public MediaDataPacket
+    {
+    public:
+        //!Returns motion data. Can be NULL, if no motion
+        /*!
+            Motion data is a monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+                '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
+                those of video picture. Motion data just designates regions of video picture where motion has been detected.
+            \warning motion data MUST be rotated by 90 degrees clock-wise! That means, picture returned here is \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and
+                \a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH pixels height
+            \return motion data
+            \note size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels is required!
+                If picture has greater size, only required region will be used. If picture has less size, considering that missing region contains no motion
+        */
+        virtual Picture* getMotionData() const = 0;
+    };
+
+
+    // {AFE4EEDA-3770-42c3-8381-EE3B55522551}
+    static const nxpl::NX_GUID IID_StreamReader = { { 0xaf, 0xe4, 0xee, 0xda, 0x37, 0x70, 0x42, 0xc3, 0x83, 0x81, 0xee, 0x3b, 0x55, 0x52, 0x25, 0x51 } };
+
+    //!Used for reading media stream from camera
+    /*!
+        Provides synchronous API to receiving media stream
+        \note returns stream of media data of different types (video, audio)
+        \note This class itself does not add any delay into media stream. Data is returned upon its availability. 
+            E.g., while reading media stream from file with 30fps, actual data rate is not limited with 30fps, but with read speed only
+    */
+    class StreamReader
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        //!Returns media packet or NULL in case of error
+        /*!
+            If no data is available, blocks till some data becomes available or \a StreamReader::interrupt had been called
+            \param packet MUST NOT be \a NULL if \a nxcip::NX_NO_ERROR is returned
+            \return error code (\a nxcip::NX_NO_ERROR on success)
+            \note Returned packet has its ref counter set to 1
+            \note On end of data, \a nxcip::NX_NO_ERROR is returned and \a packet MUST have type \a dptEmpty
+            \note If two subsequent packets has timestamp difference greater than 2 seconds it is considered that timestamp discontinuity has occured
+            \note Packets of type \a dptEmpty MUST have flag \a MediaDataPacket::fReverseStream set if end-of-stream has been reached with reverse mode
+        */
+        virtual int getNextData( MediaDataPacket** packet ) = 0;
+
+        //!Interrupt \a StreamReader::getNextData blocked in other thread
+        virtual void interrupt() = 0;
+    };
+
+
+    enum MediaStreamQuality
+    {
+        //!Default quality SHOULD be high quality
+        msqDefault = 0,
+        //!High quality
+        /*!
+            It is implementation specific what is considered high quality. Generally, \a low quality SHOULD have bitrate several times lower than high
+        */
+        msqHigh,
+        //!Low quality
+        msqLow
+    };
+
+
+    // {CEB97832-E931-4965-9B18-A8A1557107D7}
+    static const nxpl::NX_GUID IID_DtsArchiveReader = { { 0xce, 0xb9, 0x78, 0x32, 0xe9, 0x31, 0x49, 0x65, 0x9b, 0x18, 0xa8, 0xa1, 0x55, 0x71, 0x7, 0xd7 } };
+
+    //!Provides access to archive, stored on camera
+    /*!
+        Implements methods to manage (seek, select playback direction, select stream quality) archive playback.
+
+        Media stream is provided by \a nxcip::StreamReader instance returned by \a nxcip::DtsArchiveReader::getStreamReader().
+
+        \par \b cSeq (command sequence counter)
+        Methods \a DtsArchiveReader::seek, \a DtsArchiveReader::setReverseMode, \a DtsArchiveReader::playRange accept \a cSeq value which
+        they MUST use in every media packet generated in response to this command
+
+        It is not required, that archive contains data from all encoders
+        \note By default, archive is positioned to the beginning, quality set to high and playback direction is forward
+        \note Methods of this class can be called in thread different from thread calling \a StreamReader::getNextData()
+    */
+    class DtsArchiveReader
+    :
+        public nxpl::PluginInterface
+    {
+    public:
+        enum Capabilities
+        {
+            //!Signals that reverse playback by GOP (group of picture) reordering is supported
+            /*!
+                Plugin MAY support backward playback by GOP (group of picture) reordering. If this is not supported, reverse playback is emulated by media server.\n
+                This capability is not required but can increase performance.\n
+
+                Reverse gop playback is organized in following way:\n
+                Assume, we have media stream consisting of 6 gop:\n
+
+                \code
+                ------ ------ ------ ------ ------ ------
+                |GOP1| |GOP2| |GOP3| |GOP4| |GOP5| |GOP6|
+                ------ ------ ------ ------ ------ ------
+                \endcode
+
+                To be able to play it in reverse mode, plugin passes GOPs in reverse mode (RB is "reverse block"):\n
+
+                \code
+                ------ | ------ | ------ | ------ | ------ | ------
+                |GOP6| | |GOP5| | |GOP4| | |GOP3| | |GOP2| | |GOP1|
+                ------ | ------ | ------ | ------ | ------ | ------
+                  RB1  |   RB2  |   RB3  |   RB4  |   RB5  |   RB6
+                \endcode
+
+                Reverse block can consist of multiple GOP. E.g.:\n
+
+                \code
+                ------ ------ | ------ ------ | ------ ------
+                |GOP5| |GOP6| | |GOP3| |GOP4| | |GOP1| |GOP2|
+                ------ ------ | ------ ------ | ------ ------
+                     RB1      |      RB2      |      RB3
+                \endcode
+
+                - each packet in this stream MUST contain \a MediaDataPacket::fReverseStream flag
+                - first packet of each GOP MUST be key-frame and contain \a MediaDataPacket::fKeyPacket flag
+                - first packet of each RB MUST contain \a MediaDataPacket::fReverseBlockStart flag
+
+                Such stream is played by decoding the whole RB and then playing decoded frames in reverse order
+
+                \note Frames within each GOP MUST be in their original order (i.e., decoding order)
+                \note Once again, this is an optional functionality for plugin
+            */
+            reverseGopModeCapability        = 0x01,
+            //!frame skipping with \a DtsArchiveReader::setSkipFrames method is supported
+            /*!
+                \note This funtionality is optional. Helps for better performance
+            */
+            skipFramesCapability            = 0x02,
+            //!motion data can be provided in media stream
+            motionDataCapability            = 0x04
+        };
+
+        //!Returns bit mask with supported capabilities
+        virtual unsigned int getCapabilities() const = 0;
+
+        //!Initialize connection to archive
+        /*!
+            \return zero on success, error code in case on failure. Use \a DtsArchiveReader::getLastErrorString to get error description
+        */
+        virtual int open() = 0;
+        //!Returns stream reader
+        /*!
+            \a DtsArchiveReader instance holds reference to returned \a StreamReader instance
+        */
+        virtual StreamReader* getStreamReader() = 0;
+        //!Returns timestamp (usec since 1970-01-01, UTC) of oldest data, present in the archive
+        /*!
+            This value can be changed at any time (if record is ongoing)
+        */
+        virtual UsecUTCTimestamp startTime() const = 0;
+        //!Returns timestamp (usec since 1970-01-01, UTC) of newest data, present in the archive
+        /*!
+            This value can be changed at any time (if record is ongoing)
+        */
+        virtual UsecUTCTimestamp endTime() const = 0;
+        //!Seek to specified posiition in stream
+        /*!
+            Implementation is allowed to jump to frame with timestamp next to requested (i.e., \a lower_bound algorithm is implied to find frame)
+            \param[in] cSeq New value of command sequence counter
+            \param[in] timestamp timestamp to seek to
+            \param[in] findKeyFrame If \a true, MUST jump to key-frame only (selected frame timestamp MUST be equal or less than requested)
+            \param[out] selectedPosition Timestamp of actually selected position
+            \return\n
+                - \a NX_NO_ERROR on success
+                - \a NX_NO_DATA if \a timestamp is greater than timestamp of the last frame of the archive (in case of if forward play) and 
+                    if \a timestamp is less than timestamp of the first frame of the archive (in case of reverse play)
+            \note This funtionality is required
+        */
+        virtual int seek(
+            unsigned int cSeq,
+            UsecUTCTimestamp timestamp,
+            bool findKeyFrame,
+            UsecUTCTimestamp* selectedPosition ) = 0;
+        //!Set playback direction (forward/reverse)
+        /*!
+            If \a timestamp is not equal to \a INVALID_TIMESTAMP_VALUE, seek is performed along with playback direction change
+            \param[in] cSeq New value of command sequence counter
+            \param[in] isReverse If true, playback 
+            \param[in] position if not \a INVALID_TIMESTAMP_VALUE, playback SHOULD jump to this position (with rules, defined for \a DtsArchiveReader::seek)
+            \param[out] selectedPosition Timestamp of actually selected position
+            \note This method is used only if \a DtsArchiveReader::reverseModeCapability is supported
+            \return \a NX_NO_ERROR on success, otherwise - error code
+            \note This funtionality is optional
+            \note If end-of-stream reached with reverse mode, packets of type \a dptEmpty MUST have flag \a MediaDataPacket::fReverseStream set
+        */
+        virtual int setReverseMode(
+            unsigned int cSeq,
+            bool isReverse,
+            UsecUTCTimestamp timestamp,
+            UsecUTCTimestamp* selectedPosition ) = 0;
+        //!Returns \a true if reverse mode is currently on
+        virtual bool isReverseModeEnabled() const = 0;
+        //!Toggle motion data in media stream on/off
+        /*!
+            \return \a NX_NO_ERROR on success, otherwise - error code
+            \note This funtionality is optional
+        */
+        virtual int setMotionDataEnabled( bool motionPresent ) = 0;
+        //!Select media stream quality (used for dynamic media stream adaptation)
+        /*!
+            Media stream switching may not occur immediately, depending on \a waitForKeyFrame argument
+            \param[in] quality Media stream quality
+            \param[in] waitForKeyFrame If \a true, implementation SHOULD switch only on reaching next key frame of new stream.
+                If \a false, \a StreamReader instance SHOULD switch immediately to the key frame of new stream with greatest pts, not exceeding current
+            \return \a NX_NO_ERROR on success (requested data present in the stream). Otherwise - error code.\n
+                If requested quality is not supported, \a NX_NO_DATA is returned
+            \note \a nxcip::msqDefault MUST always be supported
+            \note This funtionality is optional
+        */
+        virtual int setQuality(
+            MediaStreamQuality quality,
+            bool waitForKeyFrame ) = 0;
+        //!Play time range [start; end) skipping frames
+        /*!
+            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec.
+            When frame skipping is implied, audio packets SHOULD not be reported
+            \param[in] cSeq New value of command sequence counter
+            \param start Position to seek to
+            \param endTimeHint Used to hint implementation that packets with greater timestamp are of no interest. Implementation MAY NOT cache (if it does) data with greater timestamp
+            \param step If 0, no frames MUST be skipped
+            \note Used only if \a DtsArchiveReader::skipFramesCapability is set
+            \note If frame skipping is enabled only key frames SHOULD be provided by \a StreamReader::getNextData call
+            \note This is used to generate thumbnails
+            \note This funtionality is optional
+        */
+        virtual int playRange(
+            unsigned int cSeq,
+            UsecUTCTimestamp start,
+            UsecUTCTimestamp endTimeHint,
+            unsigned int step ) = 0;
 
         //!Returns text description of the last error
         /*!
@@ -511,7 +1096,7 @@ namespace nxcip
         public nxpl::PluginInterface
     {
     public:
-        //TODO for later use
+        //TODO for future use
     };
 
 

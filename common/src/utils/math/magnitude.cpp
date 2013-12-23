@@ -42,6 +42,7 @@ namespace {
     public:
         Storage() {
             insert(new NoopMagnitudeCalculator());
+            insert(QMetaType::Void, new NoopMagnitudeCalculator());
             insert(new StandardMagnitudeCalculator<int>());
             insert(new StandardMagnitudeCalculator<long>());
             insert(new StandardMagnitudeCalculator<long long>());
@@ -97,7 +98,7 @@ qreal calculateMagnitude(long value) {
 }
 
 qreal calculateMagnitude(long long value) {
-#if defined(_MSC_VER) && _MSC_VER < 1600 /* VC++ 2008 and earlier */
+#if (defined(_MSC_VER) && _MSC_VER < 1600) || (defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 5))) /* VC++ 2008 and earlier */
     return qAbs(value);
 #else
     return std::abs(value);

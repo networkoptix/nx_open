@@ -292,7 +292,7 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::start()
 
 int QnDesktopFileEncoder::EncodedAudioInfo::audioPacketSize()
 {
-    return m_owner->m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
+    return m_owner->m_audioCodecCtx->frame_size * m_audioFormat.channelCount() * m_audioFormat.sampleSize()/8;
 }
 
 bool QnDesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
@@ -300,12 +300,12 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
     m_audioFormat = m_audioDevice.preferredFormat();
     m_audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
     m_audioFormat.setSampleSize(16);
-    m_audioFormat.setChannels(2);
+    m_audioFormat.setChannelCount(2);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);
 
     if (!m_audioDevice.isFormatSupported(m_audioFormat))
     {
-        m_audioFormat.setChannels(1);
+        m_audioFormat.setChannelCount(1);
         if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
             m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
@@ -324,9 +324,9 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
     int devId = nameToWaveIndex();
     WAVEFORMATEX wfx;
     //HRESULT hr;
-    wfx.nSamplesPerSec = m_audioFormat.frequency();
+    wfx.nSamplesPerSec = m_audioFormat.sampleRate();
     wfx.wBitsPerSample = m_audioFormat.sampleSize();
-    wfx.nChannels = m_audioFormat.channels();
+    wfx.nChannels = m_audioFormat.channelCount();
     wfx.cbSize = 0;
 
     wfx.wFormatTag = WAVE_FORMAT_PCM;
@@ -364,7 +364,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
                    int desktopNum,
                    const QnAudioDeviceInfo* audioDevice,
                    const QnAudioDeviceInfo* audioDevice2,
-                   QnScreenGrabber::CaptureMode captureMode,
+                   Qn::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -474,7 +474,7 @@ bool QnDesktopFileEncoder::init()
     QString videoCodecName = QLatin1String("mpeg4"); // "libx264"
     if (m_encodeQualuty <= 0.5)
         videoCodecName = QLatin1String("mpeg2video");
-    AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
+    AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().constData());
     if(videoCodec == 0)
     {
         m_lastErrorStr = tr("Can't find video encoder ") + videoCodecName;
@@ -567,7 +567,7 @@ bool QnDesktopFileEncoder::init()
         QStringList param = prop_list.at(i).split(QLatin1Char('='), QString::SkipEmptyParts);
         if (param.size()==2)
         {
-            int res = av_set_string3(m_videoCodecCtx, param.at(0).trimmed().toAscii().data(), param.at(1).trimmed().toAscii().data(), 1, NULL);
+            int res = av_set_string3(m_videoCodecCtx, param.at(0).trimmed().toLatin1().data(), param.at(1).trimmed().toLatin1().data(), 1, NULL);
             if (res != 0)
                 cl_log.log(QLatin1String("Wrong option for video codec:"), param.at(0), cl_logWARNING);
         }
@@ -618,7 +618,7 @@ bool QnDesktopFileEncoder::init()
         }
 
         QString audioCodecName = QLatin1String("libmp3lame"); // ""aac
-        AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toAscii().constData());
+        AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toLatin1().constData());
         if(audioCodec == 0)
         {
             m_lastErrorStr = QLatin1String("Can't find audio encoder") + audioCodecName;
@@ -630,8 +630,8 @@ bool QnDesktopFileEncoder::init()
         m_audioCodecCtx->codec_id = m_outputCtx->audio_codec;
         m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
         m_audioCodecCtx->sample_fmt = CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
-        m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channels();
-        m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.frequency();
+        m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channelCount();
+        m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.sampleRate();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
         m_audioCodecCtx->time_base         = audioRational;
         m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
@@ -760,12 +760,12 @@ int QnDesktopFileEncoder::processData(bool flush)
                 buffer2 = 0;
             }
             */
-            if (ai->m_audioFormat.channels() == 1)
+            if (ai->m_audioFormat.channelCount() == 1)
             {
                 monoToStereo((qint16*) ai->m_tmpAudioBuffer.data.data(), buffer1, stereoPacketSize/4);
                 buffer1 = (qint16*) ai->m_tmpAudioBuffer.data.data();
             }
-            if (ai2->m_audioFormat.channels() == 1)
+            if (ai2->m_audioFormat.channelCount() == 1)
             {
                 monoToStereo((qint16*) ai2->m_tmpAudioBuffer.data.data(), buffer2, stereoPacketSize/4);
                 buffer2 = (qint16*) ai2->m_tmpAudioBuffer.data.data();
@@ -809,8 +809,8 @@ void QnDesktopFileEncoder::run()
             m_capturingStopped = true;
         }
 
-        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
-        if (!capturedData.opaque)
+        CaptureInfoPtr capturedData = m_grabber->getNextFrame();
+        if (!capturedData->opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 

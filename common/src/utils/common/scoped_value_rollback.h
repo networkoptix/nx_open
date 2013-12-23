@@ -3,7 +3,13 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QObject>
-#include <QVariant>
+#include <QtCore/QVariant>
+
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/tuple/enum.hpp>
+
+class QnGenericScopedValueRollbackBase {};
 
 template<class T, class Object, class Setter, class Getter>
 class QnGenericScopedValueRollback {
@@ -107,6 +113,16 @@ public:
         base_type(object, sg_type(name), sg_type(name), newValue)
     {}
 };
+
+
+#define QN_GENERIC_SCOPED_ROLLBACK_I(TYPE, NAME, ... /* CONSTRUCTOR */) \
+    BOOST_PP_TUPLE_ENUM(TYPE) NAME(__VA_ARGS__); Q_UNUSED(NAME);
+
+#define QN_GENERIC_SCOPED_ROLLBACK(TYPE, ... /* CONSTRUCTOR */)         \
+    QN_GENERIC_SCOPED_ROLLBACK_I(TYPE, BOOST_PP_CAT(scoped_rollback_, __LINE__), ##__VA_ARGS__)
+
+#define QN_SCOPED_VALUE_ROLLBACK(VARIABLE, ... /* VALUE */)                     \
+    QN_GENERIC_SCOPED_ROLLBACK((QnScopedValueRollback<boost::remove_reference<decltype(*(VARIABLE))>::type>), VARIABLE, ##__VA_ARGS__)
 
 
 #endif // QN_SCOPED_VALUE_ROLLBACK_H

@@ -1,13 +1,14 @@
 #include "ffmpeg.h"
 
-#include <QThread>
+#include <QtCore/QThread>
 
 #include "utils/media/nalUnits.h"
 
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
-#include "utils/math/math.h"
+
+#include <utils/math/math.h>
 
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
@@ -37,7 +38,7 @@ struct FffmpegLog
 };
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     m_width(0),
@@ -139,7 +140,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
     m_motionMap.clear();
 }
 
-void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr data)
 {
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
@@ -186,7 +187,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
     //m_context->flags |= CODEC_FLAG_GRAY;
 }
 
-void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
 {
     m_codec = findCodec(m_codecId);
 
@@ -235,11 +236,20 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 //    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
-void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
 {
     //closeDecoder();
     //openDecoder();
     //return;
+
+    if (m_passedContext && data->context->ctx())
+        avcodec_copy_context(m_passedContext, data->context->ctx());
+    if (m_passedContext && m_passedContext->width && m_passedContext->height)
+    {
+        m_currentWidth = m_passedContext->width;
+        m_currentHeight = m_passedContext->height;
+    }
+    
     
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     if (m_context->codec)
@@ -310,9 +320,24 @@ void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
     }
 }
 
+void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr data, int width, int height)
+{
+    if (m_currentWidth == -1) {
+        m_currentWidth = width;
+        m_currentHeight = height;
+    }
+    else if (width != m_currentWidth || height != m_currentHeight)
+    {
+        m_currentWidth = width;
+        m_currentHeight = height;
+        m_needRecreate = false;
+        resetDecoder(data);
+    }
+}
+
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
+bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     AVFrame* copyFromFrame = m_frame;
@@ -416,18 +441,16 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPo
                 const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
                 sps.decodeBuffer(curPtr + nalLen, end);
                 sps.deserialize();
-                if (m_currentWidth == -1) {
-                    m_currentWidth = sps.getWidth();
-                    m_currentHeight = sps.getHeight();
-                }
-                else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
-                {
-                    m_currentWidth = sps.getWidth();
-                    m_currentHeight = sps.getHeight();
-                    resetDecoder(data);
-                }
+                processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
             }
         }
+        else if (data->context && data->context->ctx())
+        {
+            AVCodecContext* ctx = data->context->ctx();
+            if (ctx->width && ctx->height)
+                processNewResolutionIfChanged(data, ctx->width, ctx->height);
+        }
+
         if (data->motion) {
             while (m_motionMap.size() > MAX_DECODE_THREAD+1)
                 m_motionMap.remove(0);
@@ -612,7 +635,7 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat() const
 
 QnAbstractPictureDataRef::PicStorageType CLFFmpegVideoDecoder::targetMemoryType() const
 {
-	return QnAbstractPictureDataRef::pstSysMemPic;
+    return QnAbstractPictureDataRef::pstSysMemPic;
 }
 
 QSize CLFFmpegVideoDecoder::getOriginalPictureSize() const

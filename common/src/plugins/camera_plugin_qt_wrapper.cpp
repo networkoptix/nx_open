@@ -5,7 +5,7 @@
 
 #include "camera_plugin_qt_wrapper.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 
 namespace nxcip_qt
@@ -242,13 +242,6 @@ namespace nxcip_qt
     {
         QMutexLocker lk( &m_mutex );
         return m_intf->getPTZManager();
-    }
-
-    //!See nxcip::BaseCameraManager::getCameraMotionDataProvider
-    nxcip::CameraMotionDataProvider* BaseCameraManager::getCameraMotionDataProvider() const
-    {
-        QMutexLocker lk( &m_mutex );
-        return m_intf->getCameraMotionDataProvider();
     }
 
     //!See nxcip::BaseCameraManager::getCameraRelayIOManager

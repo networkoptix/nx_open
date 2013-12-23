@@ -1,36 +1,38 @@
 #ifndef QN_FISHEYE_SETTINGS_WIDGET_H
 #define QN_FISHEYE_SETTINGS_WIDGET_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QImage>
+#include <QtWidgets/QWidget>
 
-#include <core/resource/camera_resource.h>
-
-#include <QWidget>
+#include <core/resource/resource_fwd.h>
 
 namespace Ui {
     class FisheyeSettingsWidget;
 }
 
-class QnFisheyeSettingsWidget : public QWidget {
+
+class QnFisheyeSettingsWidget : public QWidget{
     Q_OBJECT
+
+    typedef QWidget base_type;
 public:
     QnFisheyeSettingsWidget(QWidget* parent = 0);
     virtual ~QnFisheyeSettingsWidget();
 
-    void updateFromResource(QnSecurityCamResourcePtr camera);
+    void updateFromResource(const QnResourcePtr &resource);
+    void submitToResource(const QnResourcePtr &resource);
 
-    DewarpingParams dewarpingParams() const;
 signals:
     void dataChanged();
-private:
-    qreal getAngle();
+
 private slots:
     void at_dataChanged();
-    void at_angleDataChanged();
+
+    void updateSliderFromSpinbox(double value);
+    void updateSpinboxFromSlider(int value);
 private:
     QScopedPointer<Ui::FisheyeSettingsWidget> ui;
-    bool m_silenseMode;
-    DewarpingParams m_dewarpingParams;
+    bool m_updating;
 };
 
 #endif // QN_FISHEYE_SETTINGS_WIDGET_H

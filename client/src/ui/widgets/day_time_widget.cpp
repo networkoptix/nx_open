@@ -1,9 +1,11 @@
 #include "day_time_widget.h"
 
-#include <QVBoxLayout>
-#include <QTableWidget>
-#include <QLabel>
-#include <QLocale>
+#include <QtCore/QLocale>
+
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>
@@ -47,13 +49,13 @@ public:
         setTabKeyNavigation(false);
         setShowGrid(false);
         verticalHeader()->setVisible(false);
-        verticalHeader()->setResizeMode(QHeaderView::Stretch);
+        verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         verticalHeader()->setMinimumSectionSize(0);
-        verticalHeader()->setClickable(false);
+        verticalHeader()->setSectionsClickable(false);
         horizontalHeader()->setVisible(false);
-        horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+        horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         horizontalHeader()->setMinimumSectionSize(0);
-        horizontalHeader()->setClickable(false);
+        horizontalHeader()->setSectionsClickable(false);
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setSelectionBehavior(QAbstractItemView::SelectItems);

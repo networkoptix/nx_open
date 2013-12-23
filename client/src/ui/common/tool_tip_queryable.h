@@ -2,7 +2,7 @@
 #define QN_TOOL_TIP_QUERYABLE_H
 
 #include <QtCore/QString>
-#include <QPointF>
+#include <QtCore/QPointF>
 
 /**
  * This class is a workaround for a problem with total impossibility of

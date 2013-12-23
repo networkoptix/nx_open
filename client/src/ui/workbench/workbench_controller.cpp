@@ -4,25 +4,27 @@
 #include <cmath> /* For std::floor. */
 #include <limits>
 
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGLWidget>
-#include <QGraphicsLinearLayout>
-#include <QAction>
-#include <QMenu>
-#include <QMessageBox>
-#include <QLabel>
-#include <QPropertyAnimation>
-#include <QFileInfo>
-#include <QSettings>
-#include <QFileDialog>
-#include <QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtOpenGL/QGLWidget>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QLabel>
+#include <QtCore/QPropertyAnimation>
+#include <QtCore/QFileInfo>
+#include <QtCore/QSettings>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
 #include <utils/math/color_transformations.h>
+
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -90,8 +92,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
-#include "workbench_ptz_preset_manager.h"
-
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -142,6 +142,34 @@ namespace {
     const qreal widgetManipulationOpacity = 0.3;
 
 } // anonymous namespace
+
+
+/*!
+    Returns true if widget has checked option not set
+*/
+class ResourceWidgetHasNoOptionCondition
+:
+    public InstrumentItemCondition
+{
+public:
+    ResourceWidgetHasNoOptionCondition( QnResourceWidget::Option optionToCheck )
+    :
+        m_optionToCheck( optionToCheck )
+    {
+    }
+
+    //!Implementation of InstrumentItemCondition::oeprator()
+    virtual bool operator()(QGraphicsItem *item, Instrument* /*instrument*/) const
+    {
+        QnResourceWidget* resourceWidget = dynamic_cast<QnResourceWidget*>(item);
+        if( !resourceWidget )
+            return true;
+        return (resourceWidget->options() & m_optionToCheck) == 0;
+    }
+
+private:
+    QnResourceWidget::Option m_optionToCheck;
+};
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
@@ -213,6 +241,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_resizingInstrument->setEffectRadius(8);
 
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
+    m_rotationInstrument->addItemCondition(new ResourceWidgetHasNoOptionCondition( QnResourceWidget::WindowRotationForbidden ));
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
@@ -372,6 +401,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
+    m_wheelZoomInstrument->recursiveDisable();
     m_zoomedToggle = new QnToggle(false, this);
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
@@ -379,6 +409,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_rubberBandInstrument,         SLOT(recursiveEnable()));
+    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
+    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        this,                           SLOT(at_zoomedToggle_activated()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
@@ -731,20 +763,18 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_7:
     case Qt::Key_8:
     case Qt::Key_9: {
-        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-        if(!widget)
-            break;
-
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if(!camera)
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+        if(!widget || !widget->ptzController())
             break;
 
         int hotkey = e->key() - Qt::Key_0;
-        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
-        if(preset.isNull())
+
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->resource()->toResourcePtr(), hotkey);
+        if (presetId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::PtzPresetIdRole, presetId));
+        break;
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
@@ -1034,6 +1064,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
+    data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
@@ -1353,7 +1384,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
         if (m_tourModeHintLabel) {
             m_tourModeHintLabel->hideImmideately();
-            disconnect(m_tourModeHintLabel, 0, this, 0);
+            disconnect(m_tourModeHintLabel, NULL, this, NULL);
             m_tourModeHintLabel = NULL;
         }
         return;

@@ -8,9 +8,9 @@
 
 #include <memory>
 
-#include <QIODevice>
-#include <QMutex>
-#include <QWaitCondition>
+#include <QtCore/QIODevice>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 extern "C"
 {

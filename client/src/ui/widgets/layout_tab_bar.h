@@ -1,7 +1,7 @@
 #ifndef QN_LAYOUT_TAB_BAR_H
 #define QN_LAYOUT_TAB_BAR_H
 
-#include <QTabBar>
+#include <QtWidgets/QTabBar>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -24,6 +24,7 @@ public:
     virtual Qn::ActionScope currentScope() const override;
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
+    void tabTextChanged();
 
 protected:
     virtual QSize minimumSizeHint() const override;

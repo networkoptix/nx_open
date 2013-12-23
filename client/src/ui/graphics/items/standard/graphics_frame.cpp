@@ -1,11 +1,11 @@
 #include "graphics_frame.h"
 #include "graphics_frame_p.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsSceneEvent>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOption>
 
 void GraphicsFramePrivate::updateStyledFrameWidths()
 {
@@ -225,7 +225,7 @@ void GraphicsFrame::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::StyleChange)
         d_func()->updateFrameWidth();
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     else if (event->type() == QEvent::MacSizeChange)
         d_func()->updateFrameWidth();
 #endif

@@ -10,7 +10,7 @@ class QnLocalFileProcessor : public QObject, public QnResourceProcessor
 {
     Q_OBJECT
 public:
-    void processResources(const QnResourceList &resources);
+    virtual void processResources(const QnResourceList &resources) override;
 };
 
 class QnServerCamera: public QnVirtualCameraResource
@@ -19,21 +19,22 @@ class QnServerCamera: public QnVirtualCameraResource
 public:
     QnServerCamera();
 
-    virtual bool isResourceAccessible();
-    virtual bool updateMACAddress();
+    virtual bool isResourceAccessible() override;
+    virtual bool updateMACAddress() override;
     virtual QString getDriverName() const override;
-    virtual void setIframeDistance(int frames, int timems);
+    virtual void setIframeDistance(int frames, int timems) override;
 
-    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceVideoLayout *getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceAudioLayout *getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
 
     QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 
-    QnServerCameraPtr findEnabledSubling();
+    QnServerCameraPtr findEnabledSibling();
+
 protected:
     virtual QString getUniqueId() const override;
-    virtual void setCropingPhysical(QRect croping);
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
+    virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+
 private:
     QnServerCameraPtr m_activeCamera;
 };
@@ -41,7 +42,7 @@ private:
 class QnServerCameraFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
 
     static QnServerCameraFactory& instance();
 };

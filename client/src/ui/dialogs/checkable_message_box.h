@@ -1,9 +1,9 @@
 #ifndef QN_CHECKABLE_MESSAGE_BOX_H
 #define QN_CHECKABLE_MESSAGE_BOX_H
 
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QScopedPointer>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtCore/QScopedPointer>
 
 class QnCheckableMessageBoxPrivate;
 

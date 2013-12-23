@@ -1,9 +1,14 @@
+
 #include "layout_resource.h"
+
+#include <list>
+
 #include <utils/common/warnings.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_pool.h"
+
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
@@ -64,7 +69,7 @@ void QnLayoutResource::setUrl(const QString& value)
         for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
         {
             QnLayoutItemData& item = itr.value();
-            item.resource.path = updateNovParent(value, item.resource.path);
+            item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
         }
     }
 }
@@ -156,11 +161,28 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     if(pos == m_itemByUuid.end())
         return;
 
-    QnLayoutItemData item = *pos;
+    std::list<QnLayoutItemData> removedItems;
+
+    //removing associated zoom items
+    for( auto it = m_itemByUuid.begin(); it != m_itemByUuid.end(); )
+    {
+        if( it->zoomTargetUuid == itemUuid )
+        {
+            removedItems.push_front( *it );
+            it = m_itemByUuid.erase( it );
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    removedItems.push_back( *pos );
     m_itemByUuid.erase(pos);
 
     m_mutex.unlock();
-    emit itemRemoved(::toSharedPointer(this), item);
+    for( auto item: removedItems )
+        emit itemRemoved(::toSharedPointer(this), item);
     m_mutex.lock();
 }
 
@@ -172,15 +194,6 @@ QnTimePeriod QnLayoutResource::getLocalRange() const
 void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
 {
     m_localRange = value;
-}
-
-QString QnLayoutResource::updateNovParent(const QString& novName, const QString& itemName)
-{
-    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
-    QString normNovName = novName;
-    if (!normNovName.startsWith(QLatin1String("layout://")))
-        normNovName = QLatin1String("layout://") + normNovName;
-    return normNovName + QLatin1String("?") + normItemName;
 }
 
 void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {
@@ -228,7 +241,7 @@ QSizeF QnLayoutResource::cellSpacing() const {
 void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
     {
         QMutexLocker locker(&m_mutex);
-        if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+        if(qFuzzyEquals(m_cellSpacing, cellSpacing))
             return;
         m_cellSpacing = cellSpacing;
     }
@@ -298,7 +311,7 @@ qreal QnLayoutResource::backgroundOpacity() const {
 
 void QnLayoutResource::setBackgroundOpacity(qreal value) {
     {
-        qreal bound = qBound(0.0, value, 1.0);
+        qreal bound = qBound<qreal>(0.0, value, 1.0);
         QMutexLocker locker(&m_mutex);
         if (qFuzzyCompare(m_backgroundOpacity, bound))
             return;

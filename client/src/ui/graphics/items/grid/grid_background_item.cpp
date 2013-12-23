@@ -1,6 +1,6 @@
 #include "grid_background_item.h"
 
-#include <QPainter>
+#include <QtGui/QPainter>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
@@ -8,8 +8,9 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/threaded_image_loader.h>
+#include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
+#include <utils/threaded_image_loader.h>
 #include <utils/local_file_cache.h>
 #include <utils/app_server_image_cache.h>
 
@@ -275,7 +276,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 
 #ifdef USE_YUVA420
     m_imgAsFrame->reallocate( imgToLoad->width(), imgToLoad->height(), PIX_FMT_YUVA420P );
-    bgra_to_yva12_sse2_intr(
+    bgra_to_yva12_simd_intr(
         alignedImgBuffer,
         requiredImgXStride,
         m_imgAsFrame->data[0],

@@ -4,8 +4,12 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
-#include <utils/math/limits.h> /* For INT64_MAX. */
+#include <utils/math/defines.h> /* For INT64_MAX. */
+#include <utils/common/unused.h>
+#include <utils/common/lexical_fwd.h>
+#include <utils/common/json_fwd.h>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -25,8 +29,8 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(ExtrapolationMode MotionType StreamFpsSharingMethod)
-    Q_FLAGS(CameraCapabilities PtzCapabilities)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else
     Q_NAMESPACE
@@ -78,44 +82,94 @@ public:
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
 
+    enum PtzCommand {
+        ContinuousMovePtzCommand,
+        AbsoluteDeviceMovePtzCommand,
+        AbsoluteLogicalMovePtzCommand,
+        ViewportMovePtzCommand,
+
+        GetDevicePositionPtzCommand,
+        GetLogicalPositionPtzCommand,
+        GetDeviceLimitsPtzCommand,
+        GetLogicalLimitsPtzCommand,
+        GetFlipPtzCommand,
+        
+        CreatePresetPtzCommand,
+        UpdatePresetPtzCommand,
+        RemovePresetPtzCommand,
+        ActivatePresetPtzCommand,
+        GetPresetsPtzCommand,
+
+        CreateTourPtzCommand,
+        RemoveTourPtzCommand,
+        ActivateTourPtzCommand,
+        GetToursPtzCommand,
+
+        GetDataPtzCommand,
+        SynchronizePtzCommand,
+
+        InvalidPtzCommand = -1
+    };
+
+    enum PtzDataField {
+        DevicePositionPtzField  = 0x01,
+        LogicalPositionPtzField = 0x02,
+        DeviceLimitsPtzField    = 0x04,
+        LogicalLimitsPtzField   = 0x08,
+        FlipPtzField            = 0x10,
+        PresetsPtzField         = 0x20,
+        ToursPtzField           = 0x40,
+        NoPtzFields             = 0x00,
+        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField
+    };
+    Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
+
+    enum PtzCoordinateSpace {
+        DevicePtzCoordinateSpace,
+        LogicalPtzCoordinateSpace
+    };
 
     enum PtzCapability {
-        NoPtzCapabilities                   = 0x000,
-        AbsolutePtzCapability               = 0x020,
-        ContinuousPanTiltCapability         = 0x040,
-        ContinuousZoomCapability            = 0x080,
-        OctagonalPtzCapability              = 0x100, // TODO: #Elric deprecate this shit. Not really a capability.
+        NoPtzCapabilities                   = 0x00000000,
+        
+        ContinuousPanCapability             = 0x00000001,
+        ContinuousTiltCapability            = 0x00000002,
+        ContinuousZoomCapability            = 0x00000004,
+
+        AbsolutePanCapability               = 0x00000010,
+        AbsoluteTiltCapability              = 0x00000020,
+        AbsoluteZoomCapability              = 0x00000040,
+
+        ViewportPtzCapability               = 0x00000080,
+
+        FlipPtzCapability                   = 0x00000100,
+        LimitsPtzCapability                 = 0x00000200,
+
+        DevicePositioningPtzCapability      = 0x00001000,
+        LogicalPositioningPtzCapability     = 0x00002000,
+
+        PresetsPtzCapability                = 0x00010000,
+        ToursPtzCapability                  = 0x00020000,
+
+        AsynchronousPtzCapability           = 0x00100000,
+        SynchronizedPtzCapability           = 0x00200000,
+        VirtualPtzCapability                = 0x00400000,
 
         /* Shortcuts */
-        AllPtzCapabilities                  = AbsolutePtzCapability | ContinuousPanTiltCapability | ContinuousZoomCapability | OctagonalPtzCapability,
-
-        /* Deprecated capabilities. */
-        DeprecatedContinuousPtzCapability   = 0x001,
-        DeprecatedZoomCapability            = 0x002,
+        ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
+        ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
+        AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+        FisheyePtzCapabilities              = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositioningPtzCapability | VirtualPtzCapability
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
-    /**
-     * \param capabilities              Camera capability flags containing some deprecated values.
-     * \returns                         Camera capability flags with deprecated values replaced with new ones.
-     */
-    inline Qn::PtzCapabilities undeprecatePtzCapabilities(Qn::PtzCapabilities capabilities) {
-        Qn::PtzCapabilities result = capabilities;
-
-        if(result & Qn::DeprecatedContinuousPtzCapability) {
-            result &= ~Qn::DeprecatedContinuousPtzCapability;
-            result |= Qn::ContinuousPanTiltCapability | Qn::ContinuousZoomCapability;
-        }
-
-        if(result & Qn::DeprecatedZoomCapability) {
-            result &= ~Qn::DeprecatedZoomCapability;
-            result |= Qn::ContinuousZoomCapability;
-        }
-
-        return result;
-    }
-
+    enum Projection {
+        RectilinearProjection,
+        Equirectangular2xProjection, // TODO: #Elric coefficients have nothing to do with projection, factor out!
+        Equirectangular4xProjection
+    };
 
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
@@ -204,7 +258,7 @@ public:
         ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
         ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
-        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type DewarpingParams. */
+        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
         ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */
@@ -235,16 +289,33 @@ public:
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
-        EventTypeRole,                            /**< Role for business event type. Used in BusinessEventsLogAction. */
-
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
+        PtzPresetIdRole,                            /**< Role for PTZ preset id. Value of type QString. */
+        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
+        PtzTourIdRole,                              /**< Role for PTZ tour id. Value of type QString. */
+        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
-        DisplayHtmlRole                             /**< Same as Display role, but use HTML format. */
+        DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
+
+        ModifiedRole,                               /**< Role for modified state. Value of type bool. */
+        DisabledRole,                               /**< Role for disabled state. Value of type bool. */
+        ValidRole,                                  /**< Role for valid state. Value of type bool. */
+        ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
+        ShortTextRole,                              /**< Role for short text. Value of type QString. */
+
+        EventTypeRole,                              /**< Role for business event type. Value of type BusinessEventType::Value. */
+        EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type BusinessActionType::Value. */
+        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
+
+        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
+
+        RoleCount
     };
 
 
@@ -280,9 +351,22 @@ inline QChar lit(char c) {
 }
 
 
+Q_DECLARE_METATYPE(Qn::PtzDataFields);
+Q_DECLARE_METATYPE(Qn::PtzCommand);
 Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
 Q_DECLARE_METATYPE(Qn::TimePeriodType);
 Q_DECLARE_METATYPE(Qn::TimePeriodContent);
+Q_DECLARE_METATYPE(Qn::Corner);
+
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
+
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
 
 
 #endif // QN_COMMON_GLOBALS_H

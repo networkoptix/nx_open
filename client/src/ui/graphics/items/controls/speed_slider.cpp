@@ -1,6 +1,6 @@
 #include "speed_slider.h"
 
-#include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>

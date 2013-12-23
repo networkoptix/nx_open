@@ -12,7 +12,7 @@
 #include <errno.h>
 #endif
 
-#include <QString>
+#include <QtCore/QString>
 
 
 namespace SystemError

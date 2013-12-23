@@ -13,8 +13,8 @@ public:
 
     void deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) override;
-    void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) override;
-    void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) override;
+    void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) override;
+    void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) override;
     void deserializeUsers(QnUserResourceList& users, const QByteArray& data) override;
     void deserializeResources(QnResourceList& resources, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) override;
@@ -24,7 +24,7 @@ public:
     void deserializeBusinessRules(QnBusinessEventRuleList& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
     void deserializeBusinessActionVector(QnBusinessActionDataListPtr &businessActionList, const QByteArray& data) override;
-    void deserializeKvPairs(QnKvPairs& kvPairs, const QByteArray& data);
+    void deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data);
     void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
@@ -39,7 +39,7 @@ public:
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
     void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) override;
     void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data);
-    void serializeKvPairs(const QnResourcePtr& resource, const QnKvPairList& kvPairs, QByteArray& data);
+    void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data);
     void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data);
 
 private:

@@ -2,14 +2,16 @@
 #include "ui_layout_settings_dialog.h"
 
 #include <QtCore/qmath.h>
-#include <QUrl>
-#include <QResizeEvent>
+#include <QtCore/QUrl>
+#include <QtGui/QResizeEvent>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
 #include <QtGui/QPaintEvent>
-#include <QImageReader>
+#include <QtGui/QImageReader>
+
+#include <QtWidgets/QDesktopWidget>
 
 #include <client/client_settings.h>
 #include <core/resource/layout_resource.h>
@@ -64,7 +66,8 @@ class QnLayoutSettingsDialogPrivate
 public:
     QnLayoutSettingsDialogPrivate():
         state(NoImage),
-        cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio())
+        cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
+        skipNextReleaseEvent(false)
     {}
     
     virtual ~QnLayoutSettingsDialogPrivate(){}
@@ -114,6 +117,8 @@ public:
 
     /** Text of the last error if any occured. */
     QString errorText;
+
+    bool skipNextReleaseEvent;
 };
 
 
@@ -129,6 +134,7 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     setHelpTopic(ui->imageLabel,        Qn::LayoutSettings_EMapping_Help);
     setHelpTopic(ui->lockedCheckBox,    Qn::LayoutSettings_Locking_Help);
 
+    installEventFilter(this);
     ui->imageLabel->installEventFilter(this);
     ui->imageLabel->setFrameColor(qnGlobals->frameColor());
 
@@ -159,11 +165,18 @@ QnLayoutSettingsDialog::~QnLayoutSettingsDialog()
 bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
     Q_D(QnLayoutSettingsDialog);
 
-    if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease) {
-        if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
-            selectFile();
-        else
-            viewFile();
+    if (event->type() == QEvent::LeaveWhatsThisMode)
+        d->skipNextReleaseEvent = true;
+    else if (event->type() == QEvent::MouseButtonRelease) 
+    {
+        if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease && !d->skipNextReleaseEvent)
+        {
+            if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
+                selectFile();
+            else
+                viewFile();
+        }
+        d->skipNextReleaseEvent = false;
     }
 
     return base_type::eventFilter(target, event);
@@ -263,8 +276,7 @@ void QnLayoutSettingsDialog::updateControls() {
     if (m_isUpdating)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     Q_D(const QnLayoutSettingsDialog);
 
@@ -380,8 +392,7 @@ void QnLayoutSettingsDialog::at_widthSpinBox_valueChanged(int value) {
         return;
     if (m_isUpdating)
         return;
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     qreal targetAspectRatio = bestAspectRatioForCells();
     if (targetAspectRatio < 0)
@@ -395,8 +406,7 @@ void QnLayoutSettingsDialog::at_heightSpinBox_valueChanged(int value) {
         return;
     if (m_isUpdating)
         return;
-    QnScopedValueRollback<bool> guard(&m_isUpdating, true);
-    Q_UNUSED(guard)
+    QN_SCOPED_VALUE_ROLLBACK(&m_isUpdating, true);
 
     qreal targetAspectRatio = bestAspectRatioForCells();
     if (targetAspectRatio < 0)

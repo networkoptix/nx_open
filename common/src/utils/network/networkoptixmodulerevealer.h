@@ -8,14 +8,14 @@
 
 #include <vector>
 
-#include <QThread>
+#include <QtCore/QThread>
 
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
 #include "../common/long_runnable.h"
 
 
-class UDPSocket;
+class AbstractDatagramSocket;
 
 //!Makes module to be located in network by \a NetworkOptixModuleFinder instances
 /*!
@@ -46,7 +46,7 @@ protected:
 
 private:
     PollSet m_pollSet;
-    std::vector<UDPSocket*> m_sockets;
+    std::vector<AbstractDatagramSocket*> m_sockets;
     RevealResponse m_revealResponse;
 };
 

@@ -1,5 +1,7 @@
 #include "time_period_list.h"
+
 #include <utils/common/util.h>
+#include <utils/math/math.h>
 
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const {
     if (isEmpty())

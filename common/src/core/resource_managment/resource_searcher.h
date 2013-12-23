@@ -97,7 +97,7 @@ public:
 
 //=====================================================================
 
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher
+class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance?
 {
 protected:
     QnAbstractFileResourceSearcher() {}

@@ -11,8 +11,11 @@
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
 
+#ifdef TEST_FISHEYE_CALIBRATOR
+#include "ui/fisheye/fisheye_calibrator.h"
+#endif
 
-QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLContext* context )
+QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* context )
 :
     QnAbstractRenderer( parent ),
     m_glContext( context ),
@@ -37,6 +40,10 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, const QGLCon
     setChannelCount(1);
 
     connect(this, SIGNAL(canBeDestroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection);
+
+#ifdef TEST_FISHEYE_CALIBRATOR
+    m_isCircleDetected = false;
+#endif
 }
 
 void QnResourceWidgetRenderer::setChannelCount(int channelCount)
@@ -45,6 +52,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         return;
 
     Q_ASSERT( m_glContext != NULL );
+    m_glContext->makeCurrent();
 
     for (int i = channelCount; (uint)i < m_channelRenderers.size(); ++i)
     {
@@ -55,7 +63,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     m_channelRenderers.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
 
-    for( int i = 0; (uint)i < channelCount; ++i )
+    for( int i = 0; i < channelCount; ++i )
     {
         if (m_channelRenderers[i].uploader == 0) {
             RenderingTools renderingTools;
@@ -239,7 +247,21 @@ void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& 
         if( !ctx.uploader )
             return;
 
-    ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
+#ifdef TEST_FISHEYE_CALIBRATOR
+        if (!m_isCircleDetected) {
+            m_isCircleDetected = true;
+            QnFisheyeCalibrator calibrator;
+            calibrator.analizeFrame(image);
+            emit fisheyeCenterChanged(calibrator.center(), calibrator.radius());
+            //QnMediaDewarpingParams mediaDewarpingParams = resource()->getDewarpingParams();
+            //mediaDewarpingParams.radius = calibrator.radius();
+            //mediaDewarpingParams.xCenter = calibrator.center().x();
+            //mediaDewarpingParams.yCenter = calibrator.center().y();
+            //resource()->setDewarpingParams(mediaDewarpingParams);
+        }
+#endif // for debug purpose only
+
+        ctx.uploader->uploadDecodedPicture( image, m_displayRect[image->channel]);
         ++ctx.framesSinceJump;
     }
 

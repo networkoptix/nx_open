@@ -1,7 +1,7 @@
 #ifndef QN_ANIMATION_TIMER_H
 #define QN_ANIMATION_TIMER_H
 
-#include <QAbstractAnimation>
+#include <QtCore/QAbstractAnimation>
 #include "animation_timer_listener.h"
 
 /**

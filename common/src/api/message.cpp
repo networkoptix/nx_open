@@ -1,9 +1,10 @@
 #include "message.h"
-
 #include "message.pb.h"
-#include "api/serializer/pb_serializer.h"
-#include "api/app_server_connection.h"
-#include <core/resource/resource_type.h>
+
+#include <api/serializer/pb_serializer.h>
+#include <api/app_server_connection.h>
+
+#include <core/resource/resource.h>
 
 namespace {
     typedef google::protobuf::RepeatedPtrField<pb::Resource>            PbResourceList;
@@ -11,6 +12,7 @@ namespace {
     typedef google::protobuf::RepeatedPtrField<pb::License>             PbLicenseList;
     typedef google::protobuf::RepeatedPtrField<pb::CameraServerItem>    PbCameraServerItemList;
     typedef google::protobuf::RepeatedPtrField<pb::BusinessRule>        PbBusinessRuleList;
+    typedef google::protobuf::RepeatedPtrField<pb::KvPair>              PbKvPairList;
 }
 
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
@@ -24,46 +26,34 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
 void parseResources(QnResourceList& resources, const PbResourceList& pb_resources, QnResourceFactory& resourceFactory);
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
+void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs);
 
-namespace Qn
-{
-    QString toString( Message_Type val )
-    {
-        switch( val )
-        {
-            case Message_Type_Initial:
-                return QLatin1String("Initial");
-            case Message_Type_Ping:
-                return QLatin1String("Ping");
-            case Message_Type_ResourceChange:
-                return QLatin1String("ResourceChange");
-            case Message_Type_ResourceDelete:
-                return QLatin1String("ResourceDelete");
-            case Message_Type_ResourceStatusChange:
-                return QLatin1String("ResourceStatusChange");
-            case Message_Type_ResourceDisabledChange:
-                return QLatin1String("ResourceDisabledChange");
-            case Message_Type_License:
-                return QLatin1String("License");
-            case Message_Type_CameraServerItem:
-                return QLatin1String("CameraServerItem");
-            case Message_Type_BusinessRuleInsertOrUpdate:
-                return QLatin1String("BusinessRuleInsertOrUpdate");
-            case Message_Type_BusinessRuleDelete:
-                return QLatin1String("BusinessRuleDelete");
-            case Message_Type_BroadcastBusinessAction:
-                return QLatin1String("BroadcastBusinessAction");
-            case Message_Type_FileAdd:
-                return QLatin1String("FileAdd");
-            case Message_Type_FileRemove:
-                return QLatin1String("FileRemove");
-            case Message_Type_FileUpdate:
-                return QLatin1String("FileUpdate");
-            default:
-                return QString::fromAscii("Unknown %1").arg((int)val);
+namespace Qn {
+    QString toString(const Message_Type val) {
+        switch(val) {
+        case Message_Type_Initial:                      return QLatin1String("Initial");
+        case Message_Type_Ping:                         return QLatin1String("Ping");
+        case Message_Type_ResourceChange:               return QLatin1String("ResourceChange");
+        case Message_Type_ResourceDelete:               return QLatin1String("ResourceDelete");
+        case Message_Type_ResourceStatusChange:         return QLatin1String("ResourceStatusChange");
+        case Message_Type_ResourceDisabledChange:       return QLatin1String("ResourceDisabledChange");
+        case Message_Type_License:                      return QLatin1String("License");
+        case Message_Type_CameraServerItem:             return QLatin1String("CameraServerItem");
+        case Message_Type_BusinessRuleInsertOrUpdate:   return QLatin1String("BusinessRuleInsertOrUpdate");
+        case Message_Type_BusinessRuleDelete:           return QLatin1String("BusinessRuleDelete");
+        case Message_Type_BroadcastBusinessAction:      return QLatin1String("BroadcastBusinessAction");
+        case Message_Type_FileAdd:                      return QLatin1String("FileAdd");
+        case Message_Type_FileRemove:                   return QLatin1String("FileRemove");
+        case Message_Type_FileUpdate:                   return QLatin1String("FileUpdate");
+        case Message_Type_RuntimeInfoChange:            return QLatin1String("RuntimeInfoChange");
+        case Message_Type_BusinessRuleReset:            return QLatin1String("BusinessRuleReset");
+        case Message_Type_KvPairChange:                 return QLatin1String("KvPairChang");
+        case Message_Type_KvPairDelete:                 return QLatin1String("KvPairDelete");
+        default:
+            return QString::fromLatin1("Unknown %1").arg((int)val);
         }
     }
-}
+} //Qn namespace
 
 bool QnMessage::load(const pb::Message &message)
 {
@@ -118,11 +108,14 @@ bool QnMessage::load(const pb::Message &message)
         {
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
             systemName = QString::fromUtf8(initialMessage.systemname().c_str());
+            sessionKey = initialMessage.sessionkey().c_str();
             oldHardwareId = initialMessage.oldhardwareid().c_str();
             hardwareId1 = initialMessage.hardwareid1().c_str();
             hardwareId2 = initialMessage.hardwareid2().c_str();
             hardwareId3 = initialMessage.hardwareid3().c_str();
             publicIp = QString::fromStdString(initialMessage.publicip());
+            if (initialMessage.has_allowcamerachanges())
+                allowCameraChanges = initialMessage.allowcamerachanges();
 
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
@@ -130,6 +123,7 @@ bool QnMessage::load(const pb::Message &message)
             parseResources(resources, initialMessage.resource(), *QnAppServerConnectionFactory::defaultFactory());
             parseLicenses(licenses, initialMessage.license());
             parseCameraServerItems(cameraServerItems, initialMessage.cameraserveritem());
+            parseKvPairs(kvPairs, initialMessage.kvpair());
             break;
         }
         case pb::Message_Type_Ping:
@@ -177,6 +171,10 @@ bool QnMessage::load(const pb::Message &message)
                 publicIp = QString::fromStdString(runtimeInfoChangeMessage.publicip());
             if (runtimeInfoChangeMessage.has_systemname())
                 systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
+            if (runtimeInfoChangeMessage.has_sessionkey())
+                sessionKey = runtimeInfoChangeMessage.sessionkey().c_str();
+            if (runtimeInfoChangeMessage.has_allowcamerachanges())
+                allowCameraChanges = runtimeInfoChangeMessage.allowcamerachanges();
             break;
         }
         case pb::Message_Type_BusinessRuleReset:
@@ -185,6 +183,18 @@ bool QnMessage::load(const pb::Message &message)
             parseBusinessRules(businessRules, businessRuleResetMessage.businessrule());
             break;
         }
+    case pb::Message_Type_KvPairChange:
+    {
+        const pb::KvPairChangeMessage &kvPairChangeMessage = message.GetExtension(pb::KvPairChangeMessage::message);
+        parseKvPairs(kvPairs, kvPairChangeMessage.kvpair());
+        break;
+    }
+    case pb::Message_Type_KvPairDelete:
+    {
+        const pb::KvPairDeleteMessage &kvPairDeleteMessage = message.GetExtension(pb::KvPairDeleteMessage::message);
+        parseKvPairs(kvPairs, kvPairDeleteMessage.kvpair());
+        break;
+    }
 
     default:
         break;

@@ -3,7 +3,7 @@
 
 #include <QGLFormat>
 #include <QGLWidget>
-#include <GL/gl.h>
+#include "client/client_settings.h"
 
 class QnGlWidgetFactory {
 public:
@@ -16,28 +16,47 @@ public:
 
     template<class Widget>
     static Widget *create(const QGLFormat &format, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
+        return new Widget(createGLContext(format), parent, /* shareWidget = */ NULL, windowFlags);
+    }
+
+private:
+    static QGLContext *createGLContext(const QGLFormat &format) {
         QGLFormat localFormat = format;
 #ifdef Q_OS_LINUX
+        static enum Vendor { Unknown, Nvidia, Other } vendorStatus = Unknown;
+
         /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
          * VSync will be re-enabled later if drivers are not NVidia's. */
-        localFormat.setSwapInterval(0); /* Turn vsync off. */
+        localFormat.setSwapInterval(vendorStatus == Other ? 1 : 0); /* Turn vsync off for nVidia and unknown driver. */
 #else
         localFormat.setSwapInterval(1); /* Turn vsync on. */
 #endif
+        localFormat.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
 
-        Widget *result = new Widget(localFormat, parent, /* shareWidget = */ NULL, windowFlags);
+        QGLContext *glContext = new QGLContext(localFormat);
+        glContext->create();
 
 #ifdef Q_OS_LINUX
-        result->makeCurrent();
-        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-        if (!vendor.toLower().contains("nvidia")) {
-            QGLFormat localFormat = result->format();
-            localFormat.setSwapInterval(1); /* Turn vsync on. */
-            result->setFormat(localFormat);
+        if (vendorStatus == Unknown) {
+            glContext->makeCurrent();
+            QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+            if (!vendor.toLower().contains("nvidia")) {
+                vendorStatus = Other;
+
+                localFormat = glContext->format();
+                localFormat.setSwapInterval(1); /* Turn vsync on. */
+
+                delete glContext;
+
+                glContext = new QGLContext(localFormat);
+                glContext->create();
+            } else {
+                vendorStatus = Nvidia;
+            }
         }
 #endif
 
-        return result;
+        return glContext;
     }
 };
 

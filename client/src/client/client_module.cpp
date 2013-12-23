@@ -1,8 +1,6 @@
 #include "client_module.h"
 
-#include <QApplication>
-
-#include <utils/common/module_resources.h>
+#include <QtWidgets/QApplication>
 
 #include <common/common_module.h>
 
@@ -12,7 +10,7 @@
 #include "version.h"
 
 QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
-    QN_INIT_MODULE_RESOURCES(client);
+    Q_INIT_RESOURCE(client);
 
     QnClientMetaTypes::initialize();
 
@@ -25,8 +23,8 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QApplication::setDesktopSettingsAware(false);
 
     /* Init singletons. */
-    new QnCommonModule(argc, argv, this);
-    new QnClientSettings(this);
+    QnCommonModule *common = new QnCommonModule(argc, argv, this);
+    common->instance<QnClientSettings>();
 }
 
 QnClientModule::~QnClientModule() {

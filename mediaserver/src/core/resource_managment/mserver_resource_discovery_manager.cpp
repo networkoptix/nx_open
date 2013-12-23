@@ -1,21 +1,27 @@
 #include "mserver_resource_discovery_manager.h"
 
-#include <QtCore/QtConcurrentMap>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-#include "utils/common/sleep.h"
-#include "core/resource_managment/resource_searcher.h"
-#include "core/resource/network_resource.h"
-#include "core/resource_managment/resource_pool.h"
-#include "utils/common/util.h"
+
 #include "api/app_server_connection.h"
+
+#include "business/business_event_connector.h"
+
+#include "core/dataprovider/live_stream_provider.h"
+#include <core/resource/camera_resource.h>
+#include "core/resource/network_resource.h"
+#include "core/resource/abstract_storage_resource.h"
+#include "core/resource/storage_resource.h"
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource_managment/resource_searcher.h"
+
+#include "plugins/storage/dts/abstract_dts_searcher.h"
+
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
-#include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/storage_resource.h"
-#include "core/dataprovider/live_stream_provider.h"
-#include "business/business_event_connector.h"
+#include "utils/common/sleep.h"
+#include "utils/common/util.h"
 
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
@@ -448,7 +454,8 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 
             if (m_resourceDiscoveryCounter[uniqId] >= 5)
             {
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)) {
+                QnVirtualCameraResourcePtr camRes = netRes.dynamicCast<QnVirtualCameraResource>();
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled())) {
                     if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)

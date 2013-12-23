@@ -2,7 +2,7 @@
 #define QN_SCOPED_PAINTER_ROLLBACK_H
 
 #include "scoped_value_rollback.h"
-#include <QPainter>
+#include <QtGui/QPainter>
 
 template<class T, class Accessor>
 class QnGenericScopedPainterRollback: public QnGenericScopedValueRollback<T, QPainter, Accessor, Accessor> {
@@ -87,5 +87,12 @@ typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAcc
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform> >    QnScopedPainterSmoothPixmapTransformRollback;
 
+#define QN_SCOPED_PAINTER_PEN_ROLLBACK(PAINTER, PEN)                            \
+    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QPen, detail::PainterPenAccessor>), PAINTER, PEN)
+
+#define QN_SCOPED_PAINTER_BRUSH_ROLLBACK(PAINTER, BRUSH)                        \
+    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QBrush, detail::PainterBrushAccessor>), PAINTER, BRUSH)
+
+// TODO: #Elric complete the list and remove defines
 
 #endif // QN_SCOPED_PAINTER_ROLLBACK_H

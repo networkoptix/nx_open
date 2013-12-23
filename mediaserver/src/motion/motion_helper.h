@@ -1,9 +1,9 @@
 #ifndef __MOTION_HELPER_H__
 #define __MOTION_HELPER_H__
 
-#include <QObject>
-#include <QRegion>
-#include <QMap>
+#include <QtCore/QObject>
+#include <QtGui/QRegion>
+#include <QtCore/QMap>
 #include "utils/media/sse_helper.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/network_resource.h"
@@ -19,7 +19,7 @@ public:
     virtual ~QnMotionHelper();
 
     // write motion data to file
-    void saveToArchive(QnMetaDataV1Ptr data);
+    void saveToArchive(QnConstMetaDataV1Ptr data);
 
     QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
     QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
@@ -32,6 +32,7 @@ public:
     static QList<QDate> recordedMonth(const QString& macAddress);
 
     QnMotionHelper();
+
 private:
     static QString getBaseDir(const QString& macAddress);
 
@@ -39,7 +40,13 @@ private:
     void createMask(const QRegion& region);
 
     // mach one motion image by mask
-    bool mathImage(const __m128i* data);
+    void mathImage(
+        const QList<QRegion>& regions,
+        QnResourcePtr res,
+        qint64 msStartTime,
+        qint64 msEndTime,
+        int detailLevel,
+        QVector<QnTimePeriodList>* const timePeriods );
 
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;

@@ -1,3 +1,5 @@
+#ifdef ENABLE_PULSE_CAMERA
+
 #include "pulse_resource_searcher.h"
 #include "pulse_searcher_helper.h"
 #include "../pulse/pulse_resource.h"
@@ -106,3 +108,5 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
 
     return result;
 }
+
+#endif // #ifdef ENABLE_PULSE_CAMERA

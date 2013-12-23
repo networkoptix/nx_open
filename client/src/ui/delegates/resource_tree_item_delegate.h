@@ -1,7 +1,8 @@
 #ifndef QN_RESOURCE_TREE_ITEM_DELEGATE_H
 #define QN_RESOURCE_TREE_ITEM_DELEGATE_H
 
-#include <QStyledItemDelegate>
+#include <QtCore/QPointer>
+#include <QtWidgets/QStyledItemDelegate>
 
 class QnWorkbench;
 
@@ -22,9 +23,13 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
+    
+    virtual void destroyEditor(QWidget *editor, const QModelIndex &index) const override;
+
+    virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
-    QWeakPointer<QnWorkbench> m_workbench;
+    QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon, m_buggyIcon;
 };
 

@@ -135,7 +135,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
         for( ;; )
         {
             const qint64 curClock = asyncOpCompletionTimer.elapsed();
-            if( curClock >= MAX_WAIT_TIMEOUT_MS )
+            if( curClock >= (int)MAX_WAIT_TIMEOUT_MS )
             {
                 //out of time, returning what we have...
                 for( std::set<QString>::iterator

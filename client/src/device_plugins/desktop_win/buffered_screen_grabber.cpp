@@ -7,7 +7,7 @@ static const int MAX_JITTER = 60;
 QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
                                                  int queueSize,
                                                  int frameRate,
-                                                 QnScreenGrabber::CaptureMode mode,
+                                                 Qn::CaptureMode mode,
                                                  bool captureCursor,
                                                  const QSize& captureResolution,
                                                  QWidget* widget):
@@ -32,15 +32,13 @@ QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
 
 QnBufferedScreenGrabber::~QnBufferedScreenGrabber()
 {
-    // TODO: #VASILENKO call proper stop() here.
-    m_needStop = true;
-    wait();
+    stop();
 }
 
-void QnBufferedScreenGrabber::stop()
+void QnBufferedScreenGrabber::pleaseStop()
 {
-    // TODO: #VASILENKO this is bad. This override changes the semantics of stop(). Can we fix it?
-    m_needStop = true;
+    m_grabber.pleaseStop();
+    QnLongRunnable::pleaseStop();
 }
 
 void QnBufferedScreenGrabber::run()
@@ -58,8 +56,8 @@ void QnBufferedScreenGrabber::run()
             break;
         AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
-        QnScreenGrabber::CaptureInfo info = m_grabber.captureFrame();
-        if (info.opaque == 0)
+        CaptureInfoPtr info = m_grabber.captureFrame();
+        if (!info || info->opaque == 0)
             continue;
         m_queue.push(info);
 
@@ -81,10 +79,9 @@ bool QnBufferedScreenGrabber::dataExist()
     return m_queue.size() > 0;
 }
 
-QnScreenGrabber::CaptureInfo QnBufferedScreenGrabber::getNextFrame()
+CaptureInfoPtr QnBufferedScreenGrabber::getNextFrame()
 {
-    QnScreenGrabber::CaptureInfo rez;
-    rez.opaque = 0;
+    CaptureInfoPtr rez;
     m_queue.pop(rez, 40);
     return rez;
 }

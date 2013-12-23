@@ -5,12 +5,13 @@
 #include <limits>
 
 #include <QtGui/QMouseEvent>
-#include <QtGui/QGraphicsWidget>
-#include <QtGui/QApplication>
+#include <QtWidgets/QGraphicsWidget>
+#include <QtWidgets/QApplication>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
+#include <utils/math/fuzzy.h>
 
 #include <utils/math/coordinate_transformations.h>
 
@@ -210,7 +211,7 @@ private:
     QWidget *m_viewport;
 
     /** Widget being rotated. */
-    QWeakPointer<QGraphicsWidget> m_target;
+    QPointer<QGraphicsWidget> m_target;
 
     /** Head of the rotation item, in scene coordinates. */
     QPointF m_sceneHead;
@@ -295,6 +296,15 @@ void RotationInstrument::start(QGraphicsView *view, QGraphicsWidget *target) {
 
     startInternal(view, &event, target, true);
 }
+
+RotationItem *RotationInstrument::rotationItem() const {
+    return m_rotationItem.data();
+}
+
+QGraphicsWidget *RotationInstrument::target() const {
+    return m_target.data();
+}
+
 
 void RotationInstrument::startInternal(QGraphicsView *view, QMouseEvent *event, QGraphicsWidget *target, bool instantStart) {
     m_target = target;
@@ -391,7 +401,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
     if(!qFuzzyCompare(currentRotation, newRotation)) {
         target()->setRotation(newRotation);
 
-        if(!qFuzzyCompare(target()->transformOriginPoint(), itemOrigin)) {
+        if(!qFuzzyEquals(target()->transformOriginPoint(), itemOrigin)) {
             QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
             moveViewportScene(info->view(), newSceneOrigin - sceneOrigin);
             sceneOrigin = newSceneOrigin;

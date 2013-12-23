@@ -6,7 +6,7 @@
 #include <core/resource/media_server_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/cam_display.h>
-#include <camera/video_camera.h>
+#include <camera/client_video_camera.h>
 #include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
@@ -34,13 +34,16 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
         if(m_mediaProvider != NULL) {
             /* Camera will free media provider in its destructor. */
-            m_camera = new QnVideoCamera(m_mediaResource, m_mediaProvider);
+            m_camera = new QnClientVideoCamera(m_mediaResource, m_mediaProvider);
 
             connect(this,                           SIGNAL(destroyed()),    m_camera,       SLOT(beforeStopDisplay()));
 
-            m_counter = new QnCounter(2);
+            m_counter = new QnCounter(1);
             connect(m_camera->getCamDisplay(),      SIGNAL(finished()),     m_counter,      SLOT(decrement()));
-            connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+            if (m_mediaProvider->hasThread()) {
+                connect(m_camera->getStreamreader(),    SIGNAL(finished()),     m_counter,      SLOT(decrement()));
+                m_counter->increment();
+            }
 
             connect(m_counter,                      SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
             connect(m_counter,                      SIGNAL(reachedZero()),  m_camera,       SLOT(deleteLater()));
@@ -166,6 +169,13 @@ void QnResourceDisplay::play() {
 
     //if (m_graphicsWidget->isSelected() || !m_playing)
     //    m_camera->getCamDisplay()->playAudio(m_playing);
+}
+
+void QnResourceDisplay::pause() {
+    if(m_archiveReader == NULL)
+        return;
+
+    m_archiveReader->pauseMedia();
 }
 
 bool QnResourceDisplay::isPaused() {

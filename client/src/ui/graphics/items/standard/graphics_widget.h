@@ -1,7 +1,7 @@
 #ifndef QN_GRAPHICS_WIDGET_H
 #define QN_GRAPHICS_WIDGET_H
 
-#include <QtGui/QGraphicsWidget>
+#include <QtWidgets/QGraphicsWidget>
 
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/margins.h>

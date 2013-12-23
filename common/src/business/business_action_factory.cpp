@@ -48,6 +48,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const Business
         case BusinessActionType::Diagnostics:
         case BusinessActionType::ShowPopup:
         case BusinessActionType::PlaySound:
+        case BusinessActionType::PlaySoundRepeated:
         case BusinessActionType::SayText:
             return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 

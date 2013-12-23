@@ -10,9 +10,13 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
+
+#include "plugins/storage/file_storage/layout_storage_resource.h"
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -201,7 +205,8 @@ public:
             if(!bastard)
                 bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
             if(!bastard)
-                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
+                bastard = (m_flags & QnResource::local_media) == QnResource::local_media &&
+                        m_resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); //TODO: #Elric hack hack hack
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
@@ -590,16 +595,6 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat,
     m_rootNodeType(rootNodeType),
     m_flat(isFlat)
 {
-    /* Init role names. */
-    QHash<int, QByteArray> roles = roleNames();
-    roles.insert(Qn::ResourceRole,              "resource");
-    roles.insert(Qn::ResourceFlagsRole,         "flags");
-    roles.insert(Qn::ItemUuidRole,              "uuid");
-    roles.insert(Qn::ResourceSearchStringRole,  "searchString");
-    roles.insert(Qn::ResourceStatusRole,        "status");
-    roles.insert(Qn::NodeTypeRole,              "nodeType");
-    setRoleNames(roles);
-
     m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
 
     /* Create top-level nodes. */
@@ -819,6 +814,17 @@ QVariant QnResourcePoolModel::headerData(int section, Qt::Orientation orientatio
     return QVariant(); /* No headers needed. */
 }
 
+QHash<int,QByteArray> QnResourcePoolModel::roleNames() const {
+    QHash<int, QByteArray> roles = base_type::roleNames();
+    roles.insert(Qn::ResourceRole,              "resource");
+    roles.insert(Qn::ResourceFlagsRole,         "flags");
+    roles.insert(Qn::ItemUuidRole,              "uuid");
+    roles.insert(Qn::ResourceSearchStringRole,  "searchString");
+    roles.insert(Qn::ResourceStatusRole,        "status");
+    roles.insert(Qn::NodeTypeRole,              "nodeType");
+    return roles;
+}
+
 QStringList QnResourcePoolModel::mimeTypes() const {
     QStringList result = QnWorkbenchResource::resourceMimeTypes();
     result.append(QLatin1String(pureTreeResourcesOnlyMimeType));
@@ -826,7 +832,7 @@ QStringList QnResourcePoolModel::mimeTypes() const {
 }
 
 QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
-    QMimeData *mimeData = QAbstractItemModel::mimeData(indexes);
+    QMimeData *mimeData = base_type::mimeData(indexes);
     if (mimeData) {
         const QStringList types = mimeTypes();
 
@@ -870,7 +876,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
     /* Check if the format is supported. */
     if(!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes()))
-        return QAbstractItemModel::dropMimeData(mimeData, action, row, column, parent);
+        return base_type::dropMimeData(mimeData, action, row, column, parent);
 
     /* Decode. */
     QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);

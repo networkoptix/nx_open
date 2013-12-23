@@ -10,7 +10,7 @@
 #ifndef __VERACITY_ISFS_H
 #define __VERACITY_ISFS_H
 
-#include <QtGlobal>
+#include <QtCore/QtGlobal>
 
 
 namespace Veracity

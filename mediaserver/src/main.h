@@ -1,11 +1,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <QTimer>
-#include "utils/common/long_runnable.h"
-#include "core/resource/media_server_resource.h"
+#include <QtCore/QTimer>
+
+#include <business/business_fwd.h>
+#include <core/resource/resource_fwd.h>
+
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
+
+#include "utils/common/long_runnable.h"
 
 
 class QnAppserverResourceProcessor;
@@ -32,7 +36,7 @@ private slots:
     void at_serverSaved(int, const QnResourceList&, int);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
     void at_noStorages();
-    void at_storageFailure(QnResourcePtr storage);
+    void at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);
     void at_timer();
     void at_connectionOpened();
 private:
@@ -41,7 +45,6 @@ private:
 private:
     int m_argc;
     char** m_argv;
-    bool m_waitExtIpFinished;
     qint64 m_firstRunningTime;
 
     QnRtspListener* m_rtspListener;

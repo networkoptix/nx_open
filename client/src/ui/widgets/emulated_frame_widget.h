@@ -2,7 +2,7 @@
 #define QN_EMULATED_FRAME_WIDGET_H
 
 #include <QtCore/QBasicTimer>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/drag_process_handler.h>

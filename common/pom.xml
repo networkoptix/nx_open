@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
+    <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
  
     A solution can be a group of projects, but here we only have one.
@@ -20,60 +20,79 @@
 	<packaging>pom</packaging>
 	<name>HD Witness Common Lib</name>
 
-	<properties>
+    <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
-		<!--Global libs-->
-		<global.libs/>      
-		<!--Specific os libs used-->
-		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
-		<linux.oslibs>-lz -lX11 -lXext -lXfixes</linux.oslibs>
-		<mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lsigar-universal64-macosx -lswscale -lavutil -lavformat -lavcodec -lavdevice -lavfilter -lqjson -lswresample -lz ${project.build.directory}/../../build_environment/x64/build/bin/release/libprotobuf.a</mac.oslibs>
-		<!--Global defines-->
-		<global.defines/>
-		<!--Specific os defines-->
-		<windows.defines/>
-		<linux.defines/>
-		<mac.defines/>      
-	</properties>   
+        <!--Global libs-->
+        <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
+        <global.libs>-lprotobuf -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lprotobuf -lonvif</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
+        <linux.oslibs>-lssl -lsigar</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <!--Global defines-->
+        <global.defines/>
+        <!--Specific os defines-->
+        <windows.defines>_USING_V110_SDK71_</windows.defines>
+        <linux.defines/>
+        <mac.defines/>      
+    </properties>   
 
-	<build>
-	</build>    
-	
-	<profiles>
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>Windows</family>
-				</os>
-			</activation>
-			<properties>
-				<buildLib>staticlib</buildLib>
-			</properties>
-		</profile>
-		<profile>
-			<id>linux</id>
-			<activation>
-				<os>
-					<family>unix</family>
-					<name>linux</name>
-				</os>
-			</activation>
-			<properties>
-				<buildLib>sharedlib</buildLib>
-			</properties>
-		</profile>	
-		<profile>
-			<id>macosx</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-			<properties>
-				<buildLib>sharedlib</buildLib>
-			</properties>
-		</profile>	
-	</profiles>	
+    <build>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>            
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>	
+        <profile>
+            <id>noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>            
+            <properties>
+                <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
+            </properties>
+        </profile>      
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>            
+            <properties>
+                <qt.libs>core network xml sql</qt.libs>
+            </properties>
+        </profile>          
+    </profiles>	
 
 </project>

@@ -96,8 +96,8 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
 
     while (!needToStop())
     {
-        QnScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
-        if (!capturedData.opaque)
+        CaptureInfoPtr capturedData = m_grabber->getNextFrame();
+        if (!capturedData || !capturedData->opaque || capturedData->width == 0 || capturedData->height == 0)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 

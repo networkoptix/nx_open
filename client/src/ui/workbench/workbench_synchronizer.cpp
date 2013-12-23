@@ -42,7 +42,7 @@ void QnWorkbenchSynchronizer::submit() {
     if(!m_submit)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_update, false);
+    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
 
     /* Layout may have been closed, but it doesn't mean that we should remove it.
      *
@@ -54,7 +54,7 @@ void QnWorkbenchSynchronizer::submit() {
         if(resource.isNull()) { 
             /* This actually is a newly created layout. */
             resource = QnLayoutResourcePtr(new QnLayoutResource());
-            resource->setGuid(QUuid::createUuid());
+            resource->setGuid(QUuid::createUuid().toString());
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);
             synchronizer->setAutoDeleting(true);
@@ -78,7 +78,7 @@ void QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved(const QnResourcePt
     if(!m_update)
         return;
 
-    QnScopedValueRollback<bool> guard(&m_submit, false);
+    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
     if(!layoutResource)

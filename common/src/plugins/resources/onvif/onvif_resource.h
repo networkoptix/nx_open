@@ -1,17 +1,19 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#ifdef ENABLE_ONVIF
+
 #include <list>
 #include <memory>
 #include <stack>
 
-#include <QDateTime>
-#include <QList>
-#include <QMap>
-#include <QPair>
+#include <QtCore/QDateTime>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QPair>
 #include <QSharedPointer>
-#include <QWaitCondition>
-#include <QXmlDefaultHandler>
+#include <QtCore/QWaitCondition>
+#include <QtXml/QXmlDefaultHandler>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
@@ -19,8 +21,6 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
-#include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -108,9 +108,8 @@ public:
 
     virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
-    virtual QString getVendorName() const override;
 
-    virtual int getMaxFps() override;
+    virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
     virtual bool shoudResolveConflicts() const override;
@@ -163,6 +162,12 @@ public:
     QString getPtzfUrl() const;
     void setPtzfUrl(const QString& src);
 
+    QString getPtzConfigurationToken() const;
+    void setPtzConfigurationToken(const QString &src);
+
+    QString getPtzProfileToken() const;
+    void setPtzProfileToken(const QString& src); 
+
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
@@ -175,7 +180,7 @@ public:
     static int calcTimeDrift(const QString& deviceUrl);
 
 
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     bool fetchAndSetDeviceInformation(bool performSimpleCheck);
 
     //!Relay input with token \a relayToken has changed its state to \a active
@@ -201,8 +206,9 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    bool isPTZDisabled() const;
 protected:
+    virtual QString getVendorInternal() const override;
+
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -210,7 +216,7 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual void setCropingPhysical(QRect croping);
+    virtual void setCroppingPhysical(QRect cropping);
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
@@ -257,7 +263,7 @@ private:
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
-    OnvifCameraSettingsResp* m_onvifAdditionalSettings;
+    std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
 
     mutable QMutex m_physicalParamsMutex;
     QDateTime m_advSettingsLastUpdated;
@@ -399,10 +405,11 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    QScopedPointer<QnOnvifPtzController> m_ptzController;
 
     QString m_imagingUrl;
     QString m_ptzUrl;
+    QString m_ptzProfileToken;
+    QString m_ptzConfigurationToken;
     int m_timeDrift;
     int m_prevSoapCallResult;
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
@@ -417,11 +424,12 @@ private:
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     QString m_vendorName;
-	
+    
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
     int m_streamConfCounter;
-    CameraDiagnostics::Result m_prevOnvifResultCode;
+    CameraDiagnostics::Result m_prevOnvifResultCode; 
+    QString m_onvifNotificationSubscriptionReference;
 
     bool createPullPointSubscription();
     bool pullMessages();
@@ -431,6 +439,7 @@ private:
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
+    bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
     bool setRelayOutputStateNonSafe(
@@ -439,5 +448,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
 };
+
+#endif //ENABLE_ONVIF
 
 #endif //onvif_resource_h

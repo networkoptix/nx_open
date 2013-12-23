@@ -23,22 +23,11 @@ QnCameraDiagnosticsHandler::QnCameraDiagnosticsHandler()
 
 int QnCameraDiagnosticsHandler::executeGet(
     const QString& /*path*/,
-    const QnRequestParamList &params,
-    JsonResult& result )
+    const QnRequestParams &params,
+    QnJsonRestResult& result )
 {
-    QString resID;
-    CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::none;
-    for( QnRequestParamList::const_iterator
-        it = params.begin();
-        it != params.end();
-        ++it )
-    {
-        if( it->first == resIDParamName )
-            resID = it->second;
-        else if( it->first == diagnosticsTypeParamName )
-            diagnosticsType = CameraDiagnostics::Step::fromString(it->second);
-    }
-
+    QString resID = params.value("res_id");
+    CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));
     if( resID.isEmpty() || diagnosticsType == CameraDiagnostics::Step::none )
         return nx_http::StatusCode::badRequest;
 
@@ -114,6 +103,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStrea
     const QnSecurityCamResourcePtr& cameraRes,
     QnVideoCamera* videoCamera )
 {
+    Q_UNUSED(cameraRes)
     QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
     if( !streamReader )
         return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown, "no stream reader" ); //NOTE we should never get here 

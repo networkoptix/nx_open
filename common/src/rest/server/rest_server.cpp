@@ -12,7 +12,7 @@ QnRestServer::~QnRestServer()
     stop();
 }
 
-QnTCPConnectionProcessor* QnRestServer::createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner)
+QnTCPConnectionProcessor* QnRestServer::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
     return new QnRestConnectionProcessor(clientSocket, owner);
 }

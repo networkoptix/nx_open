@@ -1,9 +1,9 @@
 #ifndef __ABSTRACT_ARCHIVE_DELEGATE_H
 #define __ABSTRACT_ARCHIVE_DELEGATE_H
 
-#include <QRegion>
-#include <QObject>
-#include <QVector>
+#include <QtGui/QRegion>
+#include <QtCore/QObject>
+#include <QtCore/QVector>
 #include "core/resource/resource.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "motion/abstract_motion_archive.h"
@@ -52,6 +52,9 @@ public:
     virtual qint64 endTime() = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     // If findIFrame=true, jump to position before time to a nearest IFrame.
+    /*!
+        \param time UTC, usec
+    */
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
     virtual QnResourceVideoLayout* getVideoLayout() = 0;
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
@@ -65,6 +68,9 @@ public:
     virtual void setSingleshotMode(bool value) { Q_UNUSED(value); }
 
     // MediaStreamQuality. By default, this function is not implemented. Return: true if need seek for change quality
+    /*!
+        \param fastSwitch Do not wait for next I-frame of new stream, but give data starting with previous I-frame
+    */
     virtual bool setQuality(MediaQuality quality, bool fastSwitch) { Q_UNUSED(quality); Q_UNUSED(fastSwitch); return false; }
 
     Flags getFlags() const { return m_flags; }

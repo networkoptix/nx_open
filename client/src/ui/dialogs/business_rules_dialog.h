@@ -4,8 +4,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QModelIndex>
 
-#include <QtGui/QDialog>
-#include <QtGui/QMenu>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QMenu>
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 

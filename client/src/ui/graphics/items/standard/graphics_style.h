@@ -1,7 +1,8 @@
 #ifndef QN_GRAPHICS_STYLE_H
 #define QN_GRAPHICS_STYLE_H
 
-#include <QtGui/QStyle>
+#include <QtCore/QPointer>
+#include <QtWidgets/QStyle>
 
 class QStyle;
 class QGraphicsWidget;
@@ -50,7 +51,7 @@ public:
     static qint64 sliderValueFromPosition(qint64 min, qint64 max, qreal pos, qreal span, bool upsideDown, bool bound);
 
 private:
-    QWeakPointer<QStyle> m_baseStyle;
+    QPointer<QStyle> m_baseStyle;
     mutable const QGraphicsWidget *m_graphicsWidget;
 };
 

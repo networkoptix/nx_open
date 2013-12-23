@@ -1,14 +1,19 @@
 #include "action_conditions.h"
 
-#include <QAction>
+#include <QtWidgets/QAction>
 
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_criterion.h>
 #include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_resource.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
 #include <camera/resource_display.h>
 
 #include <client/client_settings.h>
+
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -341,9 +346,14 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {
-    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
+    QnMediaResourcePtr media = parameters.resource().dynamicCast<QnMediaResource>();
+    if(!media)
         return Qn::InvisibleAction;
+
+    bool isImage = media->toResource()->flags() & QnResource::still_image;
+    if (isImage)
+        return Qn::InvisibleAction;
+
 #if 0
     if(camera->isGroupPlayOnly())
         return Qn::InvisibleAction;
@@ -355,7 +365,8 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
@@ -382,7 +393,8 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
         return Qn::InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
     bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
 
     return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
@@ -447,13 +459,14 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
 
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
-    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
-        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+        bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
+                && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool allowed = isServer || isMediaResource;
         bool forbidden = isExportedLayout && (isServer || isLocalResource);
         if(allowed && !forbidden)
@@ -507,10 +520,45 @@ Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {
+    if  (!context()->user())
+        return Qn::InvisibleAction;
+    QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
+    if (snapshotManager()->isFile(layout))
+        return Qn::InvisibleAction;
+    else
+        return Qn::EnabledAction;
+}
+
 Qn::ActionVisibility QnCheckForUpdatesActionCondition::check(const QnActionParameters &) {
     return qnSettings->isUpdatesEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &) {
     return qnSettings->isShowcaseEnabled() ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        if(!check(qnPtzPool->controller(resource)))
+            return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QnResourceWidget *widget, widgets) {
+        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+        if(!mediaWidget)
+            return Qn::InvisibleAction;
+        
+        if(!check(mediaWidget->ptzController()))
+            return Qn::InvisibleAction;
+    }
+
+    return Qn::EnabledAction;
+}
+
+bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
+    return controller && controller->hasCapabilities(m_capabilities);
 }
