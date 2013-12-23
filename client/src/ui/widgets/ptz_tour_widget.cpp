@@ -8,7 +8,7 @@
 
 QnPtzTourWidget::QnPtzTourWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::QnPtzTourWidget),
+    ui(new Ui::PtzTourWidget),
     m_model(new QnPtzTourModel(this))
 {
     ui->setupUi(this);
