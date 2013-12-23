@@ -8,7 +8,7 @@
 class QnPtzTourModel;
 
 namespace Ui {
-class QnPtzTourWidget;
+    class PtzTourWidget;
 }
 
 class QnPtzTourWidget : public QWidget {
@@ -30,7 +30,7 @@ private slots:
     void at_moveSpotUpButton_clicked();
     void at_moveSpotDownButton_clicked();
 private:
-    QScopedPointer<Ui::QnPtzTourWidget> ui;
+    QScopedPointer<Ui::PtzTourWidget> ui;
     QnPtzTourModel *m_model;
 };
 
