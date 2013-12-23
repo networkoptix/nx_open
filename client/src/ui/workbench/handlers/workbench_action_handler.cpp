@@ -78,6 +78,7 @@
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
+#include <ui/dialogs/picture_settings_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -233,6 +234,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::PictureSettingsAction),                  SIGNAL(triggered()),    this,   SLOT(at_pictureSettingsAction_triggered()));
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
@@ -1671,6 +1673,21 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->show();
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
+}
+
+void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    if (!resource)
+        return;
+
+    QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
+    if (!media)
+        return;
+
+    QnPictureSettingsDialog dialog(mainWindow());
+    dialog.updateFromResource(media);
+    if (dialog.exec())
+        dialog.submitToResource(media);
 }
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()

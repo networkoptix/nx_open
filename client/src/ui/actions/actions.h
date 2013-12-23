@@ -480,6 +480,11 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
+         * Opens picture settings dialog.
+         */
+        PictureSettingsAction,
+
+        /**
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,

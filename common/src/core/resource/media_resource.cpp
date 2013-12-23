@@ -141,21 +141,8 @@ void QnMediaResource::initMediaResource()
     toResource()->addFlags(QnResource::media);
 }
 
-QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const
-{
-#if 1
-    if (toResource()->flags() & QnResource::still_image)
-    {
-        QnMediaDewarpingParams params;
-        params.enabled = true;
-        params.viewMode = QnMediaDewarpingParams::Horizontal;
-        return params;
-    }
-    else 
-#endif
-    {
-        return m_dewarpingParams;
-    }
+QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
+    return m_dewarpingParams;
 }
 
 
