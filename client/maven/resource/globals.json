@@ -11,6 +11,6 @@
     
     "settings": {
         "updateFeedUrl":            "${updatefeed.url}",
-        "translationPath":          ":/translations/common_${translation.lang}.qm"
+        "translationPath":          ":/translations/common_${translation1}.qm"
     }
 }
