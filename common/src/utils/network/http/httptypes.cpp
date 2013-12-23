@@ -457,6 +457,19 @@ namespace nx_http
         return *this;
     }
 
+    void HttpMessage::serialize( BufferType* const dstBuffer ) const
+    {
+        switch( type )
+        {
+            case MessageType::request:
+                return request->serialize( dstBuffer );
+            case MessageType::response:
+                return response->serialize( dstBuffer );
+            default:
+                return /*false*/;
+        }
+    }
+
     void HttpMessage::clear()
     {
         if( type == MessageType::request )

@@ -14,7 +14,7 @@
 #include "stream_socket_server.h"
 
 
-//!Contains common logic for connection created by \a StreamSocketServer
+//!Contains common logic for server-side connection created by \a StreamSocketServer
 /*!
     \a CustomConnectionType MUST define following methods:
     \code {*.cpp}
@@ -38,7 +38,7 @@ public:
 
     BaseServerConnection(
         CustomSocketServerType* streamServer,
-        AbstractStreamSocket* streamSocket )
+        AbstractCommunicatingSocket* streamSocket )
     :
         m_streamServer( streamServer ),
         m_streamSocket( streamSocket ),
@@ -55,7 +55,7 @@ public:
 
 private:
     CustomSocketServerType* m_streamServer;
-    AbstractStreamSocket* m_streamSocket;
+    AbstractCommunicatingSocket* m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend;
 

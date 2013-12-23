@@ -1,29 +1,26 @@
 /**********************************************************
-* 19 dec 2013
+* 23 dec 2013
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef BASE_STUN_CONNECTION_H
-#define BASE_STUN_CONNECTION_H
+#ifndef BASE_STREAM_PROTOCOL_CONNECTION_H
+#define BASE_STREAM_PROTOCOL_CONNECTION_H
 
 #include <atomic>
 
 #include <boost/optional.hpp>
 
-#include "stun_message.h"
-#include "stun_message_parser.h"
-#include "stun_message_parse_handler.h"
-#include "stun_message_serializer.h"
-#include "../base_server_connection.h"
+#include "base_protocol_message_types.h"
+#include "base_server_connection.h"
 
 
-namespace nx_stun
+namespace nx_api
 {
-    //!Connection of STUN protocol
+    //!Connection of stream-orientied protocol of type request/respose
     /*!
         It is not tied to underlying transport (tcp, udp, etc...)
 
-        \a CustomStunConnectionType MUST provide following method:
+        \a CustomConnectionType MUST provide following method:
         \code {*.cpp}
             void processMessage( const Message& request, boost::optional<Message>* const response );
         \endcode
@@ -31,28 +28,44 @@ namespace nx_stun
         \todo This class contains no STUN-specific logic, so it MUST be protocol-independent (it will be used for HTTP later)
     */
     template<
-        class CustomStunConnectionType,
-        class CustomSocketServerType
-    > class BaseStunServerConnection
+        class CustomConnectionType,
+        class CustomSocketServerType,
+        class MessageType,
+        class ParserType,
+        class SerializerType
+    > class BaseStreamProtocolConnection
     :
-        public BaseServerConnection<BaseStunServerConnection<CustomStunConnectionType, CustomSocketServerType>, CustomSocketServerType>
+        public BaseServerConnection<
+            BaseStreamProtocolConnection<
+                CustomConnectionType,
+                CustomSocketServerType,
+                MessageType,
+                ParserType,
+                SerializerType>,
+            CustomSocketServerType>
     {
     public:
-        typedef BaseStunServerConnection<CustomStunConnectionType, CustomSocketServerType> SelfType;
+        typedef BaseStreamProtocolConnection<
+            CustomConnectionType,
+            CustomSocketServerType,
+            MessageType,
+            ParserType,
+            SerializerType> SelfType;
+        //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomSocketServerType> SelfType;
         typedef BaseServerConnection<SelfType, CustomSocketServerType> BaseType;
 
-        BaseStunServerConnection(
+        BaseStreamProtocolConnection(
             CustomSocketServerType* streamServer,
-            AbstractStreamSocket* streamSocket )
+            AbstractCommunicatingSocket* streamSocket )
         :
             BaseType( streamServer, streamSocket ),
-            m_parseHandler( &m_request ),
-            m_parser( &m_parseHandler ),
             m_serializerState( SerializerState::done ),
             m_isSendingMessage( 0 )
         {
             static const size_t DEFAULT_SEND_BUFFER_SIZE = 4*1024;
             m_writeBuffer.reserve( DEFAULT_SEND_BUFFER_SIZE );
+
+            m_parser.setMessage( &m_request );
         }
 
         void bytesReceived( const nx::Buffer& buf )
@@ -73,9 +86,10 @@ namespace nx_stun
                         //processing request
                         //NOTE interleaving is not supported yet
                         const bool canProcessResponse = m_isSendingMessage == 0;
-                        static_cast<CustomStunConnectionType*>(this)->processMessage( m_request, canProcessResponse ? &m_response : nullptr );
+                        static_cast<CustomConnectionType*>(this)->processMessage( m_request, canProcessResponse ? &m_response : nullptr );
                         m_parser.reset();
                         m_request.clear();
+                        m_parser.setMessage( &m_request );
                         if( canProcessResponse && m_response )
                             sendResponseMessage();
                         pos += bytesProcessed;
@@ -112,12 +126,11 @@ namespace nx_stun
         }
 
     private:
-        Message m_request;
-        boost::optional<Message> m_response;
-        MessageParseHandler m_parseHandler;
-        MessageParser<MessageParseHandler> m_parser;
-        MessageSerializer m_serializer;
-        SerializerState m_serializerState;
+        MessageType m_request;
+        boost::optional<MessageType> m_response;
+        ParserType m_parser;
+        SerializerType m_serializer;
+        SerializerState::Type m_serializerState;
         nx::Buffer m_writeBuffer;
         std::atomic<int> m_isSendingMessage;
 
@@ -132,4 +145,4 @@ namespace nx_stun
     };
 }
 
-#endif  //BASE_STUN_CONNECTION_H
+#endif   //BASE_STREAM_PROTOCOL_CONNECTION_H

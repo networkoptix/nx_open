@@ -14,10 +14,15 @@ namespace nx_stun
     class MessageParseHandler
     {
     public:
-        MessageParseHandler( Message* const message )
+        MessageParseHandler()
         :
-            m_message( message )
+            m_message( nullptr )
         {
+        }
+
+        void setMessage( Message* const message )
+        {
+            m_message = message;
         }
 
         void onMessageStart()
@@ -42,7 +47,7 @@ namespace nx_stun
         }
 
     private:
-        Message* const m_message;
+        Message* m_message;
     };
 }
 

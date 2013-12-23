@@ -13,10 +13,10 @@ namespace nx_stun
         //TODO/IMPL
     }
 
-    SerializerState MessageSerializer::serialize( nx::Buffer* const buffer, size_t* const bytesWritten )
+    nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const buffer, size_t* const bytesWritten )
     {
         //TODO/IMPL
-        return SerializerState::done;
+        return nx_api::SerializerState::done;
     }
 
     /*!

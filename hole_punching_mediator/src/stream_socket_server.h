@@ -85,43 +85,9 @@ public:
     }
 
 private:
-    //class HandlerHolder
-    //{
-    //public:
-    //    virtual ~HandlerHolder() {}
-
-    //    virtual void operator()(
-    //        SystemError::ErrorCode errorCode,
-    //        AbstractStreamSocket* newConnection ) = 0;
-    //};
-
-    //template<class HandlerType>
-    //    class CustomHandlerHolder
-    //:
-    //    public HandlerHolder
-    //{
-    //public:
-    //    CustomHandlerHolder( const HandlerType& handler )
-    //    :
-    //        m_handler( handler )
-    //    {
-    //    }
-
-    //    virtual void operator()(
-    //        SystemError::ErrorCode errorCode,
-    //        AbstractStreamSocket* newConnection ) override
-    //    {
-    //        m_handler( errorCode, newConnection );
-    //    }
-
-    //private:
-    //    HandlerType m_handler;
-    //};
-
     std::shared_ptr<AbstractStreamServerSocket> m_socket;
     std::mutex m_mutex;
     std::set<ConnectionPtr> m_connections;
-    //std::unique_ptr<HandlerHolder> m_handler;
 };
 
 #endif  //STREAM_SOCKET_SERVER_H

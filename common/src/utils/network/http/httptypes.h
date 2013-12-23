@@ -251,6 +251,8 @@ namespace nx_http
 
         HttpMessage& operator=( const HttpMessage& right );
 
+        void serialize( BufferType* const dstBuffer ) const;
+
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };
         const HttpHeaders& headers() const { return type == MessageType::request ? request->headers : response->headers; };

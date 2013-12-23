@@ -16,8 +16,10 @@
 #include <utils/common/stoppable.h>
 
 #include "hole_punching_requests_processor.h"
+#include "multi_address_server.h"
 #include "stun_stream_socket_server.h"
-#include "stun_server_connection.h"
+#include "http/http_stream_socket_server.h"
+//#include "stun_server_connection.h"
 
 
 class HolePuncherProcess
@@ -40,7 +42,8 @@ private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
-    std::list<std::unique_ptr<StunStreamSocketServer> > m_listeners;
+    std::unique_ptr<MultiAddressServer<StunStreamSocketServer>> m_multiAddressStunServer;
+    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>> m_multiAddressHttpServer;
 
     bool initialize();
     void deinitialize();

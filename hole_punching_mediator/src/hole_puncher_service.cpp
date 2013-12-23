@@ -121,34 +121,20 @@ bool HolePuncherProcess::initialize()
         return false;
     }
 
-    //binding to address(-es) to listen
-    for( const SocketAddress& addr : addrToListenList )
-    {
-        std::unique_ptr<StunStreamSocketServer> socketServer( new StunStreamSocketServer() );
-        if( !m_listeners.back()->bind( addr ) )
-        {
-            NX_LOG( QString::fromLatin1("Failed to bind to address %1. %2").arg(addr.toString()).arg(SystemError::getLastOSErrorText()), cl_logERROR );
-            continue;
-        }
-        m_listeners.push_back( std::move(socketServer) );
-    }
+    //m_multiAddressStunServer.reset( new MultiAddressServer<StunStreamSocketServer>(std::move(addrToListenList)) );
+    m_multiAddressHttpServer.reset( new MultiAddressServer<nx_http::HttpStreamSocketServer>(std::move(addrToListenList)) );
+
+    //if( !m_multiAddressStunServer->bind() )
+    //    return false;
+    if( !m_multiAddressHttpServer->bind() )
+        return false;
 
     //TODO: #ak process privilege reduction should be made here
 
-    //listening for incoming requests
-    for( auto it = m_listeners.cbegin(); it != m_listeners.cend(); )
-    {
-        if( !(*it)->listen() )
-        {
-            NX_LOG( QString::fromLatin1("Failed to listen address %1. %2").arg((*it)->address().toString()).arg(SystemError::getLastOSErrorText()), cl_logERROR );
-            it = m_listeners.erase( it );
-            continue;
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    //if( !m_multiAddressStunServer->listen() )
+    //    return false;
+    if( !m_multiAddressHttpServer->listen() )
+        return false;
 
     return true;
 }
@@ -156,7 +142,8 @@ bool HolePuncherProcess::initialize()
 void HolePuncherProcess::deinitialize()
 {
     //stopping accepting incoming connections
-    m_listeners.clear();
+    m_multiAddressStunServer.reset();
+    m_multiAddressHttpServer.reset();
 }
 
 QString HolePuncherProcess::getDataDirectory()

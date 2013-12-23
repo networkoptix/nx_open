@@ -9,7 +9,7 @@
 
 StunServerConnection::StunServerConnection(
     StunStreamSocketServer* socketServer,
-    AbstractStreamSocket* sock )
+    AbstractCommunicatingSocket* sock )
 :
     BaseType( socketServer, sock )
 {

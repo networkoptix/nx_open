@@ -11,16 +11,11 @@
 #include <utils/network/buffer.h>
 
 #include "stun_message.h"
+#include "../base_protocol_message_types.h"
 
 
 namespace nx_stun
 {
-    enum class SerializerState
-    {
-        needMoreBufferSpace,
-        done
-    };
-
     //!Serializes message to buffer
     class MessageSerializer
     {
@@ -28,7 +23,7 @@ namespace nx_stun
         //!Set message to serialize
         void setMessage( const Message& message );
 
-        SerializerState serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
+        nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
 
         /*!
             Doesn't use \a *buf beyond its capacity

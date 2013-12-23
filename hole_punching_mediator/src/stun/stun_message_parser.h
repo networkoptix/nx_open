@@ -11,19 +11,11 @@
 #include <utils/network/abstract_socket.h>
 
 #include "stun_message.h"
+#include "../base_protocol_message_types.h"
 
 
 namespace nx_stun
 {
-    enum class ParserState
-    {
-        init,
-        inProgress,
-        done,
-        //!goes to this state if data is not STUN
-        failed
-    };
-
     //!STUN message parser (event-based)
     /*!
         \a Handler MUST methods with following signature:
@@ -41,12 +33,34 @@ namespace nx_stun
     class MessageParser
     {
     public:
-        MessageParser( Handler* const hander )
+        MessageParser( Handler* const handler )
         :
-            m_hander( hander )
+            m_handler( handler ),
+            m_ownHandler( false )
         {
         }
 
+        MessageParser()
+        :
+            m_handler( new Handler() ),
+            m_ownHandler( true )
+        {
+        }
+
+        MessageParser::~MessageParser()
+        {
+            if( m_ownHandler )
+            {
+                delete m_handler;
+                m_handler = nullptr;
+            }
+        }
+
+        //!set message object to parse to
+        void setMessage( Message* const msg )
+        {
+            m_handler->setMessage( msg );
+        }
         //!Returns current parse state
         /*!
             Methods returns if:\n
@@ -58,17 +72,17 @@ namespace nx_stun
             \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
             \note Reads whole message even if parse error occured
         */
-        ParserState parse( const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/ )
+        nx_api::ParserState::Type parse( const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/ )
         {
             //TODO/IMPL
             return state();
         }
 
         //!Returns current parse state
-        ParserState state() const
+        nx_api::ParserState::Type state() const
         {
             //TODO/IMPL
-            return ParserState::init;
+            return nx_api::ParserState::init;
         }
 
         //!Resets parse state and prepares for parsing different data
@@ -78,7 +92,8 @@ namespace nx_stun
         }
 
     private:
-        Handler* const m_hander;
+        Handler* m_handler;
+        bool m_ownHandler;  //TODO: #ak remove this member
     };
 }
 
