@@ -37,6 +37,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -975,6 +976,8 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
     at_dbDataChanged();
     at_cameraDataChanged();
 
+    // Preview the changes on the central widget
+
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
     if (!m_camera || !centralWidget || centralWidget->resource() != m_camera)
         return;
@@ -984,5 +987,10 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
         dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
         mediaWidget->setDewarpingParams(dewarpingParams);
+
+        QnWorkbenchItem *item = mediaWidget->item();
+        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        itemParams.enabled = dewarpingParams.enabled;
+        item->setDewarpingParams(itemParams);
     }
 }

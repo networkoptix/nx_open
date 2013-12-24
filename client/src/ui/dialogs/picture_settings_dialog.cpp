@@ -12,6 +12,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 #include <utils/image_provider.h>
 
@@ -22,7 +23,10 @@ QnPictureSettingsDialog::QnPictureSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->fisheyeCheckBox, &QCheckBox::toggled, this, &QnPictureSettingsDialog::at_fisheyeCheckbox_toggled);
+    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnPictureSettingsDialog::at_fisheyeCheckbox_toggled);
+
+    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnPictureSettingsDialog::paramsChanged);
+    connect(ui->fisheyeWidget,      &QnFisheyeSettingsWidget::dataChanged,  this,   &QnPictureSettingsDialog::paramsChanged);
 }
 
 QnPictureSettingsDialog::~QnPictureSettingsDialog()
@@ -60,6 +64,11 @@ void QnPictureSettingsDialog::paramsChanged() {
         ui->fisheyeWidget->submitToParams(dewarpingParams);
         dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
         mediaWidget->setDewarpingParams(dewarpingParams);
+
+        QnWorkbenchItem *item = mediaWidget->item();
+        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        itemParams.enabled = dewarpingParams.enabled;
+        item->setDewarpingParams(itemParams);
     }
 
 }
