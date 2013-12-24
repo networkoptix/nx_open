@@ -25,7 +25,7 @@
 #define QN_FFMPEG_VERSION               "${ffmpeg.version}"
 #define QN_SIGAR_VERSION                "${sigar.version}"
 #define QN_BOOST_VERSION                "${boost.version}"
-#define QN_CUSTOMIZATION_NAME           "${installer.customization}"
+#define QN_CUSTOMIZATION_NAME           "${customization}"
 #define QN_MEDIA_FOLDER_NAME            "${client.mediafolder.name}"
 #ifdef _WIN32
 #   define QN_CLIENT_EXECUTABLE_NAME    "${product.name}.exe"
