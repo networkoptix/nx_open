@@ -15,11 +15,13 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/image_provider.h>
+#include <utils/common/scoped_value_rollback.h>
 
 QnPictureSettingsDialog::QnPictureSettingsDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnPictureSettingsDialog)
+    ui(new Ui::QnPictureSettingsDialog),
+    m_updating(false)
 {
     ui->setupUi(this);
 
@@ -33,6 +35,8 @@ QnPictureSettingsDialog::~QnPictureSettingsDialog()
 {}
 
 void QnPictureSettingsDialog::updateFromResource(const QnMediaResourcePtr &resource) {
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     QImage image(resource->toResource()->getUrl());
     ui->fisheyeCheckBox->setEnabled(!image.isNull());
 
@@ -58,6 +62,9 @@ void QnPictureSettingsDialog::at_fisheyeCheckbox_toggled(bool checked) {
 }
 
 void QnPictureSettingsDialog::paramsChanged() {
+    if (m_updating)
+        return;
+
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
         QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
