@@ -6,6 +6,31 @@
 #include <ui/processors/drag_process_handler.h>
 
 class DragProcessor;
+class QAbstractAnimation;
+
+class QnFisheyeAnimatedCircle: public QObject {
+    Q_OBJECT
+    Q_PROPERTY(QPointF  center      READ center     WRITE setCenter)
+    Q_PROPERTY(qreal    radius      READ radius     WRITE setRadius)
+public:
+    explicit QnFisheyeAnimatedCircle(QObject *parent = 0):
+        QObject(parent),
+        m_center(0.5, 0.5),
+        m_radius(0.5)
+        {}
+
+    QPointF center() const { return m_center; }
+    Q_SLOT  void setCenter(const QPointF &center) {m_center = center; emit changed();}
+
+    qreal   radius() const {return m_radius;}
+    Q_SLOT  void setRadius(qreal radius) {m_radius = radius; emit changed();}
+
+signals:
+    void changed();
+private:
+    QPointF m_center;
+    qreal   m_radius;
+};
 
 class QnFisheyeCalibrationImageWidget : public QWidget, public DragProcessHandler
 {
@@ -42,10 +67,12 @@ public:
 
     void    beginSearchAnimation();
     void    endSearchAnimation();
+    void    abortSearchAnimation();
 signals:
     void centerModified(const QPointF &center);
     void radiusModified(qreal radius);
 
+    void animationFinished();
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
@@ -57,7 +84,12 @@ protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 
 private:
-    void paintCircle(QPainter* painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius, bool paintCenter = false);
+    void paintCircle(QPainter* painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius);
+
+//    Q_SLOT void innerAnimationStep();
+//    Q_SLOT void outerAnimationStep();
+    void finishAnimationStep();
+    Q_SLOT void endAnimation();
 
     DragProcessor *m_dragProcessor;
     QImage  m_cachedImage;
@@ -66,16 +98,13 @@ private:
     enum AnimationStage {
         Idle,
         Searching,
-        Radius,
-        Center
+        Finishing
     };
 
     struct {
         AnimationStage stage;
-        QPointF center;
-        qreal radius;
-        QList<qreal> waves;
-        qint64 timestamp;
+        QnFisheyeAnimatedCircle *circle;
+        QPointer<QAbstractAnimation> animation;
     } m_animation;
 
     QImage  m_image;

@@ -4,12 +4,13 @@
 #include <QtGui/QImage>
 #include <QtWidgets/QWidget>
 
-#include <core/resource/resource_fwd.h>
+#include <core/ptz/media_dewarping_params.h>
 
 namespace Ui {
     class FisheyeSettingsWidget;
 }
 
+class QnImageProvider;
 
 class QnFisheyeSettingsWidget : public QWidget{
     Q_OBJECT
@@ -19,8 +20,8 @@ public:
     QnFisheyeSettingsWidget(QWidget* parent = 0);
     virtual ~QnFisheyeSettingsWidget();
 
-    void updateFromResource(const QnResourcePtr &resource);
-    void submitToResource(const QnResourcePtr &resource);
+    void updateFromParams(const QnMediaDewarpingParams &params, QnImageProvider *imageProvider);
+    void submitToParams(QnMediaDewarpingParams &params);
 
 signals:
     void dataChanged();

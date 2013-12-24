@@ -1115,6 +1115,11 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
+    factory(Qn::PictureSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Picture Settings...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::still_image), Qn::Any, this));
+
     factory(Qn::LayoutSettingsAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
        text(tr("Layout Settings...")).

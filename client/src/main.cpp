@@ -271,8 +271,11 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #ifndef API_TEST_MAIN
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
+    // these functions should be called in every thread that wants to use rand() and qrand()
+    srand(::time(NULL));
+    qsrand(::time(NULL));
+
     int result = 0;
-    //(refactoring to QnResourcePool instanciation was required to make mediaserver exit without segfault)
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);

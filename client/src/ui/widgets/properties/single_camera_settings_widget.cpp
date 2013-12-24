@@ -10,10 +10,13 @@
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QSplitter>
 
+#include <camera/single_thumbnail_loader.h>
+
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_parameters.h>
@@ -28,7 +31,6 @@
 #include <ui/style/warning_style.h>
 
 #include <utils/license_usage_helper.h>
-#include "core/resource/media_resource.h"
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
@@ -357,11 +359,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         }
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
-        ui->fisheyeSettingsWidget->submitToResource(m_camera);
 
-        QnMediaDewarpingParams dewarping = m_camera->getDewarpingParams();
-        dewarping.enabled = ui->checkBoxDewarping->isChecked();
-        m_camera->setDewarpingParams(dewarping);
+        QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
+        ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
+        dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
+        m_camera->setDewarpingParams(dewarpingParams);
 
         setHasDbChanges(false);
     }
@@ -480,7 +482,10 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
-            ui->fisheyeSettingsWidget->updateFromResource(m_camera);
+
+            if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
+                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, QSize(), this);
+            ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
 

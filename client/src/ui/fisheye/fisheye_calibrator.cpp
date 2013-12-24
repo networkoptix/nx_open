@@ -371,7 +371,8 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
         inputData[1] = inputData[2] = inputData[3] = 0;
         memcpy(inputData[0], frame.bits(), inputNumBytes);
 
-        int numBytes = avpicture_get_size(PIX_FMT_GRAY8, qPower2Ceil((unsigned)frame.width(),32), frame.height());
+        int roundWidth = qPower2Ceil((unsigned)frame.width(),32);
+        int numBytes = avpicture_get_size(PIX_FMT_GRAY8, roundWidth, frame.height());
         qFreeAligned(m_grayImageBuffer);
         m_grayImageBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
 
@@ -379,13 +380,13 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
             frame.width(), frame.height(), PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL);
 
         AVPicture dstPict;
-        avpicture_fill(&dstPict, m_grayImageBuffer, PIX_FMT_GRAY8, frame.width(), frame.height());
+        avpicture_fill(&dstPict, m_grayImageBuffer, PIX_FMT_GRAY8, roundWidth, frame.height());
 
         int inputLinesize[4];
         inputLinesize[0] = frame.bytesPerLine();
         inputLinesize[1] = inputLinesize[2] = inputLinesize[3] = 0;
 
-        QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), QImage::Format_Indexed8);
+        QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), roundWidth, QImage::Format_Indexed8);
         sws_scale(scaleContext, inputData, inputLinesize, 0, frame.height(), dstPict.data, dstPict.linesize);
         sws_freeContext(scaleContext);
         qFreeAligned(inputData[0]);
