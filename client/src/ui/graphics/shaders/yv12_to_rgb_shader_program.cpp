@@ -68,7 +68,8 @@ bool QnYv12ToRgbWithGammaShaderProgram::link()
 }
 
 QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context, QObject *parent, bool final): 
-    QnAbstractYv12ToRgbShaderProgram(context, parent) 
+    QnAbstractYv12ToRgbShaderProgram(context, parent),
+    m_gammaStr(lit("y"))
 {
     if (!final)
         return;
@@ -104,9 +105,9 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 // ---------------------------- QnFisheyeRectilinearProgram ------------------------------------
 
 QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
-    QnFisheyeShaderProgram(context, parent, gammaStr)
+    QnFisheyeShaderProgram(context, parent)
 {
-
+    setGammaStr(gammaStr);
 }
 
 QString QnFisheyeRectilinearProgram::getShaderText()
@@ -175,15 +176,15 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    )).arg(gammaStr());
 }
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
 
 QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(const QGLContext *context, QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(context, parent, gammaStr)
+    :QnFisheyeShaderProgram(context, parent)
 {
-
+    setGammaStr(gammaStr);
 }
 
 QString QnFisheyeEquirectangularHProgram::getShaderText()
@@ -259,17 +260,16 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    )).arg(gammaStr());
 }
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
 
 QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(const QGLContext *context, QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(context, parent, gammaStr)
+    :QnFisheyeShaderProgram(context, parent)
 {
-
+    setGammaStr(gammaStr);
 }
-
 
 QString QnFisheyeEquirectangularVProgram::getShaderText()
 {
@@ -344,7 +344,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    )).arg(gammaStr());
 }
 
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
@@ -375,7 +375,7 @@ bool QnAbstractRGBAShaderProgram::link()
 // ---------------------------- QnFisheyeRGBRectilinearProgram ------------------------------------
 
 QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(const QGLContext *context, QObject *parent):
-    QnFisheyeShaderProgram(context, parent, QString())
+    QnFisheyeShaderProgram(context, parent)
 {
 
 }
@@ -438,7 +438,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 // ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
 
 QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(const QGLContext *context, QObject *parent)
-    :QnFisheyeShaderProgram(context, parent, QString())
+    :QnFisheyeShaderProgram(context, parent)
 {
 
 }
@@ -508,7 +508,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 // ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
 
 QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(const QGLContext *context, QObject *parent)
-    :QnFisheyeShaderProgram(context, parent, QString())
+    :QnFisheyeShaderProgram(context, parent)
 {
 
 }

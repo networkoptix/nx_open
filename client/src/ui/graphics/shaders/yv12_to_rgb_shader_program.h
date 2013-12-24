@@ -75,18 +75,21 @@ public:
         setUniformValue(m_yGammaLocation, value.gamma);
     }
     virtual bool link() override;
+
+    void setGammaStr(const QString& value) {m_gammaStr = value; }
+    QString gammaStr() const { return m_gammaStr; }
 private:
     int m_yLevels1Location;
     int m_yLevels2Location;
     int m_yGammaLocation;
+    QString m_gammaStr;
 };
 
 template <class T>
 class QnFisheyeShaderProgram : public T
 {
 public:
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y")):
-        T(context, parent, false), m_gammaStr(gammaStr) {}
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL): T(context, parent, false) {}
     
     void setDewarpingParams(const QnMediaDewarpingParams &mediaParams,
                             const QnItemDewarpingParams &itemParams,
@@ -94,7 +97,7 @@ public:
     {
         if (itemParams.panoFactor == 1)
         {
-            float fovRot = sin(itemParams.xAngle)*mediaParams.fovRot;
+            float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
                 T::setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
                 T::setUniformValue(m_yPos, (float) 0.5);
@@ -110,7 +113,7 @@ public:
         }
         else {
             T::setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
-            T::setUniformValue(m_fovRotLocation, (float) (mediaParams.fovRot * M_PI / 180.0));
+            T::setUniformValue(m_fovRotLocation, (float) qDegreesToRadians(mediaParams.fovRot));
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
                 T::setUniformValue(m_yPos, (float) 0.5);
@@ -134,7 +137,7 @@ public:
     }
 
     virtual bool link() override {
-        T::addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
+        T::addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
         bool rez = T::link();
         if (rez) {
             m_xShiftLocation = T::uniformLocation("xShift");
@@ -171,8 +174,6 @@ protected:
     
     int m_maxXLocation;
     int m_maxYLocation;
-private:
-    QString m_gammaStr;
 };
 
 // --------- fisheye YUV (with optional gamma) ---------------
