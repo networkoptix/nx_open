@@ -191,6 +191,17 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
     return result;
 }
 
+QByteArray downloadFileWithRetry(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth)
+{
+    QByteArray rez;
+    for (int i = 0; i < 4; ++i) {
+        rez = downloadFile(status, fileName, host, port, timeout, auth);
+        if (status != CL_HTTP_SERVICEUNAVAILABLE)
+            break;
+        QnSleep::msleep(rand() % 50);
+    }
+    return rez;
+}
 
 QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
@@ -207,12 +218,12 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         port = 80;
 
     CLHttpStatus status;
-    QString model = QString(QLatin1String(downloadFile(status, QLatin1String("get?model"), host, port, timeout, auth)));
+    QString model = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model"), host, port, timeout, auth)));
 
     if (model.length()==0)
         return QList<QnResourcePtr>();
 
-    QString modelRelease = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=releasename"), host, port, timeout, auth)));
+    QString modelRelease = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=releasename"), host, port, timeout, auth)));
 
 
     if (modelRelease!=model)
@@ -222,7 +233,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     }
     else
     {
-        QString modelFull = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=fullname"), host, port, timeout, auth)));
+        QString modelFull = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=fullname"), host, port, timeout, auth)));
 
         if (modelFull.length())        
             model = modelFull;
@@ -240,7 +251,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
 
 
 
-    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("get?mac"), host, port, timeout, auth)));
+    QString mac = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?mac"), host, port, timeout, auth)));
     mac = getValueFromString(mac);
 
     if (mac.isEmpty())

@@ -360,6 +360,10 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             {
                 return CL_HTTP_REDIRECT;
             }
+            else if( statusLine.statusCode == nx_http::StatusCode::serviceUnavailable)
+            {
+                return CL_HTTP_SERVICEUNAVAILABLE;
+            }
 
             return CL_TRANSPORT_ERROR;
         }
