@@ -86,8 +86,6 @@ protected:
 private:
     void paintCircle(QPainter* painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius);
 
-//    Q_SLOT void innerAnimationStep();
-//    Q_SLOT void outerAnimationStep();
     void finishAnimationStep();
     Q_SLOT void endAnimation();
 

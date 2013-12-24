@@ -111,79 +111,11 @@ void QnFisheyeCalibrationImageWidget::beginSearchAnimation() {
     if (m_image.isNull() || m_image.width() == 0)
         return;
 
-    m_animation.stage = Searching;
     m_animation.circle->setCenter(m_center);
     m_animation.circle->setRadius(m_radius);
-    return;
-
-
-
-/*    QPropertyAnimation* anim1 = new QPropertyAnimation(m_animation.circle, "center", this);
-    anim1->setDuration(2000);
-    anim1->setStartValue(m_center);
-    anim1->setEndValue(QPointF(0.5, 0.5));
-
-    qreal targetRadius = 0.5 * m_image.height() / m_image.width();
-
-    QPropertyAnimation* anim2 = new QPropertyAnimation(m_animation.circle, "radius", this);
-    anim2->setDuration(1500);
-    anim2->setStartValue(m_radius);
-    anim2->setEndValue(targetRadius);
-
-    if (m_animation.animation)
-        m_animation.animation->stop();
-
-    QParallelAnimationGroup* anim = new QParallelAnimationGroup(this);
-    anim->addAnimation(anim1);
-    anim->addAnimation(anim2);
-
-    connect(anim, &QAbstractAnimation::finished, this, &QnFisheyeCalibrationImageWidget::outerAnimationStep);
-
-    m_animation.animation = anim;
-    m_animation.animation->start(QAbstractAnimation::DeleteWhenStopped);*/
-}
-/*
-void QnFisheyeCalibrationImageWidget::innerAnimationStep() {
-    switch (m_animation.stage) {
-    case Idle:
-        return;
-    case Finishing:
-        finishAnimationStep();
-        return;
-    default:
-        break;
-    }
-
-    QPropertyAnimation* anim = new QPropertyAnimation(m_animation.circle, "radius", this);
-    anim->setDuration(1500);
-    anim->setStartValue(m_animation.circle->radius());
-    anim->setEndValue(0.25);
-    connect(anim, &QAbstractAnimation::finished, this, &QnFisheyeCalibrationImageWidget::outerAnimationStep);
-
-    m_animation.animation = anim;
-    m_animation.animation->start(QAbstractAnimation::DeleteWhenStopped);
+    m_animation.stage = Searching;
 }
 
-void QnFisheyeCalibrationImageWidget::outerAnimationStep() {
-    switch (m_animation.stage) {
-    case Idle:
-        return;
-    case Finishing:
-        finishAnimationStep();
-        return;
-    default:
-        break;
-    }
-
-    QPropertyAnimation* anim = new QPropertyAnimation(m_animation.circle, "radius", this);
-    anim->setDuration(1500);
-    anim->setStartValue(m_animation.circle->radius());
-    anim->setEndValue(0.6);
-    connect(anim, &QAbstractAnimation::finished, this, &QnFisheyeCalibrationImageWidget::innerAnimationStep);
-
-    m_animation.animation = anim;
-    m_animation.animation->start(QAbstractAnimation::DeleteWhenStopped);
-}*/
 
 void QnFisheyeCalibrationImageWidget::finishAnimationStep() {
     QPropertyAnimation* anim1 = new QPropertyAnimation(m_animation.circle, "center", this);
@@ -229,6 +161,8 @@ void QnFisheyeCalibrationImageWidget::abortSearchAnimation() {
 void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect &targetRect, const QPointF &relativeCenter, const qreal relativeRadius) {
     if (qFuzzyIsNull(relativeRadius))
         return;
+
+    qDebug() << "painting circle within" << targetRect << "at" << relativeCenter << "by" << relativeRadius;
 
     int halfLineWidth = m_lineWidth / 2;
     qreal radius = relativeRadius * targetRect.width();
