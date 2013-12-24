@@ -151,7 +151,7 @@
 									<goal>copy-dependencies</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${project.build.directory}/../${arch}</outputDirectory>
+									<outputDirectory>${project.basedir}/../${arch}</outputDirectory>
 								</configuration>
 							</execution>
 						</executions>
