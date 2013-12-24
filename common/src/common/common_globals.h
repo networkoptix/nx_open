@@ -4,7 +4,6 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
-#include <QtCore/QStringList>
 
 #include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
@@ -335,20 +334,16 @@ public:
 } // namespace Qn
 
 
-/** Helper function to mark strings that are not to be translated. */
-inline QString lit(const QByteArray &data) {
-    return QLatin1String(data);
-}
-
-/** Helper function to mark strings that are not to be translated. */
-inline QString lit(const char *s) {
-    return QLatin1String(s);
-}
-
-/** Helper function to mark characters that are not to be translated. */
-inline QChar lit(char c) {
-    return QLatin1Char(c);
-}
+/** 
+ * \def lit
+ * Helper macro to mark strings that are not to be translated. 
+ */
+#define QN_USE_QT_STRING_LITERALS
+#ifdef QN_USE_QT_STRING_LITERALS
+#   define lit QStringLiteral
+#else
+#   define lit QLatin1String
+#endif
 
 
 Q_DECLARE_METATYPE(Qn::PtzDataFields);

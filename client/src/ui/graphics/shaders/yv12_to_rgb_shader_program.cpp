@@ -187,7 +187,7 @@ QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(const QGLContext *conte
 
 QString QnFisheyeRectilinearProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -273,7 +273,7 @@ QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(const QGLCont
 
 QString QnFisheyeEquirectangularHProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
     uniform sampler2D uTexture;
     uniform sampler2D vTexture;
@@ -358,7 +358,7 @@ QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(const QGLCont
 
 QString QnFisheyeEquirectangularVProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;

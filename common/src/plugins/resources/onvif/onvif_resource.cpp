@@ -552,7 +552,7 @@ int QnPlOnvifResource::strictBitrate(int bitrate) const
 {
     for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
     {
-        if (getModel() == lit(strictBitrateList[i].model))
+        if (getModel() == QLatin1String(strictBitrateList[i].model))
             return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
     }
     return bitrate;
