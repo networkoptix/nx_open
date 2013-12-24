@@ -33,11 +33,7 @@ CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/styles
-mkdir -p $BINSTAGE/1.4/styles
-mkdir -p $BINSTAGE/1.5/styles
 mkdir -p $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/imageformats
-mkdir -p $BINSTAGE/1.4/imageformats
-mkdir -p $BINSTAGE/1.5/imageformats
 mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 
@@ -45,14 +41,7 @@ mkdir -p $BGSTAGE
 cp -r $CLIENT_BIN_PATH/client-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r $CLIENT_BIN_PATH/applauncher-bin $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.5
 cp -r $CLIENT_BIN_PATH/vox $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
-cp -r ${project.build.directory}/1.4/bin/client-bin $BINSTAGE/1.4
-cp -r ${project.build.directory}/1.5/bin/client-bin $BINSTAGE/1.5
-cp ${project.build.directory}/1.5/lib/*.* $LIBSTAGE
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.5
 cp -r ${project.build.directory}/bin/applauncher* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 
 # Copy client startup script
@@ -72,16 +61,13 @@ cp -r $CLIENT_BG_PATH/* $BGSTAGE
 # Copy libraries, styles, imageformats
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/styles
-cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.4/styles
-cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.5/styles
+
+
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/imageformats
-cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.4/imageformats
-cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.5/imageformats
 #cp -r $CLIENT_SQLDRIVERS_PATH/*.* $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/sqldrivers
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
-find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
-chmod 755 $BINSTAGE/1.*/* 
+find $PKGSTAGE -type f -print0 | xargs -0 chmod 644 
 chmod 755 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/*
 
 # Must use system libraries due to compatibility issues
@@ -92,6 +78,31 @@ chmod 755 $BINSTAGE/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/
 # cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
 # cp -P ${qt.dir}/libICE.so* $LIBSTAGE
 # cp -P ${qt.dir}/libSM.so* $LIBSTAGE
+
+# Copying previous client versions
+
+if [ "${1.4.0}" == "true" ]; then
+    mkdir -p $BINSTAGE/1.4/styles
+    mkdir -p $BINSTAGE/1.4/imageformats
+    cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4
+    cp -r ${libdir}/1.4/bin/client-bin $BINSTAGE/1.4
+    cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.4   
+    cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.4/styles
+    cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.4/imageformats
+    chmod 755 $BINSTAGE/1.4*/*
+fi
+
+if [ "${1.5.1}" == "true" ]; then
+    mkdir -p $BINSTAGE/1.5/styles
+    mkdir -p $BINSTAGE/1.5/imageformats
+    cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.5
+    cp -r ${libdir}/1.5/bin/client-bin $BINSTAGE/1.5
+    cp ${libdir}/1.5/lib/*.* $LIBSTAGE
+    cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/1.5    
+    cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/1.5/styles
+    cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/1.5/imageformats
+    chmod 755 $BINSTAGE/1.5*/*
+fi
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
