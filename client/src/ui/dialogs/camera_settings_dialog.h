@@ -30,7 +30,6 @@ public:
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
-    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
     void cameraIssuesRequested();

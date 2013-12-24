@@ -81,9 +81,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer,                 &QnResourceWidgetRenderer::sourceSizeChanged,   this, &QnMediaResourceWidget::updateAspectRatio);
     connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
-    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
+    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
     connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
+    connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
+    connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
+    updateDewarpingParams();
     updateDisplay();
 
     /* Set up static text. */
@@ -189,7 +192,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateIconButton();
     updateAspectRatio();
     updateCursor();
-    updateFisheye();
     setImageEnhancement(item->imageEnhancement());
 }
 
@@ -649,6 +651,18 @@ QnPtzControllerPtr QnMediaResourceWidget::ptzController() const {
     return m_ptzController;
 }
 
+QnMediaDewarpingParams QnMediaResourceWidget::dewarpingParams() const {
+    return m_dewarpingParams;
+}
+
+void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &params) {
+    if (m_dewarpingParams == params)
+        return;
+    m_dewarpingParams = params;
+
+    emit dewarpingParamsChanged();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -809,7 +823,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result |= PtzButton;
     }
     
-    if (m_resource && m_resource->isFisheye()) {
+    if (m_dewarpingParams.enabled) {
         result |= FishEyeButton;
         result &= ~PtzButton;
     }
@@ -876,7 +890,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
     QSize sourceSize = m_renderer->sourceSize();
 
     if (!sourceSize.isEmpty())
-        if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
+        if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
             sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     QString resourceId;
@@ -971,13 +985,19 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     }*/
 }
 
+void QnMediaResourceWidget::updateDewarpingParams() {
+    if (m_dewarpingParams == m_resource->getDewarpingParams())
+        return;
+
+    m_dewarpingParams = m_resource->getDewarpingParams();
+    emit dewarpingParamsChanged();
+}
+
 void QnMediaResourceWidget::updateFisheye() {
     QnItemDewarpingParams itemParams = item()->dewarpingParams();
     bool enabled = itemParams.enabled;
 
-    bool fisheyeEnabled = enabled
-            && m_resource
-            && m_resource->isFisheye();
+    bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
     setOption(ControlPtz, fisheyeEnabled);
     setOption(DisplayCrosshair, fisheyeEnabled);
@@ -987,17 +1007,17 @@ void QnMediaResourceWidget::updateFisheye() {
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
 
     bool flip = fisheyeEnabled
-            && m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown;
+            && m_dewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown;
 
-    const QList<int> allowedPanoFactorValues = m_resource->getDewarpingParams().allowedPanoFactorValues();
+    const QList<int> allowedPanoFactorValues = m_dewarpingParams.allowedPanoFactorValues();
     if (!allowedPanoFactorValues.contains(itemParams.panoFactor)) {
         itemParams.panoFactor = allowedPanoFactorValues.last();
         item()->setDewarpingParams(itemParams);
-        emit fisheyeChanged();
     }
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
+    emit fisheyeChanged();
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

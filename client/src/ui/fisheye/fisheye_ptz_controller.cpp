@@ -27,9 +27,9 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
 
-    connect(m_widget,           &QnResourceWidget::aspectRatioChanged,      this, &QnFisheyePtzController::updateAspectRatio);
-    connect(resource(),         &QnResource::mediaDewarpingParamsChanged,   this, &QnFisheyePtzController::updateMediaDewarpingParams);
-    connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,   this, &QnFisheyePtzController::updateItemDewarpingParams);
+    connect(m_widget,           &QnResourceWidget::aspectRatioChanged,          this, &QnFisheyePtzController::updateAspectRatio);
+    connect(m_widget,           &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnFisheyePtzController::updateMediaDewarpingParams);
+    connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
 
     updateAspectRatio();
     updateItemDewarpingParams();
@@ -116,14 +116,18 @@ void QnFisheyePtzController::updateAspectRatio() {
 }
 
 void QnFisheyePtzController::updateMediaDewarpingParams() {
-    if (!m_widget || !m_widget->resource())
+    if (!m_widget) {
+        qWarning() << "updating params with null widget";
+        return;
+    }
+
+    if (m_mediaDewarpingParams == m_widget->dewarpingParams())
         return;
 
-    m_mediaDewarpingParams = m_widget->resource()->getDewarpingParams();
+    m_mediaDewarpingParams = m_widget->dewarpingParams();
 
     updateLimits();
     updateCapabilities();
-    m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
 void QnFisheyePtzController::updateItemDewarpingParams() {
@@ -166,103 +170,6 @@ void QnFisheyePtzController::tick(int deltaMSecs) {
         }
     }
 }
-
-#if 0
-DewarpingParams QnFisheyePtzController::updateDewarpingParams(float ar) {
-    m_lastAR = ar;
-    qint64 newTime = getUsecTimer();
-    qreal timeSpend = (newTime - m_lastTime) / 1000000.0;
-    DewarpingParams newParams = m_dewarpingParams;
-
-    if (m_moveToAnimation)
-    {
-        if (timeSpend < MOVETO_ANIMATION_TIME && isAnimationEnabled()) 
-        {
-            QEasingCurve easing(QEasingCurve::InOutQuad);
-            qreal value = easing.valueForProgress(timeSpend / MOVETO_ANIMATION_TIME);
-
-            qreal fovDelta = (m_dstPos.fov - m_srcPos.fov) * value;
-            qreal xDelta = (m_dstPos.xAngle - m_srcPos.xAngle) * value;
-            qreal yDelta = (m_dstPos.yAngle - m_srcPos.yAngle) * value;
-
-            newParams.fov = m_srcPos.fov + fovDelta;
-            newParams.xAngle = m_srcPos.xAngle + xDelta;
-            newParams.yAngle = m_srcPos.yAngle + yDelta;
-        }
-        else {
-            newParams = m_dstPos;
-            m_moveToAnimation = false;
-        }
-    }
-    else {
-        qreal zoomSpeed = -m_speed.z() * MAX_ZOOM_SPEED;
-        qreal xSpeed = m_speed.x() * MAX_MOVE_SPEED;
-        qreal ySpeed = m_speed.y() * MAX_MOVE_SPEED;
-
-        newParams.fov += zoomSpeed * timeSpend;
-        newParams.fov = qBound(MIN_FOV, newParams.fov, MAX_FOV*m_dewarpingParams.panoFactor);
-
-        newParams.xAngle = normalizeAngle(newParams.xAngle + xSpeed * timeSpend);
-        newParams.yAngle += ySpeed * timeSpend;
-
-        m_lastTime = newTime;
-    }
-
-    newParams.xAngle = boundXAngle(newParams.xAngle, newParams.fov);
-    newParams.yAngle = boundYAngle(newParams.yAngle, newParams.fov, m_dewarpingParams.panoFactor*ar, m_dewarpingParams.viewMode);
-    newParams.enabled = m_dewarpingParams.enabled;
-
-    DewarpingParams camParams = m_resource->getDewarpingParams();
-    newParams.fovRot = qDegreesToRadians(camParams.fovRot);
-    newParams.viewMode = camParams.viewMode;
-    newParams.panoFactor = m_dewarpingParams.panoFactor;
-    if (newParams.viewMode == DewarpingParams::Horizontal)
-        newParams.panoFactor = qMin(newParams.panoFactor, 2.0);
-
-    if (!(newParams == m_dewarpingParams)) 
-    {
-        if (newParams.viewMode != m_dewarpingParams.viewMode)
-            updateSpaceMapper(newParams.viewMode, newParams.panoFactor);
-        emit dewarpingParamsChanged(newParams);
-        m_dewarpingParams = newParams;
-    }
-
-    //newParams.fovRot = gradToRad(-12.0); // city 360 picture
-    //newParams.fovRot = gradToRad(-18.0);
-    return newParams;
-}
-
-void QnFisheyePtzController::setDewarpingParams(const DewarpingParams params) {
-    if (!(m_dewarpingParams == params)) {
-        setAnimationEnabled(false);
-
-        if (params.viewMode != m_dewarpingParams.viewMode)
-            updateSpaceMapper(params.viewMode, params.panoFactor);
-        m_dewarpingParams = params;
-        emit dewarpingParamsChanged(m_dewarpingParams);
-    }
-}
-
-/*void QnFisheyePtzController::changePanoMode() {
-    m_dewarpingParams.panoFactor = m_dewarpingParams.panoFactor * 2;
-    bool hView = (m_dewarpingParams.viewMode == DewarpingParams::Horizontal);
-    if ((hView  && m_dewarpingParams.panoFactor > 2) ||
-        (!hView && m_dewarpingParams.panoFactor > 4))
-    {
-        m_dewarpingParams.panoFactor = 1;
-    }
-    if (m_dewarpingParams.panoFactor == 1)
-        m_dewarpingParams.fov = DewarpingParams().fov;
-    else
-        m_dewarpingParams.fov = MAX_FOV * m_dewarpingParams.panoFactor;
-    emit dewarpingParamsChanged(m_dewarpingParams);
-    updateSpaceMapper(m_dewarpingParams.viewMode, m_dewarpingParams.panoFactor);
-}
-
-QString QnFisheyePtzController::getPanoModeText() const {
-    return QString::number(m_dewarpingParams.panoFactor * 90);
-}*/
-#endif
 
 QVector3D QnFisheyePtzController::getPositionInternal() {
     return QVector3D(

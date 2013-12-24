@@ -1694,8 +1694,13 @@ void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
 
     QScopedPointer<QnPictureSettingsDialog> dialog(new QnPictureSettingsDialog(mainWindow()));
     dialog->updateFromResource(media);
-    if (dialog->exec())
+    if (dialog->exec()) {
         dialog->submitToResource(media);
+    } else {
+        QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+        if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
+            mediaWidget->setDewarpingParams(media->getDewarpingParams());
+    }
 }
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()

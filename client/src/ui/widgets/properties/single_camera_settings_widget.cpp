@@ -22,13 +22,21 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
+
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/warning_style.h>
+
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/widgets/properties/camera_settings_widget_p.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/style/warning_style.h>
+
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -108,8 +116,10 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
-    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
+    connect(ui->checkBoxDewarping,      &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
     updateFromResource();
 }
@@ -506,6 +516,13 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     if (m_camera)
         updateMaxFPS();
+
+    // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm
+    QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
+        mediaWidget->setDewarpingParams(mediaWidget->resource()->getDewarpingParams());
+    }
+
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
@@ -958,5 +975,14 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
     at_dbDataChanged();
     at_cameraDataChanged();
 
-    emit fisheyeSettingChanged();
+    QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (!m_camera || !centralWidget || centralWidget->resource() != m_camera)
+        return;
+
+    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
+        QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
+        ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
+        dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
+        mediaWidget->setDewarpingParams(dewarpingParams);
+    }
 }
