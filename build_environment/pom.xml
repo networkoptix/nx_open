@@ -154,7 +154,8 @@
 							</environmentVariables>
 							<executable>${environment.dir}/maven/bin/mvn</executable>
 							<arguments>
-								<argument>clean</argument>
+								<argument>-U</argument>
+                                <argument>clean</argument>
 								<argument>compile</argument>
 								<argument>-Dcustomization=${customization}</argument>
 								<argument>-Darch=${arch}</argument>
