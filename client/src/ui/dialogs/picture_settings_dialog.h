@@ -29,6 +29,8 @@ private slots:
     void paramsChanged();
 private:
     QScopedPointer<Ui::QnPictureSettingsDialog> ui;
+
+    bool m_updating;
 };
 
 #endif // PICTURE_SETTINGS_DIALOG_H
