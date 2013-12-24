@@ -92,7 +92,7 @@ public:
                             const QnItemDewarpingParams &itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
-        if (itemParams.panoFactor = 1)
+        if (itemParams.panoFactor == 1)
         {
             float fovRot = sin(itemParams.xAngle)*mediaParams.fovRot;
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
