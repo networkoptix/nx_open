@@ -17,7 +17,7 @@ bool deserialize(const QJsonValue &value, QnResourceDataPoolChunk *target) {
         return false;
 
     QnResourceDataPoolChunk result;
-    if(!QJson::deserialize(map, "keys", &result.keys) || !QJson::deserialize(value, &result.data))
+    if(!QJson::deserialize(map, lit("keys"), &result.keys) || !QJson::deserialize(value, &result.data))
         return false;
 
     *target = result;
@@ -77,11 +77,11 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
         return false;
 
     QString version;
-    if(!QJson::deserialize(map, "version", &version) || version != lit("1.0"))
+    if(!QJson::deserialize(map, lit("version"), &version) || version != lit("1.0"))
         return false;
 
     QList<QnResourceDataPoolChunk> chunks;
-    if(!QJson::deserialize(map, "data", &chunks))
+    if(!QJson::deserialize(map, lit("data"), &chunks))
         return false;
 
     QMutexLocker locker(&m_mutex);

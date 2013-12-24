@@ -76,11 +76,6 @@ namespace QJson {
         QJson::serialize(value, &jsonValue);
     }
 
-    template<class T>
-    void serialize(const T &value, const char *key, QJsonObject *target) {
-        QJson::serialize(value, QLatin1String(key), target); // TODO: #Elric remove, use QStringLiteral
-    }
-
     /**
      * Serializes the given value into a JSON string.
      * 
@@ -128,11 +123,6 @@ namespace QJson {
         } else {
             return QJson::deserialize(*pos, target);
         }
-    }
-
-    template<class T>
-    bool deserialize(const QJsonObject &value, const char *key, T *target, bool optional = false) {
-        return QJson::deserialize(value, QLatin1String(key), target, optional); // TODO: #Elric remove, use QStringLiteral
     }
 
     /**

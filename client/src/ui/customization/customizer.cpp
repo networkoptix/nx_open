@@ -21,25 +21,25 @@ bool deserialize(const QJsonValue &value, QnColorGroup *target) {
         return false;
 
     return
-        QJson::deserialize(map, "windowText",       &(*target)[QPalette::WindowText],       true) && 
-        QJson::deserialize(map, "button",           &(*target)[QPalette::Button],           true) && 
-        QJson::deserialize(map, "light",            &(*target)[QPalette::Light],            true) && 
-        QJson::deserialize(map, "midlight",         &(*target)[QPalette::Midlight],         true) && 
-        QJson::deserialize(map, "dark",             &(*target)[QPalette::Dark],             true) && 
-        QJson::deserialize(map, "mid",              &(*target)[QPalette::Mid],              true) && 
-        QJson::deserialize(map, "text",             &(*target)[QPalette::Text],             true) && 
-        QJson::deserialize(map, "brightText",       &(*target)[QPalette::BrightText],       true) && 
-        QJson::deserialize(map, "buttonText",       &(*target)[QPalette::ButtonText],       true) && 
-        QJson::deserialize(map, "base",             &(*target)[QPalette::Base],             true) && 
-        QJson::deserialize(map, "window",           &(*target)[QPalette::Window],           true) && 
-        QJson::deserialize(map, "shadow",           &(*target)[QPalette::Shadow],           true) && 
-        QJson::deserialize(map, "highlight",        &(*target)[QPalette::Highlight],        true) && 
-        QJson::deserialize(map, "highlightedText",  &(*target)[QPalette::HighlightedText],  true) && 
-        QJson::deserialize(map, "link",             &(*target)[QPalette::Link],             true) && 
-        QJson::deserialize(map, "linkVisited",      &(*target)[QPalette::LinkVisited],      true) && 
-        QJson::deserialize(map, "alternateBase",    &(*target)[QPalette::AlternateBase],    true) && 
-        QJson::deserialize(map, "toolTipBase",      &(*target)[QPalette::ToolTipBase],      true) && 
-        QJson::deserialize(map, "toolTipText",      &(*target)[QPalette::ToolTipText],      true);
+        QJson::deserialize(map, lit("windowText"),       &(*target)[QPalette::WindowText],       true) && 
+        QJson::deserialize(map, lit("button"),           &(*target)[QPalette::Button],           true) && 
+        QJson::deserialize(map, lit("light"),            &(*target)[QPalette::Light],            true) && 
+        QJson::deserialize(map, lit("midlight"),         &(*target)[QPalette::Midlight],         true) && 
+        QJson::deserialize(map, lit("dark"),             &(*target)[QPalette::Dark],             true) && 
+        QJson::deserialize(map, lit("mid"),              &(*target)[QPalette::Mid],              true) && 
+        QJson::deserialize(map, lit("text"),             &(*target)[QPalette::Text],             true) && 
+        QJson::deserialize(map, lit("brightText"),       &(*target)[QPalette::BrightText],       true) && 
+        QJson::deserialize(map, lit("buttonText"),       &(*target)[QPalette::ButtonText],       true) && 
+        QJson::deserialize(map, lit("base"),             &(*target)[QPalette::Base],             true) && 
+        QJson::deserialize(map, lit("window"),           &(*target)[QPalette::Window],           true) && 
+        QJson::deserialize(map, lit("shadow"),           &(*target)[QPalette::Shadow],           true) && 
+        QJson::deserialize(map, lit("highlight"),        &(*target)[QPalette::Highlight],        true) && 
+        QJson::deserialize(map, lit("highlightedText"),  &(*target)[QPalette::HighlightedText],  true) && 
+        QJson::deserialize(map, lit("link"),             &(*target)[QPalette::Link],             true) && 
+        QJson::deserialize(map, lit("linkVisited"),      &(*target)[QPalette::LinkVisited],      true) && 
+        QJson::deserialize(map, lit("alternateBase"),    &(*target)[QPalette::AlternateBase],    true) && 
+        QJson::deserialize(map, lit("toolTipBase"),      &(*target)[QPalette::ToolTipBase],      true) && 
+        QJson::deserialize(map, lit("toolTipText"),      &(*target)[QPalette::ToolTipText],      true);
 }
 
 bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
@@ -48,10 +48,10 @@ bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
         return false;
 
     return 
-        QJson::deserialize(map, "disabled",         &(*target)[QPalette::Disabled],         true) && 
-        QJson::deserialize(map, "active",           &(*target)[QPalette::Active],           true) && 
-        QJson::deserialize(map, "inactive",         &(*target)[QPalette::Inactive],         true) && 
-        QJson::deserialize(map, "default",          &(*target)[QPalette::NColorGroups],     true);
+        QJson::deserialize(map, lit("disabled"),         &(*target)[QPalette::Disabled],         true) && 
+        QJson::deserialize(map, lit("active"),           &(*target)[QPalette::Active],           true) && 
+        QJson::deserialize(map, lit("inactive"),         &(*target)[QPalette::Inactive],         true) && 
+        QJson::deserialize(map, lit("default"),          &(*target)[QPalette::NColorGroups],     true);
 }
 
 bool deserialize(const QJsonValue &value, QPalette *target) {
