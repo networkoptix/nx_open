@@ -90,7 +90,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     }
 }
 
-bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name) const
+bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
