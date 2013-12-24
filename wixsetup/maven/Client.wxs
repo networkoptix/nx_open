@@ -5,15 +5,15 @@
         <?include BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="${installer.customization}ClientDir" Name="Client">
-                <Directory Id="${installer.customization}HelpDir" Name="help"/>                         
+            <Directory Id="${customization}ClientDir" Name="Client">
+                <Directory Id="${customization}HelpDir" Name="help"/>                         
 
-                <Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
+                <Directory Id="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
 
                     <Component Id="AppLauncherExecutable">
                         <File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="${libdir}/bin/${build.configuration}/applauncher.exe" KeyPath="yes">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-                              WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
+                              WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
                         </File>
                     </Component>
@@ -31,7 +31,7 @@
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
                         <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                          WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+                          WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
                         </Shortcut>
                     </Component>                            
 
@@ -44,7 +44,7 @@
                     <Directory Id="ImageFormats" Name="imageformats">
                     </Directory>    
 
-                    <Directory Id="${installer.customization}VoxDir" Name="vox"/>                                
+                    <Directory Id="${customization}VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
                         <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
@@ -84,7 +84,7 @@
                     </Component>
                 </Directory>    
                 <?if ${1.4.0} = true ?>
-                    <Directory Id="${installer.customization}_1_4_Dir" Name="1.4">
+                    <Directory Id="${customization}_1_4_Dir" Name="1.4">
 
                         <Directory Id="styles_1_4" Name="styles">
                             <Component Id="bespin_1_4">
@@ -111,7 +111,7 @@
                     </Directory> 
                 <?endif?>
                 <?if ${1.5.1} = true ?>
-                    <Directory Id="${installer.customization}_1_5_Dir" Name="1.5">
+                    <Directory Id="${customization}_1_5_Dir" Name="1.5">
 
                         <Directory Id="styles_1_5" Name="styles">
                             <Component Id="bespin_1_5">
@@ -144,7 +144,7 @@
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="ClientFFmpegLibraries" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientFFmpegLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
             </Component>
@@ -180,7 +180,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientQuickSync" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientQuickSync" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQuickSyncDll" Name="quicksyncdecoder1.dll" Source="${libdir}/bin/${build.configuration}/quicksyncdecoder2.dll"/>
             </Component>
@@ -189,7 +189,7 @@
             </Component>
         </ComponentGroup>                            
 
-        <ComponentGroup Id="ClientQTLibraries" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
             </Component>
@@ -210,7 +210,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenAL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientOpenAL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
             </Component>
@@ -219,7 +219,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenSSL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientOpenSSL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
             </Component>
@@ -239,7 +239,7 @@
             </Component>
         </ComponentGroup>        
         <?if ${1.4.0} = true ?>
-            <ComponentGroup Id="ClientFFmpegLibraries_1_4" Directory="${installer.customization}_1_4_Dir">
+            <ComponentGroup Id="ClientFFmpegLibraries_1_4" Directory="${customization}_1_4_Dir">
                 <Component>
                     <File Id="ClientAvcodecDll_1_4" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
                 </Component>
@@ -275,7 +275,7 @@
                 </Component>
             </ComponentGroup>                            
             
-            <ComponentGroup Id="ClientQTLibraries_1_4" Directory="${installer.customization}_1_4_Dir">
+            <ComponentGroup Id="ClientQTLibraries_1_4" Directory="${customization}_1_4_Dir">
                 <Component>
                     <File Id="ClientQtCore$(var.suffix)4.dll_1_4" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
                 </Component>
@@ -296,7 +296,7 @@
                 </Component>
             </ComponentGroup>
         
-            <ComponentGroup Id="ClientOpenAL_1_4" Directory="${installer.customization}_1_4_Dir">
+            <ComponentGroup Id="ClientOpenAL_1_4" Directory="${customization}_1_4_Dir">
                 <Component>
                     <File Id="OpenAL32.dll_1_4" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
                 </Component>
@@ -305,7 +305,7 @@
                 </Component>
             </ComponentGroup>
 
-            <ComponentGroup Id="ClientOpenSSL_1_4" Directory="${installer.customization}_1_4_Dir">
+            <ComponentGroup Id="ClientOpenSSL_1_4" Directory="${customization}_1_4_Dir">
                 <Component>
                     <File Id="Clientlibeay32.dll_1_4" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
                 </Component>
@@ -326,7 +326,7 @@
             </ComponentGroup>            
         <?endif?>            
         <?if ${1.5.1} = true ?>
-            <ComponentGroup Id="ClientFFmpegLibraries_1_5" Directory="${installer.customization}_1_5_Dir">
+            <ComponentGroup Id="ClientFFmpegLibraries_1_5" Directory="${customization}_1_5_Dir">
                 <Component>
                     <File Id="ClientAvcodecDll_1_5" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
                 </Component>
@@ -362,7 +362,7 @@
                 </Component>
             </ComponentGroup>                            
 
-            <ComponentGroup Id="ClientQTLibraries_1_5" Directory="${installer.customization}_1_5_Dir">
+            <ComponentGroup Id="ClientQTLibraries_1_5" Directory="${customization}_1_5_Dir">
                 <Component>
                     <File Id="ClientQtCore$(var.suffix)4.dll_1_5" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
                 </Component>
@@ -383,7 +383,7 @@
                 </Component>
             </ComponentGroup>
 
-            <ComponentGroup Id="ClientOpenAL_1_5" Directory="${installer.customization}_1_5_Dir">
+            <ComponentGroup Id="ClientOpenAL_1_5" Directory="${customization}_1_5_Dir">
                 <Component>
                     <File Id="OpenAL32.dll_1_5" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
                 </Component>
@@ -392,7 +392,7 @@
                 </Component>
             </ComponentGroup>
 
-            <ComponentGroup Id="ClientOpenSSL_1_5" Directory="${installer.customization}_1_5_Dir">
+            <ComponentGroup Id="ClientOpenSSL_1_5" Directory="${customization}_1_5_Dir">
                 <Component>
                     <File Id="Clientlibeay32.dll_1_5" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
                 </Component>
