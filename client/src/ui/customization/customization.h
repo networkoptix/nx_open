@@ -15,7 +15,7 @@ public:
         return m_data.isEmpty();
     }
 
-    const QJsonObject &data() {
+    const QJsonObject &data() const {
         return m_data;
     }
 

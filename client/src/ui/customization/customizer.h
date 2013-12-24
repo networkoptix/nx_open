@@ -9,6 +9,8 @@
 
 class QnJsonSerializer;
 
+class QnCustomizerPrivate;
+
 class QnCustomizer: public QObject, public Singleton<QnCustomizer> {
     Q_OBJECT
 public:
@@ -22,11 +24,7 @@ public:
     void customize(QObject *object);
 
 private:
-    void customize(QObject *object, const QJsonObject &customization, const QString &key);
-
-private:
-    QScopedPointer<QnJsonSerializer> m_serializer;
-    QnCustomization m_customization;
+    QScopedPointer<QnCustomizerPrivate> d;
 };
 
 #define qnCustomizer (QnCustomizer::instance())

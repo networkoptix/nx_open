@@ -12,73 +12,7 @@
 // --------------------------------------------------------------------------- //
 // QnPaletteCustomizationSerializer
 // --------------------------------------------------------------------------- //
-typedef QColor QnColorGroup[QPalette::NColorRoles];
-typedef QnColorGroup QnPaletteColors[QPalette::NColorGroups + 1];
 
-bool deserialize(const QJsonValue &value, QnColorGroup *target) {
-    QJsonObject map;
-    if(!QJson::deserialize(value, &map))
-        return false;
-
-    return
-        QJson::deserialize(map, lit("windowText"),       &(*target)[QPalette::WindowText],       true) && 
-        QJson::deserialize(map, lit("button"),           &(*target)[QPalette::Button],           true) && 
-        QJson::deserialize(map, lit("light"),            &(*target)[QPalette::Light],            true) && 
-        QJson::deserialize(map, lit("midlight"),         &(*target)[QPalette::Midlight],         true) && 
-        QJson::deserialize(map, lit("dark"),             &(*target)[QPalette::Dark],             true) && 
-        QJson::deserialize(map, lit("mid"),              &(*target)[QPalette::Mid],              true) && 
-        QJson::deserialize(map, lit("text"),             &(*target)[QPalette::Text],             true) && 
-        QJson::deserialize(map, lit("brightText"),       &(*target)[QPalette::BrightText],       true) && 
-        QJson::deserialize(map, lit("buttonText"),       &(*target)[QPalette::ButtonText],       true) && 
-        QJson::deserialize(map, lit("base"),             &(*target)[QPalette::Base],             true) && 
-        QJson::deserialize(map, lit("window"),           &(*target)[QPalette::Window],           true) && 
-        QJson::deserialize(map, lit("shadow"),           &(*target)[QPalette::Shadow],           true) && 
-        QJson::deserialize(map, lit("highlight"),        &(*target)[QPalette::Highlight],        true) && 
-        QJson::deserialize(map, lit("highlightedText"),  &(*target)[QPalette::HighlightedText],  true) && 
-        QJson::deserialize(map, lit("link"),             &(*target)[QPalette::Link],             true) && 
-        QJson::deserialize(map, lit("linkVisited"),      &(*target)[QPalette::LinkVisited],      true) && 
-        QJson::deserialize(map, lit("alternateBase"),    &(*target)[QPalette::AlternateBase],    true) && 
-        QJson::deserialize(map, lit("toolTipBase"),      &(*target)[QPalette::ToolTipBase],      true) && 
-        QJson::deserialize(map, lit("toolTipText"),      &(*target)[QPalette::ToolTipText],      true);
-}
-
-bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
-    QJsonObject map;
-    if(!QJson::deserialize(value, &map))
-        return false;
-
-    return 
-        QJson::deserialize(map, lit("disabled"),         &(*target)[QPalette::Disabled],         true) && 
-        QJson::deserialize(map, lit("active"),           &(*target)[QPalette::Active],           true) && 
-        QJson::deserialize(map, lit("inactive"),         &(*target)[QPalette::Inactive],         true) && 
-        QJson::deserialize(map, lit("default"),          &(*target)[QPalette::NColorGroups],     true);
-}
-
-bool deserialize(const QJsonValue &value, QPalette *target) {
-    QnPaletteColors colors;
-    if(!QJson::deserialize(value, &colors))
-        return false;
-
-    for(int role = 0; role < QPalette::NColorRoles; role++) {
-        const QColor &color = colors[QPalette::NColorGroups][role];
-        if(color.isValid())
-            target->setColor(static_cast<QPalette::ColorRole>(role), color);
-    }
-
-    for(int group = 0; group < QPalette::NColorGroups; group++) {
-        for(int role = 0; role < QPalette::NColorRoles; role++) {
-            const QColor &color = colors[group][role];
-            if(color.isValid())
-                target->setColor(static_cast<QPalette::ColorGroup>(group), static_cast<QPalette::ColorRole>(role), color);
-        }
-    }
-
-    return true;
-}
-
-void serialize(const QPalette &value, QJsonValue *target) {
-    assert(false);
-}
 
 typedef QnDefaultJsonSerializer<QPalette> QnPaletteCustomizationSerializer;
 
@@ -181,16 +115,58 @@ private:
 
 
 // -------------------------------------------------------------------------- //
+// QnCustomizationData
+// -------------------------------------------------------------------------- //
+class QnCustomizationData {
+public:
+    QnCustomizationData(): type(QMetaType::UnknownType) {}
+    QnCustomizationData(const QJsonValue &json): type(QMetaType::UnknownType), json(json) {}
+
+    int type;
+    QVariant value;
+    QJsonValue json;
+};
+
+typedef QHash<QString, QnCustomizationData> QnCustomizationDataHash;
+Q_DECLARE_METATYPE(QnCustomizationDataHash)
+
+bool deserialize(const QJsonValue &value, QnCustomizationData *target) {
+    *target = QnCustomizationData();
+    target->json = value;
+    return true;
+}
+
+
+
+
+// -------------------------------------------------------------------------- //
 // QnCustomizer
 // -------------------------------------------------------------------------- //
+class QnCustomizerPrivate {
+public:
+    QnCustomizerPrivate();
+
+    void customize(QObject *object, const char *className);
+    void customize(QObject *object, QnCustomizationData *data, const char *className);
+
+    int hashType;
+    QnCustomization customization;
+    QHash<QLatin1String, QnCustomizationData> dataByClassName;
+    QList<QByteArray> classNames;
+};
+
+QnCustomizerPrivate::QnCustomizerPrivate() {
+    hashType = qMetaTypeId<QnCustomizationDataHash>();
+}
+
 QnCustomizer::QnCustomizer(QObject *parent):
     QObject(parent),
-    m_serializer(new QnObjectStarCustomizationSerializer())
+    d(new QnCustomizerPrivate())
 {}
 
 QnCustomizer::QnCustomizer(const QnCustomization &customization, QObject *parent):
     QObject(parent),
-    m_serializer(new QnObjectStarCustomizationSerializer())
+    d(new QnCustomizerPrivate())
 {
     setCustomization(customization);
 }
@@ -200,11 +176,18 @@ QnCustomizer::~QnCustomizer() {
 }
 
 void QnCustomizer::setCustomization(const QnCustomization &customization) {
-    m_customization = customization;
+    d->customization = customization;
+
+    const QJsonObject &object = customization.data();
+    for(auto pos = object.begin(); pos != object.end(); pos++) {
+        QByteArray className = pos.key().toLatin1();
+        d->classNames.push_back(className);
+        d->dataByClassName[QLatin1String(className)] = QnCustomizationData(*pos);
+    }
 }
 
 const QnCustomization &QnCustomizer::customization() const {
-    return m_customization;
+    return d->customization;
 }
 
 void QnCustomizer::customize(QObject *object) {
@@ -222,13 +205,25 @@ void QnCustomizer::customize(QObject *object) {
     }
 
     for(int i = metaObjects.size() - 1; i >= 0; i--)
-        customize(object, m_customization.data(), QLatin1String(metaObjects[i]->className()));
+        customize(object, d->dataByClassName, QLatin1String(metaObjects[i]->className()));
 }
 
-void QnCustomizer::customize(QObject *object, const QJsonObject &customization, const QString &key) {
-    auto pos = customization.find(key);
-    if(pos == customization.end())
+void QnCustomizerPrivate::customize(QObject *object, const char *className) {
+    auto pos = dataByClassName.find(QLatin1String(className));
+    if(pos == dataByClassName.end())
         return;
-    
-    m_serializer->deserialize(*pos, &object);
+
+    customize(object, &*pos);
 }
+
+void QnCustomizerPrivate::customize(QObject *object, QnCustomizationData *data, const char *className) {
+    if(data->type != hashType) {
+        data->type = hashType;
+        
+        QnCustomizationDataHash hash;
+        if(!QJson::deserialize(data->json, &hash))
+            qnWarning("Could not deserialize customization data for class '%1'.", className);
+
+    }
+}
+
