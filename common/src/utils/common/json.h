@@ -268,7 +268,7 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
         return false;                                                           \
     QJsonObject object = value.toObject();                                      \
                                                                                 \
-    TYPE result = *target; /* This allows for partial deserialization if the user wants it. */ \
+    TYPE result;                                                                \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
     *target = result;                                                           \
     return true;                                                                \
@@ -313,7 +313,6 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 #else // Q_MOC_RUN
 
 /* Qt moc chokes on our macro hell, so we make things easier for it. */
-#define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(...)
