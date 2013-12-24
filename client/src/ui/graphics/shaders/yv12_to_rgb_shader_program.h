@@ -92,7 +92,7 @@ public:
                             const QnItemDewarpingParams &itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
-        if (qFuzzyCompare(itemParams.panoFactor, 1.0))
+        if (itemParams.panoFactor = 1)
         {
             float fovRot = sin(itemParams.xAngle)*mediaParams.fovRot;
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
@@ -134,7 +134,7 @@ public:
     }
 
     virtual bool link() override {
-        addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
+        T::addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
         bool rez = T::link();
         if (rez) {
             m_xShiftLocation = T::uniformLocation("xShift");
