@@ -1,5 +1,7 @@
 #include "palette_data.h"
 
+#include <cassert>
+
 #include <boost/array.hpp>
 
 #include <utils/common/json.h>
@@ -14,12 +16,19 @@ typedef boost::array<QnColorGroup, QPalette::NColorGroups> QnPaletteColors;
 class QnPaletteDataPrivate: public QSharedData {
 public:
     QnPaletteColors colors;
+
+    template<class Functor>
+    void forEachColor(const Functor &functor) const {
+        for(QPalette::ColorGroup group = static_cast<QPalette::ColorGroup>(0); group < QPalette::NColorGroups; group = static_cast<QPalette::ColorGroup>(group + 1))
+            for(QPalette::ColorRole role = static_cast<QPalette::ColorRole>(0); role < QPalette::NColorRoles; role = static_cast<QPalette::ColorRole>(role + 1))
+                functor(group, role);
+    }
 };
 
 QnPaletteData::QnPaletteData(const QPalette &palette): d(new QnPaletteDataPrivate) {
-    for(QPalette::ColorGroup group = static_cast<QPalette::ColorGroup>(0); group < QPalette::NColorGroups; group = static_cast<QPalette::ColorGroup>(group + 1))
-        for(QPalette::ColorRole role = static_cast<QPalette::ColorRole>(0); role < QPalette::NColorRoles; role = static_cast<QPalette::ColorRole>(role + 1))
-            setColor(group, role, palette.color(group, role));
+    d->forEachColor([&](QPalette::ColorGroup group, QPalette::ColorRole role) {
+        setColor(group, role, palette.color(group, role));
+    });
 }
 
 QnPaletteData::QnPaletteData(): d(new QnPaletteDataPrivate) {
@@ -28,6 +37,16 @@ QnPaletteData::QnPaletteData(): d(new QnPaletteDataPrivate) {
 
 QnPaletteData::~QnPaletteData() {
     return;
+}
+
+void QnPaletteData::apply(QPalette *palette) {
+    assert(palette);
+
+    d->forEachColor([&](QPalette::ColorGroup group, QPalette::ColorRole role) {
+        const QColor &color = d->colors[group][role];
+        if(color.isValid())
+            palette->setColor(group, role, color);
+    });
 }
 
 const QColor &QnPaletteData::color(QPalette::ColorGroup group, QPalette::ColorRole role) const {

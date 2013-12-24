@@ -1,6 +1,7 @@
 #ifndef QN_PALETTE_DATA_H
 #define QN_PALETTE_DATA_H
 
+#include <QtCore/QMetaType>
 #include <QtCore/QExplicitlySharedDataPointer>
 #include <QtGui/QPalette>
 
@@ -19,6 +20,8 @@ public:
     QnPaletteData();
     ~QnPaletteData();
 
+    void apply(QPalette *palette);
+
     const QColor &color(QPalette::ColorGroup group, QPalette::ColorRole role) const;
     void setColor(QPalette::ColorGroup group, QPalette::ColorRole role, const QColor &color);
 
@@ -27,5 +30,6 @@ public:
 private:
     QExplicitlySharedDataPointer<QnPaletteDataPrivate> d;
 };
+Q_DECLARE_METATYPE(QnPaletteData)
 
 #endif // QN_PALETTE_DATA_H

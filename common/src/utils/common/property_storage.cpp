@@ -43,21 +43,47 @@ QnPropertyStorage::~QnPropertyStorage() {
     return;
 }
 
+QVariant QnPropertyStorage::valueLocked(int id) const {
+    return m_valueById.value(id);
+}
+
+bool QnPropertyStorage::setValueLocked(int id, const QVariant &value) {
+    if(!isWritableLocked(id)) {
+        qnWarning("Property '%1' is not writeable.", name(id));
+        return false;
+    }
+
+    return updateValue(id, value) == Changed;
+}
+
 QVariant QnPropertyStorage::value(int id) const {
     QnPropertyStorageLocker locker(this);
-
-    return m_valueById.value(id);
+    return valueLocked(id);
 }
 
 bool QnPropertyStorage::setValue(int id, const QVariant &value) {
     QnPropertyStorageLocker locker(this);
-    
-    if(!isWriteable(id)) {
-        qnWarning("Property '%1' is not writeable.", name(id));
+    return setValueLocked(id, value);
+}
+
+QVariant QnPropertyStorage::value(const QString &name) const {
+    QnPropertyStorageLocker locker(this);
+
+    auto pos = m_idByName.find(name);
+    if(pos == m_idByName.end())
+        return QVariant();
+
+    return valueLocked(*pos);
+}
+
+bool QnPropertyStorage::setValue(const QString &name, const QVariant &value) {
+    QnPropertyStorageLocker locker(this);
+
+    auto pos = m_idByName.find(name);
+    if(pos == m_idByName.end())
         return false;
-    }
-    
-    return updateValue(id, value) == Changed;
+
+    return setValueLocked(*pos, value);
 }
 
 QnPropertyStorage::UpdateStatus QnPropertyStorage::updateValue(int id, const QVariant &value) {
@@ -99,6 +125,7 @@ void QnPropertyStorage::setName(int id, const QString &name) {
     QnPropertyStorageLocker locker(this);
 
     m_nameById[id] = name;
+    m_idByName[name] = id;
 }
 
 void QnPropertyStorage::addArgumentName(int id, const char *argumentName) {
@@ -142,19 +169,19 @@ void QnPropertyStorage::setType(int id, int type) {
 }
 
 bool QnPropertyStorage::isWritableLocked(int id) const {
-    return m_writeableById.value(id, true); /* By default, properties are writable. */
+    return m_writableById.value(id, true); /* By default, properties are writable. */
 }
 
-bool QnPropertyStorage::isWriteable(int id) const {
+bool QnPropertyStorage::isWritable(int id) const {
     QnPropertyStorageLocker locker(this);
 
     return isWritableLocked(id);
 }
 
-void QnPropertyStorage::setWriteable(int id, bool writeable) {
+void QnPropertyStorage::setWritable(int id, bool writable) {
     QnPropertyStorageLocker locker(this);
 
-    m_writeableById[id] = writeable;
+    m_writableById[id] = writable;
 }
 
 bool QnPropertyStorage::isThreadSafe() const {

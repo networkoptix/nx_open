@@ -9,6 +9,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/customization/customization.h>
+#include <ui/customization/palette_data.h>
 
 #include "client_globals.h"
 #include "client_model_types.h"
@@ -64,6 +65,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
     QnJsonSerializer::registerSerializer<QnCalendarColors>();
+    QnJsonSerializer::registerSerializer<QnPaletteData>();
     
     QnJsonSerializer::registerSerializer<QVector<QColor> >();
     QnJsonSerializer::registerSerializer<QVector<QUuid> >();
