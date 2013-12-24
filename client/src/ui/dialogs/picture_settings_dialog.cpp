@@ -4,17 +4,29 @@
 #include <core/resource/media_resource.h>
 #include <core/ptz/media_dewarping_params.h>
 
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
+
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 #include <utils/image_provider.h>
 
 QnPictureSettingsDialog::QnPictureSettingsDialog(QWidget *parent) :
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnPictureSettingsDialog)
 {
     ui->setupUi(this);
 
-    connect(ui->fisheyeCheckBox, &QCheckBox::toggled, this, &QnPictureSettingsDialog::at_fisheyeCheckbox_toggled);
+    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnPictureSettingsDialog::at_fisheyeCheckbox_toggled);
+
+    connect(ui->fisheyeCheckBox,    &QCheckBox::toggled,                    this,   &QnPictureSettingsDialog::paramsChanged);
+    connect(ui->fisheyeWidget,      &QnFisheyeSettingsWidget::dataChanged,  this,   &QnPictureSettingsDialog::paramsChanged);
 }
 
 QnPictureSettingsDialog::~QnPictureSettingsDialog()
@@ -41,7 +53,22 @@ void QnPictureSettingsDialog::submitToResource(const QnMediaResourcePtr &resourc
     resource->setDewarpingParams(params);
 }
 
-
 void QnPictureSettingsDialog::at_fisheyeCheckbox_toggled(bool checked) {
     ui->stackedWidget->setCurrentWidget(checked ? ui->fisheyePage : ui->imagePage);
+}
+
+void QnPictureSettingsDialog::paramsChanged() {
+    QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
+        QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
+        ui->fisheyeWidget->submitToParams(dewarpingParams);
+        dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
+        mediaWidget->setDewarpingParams(dewarpingParams);
+
+        QnWorkbenchItem *item = mediaWidget->item();
+        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        itemParams.enabled = dewarpingParams.enabled;
+        item->setDewarpingParams(itemParams);
+    }
+
 }

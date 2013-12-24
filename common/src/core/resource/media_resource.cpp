@@ -161,11 +161,6 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-bool QnMediaResource::isFisheye() const
-{
-    return getDewarpingParams().enabled;
-}
-
 void QnMediaResource::updateInner(QnResourcePtr other)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);

@@ -5,11 +5,13 @@
 
 #include <ui/dialogs/button_box_dialog.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 namespace Ui {
 class QnPictureSettingsDialog;
 }
 
-class QnPictureSettingsDialog : public QnButtonBoxDialog
+class QnPictureSettingsDialog : public QnButtonBoxDialog, protected QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -24,6 +26,7 @@ public:
 private slots:
     void at_fisheyeCheckbox_toggled(bool checked);
 
+    void paramsChanged();
 private:
     QScopedPointer<Ui::QnPictureSettingsDialog> ui;
 };

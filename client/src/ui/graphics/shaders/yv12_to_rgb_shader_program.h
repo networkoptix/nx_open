@@ -92,64 +92,64 @@ public:
                             const QnItemDewarpingParams &itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
-        if (qFuzzyCompare(itemParams.panoFactor, 1.0))
+        if (itemParams.panoFactor == 1)
         {
             float fovRot = sin(itemParams.xAngle)*mediaParams.fovRot;
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
-                setUniformValue(m_yPos, (float) 0.5);
-                setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
-                setUniformValue(m_fovRotLocation, (float) fovRot);
+                T::setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
+                T::setUniformValue(m_yPos, (float) 0.5);
+                T::setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
+                T::setUniformValue(m_fovRotLocation, (float) fovRot);
             }
             else {
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0));
-                setUniformValue(m_yPos, (float) 1.0);
-                setUniformValue(m_xShiftLocation, (float) fovRot);
-                setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
+                T::setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0));
+                T::setUniformValue(m_yPos, (float) 1.0);
+                T::setUniformValue(m_xShiftLocation, (float) fovRot);
+                T::setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
             }
         }
         else {
-            setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
-            setUniformValue(m_fovRotLocation, (float) (mediaParams.fovRot * M_PI / 180.0));
+            T::setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
+            T::setUniformValue(m_fovRotLocation, (float) (mediaParams.fovRot * M_PI / 180.0));
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
-                setUniformValue(m_yPos, (float) 0.5);
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
+                T::setUniformValue(m_yPos, (float) 0.5);
+                T::setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
             }
             else {
-                setUniformValue(m_yPos, (float) 1.0);
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - itemParams.fov/itemParams.panoFactor/2.0));
+                T::setUniformValue(m_yPos, (float) 1.0);
+                T::setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - itemParams.fov/itemParams.panoFactor/2.0));
             }
         }
 
-        setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
-        setUniformValue(m_panoFactorLocation, (float) (itemParams.panoFactor));
-        setUniformValue(m_dstFovLocation, (float) itemParams.fov);
+        T::setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
+        T::setUniformValue(m_panoFactorLocation, (float) (itemParams.panoFactor));
+        T::setUniformValue(m_dstFovLocation, (float) itemParams.fov);
 
-        setUniformValue(m_yCenterLocation, (float) mediaParams.yCenter);
-        setUniformValue(m_xCenterLocation, (float) mediaParams.xCenter);
-        setUniformValue(m_radiusLocation, (float) mediaParams.radius);
-        setUniformValue(m_maxXLocation, maxX);
-        setUniformValue(m_maxYLocation, maxY);
+        T::setUniformValue(m_yCenterLocation, (float) mediaParams.yCenter);
+        T::setUniformValue(m_xCenterLocation, (float) mediaParams.xCenter);
+        T::setUniformValue(m_radiusLocation, (float) mediaParams.radius);
+        T::setUniformValue(m_maxXLocation, maxX);
+        T::setUniformValue(m_maxYLocation, maxY);
     }
 
     virtual bool link() override {
-        addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
+        T::addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
         bool rez = T::link();
         if (rez) {
-            m_xShiftLocation = uniformLocation("xShift");
-            m_yShiftLocation = uniformLocation("yShift");
-            m_fovRotLocation = uniformLocation("fovRot");
-            m_dstFovLocation = uniformLocation("dstFov");
-            m_aspectRatioLocation = uniformLocation("aspectRatio");
-            m_panoFactorLocation = uniformLocation("panoFactor");
-            m_yPos = uniformLocation("yPos");
-            m_xCenterLocation = uniformLocation("xCenter");
-            m_yCenterLocation = uniformLocation("yCenter");
-            m_radiusLocation = uniformLocation("radius");
+            m_xShiftLocation = T::uniformLocation("xShift");
+            m_yShiftLocation = T::uniformLocation("yShift");
+            m_fovRotLocation = T::uniformLocation("fovRot");
+            m_dstFovLocation = T::uniformLocation("dstFov");
+            m_aspectRatioLocation = T::uniformLocation("aspectRatio");
+            m_panoFactorLocation = T::uniformLocation("panoFactor");
+            m_yPos = T::uniformLocation("yPos");
+            m_xCenterLocation = T::uniformLocation("xCenter");
+            m_yCenterLocation = T::uniformLocation("yCenter");
+            m_radiusLocation = T::uniformLocation("radius");
 
-            m_maxXLocation = uniformLocation("maxX");
-            m_maxYLocation = uniformLocation("maxY");
+            m_maxXLocation = T::uniformLocation("maxX");
+            m_maxYLocation = T::uniformLocation("maxY");
         }
         return rez;
     }

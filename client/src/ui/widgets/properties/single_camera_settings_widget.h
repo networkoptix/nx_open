@@ -97,7 +97,6 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
-    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:

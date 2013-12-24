@@ -138,7 +138,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     {
         QList<QImage> images;
         QnItemDewarpingParams itemDewarpingParams;
-        QnMediaDewarpingParams mediaDewarpingParams = widget->resource()->getDewarpingParams();
+        QnMediaDewarpingParams mediaDewarpingParams = widget->dewarpingParams();
         if (mediaDewarpingParams.enabled)
             itemDewarpingParams = widget->item()->dewarpingParams();
         for (int i = 0; i < layout->channelCount(); ++i)
