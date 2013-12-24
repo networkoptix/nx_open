@@ -39,6 +39,10 @@ public:
     QnFisheyeEquirectangularVProgram* fisheyePanoVProgram;
     QnFisheyeEquirectangularVProgram* fisheyePanoVGammaProgram;
 
+    QnFisheyeRGBRectilinearProgram* fisheyeRGBPtzProgram;
+    QnFisheyeRGBEquirectangularHProgram* fisheyeRGBPanoHProgram;
+    QnFisheyeRGBEquirectangularVProgram* fisheyeRGBPanoVProgram;
+
     QnYv12ToRgbaShaderProgram *yv12ToRgba;
     QnNv12ToRgbShaderProgram *nv12ToRgb;
 };
@@ -114,6 +118,14 @@ private:
     	const QRectF& tex0Coords,
     	unsigned int tex0ID,
     	const float* v_array );
+
+    //!Draws texture \a tex0ID with fisheye effect to the screen
+    void drawFisheyeRGBVideoTexture(
+        const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
+        const QRectF& tex0Coords,
+        unsigned int tex0ID,
+        const float* v_array);
+
     //!Draws to the screen YV12 image represented with three textures (one for each plane YUV) using shader which mixes all three planes to RGB
     void drawYV12VideoTexture(
         const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,

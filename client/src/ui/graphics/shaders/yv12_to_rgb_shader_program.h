@@ -37,6 +37,26 @@ private:
 };
 
 
+class QnAbstractRGBAShaderProgram : public QGLShaderProgram {
+    Q_OBJECT
+public:
+    QnAbstractRGBAShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
+
+    void setRGBATexture(int target) {
+        setUniformValue(m_rgbaTextureLocation, target);
+    }
+
+    void setOpacity(GLfloat opacity) {
+        setUniformValue(m_opacityLocation, opacity);
+    }
+
+    virtual bool link() override;
+
+private:
+    int m_rgbaTextureLocation;
+    int m_opacityLocation;
+};
+
 class QnYv12ToRgbShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT
 public:
@@ -61,19 +81,79 @@ private:
     int m_yGammaLocation;
 };
 
-class QnFisheyeShaderProgram : public QnYv12ToRgbWithGammaShaderProgram
+template <class T>
+class QnFisheyeShaderProgram : public T
 {
-	Q_OBJECT
 public:
-    static const QString GAMMA_STRING;
-
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y")):
+        T(context, parent, false), m_gammaStr(gammaStr) {}
     
     void setDewarpingParams(const QnMediaDewarpingParams &mediaParams,
                             const QnItemDewarpingParams &itemParams,
-                            float aspectRatio, float maxX, float maxY);
+                            float aspectRatio, float maxX, float maxY)
+    {
+        if (qFuzzyCompare(itemParams.panoFactor, 1.0))
+        {
+            float fovRot = sin(itemParams.xAngle)*mediaParams.fovRot;
+            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
+                setUniformValue(m_yPos, (float) 0.5);
+                setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
+                setUniformValue(m_fovRotLocation, (float) fovRot);
+            }
+            else {
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0));
+                setUniformValue(m_yPos, (float) 1.0);
+                setUniformValue(m_xShiftLocation, (float) fovRot);
+                setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
+            }
+        }
+        else {
+            setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
+            setUniformValue(m_fovRotLocation, (float) (mediaParams.fovRot * M_PI / 180.0));
+            //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
+            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+                setUniformValue(m_yPos, (float) 0.5);
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
+            }
+            else {
+                setUniformValue(m_yPos, (float) 1.0);
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - itemParams.fov/itemParams.panoFactor/2.0));
+            }
+        }
 
-    virtual bool link() override;
+        setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
+        setUniformValue(m_panoFactorLocation, (float) (itemParams.panoFactor));
+        setUniformValue(m_dstFovLocation, (float) itemParams.fov);
+
+        setUniformValue(m_yCenterLocation, (float) mediaParams.yCenter);
+        setUniformValue(m_xCenterLocation, (float) mediaParams.xCenter);
+        setUniformValue(m_radiusLocation, (float) mediaParams.radius);
+        setUniformValue(m_maxXLocation, maxX);
+        setUniformValue(m_maxYLocation, maxY);
+    }
+
+    virtual bool link() override {
+        addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
+        bool rez = T::link();
+        if (rez) {
+            m_xShiftLocation = uniformLocation("xShift");
+            m_yShiftLocation = uniformLocation("yShift");
+            m_fovRotLocation = uniformLocation("fovRot");
+            m_dstFovLocation = uniformLocation("dstFov");
+            m_aspectRatioLocation = uniformLocation("aspectRatio");
+            m_panoFactorLocation = uniformLocation("panoFactor");
+            m_yPos = uniformLocation("yPos");
+            m_xCenterLocation = uniformLocation("xCenter");
+            m_yCenterLocation = uniformLocation("yCenter");
+            m_radiusLocation = uniformLocation("radius");
+
+            m_maxXLocation = uniformLocation("maxX");
+            m_maxYLocation = uniformLocation("maxY");
+        }
+        return rez;
+    }
+
 protected:
     virtual QString getShaderText() = 0;
 protected:
@@ -95,7 +175,9 @@ private:
     QString m_gammaStr;
 };
 
-class QnFisheyeRectilinearProgram : public QnFisheyeShaderProgram
+// --------- fisheye YUV (with optional gamma) ---------------
+
+class QnFisheyeRectilinearProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
 	Q_OBJECT
 public:
@@ -104,7 +186,7 @@ protected:
     virtual QString getShaderText() override;
 };
 
-class QnFisheyeEquirectangularHProgram : public QnFisheyeShaderProgram
+class QnFisheyeEquirectangularHProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
 	Q_OBJECT
 public:
@@ -113,7 +195,7 @@ protected:
     virtual QString getShaderText() override;
 };
 
-class QnFisheyeEquirectangularVProgram : public QnFisheyeShaderProgram
+class QnFisheyeEquirectangularVProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
 	Q_OBJECT
 public:
@@ -121,6 +203,37 @@ public:
 protected:
     virtual QString getShaderText() override;
 };
+
+// --------- fisheye RGB ---------------
+
+class QnFisheyeRGBRectilinearProgram : public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
+{
+    Q_OBJECT
+public:
+    QnFisheyeRGBRectilinearProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+protected:
+    virtual QString getShaderText() override;
+};
+
+class QnFisheyeRGBEquirectangularHProgram : public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
+{
+    Q_OBJECT
+public:
+    QnFisheyeRGBEquirectangularHProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+protected:
+    virtual QString getShaderText() override;
+};
+
+class QnFisheyeRGBEquirectangularVProgram : public QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>
+{
+    Q_OBJECT
+public:
+    QnFisheyeRGBEquirectangularVProgram(const QGLContext *context = NULL, QObject *parent = NULL);
+protected:
+    virtual QString getShaderText() override;
+};
+
+// ---------  RGBA programm ---------------
 
 class QnYv12ToRgbaShaderProgram: public QnAbstractYv12ToRgbShaderProgram {
     Q_OBJECT
