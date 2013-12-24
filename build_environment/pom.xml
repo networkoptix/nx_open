@@ -22,13 +22,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>help</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>${customization}</classifier>
-		</dependency>
-		<dependency>
 			<groupId>org.boost</groupId>
 			<artifactId>boost</artifactId>
 			<version>1.52-SNAPSHOT</version>
@@ -146,6 +139,34 @@
 							<skip>${rsync.skip}</skip>
 						</configuration>
 					</execution>
+					<execution>
+						<id>grab-dynamic-dependencies</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<environmentVariables>
+								<key>environment</key>
+								<value>${environment.dir}</value>
+								<key>arch</key>
+								<value>${arch}</value>
+							</environmentVariables>
+							<executable>${environment.dir}/maven/bin/mvn</executable>
+							<arguments>
+								<argument>clean</argument>
+								<argument>compile</argument>
+								<argument>-Dcustomization=${customization}</argument>
+								<argument>-Darch=${arch}</argument>
+								<argument>-Dplatform=${platform}</argument>
+								<argument>-D1.4.0=${1.4.0}</argument>
+								<argument>-D1.5.1=${1.5.1}</argument>
+								<argument>-Denvironment.dir=${environment.dir}</argument>								
+								<argument>-Dmaven.repo.local=${environment.dir}/maven/repository</argument>								
+							</arguments>
+							<workingDirectory>${project.basedir}/dependencies</workingDirectory>		
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>	
 			<plugin>
@@ -220,7 +241,7 @@
 										<exclude>**/*.lib</exclude>
 									</excludes>
 								</resource>
-								
+
 								<resource>
 									<targetPath>${project.build.directory}/bin</targetPath>
 									<directory>${environment.dir}/qt/plugins/${arch}</directory>
@@ -440,7 +461,7 @@
 								<configuration>
 									<executable>${project.build.directory}/prepare-package.sh</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
-		    							<skip>${assembly-skip}</skip>
+									<skip>${assembly-skip}</skip>
 								</configuration>
 							</execution>							
 						</executions>
@@ -498,13 +519,13 @@
 			</build>			
 		</profile>		
 
-                <profile>
-                        <id>macosx</id>
-                        <activation>
-                                <os>
-                                        <family>mac</family>
-                                </os>
-                        </activation>
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
 
 			<dependencies>
 				<dependency>
@@ -514,10 +535,10 @@
 					<type>zip</type>
 					<classifier>${platform}-${arch}-${compiler}</classifier>
 				</dependency>
-	             		<dependency>
-				        <groupId>net.sourceforge</groupId>
-            				<artifactId>qjson</artifactId>
-		 			<version>0.8.1-SNAPSHOT</version>
+				<dependency>
+					<groupId>net.sourceforge</groupId>
+					<artifactId>qjson</artifactId>
+					<version>0.8.1-SNAPSHOT</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}-qt484</classifier>
 				</dependency>
@@ -558,7 +579,7 @@
 								<configuration>
 									<executable>${project.build.directory}/prepare-package.sh</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
-		    							<skip>${assembly-skip}</skip>
+									<skip>${assembly-skip}</skip>
 								</configuration>
 							</execution>							
 						</executions>
@@ -615,7 +636,7 @@
 					</plugin>					
 				</plugins>
 			</build>
-                </profile>
+		</profile>
 
 	</profiles>	
 </project>

@@ -63,6 +63,9 @@ applauncher/x64
 axiscamplugin/x86
 axiscamplugin/x64
 
+build_environment/dependencies/x86
+build_environment/dependencies/x64
+
 client/bin
 client/build
 client/src/Info.plist
