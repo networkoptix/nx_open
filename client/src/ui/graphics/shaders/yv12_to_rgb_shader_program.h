@@ -97,7 +97,7 @@ public:
     {
         if (itemParams.panoFactor == 1)
         {
-            float fovRot = sin(itemParams.xAngle)*mediaParams.fovRot;
+            float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
                 T::setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
                 T::setUniformValue(m_yPos, (float) 0.5);
@@ -113,7 +113,7 @@ public:
         }
         else {
             T::setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
-            T::setUniformValue(m_fovRotLocation, (float) (mediaParams.fovRot * M_PI / 180.0));
+            T::setUniformValue(m_fovRotLocation, (float) qDegreesToRadians(mediaParams.fovRot));
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
                 T::setUniformValue(m_yPos, (float) 0.5);
