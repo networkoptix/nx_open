@@ -86,7 +86,7 @@
 									<useDefaultExcludes>true</useDefaultExcludes>
 									<includes>
 										<include>**/${project.artifactId}.lib</include>
-										<include>**/${project.artifactId}.exe</include>
+										<include>**/${build.configuration}/${project.artifactId}.exe</include>
 										<include>**/${project.artifactId}.pdb</include>
 										<include>**/${project.artifactId}.ilk</include>											
 										<include>**/${project.artifactId}.so</include>
