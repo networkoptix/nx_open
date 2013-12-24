@@ -134,7 +134,7 @@ public:
     }
 
     virtual bool link() override {
-        T::addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
+        T::addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
         bool rez = T::link();
         if (rez) {
             m_xShiftLocation = T::uniformLocation("xShift");
@@ -171,7 +171,7 @@ protected:
     
     int m_maxXLocation;
     int m_maxYLocation;
-private:
+protected:
     QString m_gammaStr;
 };
 

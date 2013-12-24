@@ -175,7 +175,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    )).arg(m_gammaStr);
 }
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
@@ -259,7 +259,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    )).arg(m_gammaStr);;
 }
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
@@ -344,7 +344,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    )).arg(m_gammaStr);;
 }
 
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
