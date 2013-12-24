@@ -1655,8 +1655,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                               this, SLOT(at_cameraSettingsDialog_advancedSettingChanged()));
         connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraIssuesRequested()),                                this, SLOT(at_cameraSettingsDialog_cameraIssuesRequested()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraRulesRequested()),                                 this, SLOT(at_cameraSettingsDialog_cameraRulesRequested()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -1748,22 +1746,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
     QnResourceList resources = cameraSettingsDialog()->widget()->resources();
     menu()->trigger(Qn::OpenInNewLayoutAction, resources);
-
-    cameraSettingsDialog()->widget()->setResources(resources);
-    m_selectionUpdatePending = false;
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraIssuesRequested() {
-    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
-    menu()->trigger(Qn::CameraIssuesAction, resources);
-
-    cameraSettingsDialog()->widget()->setResources(resources);
-    m_selectionUpdatePending = false;
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraRulesRequested() {
-    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
-    menu()->trigger(Qn::CameraBusinessRulesAction, resources);
 
     cameraSettingsDialog()->widget()->setResources(resources);
     m_selectionUpdatePending = false;

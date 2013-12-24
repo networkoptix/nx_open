@@ -241,8 +241,6 @@ protected slots:
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsDialog_advancedSettingChanged();
     void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_cameraSettingsDialog_cameraIssuesRequested();
-    void at_cameraSettingsDialog_cameraRulesRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
