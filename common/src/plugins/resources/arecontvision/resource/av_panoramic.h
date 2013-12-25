@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_ARECONT
 
+#include <QElapsedTimer>
 #include "av_resource.h"
 
 
@@ -33,6 +34,7 @@ protected:
     QnResourceVideoLayoutPtr m_vrl;
     bool m_isRotated;    
     QnCustomResourceVideoLayoutPtr m_rotatedLayout;
+    QElapsedTimer m_flipTimer;
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;
