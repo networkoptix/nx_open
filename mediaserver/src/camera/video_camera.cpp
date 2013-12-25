@@ -65,7 +65,7 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, QnResource
     m_role(role),
     m_nextMinTryTime(0)
 {
-    const QnResourceVideoLayout* layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
+    QnConstResourceVideoLayoutPtr layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
     m_allChannelsMask = (1 << layout->channelCount()) - 1;
 }
 

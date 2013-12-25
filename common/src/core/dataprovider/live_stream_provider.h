@@ -91,7 +91,7 @@ private:
 #endif
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
-    const QnResourceVideoLayout* m_layout;
+    QnConstResourceVideoLayoutPtr m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
     Qn::SecondStreamQuality  m_secondaryQuality;

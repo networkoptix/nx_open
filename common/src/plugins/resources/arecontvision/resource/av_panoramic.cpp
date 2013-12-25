@@ -13,12 +13,10 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
     m_isRotated = false;
-    m_rotatedLayout = 0;
 }
 
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
 {
-    delete m_rotatedLayout;
 }
 
 
@@ -192,16 +190,16 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
-const QnResourceVideoLayout* QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QMutexLocker lock(&m_mutex);
 
-    QnResourceVideoLayout* layout = const_cast<QnResourceVideoLayout*> (QnPlAreconVisionResource::getVideoLayout(dataProvider));
-    QnCustomResourceVideoLayout* customLayout = dynamic_cast<QnCustomResourceVideoLayout*>(layout);
+    const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
+    const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
     if (m_isRotated && customLayout)
     {
-        if (m_rotatedLayout == 0) {
-            m_rotatedLayout = new QnCustomResourceVideoLayout(customLayout->size());
+        if (!m_rotatedLayout) {
+            m_rotatedLayout.reset( new QnCustomResourceVideoLayout(customLayout->size()) );
             QVector<int> channels = customLayout->getChannels();
             std::reverse(channels.begin(), channels.end());
             m_rotatedLayout->setChannels(channels);

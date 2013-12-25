@@ -467,8 +467,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         m_contrastParams.enabled ||
         m_itemDewarpingParams.enabled;
 
-    const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
-    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
+    QnConstResourceVideoLayoutPtr layout = mediaDev->getVideoLayout(m_mediaProvider);
+    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.get());
     {
         if (!isTranscode)
             av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toLatin1().data(), 0);
@@ -586,7 +586,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             videoStream->first_dts = 0;
         }
 
-        const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
+        QnConstResourceAudioLayoutPtr audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         m_isAudioPresent = false;
         for (int i = 0; i < audioLayout->channelCount(); ++i) 
         {

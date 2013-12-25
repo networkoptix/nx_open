@@ -13,7 +13,8 @@ public:
     QnISDStreamReader(QnResourcePtr res);
     virtual ~QnISDStreamReader();
 
-    const QnResourceAudioLayout* getDPAudioLayout() const;
+    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStream() override;

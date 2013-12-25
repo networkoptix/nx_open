@@ -33,7 +33,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         return;
 
     QnResourceDisplayPtr display = widget->display();
-    const QnResourceVideoLayout *layout = display->videoLayout();
+    QnConstResourceVideoLayoutPtr layout = display->videoLayout();
 
     // TODO: #Elric move out, common code
     QString timeString;

@@ -79,7 +79,8 @@ namespace {
     /** Static text should be rescaled no more often than once in this period */
     const qint64 minTextRescaleDelay = 1000;
 
-    Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
+    //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
+    std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() );
 
     void splitFormat(const QString &format, QString *left, QString *right) {
         int index = format.indexOf(QLatin1Char('\t'));
@@ -108,7 +109,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_item(item),
     m_options(DisplaySelection | DisplayButtons),
     m_localActive(false),
-    m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
@@ -268,7 +268,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     if(!m_resource)
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     connect(m_resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
-    setChannelLayout(qn_resourceWidget_defaultContentLayout());
+    setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
     /* Run handlers. */
     updateTitleText();
@@ -668,7 +668,7 @@ void QnResourceWidget::updateStatusOverlay() {
     setStatusOverlay(calculateStatusOverlay());
 }
 
-void QnResourceWidget::setChannelLayout(const QnResourceVideoLayout *channelLayout) {
+void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout) {
     if(m_channelsLayout == channelLayout)
         return;
 

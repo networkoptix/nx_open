@@ -12,6 +12,8 @@ QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     m_codecId = CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_U8;
     m_bits_per_coded_sample = 8;
+
+    m_audioLayout.reset( new QnRtspAudioLayout() );
 }
 
 QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
@@ -59,7 +61,7 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
-    m_audioLayout.setAudioTrackInfo(track);
+    m_audioLayout->setAudioTrackInfo(track);
 }
 
 bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
@@ -89,9 +91,9 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
     return true;
 }
 
-QnResourceAudioLayout* QnSimpleAudioRtpParser::getAudioLayout()
+QnResourceAudioLayoutPtr QnSimpleAudioRtpParser::getAudioLayout()
 {
-    return &m_audioLayout;
+    return m_audioLayout;
 }
 
 void QnSimpleAudioRtpParser::setBitsPerSample(int value)

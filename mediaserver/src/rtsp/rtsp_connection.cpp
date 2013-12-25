@@ -456,7 +456,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
         return -1;
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnResourceVideoLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
+    QnConstResourceVideoLayoutPtr layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->channelCount() : -1;
 }
 
@@ -525,7 +525,7 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -641,7 +641,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     QTextStream sdp(&d->responseBody);
 
     
-    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
 
     
     int numAudio = 0;
@@ -653,7 +653,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             numAudio = 1;
     }
     else {
-        const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
+        QnConstResourceAudioLayoutPtr audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
         if (audioLayout)
             numAudio = audioLayout->channelCount();
     }
@@ -782,7 +782,7 @@ int QnRtspConnectionProcessor::composeSetup()
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
+    QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->channelCount()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
@@ -1006,7 +1006,7 @@ void QnRtspConnectionProcessor::checkQuality()
     }
 }
 
-void QnRtspConnectionProcessor::createPredefinedTracks(const QnResourceVideoLayout* videoLayout)
+void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
 {
     Q_D(QnRtspConnectionProcessor);
 
@@ -1055,7 +1055,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
         //d->socket->setSendTimeout(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
-        const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+        QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
         if (videoLayout) {
             QString layoutStr = videoLayout->toString();

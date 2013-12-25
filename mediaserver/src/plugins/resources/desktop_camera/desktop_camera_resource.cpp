@@ -51,7 +51,7 @@ QString QnDesktopCameraResource::getUserName() const
     return getPhysicalId().mid(gePhysicalIdPrefix().size());
 }
 
-const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     const QnDesktopCameraStreamReader* deskopReader = dynamic_cast<const QnDesktopCameraStreamReader*>(dataProvider);
     if (deskopReader && deskopReader->getDPAudioLayout())

@@ -147,7 +147,7 @@ void QnActiStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-const QnResourceAudioLayout* QnActiStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnActiStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }

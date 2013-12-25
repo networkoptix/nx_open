@@ -38,7 +38,7 @@ public:
 
     QString gePhysicalIdPrefix() const;
     QString getUserName() const;
-    const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
+    QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 };
 typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 

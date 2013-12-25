@@ -534,7 +534,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
     }
 }
 
-const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);

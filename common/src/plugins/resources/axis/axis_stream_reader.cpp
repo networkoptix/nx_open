@@ -386,7 +386,7 @@ void QnAxisStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-const QnResourceAudioLayout* QnAxisStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnAxisStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }
