@@ -16,11 +16,16 @@ class QnPaletteDataPrivate;
  */
 class QnPaletteData {
 public:
-    QnPaletteData(const QPalette &palette);
     QnPaletteData();
+    QnPaletteData(const QPalette &palette);
+    QnPaletteData(const QnPaletteData &other);
     ~QnPaletteData();
 
-    void apply(QPalette *palette);
+    QnPaletteData &operator=(const QnPaletteData &other);
+
+    void swap(QnPaletteData &other) { qSwap(d, other.d); }
+
+    void applyTo(QPalette *palette) const;
 
     const QColor &color(QPalette::ColorGroup group, QPalette::ColorRole role) const;
     void setColor(QPalette::ColorGroup group, QPalette::ColorRole role, const QColor &color);
@@ -30,6 +35,8 @@ public:
 private:
     QExplicitlySharedDataPointer<QnPaletteDataPrivate> d;
 };
+
 Q_DECLARE_METATYPE(QnPaletteData)
+Q_DECLARE_SHARED(QnPaletteData)
 
 #endif // QN_PALETTE_DATA_H

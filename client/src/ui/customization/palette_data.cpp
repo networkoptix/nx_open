@@ -25,21 +25,30 @@ public:
     }
 };
 
+QnPaletteData::QnPaletteData(): d(new QnPaletteDataPrivate) {
+    return;
+}
+
 QnPaletteData::QnPaletteData(const QPalette &palette): d(new QnPaletteDataPrivate) {
     d->forEachColor([&](QPalette::ColorGroup group, QPalette::ColorRole role) {
         setColor(group, role, palette.color(group, role));
     });
 }
 
-QnPaletteData::QnPaletteData(): d(new QnPaletteDataPrivate) {
-    return;
+QnPaletteData::QnPaletteData(const QnPaletteData &other) {
+    d = other.d;
 }
 
 QnPaletteData::~QnPaletteData() {
     return;
 }
 
-void QnPaletteData::apply(QPalette *palette) {
+QnPaletteData &QnPaletteData::operator=(const QnPaletteData &other) {
+    d = other.d;
+    return *this;
+}
+
+void QnPaletteData::applyTo(QPalette *palette) const {
     assert(palette);
 
     d->forEachColor([&](QPalette::ColorGroup group, QPalette::ColorRole role) {

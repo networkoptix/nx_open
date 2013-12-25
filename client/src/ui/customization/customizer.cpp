@@ -77,103 +77,6 @@ public:
 };
 
 
-// --------------------------------------------------------------------------- //
-// QnObjectStarCustomizationSerializer
-// --------------------------------------------------------------------------- //
-class QnObjectStarCustomizationSerializer: public QnJsonSerializer {
-public:
-    QnObjectStarCustomizationSerializer(): 
-        QnJsonSerializer(QMetaType::QObjectStar),
-        m_paletteSerializer(new QnPaletteCustomizationSerializer)
-    {
-        /* QnJsonSerializer does locking, so we use local cache to avoid it. */
-        foreach(QnJsonSerializer *serializer, QnJsonSerializer::allSerializers())
-            m_serializerByType.insert(serializer->type(), serializer);
-
-        m_serializerByType.insert(QMetaType::QObjectStar, this);
-        m_serializerByType.insert(QMetaType::QPalette, m_paletteSerializer.data());
-    }
-
-protected:
-    virtual void serializeInternal(const void *, QJsonValue *) const override {
-        assert(false); /* We should never get here. */
-    }
-
-    virtual bool deserializeInternal(const QJsonValue &value, void *target) const override {
-        QObject *object = *static_cast<QObject **>(target);
-        if(!object)
-            return false;
-
-        QJsonObject map;
-        if(!QJson::deserialize(value, &map))
-            return false;
-
-        // TODO: #Elric hack
-        if(object->inherits("QnPropertyStorage")) {
-            QnPropertyStorage *storage = static_cast<QnPropertyStorage *>(object);
-            storage->updateFromJson(map);
-            return true;
-        }
-
-        const QMetaObject *metaObject = object->metaObject();
-
-        for(auto pos = map.begin(); pos != map.end(); pos++) {
-            const QString &key = pos.key();
-            const QJsonValue &jsonValue = *pos;
-
-            int index = metaObject->indexOfProperty(key.toLatin1());
-            if(index != -1) {
-                QMetaProperty p = metaObject->property(index);
-                if (!p.isWritable())
-                    return false;
-
-                QVariant targetValue = p.read(object);
-                const QnJsonSerializer *serializer = m_serializerByType.value(targetValue.userType());
-                if(!serializer)
-                    return false;
-
-                if(!serializer->deserialize(jsonValue, &targetValue))
-                    return false;
-
-                p.write(object, targetValue);
-                continue;
-            }
-
-            // TODO: #Elric extend properly
-            if(object->inherits("QApplication")) {
-                if(key == lit("palette")) {
-                    const QnJsonSerializer *serializer = m_serializerByType.value(QMetaType::QPalette);
-                    if(!serializer)
-                        return false;
-
-                    QPalette palette;
-                    if(!serializer->deserialize(jsonValue, &palette))
-                        return false;
-
-                    static_cast<QApplication *>(object)->setPalette(palette);
-                    continue;
-                }
-            }
-
-            QObject *child = object->findChild<QObject *>(key);
-            if(child != NULL) {
-                if(!this->deserialize(jsonValue, &child))
-                    return false;
-                continue;
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-private:
-    QScopedPointer<QnJsonSerializer> m_paletteSerializer;
-    QnFlatMap<int, QnJsonSerializer *> m_serializerByType;
-};
-
-
 // -------------------------------------------------------------------------- //
 // QnCustomizationData
 // -------------------------------------------------------------------------- //
@@ -279,28 +182,38 @@ void QnCustomizerPrivate::customize(QObject *object, QnCustomizationData *data, 
 void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className) {
     QVariant value = accessor->read(object, key);
     if(!value.isValid()) {
-        qnWarning("Property '%1' is not defined for class '%2'.", key, className);
+        qnWarning("Could not customize property '%1' of class '%2'. The property is not defined for this class.", key, className);
         return;
     }
 
     int type = value.type();
     if(data->type != type) {
         if(data->type != QMetaType::UnknownType)
-            qnWarning("Property '%1' has different types for different instances of class '%2'.", key, className);
+            qnWarning("Property '%1' of class '%2' has different types for different instances of this class.", key, className);
 
         data->type = type;
 
         int proxyType = type == QMetaType::QPalette ? paletteDataType : type;
         QnJsonSerializer *serializer = serializerByType.value(proxyType);
         if(!serializer) {
-            qnWarning("No serializer is registered for type '%1'. Could not customize property '%2' of class '%3'.", QMetaType::typeName(proxyType), key, className);
+            qnWarning("Could not customize property '%1' of class '%2'. No serializer is registered for type '%3'.", key, className, QMetaType::typeName(proxyType));
             return;
         }
 
-        if(serializer->deserialize(data->json, &data->value))
-            qnWarning("Could not deserialize customization data for property '%1' of class '%2'.", key, className);
+        if(!serializer->deserialize(data->json, &data->value)) {
+            qnWarning("Could not customize property '%1' of class '%2'. Could not deserialize customization data.", key, className);
+            return;
+        }
     }
 
+    if(type == QMetaType::QPalette) {
+        static_cast<const QnPaletteData *>(data->value.data())->applyTo(static_cast<QPalette *>(value.data()));
+    } else {
+        value = data->value;
+    }
+
+    if(!accessor->write(object, key, value))
+        qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.");
 }
 
 
