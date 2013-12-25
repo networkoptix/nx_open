@@ -1,6 +1,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QWaitCondition>
+#include <QtCore/QCoreApplication>
 
 #include "syncplay_wrapper.h"
 #include "syncplay_archive_delegate.h"
@@ -9,6 +10,8 @@
 #include "utils/common/util.h"
 #include "playbackmask_helper.h"
 #include "utils/common/synctime.h"
+#include "utils/common/synctime.h"
+
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
