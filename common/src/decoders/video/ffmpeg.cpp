@@ -238,6 +238,12 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
 {
+    if (!(data->flags & AV_PKT_FLAG_KEY))
+    {
+        m_needRecreate = true;
+        return; // can't reset right now
+    }
+
     //closeDecoder();
     //openDecoder();
     //return;

@@ -1146,7 +1146,7 @@ int QnRtspConnectionProcessor::composePlay()
 
         int copySize = 0;
         if (!getResource()->toResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
-            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0);
+            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 
         if (copySize == 0) {
@@ -1165,7 +1165,8 @@ int QnRtspConnectionProcessor::composePlay()
         }
 
         d->dataProcessor->unlockDataQueue();
-        d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
+        quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
+        d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
         connectToLiveDataProviders();
     }
     else if (d->liveMode == Mode_Archive && d->archiveDP) 
@@ -1293,7 +1294,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time); // for fast quality switching
+                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)

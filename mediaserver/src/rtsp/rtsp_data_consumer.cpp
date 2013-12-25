@@ -605,7 +605,7 @@ void QnRtspDataConsumer::addData(QnAbstractMediaDataPtr data)
     m_dataQueue.push(data);
 }
 
-int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
+int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
@@ -617,7 +617,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
     }
     int copySize = 0;
     //if (camera && !res->hasFlags(QnResource::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 
