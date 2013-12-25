@@ -23,4 +23,3 @@ if __name__ == '__main__':
         print "failed with code: %s" % str(p.returncode) 
         sys.exit(1)
     fixasfiles()
-

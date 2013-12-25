@@ -247,12 +247,14 @@ void QnRtspTimeHelper::reset()
 
 bool QnRtspTimeHelper::isLocalTimeChanged()
 {
-    int elapsed;
+    qint64 elapsed;
+    int tryCount = 0;
     qint64 ct;
     do {
         elapsed = m_timer.elapsed();
         ct = qnSyncTime->currentMSecsSinceEpoch();
-    } while (m_timer.elapsed() != elapsed);
+    } while (m_timer.elapsed() != elapsed && ++tryCount < 3);
+
     qint64 expectedLocalTime = elapsed + m_localStartTime;
     bool timeChanged = qAbs(expectedLocalTime - ct) > LOCAL_TIME_RESYNC_THRESHOLD;
     if (timeChanged || elapsed > 3600) {

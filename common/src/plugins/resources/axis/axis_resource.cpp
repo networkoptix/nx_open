@@ -547,8 +547,7 @@ QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractS
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-
-int QnPlAxisResource::getChannelNum() const
+int QnPlAxisResource::getChannelNumAxis() const
 {
     QString phId = getPhysicalId();
 
@@ -903,6 +902,11 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     } else {
         return new QnAxisPtzController(toSharedPointer(this));
     }
+}
+
+int QnPlAxisResource::getChannel() const
+{
+    return getChannelNumAxis() - 1;
 }
 
 #endif // #ifdef ENABLE_AXIS

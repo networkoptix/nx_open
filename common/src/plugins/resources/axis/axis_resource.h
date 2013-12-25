@@ -56,7 +56,9 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
-    int getChannelNum() const;
+    virtual int getChannel() const override;
+
+    int getChannelNumAxis() const; // depracated
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;

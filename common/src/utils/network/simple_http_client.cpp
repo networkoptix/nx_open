@@ -355,7 +355,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
             {
                 return CL_HTTP_NOT_FOUND;
             }
-            //else if (m_responseLine.contains("302 moved"))
+            //else if (m_responseLine.contains("302 moved")) // TODO: #MERGE was "302 moved" || "302 found"
             else if( statusLine.statusCode == nx_http::StatusCode::moved )
             {
                 return CL_HTTP_REDIRECT;
