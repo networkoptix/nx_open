@@ -761,7 +761,7 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
-    m_mainMenu = menu()->newMenu(Qn::MainScope);
+    m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }

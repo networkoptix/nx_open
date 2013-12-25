@@ -1511,18 +1511,18 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
     action->trigger();
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnActionParameters &parameters) {
-    return newMenu(Qn::NoAction, scope, parameters);
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters) {
+    return newMenu(Qn::NoAction, scope, parent, parameters);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, const QnActionParameters &parameters) {
+QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters) {
     QnAction *rootAction = rootId == Qn::NoAction ? m_root : action(rootId);
 
     QMenu *result = NULL;
     if(!rootAction) {
         qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
     } else {
-        result = newMenuRecursive(rootAction, scope, parameters);
+        result = newMenuRecursive(rootAction, scope, parameters, parent);
     }
 
     if(result) {
@@ -1553,8 +1553,8 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     }
 }
 
-QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters) {
-    QMenu *result = new QMenu();
+QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget) {
+    QMenu *result = new QMenu(parentWidget);
 
     if(!parent->children().isEmpty()) {
         foreach(QnAction *action, parent->children()) {
@@ -1567,7 +1567,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             if(visibility == Qn::InvisibleAction)
                 continue;
 
-            QMenu *menu = newMenuRecursive(action, scope, parameters);
+            QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget);
             if((!menu || menu->isEmpty())  && (action->flags() & Qn::RequiresChildren))
                 continue;
 
