@@ -166,7 +166,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     if(index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
     
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, target));
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, mainWindow(), target));
     if(menu->isEmpty())
         return;
 

@@ -558,7 +558,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     if(!m_menuEnabled)
         return;
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
 
