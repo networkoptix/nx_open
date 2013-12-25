@@ -153,6 +153,10 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
 void QnArecontPanoramicResource::updateFlipState()
 {
+    if (m_flipTimer.isValid() && m_flipTimer.elapsed() < 1000)
+        return;
+    m_flipTimer.restart();
+
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get?rotate");
     CLHttpStatus responseCode = connection.doGET(request);
@@ -196,6 +200,7 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
 
     const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
     const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
+    updateFlipState();
     if (m_isRotated && customLayout)
     {
         if (!m_rotatedLayout) {
