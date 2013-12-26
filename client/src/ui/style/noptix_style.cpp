@@ -223,7 +223,6 @@ void QnNoptixStyle::polish(QApplication *application) {
     application->setPalette(palette);
 
     QFont font;
-    qDebug() << "font family" << font.family();
     font.setPixelSize(12);
     font.setStyle(QFont::StyleNormal);
     font.setWeight(QFont::Normal);
@@ -233,7 +232,6 @@ void QnNoptixStyle::polish(QApplication *application) {
     application->setFont(font);
 
     QFont menuFont;
-//    menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
     application->setFont(menuFont, "QMenu");
 }
