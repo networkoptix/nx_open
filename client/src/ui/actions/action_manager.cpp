@@ -369,6 +369,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         text(tr("Select All")).
         shortcut(tr("Ctrl+A")).
+        shortcutContext(Qt::WidgetWithChildrenShortcut).
         autoRepeat(false);
 
     factory(Qn::SelectionChangeAction).
