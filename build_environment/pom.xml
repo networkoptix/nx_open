@@ -163,6 +163,7 @@
                                 <argument>-Dplatform=${platform}</argument>
                                 <argument>-D1.4.0=${1.4.0}</argument>
                                 <argument>-D1.5.1=${1.5.1}</argument>
+                                <argument>-D2.0.2=${2.0.2}</argument>                                
                                 <argument>-Denvironment.dir=${environment.dir}</argument>								
                                 <argument>-Dmaven.repo.local=${environment.dir}/maven/repository</argument>								
                             </arguments>

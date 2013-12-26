@@ -141,6 +141,37 @@
                         </Component>
                     </Directory>
                 <?endif?>
+                <?if ${2.0.2} = true ?>
+                    <Directory Id="${customization}_2_0_Dir" Name="2.0">
+
+                        <Directory Id="styles_2_0" Name="styles">
+                            <Component Id="bespin_2_0">
+                                <File Id="bespin$(var.suffix).dll_2_0" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
+                            </Component>
+                        </Directory>
+
+                        <Directory Id="ImageFormats_2_0" Name="imageformats">
+                        </Directory>                            
+
+                        <Component Id="ClientExecutable_2_0">
+                            <File Id="client.exe_2_0" Name="${product.name}.exe" Source="${libdir}/2.0.2/bin/client.exe" KeyPath="yes">
+                                <fire:FirewallException Id="FirewallExceptionClient_2_0" Name="${product.name} 2.0" Scope="any" IgnoreFailure="yes"/>
+                            </File>
+                        </Component>
+
+                        <Component Id="ClientQjson_2_0">
+                            <File Id="ClientQjson.dll_2_0" Name="qjson.dll" Source="${libdir}/bin/${build.configuration}\qjson.dll"/>
+                        </Component>                            
+
+                        <Component Id="ClientSigar_2_0">
+                            <File Id="ClientSigar.dll_2_0" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
+                        </Component>
+
+                        <Component Id="ClientQtColorPicker_2_0">
+                            <File Id="ColorPicker26$(var.suffix).dll_2_0" Name="QtSolutions_ColorPicker-2.6$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                        </Component>
+                    </Directory>
+                <?endif?>                
             </Directory>
         </DirectoryRef>
 
@@ -413,6 +444,94 @@
             </ComponentGroup>             
         <?endif?>
 
+        <?if ${2.0.2} = true ?>
+            <ComponentGroup Id="ClientFFmpegLibraries_2_0" Directory="${customization}_2_0_Dir">
+                <Component>
+                    <File Id="ClientAvcodecDll_2_0" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientAvdeviceDll_2_0" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientAvfilterDll_2_0" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientAvformatDll_2_0" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientAvutilDll_2_0" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientSwscaleDll_2_0" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientOggDll_2_0" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientVorbisDll_2_0" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientMp3lameDll_2_0" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientVorbisEncDll_2_0" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                </Component>
+                <Component>
+                    <File Id="ClientX264_2_0" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
+                </Component>
+            </ComponentGroup>                            
+
+            <ComponentGroup Id="ClientQTLibraries_2_0" Directory="${customization}_2_0_Dir">
+                <Component>
+                    <File Id="ClientQtCore$(var.suffix)4.dll_2_0" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="ClientQtGui$(var.suffix)4.dll_2_0" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="ClientQtMultimedia$(var.suffix)4.dll_2_0" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="ClientQtNetwork$(var.suffix)4.dll_2_0" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="ClientQtOpenGL$(var.suffix)4.dll_2_0" Name="QtOpenGL$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="ClientQtXml$(var.suffix)4.dll_2_0" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
+                </Component>
+            </ComponentGroup>
+
+            <ComponentGroup Id="ClientOpenAL_2_0" Directory="${customization}_2_0_Dir">
+                <Component>
+                    <File Id="OpenAL32.dll_2_0" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
+                </Component>
+                <Component>
+                    <File Id="wrap_oal.dll_2_0" Name="wrap_oal.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
+                </Component>
+            </ComponentGroup>
+
+            <ComponentGroup Id="ClientOpenSSL_2_0" Directory="${customization}_2_0_Dir">
+                <Component>
+                    <File Id="Clientlibeay32.dll_2_0" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                </Component>
+                <Component>
+                    <File Id="Clientssleay32.dll_2_0" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+                </Component>
+            </ComponentGroup>      
+            <ComponentGroup Id="ImageFormats_2_0" Directory="ImageFormats_2_0">
+                <Component>
+                    <File Id="qgif4.dll_2_0" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="qjpeg4.dll_2_0" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+                </Component>
+                <Component>
+                    <File Id="qtiff4.dll_2_0" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
+                </Component>
+            </ComponentGroup>             
+        <?endif?>        
+
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 
@@ -461,6 +580,18 @@
                 <ComponentRef Id="ClientQtColorPicker_1_5"/>
                 <ComponentRef Id="bespin_1_5" />             
             <?endif?>
+            <?if ${2.0.2} = true ?>
+                <ComponentRef Id="ClientExecutable_2_0" />          
+                <ComponentGroupRef Id="ClientFFmpegLibraries_2_0"/>
+                <ComponentGroupRef Id="ClientQTLibraries_2_0" />
+                <ComponentGroupRef Id="ImageFormats_2_0" />
+                <ComponentGroupRef Id="ClientOpenAL_2_0" />
+                <ComponentGroupRef Id="ClientOpenSSL_2_0" />
+                <ComponentRef Id="ClientQjson_2_0"/>
+                <ComponentRef Id="ClientSigar_2_0"/>            
+                <ComponentRef Id="ClientQtColorPicker_2_0"/>
+                <ComponentRef Id="bespin_2_0" />             
+            <?endif?>            
         </Feature>
     </Fragment>
 </Wix>

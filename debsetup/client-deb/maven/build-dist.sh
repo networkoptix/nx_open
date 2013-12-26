@@ -104,6 +104,19 @@ if [ "${1.5.1}" == "true" ]; then
     chmod 755 $BINSTAGE/1.5*/*
 fi
 
+if [ "${2.0.2}" == "true" ]; then
+    mkdir -p $BINSTAGE/2.0/styles
+    mkdir -p $BINSTAGE/2.0/imageformats
+    cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/2.0
+    cp -r ${libdir}/2.0/bin/client-bin $BINSTAGE/2.0
+    cp ${libdir}/2.0/lib/*.* $LIBSTAGE
+    cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/2.0
+    cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/2.0/styles
+    cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/2.0/imageformats
+    chmod 755 $BINSTAGE/2.0*/*
+fi
+
+
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
 
