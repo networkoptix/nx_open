@@ -431,7 +431,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(user, tr("New Layout")));
+    dialog->setName(generateUniqueLayoutName(user, tr("New layout")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     QMessageBox::Button button;
@@ -452,6 +452,14 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         }
 
         if (!existing.isEmpty()) {
+            bool allAreLocal = true;
+            foreach (const QnLayoutResourcePtr &layout, existing)
+                allAreLocal &= snapshotManager()->isLocal(layout);
+            if (allAreLocal) {
+                removeLayouts(existing);
+                break;
+            }
+
             button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
             if (button == QMessageBox::Cancel)
                 return;
