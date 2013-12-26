@@ -583,6 +583,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::EscapeHotkeyAction).
         flags(Qn::GlobalHotkey).
         shortcut(tr("Esc")).
+        shortcutContext(Qt::WidgetWithChildrenShortcut).
         text(tr("Stop current action"));
 
     factory(Qn::FullscreenAction).
