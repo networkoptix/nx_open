@@ -61,7 +61,6 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
 :CLServerPushStreamReader(res),
-mHttpClient(0),
 m_request(requst)
 {
 
@@ -146,7 +145,7 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
-    mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
+    mHttpClient.reset( new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth()) );
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
     switch( httpStatus )
     {
@@ -168,11 +167,10 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
 
 void MJPEGtreamreader::closeStream()
 {
-    delete mHttpClient;
-    mHttpClient = 0;
+    mHttpClient.reset();
 }
 
 bool MJPEGtreamreader::isStreamOpened() const
 {
-    return ( mHttpClient && mHttpClient->isOpened() );
+    return ( mHttpClient.get() && mHttpClient->isOpened() );
 }

@@ -1,6 +1,8 @@
 #ifndef cl_mjpeg_dataprovider_h_1140
 #define cl_mjpeg_dataprovider_h_1140
 
+#include <memory>
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 
@@ -21,7 +23,7 @@ protected:
     void updateStreamParamsBasedOnFps() override {};
 
 private:
-    CLSimpleHTTPClient* mHttpClient;
+    std::auto_ptr<CLSimpleHTTPClient> mHttpClient;
 
     QString m_request;
 };
