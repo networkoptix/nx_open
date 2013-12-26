@@ -277,7 +277,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, 
         *result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded));
         (*result)->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
         if(m_encoderCtx->coded_frame->key_frame)
-            (*result)->flags |= AV_PKT_FLAG_KEY;
+            (*result)->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         (*result)->data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         return 0;
     }

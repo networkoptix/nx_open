@@ -162,7 +162,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
     result->width = m_sps.getWidth();
     result->height = m_sps.getHeight();
     if (m_keyDataExists) {
-        result->flags = AV_PKT_FLAG_KEY;
+        result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
             serializeSpsPps(result->data);
     }

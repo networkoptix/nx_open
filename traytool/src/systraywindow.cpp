@@ -730,6 +730,17 @@ void QnSystrayWindow::onShowAppServerLogAction()
     QProcess::startDetached(lit("notepad ") + logFileName);
 }
 
+Qt::CheckState QnSystrayWindow::getDiscoveryState() const
+{
+    Qt::CheckState discoveryState = Qt::Checked;
+    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
+    if (disabledVendors == lit("all"))
+        discoveryState = Qt::Unchecked;
+    else if (!disabledVendors.isEmpty())
+        discoveryState = Qt::PartiallyChecked;
+    return discoveryState;
+}
+
 void QnSystrayWindow::onSettingsAction()
 {
     QUrl appServerUrl = getAppServerURL();
@@ -756,12 +767,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
     ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
     
-    Qt::CheckState discoveryState = Qt::Checked;
-    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
-    if (disabledVendors == lit("all"))
-        discoveryState = Qt::Unchecked;
-    else if (!disabledVendors.isEmpty())
-        discoveryState = Qt::PartiallyChecked;
+    Qt::CheckState discoveryState = getDiscoveryState();
     ui->checkBoxDiscovery->setCheckState(discoveryState);
 
     onRadioButtonPublicIpChanged();
@@ -839,6 +845,9 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
     else
         publicIPState = 2;
     if (m_mediaServerSettings.value(lit("publicIPEnabled")).toInt() != publicIPState)
+        return true;
+
+    if (getDiscoveryState() != ui->checkBoxDiscovery->checkState())
         return true;
 
     return false;

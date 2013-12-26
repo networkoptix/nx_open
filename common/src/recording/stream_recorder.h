@@ -27,9 +27,23 @@ class QnFfmpegVideoTranscoder;
 class QnStreamRecorder : public QnAbstractDataConsumer
 {
     Q_OBJECT
-
+    Q_ENUMS(StreamRecorderError)
+    Q_ENUMS(Role)
 public:
     enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
+    enum StreamRecorderError {
+        NoError = 0,
+        ContainerNotFoundError,
+        FileCreateError,
+        VideoStreamAllocationError,
+        AudioStreamAllocationError,
+        InvalidAudioCodecError,
+        IncompatibleCodecError,
+
+        LastError
+    };
+
+    static QString errorString(int errCode);
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
@@ -104,11 +118,9 @@ public:
 
     void setSrcRect(const QRectF& srcRect);
 signals:
-    void recordingFailed(QString errMessage);
     void recordingStarted();
-
-    void recordingFinished(QString fileName);
     void recordingProgress(int progress);
+    void recordingFinished(int status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData);
@@ -128,7 +140,7 @@ protected:
     }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 
-    bool addSignatureFrame(QString& errorString);
+    bool addSignatureFrame();
     void markNeedKeyData();
     virtual bool saveData(QnConstAbstractMediaDataPtr md);
     virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
@@ -152,7 +164,7 @@ private:
     bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;
     bool m_packetWrited;
-    QString m_lastErrMessage;
+    int  m_lastError;
     qint64 m_currentChunkLen;
 
     QString m_fileName;

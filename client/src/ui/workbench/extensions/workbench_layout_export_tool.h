@@ -89,13 +89,12 @@ signals:
      * @brief finished                          This signal is emitted when the process is finished.
      * @param success                           True if the process is finished successfully, false otherwise.
      */
-    void finished(bool success);
+    void finished(bool success, const QString &filename);
 private slots:
     bool exportMediaResource(const QnMediaResourcePtr& resource);
 
     void at_camera_progressChanged(int progress);
-    void at_camera_exportFinished();
-    void at_camera_exportFailed(QString errorMessage);
+    void at_camera_exportFinished(int status, const QString &filename);
 private:
     bool exportNextCamera();
     void finishExport(bool success);
@@ -113,7 +112,7 @@ private:
     /** Exported time period. */
     QnTimePeriod m_period;
 
-    /** Name of hte file the layout should be exported to. */
+    /** Name of the file the layout should be exported to. */
     QString m_targetFilename;
 
     /** Name of the file we are writing. May differ from target filename if target file is busy. */

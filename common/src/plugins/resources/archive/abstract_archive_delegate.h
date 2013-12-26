@@ -5,11 +5,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 #include "core/resource/resource.h"
+#include "core/resource/resource_media_layout.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "motion/abstract_motion_archive.h"
 
-class QnResourceVideoLayout;
-class QnResourceAudioLayout;
 
 /*
 class QnAbstractFilterPlaybackDelegate
@@ -56,8 +55,8 @@ public:
         \param time UTC, usec
     */
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
-    virtual QnResourceVideoLayout* getVideoLayout() = 0;
-    virtual QnResourceAudioLayout* getAudioLayout() = 0;
+    virtual QnResourceVideoLayoutPtr getVideoLayout() = 0;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() = 0;
 
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
     

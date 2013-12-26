@@ -558,7 +558,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     if(!m_menuEnabled)
         return;
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), display()->scene()->selectedItems()));
     if(menu->isEmpty())
         return;
 
@@ -575,13 +575,6 @@ void QnWorkbenchController::startRecording() {
     }
 
     if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
@@ -613,9 +606,8 @@ void QnWorkbenchController::at_recordingAnimation_finished() {
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
-        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            if (m_screenRecorder) // just in case =)
-                m_screenRecorder->startRecording(widget);
+        if (m_screenRecorder) // just in case =)
+            m_screenRecorder->startRecording();
     }
     m_countdownCanceled = false;
 }
@@ -1070,7 +1062,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     delete widget;
 
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-    if (layout->getItems().size() >= qnSettings->maxVideoItems())
+    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
         return;
     layout->addItem(data);
     display()->widget(data.uuid)->setCheckedButtons(buttons);

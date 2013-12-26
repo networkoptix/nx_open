@@ -180,7 +180,7 @@ void QnISDStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-const QnResourceAudioLayout* QnISDStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnISDStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }

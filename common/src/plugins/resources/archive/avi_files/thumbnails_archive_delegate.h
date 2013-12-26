@@ -15,8 +15,8 @@ public:
     virtual qint64 startTime() override;
     virtual qint64 endTime() override;
     virtual qint64 seek (qint64 time, bool findIFrame) override;
-    virtual QnResourceVideoLayout* getVideoLayout() override;
-    virtual QnResourceAudioLayout* getAudioLayout() override;
+    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep);
     virtual void setGroupId(const QByteArray& groupId) override;

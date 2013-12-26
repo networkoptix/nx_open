@@ -33,8 +33,8 @@ public:
     virtual bool isSingleShotMode() const;
 
 
-    virtual const QnResourceVideoLayout* getDPVideoLayout() const;
-    virtual const QnResourceAudioLayout* getDPAudioLayout() const;
+    virtual QnConstResourceVideoLayoutPtr getDPVideoLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);

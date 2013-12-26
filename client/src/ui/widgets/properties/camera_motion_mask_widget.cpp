@@ -221,7 +221,7 @@ void QnCameraMotionMaskWidget::clearMotion()
 
 bool QnCameraMotionMaskWidget::isValidMotionRegion() {
     if (m_resourceWidget && m_needControlMaxRects) {
-        const QnResourceVideoLayout *layout = m_camera->getVideoLayout();
+        QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
         const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
         for (int i = 0; i < qMin(regions.size(), layout->channelCount()); ++i) {
             QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),

@@ -78,7 +78,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     if (channels > 1)
     {
         // multiple channel encoder
-        profileSufix = QByteArray::number(res->getChannelNum());
+        profileSufix = QByteArray::number(res->getChannelNumAxis());
     }
 
     if (role == QnResource::Role_LiveVideo)
@@ -197,7 +197,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
     if (channels > 1)
     {
-        stream << "&camera=" << res->getChannelNum();
+        stream << "&camera=" << res->getChannelNumAxis();
     }
 
     
@@ -337,7 +337,7 @@ void QnAxisStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
-    if (getRole() == QnResource::Role_LiveVideo) 
+    if (getRole() == QnResource::Role_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
         m_axisRes->readMotionInfo();
 
     if (!isStreamOpened()) {
@@ -386,7 +386,7 @@ void QnAxisStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-const QnResourceAudioLayout* QnAxisStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnAxisStreamReader::getDPAudioLayout() const
 {
     return m_rtpStreamParser.getAudioLayout();
 }

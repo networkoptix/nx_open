@@ -86,7 +86,7 @@ public:
     /**
      * \returns                         Video resource layout, if any, 
      */
-    const QnResourceVideoLayout *videoLayout() const;
+    QnConstResourceVideoLayoutPtr videoLayout() const;
 
     /**
      * \returns                         Length of this display, in microseconds. If the length is not defined, returns -1.

@@ -32,6 +32,8 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
     Q_ASSERT( m_thirdPartyRes );
+
+    m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 }
 
 ThirdPartyStreamReader::~ThirdPartyStreamReader()
@@ -334,10 +336,10 @@ void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-const QnResourceAudioLayout* ThirdPartyStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
 {
     return m_liveStreamReader
-        ? &m_audioLayout    //TODO/IMPL
+        ? m_audioLayout    //TODO/IMPL
         : m_rtpStreamParser.getAudioLayout();
 }
 
@@ -462,7 +464,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
         }
     }
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
-        mediaPacket->flags |= AV_PKT_FLAG_KEY;
+        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
     {
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -582,5 +584,5 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     m_audioContext->ctx()->block_align = audioFormat.blockAlign;
     m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
 
-    m_audioLayout.addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
+    m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }

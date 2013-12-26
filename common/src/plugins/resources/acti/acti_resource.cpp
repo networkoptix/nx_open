@@ -450,7 +450,7 @@ bool QnActiResource::isInputPortMonitored() const
     return m_inputMonitored;
 }
 
-const QnResourceAudioLayout* QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnActiStreamReader* actiReader = dynamic_cast<const QnActiStreamReader*>(dataProvider);

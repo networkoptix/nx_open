@@ -258,6 +258,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     qreal aspectRatio = (imageSize.width()/m_itemDewarping.panoFactor) / (qreal) imageSize.height();
     qreal yPos;
     qreal phiShiftSign;
+    qreal yAngle = m_itemDewarping.yAngle;
     if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::Horizontal) {
         yPos = 0.5;
         phiShiftSign = 1.0;
@@ -265,6 +266,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     else {
         yPos =  1.0;
         phiShiftSign = -1.0;
+        yAngle -= m_itemDewarping.fov/m_itemDewarping.panoFactor/2.0;
     }
     qreal radius = m_mediaDewarping.radius;
     qreal xCenter = m_mediaDewarping.xCenter;
@@ -292,7 +294,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
 
             float cosTheta = cos(pos.x());
             float roty = -m_mediaDewarping.fovRot * cosTheta;
-            float phi   = phiShiftSign * (pos.y() * (1.0 - roty*xy1.y())  - roty - m_itemDewarping.yAngle);
+            float phi   = phiShiftSign * (pos.y() * (1.0 - roty*xy1.y())  - roty - yAngle);
             float cosPhi = cos(phi);
 
             // Vector in 3D space

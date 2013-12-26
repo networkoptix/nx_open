@@ -482,7 +482,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         m_frameSize = 0;
 
         m_videoData->channelNumber = 0;
-        m_videoData->flags |= AV_PKT_FLAG_KEY;
+        m_videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         m_videoData->compressionType = CODEC_ID_MJPEG;
         //m_videoData->context = m_context;
         m_videoData->width = width*8;

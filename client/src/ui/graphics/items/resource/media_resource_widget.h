@@ -113,11 +113,22 @@ public:
     QnMediaDewarpingParams dewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams &params);
 
+    /**
+     * Getter and setter for dewarpingParams in item().
+     * \see fisheye_ptz_controller.cpp
+     */
+    QnItemDewarpingParams itemDewarpingParams() const;
+    void setItemDewarpingParams(const QnItemDewarpingParams &params);
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
+    /**
+     * This signal is emmited when item dewarpingParams have been changed.
+     */
+    void itemDewarpingParamsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;

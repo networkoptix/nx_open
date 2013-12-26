@@ -25,6 +25,8 @@ QnAacRtpParser::QnAacRtpParser():
     m_channels = 0;
     m_streamtype = 0;
     m_auHeaderExists = false;
+
+    m_audioLayout.reset( new QnRtspAudioLayout() );
 }
 
 QnAacRtpParser::~QnAacRtpParser()
@@ -82,7 +84,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
-    m_audioLayout.setAudioTrackInfo(track);
+    m_audioLayout->setAudioTrackInfo(track);
 
 }
 
@@ -184,7 +186,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
     return true;
 }
 
-QnResourceAudioLayout* QnAacRtpParser::getAudioLayout()
+QnResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
 {
-    return &m_audioLayout;
+    return m_audioLayout;
 }

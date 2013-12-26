@@ -83,13 +83,14 @@ public:
     /**
      * \param scope                     Scope of the menu to create.
      * \param parameters                Action parameters for menu creation.
+     * \param parent                    Parent widget for the new menu.
      * \returns                         Newly created menu for the given paramters.
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
-    QMenu *newMenu(Qn::ActionScope scope, const QnActionParameters &parameters = QnActionParameters());
+    QMenu *newMenu(Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters());
 
-    QMenu *newMenu(Qn::ActionId rootId, Qn::ActionScope scope, const QnActionParameters &parameters = QnActionParameters());
+    QMenu *newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent  = NULL, const QnActionParameters &parameters = QnActionParameters());
 
     /**
      * \returns                         Action target provider that is assigned to this
@@ -135,7 +136,7 @@ protected:
 
     void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
-    QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters);
+    QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget = NULL);
 
     bool redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
 

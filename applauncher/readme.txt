@@ -45,37 +45,42 @@ Remote directory is defined by http url. E.g.: http://x.x.x.x/builds/networkopti
 Mirror list is read from predefined http url (can be overridden by parameter mirrorListUrl).
 Mirror list is defined by xml of folowing format:
 
+
+
 <?xml version="1.0" encoding="UTF-8"?>
-<mirrorlist>
-    <product name="dwspectrum">
-        <customization name="digitalwatchdog">
-            <module name="client">
-                <version name="1.5">
-                    <mirror>http://dwserver1/1.5/</mirror>
-                    <mirror>http://dwserver2/1.5/</mirror>
-                </version>
-                <version name="1.6">
-                    <mirror>http://dwserver1/1.6/</mirror>
-                    <mirror>http://dwserver2/1.6/</mirror>
-                    <mirror>http://dwserverN/1.6/</mirror>
-                </version>
-            </module>
-        </customization>
-    </product>
-    <product name="hdwitness">
-        <customization name="Vms">  <!-- default customization -->
-            <module name="client">
-                <version name="1.5">
-                    <mirror>http://networkoptix/archive/1.5/</mirror>
-                    <mirror>http://networkoptix-mirror/1.5/</mirror>
-                </version>
-                <version name="1.6">
-                    <mirror>http://networkoptix/archive/1.6/</mirror>
-                </version>
-            </module>
-        </customization>
-    </product>
-</mirrorlist>
+<condition resName="product" matchType="equal">
+
+    <condition value="dwspectrum" resName="customization" matchType="equal">
+        <condition value="digitalwatchdog" resName="module" matchType="equal">
+            <condition value="client" resName="version" matchType="equal">
+                <sequence value="1.5">
+                    <set resName="mirrorUrl" resValue="http://dwserver1/1.5/"/>
+                    <set resName="mirrorUrl" resValue="http://dwserver2/1.5/"/>
+                </sequence>
+                <sequence name="1.6">
+                    <set resName="mirrorUrl" resValue="http://dwserver1/1.6/"/>
+                    <set resName="mirrorUrl" resValue="http://dwserver2/1.6/"/>
+                    <set resName="mirrorUrl" resValue="http://dwserverN/1.6/"/>
+                </sequence>
+            </condition>
+        </condition>
+    </condition>
+
+    <condition value="hdwitness" resName="customization" matchType="equal">
+        <condition value="Vms" resName="module" matchType="equal">
+            <condition value="client" resName="version" matchType="equal">
+                <sequence value="1.5">
+                    <set resName="mirrorUrl" resValue="http://networkoptix/archive/1.5/"/>
+                    <set resName="mirrorUrl" resValue="http://networkoptix-mirror/1.5/"/>
+                </sequence>
+                <sequence name="1.6">
+                    <set resName="mirrorUrl" resValue="http://networkoptix/archive/1.6/"/>
+                </sequence>
+            </condition>
+        </condition>
+    </condition>
+
+</condition>
 
 
 Contents of remote directory is read from contents.xml (url http://x.x.x.x/builds/networkoptix/2.1/contents.xml) file. File has following format:

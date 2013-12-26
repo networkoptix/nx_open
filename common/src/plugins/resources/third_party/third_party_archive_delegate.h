@@ -33,9 +33,9 @@ public:
     //!Implementation of QnAbstractArchiveDelegate::seek
     virtual qint64 seek( qint64 time, bool findIFrame ) override;
     //!Implementation of QnAbstractArchiveDelegate::getVideoLayout
-    virtual QnResourceVideoLayout* getVideoLayout() override;
+    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
     //!Implementation of QnAbstractArchiveDelegate::getAudioLayout
-    virtual QnResourceAudioLayout* getAudioLayout() override;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
     //!Implementation of QnAbstractArchiveDelegate::onReverseMode
     virtual void onReverseMode( qint64 displayTime, bool value ) override;
     //!Implementation of QnAbstractArchiveDelegate::setSingleshotMode

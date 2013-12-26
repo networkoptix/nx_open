@@ -35,8 +35,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayout* getVideoLayout();
-    virtual QnResourceAudioLayout* getAudioLayout();
+    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual AVCodecContext* setAudioChannel(int num);
 
@@ -72,8 +72,8 @@ private:
     int m_audioStreamIndex;
     int m_firstVideoIndex;
     bool m_streamsFound;
-    QnCustomResourceVideoLayout* m_videoLayout;
-    QnResourceAudioLayout* m_audioLayout;
+    QnCustomResourceVideoLayoutPtr m_videoLayout;
+    QnResourceAudioLayoutPtr m_audioLayout;
     QVector<int> m_indexToChannel;
     QList<QnMediaContextPtr> m_contexts;
 

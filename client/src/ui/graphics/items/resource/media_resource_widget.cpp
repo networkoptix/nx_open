@@ -56,7 +56,7 @@
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
-    Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
+    static std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() );
 
 } // anonymous namespace
 
@@ -193,6 +193,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
     updateCursor();
     setImageEnhancement(item->imageEnhancement());
+
+    connect(item, SIGNAL(dewarpingParamsChanged()), this, SIGNAL(itemDewarpingParamsChanged()));
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -316,7 +318,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
     bool changed = false;
     if (m_camera) {
-        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
+        QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->channelCount(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -342,7 +344,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
     int channel =0;
     QPoint channelPos = gridPos;
     if (m_camera) {
-        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
+        QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->channelCount(); ++i) {
             QRect r(channelGridOffset(i), QSize(MD_WIDTH, MD_HEIGHT));
@@ -417,7 +419,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
     } else {
-        setChannelLayout(qn_resourceWidget_defaultContentLayout());
+        setChannelLayout(qn_resourceWidget_defaultContentLayout);
         m_renderer->setChannelCount(0);
     }
 
@@ -663,6 +665,14 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     emit dewarpingParamsChanged();
 }
 
+QnItemDewarpingParams QnMediaResourceWidget::itemDewarpingParams() const {
+    return item()->dewarpingParams();
+}
+
+void QnMediaResourceWidget::setItemDewarpingParams(const QnItemDewarpingParams &params) {
+    item()->setDewarpingParams(params);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -747,6 +757,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 QString QnMediaResourceWidget::calculateInfoText() const {
     qreal fps = 0.0;
     qreal mbps = 0.0;
+
     for(int i = 0; i < channelCount(); i++) {
         const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));

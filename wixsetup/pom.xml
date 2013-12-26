@@ -19,37 +19,6 @@
         <skip.compress>true</skip.compress>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
-            <type>zip</type>
-            <scope>runtime</scope>
-            <classifier>1.4-${platform}-${arch}-${customization}</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>cpp</artifactId>
-                </exclusion>                
-            </exclusions>           
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-            <type>zip</type>
-            <scope>runtime</scope>
-            <classifier>1.5-${platform}-${arch}-${customization}</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>cpp</artifactId>
-                </exclusion>                
-            </exclusions>           
-        </dependency>        
-    </dependencies>
-
     <build>
         <finalName>${finalName}</finalName>
         <directory>${arch}</directory>
