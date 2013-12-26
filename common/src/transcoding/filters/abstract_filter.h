@@ -19,6 +19,11 @@ public:
      * \param updateRect    image rect to update. Filter MUST not update image outside the rect. Rect in range [0..1]
      */
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) = 0;
+    virtual void updateImage(QImage &image, const QRectF& updateRect) {
+        Q_UNUSED(image);
+        Q_UNUSED(updateRect);
+        Q_UNIMPLEMENTED();  //TODO: #vasilenko implement please
+    }
 
     virtual ~QnAbstractImageFilter() {}
 };
