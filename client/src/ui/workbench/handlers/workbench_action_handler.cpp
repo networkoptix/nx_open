@@ -350,7 +350,7 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
-    if (layout->getItems().size() >= qnSettings->maxVideoItems())
+    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
         return;
 
     {
@@ -828,7 +828,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         /* Add to layout. */
         foreach(const QnLayoutItemData &data, itemDataByUuid) {
-            if (layout->getItems().size() >= qnSettings->maxVideoItems())
+            if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
                 return;
 
             layout->addItem(data);

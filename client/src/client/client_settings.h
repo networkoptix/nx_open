@@ -25,7 +25,7 @@ class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSetti
 public:
     enum Variable {
         /** Maximum number of items that is allowed on the scene. */
-        MAX_VIDEO_ITEMS,
+        MAX_SCENE_VIDEO_ITEMS,
 
         /** Maximum number of items that is allowed during the preview search. */
         MAX_PREVIEW_SEARCH_ITEMS,
@@ -141,7 +141,7 @@ private:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
-        QN_DECLARE_RW_PROPERTY(int,                         maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24)
+        QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
         QN_DECLARE_RW_PROPERTY(int,                         maxPreviewSearchItems,  setMaxPreviewSearchItems,   MAX_PREVIEW_SEARCH_ITEMS,   16)
         QN_DECLARE_RW_PROPERTY(bool,                        isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
         QN_DECLARE_RW_PROPERTY(qreal,                       audioVolume,            setAudioVolume,             AUDIO_VOLUME,               1.0)

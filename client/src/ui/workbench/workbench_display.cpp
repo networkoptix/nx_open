@@ -762,7 +762,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    if (m_widgets.size() >= qnSettings->maxVideoItems()) {
+    if (m_widgets.size() >= qnSettings->maxSceneVideoItems()) {
         qnDeleteLater(item);
         return false;
     }
