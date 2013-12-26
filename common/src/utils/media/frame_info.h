@@ -149,7 +149,10 @@ public:
     QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
+    CLVideoDecoderOutput(QImage image);
     ~CLVideoDecoderOutput();
+
+    QImage toImage() const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
