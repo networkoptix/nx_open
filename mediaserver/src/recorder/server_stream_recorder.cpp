@@ -48,7 +48,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
 
     m_panicSchedileRecord.setData(scheduleData);
 
-    connect(this, SIGNAL(recordingFailed(QString)), this, SLOT(at_recordingFailed(QString)));
+    connect(this, &QnStreamRecorder::recordingFinished, this, &QnServerStreamRecorder::at_recordingFinished);
 
     connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnConstAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnConstAbstractDataPacketPtr)));
     connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QnResourcePtr&)));
@@ -59,9 +59,11 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
     stop();
 }
 
-void QnServerStreamRecorder::at_recordingFailed(QString msg)
-{
-    Q_UNUSED(msg)
+void QnServerStreamRecorder::at_recordingFinished(int status, const QString &filename) {
+    Q_UNUSED(filename)
+    if (status == QnStreamRecorder::NoError)
+        return;
+
     Q_ASSERT(m_mediaServer);
     if (m_mediaServer) {
         if (!m_diskErrorWarned)

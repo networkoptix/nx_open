@@ -579,13 +579,6 @@ void QnWorkbenchController::startRecording() {
         return;
     }
 
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
     m_countdownCanceled = false;
@@ -613,9 +606,8 @@ void QnWorkbenchController::at_recordingAnimation_finished() {
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
-        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            if (m_screenRecorder) // just in case =)
-                m_screenRecorder->startRecording(widget);
+        if (m_screenRecorder) // just in case =)
+            m_screenRecorder->startRecording();
     }
     m_countdownCanceled = false;
 }
