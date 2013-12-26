@@ -5,7 +5,6 @@
 #include <exception>
 
 #include <QtCore/QString>
-#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 
 #ifdef Q_OS_WIN
 #   include <winsock2.h>
@@ -63,8 +62,6 @@ class Socket
 :
     virtual public AbstractSocket
 {
-    Q_DECLARE_TR_FUNCTIONS(Socket)
-
 public:
     //TODO/IMPL draft refactoring of socket operation result receiving. Enum introduced like in std stream bits
     enum StatusBit
@@ -200,8 +197,8 @@ protected:
     int sockDesc;              // Socket descriptor
     QString m_lastError;
 
-    Socket(int type, int protocol) ;
-    Socket(int sockDesc);
+    Socket( int type, int protocol, SocketImpl* impl = nullptr );
+    Socket( int sockDesc, SocketImpl* impl = nullptr );
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
     bool createSocket(int type, int protocol);
     void setStatusBit( StatusBit _status );
@@ -229,8 +226,6 @@ class CommunicatingSocket
     public Socket,
     virtual public AbstractCommunicatingSocket
 {
-    Q_DECLARE_TR_FUNCTIONS(CommunicatingSocket)
-
 public:
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
@@ -266,11 +261,15 @@ public:
     unsigned short getForeignPort() ;
 
 protected:
+    bool mConnected;
+
     CommunicatingSocket(int type, int protocol) ;
     CommunicatingSocket(int newConnSD);
 
-protected:
-    bool mConnected;
+    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
 };
 
 /**
@@ -281,8 +280,6 @@ class TCPSocket
     public CommunicatingSocket,
     virtual public AbstractStreamSocket
 {
-    Q_DECLARE_TR_FUNCTIONS(TCPSocket)
-
 public:
     /**
      *   Construct a TCP socket with no connection
@@ -298,6 +295,8 @@ public:
      *   @exception SocketException thrown if unable to create TCP socket
      */
     TCPSocket(const QString &foreignAddress, unsigned short foreignPort);
+    //!User by \a TCPServerSocket class
+    TCPSocket(int newConnSD);
 
     //!Implementation of AbstractStreamSocket::reopen
     virtual bool reopen() override;
@@ -309,7 +308,6 @@ public:
 private:
     // Access for TCPServerSocket::accept() connection creation
     friend class TCPServerSocket;
-    TCPSocket(int newConnSD);
 };
 
 /**
@@ -320,8 +318,6 @@ class TCPServerSocket
     public Socket,
     virtual public AbstractStreamServerSocket
 {
-    Q_DECLARE_TR_FUNCTIONS(TCPServerSocket)
-
 public:
     TCPServerSocket();
 
@@ -338,21 +334,12 @@ public:
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
 
+protected:
+    //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
+    virtual bool acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> handler ) override;
+
 private:
     bool setListen(int queueLen) ;
-};
-
-class TCPSslServerSocket: public TCPServerSocket
-{
-public:
-    /*
-    *   allowNonSecureConnect - allow mixed ssl and non ssl connect for socket
-    */
-    TCPSslServerSocket(bool allowNonSecureConnect = true);
-
-    virtual AbstractStreamSocket* accept() override;
-private:
-    bool m_allowNonSecureConnect;
 };
 
 /**
@@ -363,8 +350,6 @@ class UDPSocket
     public CommunicatingSocket,
     virtual public AbstractDatagramSocket
 {
-    Q_DECLARE_TR_FUNCTIONS(UDPSocket)
-
 public:
     static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
 

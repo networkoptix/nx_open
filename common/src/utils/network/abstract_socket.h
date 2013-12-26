@@ -10,12 +10,16 @@
 #   include <winsock2.h>
 #endif
 
+#include <memory>
+
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
 #include "../common/byte_array.h"
 #include "../common/systemerror.h"
 
+
+//todo: #ak cancel asynchoronous operations
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class AbstractSocket
@@ -135,6 +139,15 @@ class AbstractCommunicatingSocket
     virtual public AbstractSocket
 {
 public:
+    //!This class for internal use only. MAY be removed or changed in future
+    class AbstractAsyncIOHandler
+    {
+    public:
+        virtual ~AbstractAsyncIOHandler() {}
+        virtual void done( SystemError::ErrorCode errorCode, size_t bytesProcessed ) = 0;
+    };
+
+
     virtual ~AbstractCommunicatingSocket() {}
 
     static const int DEFAULT_TIMEOUT_MILLIS = 3000;
@@ -191,31 +204,56 @@ public:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, size_t bytesRead )
             \endcode
-            \a bytesRead is indefined, if errorCode is not SystemError::noError
+            \a bytesRead is undefined, if errorCode is not SystemError::noError.
+            \a bytesRead is 0, if connection has been closed
         \return true, if asynchronous read has been issued
         \warning If \a dst->capacity() == 0, \a false is returned and no bytes read
         \warning Multiple concurrent asynchronous write operations result in undefined behavour
     */
     template<class HandlerType>
-        bool readSomeAsync( nx::Buffer* const dst, HandlerType /*handler*/ )
+        bool readSomeAsync( nx::Buffer* const dst, HandlerType handler )
         {
-            //TODO/IMPL
-            return false;
+            return recvAsyncImpl( dst, std::unique_ptr<AbstractAsyncIOHandler>( new CustomAsyncIOHandler<HandlerType>(std::move(handler)) ) );
         }
 
+    //!Asynchnouosly writes all bytes from input buffer
     /*!
-        \param handler functor with following signature:
+        \param handler functor with following parameters:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, size_t bytesWritten )
             \endcode
-            \a bytesWritten is indefined, if errorCode is not SystemError::noError
+            \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
     */
     template<class HandlerType>
-        bool sendAsync( const nx::Buffer& /*src*/, HandlerType /*handler*/ )
+        bool sendAsync( const nx::Buffer& src, HandlerType handler )
         {
-            //TODO/IMPL
-            return false;
+            return sendAsyncImpl( src, std::unique_ptr<AbstractAsyncIOHandler>( new CustomAsyncIOHandler<HandlerType>(std::move(handler)) ) );
         }
+
+protected:
+    template<class HandlerFunc>
+    class CustomAsyncIOHandler
+    :
+        public AbstractAsyncIOHandler
+    {
+    public:
+        CustomAsyncIOHandler( const HandlerFunc& handler ) : m_handler( handler ) {}
+        CustomAsyncIOHandler( const HandlerFunc&& handler ) : m_handler( handler ) {}
+
+        virtual void done( SystemError::ErrorCode errorCode, size_t bytesProcessed ) override
+        {
+            m_handler( errorCode, bytesProcessed );
+        }
+
+    private:
+        HandlerFunc m_handler;
+    };
+
+    /*!
+        \param handler This SHOULD be freed by implementation
+    */
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) = 0;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) = 0;
 };
 
 //!Interface for connection-orientied sockets
@@ -252,19 +290,14 @@ class AbstractStreamServerSocket
     virtual public AbstractSocket
 {
 public:
-    class AsyncAcceptHandler
+    //!This class for internal use only. MAY be removed or changed in future
+    class AbstractAsyncAcceptHandler
     {
     public:
-        virtual ~AsyncAcceptHandler() {}
-
-        /*!
-            \param newConnection Object ownership is passed to \a AbstractStreamServerSocket::AsyncAcceptHandler instance
-        */
-        virtual void newConnectionAccepted(
-            SystemError::ErrorCode errorCode,
-            AbstractStreamServerSocket* serverSocket,
-            AbstractStreamSocket* newConnection ) = 0;
+        virtual ~AbstractAsyncAcceptHandler() {}
+        virtual void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ) = 0;
     };
+
 
     virtual ~AbstractStreamServerSocket() {}
 
@@ -291,11 +324,34 @@ public:
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
     template<class HandlerType>
-        bool acceptAsync( HandlerType /*handler*/ )
+        bool acceptAsync( HandlerType handler )
         {
-            //TODO/IMPL
-            return false;
+            return acceptAsyncImpl( std::unique_ptr<AbstractAsyncAcceptHandler>(new CustomAsyncAcceptHandler<HandlerType>(std::move(handler))) );
         }
+
+protected:
+    template<class HandlerFunc>
+    class CustomAsyncAcceptHandler
+    :
+        public AbstractAsyncAcceptHandler
+    {
+    public:
+        CustomAsyncAcceptHandler( const HandlerFunc& handler ) : m_handler( handler ) {}
+        CustomAsyncAcceptHandler( const HandlerFunc&& handler ) : m_handler( handler ) {}
+
+        virtual void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ) override
+        {
+            m_handler( errorCode, newConnection );
+        }
+
+    private:
+        HandlerFunc m_handler;
+    };
+
+    /*!
+        \param handler This SHOULD be freed by implementation
+    */
+    virtual bool acceptAsyncImpl( std::unique_ptr<AbstractAsyncAcceptHandler> handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

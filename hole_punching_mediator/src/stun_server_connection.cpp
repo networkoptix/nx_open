@@ -15,7 +15,7 @@ StunServerConnection::StunServerConnection(
 {
 }
 
-void StunServerConnection::processMessage( const nx_stun::Message& /*request*/, boost::optional<nx_stun::Message>* const /*response*/ )
+void StunServerConnection::processMessage( const nx_stun::Message& /*request*/ )
 {
     //TODO/IMPL
 }

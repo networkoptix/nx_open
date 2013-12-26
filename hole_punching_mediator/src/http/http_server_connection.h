@@ -40,7 +40,7 @@ public:
         nx_http::HttpStreamSocketServer* socketServer,
         AbstractCommunicatingSocket* sock );
 
-    void processMessage( const nx_http::HttpMessage& request, boost::optional<nx_http::HttpMessage>* const response );
+    void processMessage( const nx_http::HttpMessage& request );
 };
 
 #endif  //HTTP_SERVER_CONNECTION_H

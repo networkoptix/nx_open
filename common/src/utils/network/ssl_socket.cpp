@@ -460,6 +460,20 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
     return d->wrappedSocket->handle();
 }
 
+bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+{
+    assert( false );
+    return false;
+}
+
+bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+{
+    assert( false );
+    return false;
+}
+
+
+
 // ------------------------------ QnMixedSSLSocket -------------------------------------------------------
 static const int TEST_DATA_LEN = 3;
 
@@ -523,4 +537,54 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
         return QnSSLSocket::send((char*) buffer, bufferLen);
     else 
         return d->wrappedSocket->send(buffer, bufferLen);
+}
+
+//!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
+bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+{
+    assert( false );
+    return false;
+}
+
+//!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
+bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+{
+    assert( false );
+    return false;
+}
+
+
+//////////////////////////////////////////////////////////
+////////////// class TCPSslServerSocket
+//////////////////////////////////////////////////////////
+
+TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect)
+:
+    TCPServerSocket(),
+    m_allowNonSecureConnect(allowNonSecureConnect)
+{
+}
+
+AbstractStreamSocket* TCPSslServerSocket::accept()
+{
+    AbstractStreamSocket* sock = TCPServerSocket::accept();
+    if (!sock)
+        return 0;
+
+    if (m_allowNonSecureConnect)
+        return new QnMixedSSLSocket(sock);
+
+    else
+        return new QnSSLSocket(sock, true);
+
+#if 0
+    // transparent accept required state machine here. doesn't implemented. Handshake implemented on first IO operations
+
+    QnSSLSocket* sslSock = new QnSSLSocket(sock);
+    if (sslSock->doServerHandshake())
+        return sslSock;
+    
+    delete sslSock;
+    return 0;
+#endif
 }

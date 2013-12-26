@@ -16,9 +16,7 @@ HttpServerConnection::HttpServerConnection(
 {
 }
 
-void HttpServerConnection::processMessage(
-    const nx_http::HttpMessage& request,
-    boost::optional<nx_http::HttpMessage>* const response )
+void HttpServerConnection::processMessage( const nx_http::HttpMessage& request )
 {
     //TODO/IMPL
 }

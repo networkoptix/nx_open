@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QCoreApplication>
 
 #include "socket.h"
 #include "system_socket.h"

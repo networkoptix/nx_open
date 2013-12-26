@@ -37,7 +37,7 @@ public:
         StunStreamSocketServer* socketServer,
         AbstractCommunicatingSocket* sock );
 
-    void processMessage( const nx_stun::Message& request, boost::optional<nx_stun::Message>* const response );
+    void processMessage( const nx_stun::Message& request );
 };
 
 #endif  //STUN_SERVER_CONNECTION_H

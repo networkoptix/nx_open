@@ -91,7 +91,8 @@ namespace nx_http
                             lk.relock();
                             continue;
 
-                        case PollSet::etTimedOut:
+                        case PollSet::etReadTimedOut:
+                        case PollSet::etWriteTimedOut:
                         case PollSet::etError:
                             NX_LOG( QString::fromLatin1("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
                             if( reconnectIfAppropriate() )
@@ -109,7 +110,7 @@ namespace nx_http
                     break;
 
                 case sSendingRequest:
-                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
+                    if( eventType == PollSet::etError || (eventType & PollSet::etTimedOut) )
                     {
                         if( eventType == PollSet::etError )
                         {
@@ -153,7 +154,7 @@ namespace nx_http
                 case sReceivingResponse:
                 {
                     Q_ASSERT( eventType != PollSet::etWrite );
-                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
+                    if( eventType == PollSet::etError || (eventType & PollSet::etTimedOut) )
                     {
                         if( eventType == PollSet::etError )
                         {

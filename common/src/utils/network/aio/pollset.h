@@ -34,6 +34,8 @@ public:
         etError = 4,
         //!Used for periodic operations and for socket timers
         etTimedOut = 8,
+        etReadTimedOut = etRead | etTimedOut,
+        etWriteTimedOut = etWrite | etTimedOut,
         etCount = 9
     };
 

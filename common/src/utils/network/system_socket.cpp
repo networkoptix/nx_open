@@ -12,6 +12,7 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include "aio/aioservice.h"
 #include "system_socket_impl.h"
 #include "../common/systemerror.h"
 
@@ -458,10 +459,13 @@ const SocketImpl* Socket::impl() const
     return m_impl;
 }
 
-Socket::Socket(int type, int protocol)
+Socket::Socket(
+    int type,
+    int protocol,
+    SocketImpl* impl )
 :
     sockDesc( -1 ),
-    m_impl( NULL ),
+    m_impl( impl ),
     m_nonBlockingMode( false ),
     m_status( 0 ),
     m_prevErrorCode( SystemError::noError ),
@@ -474,13 +478,14 @@ Socket::Socket(int type, int protocol)
         setStatusBit( sbFailed );
     }
 
-    m_impl = new SocketImpl();
+    if( !m_impl )
+        m_impl = new SocketImpl();
 }
 
-Socket::Socket(int _sockDesc)
+Socket::Socket( int _sockDesc, SocketImpl* impl )
 :
     sockDesc( -1 ),
-    m_impl( NULL ),
+    m_impl( impl ),
     m_nonBlockingMode( false ),
     m_status( 0 ),
     m_prevErrorCode( SystemError::noError ),
@@ -488,7 +493,8 @@ Socket::Socket(int _sockDesc)
     m_writeTimeoutMS( 0 )
 {
     this->sockDesc = _sockDesc;
-    m_impl = new SocketImpl();
+    if( !m_impl )
+        m_impl = new SocketImpl();
 }
 
 // Function to fill in address structure given an address and port
@@ -518,7 +524,7 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
         QString errorMessage = QString::fromLocal8Bit(gai_strerror(status));
 #endif  /* UNICODE */
 
-        m_lastError = tr("Couldn't resolve %1: %2.").arg(address).arg(errorMessage);
+        m_lastError = QString::fromLatin1("Couldn't resolve %1: %2.").arg(address).arg(errorMessage);
         return false;
     }
 
@@ -569,6 +575,130 @@ void Socket::saveErrorInfo()
 //////////////////////////////////////////////////////////
 ///////// class CommunicatingSocket
 //////////////////////////////////////////////////////////
+
+class CommunicatingSocketPrivate
+:
+    public SocketImpl,
+    public aio::AIOEventHandler
+{
+public:
+    std::unique_ptr<AbstractCommunicatingSocket::AbstractAsyncIOHandler> recvHandler;
+    nx::Buffer* recvBuffer;
+    std::unique_ptr<AbstractCommunicatingSocket::AbstractAsyncIOHandler> sendHandler;
+    const nx::Buffer* sendBuffer;
+    size_t sendBufPos;
+
+    CommunicatingSocketPrivate()
+    :
+        recvBuffer( nullptr ),
+        sendBuffer( nullptr ),
+        sendBufPos( 0 )
+    {
+    }
+
+    virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) override
+    {
+        switch( eventType )
+        {
+            case PollSet::etRead:
+            {
+                assert( recvHandler );
+
+                //reading to buffer
+                const size_t bufSizeBak = recvBuffer->size();
+                recvBuffer->resize( recvBuffer->capacity() );
+                const int bytesRead = dynamic_cast<AbstractCommunicatingSocket*>(sock)->recv(
+                    recvBuffer->data() + recvBuffer->size(),
+                    recvBuffer->capacity() - recvBuffer->size() );
+                if( bytesRead == -1 )
+                {
+                    recvBuffer->resize( bufSizeBak );
+                    recvHandler->done( SystemError::getLastOSErrorCode(), (size_t)-1 );
+                }
+                else
+                {
+                    if( bytesRead > 0 )
+                        recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
+                    recvHandler->done( SystemError::noError, bytesRead );
+                }
+
+                recvBuffer = nullptr;
+                recvHandler.reset();
+                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+                break;
+            }
+
+            case PollSet::etWrite:
+            {
+                assert( sendHandler );
+                const int bytesWritten = dynamic_cast<AbstractCommunicatingSocket*>(sock)->send(
+                    sendBuffer->constData() + sendBufPos,
+                    sendBuffer->size() - sendBufPos );
+                if( bytesWritten == -1 || bytesWritten == 0 )
+                {
+                    sendHandler->done(
+                        bytesWritten == 0 ? SystemError::connectionReset : SystemError::getLastOSErrorCode(),
+                        sendBufPos );
+                    sendHandler.reset();
+                    sendBuffer = nullptr;
+                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
+                    break;
+                }
+
+                sendBufPos += bytesWritten;
+                if( sendBufPos == sendBuffer->size() )
+                {
+                    sendHandler->done( SystemError::noError, sendBufPos );
+                    sendHandler.reset();
+                    sendBuffer = nullptr;
+                    sendBufPos = 0;
+                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
+                }
+                break;
+            }
+
+            case PollSet::etReadTimedOut:
+                recvHandler->done( SystemError::timedOut, (size_t)-1 );
+                recvHandler.reset();
+                recvBuffer = nullptr;
+                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+                break;
+
+            case PollSet::etWriteTimedOut:
+                sendHandler->done( SystemError::timedOut, (size_t)-1 );
+                sendHandler.reset();
+                sendBuffer = nullptr;
+                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
+                break;
+
+            case PollSet::etError:
+                //TODO/IMPL distinguish read and write
+                //TODO/IMPL get correct socket error
+                if( recvHandler )
+                {
+                    recvHandler->done( SystemError::notConnected, (size_t)-1 );
+                    recvHandler.reset();
+                    recvBuffer = nullptr;
+                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+                }
+                if( sendHandler )
+                {
+                    sendHandler->done( SystemError::notConnected, (size_t)-1 );
+                    sendHandler.reset();
+                    sendBuffer = nullptr;
+                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
+                }
+                break;
+
+            default:
+                assert( false );
+                break;
+        }
+    }
+};
+
+
+
 
 // CommunicatingSocket Code
 
@@ -657,7 +787,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
     {
         if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
         {
-            m_lastError = tr("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
+            m_lastError = QString::fromLatin1("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
             return false;
         }
         if( isNonBlockingModeBak )
@@ -853,6 +983,25 @@ unsigned short CommunicatingSocket::getForeignPort()  {
     return ntohs(addr.sin_port);
 }
 
+bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler )
+{
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
+
+    d->recvBuffer = buf;
+    d->recvHandler = std::move(handler);
+    return aio::AIOService::instance()->watchSocket( this, PollSet::etRead, d );
+}
+
+bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler )
+{
+    CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
+
+    d->sendBuffer = &buf;
+    d->sendHandler = std::move(handler);
+    d->sendBufPos = 0;
+    return aio::AIOService::instance()->watchSocket( this, PollSet::etWrite, d );
+}
+
 
 //////////////////////////////////////////////////////////
 ///////// class TCPSocket
@@ -870,6 +1019,9 @@ TCPSocket::TCPSocket( const QString &foreignAddress, unsigned short foreignPort 
     CommunicatingSocket(SOCK_STREAM, IPPROTO_TCP)
 {
     connect( foreignAddress, foreignPort, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS );
+}
+
+TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 }
 
 bool TCPSocket::reopen()
@@ -910,9 +1062,6 @@ bool TCPSocket::getNoDelay( bool* value )
 
     *value = flag > 0;
     return true;
-}
-
-TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 }
 
 
@@ -959,12 +1108,92 @@ static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_T
     return ::accept(sockDesc, NULL, NULL);
 }
 
+class TCPServerSocketPrivate
+:
+    public SocketImpl,
+    public aio::AIOEventHandler
+{
+public:
+    std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> acceptHandler;
+    int socketHandle;
 
+    TCPServerSocketPrivate()
+    :
+        socketHandle( 0 )
+    {
+    }
+
+    virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) override
+    {
+        assert( acceptHandler );
+
+        switch( eventType )
+        {
+            case PollSet::etRead:
+            {
+                //accepting socket
+                AbstractStreamSocket* newSocket = dynamic_cast<TCPServerSocket*>(sock)->accept();
+                acceptHandler->onNewConnection(
+                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
+                    newSocket );
+                break;
+            }
+
+            case PollSet::etReadTimedOut:
+                acceptHandler->onNewConnection( SystemError::timedOut, nullptr );
+                break;
+
+            case PollSet::etError:
+                //TODO/IMPL get correct socket error
+                acceptHandler->onNewConnection( SystemError::connectionReset, nullptr );
+                break;
+
+            default:
+                assert( false );
+                break;
+        }
+
+        //TODO: #ak SHOULD avoid unneccessary watchSocket and removeFromWatch calls and unnecessary handler deletion
+        aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+        acceptHandler.reset();
+    }
+
+    AbstractStreamSocket* accept( unsigned int recvTimeoutMs )
+    {
+        int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs );
+        if( newConnSD >= 0 )
+        {
+            //clearStatusBit( Socket::sbFailed );
+            return new TCPSocket(newConnSD);
+        }
+        else if( newConnSD == -2 )
+        {
+            //setting system error code
+    #ifdef _WIN32
+            ::SetLastError( SystemError::timedOut );
+    #else
+            errno = SystemError::timedOut;
+    #endif
+            return nullptr;    //timeout
+        }
+        else
+        {
+            //error
+            //saveErrorInfo();
+            //setStatusBit( Socket::sbFailed );
+            return nullptr;
+        }
+    }
+};
 
 TCPServerSocket::TCPServerSocket()
 :
-    Socket(SOCK_STREAM, IPPROTO_TCP)
+    Socket(
+        SOCK_STREAM,
+        IPPROTO_TCP,
+        new TCPServerSocketPrivate() )
 {
+    static_cast<TCPServerSocketPrivate*>( impl() )->socketHandle = sockDesc;
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
 }
 
@@ -972,6 +1201,15 @@ int TCPServerSocket::accept(int sockDesc)
 {
     int result = acceptWithTimeout( sockDesc );
     return result == -2 ? -1 : result;
+}
+
+bool TCPServerSocket::acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> handler )
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>( impl() );
+
+    d->acceptHandler = std::move(handler);
+    //TODO: #ak usually acceptAsyncImpl will be called constantly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
+    return aio::AIOService::instance()->watchSocket( this, PollSet::etRead, d );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -983,32 +1221,12 @@ bool TCPServerSocket::listen( int queueLen )
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>( impl() );
+
     unsigned int recvTimeoutMs = 0;
     if( !getRecvTimeout( &recvTimeoutMs ) )
-        return NULL;
-    int newConnSD = acceptWithTimeout( sockDesc, recvTimeoutMs );
-    if( newConnSD >= 0 )
-    {
-        //clearStatusBit( Socket::sbFailed );
-        return new TCPSocket(newConnSD);
-    }
-    else if( newConnSD == -2 )
-    {
-        //setting system error code
-#ifdef _WIN32
-        ::SetLastError( SystemError::timedOut );
-#else
-        errno = SystemError::timedOut;
-#endif
-        return NULL;    //timeout
-    }
-    else
-    {
-        //error
-        //saveErrorInfo();
-        //setStatusBit( Socket::sbFailed );
-        return NULL;
-    }
+        return nullptr;
+    return d->accept( recvTimeoutMs );
 }
 
 bool TCPServerSocket::setListen(int queueLen)
@@ -1016,36 +1234,6 @@ bool TCPServerSocket::setListen(int queueLen)
     return ::listen(sockDesc, queueLen) == 0;
 }
 
-// -------------------------- TCPSslServerSocket ----------------
-
-TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect): TCPServerSocket(), m_allowNonSecureConnect(allowNonSecureConnect)
-{
-
-}
-
-AbstractStreamSocket* TCPSslServerSocket::accept()
-{
-    AbstractStreamSocket* sock = TCPServerSocket::accept();
-    if (!sock)
-        return 0;
-
-    if (m_allowNonSecureConnect)
-        return new QnMixedSSLSocket(sock);
-
-    else
-        return new QnSSLSocket(sock, true);
-
-#if 0
-    // transparent accept required state machine here. doesn't implemented. Handshake implemented on first IO operations
-
-    QnSSLSocket* sslSock = new QnSSLSocket(sock);
-    if (sslSock->doServerHandshake())
-        return sslSock;
-    
-    delete sslSock;
-    return 0;
-#endif
-}
 
 //////////////////////////////////////////////////////////
 ///////// class UDPSocket
@@ -1125,7 +1313,7 @@ void UDPSocket::setBroadcast() {
 //        if (errno != EAFNOSUPPORT)
 //#endif
 //        {
-//            throw SocketException(tr("Disconnect failed (connect())."), true);
+//            throw SocketException(QString::fromLatin1("Disconnect failed (connect())."), true);
 //        }
 //    }
 //}

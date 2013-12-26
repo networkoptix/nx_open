@@ -53,10 +53,11 @@ public:
     //    bool listen( const HandlerType& handler )
     bool listen()
     {
-        //m_handler.reset( new CustomHandlerHolder<HandlerType>( handler ) );
+        using namespace std::placeholders;
+
         if( !m_socket->listen() )
             return false;
-        return m_socket->acceptAsync( std::bind( std::mem_fn(&SelfType::newConnectionAccepted), this ) );
+        return m_socket->acceptAsync( std::bind( std::mem_fn(&SelfType::newConnectionAccepted), this, _1, _2 ) );
     }
 
     SocketAddress address() const
@@ -68,14 +69,15 @@ public:
         SystemError::ErrorCode /*errorCode*/,
         AbstractStreamSocket* newConnection )
     {
-        //(*m_handler)( errorCode, newConnection );
+        using namespace std::placeholders;
+
         if( newConnection )
         {
             auto conn = std::make_shared<ConnectionType>( static_cast<CustomServerType*>(this), newConnection );
             std::unique_lock<std::mutex> lk( m_mutex );
             m_connections.insert( conn );
         }
-        m_socket->acceptAsync( this );
+        m_socket->acceptAsync( std::bind( std::mem_fn(&SelfType::newConnectionAccepted), this, _1, _2 ) );
     }
 
     void connectionTerminated( const ConnectionPtr& connection )

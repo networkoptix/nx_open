@@ -1,11 +1,14 @@
 #ifndef __SSL_SOCKET_H_
 #define __SSL_SOCKET_H_
 
+#include <openssl/ssl.h>
+
 #include <QObject>
 
-#include "socket_common.h"
 #include "abstract_socket.h"
-#include <openssl/ssl.h>
+#include "socket_common.h"
+#include "system_socket.h"
+
 
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
@@ -63,6 +66,12 @@ protected:
     QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide);
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal( const void* buffer, unsigned int bufferLen );
+
+    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+
 private:
     void init();
 protected:
@@ -76,8 +85,29 @@ public:
     QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket);
     virtual int recv( void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
+
+protected:
+    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
+};
+
+class TCPSslServerSocket: public TCPServerSocket
+{
+public:
+    /*
+    *   allowNonSecureConnect - allow mixed ssl and non ssl connect for socket
+    */
+    TCPSslServerSocket(bool allowNonSecureConnect = true);
+
+    virtual AbstractStreamSocket* accept() override;
+
+private:
+    bool m_allowNonSecureConnect;
 };
 
 #endif // __SSL_SOCKET_H_

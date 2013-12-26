@@ -44,12 +44,14 @@ public:
         m_streamSocket( streamSocket ),
         m_bytesToSend( 0 )
     {
-        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( std::mem_fn( &SelfType::onBytesRead ), this ) );
+        using namespace std::placeholders;
+        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( std::mem_fn( &SelfType::onBytesRead ), this, _1, _2 ) );
     }
 
     void sendBufAsync( const nx::Buffer& buf )
     {
-        m_streamSocket->sendAsync( buf, std::bind( std::mem_fn( &SelfType::onBytesSent ), this ) );
+        using namespace std::placeholders;
+        m_streamSocket->sendAsync( buf, std::bind( std::mem_fn( &SelfType::onBytesSent ), this, _1, _2 ) );
         m_bytesToSend = buf.size();
     }
 
@@ -61,11 +63,13 @@ private:
 
     void onBytesRead( SystemError::ErrorCode errorCode, size_t count )
     {
+        using namespace std::placeholders;
+
         if( errorCode != SystemError::noError )
             return handleSocketError( errorCode );
 
         static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer.substr(0, count) );
-        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( std::mem_fn( &SelfType::onBytesRead ), this ) );
+        m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( std::mem_fn( &SelfType::onBytesRead ), this, _1, _2 ) );
     }
 
     void onBytesSent( SystemError::ErrorCode errorCode, size_t count )

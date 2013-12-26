@@ -20,9 +20,12 @@ namespace nx_api
     /*!
         It is not tied to underlying transport (tcp, udp, etc...)
 
-        \a CustomConnectionType MUST provide following method:
+        \a CustomConnectionType MUST provide following methods:
         \code {*.cpp}
-            void processMessage( const Message& request, boost::optional<Message>* const response );
+            //!Called for every received message 
+            void processMessage( const Message& request );
+            //!Called after sending message (e.g. response)
+            void messageSent();
         \endcode
 
         \todo This class contains no STUN-specific logic, so it MUST be protocol-independent (it will be used for HTTP later)
@@ -85,13 +88,10 @@ namespace nx_api
                     {
                         //processing request
                         //NOTE interleaving is not supported yet
-                        const bool canProcessResponse = m_isSendingMessage == 0;
-                        static_cast<CustomConnectionType*>(this)->processMessage( m_request, canProcessResponse ? &m_response : nullptr );
+                        static_cast<CustomConnectionType*>(this)->processMessage( m_request );
                         m_parser.reset();
                         m_request.clear();
                         m_parser.setMessage( &m_request );
-                        if( canProcessResponse && m_response )
-                            sendResponseMessage();
                         pos += bytesProcessed;
                         break;
                     }
@@ -123,6 +123,20 @@ namespace nx_api
             }
             //assuming that all bytes will be written or none
             sendBufAsync( m_writeBuffer );
+        }
+
+        /*!
+            Initiates asynchoronous message send
+        */
+        bool sendMessage( const MessageType& msg )
+        {
+            if( m_isSendingMessage > 0 )
+                return false;   //TODO: #ak interleaving is not supported yet
+
+            //TODO/IMPL avoid message copying
+            m_response = msg;
+            sendResponseMessage();
+            return true;
         }
 
     private:
