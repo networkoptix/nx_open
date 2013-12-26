@@ -80,7 +80,7 @@
 										<include>*-${arch}*.vcproj</include>
 									</includes>
 								</fileset>								
-								<fileset>
+								<!-- <fileset>
 									<directory>${libdir}</directory>
 									<followSymlinks>false</followSymlinks>
 									<useDefaultExcludes>true</useDefaultExcludes>
@@ -93,7 +93,7 @@
 										<include>**/${project.artifactId}</include>
 										<include>**/${project.artifactId}-bin</include>
 									</includes>
-								</fileset>								
+								</fileset> -->								
 							</filesets>
 							<skip>${clean-skip}</skip>
 						</configuration>
