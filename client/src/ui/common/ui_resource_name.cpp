@@ -13,11 +13,11 @@ QString getResourceName(const QnResourcePtr &resource) {
 }
 
 QString generateUniqueName(const QStringList &usedNames, const QString &baseName) {
-    if (!usedNames.contains(baseName))
+    if (!usedNames.contains(baseName.toLower()))
         return baseName;
 
     const QString nonZeroName = baseName + QString(QLatin1String(" %1"));
-    QRegExp pattern = QRegExp(baseName + QLatin1String(" ?([0-9]+)?"));
+    QRegExp pattern = QRegExp(baseName.toLower() + QLatin1String(" ?([0-9]+)?"));
 
     /* Prepare new name. */
     int number = 0;
@@ -36,6 +36,6 @@ QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &b
     QStringList usedNames;
     QnId parentId = user ? user->getId() : QnId();
     foreach(const QnLayoutResourcePtr &resource, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
-        usedNames.push_back(resource->getName());
+        usedNames.push_back(resource->getName().toLower());
     return generateUniqueName(usedNames, baseName);
 }
