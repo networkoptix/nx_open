@@ -1,29 +1,74 @@
 #include "workbench_screenshot_handler.h"
 
-#include <QtWidgets/QAction>
 #include <QtGui/QImageWriter>
+#include <QtGui/QPainter>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QMessageBox>
 
-#include <utils/common/string.h>
-#include <utils/common/warnings.h>
+#include <camera/cam_display.h>
 
 #include <client/client_settings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/workbench/workbench_item.h>
 
-#include <camera/cam_display.h>
+#include <utils/common/string.h>
+#include <utils/common/warnings.h>
 
 #include "file_processor.h"
-#include "ui/workbench/workbench_item.h"
-#include "transcoding/filters/time_image_filter.h"
 
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
     QnWorkbenchContextAware(parent) 
 {
     connect(action(Qn::TakeScreenshotAction), SIGNAL(triggered()), this, SLOT(at_takeScreenshotAction_triggered()));
+}
+
+void QnWorkbenchScreenshotHandler::drawTimeStamp(QPainter *painter, const QRect &rect, Qn::Corner position, const QString &timestamp) {
+    if (position == Qn::NoCorner)
+        return;
+
+    QFont font;
+    font.setPixelSize(qMax(rect.height() / 20, 12));
+
+    QFontMetrics fm(font);
+    QSize size = fm.size(0, timestamp);
+    int spacing = 2;
+
+    painter->setPen(Qt::black);
+    painter->setBrush(Qt::white);
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
+
+    QPainterPath path;
+    int x = rect.x();
+    int y = rect.y();
+
+    switch (position) {
+    case Qn::TopLeftCorner:
+    case Qn::BottomLeftCorner:
+        x += rect.x() + spacing * 2;
+        break;
+    default:
+        x += rect.width() - size.width() - spacing*2;
+        break;
+    }
+
+    switch (position) {
+    case Qn::TopLeftCorner:
+    case Qn::TopRightCorner:
+        y += spacing + fm.ascent();
+        break;
+    default:
+        y += rect.height() - fm.descent() - spacing;
+        break;
+    }
+
+    path.addText(x, y, font, timestamp);
+    painter->drawPath(path);
 }
 
 void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
@@ -108,18 +153,19 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
         QString selectedFilter = dialog->selectedNameFilter();
         QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        if (!fileName.toLower().endsWith(selectedExtension))
+        if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
-        if (QFile::exists(fileName)) {
-            QMessageBox::StandardButton button = QMessageBox::information(
-                mainWindow(),
-                tr("Save As"),
-                tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-            );
-            if(button == QMessageBox::Cancel || button == QMessageBox::No)
-                return;
+            if (QFile::exists(fileName)) {
+                QMessageBox::StandardButton button = QMessageBox::information(
+                    mainWindow(),
+                    tr("Save As"),
+                    tr("File '%1' already exists. Do you want to replace it?").arg(QFileInfo(fileName).baseName()),
+                    QMessageBox::Ok | QMessageBox::Cancel
+                );
+                if(button == QMessageBox::Cancel)
+                    return;
+            }
         }
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
@@ -140,7 +186,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         QnItemDewarpingParams itemDewarpingParams;
         QnMediaDewarpingParams mediaDewarpingParams = widget->dewarpingParams();
         if (mediaDewarpingParams.enabled)
-            itemDewarpingParams = widget->item()->dewarpingParams();
+            itemDewarpingParams = widget->itemDewarpingParams();
         for (int i = 0; i < layout->channelCount(); ++i)
             images.push_back(display->camDisplay()->getScreenshot(i, widget->item()->imageEnhancement(), mediaDewarpingParams, itemDewarpingParams));
         QSize channelSize = images[0].size();
@@ -149,59 +195,16 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
         screenshot = QImage(totalSize.width() * zoomRect.width(), totalSize.height() * zoomRect.height(), QImage::Format_ARGB32);
         screenshot.fill(qRgba(0, 0, 0, 0));
-        QPainter p(&screenshot);
-        p.setCompositionMode(QPainter::CompositionMode_Source);
+        QScopedPointer<QPainter> painter(new QPainter(&screenshot));
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
         for (int i = 0; i < layout->channelCount(); ++i) {
-            p.drawImage(
+            painter->drawImage(
                 QnGeometry::cwiseMul(layout->position(i), channelSize) - QnGeometry::cwiseMul(zoomRect.topLeft(), totalSize),
                 images[i]
             );
         }
 
-        if (timestampPos != Qn::NoCorner) {
-            QString timeStamp;
-            qint64 time = display->camDisplay()->getCurrentTime() / 1000;
-            if(widget->resource()->toResource()->flags() & QnResource::utc) {
-                timeStamp = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd hh:mm:ss"));
-            } else {
-                timeStamp = QTime().addMSecs(time).toString(lit("hh:mm:ss"));
-            }
-
-            QFont font;
-            font.setPixelSize(qMax(screenshot.height() / 20, 12));
-
-            QFontMetrics fm(font);
-            QSize size = fm.size(0, timeString);
-            int spacing = 2;
-
-            p.setPen(Qt::black);
-            p.setBrush(Qt::white);
-            p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
-
-            QPainterPath path;
-            int x, y;
-            if (timestampPos == Qn::TopLeftCorner)
-            {
-                x = spacing*2;
-                y = spacing + fm.ascent();
-            }
-            else if (timestampPos == Qn::TopRightCorner) {
-                x = screenshot.width() - size.width() - spacing*2;
-                y = spacing + fm.ascent();
-            }
-            else if (timestampPos == Qn::BottomRightCorner) {
-                x = screenshot.width() - size.width() - spacing*2;
-                y = screenshot.height() - fm.descent() - spacing;
-            }
-            else {
-                x = spacing*2;
-                y = screenshot.height() - fm.descent() - spacing;
-            }
-
-            path.addText(x, y, font, timeStamp);
-
-            p.drawPath(path);
-        }
+        drawTimeStamp(painter.data(), screenshot.rect(), timestampPos, timeString);
     }
 
     if (!screenshot.save(fileName)) {

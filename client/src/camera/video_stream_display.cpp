@@ -1017,11 +1017,16 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
     QMutexLocker mutex(&m_mtx);
     const AVFrame* lastFrame = dec->lastFrame();
+
     if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
         lastFrame = m_lastDisplayedFrame.data();
 
     if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
         return QImage();
+
+    // TODO: #GDM Uncomment when will implement feature #2563
+//    if (m_lastDisplayedFrame->flags && QnAbstractMediaData::MediaFlags_LowQuality)
+//        return QImage();    //screenshot will be received from the server
 
     // copy image
     QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());

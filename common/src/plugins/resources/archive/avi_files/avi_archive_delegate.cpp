@@ -221,7 +221,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
     data->data.write((const char*) packet.data, packet.size);
     data->compressionType = stream->codec->codec_id;
-    data->flags = packet.flags;
+    data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     while (packet.stream_index >= m_lastPacketTimes.size())
         m_lastPacketTimes << m_startTime;

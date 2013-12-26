@@ -228,7 +228,7 @@ QnAbstractMediaDataPtr QnColdStoreDelegate::getNextData()
     videoData->timestamp = fi.time;
 
     if (fi.i_frame)
-        videoData->flags |= AV_PKT_FLAG_KEY;
+        videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
     ++m_curr_frame;
     if (m_curr_frame == m_frameInfo.size())

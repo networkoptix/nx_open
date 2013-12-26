@@ -166,7 +166,7 @@ public:
 
     void copyDataFrom(const AVFrame* frame);
 public:
-    int flags;
+    QnAbstractMediaData::MediaFlags flags;
 
     /** Pixel width to pixel height ratio. Some videos have non-square pixels, we support that. */
     double sample_aspect_ratio; 

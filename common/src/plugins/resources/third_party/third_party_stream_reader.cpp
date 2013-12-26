@@ -464,7 +464,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
         }
     }
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
-        mediaPacket->flags |= AV_PKT_FLAG_KEY;
+        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
     {
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
