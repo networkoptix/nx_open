@@ -132,6 +132,7 @@
                             <executable>${python.dir}/python</executable>
                             <arguments>
                                 <argument>copy_additional_resources.py</argument>
+                                <argument>-D2.0.2=${2.0.2}</argument>                                
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>		
                         </configuration>
