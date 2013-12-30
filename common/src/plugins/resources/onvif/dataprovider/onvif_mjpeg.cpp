@@ -174,5 +174,5 @@ void MJPEGtreamreader::closeStream()
 
 bool MJPEGtreamreader::isStreamOpened() const
 {
-    return ( mHttpClient && mHttpClient->isOpened() );
+    return ( mHttpClient.get() && mHttpClient->isOpened() );
 }
