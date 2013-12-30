@@ -1,0 +1,522 @@
+
+#ifndef EC_API_H
+#define EC_API_H
+
+#include <memory>
+
+#include "api/model/email_attachment.h"
+#include "impl/ec_api_impl.h"
+
+
+//!Contains API classes for the new enterprise controller
+/*!
+    TODO comment all API classes
+*/
+namespace ec2
+{
+    typedef int ReqID;
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractResourceManager
+    {
+    public:
+        virtual ~AbstractResourceManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnResourceTypeList&)
+        */
+        template<class HandlerType> ReqID getResourceTypes( HandlerType handler ) {
+            return getResourceTypes( std::static_pointer_cast<impl::GetResourceTypesHandler>(std::make_shared<impl::CustomGetResourceTypesHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnResourceList&)
+        */
+        template<class HandlerType> ReqID getResources( HandlerType handler ) {
+            return getResources( std::static_pointer_cast<impl::GetResourcesHandler>(std::make_shared<impl::CustomGetResourcesHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnResourcePtr&)
+        */
+        template<class HandlerType> ReqID getResource( const QnId& id, HandlerType handler ) {
+            return getResource( std::static_pointer_cast<impl::GetResourceHandler>(std::make_shared<impl::CustomGetResourceHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, HandlerType handler ) {
+            return setResourceStatus( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
+        */
+        template<class HandlerType> ReqID getKvPairs( const QnResourcePtr& resource, HandlerType handler ) {
+            return getKvPairs( resource, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID setResourceDisabled( const QnId& resourceId, bool disabled, HandlerType handler ) {
+            return setResourceDisabled( resourceId, disabled, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( const QnResourcePtr& resource, HandlerType handler ) {
+            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( int resourceId, const QnKvPairList& kvPairs, HandlerType handler ) {
+            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID remove( const QnResourcePtr &resource, HandlerType handler ) {
+            return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
+        virtual ReqID getResources( impl::GetResourcesHandlerPtr handler ) = 0;
+        virtual ReqID getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) = 0;
+        virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler ) = 0;
+
+        virtual ReqID getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler ) = 0;
+        virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
+
+
+    class AbstractMediaServerManager
+    {
+    public:
+        virtual ~AbstractMediaServerManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers)
+        */
+        template<class HandlerType> ReqID getServers( HandlerType handler ) {
+            return getServers( std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( const QnMediaServerResourcePtr& resource, HandlerType handler ) {
+            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers, const QByteArray& authKey)
+        */
+        template<class HandlerType> ReqID saveServer( const QnMediaServerResourcePtr& mserver, HandlerType handler ) {
+            return saveServer( std::static_pointer_cast<impl::SaveServerHandler>(mserver, std::make_shared<impl::CustomSaveServerHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID remove( const QnMediaServerResourcePtr &resource, HandlerType handler ) {
+            return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID getServers( impl::GetServersHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
+        virtual ReqID remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
+
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractCameraManager
+    {
+    public:
+        virtual ~AbstractCameraManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
+        */
+        template<class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr&, HandlerType handler ) {
+            return addCamera( std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem ) {
+            return addCameraHistoryItem( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
+        */
+        template<class HandlerType> ReqID getCameras( QnId mediaServerId, HandlerType handler ) {
+            return getCameras( std::static_pointer_cast<impl::GetCamerasHandler>(std::make_shared<impl::CustomGetCamerasHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnCameraHistoryList& cameras)
+        */
+        template<class HandlerType> ReqID getCameraHistoryList( HandlerType handler ) {
+            return getCameraHistoryList( std::static_pointer_cast<impl::GetCamerasHistoryHandler>(std::make_shared<impl::CustomGetCamerasHistoryHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( const QnVirtualCameraResourceList& cameras, HandlerType handler ) {
+            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID remove( const QnVirtualCameraResourcePtr& resource, HandlerType handler ) {
+            return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
+        virtual ReqID addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler ) = 0;
+        virtual ReqID getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractLicenseManager
+    {
+    public:
+        virtual ~AbstractLicenseManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnLicenseList&)
+        */
+        template<class HandlerType> ReqID getLicenses( HandlerType handler ) {
+            return getLicenses( std::static_pointer_cast<impl::GetLicensesHandler>(std::make_shared<impl::CustomGetLicensesHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID addLicenses( const QList<QnLicensePtr>& licenses, HandlerType handler ) {
+            return addLicensesAsync( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
+        virtual ReqID addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractBusinessEventManager
+    {
+    public:
+        virtual ~AbstractBusinessEventManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnBusinessEventRuleList&)
+        */
+        template<class HandlerType> ReqID getBusinessRules( HandlerType handler ) {
+            return getBusinessRules( std::static_pointer_cast<impl::GetBusinessRules>(std::make_shared<impl::CustomGetBusinessRules<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID addBusinessRule( const QnBusinessEventRulePtr& businessRule, HandlerType handler ) {
+            return addBusinessRule( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        //!Test if email settings are valid
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID testEmailSettings( const QnKvPairList& settings, HandlerType handler ) {
+            return testEmailSettings( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+        /*!
+            \param to Destination address list
+            \param timeout TODO
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID sendEmail(
+            const QStringList& to,
+            const QString& subject,
+            const QString& message,
+            int timeout,
+            const QnEmailAttachmentList& attachments,
+            HandlerType handler )
+        {
+            return sendEmail( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( const QnBusinessEventRulePtr& rule, HandlerType handler ) {
+            return save( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID deleteRule( int ruleId, HandlerType handler ) {
+            return deleteRule( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, HandlerType handler ) {
+            return broadcastBusinessAction( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID resetBusinessRules( HandlerType handler ) {
+            return resetBusinessRules( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    private:
+        virtual ReqID getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
+        virtual ReqID addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID sendEmail(
+            const QStringList& to,
+            const QString& subject,
+            const QString& message,
+            int timeout,
+            const QnEmailAttachmentList& attachments,
+            impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID deleteRule( int ruleId, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractUserManager
+    {
+    public:
+        virtual ~AbstractUserManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
+        */
+        template<class HandlerType> ReqID getUsers( QnUserResourceList& users, HandlerType handler ) {
+            return getUsers( getUsers, std::static_pointer_cast<impl::GetUsersHandler>(std::make_shared<impl::CustomGetUsersHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( const QnUserResourcePtr& resource, HandlerType handler ) {
+            return save( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID remove( const QnUserResourcePtr& resource, HandlerType handler ) {
+            return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    private:
+        virtual ReqID getUsers( impl::GetUsersHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractLayoutManager
+    {
+    public:
+        virtual ~AbstractLayoutManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnLayoutResourceList&)
+        */
+        template<class HandlerType> ReqID getLayouts( HandlerType handler ) {
+            return getLayouts( std::static_pointer_cast<impl::GetLayoutsHandler>(std::make_shared<impl::CustomGetLayoutsHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID save( const QnLayoutResourceList& resources, HandlerType handler ) {
+            return save( resources, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID remove( const QnLayoutResourcePtr& resource, HandlerType handler ) {
+            return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID getLayouts( impl::GetLayoutsHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID remove( const QnLayoutResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractStoredFileManager
+    {
+    public:
+        virtual ~AbstractStoredFileManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QByteArray&)
+        */
+        template<class HandlerType> ReqID getStoredFile( const QString& filename, HandlerType handler ) {
+            return getStoredFile( filename, std::static_pointer_cast<impl::GetStoredFileHandler>(std::make_shared<impl::impl::CustomGetStoredFileHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID addStoredFile( const QString& filename, const QByteArray& data, HandlerType handler ) {
+            return addStoredFile( filename, data, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID deleteStoredFile( const QString& filename, HandlerType handler ) {
+            return deleteStoredFile( filename, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QStringList& filenames)
+        */
+        template<class HandlerType> ReqID listDirectory( const QString& folderName, HandlerType handler ) {
+            return listDirectory( folderName, std::static_pointer_cast<impl::ListDirectoryHandler>(std::make_shared<impl::impl::CustomListDirectoryHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) = 0;
+        virtual ReqID addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
+
+    enum class PanicMode
+    {
+        on,
+        off
+    };
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractECConnection
+    {
+    public:
+        virtual ~AbstractECConnection() {}
+
+        virtual AbstractResourceManagerPtr getResourceManager() = 0;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
+        virtual AbstractCameraManagerPtr getCameraManager() = 0;
+        virtual AbstractLicenseManagerPtr getLicenseManager() = 0;
+        virtual AbstractBusinessEventManagerPtr getBusinessEventManager() = 0;
+        virtual AbstractUserManagerPtr getUserManager() = 0;
+        virtual AbstractLayoutManagerPtr getLayoutManager() = 0;
+        virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
+
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID setPanicMode( PanicMode value, HandlerType handler ) {
+            return setPanicMode( value, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+        /*!
+            \param handler Functor with params: (ErrorCode, qint64)
+        */
+        template<class HandlerType> ReqID getCurrentTime( HandlerType handler ) {
+            return getCurrentTime( std::static_pointer_cast<impl::CurrentTimeHandler>(std::make_shared<impl::impl::CustomCurrentTimeHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, QByteArray dbFile)
+        */
+        template<class HandlerType> ReqID dumpDatabaseAsync( HandlerType handler ) {
+            return dumpDatabaseAsync( std::static_pointer_cast<impl::DumpDatabaseHandler>(std::make_shared<impl::impl::CustomDumpDatabaseHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID restoreDatabaseAsync( const QByteArray& dbFile, HandlerType handler ) {
+            return restoreDatabaseAsync( dbFile, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnKvPairList&)
+            \return Request id
+        */
+        template<class HandlerType> ReqID getSettingsAsync( HandlerType handler ) {
+            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(std::make_shared<impl::impl::CustomGetSettingsHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID saveSettingsAsync( const QnKvPairList& kvPairs ) {
+            return saveSettingsAsync( kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+
+        //!Cancel running async request
+        /*!
+            \warning Request handler may still be called after return of this method, since request could already have been completed and resulted posted to handler
+        */
+        //virtual void cancelRequest( ReqID requestID ) = 0;
+
+    protected:
+        virtual ReqID setPanicMode( PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
+        virtual ReqID dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
+        virtual ReqID restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
+        virtual ReqID saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
+    };  
+
+    class ECAddress
+    {
+        //TODO/IMPL
+    };
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractECConnectionFactory
+    {
+    public:
+        virtual ~AbstractECConnectionFactory() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class HandlerType> ReqID testConnectionAsync( const ECAddress& addr, HandlerType handler ) {
+            return testConnectionAsync( addr, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<HandlerType>>(handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode, AbstractECConnection*)
+        */
+        template<class HandlerType> ReqID connectAsync( const ECAddress& addr, HandlerType handler ) {
+            return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::impl::CustomConnectHandler<HandlerType>>(handler)) );
+        }
+
+    protected:
+        virtual ReqID testConnectionAsync( const ECAddress& addr, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID connectAsync( const ECAddress& addr, impl::ConnectHandlerPtr handler ) = 0;
+    };
+}
+
+#endif  //EC_API_H
