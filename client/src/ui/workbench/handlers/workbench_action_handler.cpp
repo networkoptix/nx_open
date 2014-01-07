@@ -197,9 +197,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
-    connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
-    connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
-    connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -775,24 +772,6 @@ void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
 
 void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
     action(Qn::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
-}
-
-void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
-    qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-
-    QnPaletteWidget *w = new QnPaletteWidget();
-    w->setPalette(qApp->palette());
-    w->show();
-}
-
-void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
-    qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
-}
-
-void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
-    QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
-    dialog->setResources(resourcePool()->getResources());
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {

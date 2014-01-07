@@ -35,7 +35,7 @@ private:
  * <tt>QN_DECLARE_R_PROPERTY</tt> and <tt>QN_DECLARE_RW_PROPERTY</tt> macros,
  * wrapped in a pair of <tt>QN_BEGIN_PROPERTY_STORAGE</tt> and 
  * <tt>QN_END_PROPERTY_STORAGE</tt> invocations. These macros will generate
- * an <tt>init()</tt> function, that is the to be called from derived class's
+ * an <tt>init()</tt> function, that is then to be called from derived class's
  * constructor.
  */
 class QnPropertyStorage: public QObject {
@@ -43,6 +43,8 @@ class QnPropertyStorage: public QObject {
 public:
     QnPropertyStorage(QObject *parent = NULL);
     virtual ~QnPropertyStorage();
+
+    QList<int> variables() const;
 
     QVariant value(int id) const;
     bool setValue(int id, const QVariant &value);
@@ -80,8 +82,6 @@ public:
 
     bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
     bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
-
-    // TODO: #Elric also need string-based interface
 
 signals:
     void valueChanged(int id);

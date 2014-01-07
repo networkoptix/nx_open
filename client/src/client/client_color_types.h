@@ -4,8 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/json.h>
-
+#include <utils/common/json_fwd.h>
 
 struct QnTimeSliderColors {
 public:
@@ -34,13 +33,7 @@ public:
 };
 
 Q_DECLARE_METATYPE(QnTimeSliderColors)
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(
-    QnTimeSliderColors, 
-    (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
-        (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
-        (separator)(dateOverlay)(dateOverlayAlternate), 
-    inline
-)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimeSliderColors)
 
 
 struct QnBackgroundColors {
@@ -51,7 +44,7 @@ struct QnBackgroundColors {
 };
 
 Q_DECLARE_METATYPE(QnBackgroundColors)
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnBackgroundColors, (normal)(panic), inline)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnBackgroundColors)
 
 
 struct QnCalendarColors {
@@ -70,11 +63,7 @@ struct QnCalendarColors {
 };
 
 Q_DECLARE_METATYPE(QnCalendarColors)
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(
-    QnCalendarColors, 
-    (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), 
-    inline
-)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnCalendarColors)
 
 
 #endif // QN_CLIENT_COLOR_TYPES

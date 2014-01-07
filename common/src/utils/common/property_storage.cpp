@@ -43,6 +43,10 @@ QnPropertyStorage::~QnPropertyStorage() {
     return;
 }
 
+QList<int> QnPropertyStorage::variables() const {
+    return m_valueById.keys();
+}
+
 QVariant QnPropertyStorage::valueLocked(int id) const {
     return m_valueById.value(id);
 }
@@ -53,7 +57,7 @@ bool QnPropertyStorage::setValueLocked(int id, const QVariant &value) {
         return false;
     }
 
-    return updateValue(id, value) == Changed;
+    return updateValue(id, value) != Failed;
 }
 
 QVariant QnPropertyStorage::value(int id) const {

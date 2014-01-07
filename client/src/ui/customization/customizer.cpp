@@ -109,7 +109,7 @@ public:
     virtual ~QnCustomizerPrivate();
 
     void customize(QObject *object);
-    void customize(QObject *object, const char *className);
+    void customize(QObject *object, QnPropertyAccessor *accessor, const char *className);
     void customize(QObject *object, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className);
     void customize(QObject *object, const QString &key, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className);
 
@@ -143,24 +143,34 @@ QnCustomizerPrivate::~QnCustomizerPrivate() {
 }
 
 void QnCustomizerPrivate::customize(QObject *object) {
-    QVarLengthArray<const QMetaObject *, 32> metaObjects;
+    QVarLengthArray<const char *, 32> classNames;
 
     const QMetaObject *metaObject = object->metaObject();
     while(metaObject) {
-        metaObjects.append(metaObject);
+        classNames.append(metaObject->className());
         metaObject = metaObject->superClass();
     }
 
-    for(int i = metaObjects.size() - 1; i >= 0; i--)
-        customize(object, metaObjects[i]->className());
+    /* Pick the most-specialized property accessor. */
+    QnPropertyAccessor *accessor = NULL;
+    for(int i = 0; i < classNames.size(); i++) {
+        accessor = accessorByClassName.value(QLatin1String(classNames[i]));
+        if(accessor)
+            break;
+    }
+    if(!accessor)
+        accessor = defaultAccessor.data();
+
+    for(int i = classNames.size() - 1; i >= 0; i--)
+        customize(object, accessor, classNames[i]);
 }
 
-void QnCustomizerPrivate::customize(QObject *object, const char *className) {
+void QnCustomizerPrivate::customize(QObject *object, QnPropertyAccessor *accessor, const char *className) {
     auto pos = dataByClassName.find(QLatin1String(className));
     if(pos == dataByClassName.end())
         return;
 
-    customize(object, &*pos, accessorByClassName.value(QLatin1String(className), defaultAccessor.data()), className);
+    customize(object, &*pos, accessor, className);
 }
 
 void QnCustomizerPrivate::customize(QObject *object, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className) {
@@ -180,13 +190,16 @@ void QnCustomizerPrivate::customize(QObject *object, QnCustomizationData *data, 
 }
 
 void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className) {
+    if(key.startsWith(L'_'))
+        return; /* Reserved for comments. */
+
     QVariant value = accessor->read(object, key);
     if(!value.isValid()) {
         qnWarning("Could not customize property '%1' of class '%2'. The property is not defined for this class.", key, className);
         return;
     }
 
-    int type = value.type();
+    int type = value.userType();
     if(data->type != type) {
         if(data->type != QMetaType::UnknownType)
             qnWarning("Property '%1' of class '%2' has different types for different instances of this class.", key, className);
@@ -213,7 +226,7 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
     }
 
     if(!accessor->write(object, key, value))
-        qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.");
+        qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.", key, className);
 }
 
 

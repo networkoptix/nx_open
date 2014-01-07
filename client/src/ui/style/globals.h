@@ -165,8 +165,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   businessRuleDisabledHighlightColor,         BUSINESS_RULE_DISABLED_HIGHLIGHT_COLOR,         QColor(64, 64, 64))
         QN_DECLARE_R_PROPERTY(QColor,   businessRuleInvalidBackgroundColor,         BUSINESS_RULE_INVALID_BACKGROUND_COLOR,         QColor(150, 0, 0))
         QN_DECLARE_R_PROPERTY(QColor,   businessRuleInvalidColumnBackgroundColor,   BUSINESS_RULE_INVALID_COLUMN_BACKGROUND_COLOR,  QColor(204, 0, 0))
-
-
     QN_END_PROPERTY_STORAGE()
 };
 

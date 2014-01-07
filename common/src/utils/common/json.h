@@ -22,6 +22,7 @@
 
 #include "adl_wrapper.h"
 #include "json_fwd.h"
+#include "unused.h"
 
 namespace QJsonDetail {
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
@@ -46,6 +47,11 @@ namespace QJsonDetail {
 
 
 namespace QJson {
+    enum Option {
+        Optional = 0x1
+    };
+    Q_DECLARE_FLAGS(Options, Option)
+
     /**
      * Serializes the given value into intermediate JSON representation.
      * 
@@ -210,20 +216,37 @@ namespace QJsonAccessors {
 
 
 namespace QJsonDetail {
+    template<class Class, class Getter>
+    inline void serializeMember(const Class &object, const Getter &getter, const QString &key, QJsonObject *target, QJson::Options globalOptions, QJson::Options localOptions = 0) {
+        using namespace QJsonAccessors;
+        unused(globalOptions, localOptions);
+
+        QJson::serialize(getMember(object, getter), key, target);
+    }
+
+    template<class Class, class Setter, class Getter>
+    inline bool deserializeMember(const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, QJson::Options localOptions = 0) {
+        using namespace QJsonAccessors;
+        unused(getter);
+
+        typedef boost::remove_reference<decltype(getMember(*object, getter))>::type member_type;
+        return deserializeMember(value, key, object, setter, globalOptions | localOptions, static_cast<const member_type *>(NULL));
+    }
+
     template<class Class, class Setter, class T>
-    bool deserializeMember(const QJsonObject &value, const QString &key, Class &object, const Setter &setter, const T * = NULL) {
+    inline bool deserializeMember(const QJsonObject &value, const QString &key, Class *object, const Setter &setter, QJson::Options options, const T *) {
         using namespace QJsonAccessors;
 
         T member;
-        if(!QJson::deserialize(value, key, &member))
+        if(!QJson::deserialize(value, key, &member, options & QJson::Optional))
             return false;
-        setMember(object, setter, member);
+        setMember(*object, setter, member);
         return true;
     }
 
     template<class Class, class Setter, class T>
-    bool deserializeMember(const QJsonObject &value, const QString &key, Class &object, T Class::*setter, const T * = NULL) {
-        return QJson::deserialize(value, key, &object.*setter);
+    inline bool deserializeMember(const QJsonObject &value, const QString &key, Class *object, T Class::*setter, QJson::Options options, const T *) {
+        return QJson::deserialize(value, key, &object->*setter, options & QJson::Optional);
     }
 
 } // namespace QJsonDetail
@@ -237,10 +260,14 @@ namespace QJsonDetail {
  * \param TYPE                          Struct type to define (de)serialization functions for.
  * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
  *                                      given type that are to be (de)serialized.
+ * \param OPTIONS                       Additional (de)serialization options.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, OPTIONS, ... /* PREFIX */) \
+    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, BOOST_PP_SEQ_TRANSFORM(QN_CLASS_FROM_STRUCT_JSON_FIELD_I, TYPE, FIELD_SEQ), OPTIONS, ##__VA_ARGS__)
+
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(TYPE, BOOST_PP_SEQ_TRANSFORM(QN_CLASS_FROM_STRUCT_JSON_FIELD_I, TYPE, FIELD_SEQ), ##__VA_ARGS__)
+    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, 0, ##__VA_ARGS__)
 
 #define QN_CLASS_FROM_STRUCT_JSON_FIELD_I(R, TYPE, FIELD)                       \
     (&TYPE::FIELD, &TYPE::FIELD, BOOST_PP_STRINGIZE(FIELD))
@@ -252,43 +279,44 @@ namespace QJsonDetail {
  * \param TYPE                          Class type to define (de)serialization functions for.
  * \param FIELD_SEQ                     Preprocessor sequence of field descriptions for
  *                                      the given class type.
+ * \param OPTIONS                       Additional (de)serialization options.
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, OPTIONS, ... /* PREFIX */) \
 __VA_ARGS__ void serialize(const TYPE &value, QJsonValue *target) {             \
-    using namespace QJsonAccessors;                                             \
+    const QJson::Options options = OPTIONS;                                     \
     QJsonObject result;                                                         \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_I, ~, FIELD_SEQ) \
     *target = result;                                                           \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           \
-    using namespace QJsonAccessors;                                             \
     if(value.type() != QJsonValue::Object)                                      \
         return false;                                                           \
     QJsonObject object = value.toObject();                                      \
                                                                                 \
+    const QJson::Options options = OPTIONS;                                     \
     TYPE result;                                                                \
     BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
     *target = result;                                                           \
     return true;                                                                \
 }
 
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, 0, ##__VA_ARGS__)
+
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_I(R, DATA, FIELD)               \
     QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II FIELD
 
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II(GETTER, SETTER, NAME)        \
-    QJson::serialize(getMember(value, GETTER), QStringLiteral(NAME), &result);
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II(GETTER, SETTER, NAME, ... /* OPTIONS */) \
+    QJsonDetail::serializeMember(value, GETTER, QStringLiteral(NAME), &result, options, ##__VA_ARGS__);
 
 #define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I(R, DATA, FIELD)             \
     QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II FIELD
 
-#define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II(GETTER, SETTER, NAME)      \
-    {                                                                           \
-        typedef boost::remove_reference<decltype(getMember(result, GETTER))>::type member_type; \
-        if(!QJsonDetail::deserializeMember(object, QStringLiteral(NAME), result, SETTER, static_cast<const member_type *>(NULL))) \
-            return false;                                                       \
-    }
+#define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II(GETTER, SETTER, NAME, ... /* OPTIONS */) \
+    if(!QJsonDetail::deserializeMember(object, QStringLiteral(NAME), &result, GETTER, SETTER, options, ##__VA_ARGS__)) \
+        return false;
 
 
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
@@ -313,7 +341,9 @@ __VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target) {           
 #else // Q_MOC_RUN
 
 /* Qt moc chokes on our macro hell, so we make things easier for it. */
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(...)
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(...)
 #define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(...)
 

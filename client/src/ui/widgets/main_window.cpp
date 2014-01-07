@@ -38,6 +38,7 @@
 #include <ui/workbench/handlers/workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
+#include <ui/workbench/handlers/workbench_debug_handler.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
@@ -48,7 +49,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "ui/style/noptix_style.h"
@@ -89,7 +89,6 @@ namespace {
 
         if(helpTopicId != -1)
             setHelpTopic(button, helpTopicId);
-
 
         return button;
     }
@@ -191,6 +190,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchExportHandler>();
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
+    context->instance<QnWorkbenchDebugHandler>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
