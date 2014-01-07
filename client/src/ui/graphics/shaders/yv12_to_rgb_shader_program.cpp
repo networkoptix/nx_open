@@ -112,7 +112,7 @@ QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(const QGLContext *conte
 
 QString QnFisheyeRectilinearProgram::getShaderText()
 {
-    return QLatin1String(QN_SHADER_SOURCE(
+    return QString(QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -176,7 +176,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    )).arg(gammaStr());
+    ))).arg(gammaStr());
 }
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
@@ -189,8 +189,8 @@ QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(const QGLCont
 
 QString QnFisheyeEquirectangularHProgram::getShaderText()
 {
-    return QLatin1String(QN_SHADER_SOURCE(
-        uniform sampler2D yTexture;
+    return QString(QLatin1String(QN_SHADER_SOURCE(
+    uniform sampler2D yTexture;
     uniform sampler2D uTexture;
     uniform sampler2D vTexture;
     uniform float opacity;
@@ -260,7 +260,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    )).arg(gammaStr());
+    ))).arg(gammaStr());
 }
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
@@ -273,7 +273,7 @@ QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(const QGLCont
 
 QString QnFisheyeEquirectangularVProgram::getShaderText()
 {
-    return QLatin1String(QN_SHADER_SOURCE(
+    return QString(QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -344,7 +344,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    )).arg(gammaStr());
+    ))).arg(gammaStr());
 }
 
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
@@ -382,7 +382,7 @@ QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(const QGLContext 
 
 QString QnFisheyeRGBRectilinearProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QLatin1String(QN_SHADER_SOURCE(
     uniform sampler2D rgbaTexture;
     uniform float opacity;
     uniform float xShift;
@@ -445,7 +445,7 @@ QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(const Q
 
 QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QLatin1String(QN_SHADER_SOURCE(
     uniform sampler2D rgbaTexture;
     uniform float opacity;
     uniform float xShift;
@@ -515,7 +515,7 @@ QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(const Q
 
 QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QLatin1String(QN_SHADER_SOURCE(
     uniform sampler2D rgbaTexture;
     uniform float opacity;
     uniform float xShift;
