@@ -14,14 +14,26 @@ namespace QnExp {
         Minus,
         Times,
         Divide,
-        Lparen,
-        Rparen,
-
-        Uminus,
-        Uplus,
+        LParen,
+        RParen,
+        Dot,
+        Comma,
         End,
 
-        Invalid
+        Invalid = -1
+    };
+
+    enum InstructionType {
+        Stor,
+        Add,
+        Sub,
+        Mul,
+        Div,
+        Neg,
+        Udd,
+        Call,
+        MCall,
+        Nop = -1
     };
 
     QString serialized(TokenType type) {
@@ -32,19 +44,40 @@ namespace QnExp {
         case Minus:     return lit("MINUS");
         case Times:     return lit("TIMES");
         case Divide:    return lit("DIVIDE");
-        case Lparen:    return lit("LPAREN");
-        case Rparen:    return lit("RPAREN");
-        case Uminus:    return lit("UMINUS");
-        case Uplus:     return lit("UPLUS");
+        case LParen:    return lit("LPAREN");
+        case RParen:    return lit("RPAREN");
+        case Dot:       return lit("DOT");
+        case Comma:     return lit("COMMA");
         case End:       return lit("END");
         case Invalid:   return lit("INVALID");
-        default:        assert(false);
+        default:        assert(false); return QString();
         }
     }
 
     void serialize(TokenType type, QString *target) {
         *target = serialized(type);
     }
+
+    QString serialized(InstructionType type) {
+        switch (type) {
+        case Stor:      return lit("STOR");
+        case Add:       return lit("ADD");
+        case Sub:       return lit("SUB");
+        case Mul:       return lit("MUL");
+        case Div:       return lit("DIV");
+        case Neg:       return lit("NEG");
+        case Udd:       return lit("UDD");
+        case Call:      return lit("CALL");
+        case MCall:     return lit("MCALL");
+        case Nop:       return lit("NOP");
+        default:        assert(false); return QString();
+        }
+    }
+
+    void serialize(InstructionType type, QString *target) {
+        *target = serialized(type);
+    }
+
 
     class Token {
     public:
@@ -62,6 +95,22 @@ namespace QnExp {
     };
 
 
+    class Instruction {
+    public:
+        explicit Instruction(InstructionType type = Nop, QVariant data = QVariant()): m_type(type), m_data(data) {}
+
+        InstructionType type() const { return m_type; }
+        void setType(InstructionType type) { m_type = type; }
+
+        const QVariant &data() const { return m_data; }
+        void setData(const QVariant &data) { m_data = data; }
+
+    private:
+        InstructionType m_type;
+        QVariant m_data;
+    };
+
+
     class Lexer {
         Q_DECLARE_TR_FUNCTIONS(Lexer)
     public:
@@ -75,9 +124,12 @@ namespace QnExp {
             }
 
             while(true) {
-                switch(m_source[m_pos].unicode()) {
+                QChar c = m_source[m_pos];
+                switch(c.unicode()) {
                 case L' ': case L'\t': case L'\n': case L'\r':
                     break;
+                case L'_': 
+                    return readVariableToken();
                 case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
                     return readNumberToken();
                 case L'-':  
@@ -89,13 +141,21 @@ namespace QnExp {
                 case L'/':  
                     return readSymbolToken(Divide);
                 case L'(':  
-                    return readSymbolToken(Lparen);
+                    return readSymbolToken(LParen);
                 case L')':  
-                    return readSymbolToken(Rparen);
+                    return readSymbolToken(RParen);
+                case L'.':
+                    return readSymbolToken(Dot);
+                case L',':
+                    return readSymbolToken(Comma);
                 case L'\0': 
                     return readSymbolToken(End);
                 default:    
-                    unexpected();
+                    if(c.isLetter()) {
+                        return readVariableToken();
+                    } else {
+                        unexpected();
+                    }
                 }
             }
         }
@@ -124,6 +184,19 @@ namespace QnExp {
             }
         }
 
+        Token readVariableToken() {
+            int startPos = m_pos;
+            while(true) {
+                QChar c = m_source[m_pos];
+                if(c.isLetterOrNumber() || c.unicode() == L'_') {
+                    m_pos++;
+                    continue;
+                } else {
+                    return Token(Variable, m_source.midRef(startPos, m_pos - startPos), startPos);
+                }
+            }
+        }
+
         Token readSymbolToken(TokenType type) {
             m_pos++;
             return Token(type, m_source.midRef(m_pos - 1, 1), m_pos - 1);
@@ -141,7 +214,7 @@ namespace QnExp {
     public:
         Parser(Lexer *lexer): m_lexer(lexer) {};
 
-        QVector<Token> parse() {
+        QVector<Instruction> parse() {
             m_rpn.clear();
             parseExpr();
             
@@ -164,15 +237,72 @@ namespace QnExp {
         }
 
         void parseArgs() {
-            /* args ::= expr {',' expr} */
+            /* args ::= '('')' | '(' expr {',' expr} ')' | */
+            Token token = m_lexer->peekNextToken();
+            if(token.type() != LParen) {
+                m_rpn.push_back(Instruction(Call, 0));
+                return;
+            }
+
+            require(LParen);
+
+            token = m_lexer->peekNextToken();
+            if(token.type() == RParen) {
+                require(RParen);
+                m_rpn.push_back(Instruction(Call, 0));
+                return;
+            }
+            
+            int argc = 1;
+            parseExpr();
+
+            while(true) {
+                token = m_lexer->peekNextToken();
+                if(token.type() == Comma) {
+                    require(Comma);
+                    parseExpr();
+                    argc++;
+                } else {
+                    m_rpn.push_back(Instruction(Call, argc));
+                    return;
+                }
+            }
         }
 
         void parseInvocation() {
-            /* invocation ::= VAR ('(' ARGS ')' | '('')' | EMPTY) */
+            /* invocation ::= VAR args */
+            Token token = m_lexer->peekNextToken();
+            if(token.type() == Variable) {
+                require(Variable);
+                m_rpn.push_back(Instruction(Stor, token.text().toString()));
+            } else {
+                unexpected(token);
+            }
+
+            parseArgs();
         }
 
         void parseChain() {
             /* chain ::= invocation {'.' invocation} */
+            Token token = m_lexer->peekNextToken();
+            if(token.type() == Variable) {
+                parseInvocation();
+            } else {
+                unexpected(token);
+            }
+
+            while(true) {
+                token = m_lexer->peekNextToken();
+                if(token.type() == Dot) {
+                    require(Dot);
+                    parseInvocation();
+
+                    /* Replace Call with MCall */
+                    m_rpn.back().setType(MCall);
+                } else {
+                    return;
+                }
+            }
         }
 
         void parseFactor() {
@@ -181,24 +311,24 @@ namespace QnExp {
             switch(token.type()) {
             case Number:
                 require(Number);
-                m_rpn.push_back(token);
+                m_rpn.push_back(Instruction(Stor, token.text().toInt())); // TODO: throw on int parse error
                 break;
-            
-            case Lparen:
-                require(Lparen);
+
+            case Variable:
+                parseChain();
+                break;
+
+            case LParen:
+                require(LParen);
                 parseExpr();
-                require(Rparen);
+                require(RParen);
                 break;
             
             case Minus:
             case Plus:
                 require(token.type());
                 parseFactor();
-                if(token.type() == Plus) {
-                    m_rpn.push_back(Token(Uplus, token.text(), token.pos()));
-                } else if(token.type() == Minus) {
-                    m_rpn.push_back(Token(Uminus, token.text(), token.pos()));
-                }
+                m_rpn.push_back(Instruction(token.type() == Plus ? Udd : Neg));
                 break;
 
             default:
@@ -211,7 +341,7 @@ namespace QnExp {
             Token token = m_lexer->peekNextToken();
             switch(token.type()) {
             case Number:
-            case Lparen:
+            case LParen:
             case Minus:
             case Plus:
                 parseFactor();
@@ -228,7 +358,7 @@ namespace QnExp {
                 case Divide:
                     require(token.type());
                     parseFactor();
-                    m_rpn.push_back(token);
+                    m_rpn.push_back(Instruction(token.type() == Times ? Mul : Div));
                     break;
                 default:
                     return;                
@@ -241,7 +371,7 @@ namespace QnExp {
             Token token = m_lexer->peekNextToken();
             switch(token.type()) {
             case Number:
-            case Lparen:
+            case LParen:
             case Minus:
             case Plus:
                 parseTerm();
@@ -258,7 +388,7 @@ namespace QnExp {
                 case Minus:
                     require(token.type());
                     parseTerm();
-                    m_rpn.push_back(token);
+                    m_rpn.push_back(Instruction(token.type() == Plus ? Add : Sub));
                     break;
                 default:
                     return;
@@ -268,7 +398,7 @@ namespace QnExp {
 
     private:
         Lexer *m_lexer;
-        QVector<Token> m_rpn; /* Reverse Polish Notation */
+        QVector<Instruction> m_rpn; /* Reverse Polish Notation */
     };
 
 
@@ -278,46 +408,46 @@ namespace QnExp {
         Calculator(Parser *parser): m_parser(parser) {}
 
         double calculate() {
-            QVector<Token> rpn = m_parser->parse();
+            QVector<Instruction> rpn = m_parser->parse();
             QVector<double> stack;
 
             for(unsigned int i = 0; i < rpn.size(); i++) {
-                Token token = rpn[i];
+                Instruction instruction = rpn[i];
                 double v1, v2;
-                switch(token.type()) {
-                case Number:
-                    stack.push_back(token.text().toDouble());
+                switch(instruction.type()) {
+                case Stor:
+                    stack.push_back(instruction.text().toDouble());
                     break;
-                case Plus:
+                case Add:
                     v2 = pop_back(stack);
                     v1 = pop_back(stack);
                     stack.push_back(v1 + v2);
                     break;
-                case Minus:
+                case Sub:
                     v2 = pop_back(stack);
                     v1 = pop_back(stack);
                     stack.push_back(v1 - v2);
                     break;
-                case Times:
+                case Mul:
                     v2 = pop_back(stack);
                     v1 = pop_back(stack);
                     stack.push_back(v1 * v2);
                     break;
-                case Divide:
+                case Div:
                     v2 = pop_back(stack);
                     v1 = pop_back(stack);
                     stack.push_back(v1 / v2);
                     break;
-                case Uminus:
+                case Neg:
                     v1 = pop_back(stack);
                     stack.push_back(- v1);
                     break;
-                case Uplus:
+                case Udd:
                     v1 = pop_back(stack);
                     stack.push_back(+ v1);
                     break;
                 default:
-                    unexpected(token);
+                    assert(false);
                 }
             }
 
