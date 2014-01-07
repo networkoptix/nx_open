@@ -149,6 +149,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (NameHelper::instance().isSupported(modelName))
             return resList;
 
+        if (OnvifResourceInformationFetcher::ignoreCamera(manufacturer, modelName))
+            return resList;
+
         int modelNamePos = modelName.indexOf(QLatin1String(" "));
         if (modelNamePos >= 0)
         {

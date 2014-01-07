@@ -9,6 +9,7 @@
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 #include <core/ptz/item_dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
@@ -109,10 +110,25 @@ public:
      */
     QnPtzControllerPtr ptzController() const;
 
+    QnMediaDewarpingParams dewarpingParams() const;
+    void setDewarpingParams(const QnMediaDewarpingParams &params);
+
+    /**
+     * Getter and setter for dewarpingParams in item().
+     * \see fisheye_ptz_controller.cpp
+     */
+    QnItemDewarpingParams itemDewarpingParams() const;
+    void setItemDewarpingParams(const QnItemDewarpingParams &params);
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
+    void dewarpingParamsChanged();
+    /**
+     * This signal is emmited when item dewarpingParams have been changed.
+     */
+    void itemDewarpingParamsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -169,6 +185,7 @@ private:
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
     Q_SLOT void updateFisheye();
+    Q_SLOT void updateDewarpingParams();
 
 private:
     /** Media resource. */
@@ -209,6 +226,8 @@ private:
     QStaticText m_sensStaticText[10];
 
     QnPtzControllerPtr m_ptzController;
+
+    QnMediaDewarpingParams m_dewarpingParams;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

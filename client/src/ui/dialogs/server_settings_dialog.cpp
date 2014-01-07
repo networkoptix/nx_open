@@ -525,7 +525,7 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
     if(item.path.isEmpty() || !item.isExternal)
         return;
 
-    QScopedPointer<QMenu> menu(new QMenu());
+    QScopedPointer<QMenu> menu(new QMenu(this));
     menu->addAction(m_removeAction);
 
     QAction *action = menu->exec(QCursor::pos());

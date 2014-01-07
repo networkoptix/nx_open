@@ -228,6 +228,9 @@ void QnNoptixStyle::polish(QApplication *application) {
     font.setPixelSize(12);
     font.setStyle(QFont::StyleNormal);
     font.setWeight(QFont::Normal);
+#ifdef Q_OS_LINUX
+    font.setFamily(lit("Ubuntu")); // TODO: #Elric implement properly
+#endif
     application->setFont(font);
 
     QFont menuFont;

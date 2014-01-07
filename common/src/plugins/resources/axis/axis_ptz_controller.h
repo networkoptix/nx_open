@@ -37,13 +37,15 @@ private:
     CLSimpleHTTPClient *newHttpClient() const;
     bool query(const QString &request, QByteArray *body = NULL) const;
     bool query(const QString &request, QnAxisParameterMap *params) const;
-
+    QString getCameraNum();
+    
 private:
     QnPlAxisResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     Qt::Orientations m_flip;
     QnPtzLimits m_limits;
     QnLinearFunction m_logicalToCameraZoom, m_cameraToLogicalZoom;
+    mutable QByteArray ptz_ctl_id; // TODO: #Elric wtf?
 };
 
 #endif // #ifdef ENABLE_AXIS

@@ -527,7 +527,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
         return data.overlayWidget;
 
     bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
-    bool isFisheyeEnabled = widget->resource()->getDewarpingParams().enabled;
+    bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
@@ -603,7 +603,7 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
         const PtzData &data = m_dataByWidget[widget];
 
         bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
-        bool isFisheyeEnabled = widget->resource()->getDewarpingParams().enabled;
+        bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
         overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
         overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
@@ -1048,7 +1048,7 @@ void PtzInstrument::at_modeButton_clicked() {
         ensureOverlayWidget(widget);
 
         QnItemDewarpingParams iparams = widget->item()->dewarpingParams();
-        QnMediaDewarpingParams mparams = widget->resource()->getDewarpingParams();
+        QnMediaDewarpingParams mparams = widget->dewarpingParams();
 
         const QList<int> allowed = mparams.allowedPanoFactorValues();
 

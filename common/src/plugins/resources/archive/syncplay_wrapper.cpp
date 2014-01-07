@@ -1,6 +1,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QWaitCondition>
+#include <QtCore/QCoreApplication>
 
 #include "syncplay_wrapper.h"
 #include "syncplay_archive_delegate.h"
@@ -9,6 +10,8 @@
 #include "utils/common/util.h"
 #include "playbackmask_helper.h"
 #include "utils/common/synctime.h"
+#include "utils/common/synctime.h"
+
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -631,8 +634,13 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
         }
 
         if (d->enabled) {
-            if (allReady)
-                QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
+            if (allReady) {
+                bool callSync = QThread::currentThread() == qApp->thread();
+                if (callSync)
+                    jumpTo(DATETIME_NOW, 0);
+                else
+                    QMetaObject::invokeMethod(this, "jumpToLive", Qt::QueuedConnection); // all items at EOF position. This call may occured from non GUI thread!
+            }
         }
         else {
             if (reader)

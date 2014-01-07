@@ -71,14 +71,20 @@ QnGlRendererShaders::QnGlRendererShaders(const QGLContext *context, QObject *par
     nv12ToRgb = new QnNv12ToRgbShaderProgram(context, this);
     
     
+    const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
+
     fisheyePtzProgram = new QnFisheyeRectilinearProgram(context, this);
-    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+    fisheyePtzGammaProgram =  new QnFisheyeRectilinearProgram(context, this, GAMMA_STRING);
 
     fisheyePanoHProgram = new QnFisheyeEquirectangularHProgram(context, this);
-    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+    fisheyePanoHGammaProgram = new QnFisheyeEquirectangularHProgram(context, this, GAMMA_STRING);
 
     fisheyePanoVProgram = new QnFisheyeEquirectangularVProgram(context, this);
-    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(context, this, QnFisheyeShaderProgram::GAMMA_STRING);
+    fisheyePanoVGammaProgram = new QnFisheyeEquirectangularVProgram(context, this, GAMMA_STRING);
+
+    fisheyeRGBPtzProgram = new QnFisheyeRGBRectilinearProgram(context, this);
+    fisheyeRGBPanoHProgram = new QnFisheyeRGBEquirectangularHProgram(context, this);
+    fisheyeRGBPanoVProgram = new QnFisheyeRGBEquirectangularVProgram(context, this);
 }
 
 QnGlRendererShaders::~QnGlRendererShaders() {
@@ -186,10 +192,17 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         switch( picLock->colorFormat() )
         {
             case PIX_FMT_RGBA:
-                drawVideoTextureDirectly(
-                    QnGeometry::subRect(picLock->textureRect(), sourceRect),
-                    picLock->glTextures()[0],
-                    v_array );
+                if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
+                    drawFisheyeRGBVideoTexture(
+                        picLock,
+                        QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                        picLock->glTextures()[0],
+                        v_array );
+                else
+                    drawVideoTextureDirectly(
+                        QnGeometry::subRect(picLock->textureRect(), sourceRect),
+                        picLock->glTextures()[0],
+                        v_array );
                 break;
 
             case PIX_FMT_YUVA420P:
@@ -324,7 +337,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     QnAbstractYv12ToRgbShaderProgram* shader;
     QnYv12ToRgbWithGammaShaderProgram* gammaShader = 0;
-    QnFisheyeShaderProgram* fisheyeShader = 0;
+    QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>* fisheyeShader = 0;
     QnMediaDewarpingParams mediaParams;
     QnItemDewarpingParams itemParams;
 
@@ -405,6 +418,59 @@ void QnGLRenderer::drawYV12VideoTexture(
     drawBindedTexture( v_array, tx_array );
 
     shader->release();
+}
+
+void QnGLRenderer::drawFisheyeRGBVideoTexture(
+    const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
+    const QRectF& tex0Coords,
+    unsigned int tex0ID,
+    const float* v_array)
+{
+
+    float tx_array[8] = {
+        (float)tex0Coords.x(), (float)tex0Coords.y(),
+        (float)tex0Coords.right(), (float)tex0Coords.top(),
+        (float)tex0Coords.right(), (float)tex0Coords.bottom(),
+        (float)tex0Coords.x(), (float)tex0Coords.bottom()
+    };
+
+    glEnable(GL_TEXTURE_2D);
+    DEBUG_CODE(glCheckError("glEnable"));
+
+    QnFisheyeShaderProgram<QnAbstractRGBAShaderProgram>* fisheyeShader = 0;
+    QnMediaDewarpingParams mediaParams;
+    QnItemDewarpingParams itemParams;
+
+    float ar = 1.0;
+    ar = picLock->width()/(float)picLock->height();
+    //m_fisheyeController->tick();
+    mediaParams = m_fisheyeController->mediaDewarpingParams();
+    itemParams = m_fisheyeController->itemDewarpingParams();
+
+    if (itemParams.panoFactor > 1.0)
+    {
+        if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal)
+            fisheyeShader = m_shaders->fisheyeRGBPanoHProgram;
+        else
+            fisheyeShader = m_shaders->fisheyeRGBPanoVProgram;
+    }
+    else {
+        fisheyeShader = m_shaders->fisheyeRGBPtzProgram;
+    }
+
+    fisheyeShader->bind();
+    fisheyeShader->setRGBATexture( 0 );
+    fisheyeShader->setOpacity(m_decodedPictureProvider.opacity());
+
+    fisheyeShader->setDewarpingParams(mediaParams, itemParams, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex0ID);
+    DEBUG_CODE(glCheckError("glBindTexture"));
+
+    drawBindedTexture( v_array, tx_array );
+
+    fisheyeShader->release();
 }
 
 #ifndef GL_TEXTURE3

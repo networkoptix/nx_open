@@ -61,7 +61,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Set default values. */
     setMediaFolder(getMoviesDirectory());
     setBackgroundsFolder(getBackgroundsDirectory());
-    setMaxVideoItems(sizeof(void *) == sizeof(qint32) ? 24 : 64);
+    setMaxSceneVideoItems(sizeof(void *) == sizeof(qint32) ? 24 : 64);
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
@@ -71,7 +71,6 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Set names. */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
     setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
-    setName(MAX_VIDEO_ITEMS,        lit("maxVideoItems"));
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
     setName(OPEN_LAYOUTS_ON_LOGIN,  lit("openLayoutsOnLogin"));
     setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
@@ -80,7 +79,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     /* Set command line switch names. */
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
-    addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
+    addArgumentName(MAX_SCENE_VIDEO_ITEMS, "--max-video-items");
     addArgumentName(UPDATES_ENABLED,       "--updates-enabled");
 
     /* Load from internal resource. */

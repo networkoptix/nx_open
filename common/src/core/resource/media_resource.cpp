@@ -91,12 +91,10 @@ QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
 // -------------------------------------------------------------------------- //
 QnMediaResource::QnMediaResource()
 {
-    m_customVideoLayout = 0;
 }
 
 QnMediaResource::~QnMediaResource()
 {
-    delete m_customVideoLayout;
 }
 
 QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
@@ -104,36 +102,36 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
     return QImage();
 }
 
-static QnDefaultResourceVideoLayout defaultVideoLayout;
-const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {
-        return &defaultVideoLayout;
+        return defaultVideoLayout;
     }
     else {
-        if (m_customVideoLayout == 0)
+        if (!m_customVideoLayout)
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
         return m_customVideoLayout;
     }
 }
 
-void QnMediaResource::setCustomVideoLayout(const QnCustomResourceVideoLayout* newLayout)
+void QnMediaResource::setCustomVideoLayout(QnConstCustomResourceVideoLayoutPtr newLayout)
 {
-    if (m_customVideoLayout == 0)
-        m_customVideoLayout = new QnCustomResourceVideoLayout(newLayout->size());
+    if (!m_customVideoLayout)
+        m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
 
     *m_customVideoLayout = *newLayout;
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
 
-static QnEmptyResourceAudioLayout audioLayout;
-const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
+static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
-    return &audioLayout;
+    return audioLayout;
 }
 
 void QnMediaResource::initMediaResource()
@@ -159,11 +157,6 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
             toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
     }
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
-}
-
-bool QnMediaResource::isFisheye() const
-{
-    return getDewarpingParams().enabled;
 }
 
 void QnMediaResource::updateInner(QnResourcePtr other)

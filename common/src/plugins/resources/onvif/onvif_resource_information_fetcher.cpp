@@ -90,7 +90,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     }
 }
 
-bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name) const
+bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
@@ -157,8 +157,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (manufacturer.isEmpty())
             manufacturer = resType->getName();
     }
-    else if (model.isEmpty() || manufacturer.isEmpty())
+    else // if (model.isEmpty() || manufacturer.isEmpty())
     {
+        // always call getDeviceInformation to filter non-onvif devices
         DeviceInfoReq request;
         DeviceInfoResp response;
         int soapRes = soapWrapper.getDeviceInformation(request, response);
@@ -166,6 +167,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
                      << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
                      << ". " << soapWrapper.getLastError();
+            return; // non onvif device
         } 
         else {
             if (!response.Manufacturer.empty())

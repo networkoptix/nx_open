@@ -207,16 +207,16 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     return result;
 }
 
-static QnDefaultResourceVideoLayout videoLayout;
-QnResourceVideoLayout* QnVMax480ArchiveDelegate::getVideoLayout()
+static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+QnResourceVideoLayoutPtr QnVMax480ArchiveDelegate::getVideoLayout()
 {
-    return &videoLayout;
+    return videoLayout;
 }
 
-static QnEmptyResourceAudioLayout audioLayout;
-QnResourceAudioLayout* QnVMax480ArchiveDelegate::getAudioLayout()
+static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+QnResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
 {
-    return &audioLayout;
+    return audioLayout;
 }
 
 void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)

@@ -41,25 +41,21 @@ public:
 public slots:
     /**
      * Starts screen recording.
-     *
-     * \param appWidget                 Widget to use for recording in windowed mode.
      */
-    void startRecording(QGLWidget *appWidget);
+    void startRecording();
 
 signals:
     void recordingStarted();
     void recordingFinished(const QString &recordedFileName);
     void error(const QString &errorMessage);
 private slots:
-    void onRecordingFailed(QString msg);
-    void onRecordingFinished(QString);
+    void at_recorder_recordingFinished(int status, const QString &filename);
 private:
     void cleanupRecorder();
 private:
     bool m_recording;
     QnDesktopDataProviderWrapper* m_dataProvider;
     QnStreamRecorder* m_recorder;
-    //QnDesktopFileEncoder* m_encoder;
 };
 
 #endif // QN_SCREEN_RECORDER_H

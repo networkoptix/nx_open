@@ -125,16 +125,16 @@ qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
     }
 }
 
-static QnDefaultResourceVideoLayout videoLayout;
-QnResourceVideoLayout* ThirdPartyArchiveDelegate::getVideoLayout()
+static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+QnResourceVideoLayoutPtr ThirdPartyArchiveDelegate::getVideoLayout()
 {
-    return &videoLayout;
+    return videoLayout;
 }
 
-static QnEmptyResourceAudioLayout audioLayout;
-QnResourceAudioLayout* ThirdPartyArchiveDelegate::getAudioLayout()
+static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+QnResourceAudioLayoutPtr ThirdPartyArchiveDelegate::getAudioLayout()
 {
-    return &audioLayout;
+    return audioLayout;
 }
 
 void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )

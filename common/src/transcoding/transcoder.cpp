@@ -80,7 +80,7 @@ QnVideoTranscoder::~QnVideoTranscoder()
         delete filter;
 }
 
-void QnVideoTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+void QnVideoTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_layout = layout;
 }
@@ -259,7 +259,7 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
-void QnTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_vLayout = layout;
 }

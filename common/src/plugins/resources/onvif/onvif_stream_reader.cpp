@@ -743,7 +743,7 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
     return 0;
 }
 
-const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnOnvifStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }

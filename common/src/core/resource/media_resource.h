@@ -61,17 +61,16 @@ public:
     virtual QImage getImage(int channel, QDateTime time, Qn::StreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
-    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
 
-    void setCustomVideoLayout(const QnCustomResourceVideoLayout* newLayout);
+    void setCustomVideoLayout(QnConstCustomResourceVideoLayoutPtr newLayout);
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;
     virtual const QnResourcePtr toResourcePtr() const = 0;
     virtual QnResourcePtr toResourcePtr() = 0;
 
-    virtual bool isFisheye() const;
     QnMediaDewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams& params);
 
@@ -80,7 +79,7 @@ protected:
     void updateInner(QnResourcePtr other);
 
 protected:
-    QnCustomResourceVideoLayout* m_customVideoLayout;
+    QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     QnMediaDewarpingParams m_dewarpingParams;
 };
 

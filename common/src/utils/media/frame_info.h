@@ -149,7 +149,10 @@ public:
     QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
+    CLVideoDecoderOutput(QImage image);
     ~CLVideoDecoderOutput();
+
+    QImage toImage() const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -166,7 +169,7 @@ public:
 
     void copyDataFrom(const AVFrame* frame);
 public:
-    int flags;
+    QnAbstractMediaData::MediaFlags flags;
 
     /** Pixel width to pixel height ratio. Some videos have non-square pixels, we support that. */
     double sample_aspect_ratio; 

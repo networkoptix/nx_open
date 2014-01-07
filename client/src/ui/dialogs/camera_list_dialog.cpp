@@ -100,7 +100,7 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
     QnActionManager* manager = context()->menu();
 
     if (!resList.isEmpty()) {
-        menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resList));
+        menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resList));
         foreach(QAction* action, menu->actions())
             action->setShortcut(QKeySequence());
     }
@@ -108,7 +108,7 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
     if (menu)
         menu->addSeparator();
     else
-        menu = new QMenu();
+        menu = new QMenu(this);
 
     m_clipboardAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
     m_exportAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());

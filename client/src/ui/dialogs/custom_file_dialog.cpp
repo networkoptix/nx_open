@@ -20,7 +20,7 @@ void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnWidgetC
     checkbox->setText(text);
     checkbox->setChecked(*value);
     m_checkBoxes.insert(checkbox, value);
-    addWidget(checkbox, false, delegate);
+    addWidget(checkbox, true, delegate);
 }
 
 void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxValue, int *value) {

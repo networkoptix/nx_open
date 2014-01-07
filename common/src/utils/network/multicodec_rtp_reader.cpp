@@ -524,12 +524,12 @@ bool QnMulticodecRtpReader::isStreamOpened() const
     return m_RtpSession.isOpened();
 }
 
-const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
+QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
 {
     if (m_audioParser)
         return m_audioParser->getAudioLayout();
     else
-        return 0;
+        return nullptr;
 }
 
 void QnMulticodecRtpReader::pleaseStop()

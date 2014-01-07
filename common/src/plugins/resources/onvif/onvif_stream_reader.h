@@ -32,9 +32,10 @@ public:
 
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
-    const QnResourceAudioLayout* getDPAudioLayout() const;
+    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     virtual void pleaseStop() override;
     virtual bool secondaryResolutionIsLarge() const override;
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStream() override;

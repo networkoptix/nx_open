@@ -67,7 +67,8 @@ QnAVIPlaylistArchiveDelegate::QnAVIPlaylistArchiveDelegate() :
     m_ffmpegIOContext(0),
     m_currentFileIndex(-1),
     m_inSeek(false),
-    m_totalContentLength(0)
+    m_totalContentLength(0),
+    m_defaultVideoLayout( new QnDefaultResourceVideoLayout() )
 {
 }
 
@@ -376,9 +377,9 @@ qint32 QnAVIPlaylistArchiveDelegate::writePacket(quint8* /*buf*/, int /*size*/)
     return 0; // not implemented
 }
 
-QnResourceVideoLayout* QnAVIPlaylistArchiveDelegate::getVideoLayout()
+QnResourceVideoLayoutPtr QnAVIPlaylistArchiveDelegate::getVideoLayout()
 {
-    return &m_defaultVideoLayout;
+    return m_defaultVideoLayout;
 }
 
 qint64 QnAVIPlaylistArchiveDelegate::endTime() 

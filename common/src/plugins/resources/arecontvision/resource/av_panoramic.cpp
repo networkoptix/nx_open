@@ -13,12 +13,10 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
     m_isRotated = false;
-    m_rotatedLayout = 0;
 }
 
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
 {
-    delete m_rotatedLayout;
 }
 
 
@@ -155,6 +153,10 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
 void QnArecontPanoramicResource::updateFlipState()
 {
+    if (m_flipTimer.isValid() && m_flipTimer.elapsed() < 1000)
+        return;
+    m_flipTimer.restart();
+
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get?rotate");
     CLHttpStatus responseCode = connection.doGET(request);
@@ -192,16 +194,17 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
-const QnResourceVideoLayout* QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QMutexLocker lock(&m_mutex);
 
-    QnResourceVideoLayout* layout = const_cast<QnResourceVideoLayout*> (QnPlAreconVisionResource::getVideoLayout(dataProvider));
-    QnCustomResourceVideoLayout* customLayout = dynamic_cast<QnCustomResourceVideoLayout*>(layout);
+    const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
+    const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
+    updateFlipState();
     if (m_isRotated && customLayout)
     {
-        if (m_rotatedLayout == 0) {
-            m_rotatedLayout = new QnCustomResourceVideoLayout(customLayout->size());
+        if (!m_rotatedLayout) {
+            m_rotatedLayout.reset( new QnCustomResourceVideoLayout(customLayout->size()) );
             QVector<int> channels = customLayout->getChannels();
             std::reverse(channels.begin(), channels.end());
             m_rotatedLayout->setChannels(channels);

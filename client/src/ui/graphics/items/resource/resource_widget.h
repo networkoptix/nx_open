@@ -7,6 +7,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
@@ -103,7 +104,7 @@ public:
     /**
      * \returns                         Layout of channels in this widget. Never returns NULL.
      */
-    const QnResourceVideoLayout *channelLayout() const {
+    QnConstResourceVideoLayoutPtr channelLayout() const {
         return m_channelsLayout;
     }
     
@@ -354,7 +355,7 @@ protected:
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
-    void setChannelLayout(const QnResourceVideoLayout *channelLayout);
+    void setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout);
     virtual void channelLayoutChangedNotify() {}
     
     virtual void optionsChangedNotify(Options changedFlags);
@@ -399,7 +400,7 @@ private:
     bool m_localActive;
 
     /** Layout of this widget's channels. */
-    const QnResourceVideoLayout *m_channelsLayout;
+    QnConstResourceVideoLayoutPtr m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
