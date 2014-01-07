@@ -8,6 +8,7 @@
 
 namespace QnExp {
     enum TokenType {
+        Variable,
         Number,
         Plus,
         Minus,
@@ -25,6 +26,7 @@ namespace QnExp {
 
     QString serialized(TokenType type) {
         switch (type) {
+        case Variable:  return lit("VARIABLE");
         case Number:    return lit("NUMBER");
         case Plus:      return lit("PLUS");
         case Minus:     return lit("MINUS");
@@ -161,8 +163,20 @@ namespace QnExp {
                 unexpected(token);
         }
 
+        void parseArgs() {
+            /* args ::= expr {',' expr} */
+        }
+
+        void parseInvocation() {
+            /* invocation ::= VAR ('(' ARGS ')' | '('')' | EMPTY) */
+        }
+
+        void parseChain() {
+            /* chain ::= invocation {'.' invocation} */
+        }
+
         void parseFactor() {
-            /* factor ::= INT | '(' expr ')' | ('-' | '+') factor */
+            /* factor ::= chain | INT | '(' expr ')' | ('-' | '+') factor */
             Token token = m_lexer->peekNextToken();
             switch(token.type()) {
             case Number:
