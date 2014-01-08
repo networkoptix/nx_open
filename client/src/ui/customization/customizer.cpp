@@ -5,6 +5,7 @@
 #include <utils/common/json_serializer.h>
 #include <utils/common/flat_map.h>
 #include <utils/common/property_storage.h>
+#include <utils/common/evaluator.h>
 
 #include "palette_data.h"
 
@@ -77,6 +78,64 @@ public:
 };
 
 
+
+// --------------------------------------------------------------------------- //
+// QnCustomizationColorSerializer
+// --------------------------------------------------------------------------- //
+class QnCustomizationColorSerializer: public QObject, public QnJsonSerializer, public QnPropertyAccessor {
+public:
+    QnCustomizationColorSerializer(QObject *parent = NULL): 
+        QObject(parent),
+        QnJsonSerializer(QMetaType::QColor)
+    {
+        m_evaluator.registerFunctions(Qee::ColorFunctions);
+    }
+
+protected:
+    virtual void serializeInternal(const void *value, QJsonValue *target) const override {
+        QJson::serialize(*static_cast<const QColor *>(value), target);
+    }
+
+    virtual bool deserializeInternal(const QJsonValue &value, void *target) const override {
+        if(QJson::deserialize(value, static_cast<QColor *>(target)))
+            return true; /* Try the easy way first. */
+
+        QString source;
+        if(!QJson::deserialize(value, &source))
+            return false;
+
+        QVariant result;
+        try {
+            result = m_evaluator.evaluate(Qee::Parser::parse(source));
+        } catch(const QnException &exception) {
+            qnWarning(exception.what());
+            return false;
+        }
+
+        if(result.type() != QMetaType::QColor)
+            return false;
+
+        *static_cast<QColor *>(target) = *static_cast<QColor *>(result.data());
+        return true;
+    }
+
+    virtual QVariant read(const QObject *object, const QString &name) const {
+        QVariant result = static_cast<const QnCustomizationColorSerializer *>(object)->m_evaluator.constant(name);
+        return result.isValid() ? result : QVariant(QMetaType::QColor, NULL);
+    }
+
+    virtual bool write(QObject *object, const QString &name, const QVariant &value) const {
+        static_cast<QnCustomizationColorSerializer *>(object)->m_evaluator.registerConstant(name, value);
+        return true;
+    }
+
+private:
+    Qee::Evaluator m_evaluator;
+};
+
+
+
+
 // -------------------------------------------------------------------------- //
 // QnCustomizationData
 // -------------------------------------------------------------------------- //
@@ -121,6 +180,7 @@ public:
     QList<QByteArray> classNames;
     QHash<QLatin1String, QnPropertyAccessor *> accessorByClassName;
     QScopedPointer<QnPropertyAccessor> defaultAccessor;
+    QScopedPointer<QnCustomizationColorSerializer> colorSerializer;
     QnFlatMap<int, QnJsonSerializer *> serializerByType;
 };
 
@@ -129,6 +189,7 @@ QnCustomizerPrivate::QnCustomizerPrivate() {
     paletteDataType = qMetaTypeId<QnPaletteData>();
 
     defaultAccessor.reset(new QnObjectPropertyAccessor());
+    colorSerializer.reset(new QnCustomizationColorSerializer());
     
     accessorByClassName.insert(QLatin1String("QApplication"), new QnApplicationPropertyAccessor());
     accessorByClassName.insert(QLatin1String("QnPropertyStorage"), new QnStoragePropertyAccessor());
@@ -136,6 +197,7 @@ QnCustomizerPrivate::QnCustomizerPrivate() {
     /* QnJsonSerializer does locking, so we use local cache to avoid it. */
     foreach(QnJsonSerializer *serializer, QnJsonSerializer::allSerializers())
         serializerByType.insert(serializer->type(), serializer);
+    serializerByType.insert(QMetaType::QColor, colorSerializer.data());
 }
 
 QnCustomizerPrivate::~QnCustomizerPrivate() {
@@ -258,6 +320,9 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
         d->classNames.push_back(className);
         d->dataByClassName[QLatin1String(className)] = QnCustomizationData(*pos);
     }
+
+    /* Load globals. */
+    d->customize(d->colorSerializer.data(), d->colorSerializer.data(), "globals");
 }
 
 const QnCustomization &QnCustomizer::customization() const {

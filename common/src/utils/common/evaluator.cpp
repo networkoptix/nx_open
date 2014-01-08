@@ -430,18 +430,22 @@ namespace Qee {
         m_functionTypeId = qMetaTypeId<Function>();
     }
 
-    void Evaluator::registerVariable(const QString &name, const QVariant &value) {
-        m_variables.insert(name, value);
+    QVariant Evaluator::constant(const QString &name) const {
+        return m_constants.value(name);
+    }
+
+    void Evaluator::registerConstant(const QString &name, const QVariant &value) {
+        m_constants.insert(name, value);
     }
 
     void Evaluator::registerFunction(const QString &name, const Function &function) {
-        m_variables.insert(name, QVariant::fromValue(function));
+        m_constants.insert(name, QVariant::fromValue(function));
     }
 
     void Evaluator::registerFunctions(StandardFunctions functions) {
         if(functions & ColorFunctions) {
             // TODO: #Elric provide full symmetry by also registering SVG color names?
-            registerFunction(lit("QColor"), &eval_QColor);
+            registerFunction(lit("QColor"),             &eval_QColor);
             registerFunction(lit("QColor::lighter"),    &eval_QColor_lighter);
             registerFunction(lit("QColor::darker"),     &eval_QColor_darker);
             registerFunction(lit("QColor::setRed"),     &eval_QColor_setRed);
@@ -451,7 +455,7 @@ namespace Qee {
         }
     }
 
-    QVariant Evaluator::evaluate(const QVector<Instruction> &program) const {
+    QVariant Evaluator::evaluate(const Program &program) const {
         QVector<QVariant> stack;
 
         foreach(const Instruction &instruction, program)
@@ -570,7 +574,7 @@ namespace Qee {
         if(instruction.type() == MCall)
             name = QLatin1String(stack[stack.size() - argc - 1].typeName()) + lit("::") + name;
 
-        QVariant variable = m_variables.value(name);
+        QVariant variable = m_constants.value(name);
         if(variable.userType() == QMetaType::UnknownType)
             throw QnException(tr("Function or variable '%1' is not defined.").arg(name));
 

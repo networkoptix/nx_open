@@ -112,14 +112,17 @@ namespace Qee {
     };
 
 
+    typedef QVector<Instruction> Program;
+
+
     class Parser {
         Q_DECLARE_TR_FUNCTIONS(Qee::Parser)
     public:
         Parser(Lexer *lexer): m_lexer(lexer) {};
 
-        QVector<Instruction> parse();
+        Program parse();
 
-        static QVector<Instruction> parse(const QString &source) {
+        static Program parse(const QString &source) {
             Lexer lexer(source);
             Parser parser(&lexer);
             return parser.parse();
@@ -145,34 +148,36 @@ namespace Qee {
     class ParameterPack {
         Q_DECLARE_TR_FUNCTIONS(Qee::ParameterPack)
     public:
-        ParameterPack(const QVector<QVariant> &stack, int size, const QString &functionName): m_stack(stack), m_size(size), m_functionName(functionName) {}
+        ParameterPack(const QVector<QVariant> &stack, int size, const QString &name): m_stack(stack), m_size(size), m_name(name) {}
 
         int size() const { return m_size; }
-        
+
+        const QString &name() { return m_name; }
+
         QVariant get(int index) const { 
             if(index < 0 || index >= m_size)
-                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_functionName).arg(index));
+                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
             return ref(index);
         }
 
         template<class T>
         T get(int index) const {
             if(index < 0 || index >= m_size)
-                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_functionName).arg(index));
+                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_name).arg(index));
             const QVariant &param = ref(index);
             if(!param.canConvert<T>())
-                throw QnException(tr("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_functionName).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(qMetaTypeId<T>()))));
+                throw QnException(tr("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_name).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(qMetaTypeId<T>()))));
             return param.value<T>();
         }
 
         void requireSize(int size) const {
             if(m_size != size)
-                throw QnException(tr("Function '%1' is expected to have %3 arguments, %2 provided.").arg(m_functionName).arg(m_size).arg(size));
+                throw QnException(tr("Function '%1' is expected to have %3 arguments, %2 provided.").arg(m_name).arg(m_size).arg(size));
         }
 
         void requireSize(int minSize, int maxSize) const {
             if(m_size < minSize || m_size > maxSize)
-                throw QnException(tr("Function '%1' is expected to have %3-%4 arguments, %2 provided.").arg(m_functionName).arg(m_size).arg(minSize).arg(maxSize));
+                throw QnException(tr("Function '%1' is expected to have %3-%4 arguments, %2 provided.").arg(m_name).arg(m_size).arg(minSize).arg(maxSize));
         }
 
     private:
@@ -183,7 +188,7 @@ namespace Qee {
     private:
         const QVector<QVariant> &m_stack;
         int m_size;
-        QString m_functionName;
+        QString m_name;
     };
 
     typedef QVariant (*Function)(const ParameterPack &);
@@ -194,9 +199,10 @@ namespace Qee {
     public:
         Evaluator();
 
-        QVariant evaluate(const QVector<Instruction> &program) const;
+        QVariant evaluate(const Program &program) const;
 
-        void registerVariable(const QString &name, const QVariant &value);
+        QVariant constant(const QString &name) const;
+        void registerConstant(const QString &name, const QVariant &value);
         void registerFunction(const QString &name, const Function &function);
         void registerFunctions(StandardFunctions functions);
 
@@ -215,7 +221,7 @@ namespace Qee {
 
     private:
         int m_functionTypeId;
-        QHash<QString, QVariant> m_variables;
+        QHash<QString, QVariant> m_constants;
     };
 
 } // namespace QnExp
