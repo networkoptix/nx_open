@@ -1,0 +1,536 @@
+#include "evaluator.h"
+
+#include "lexical.h"
+
+namespace Qee {
+// -------------------------------------------------------------------------- //
+// Utility
+// -------------------------------------------------------------------------- //
+    QString serialized(TokenType type) {
+        switch (type) {
+        case Variable:  return lit("VARIABLE");
+        case Number:    return lit("NUMBER");
+        case Plus:      return lit("PLUS");
+        case Minus:     return lit("MINUS");
+        case Times:     return lit("TIMES");
+        case Divide:    return lit("DIVIDE");
+        case LParen:    return lit("LPAREN");
+        case RParen:    return lit("RPAREN");
+        case Dot:       return lit("DOT");
+        case Comma:     return lit("COMMA");
+        case End:       return lit("END");
+        case Invalid:   return lit("INVALID");
+        default:        assert(false); return QString();
+        }
+    }
+
+    QString serialized(InstructionType type) {
+        switch (type) {
+        case Stor:      return lit("STOR");
+        case Add:       return lit("ADD");
+        case Sub:       return lit("SUB");
+        case Mul:       return lit("MUL");
+        case Div:       return lit("DIV");
+        case Neg:       return lit("NEG");
+        case Udd:       return lit("UDD");
+        case Call:      return lit("CALL");
+        case MCall:     return lit("MCALL");
+        case Nop:       return lit("NOP");
+        default:        assert(false); return QString();
+        }
+    }
+
+
+// -------------------------------------------------------------------------- //
+// Lexer
+// -------------------------------------------------------------------------- //
+    Token Lexer::readNextToken() {
+        if(m_token.type() != Invalid) {
+            Token result = m_token;
+            m_token = Token();
+            return result;
+        }
+
+        while(true) {
+            QChar c = m_source[m_pos];
+            switch(c.unicode()) {
+            case L' ': case L'\t': case L'\n': case L'\r':
+                break;
+            case L'_': 
+                return readVariableToken();
+            case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
+                return readNumberToken();
+            case L'#':
+                return readColorToken();
+            case L'-':  
+                return readSymbolToken(Minus);
+            case L'+':  
+                return readSymbolToken(Plus);
+            case L'*':  
+                return readSymbolToken(Times);
+            case L'/':  
+                return readSymbolToken(Divide);
+            case L'(':  
+                return readSymbolToken(LParen);
+            case L')':  
+                return readSymbolToken(RParen);
+            case L'.':
+                return readSymbolToken(Dot);
+            case L',':
+                return readSymbolToken(Comma);
+            case L'\0': 
+                return readSymbolToken(End);
+            default:    
+                if(c.isLetter()) {
+                    return readVariableToken();
+                } else {
+                    unexpected();
+                }
+            }
+        }
+    }
+
+    Token Lexer::peekNextToken() {
+        if(m_token.type() == Invalid)
+            m_token = readNextToken();
+        return m_token;
+    }
+
+    void Lexer::unexpected() const {
+        throw QnException(tr("Unexpected symbol '%1' at position %2.").arg(m_source[m_pos]).arg(m_pos));
+    }
+
+    Token Lexer::readNumberToken() {
+        int startPos = m_pos;
+        while(true) {
+            switch(m_source[m_pos].unicode()) {
+            case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
+                m_pos++;
+                break;
+            default:
+                return Token(Number, m_source.midRef(startPos, m_pos - startPos), startPos);
+            }
+        }
+    }
+
+    Token Lexer::readColorToken() {
+        int startPos = m_pos;
+        m_pos++; /* Skip '#' */
+        while(true) {
+            switch(m_source[m_pos].unicode()) {
+            case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
+            case L'a': case L'b': case L'c': case L'd': case L'e': case L'f':
+            case L'A': case L'B': case L'C': case L'D': case L'E': case L'F':
+                m_pos++;
+                break;
+            default:
+                return Token(Number, m_source.midRef(startPos, m_pos - startPos), startPos);
+            }
+        }
+    }
+
+    Token Lexer::readVariableToken() {
+        int startPos = m_pos;
+        while(true) {
+            QChar c = m_source[m_pos];
+            if(c.isLetterOrNumber() || c.unicode() == L'_') {
+                m_pos++;
+                continue;
+            } else {
+                return Token(Variable, m_source.midRef(startPos, m_pos - startPos), startPos);
+            }
+        }
+    }
+
+    Token Lexer::readSymbolToken(TokenType type) {
+        m_pos++;
+        return Token(type, m_source.midRef(m_pos - 1, 1), m_pos - 1);
+    }
+
+
+// -------------------------------------------------------------------------- //
+// Parser
+// -------------------------------------------------------------------------- //
+    QVector<Instruction> Parser::parse() {
+        m_program.clear();
+        parseExpr();
+
+        Token token = m_lexer->peekNextToken();
+        if(token.type() != End)
+            unexpected(token);
+
+        return m_program;
+    }
+
+    void Parser::unexpected(const Token &token) const {
+        throw QnException(tr("Unexpected token %1 ('%2') at position %3.").arg(serialized(token.type())).arg(token.text().toString()).arg(token.pos()));
+    }
+
+    void Parser::require(TokenType type) {
+        Token token = m_lexer->readNextToken();
+        if(token.type() != type)
+            unexpected(token);
+    }
+
+    void Parser::parseArgs() {
+        /* args ::= '('')' | '(' expr {',' expr} ')' | */
+        Token token = m_lexer->peekNextToken();
+        if(token.type() != LParen) {
+            m_program.push_back(Instruction(Call, 0));
+            return;
+        }
+
+        require(LParen);
+
+        token = m_lexer->peekNextToken();
+        if(token.type() == RParen) {
+            require(RParen);
+            m_program.push_back(Instruction(Call, 0));
+            return;
+        }
+
+        int argc = 1;
+        parseExpr();
+
+        while(true) {
+            token = m_lexer->peekNextToken();
+            if(token.type() == Comma) {
+                require(Comma);
+                parseExpr();
+                argc++;
+            } else {
+                require(RParen);
+                m_program.push_back(Instruction(Call, argc));
+                return;
+            }
+        }
+    }
+
+    void Parser::parseInvocation() {
+        /* invocation ::= (VAR | COLOR) args */
+        Token token = m_lexer->peekNextToken();
+        switch (token.type()) {
+        case Variable:
+            require(Variable);
+            m_program.push_back(Instruction(Stor, token.text().toString()));
+        case Color: {
+            require(Color);
+            QColor color;
+            if(!QnLexical::deserialize(token.text().toString(), &color))
+                throw QnException();
+            m_program.push_back(Instruction(Stor, color));
+        }
+        default:
+            unexpected(token);
+        }
+
+        parseArgs();
+    }
+
+    void Parser::parseChain() {
+        /* chain ::= invocation {'.' invocation} */
+        Token token = m_lexer->peekNextToken();
+        if(token.type() == Variable) {
+            parseInvocation();
+        } else {
+            unexpected(token);
+        }
+
+        while(true) {
+            token = m_lexer->peekNextToken();
+            if(token.type() == Dot) {
+                require(Dot);
+                parseInvocation();
+
+                /* Replace Call with MCall */
+                m_program.back().setType(MCall);
+            } else {
+                return;
+            }
+        }
+    }
+
+    void Parser::parseFactor() {
+        /* factor ::= chain | INT | '(' expr ')' | ('-' | '+') factor */
+        Token token = m_lexer->peekNextToken();
+        switch(token.type()) {
+        case Number:
+            require(Number);
+            m_program.push_back(Instruction(Stor, token.text().toInt())); // TODO: throw on int parse error
+            break;
+
+        case Variable:
+            parseChain();
+            break;
+
+        case LParen:
+            require(LParen);
+            parseExpr();
+            require(RParen);
+            break;
+
+        case Minus:
+        case Plus:
+            require(token.type());
+            parseFactor();
+            m_program.push_back(Instruction(token.type() == Plus ? Udd : Neg));
+            break;
+
+        default:
+            unexpected(token);
+        }
+    }
+
+    void Parser::parseTerm() {
+        /* term ::= factor {('*' | '/') factor} */
+        Token token = m_lexer->peekNextToken();
+        switch(token.type()) {
+        case Number:
+        case LParen:
+        case Minus:
+        case Plus:
+            parseFactor();
+            break;
+
+        default:
+            unexpected(token);
+        }
+
+        while(true) {
+            token = m_lexer->peekNextToken();
+            switch(token.type()) {
+            case Times:
+            case Divide:
+                require(token.type());
+                parseFactor();
+                m_program.push_back(Instruction(token.type() == Times ? Mul : Div));
+                break;
+            default:
+                return;                
+            }
+        }
+    }
+
+    void Parser::parseExpr() {
+        /* expr ::= term {('+' | '-') term} */
+        Token token = m_lexer->peekNextToken();
+        switch(token.type()) {
+        case Number:
+        case LParen:
+        case Minus:
+        case Plus:
+            parseTerm();
+            break;
+
+        default:
+            unexpected(token);
+        }
+
+        while(true) {
+            token = m_lexer->peekNextToken();
+            switch(token.type()) {
+            case Plus:
+            case Minus:
+                require(token.type());
+                parseTerm();
+                m_program.push_back(Instruction(token.type() == Plus ? Add : Sub));
+                break;
+            default:
+                return;
+            }
+        }
+    }
+
+
+// -------------------------------------------------------------------------- //
+// Evaluator
+// -------------------------------------------------------------------------- //
+    Evaluator::Evaluator() {
+        m_functionTypeId = qMetaTypeId<Function>();
+    }
+
+    void Evaluator::registerVariable(const QString &name, const QVariant &value) {
+        m_variables.insert(name, value);
+    }
+
+    void Evaluator::registerFunction(const QString &name, const Function &function) {
+        m_variables.insert(name, QVariant::fromValue(function));
+    }
+
+    QVariant Evaluator::evaluate(const QVector<Instruction> &program) const {
+        QVector<QVariant> stack;
+
+        foreach(const Instruction &instruction, program)
+            exec(stack, instruction);
+
+        if(stack.size() != 1)
+            throw QnException(tr("Invalid stack size after program evaluation: %1.").arg(program.size()));
+
+        return stack[0];
+    }
+
+    void Evaluator::exec(QVector<QVariant> &stack, const Instruction &instruction) const {
+        switch(instruction.type()) {
+        case Stor:
+            stor(stack, instruction.data());
+            break;
+        case Add:
+        case Sub:
+        case Mul:
+        case Div:
+            binop(stack, instruction.type());
+            break;
+        case Neg:
+        case Udd:
+            unop(stack, instruction.type());
+            break;
+        case Call:
+        case MCall:
+            call(stack, instruction);
+            break;
+        default:
+            assert(false);
+        }
+    }
+
+    void Evaluator::stor(QVector<QVariant> &stack, const QVariant &data) const {
+        stack.push_back(data);
+    }
+
+    void Evaluator::binop(QVector<QVariant> &stack, InstructionType op) const {
+        QVariant r = pop_back(stack);
+        QVariant l = pop_back(stack);
+
+        int type = superType(r.userType(), l.userType());
+        if(type == QMetaType::UnknownType)
+            throw QnException(tr("Could not deduce result type for operation %1('%2', '%3').").arg(serialized(op)).arg(QLatin1String(l.typeName())).arg(QLatin1String(r.typeName())));
+
+        if(type == QMetaType::LongLong) {
+            stack.push_back(binop(l.toLongLong(), r.toLongLong(), op));
+        } else {
+            stack.push_back(binop(l.toDouble(), r.toDouble(), op));
+        }
+    }
+
+    long long Evaluator::binop(long long l, long long r, InstructionType op) const {
+        switch (op) {
+        case Add:   return l + r;
+        case Sub:   return l - r;
+        case Mul:   return l * r;
+        case Div:   return l / r;
+        default:    assert(false); return 0;
+        }
+    }
+
+    double Evaluator::binop(double l, double r, InstructionType op) const {
+        switch (op) {
+        case Add:   return l + r;
+        case Sub:   return l - r;
+        case Mul:   return l * r;
+        case Div:   return l / r;
+        default:    assert(false); return 0;
+        }
+    }
+
+    void Evaluator::unop(QVector<QVariant> &stack, InstructionType op) const {
+        QVariant a = pop_back(stack);
+
+        int type = upperType(a.userType());
+        if(type == QMetaType::UnknownType)
+            throw QnException(tr("Could not deduce arithmetic supertype for type '%1'.").arg(QLatin1String(a.typeName())));
+
+        if(type == QMetaType::LongLong) {
+            if(op == Neg) {
+                stack.push_back(-a.toLongLong());
+            } else {
+                stack.push_back(a.toLongLong());
+            }
+        } else {
+            if(op == Neg) {
+                stack.push_back(-a.toDouble());
+            } else {
+                stack.push_back(a.toDouble());
+            }
+        }
+    }
+
+    void Evaluator::call(QVector<QVariant> &stack, const Instruction &instruction) const {
+        QVariant argcVariant = instruction.data();
+        if(argcVariant.userType() != QMetaType::Int)
+            throw QnException(tr("Argument number for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(argcVariant.typeName())));
+        int argc = argcVariant.toInt();
+
+        if(stack.size() < argc + 1)
+            throw QnException(tr("Stack underflow during execution of %1 instruction.").arg(serialized(instruction.type())));
+
+        QVariant nameVariant = stack[stack.size() - argc - 1];
+        if(nameVariant.userType() != QMetaType::QString)
+            throw QnException(tr("Function name for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(nameVariant.typeName())));
+        QString name = nameVariant.toString();
+
+        if(instruction.type() == MCall)
+            name = QLatin1String(stack[stack.size() - argc].typeName()) + lit("::") + name;
+
+        QVariant variable = m_variables.value(name);
+        if(variable.userType() == QMetaType::UnknownType)
+            throw QnException(tr("Function or variable '%1' is not defined.").arg(name));
+
+        QVariant result;
+        if(variable.type() != m_functionTypeId) {
+            if(argc > 0)
+                throw QnException(tr("Variable '%1' is not a function and cannot be called.").arg(name));
+            result = variable;
+        } else {
+            result = variable.value<Function>()(ParameterPack(stack, argc, name));
+        }
+
+        stack.resize(stack.size() - argc - 1);
+        stack.push_back(result);
+    }
+
+    QVariant Evaluator::pop_back(QVector<QVariant> &stack) {
+        if(stack.isEmpty())
+            throw QnException(tr("Stack underflow during program evaluation."));
+
+        QVariant result = stack.back();
+        stack.pop_back();
+        return result;
+    }
+
+    int Evaluator::superType(int l, int r) {
+        int ul = upperType(l);
+        int ur = upperType(r);
+
+        if(ul == QMetaType::UnknownType || ur == QMetaType::UnknownType)
+            return QMetaType::UnknownType;
+
+        if(ul == QMetaType::Double || ur == QMetaType::Double)
+            return QMetaType::Double;
+
+        return QMetaType::LongLong;
+    }
+
+    int Evaluator::upperType(int type) {
+        switch (type) {
+        case QMetaType::Char:
+        case QMetaType::SChar:
+        case QMetaType::UChar:
+        case QMetaType::Short:
+        case QMetaType::UShort:
+        case QMetaType::Int:
+        case QMetaType::UInt:
+        case QMetaType::Long:
+        case QMetaType::ULong:
+        case QMetaType::LongLong:
+        case QMetaType::ULongLong:
+            return QMetaType::LongLong;
+        case QMetaType::Float:
+        case QMetaType::Double:
+            return QMetaType::Double;
+        default:
+            return QMetaType::UnknownType;
+        }
+    }
+
+} // namespace Qee
+

@@ -11,11 +11,24 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
-#include <utils/common/color.h>
 #include <utils/common/json.h>
 
+namespace {
+    QColor parseColor(const QVariant &value, const QColor &defaultValue) {
+        if(value.userType() == QVariant::Color) {
+            return value.value<QColor>();
+        } else if(value.userType() == QVariant::StringList) {
+            QColor result;
+            return QnLexical::deserialize(value.toStringList().join(QLatin1String(",")), &result) ? result : defaultValue;
+        } else {
+            QColor result;
+            return QnLexical::deserialize(value.toString(), &result) ? result : defaultValue;
+        }
+    }
 
-Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
+    Q_GLOBAL_STATIC(QnGlobals, qn_globals_instance);
+
+} // anonymous namespace
 
 QnGlobals::QnGlobals(QObject *parent):
     base_type(parent)

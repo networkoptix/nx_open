@@ -5,7 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
-#include <utils/common/color.h>
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QColor)
 
 QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QSize, 
     ((&QSize::width, &QSize::setWidth, "width"))
@@ -94,17 +94,6 @@ bool deserialize(const QJsonValue &value, QUuid *target) {
         return false;
 
     return QnLexical::deserialize(jsonString, target);
-}
-
-void serialize(const QColor &value, QJsonValue *target) {
-    *target = value.name();
-}
-
-bool deserialize(const QJsonValue &value, QColor *target) {
-    if(value.type() != QJsonValue::String)
-        return false;
-    *target = parseColor(value);
-    return true;
 }
 
 void serialize(const QFont &value, QJsonValue *target) {

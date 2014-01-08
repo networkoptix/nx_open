@@ -2,14 +2,16 @@
 #define QN_EVALUATOR_H
 
 #include <QtCore/QString>
+#include <QtCore/QMetaType>
 #include <QtCore/QCoreApplication>
 
 #include "exception.h"
 
-namespace QnExp {
+namespace Qee {
     enum TokenType {
         Variable,
         Number,
+        Color,
         Plus,
         Minus,
         Times,
@@ -36,43 +38,13 @@ namespace QnExp {
         Nop = -1
     };
 
-    QString serialized(TokenType type) {
-        switch (type) {
-        case Variable:  return lit("VARIABLE");
-        case Number:    return lit("NUMBER");
-        case Plus:      return lit("PLUS");
-        case Minus:     return lit("MINUS");
-        case Times:     return lit("TIMES");
-        case Divide:    return lit("DIVIDE");
-        case LParen:    return lit("LPAREN");
-        case RParen:    return lit("RPAREN");
-        case Dot:       return lit("DOT");
-        case Comma:     return lit("COMMA");
-        case End:       return lit("END");
-        case Invalid:   return lit("INVALID");
-        default:        assert(false); return QString();
-        }
-    }
+    QString serialized(TokenType type);
 
     void serialize(TokenType type, QString *target) {
         *target = serialized(type);
     }
 
-    QString serialized(InstructionType type) {
-        switch (type) {
-        case Stor:      return lit("STOR");
-        case Add:       return lit("ADD");
-        case Sub:       return lit("SUB");
-        case Mul:       return lit("MUL");
-        case Div:       return lit("DIV");
-        case Neg:       return lit("NEG");
-        case Udd:       return lit("UDD");
-        case Call:      return lit("CALL");
-        case MCall:     return lit("MCALL");
-        case Nop:       return lit("NOP");
-        default:        assert(false); return QString();
-        }
-    }
+    QString serialized(InstructionType type);
 
     void serialize(InstructionType type, QString *target) {
         *target = serialized(type);
@@ -112,95 +84,20 @@ namespace QnExp {
 
 
     class Lexer {
-        Q_DECLARE_TR_FUNCTIONS(Lexer)
+        Q_DECLARE_TR_FUNCTIONS(Qee::Lexer)
     public:
         Lexer(const QString &source): m_source(source + QChar(L'\0')), m_pos(0) {}
 
-        Token readNextToken() {
-            if(m_token.type() != Invalid) {
-                Token result = m_token;
-                m_token = Token();
-                return result;
-            }
-
-            while(true) {
-                QChar c = m_source[m_pos];
-                switch(c.unicode()) {
-                case L' ': case L'\t': case L'\n': case L'\r':
-                    break;
-                case L'_': 
-                    return readVariableToken();
-                case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
-                    return readNumberToken();
-                case L'-':  
-                    return readSymbolToken(Minus);
-                case L'+':  
-                    return readSymbolToken(Plus);
-                case L'*':  
-                    return readSymbolToken(Times);
-                case L'/':  
-                    return readSymbolToken(Divide);
-                case L'(':  
-                    return readSymbolToken(LParen);
-                case L')':  
-                    return readSymbolToken(RParen);
-                case L'.':
-                    return readSymbolToken(Dot);
-                case L',':
-                    return readSymbolToken(Comma);
-                case L'\0': 
-                    return readSymbolToken(End);
-                default:    
-                    if(c.isLetter()) {
-                        return readVariableToken();
-                    } else {
-                        unexpected();
-                    }
-                }
-            }
-        }
-
-        Token peekNextToken() {
-            if(m_token.type() == Invalid)
-                m_token = readNextToken();
-            return m_token;
-        }
+        Token readNextToken();
+        Token peekNextToken();
 
     private:
-        void unexpected() const {
-            throw QnException(tr("Unexpected symbol '%1' at position %2.").arg(m_source[m_pos]).arg(m_pos));
-        }
+        void unexpected() const;
 
-        Token readNumberToken() {
-            int startPos = m_pos;
-            while(true) {
-                switch(m_source[m_pos].unicode()) {
-                case L'0': case L'1': case L'2': case L'3': case L'4': case L'5': case L'6': case L'7': case L'8': case L'9':
-                    m_pos++;
-                    break;
-                default:
-                    return Token(Number, m_source.midRef(startPos, m_pos - startPos), startPos);
-                }
-            }
-        }
-
-        Token readVariableToken() {
-            int startPos = m_pos;
-            while(true) {
-                QChar c = m_source[m_pos];
-                if(c.isLetterOrNumber() || c.unicode() == L'_') {
-                    m_pos++;
-                    continue;
-                } else {
-                    return Token(Variable, m_source.midRef(startPos, m_pos - startPos), startPos);
-                }
-            }
-        }
-
-        Token readSymbolToken(TokenType type) {
-            m_pos++;
-            return Token(type, m_source.midRef(m_pos - 1, 1), m_pos - 1);
-        }
+        Token readNumberToken();
+        Token readColorToken();
+        Token readVariableToken();
+        Token readSymbolToken(TokenType type);
 
     private:
         QString m_source;
@@ -210,271 +107,133 @@ namespace QnExp {
 
 
     class Parser {
-        Q_DECLARE_TR_FUNCTIONS(Parser)
+        Q_DECLARE_TR_FUNCTIONS(Qee::Parser)
     public:
         Parser(Lexer *lexer): m_lexer(lexer) {};
 
-        QVector<Instruction> parse() {
-            m_rpn.clear();
-            parseExpr();
-            
-            Token token = m_lexer->peekNextToken();
-            if(token.type() != End)
-                unexpected(token);
+        QVector<Instruction> parse();
 
-            return m_rpn;
+        static QVector<Instruction> parse(const QString &source) {
+            Lexer lexer(source);
+            Parser parser(&lexer);
+            return parser.parse();
         }
 
     private:
-        void unexpected(const Token &token) const {
-            throw QnException(tr("Unexpected token %1 ('%2') at position %3.").arg(serialized(token.type())).arg(token.text().toString()).arg(token.pos()));
-        }
+        void unexpected(const Token &token) const;
 
-        void require(TokenType type) {
-            Token token = m_lexer->readNextToken();
-            if(token.type() != type)
-                unexpected(token);
-        }
-
-        void parseArgs() {
-            /* args ::= '('')' | '(' expr {',' expr} ')' | */
-            Token token = m_lexer->peekNextToken();
-            if(token.type() != LParen) {
-                m_rpn.push_back(Instruction(Call, 0));
-                return;
-            }
-
-            require(LParen);
-
-            token = m_lexer->peekNextToken();
-            if(token.type() == RParen) {
-                require(RParen);
-                m_rpn.push_back(Instruction(Call, 0));
-                return;
-            }
-            
-            int argc = 1;
-            parseExpr();
-
-            while(true) {
-                token = m_lexer->peekNextToken();
-                if(token.type() == Comma) {
-                    require(Comma);
-                    parseExpr();
-                    argc++;
-                } else {
-                    m_rpn.push_back(Instruction(Call, argc));
-                    return;
-                }
-            }
-        }
-
-        void parseInvocation() {
-            /* invocation ::= VAR args */
-            Token token = m_lexer->peekNextToken();
-            if(token.type() == Variable) {
-                require(Variable);
-                m_rpn.push_back(Instruction(Stor, token.text().toString()));
-            } else {
-                unexpected(token);
-            }
-
-            parseArgs();
-        }
-
-        void parseChain() {
-            /* chain ::= invocation {'.' invocation} */
-            Token token = m_lexer->peekNextToken();
-            if(token.type() == Variable) {
-                parseInvocation();
-            } else {
-                unexpected(token);
-            }
-
-            while(true) {
-                token = m_lexer->peekNextToken();
-                if(token.type() == Dot) {
-                    require(Dot);
-                    parseInvocation();
-
-                    /* Replace Call with MCall */
-                    m_rpn.back().setType(MCall);
-                } else {
-                    return;
-                }
-            }
-        }
-
-        void parseFactor() {
-            /* factor ::= chain | INT | '(' expr ')' | ('-' | '+') factor */
-            Token token = m_lexer->peekNextToken();
-            switch(token.type()) {
-            case Number:
-                require(Number);
-                m_rpn.push_back(Instruction(Stor, token.text().toInt())); // TODO: throw on int parse error
-                break;
-
-            case Variable:
-                parseChain();
-                break;
-
-            case LParen:
-                require(LParen);
-                parseExpr();
-                require(RParen);
-                break;
-            
-            case Minus:
-            case Plus:
-                require(token.type());
-                parseFactor();
-                m_rpn.push_back(Instruction(token.type() == Plus ? Udd : Neg));
-                break;
-
-            default:
-                unexpected(token);
-            }
-        }
-
-        void parseTerm() {
-            /* term ::= factor {('*' | '/') factor} */
-            Token token = m_lexer->peekNextToken();
-            switch(token.type()) {
-            case Number:
-            case LParen:
-            case Minus:
-            case Plus:
-                parseFactor();
-                break;
-
-            default:
-                unexpected(token);
-            }
-
-            while(true) {
-                token = m_lexer->peekNextToken();
-                switch(token.type()) {
-                case Times:
-                case Divide:
-                    require(token.type());
-                    parseFactor();
-                    m_rpn.push_back(Instruction(token.type() == Times ? Mul : Div));
-                    break;
-                default:
-                    return;                
-                }
-            }
-        }
-
-        void parseExpr() {
-            /* expr ::= term {('+' | '-') term} */
-            Token token = m_lexer->peekNextToken();
-            switch(token.type()) {
-            case Number:
-            case LParen:
-            case Minus:
-            case Plus:
-                parseTerm();
-                break;
-
-            default:
-                unexpected(token);
-            }
-
-            while(true) {
-                token = m_lexer->peekNextToken();
-                switch(token.type()) {
-                case Plus:
-                case Minus:
-                    require(token.type());
-                    parseTerm();
-                    m_rpn.push_back(Instruction(token.type() == Plus ? Add : Sub));
-                    break;
-                default:
-                    return;
-                }
-            }
-        }
+        void require(TokenType type);
+        void parseArgs();
+        void parseInvocation();
+        void parseChain();
+        void parseFactor();
+        void parseTerm();
+        void parseExpr();
 
     private:
         Lexer *m_lexer;
-        QVector<Instruction> m_rpn; /* Reverse Polish Notation */
+        QVector<Instruction> m_program;
     };
 
 
-    class Calculator {
-        Q_DECLARE_TR_FUNCTIONS(Calculator)
+    class ParameterPack {
+        Q_DECLARE_TR_FUNCTIONS(Qee::ParameterPack)
     public:
-        Calculator(Parser *parser): m_parser(parser) {}
+        ParameterPack(const QVector<QVariant> &stack, int size, const QString &functionName): m_stack(stack), m_size(size), m_functionName(functionName) {}
 
-        double calculate() {
-            QVector<Instruction> rpn = m_parser->parse();
-            QVector<double> stack;
+        int size() const { return m_size; }
+        
+        QVariant operator[](int index) const { 
+            if(index < 0 || index >= m_size)
+                return QVariant();
+            return m_stack[m_stack.size() - m_size + index];
+        }
 
-            for(unsigned int i = 0; i < rpn.size(); i++) {
-                Instruction instruction = rpn[i];
-                double v1, v2;
-                switch(instruction.type()) {
-                case Stor:
-                    stack.push_back(instruction.text().toDouble());
-                    break;
-                case Add:
-                    v2 = pop_back(stack);
-                    v1 = pop_back(stack);
-                    stack.push_back(v1 + v2);
-                    break;
-                case Sub:
-                    v2 = pop_back(stack);
-                    v1 = pop_back(stack);
-                    stack.push_back(v1 - v2);
-                    break;
-                case Mul:
-                    v2 = pop_back(stack);
-                    v1 = pop_back(stack);
-                    stack.push_back(v1 * v2);
-                    break;
-                case Div:
-                    v2 = pop_back(stack);
-                    v1 = pop_back(stack);
-                    stack.push_back(v1 / v2);
-                    break;
-                case Neg:
-                    v1 = pop_back(stack);
-                    stack.push_back(- v1);
-                    break;
-                case Udd:
-                    v1 = pop_back(stack);
-                    stack.push_back(+ v1);
-                    break;
-                default:
-                    assert(false);
-                }
-            }
+        void requireSize(int size) {
+            if(m_size != size)
+                throw QnException(tr("Function '%1' is expected to have %3 arguments, %2 provided.").arg(m_functionName).arg(m_size).arg(size));
+        }
 
-            if(stack.size() != 1)
-                throw QnException(tr("Invalid stack size after RPN evaluation: %1.").arg(rpn.size()));
+        void requireSize(int minSize, int maxSize) {
+            if(m_size < minSize || m_size > maxSize)
+                throw QnException(tr("Function '%1' is expected to have %3-%4 arguments, %2 provided.").arg(m_functionName).arg(m_size).arg(minSize).arg(maxSize));
+        }
 
-            return stack[0];
+        void requireType(int index, int type) {
+            if(index < 0 || index >= m_size)
+                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_functionName).arg(index));
+
+            QVariant param = this->operator[](index);
+            if(!param.canConvert(type))
+                throw QnException(tr("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_functionName).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(type))));
+        }
+
+        void requireSignature(int type0) {
+            requireSize(1);
+            requireType(0, type0);
+        }
+
+        void requireSignature(int type0, int type1) {
+            requireSize(2);
+            requireType(0, type0);
+            requireType(1, type1);
+        }
+
+        void requireSignature(int type0, int type1, int type2) {
+            requireSize(3);
+            requireType(0, type0);
+            requireType(1, type1);
+            requireType(2, type2);
+        }
+
+        void requireSignature(int type0, int type1, int type2, int type3) {
+            requireSize(4);
+            requireType(0, type0);
+            requireType(1, type1);
+            requireType(2, type2);
+            requireType(2, type3);
         }
 
     private:
-        void unexpected(const Token &token) const {
-            throw QnException(tr("Unexpected token %1 (%2) in RPN at position %3.").arg(serialized(token.type())).arg(token.text().toString()).arg(token.pos()));
-        }
+        const QVector<QVariant> &m_stack;
+        int m_size;
+        QString m_functionName;
+    };
 
-        double pop_back(QVector<double> &stack) {
-            if(stack.isEmpty())
-                throw QnException(tr("Invalid stack size during RPN evaluation: 0."));
-            
-            double result = stack.back();
-            stack.pop_back();
-            return result;
-        }
+    typedef QVariant (*Function)(const ParameterPack &);
+
+
+    class Evaluator {
+        Q_DECLARE_TR_FUNCTIONS(Qee::Evaluator)
+    public:
+        Evaluator();
+
+        QVariant evaluate(const QVector<Instruction> &program) const;
+
+        void registerVariable(const QString &name, const QVariant &value);
+        void registerFunction(const QString &name, const Function &function);
 
     private:
-        Parser *m_parser;
+        void exec(QVector<QVariant> &stack, const Instruction &instruction) const;
+        void stor(QVector<QVariant> &stack, const QVariant &data) const;
+        void binop(QVector<QVariant> &stack, InstructionType op) const;
+        long long binop(long long l, long long r, InstructionType op) const;
+        double binop(double l, double r, InstructionType op) const;
+        void unop(QVector<QVariant> &stack, InstructionType op) const;
+        void call(QVector<QVariant> &stack, const Instruction &instruction) const;
+        
+        static QVariant pop_back(QVector<QVariant> &stack);
+        static int superType(int l, int r);
+        static int upperType(int type);
+
+    private:
+        int m_functionTypeId;
+        QHash<QString, QVariant> m_variables;
     };
 
 } // namespace QnExp
 
+Q_DECLARE_METATYPE(Qee::Function)
+
 #endif // QN_EVALUATOR_H
+
