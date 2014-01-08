@@ -38,15 +38,21 @@ namespace Qee {
         Nop = -1
     };
 
+    enum StandardFunction {
+        ColorFunctions = 0x1,
+    };
+    Q_DECLARE_FLAGS(StandardFunctions, StandardFunction)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(StandardFunctions)
+
     QString serialized(TokenType type);
 
-    void serialize(TokenType type, QString *target) {
+    inline void serialize(TokenType type, QString *target) {
         *target = serialized(type);
     }
 
     QString serialized(InstructionType type);
 
-    void serialize(InstructionType type, QString *target) {
+    inline void serialize(InstructionType type, QString *target) {
         *target = serialized(type);
     }
 
@@ -143,55 +149,35 @@ namespace Qee {
 
         int size() const { return m_size; }
         
-        QVariant operator[](int index) const { 
+        QVariant get(int index) const { 
             if(index < 0 || index >= m_size)
-                return QVariant();
-            return m_stack[m_stack.size() - m_size + index];
+                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_functionName).arg(index));
+            return ref(index);
         }
 
-        void requireSize(int size) {
+        template<class T>
+        T get(int index) const {
+            if(index < 0 || index >= m_size)
+                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_functionName).arg(index));
+            const QVariant &param = ref(index);
+            if(!param.canConvert<T>())
+                throw QnException(tr("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_functionName).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(qMetaTypeId<T>()))));
+            return param.value<T>();
+        }
+
+        void requireSize(int size) const {
             if(m_size != size)
                 throw QnException(tr("Function '%1' is expected to have %3 arguments, %2 provided.").arg(m_functionName).arg(m_size).arg(size));
         }
 
-        void requireSize(int minSize, int maxSize) {
+        void requireSize(int minSize, int maxSize) const {
             if(m_size < minSize || m_size > maxSize)
                 throw QnException(tr("Function '%1' is expected to have %3-%4 arguments, %2 provided.").arg(m_functionName).arg(m_size).arg(minSize).arg(maxSize));
         }
 
-        void requireType(int index, int type) {
-            if(index < 0 || index >= m_size)
-                throw QnException(tr("Parameter %2 is not specified for function '%1'.").arg(m_functionName).arg(index));
-
-            QVariant param = this->operator[](index);
-            if(!param.canConvert(type))
-                throw QnException(tr("Parameter %2 of function '%1' is of type '%3', but type '%4' was expected.").arg(m_functionName).arg(index).arg(QLatin1String(param.typeName())).arg(QLatin1String(QMetaType::typeName(type))));
-        }
-
-        void requireSignature(int type0) {
-            requireSize(1);
-            requireType(0, type0);
-        }
-
-        void requireSignature(int type0, int type1) {
-            requireSize(2);
-            requireType(0, type0);
-            requireType(1, type1);
-        }
-
-        void requireSignature(int type0, int type1, int type2) {
-            requireSize(3);
-            requireType(0, type0);
-            requireType(1, type1);
-            requireType(2, type2);
-        }
-
-        void requireSignature(int type0, int type1, int type2, int type3) {
-            requireSize(4);
-            requireType(0, type0);
-            requireType(1, type1);
-            requireType(2, type2);
-            requireType(2, type3);
+    private:
+        const QVariant &ref(int index) const {
+            return m_stack[m_stack.size() - m_size - 1 + index];
         }
 
     private:
@@ -212,6 +198,7 @@ namespace Qee {
 
         void registerVariable(const QString &name, const QVariant &value);
         void registerFunction(const QString &name, const Function &function);
+        void registerFunctions(StandardFunctions functions);
 
     private:
         void exec(QVector<QVariant> &stack, const Instruction &instruction) const;

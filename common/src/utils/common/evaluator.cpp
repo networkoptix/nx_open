@@ -124,7 +124,7 @@ namespace Qee {
                 m_pos++;
                 break;
             default:
-                return Token(Number, m_source.midRef(startPos, m_pos - startPos), startPos);
+                return Token(Color, m_source.midRef(startPos, m_pos - startPos), startPos);
             }
         }
     }
@@ -175,17 +175,14 @@ namespace Qee {
     void Parser::parseArgs() {
         /* args ::= '('')' | '(' expr {',' expr} ')' | */
         Token token = m_lexer->peekNextToken();
-        if(token.type() != LParen) {
-            m_program.push_back(Instruction(Call, 0));
+        if(token.type() != LParen)
             return;
-        }
 
         require(LParen);
 
         token = m_lexer->peekNextToken();
         if(token.type() == RParen) {
             require(RParen);
-            m_program.push_back(Instruction(Call, 0));
             return;
         }
 
@@ -200,40 +197,46 @@ namespace Qee {
                 argc++;
             } else {
                 require(RParen);
-                m_program.push_back(Instruction(Call, argc));
                 return;
             }
         }
     }
 
     void Parser::parseInvocation() {
-        /* invocation ::= (VAR | COLOR) args */
+        /* invocation ::= COLOR | VAR args */
         Token token = m_lexer->peekNextToken();
         switch (token.type()) {
         case Variable:
             require(Variable);
+            parseArgs();
             m_program.push_back(Instruction(Stor, token.text().toString()));
+            m_program.push_back(Instruction(Call, 0));
+            break;
         case Color: {
             require(Color);
             QColor color;
             if(!QnLexical::deserialize(token.text().toString(), &color))
-                throw QnException();
+                throw QnException(tr("Invalid color constant '%1'.").arg(token.text().toString()));
             m_program.push_back(Instruction(Stor, color));
+            break;
         }
         default:
             unexpected(token);
+            break;
         }
-
-        parseArgs();
     }
 
     void Parser::parseChain() {
         /* chain ::= invocation {'.' invocation} */
         Token token = m_lexer->peekNextToken();
-        if(token.type() == Variable) {
+        switch (token.type()) {
+        case Variable:
+        case Color:
             parseInvocation();
-        } else {
+            break;
+        default:
             unexpected(token);
+            break;
         }
 
         while(true) {
@@ -254,11 +257,16 @@ namespace Qee {
         /* factor ::= chain | INT | '(' expr ')' | ('-' | '+') factor */
         Token token = m_lexer->peekNextToken();
         switch(token.type()) {
-        case Number:
+        case Number: {
             require(Number);
-            m_program.push_back(Instruction(Stor, token.text().toInt())); // TODO: throw on int parse error
+            long long number;
+            if(!QnLexical::deserialize(token.text().toString(), &number))
+                throw QnException(tr("Invalid number constant '%1'.").arg(token.text().toString()));
+            m_program.push_back(Instruction(Stor, number));
             break;
+        }
 
+        case Color:
         case Variable:
             parseChain();
             break;
@@ -286,6 +294,8 @@ namespace Qee {
         Token token = m_lexer->peekNextToken();
         switch(token.type()) {
         case Number:
+        case Variable:
+        case Color:
         case LParen:
         case Minus:
         case Plus:
@@ -316,6 +326,8 @@ namespace Qee {
         Token token = m_lexer->peekNextToken();
         switch(token.type()) {
         case Number:
+        case Variable:
+        case Color:
         case LParen:
         case Minus:
         case Plus:
@@ -343,6 +355,75 @@ namespace Qee {
 
 
 // -------------------------------------------------------------------------- //
+// Evaluator Functions
+// -------------------------------------------------------------------------- //
+    QVariant eval_QColor(const ParameterPack &args) {
+        args.requireSize(3, 4);
+
+        int r = args.get<int>(0);
+        int g = args.get<int>(1);
+        int b = args.get<int>(2);
+        int a = 255;
+        if(args.size() == 4)
+            a = args.get<int>(3);
+
+        return QColor(r, g, b, a);
+    }
+
+    QVariant eval_QColor_lighter(const ParameterPack &args) {
+        args.requireSize(1, 2);
+
+        if(args.size() == 1) {
+            return args.get<QColor>(0).lighter();
+        } else {
+            return args.get<QColor>(0).lighter(args.get<int>(1));
+        }
+    }
+
+    QVariant eval_QColor_darker(const ParameterPack &args) {
+        args.requireSize(1, 2);
+
+        if(args.size() == 1) {
+            return args.get<QColor>(0).darker();
+        } else {
+            return args.get<QColor>(0).darker(args.get<int>(1));
+        }
+    }
+
+    QVariant eval_QColor_setRed(const ParameterPack &args) {
+        args.requireSize(2);
+
+        QColor result = args.get<QColor>(0);
+        result.setRed(args.get<int>(1));
+        return result;
+    }
+
+    QVariant eval_QColor_setGreen(const ParameterPack &args) {
+        args.requireSize(2);
+
+        QColor result = args.get<QColor>(0);
+        result.setGreen(args.get<int>(1));
+        return result;
+    }
+
+    QVariant eval_QColor_setBlue(const ParameterPack &args) {
+        args.requireSize(2);
+
+        QColor result = args.get<QColor>(0);
+        result.setBlue(args.get<int>(1));
+        return result;
+    }
+
+    QVariant eval_QColor_setAlpha(const ParameterPack &args) {
+        args.requireSize(2);
+
+        QColor result = args.get<QColor>(0);
+        result.setAlpha(args.get<int>(1));
+        return result;
+    }
+
+
+// -------------------------------------------------------------------------- //
 // Evaluator
 // -------------------------------------------------------------------------- //
     Evaluator::Evaluator() {
@@ -355,6 +436,19 @@ namespace Qee {
 
     void Evaluator::registerFunction(const QString &name, const Function &function) {
         m_variables.insert(name, QVariant::fromValue(function));
+    }
+
+    void Evaluator::registerFunctions(StandardFunctions functions) {
+        if(functions & ColorFunctions) {
+            // TODO: #Elric provide full symmetry by also registering SVG color names?
+            registerFunction(lit("QColor"), &eval_QColor);
+            registerFunction(lit("QColor::lighter"),    &eval_QColor_lighter);
+            registerFunction(lit("QColor::darker"),     &eval_QColor_darker);
+            registerFunction(lit("QColor::setRed"),     &eval_QColor_setRed);
+            registerFunction(lit("QColor::setGreen"),   &eval_QColor_setGreen);
+            registerFunction(lit("QColor::setBlue"),    &eval_QColor_setBlue);
+            registerFunction(lit("QColor::setAlpha"),   &eval_QColor_setAlpha);
+        }
     }
 
     QVariant Evaluator::evaluate(const QVector<Instruction> &program) const {
@@ -460,23 +554,28 @@ namespace Qee {
             throw QnException(tr("Argument number for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(argcVariant.typeName())));
         int argc = argcVariant.toInt();
 
+        if(argc < 0)
+            throw QnException(tr("Argument number for %1 instruction is invalid.").arg(serialized(instruction.type())));
+        if(instruction.type() == MCall)
+            argc++; /* 'this' is treated as another argument. */ 
+
         if(stack.size() < argc + 1)
             throw QnException(tr("Stack underflow during execution of %1 instruction.").arg(serialized(instruction.type())));
 
-        QVariant nameVariant = stack[stack.size() - argc - 1];
+        QVariant nameVariant = stack[stack.size() - 1];
         if(nameVariant.userType() != QMetaType::QString)
             throw QnException(tr("Function name for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(nameVariant.typeName())));
         QString name = nameVariant.toString();
 
         if(instruction.type() == MCall)
-            name = QLatin1String(stack[stack.size() - argc].typeName()) + lit("::") + name;
+            name = QLatin1String(stack[stack.size() - argc - 1].typeName()) + lit("::") + name;
 
         QVariant variable = m_variables.value(name);
         if(variable.userType() == QMetaType::UnknownType)
             throw QnException(tr("Function or variable '%1' is not defined.").arg(name));
 
         QVariant result;
-        if(variable.type() != m_functionTypeId) {
+        if(variable.userType() != m_functionTypeId) {
             if(argc > 0)
                 throw QnException(tr("Variable '%1' is not a function and cannot be called.").arg(name));
             result = variable;
