@@ -1,8 +1,11 @@
 #ifndef QN_GL_WIDGET_FACTORY_H
 #define QN_GL_WIDGET_FACTORY_H
 
-#include <QGLFormat>
-#include <QGLWidget>
+#ifdef Q_OS_WINDOWS
+#include <QtCore/qt_windows.h>
+#endif
+#include <QtOpenGL/QGLFormat>
+#include <QtOpenGL/QGLWidget>
 #include "client/client_settings.h"
 
 class QnGlWidgetFactory {
@@ -11,52 +14,33 @@ public:
     static Widget *create(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
         QGLFormat format;
         format.setOption(QGL::SampleBuffers); /* Multisampling. */
+        format.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
+        /* Unfortunately, in Qt5 this function is broken :( */
+        // format.setSwapInterval(1);
         return create<Widget>(format, parent, windowFlags);
     }
 
     template<class Widget>
     static Widget *create(const QGLFormat &format, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
-        return new Widget(createGLContext(format), parent, /* shareWidget = */ NULL, windowFlags);
-    }
+        /* We cannot create QGLContext without painting device, thus we use context created by GL widget. */
+        Widget *widget = new Widget(format, parent, /* shareWidget = */ NULL, windowFlags);
 
-private:
-    static QGLContext *createGLContext(const QGLFormat &format) {
-        QGLFormat localFormat = format;
-#ifdef Q_OS_LINUX
-        static enum Vendor { Unknown, Nvidia, Other } vendorStatus = Unknown;
+        /* In Qt5 QGLContext uses QOpenGLContext internally. But QOpenGLContext hasn't support for
+           swap interval (up to Qt5.2). So we have to implement vsync manually. */
+        widget->context()->makeCurrent();
 
-        /* Linux NVidia drivers contain bug that leads to application hanging if VSync is on.
-         * VSync will be re-enabled later if drivers are not NVidia's. */
-        localFormat.setSwapInterval(vendorStatus == Other ? 1 : 0); /* Turn vsync off for nVidia and unknown driver. */
-#else
-        localFormat.setSwapInterval(1); /* Turn vsync on. */
-#endif
-        localFormat.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
+    #if defined(Q_OS_WIN32)
+        WglSwapIntervalExt wglSwapIntervalExt = ((WglSwapIntervalExt)wglGetProcAddress("wglSwapIntervalEXT"));
+        if (wglSwapIntervalExt)
+            wglSwapIntervalExt(1);
+    #elif defined(Q_OS_MAC)
+        // TODO: #dklychkov Implement vsync for mac
+    #elif defined(Q_OS_LINUX)
+        // TODO: #dklychkov Implement vsync for linux
+    #endif
 
-        QGLContext *glContext = new QGLContext(localFormat);
-        glContext->create();
 
-#ifdef Q_OS_LINUX
-        if (vendorStatus == Unknown) {
-            glContext->makeCurrent();
-            QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-            if (!vendor.toLower().contains("nvidia")) {
-                vendorStatus = Other;
-
-                localFormat = glContext->format();
-                localFormat.setSwapInterval(1); /* Turn vsync on. */
-
-                delete glContext;
-
-                glContext = new QGLContext(localFormat);
-                glContext->create();
-            } else {
-                vendorStatus = Nvidia;
-            }
-        }
-#endif
-
-        return glContext;
+        return widget;
     }
 };
 
