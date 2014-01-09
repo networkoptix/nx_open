@@ -57,7 +57,7 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
 }
 
 QnTourPtzController::~QnTourPtzController() {
-    return;
+    m_executor->deleteLater();
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
