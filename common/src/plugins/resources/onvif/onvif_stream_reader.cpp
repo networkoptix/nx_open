@@ -435,7 +435,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
         if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
             return result;
     }
-    return sendProfileToCamera(info, profile);
+
+    if (m_onvifRes->isCameraControlDisabled())
+        return CameraDiagnostics::NoErrorResult();
+    else
+        return sendProfileToCamera(info, profile);
+
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(const QString& name, const QString& token) const

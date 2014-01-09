@@ -1905,7 +1905,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
         QRect currentRect(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
         QRect maxRect = getVideoSourceMaxSize(QString::fromStdString(conf->token));
         m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
-        if (maxRect.isValid() && currentRect != maxRect)
+        if (maxRect.isValid() && currentRect != maxRect && !isCameraControlDisabled())
         {
             updateVideoSource(conf, maxRect);
             return sendVideoSourceToCamera(conf);
