@@ -13,6 +13,7 @@
 
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
+#include <ui/customization/customized.h>
 
 #include "instrument_item_condition.h"
 
@@ -125,10 +126,10 @@ namespace detail {
  * inside derived class's destructor if it reimplements either 
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public Connective<QObject>, protected QnGeometry, protected QnSceneTransformations {
+class Instrument: public Customized<Connective<QObject> >, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT;
 
-    typedef Connective<QObject> base_type;
+    typedef Customized<Connective<QObject> > base_type;
 
 public:
     /**

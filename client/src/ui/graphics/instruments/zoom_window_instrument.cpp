@@ -329,7 +329,11 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent)
 {
-    m_zoomWindowColors = qnGlobals->zoomWindowColors();
+    /* Sensible default. */
+    m_colors 
+        << QColor(192, 32, 32)
+        << QColor(32, 192, 32)
+        << QColor(64, 64, 255);
 
     connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
@@ -345,11 +349,15 @@ QColor ZoomWindowInstrument::nextZoomWindowColor() const {
     foreach(QnResourceWidget *widget, display()->widgets())
         colors.insert(widget->frameColor());
 
-    foreach(const QColor &color, m_zoomWindowColors)
+    foreach(const QColor &color, m_colors)
         if(!colors.contains(color))
             return color;
 
-    return m_zoomWindowColors[random(0, m_zoomWindowColors.size())];
+    if(m_colors.isEmpty()) {
+        return Qt::white;
+    } else {
+        return m_colors[random(0, m_colors.size())];
+    }
 }
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {

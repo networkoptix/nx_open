@@ -58,8 +58,6 @@ public:
 
         BACKGROUD_GRADIENT_COLOR,
 
-        ZOOM_WINDOW_COLORS,
-
         /** Color of system notifications */
         NOTIFICATION_COLOR_SYSTEM,
 
@@ -111,8 +109,6 @@ protected:
     virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
     virtual QVariant readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) override;
 
-    static QVector<QColor> defaultZoomWindowColors();
-
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_R_PROPERTY(QColor,   shadowColor,                    SHADOW_COLOR,                           QColor(0, 0, 0, 128))
@@ -124,7 +120,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
         QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128))
         QN_DECLARE_R_PROPERTY(QColor,   ptzColor,                       PTZ_COLOR,                              QColor(128, 196, 255, 255))
-        QN_DECLARE_R_PROPERTY(QColor,   zoomWindowColor,                ZOOM_WINDOW_COLOR,                      QColor(128, 196, 255, 255))
 
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
@@ -141,7 +136,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0))
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50))
 
-        QN_DECLARE_R_PROPERTY(QVector<QColor>,      zoomWindowColors,   ZOOM_WINDOW_COLORS,                     defaultZoomWindowColors())
 
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorSystem,        NOTIFICATION_COLOR_SYSTEM,              QColor(255, 0, 0))
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorCommon,        NOTIFICATION_COLOR_COMMON,              QColor(103, 237, 66))
