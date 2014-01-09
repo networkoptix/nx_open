@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>appIcon.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>${namespace.major}.${namespace.minor}.${namespace.additional}</string>
+	<string>${mac.bundle.identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -23,14 +23,12 @@
 	<key>CFBundleVersion</key>
 	<string>${release.version}</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.5.0</string>
+	<string>10.7.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.business</string>
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2013 ${company.name}</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>© 2011-2014 ${company.name}</string>
 </dict>
 </plist>
