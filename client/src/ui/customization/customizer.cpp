@@ -97,7 +97,7 @@ protected:
     }
 
     virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const override {
-        if(QJson::deserialize(ctx, value, static_cast<QColor *>(target)))
+        if(QJson::deserialize(value, static_cast<QColor *>(target)))
             return true; /* Try the easy way first. */
 
         QString source;

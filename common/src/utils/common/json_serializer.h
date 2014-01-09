@@ -84,5 +84,6 @@ void QnJsonSerializer::registerSerializer() {
     registerSerializer(new QnDefaultJsonSerializer<T>());
 }
 
+#include "json.h"
 
 #endif // QN_JSON_SERIALIZER_H

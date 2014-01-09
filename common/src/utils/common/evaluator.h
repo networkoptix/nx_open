@@ -132,7 +132,7 @@ namespace Qee {
         void unexpected(const Token &token) const;
 
         void require(TokenType type);
-        void parseArgs();
+        void parseArgs(int *argc);
         void parseInvocation();
         void parseChain();
         void parseFactor();

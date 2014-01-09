@@ -172,8 +172,10 @@ namespace Qee {
             unexpected(token);
     }
 
-    void Parser::parseArgs() {
+    void Parser::parseArgs(int *argc) {
         /* args ::= '('')' | '(' expr {',' expr} ')' | */
+        *argc = 0;
+
         Token token = m_lexer->peekNextToken();
         if(token.type() != LParen)
             return;
@@ -186,7 +188,7 @@ namespace Qee {
             return;
         }
 
-        int argc = 1;
+        *argc = 1;
         parseExpr();
 
         while(true) {
@@ -194,7 +196,7 @@ namespace Qee {
             if(token.type() == Comma) {
                 require(Comma);
                 parseExpr();
-                argc++;
+                (*argc)++;
             } else {
                 require(RParen);
                 return;
@@ -206,12 +208,14 @@ namespace Qee {
         /* invocation ::= COLOR | VAR args */
         Token token = m_lexer->peekNextToken();
         switch (token.type()) {
-        case Variable:
+        case Variable: {
             require(Variable);
-            parseArgs();
+            int argc;
+            parseArgs(&argc);
             m_program.push_back(Instruction(Stor, token.text().toString()));
-            m_program.push_back(Instruction(Call, 0));
+            m_program.push_back(Instruction(Call, argc));
             break;
+        }
         case Color: {
             require(Color);
             QColor color;
