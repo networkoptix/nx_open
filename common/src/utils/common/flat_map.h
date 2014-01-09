@@ -3,9 +3,11 @@
 
 #include <cassert>
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/is_empty.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/functional/value_factory.hpp>
+#endif
 
 #include <QtCore/QVector>
 
