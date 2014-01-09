@@ -8,7 +8,7 @@
 
 
 QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr resource,
-                                                              qint64 usecSinceEpoch,
+                                                              qint64 microSecSinceEpoch,
                                                               const QSize &size,
                                                               QObject *parent) {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
@@ -23,18 +23,18 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr reso
     if (!serverConnection)
         return NULL;
 
-    return new QnSingleThumbnailLoader(serverConnection, networkResource, usecSinceEpoch, size, parent);
+    return new QnSingleThumbnailLoader(serverConnection, networkResource, microSecSinceEpoch, size, parent);
 }
 
 QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
                                                  QnNetworkResourcePtr resource,
-                                                 qint64 usecSinceEpoch,
+                                                 qint64 microSecSinceEpoch,
                                                  const QSize &size,
                                                  QObject *parent):
     base_type(parent),
     m_resource(resource),
     m_connection(connection),
-    m_usecSinceEpoch(usecSinceEpoch),
+    m_microSecSinceEpoch(microSecSinceEpoch),
     m_size(size)
 {
     if(!connection)
@@ -54,10 +54,10 @@ void QnSingleThumbnailLoader::doLoadAsync()
 {
     m_connection->getThumbnailAsync(
             m_resource.dynamicCast<QnNetworkResource>(),
-            m_usecSinceEpoch,
+            m_microSecSinceEpoch,
             m_size,
             QLatin1String("png"),
-            QnMediaServerConnection::IFrameAfterTime,
+            QnMediaServerConnection::Precise,
             this,
             SLOT(at_replyReceived(int, const QImage&, int)));
 }
