@@ -193,6 +193,13 @@ namespace Qee {
 
     typedef QVariant (*Function)(const ParameterPack &);
 
+    
+    class Resolver {
+    public:
+        virtual ~Resolver() {}
+        virtual QVariant resolveConstant(const QString &name) const = 0;
+    };
+
 
     class Evaluator {
         Q_DECLARE_TR_FUNCTIONS(Qee::Evaluator)
@@ -200,6 +207,9 @@ namespace Qee {
         Evaluator();
 
         QVariant evaluate(const Program &program) const;
+
+        Resolver *resolver() const { return m_resolver; }
+        void setResolver(Resolver *resolver) { m_resolver = resolver; }
 
         QVariant constant(const QString &name) const;
         void registerConstant(const QString &name, const QVariant &value);
@@ -222,6 +232,7 @@ namespace Qee {
     private:
         int m_functionTypeId;
         QHash<QString, QVariant> m_constants;
+        Resolver *m_resolver;
     };
 
 } // namespace QnExp

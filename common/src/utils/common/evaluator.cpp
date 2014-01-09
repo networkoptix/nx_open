@@ -432,6 +432,7 @@ namespace Qee {
 // -------------------------------------------------------------------------- //
     Evaluator::Evaluator() {
         m_functionTypeId = qMetaTypeId<Function>();
+        m_resolver = NULL;
     }
 
     QVariant Evaluator::constant(const QString &name) const {
@@ -579,8 +580,12 @@ namespace Qee {
             name = QLatin1String(stack[stack.size() - argc - 1].typeName()) + lit("::") + name;
 
         QVariant variable = m_constants.value(name);
-        if(variable.userType() == QMetaType::UnknownType)
-            throw QnException(tr("Function or variable '%1' is not defined.").arg(name));
+        if(variable.userType() == QMetaType::UnknownType) {
+            if(m_resolver)
+                variable = m_resolver->resolveConstant(name);
+            if(variable.userType() == QMetaType::UnknownType)
+                throw QnException(tr("Function or variable '%1' is not defined.").arg(name));
+        }
 
         QVariant result;
         if(variable.userType() != m_functionTypeId) {

@@ -78,17 +78,48 @@ public:
 };
 
 
+// -------------------------------------------------------------------------- //
+// QnCustomizationData
+// -------------------------------------------------------------------------- //
+class QnCustomizationData {
+public:
+    QnCustomizationData(): type(QMetaType::UnknownType) {}
+    QnCustomizationData(const QJsonValue &json): type(QMetaType::UnknownType), json(json) {}
+
+    int type;
+    QVariant value;
+    QJsonValue json;
+};
+
+typedef QHash<QString, QnCustomizationData> QnCustomizationDataHash;
+Q_DECLARE_METATYPE(QnCustomizationDataHash)
+
+bool deserialize(QnJsonContext *, const QJsonValue &value, QnCustomizationData *target) {
+    *target = QnCustomizationData();
+    target->json = value;
+    return true;
+}
+
 
 // --------------------------------------------------------------------------- //
 // QnCustomizationColorSerializer
 // --------------------------------------------------------------------------- //
-class QnCustomizationColorSerializer: public QObject, public QnJsonSerializer, public QnPropertyAccessor {
+class QnCustomizationColorSerializer: public QObject, public QnJsonSerializer, public Qee::Resolver {
 public:
     QnCustomizationColorSerializer(QObject *parent = NULL): 
         QObject(parent),
         QnJsonSerializer(QMetaType::QColor)
     {
         m_evaluator.registerFunctions(Qee::ColorFunctions);
+        m_evaluator.setResolver(this);
+    }
+
+    const QnCustomizationDataHash &globals() const {
+        return m_globals;
+    }
+
+    void setGlobals(const QnCustomizationDataHash &globals) {
+        m_globals = globals;
     }
 
 protected:
@@ -119,44 +150,30 @@ protected:
         return true;
     }
 
-    virtual QVariant read(const QObject *object, const QString &name) const {
-        QVariant result = static_cast<const QnCustomizationColorSerializer *>(object)->m_evaluator.constant(name);
-        return result.isValid() ? result : QVariant(QMetaType::QColor, NULL);
-    }
+    virtual QVariant resolveConstant(const QString &name) const override {
+        auto pos = const_cast<QnCustomizationColorSerializer *>(this)->m_globals.find(name);
+        if(pos == m_globals.end())
+            return QVariant();
 
-    virtual bool write(QObject *object, const QString &name, const QVariant &value) const {
-        static_cast<QnCustomizationColorSerializer *>(object)->m_evaluator.registerConstant(name, value);
-        return true;
+        if(pos->type != QMetaType::UnknownType)
+            return pos->value;
+
+        pos->type = QMetaType::QColor;
+
+        QnJsonContext ctx;
+        if(!deserialize(&ctx, pos->json, &pos->value)) {
+            qnWarning("Could not deserialize global constant '%1'.", name);
+            pos->value = QColor();
+        }
+
+        return pos->value;
     }
 
 private:
     Qee::Evaluator m_evaluator;
+    QnCustomizationDataHash m_globals;
 };
 
-
-
-
-// -------------------------------------------------------------------------- //
-// QnCustomizationData
-// -------------------------------------------------------------------------- //
-class QnCustomizationData {
-public:
-    QnCustomizationData(): type(QMetaType::UnknownType) {}
-    QnCustomizationData(const QJsonValue &json): type(QMetaType::UnknownType), json(json) {}
-
-    int type;
-    QVariant value;
-    QJsonValue json;
-};
-
-typedef QHash<QString, QnCustomizationData> QnCustomizationDataHash;
-Q_DECLARE_METATYPE(QnCustomizationDataHash)
-
-bool deserialize(QnJsonContext *, const QJsonValue &value, QnCustomizationData *target) {
-    *target = QnCustomizationData();
-    target->json = value;
-    return true;
-}
 
 
 // -------------------------------------------------------------------------- //
@@ -324,7 +341,15 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
     }
 
     /* Load globals. */
-    d->customize(d->colorSerializer.data(), d->colorSerializer.data(), "globals");
+    auto pos = d->dataByClassName.find(QLatin1String("globals"));
+    if(pos != d->dataByClassName.end()) {
+        QnCustomizationDataHash globals;
+        if(!QJson::deserialize(&d->serializationContext, pos->json, &globals)) {
+            qnWarning("Could not deserialize global constants block.");
+        } else {
+            d->colorSerializer->setGlobals(globals);
+        }
+    }
 }
 
 const QnCustomization &QnCustomizer::customization() const {
