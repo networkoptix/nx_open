@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include "json.h"
+class QnJsonContext;
 
 class QnJsonSerializer {
 public:
@@ -21,38 +21,46 @@ public:
         return m_type;
     }
 
-    void serialize(const QVariant &value, QJsonValue *target) const {
+    void serialize(QnJsonContext *ctx, const QVariant &value, QJsonValue *target) const {
         assert(value.userType() == m_type && target);
 
-        serializeInternal(value.constData(), target);
+        serializeInternal(ctx, value.constData(), target);
     }
 
-    void serialize(const void *value, QJsonValue *target) const {
+    void serialize(QnJsonContext *ctx, const void *value, QJsonValue *target) const {
         assert(value && target);
 
-        serializeInternal(value, target);
+        serializeInternal(ctx, value, target);
     }
 
-    bool deserialize(const QJsonValue &value, QVariant *target) const {
+    bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QVariant *target) const {
         assert(target);
 
         *target = QVariant(m_type, static_cast<const void *>(NULL));
-        return deserializeInternal(value, target->data());
+        return deserializeInternal(ctx, value, target->data());
     }
 
-    bool deserialize(const QJsonValue &value, void *target) const {
+    bool deserialize(QnJsonContext *ctx, const QJsonValue &value, void *target) const {
         assert(target);
 
-        return deserializeInternal(value, target);
+        return deserializeInternal(ctx, value, target);
     }
 
 protected:
-    virtual void serializeInternal(const void *value, QJsonValue *target) const = 0;
-    virtual bool deserializeInternal(const QJsonValue &value, void *target) const = 0;
+    virtual void serializeInternal(QnJsonContext *ctx, const void *value, QJsonValue *target) const = 0;
+    virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const = 0;
 
 private:
     int m_type;
 };
+
+
+namespace QJsonDetail {
+    template<class T>
+    void serialize_value_direct(QnJsonContext *ctx, const T &value, QJsonValue *target);
+    template<class T>
+    bool deserialize_value_direct(QnJsonContext *ctx, const QJsonValue &value, T *target);
+} // namespace QJsonDetail
 
 
 template<class T>
@@ -61,12 +69,12 @@ public:
     QnDefaultJsonSerializer(): QnJsonSerializer(qMetaTypeId<T>()) {}
 
 protected:
-    virtual void serializeInternal(const void *value, QJsonValue *target) const override {
-        QJson::serialize(*static_cast<const T *>(value), target);
+    virtual void serializeInternal(QnJsonContext *ctx, const void *value, QJsonValue *target) const override {
+        QJsonDetail::serialize_value_direct(ctx, *static_cast<const T *>(value), target);
     }
 
-    virtual bool deserializeInternal(const QJsonValue &value, void *target) const override {
-        return QJson::deserialize(value, static_cast<T *>(target));
+    virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const override {
+        return QJsonDetail::deserialize_value_direct(ctx, value, static_cast<T *>(target));
     }
 };
 

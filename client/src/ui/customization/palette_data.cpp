@@ -92,14 +92,14 @@ void QnPaletteData::setColor(QPalette::ColorGroup group, QPalette::ColorRole rol
     MACRO(QPalette::ToolTipBase,    lit("toolTipBase"))                         \
     MACRO(QPalette::ToolTipText,    lit("toolTipText"))
 
-void serialize(const QnColorGroup &value, QJsonValue *target) {
+void serialize(QnJsonContext *ctx, const QnColorGroup &value, QJsonValue *target) {
     QJsonObject map;
 
 #define STEP(ROLE, NAME)                                                        \
     {                                                                           \
         const QColor &color = value[ROLE];                                      \
         if(color.isValid())                                                     \
-            QJson::serialize(color, NAME, &map);                                \
+            QJson::serialize(ctx, color, NAME, &map);                           \
     }
     FOR_EACH_COLOR_ROLE(STEP)
 #undef STEP
@@ -107,15 +107,15 @@ void serialize(const QnColorGroup &value, QJsonValue *target) {
     *target = map;
 }
 
-bool deserialize(const QJsonValue &value, QnColorGroup *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnColorGroup *target) {
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     QnColorGroup result;
     if(
 #define STEP(ROLE, NAME)                                                        \
-        !QJson::deserialize(map, NAME, &result[ROLE], true) ||
+        !QJson::deserialize(ctx, map, NAME, &result[ROLE], true) ||
     FOR_EACH_COLOR_ROLE(STEP)
 #undef STEP
         false
@@ -127,23 +127,23 @@ bool deserialize(const QJsonValue &value, QnColorGroup *target) {
     return true;
 }
 
-void serialize(const QnPaletteColors &value, QJsonValue *target) {
+void serialize(QnJsonContext *ctx, const QnPaletteColors &value, QJsonValue *target) {
     QJsonObject map;
 
-    QJson::serialize(value[QPalette::Active],   lit("active"),      &map);
-    QJson::serialize(value[QPalette::Disabled], lit("disabled"),    &map);
-    QJson::serialize(value[QPalette::Inactive], lit("inactive"),    &map);
+    QJson::serialize(ctx, value[QPalette::Active],   lit("active"),      &map);
+    QJson::serialize(ctx, value[QPalette::Disabled], lit("disabled"),    &map);
+    QJson::serialize(ctx, value[QPalette::Inactive], lit("inactive"),    &map);
 
     *target = map;
 }
 
-bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPaletteColors *target) {
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     QnColorGroup defaultGroup;
-    if(!QJson::deserialize(map, lit("default"), &defaultGroup, true))
+    if(!QJson::deserialize(ctx, map, lit("default"), &defaultGroup, true))
         return false;
 
     QnPaletteColors result;
@@ -151,9 +151,9 @@ bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
         result[i] = defaultGroup;
 
     if(
-        !QJson::deserialize(map, lit("active"),     &result[QPalette::Active],      true) ||
-        !QJson::deserialize(map, lit("disabled"),   &result[QPalette::Disabled],    true) ||
-        !QJson::deserialize(map, lit("inactive"),   &result[QPalette::Inactive],    true)
+        !QJson::deserialize(ctx, map, lit("active"),     &result[QPalette::Active],      true) ||
+        !QJson::deserialize(ctx, map, lit("disabled"),   &result[QPalette::Disabled],    true) ||
+        !QJson::deserialize(ctx, map, lit("inactive"),   &result[QPalette::Inactive],    true)
     ) {
         return false;
     }
@@ -162,12 +162,12 @@ bool deserialize(const QJsonValue &value, QnPaletteColors *target) {
     return true;
 }
 
-void serialize(const QnPaletteData &value, QJsonValue *target) {
-    serialize(value.d->colors, target);
+void serialize(QnJsonContext *ctx, const QnPaletteData &value, QJsonValue *target) {
+    serialize(ctx, value.d->colors, target);
 }
 
-bool deserialize(const QJsonValue &value, QnPaletteData *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPaletteData *target) {
     target->d.detach();
-    return deserialize(value, &target->d->colors);
+    return deserialize(ctx, value, &target->d->colors);
 }
 

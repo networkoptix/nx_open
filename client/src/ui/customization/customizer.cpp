@@ -92,16 +92,16 @@ public:
     }
 
 protected:
-    virtual void serializeInternal(const void *value, QJsonValue *target) const override {
-        QJson::serialize(*static_cast<const QColor *>(value), target);
+    virtual void serializeInternal(QnJsonContext *ctx, const void *value, QJsonValue *target) const override {
+        QJson::serialize(ctx, *static_cast<const QColor *>(value), target);
     }
 
-    virtual bool deserializeInternal(const QJsonValue &value, void *target) const override {
-        if(QJson::deserialize(value, static_cast<QColor *>(target)))
+    virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const override {
+        if(QJson::deserialize(ctx, value, static_cast<QColor *>(target)))
             return true; /* Try the easy way first. */
 
         QString source;
-        if(!QJson::deserialize(value, &source))
+        if(!QJson::deserialize(ctx, value, &source))
             return false;
 
         QVariant result;
@@ -152,7 +152,7 @@ public:
 typedef QHash<QString, QnCustomizationData> QnCustomizationDataHash;
 Q_DECLARE_METATYPE(QnCustomizationDataHash)
 
-bool deserialize(const QJsonValue &value, QnCustomizationData *target) {
+bool deserialize(QnJsonContext *, const QJsonValue &value, QnCustomizationData *target) {
     *target = QnCustomizationData();
     target->json = value;
     return true;
@@ -182,6 +182,7 @@ public:
     QScopedPointer<QnPropertyAccessor> defaultAccessor;
     QScopedPointer<QnCustomizationColorSerializer> colorSerializer;
     QnFlatMap<int, QnJsonSerializer *> serializerByType;
+    QnJsonContext serializationContext;
 };
 
 QnCustomizerPrivate::QnCustomizerPrivate() {
@@ -198,6 +199,7 @@ QnCustomizerPrivate::QnCustomizerPrivate() {
     foreach(QnJsonSerializer *serializer, QnJsonSerializer::allSerializers())
         serializerByType.insert(serializer->type(), serializer);
     serializerByType.insert(QMetaType::QColor, colorSerializer.data());
+    serializationContext.registerSerializer(colorSerializer.data());
 }
 
 QnCustomizerPrivate::~QnCustomizerPrivate() {
@@ -240,7 +242,7 @@ void QnCustomizerPrivate::customize(QObject *object, QnCustomizationData *data, 
         data->type = customizationHashType;
 
         QnCustomizationDataHash hash;
-        if(!QJson::deserialize(data->json, &hash))
+        if(!QJson::deserialize(&serializationContext, data->json, &hash))
             qnWarning("Could not deserialize customization data for class '%1'.", className);
 
         data->value = QVariant::fromValue(hash);
@@ -275,7 +277,7 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
             return;
         }
 
-        if(!serializer->deserialize(data->json, &data->value)) {
+        if(!serializer->deserialize(&serializationContext, data->json, &data->value)) {
             qnWarning("Could not customize property '%1' of class '%2'. Could not deserialize customization data.", key, className);
             return;
         }

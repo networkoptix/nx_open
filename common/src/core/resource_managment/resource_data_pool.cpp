@@ -11,13 +11,13 @@ struct QnResourceDataPoolChunk {
     QnResourceData data;
 };
 
-bool deserialize(const QJsonValue &value, QnResourceDataPoolChunk *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPoolChunk *target) {
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     QnResourceDataPoolChunk result;
-    if(!QJson::deserialize(map, lit("keys"), &result.keys) || !QJson::deserialize(value, &result.data))
+    if(!QJson::deserialize(ctx, map, lit("keys"), &result.keys) || !QJson::deserialize(ctx, value, &result.data))
         return false;
 
     *target = result;

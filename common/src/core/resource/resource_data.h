@@ -57,6 +57,6 @@ private:
 #endif
 };
 
-bool deserialize(const QJsonValue &value, QnResourceData *target);
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target);
 
 #endif // QN_RESOURCE_DATA_H

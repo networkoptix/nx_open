@@ -59,29 +59,29 @@ QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector4D,
     ((&QVector4D::w, &QVector4D::setW, "w"))
 )
 
-void serialize(const QRegion &value, QJsonValue *target) {
-    QJson::serialize(value.rects(), target);
+void serialize(QnJsonContext *ctx, const QRegion &value, QJsonValue *target) {
+    QJson::serialize(ctx, value.rects(), target);
 }
 
-bool deserialize(const QJsonValue &value, QRegion *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QRegion *target) {
     if(value.type() == QJsonValue::Null) {
         *target = QRegion();
         return true;
     }
 
     QVarLengthArray<QRect, 32> rects;
-    if(!QJson::deserialize(value, &rects))
+    if(!QJson::deserialize(ctx, value, &rects))
         return false;
 
     target->setRects(rects.data(), rects.size());
     return true;
 }
 
-void serialize(const QUuid &value, QJsonValue *target) {
+void serialize(QnJsonContext *, const QUuid &value, QJsonValue *target) {
     *target = QnLexical::serialized(value);
 }
 
-bool deserialize(const QJsonValue &value, QUuid *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QUuid *target) {
     /* Support JSON null for QUuid, even though we don't generate it on
      * serialization. */
     if(value.type() == QJsonValue::Null) {
@@ -90,17 +90,17 @@ bool deserialize(const QJsonValue &value, QUuid *target) {
     }
 
     QString jsonString;
-    if(!QJson::deserialize(value, &jsonString))
+    if(!::deserialize(ctx, value, &jsonString)) /* Note the direct call instead of invocation through QJson. */
         return false;
 
     return QnLexical::deserialize(jsonString, target);
 }
 
-void serialize(const QFont &value, QJsonValue *target) {
+void serialize(QnJsonContext *, const QFont &, QJsonValue *) {
     assert(false); /* Won't need for now. */ // TODO: #Elric
 }
 
-bool deserialize(const QJsonValue &value, QFont *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
     if(value.type() == QJsonValue::String) {
         *target = QFont(value.toString());
         return true;
@@ -110,8 +110,8 @@ bool deserialize(const QJsonValue &value, QFont *target) {
         QString family;
         int pointSize = -1;
         if(
-            !QJson::deserialize(map, lit("family"), &family) ||
-            !QJson::deserialize(map, lit("pointSize"), &pointSize, true)
+            !QJson::deserialize(ctx, map, lit("family"), &family) ||
+            !QJson::deserialize(ctx, map, lit("pointSize"), &pointSize, true)
         ) {
             return false;
         }

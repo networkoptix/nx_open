@@ -2,6 +2,7 @@
 #define QN_JSON_FWD_H
 
 class QJsonValue;
+class QnJsonContext;
 
 /**
  * \param TYPE                          Type to declare json (de)serialization functions for.
@@ -10,7 +11,7 @@ class QJsonValue;
  *                                      Definitions still have to be supplied.
  */
 #define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)         \
-__VA_ARGS__ void serialize(const TYPE &value, QJsonValue *target);              \
-__VA_ARGS__ bool deserialize(const QJsonValue &value, TYPE *target);
+__VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target); \
+__VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target);
 
 #endif // QN_JSON_FWD_H

@@ -85,16 +85,16 @@ void QnStatisticsColors::ensureVectors() {
     }
 }
 
-void serialize(const QnStatisticsColors &value, QJsonValue *target) {
-    detail::serialize(value, target);
+void serialize(QnJsonContext *ctx, const QnStatisticsColors &value, QJsonValue *target) {
+    detail::serialize(ctx, value, target);
 }
 
-bool deserialize(const QJsonValue &value, QnStatisticsColors *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnStatisticsColors *target) {
     if(value.type() == QJsonValue::Null) {
         /* That's null color storage. */
         *target = QnStatisticsColors();
         return true;
     }
 
-    return detail::deserialize(value, target);
+    return detail::deserialize(ctx, value, target);
 }
