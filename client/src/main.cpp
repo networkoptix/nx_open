@@ -333,7 +333,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
-    customizer->customize(application);
     application->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
