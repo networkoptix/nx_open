@@ -68,37 +68,13 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
     int type = this->type(id);
     if(type == QMetaType::QColor) {
         return parseColor(settings->value(name(id)), defaultValue.value<QColor>());
-    } else if (type == qMetaTypeId<QnStatisticsColors>()) {
-        QnStatisticsColors colors;
-
-        QVariant value = settings->value(name(id));
-        QString serializedValue;
-        if (value.type() == QVariant::String)
-            serializedValue = value.toString();
-        else if (value.type() == QVariant::StringList)
-            serializedValue = value.value<QStringList>().join(QLatin1String(", "));
-
-        if (!serializedValue.isEmpty())
-            colors.update(serializedValue.toLatin1());
-        return QVariant::fromValue<QnStatisticsColors>(colors);
-    }
-    else {
+    } else {
         return base_type::readValueFromSettings(settings, id, defaultValue);
     }
 }
 
 QVariant QnGlobals::readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) {
-    int type = this->type(id);
-    if(type == qMetaTypeId<QnStatisticsColors>()) {
-        QnStatisticsColors value;
-        if(QJson::deserialize(json.value(name(id)), &value)) {
-            return QVariant::fromValue<QnStatisticsColors>(value);
-        } else {
-            return defaultValue;
-        }
-    } else {
-        return base_type::readValueFromJson(json, id, defaultValue);
-    }
+    return base_type::readValueFromJson(json, id, defaultValue);
 }
 
 QVector<QColor> QnGlobals::defaultZoomWindowColors() {

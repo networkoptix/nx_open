@@ -7,6 +7,8 @@
 
 #include <api/model/statistics_reply.h>
 
+#include <client/client_color_types.h>
+
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 
@@ -20,6 +22,7 @@ class QnGlFunctions;
 
 class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerListener {
     Q_OBJECT
+    Q_PROPERTY(QnStatisticsColors colors READ colors WRITE setColors)
     typedef QnResourceWidget base_type;
 
 public:
@@ -30,23 +33,16 @@ public:
 #define ShowLogButton ShowLogButton
 #define CheckIssuesButton CheckIssuesButton
 
-    /**
-     * Constructor.
-     *
-     * \param item                      Workbench item that this resource widget will represent.
-     * \param parent                    Parent item.
-     */
     QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
-
-    /**
-     * Virtual destructor.
-     */
     virtual ~QnServerResourceWidget();
 
     /**
      * \returns                         Resource associated with this widget.
      */
     QnMediaServerResourcePtr resource() const;
+
+    const QnStatisticsColors &colors() const;
+    void setColors(const QnStatisticsColors &colors);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -85,9 +81,13 @@ private:
 
     void updateLegend();
 
+    QColor deviceColor(QnStatisticsDeviceType deviceType, const QString &key) const;
+
 private:
     //TODO: #GDM move all required fields to inner class
     friend class StatisticsOverlayWidget;
+
+    QnStatisticsColors m_colors;
 
     QnMediaServerStatisticsManager *m_manager;
 

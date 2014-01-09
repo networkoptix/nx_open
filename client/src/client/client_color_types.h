@@ -66,4 +66,23 @@ Q_DECLARE_METATYPE(QnCalendarColors)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnCalendarColors)
 
 
+struct QnStatisticsColors {
+    QnStatisticsColors();
+
+    QColor grid;
+    QColor frame;
+    QColor cpu;
+    QColor ram;
+    QColor networkLimit;
+    QVector<QColor> hdds;
+    QVector<QColor> network;
+
+    QColor hddByKey(const QString &key) const;
+    QColor networkByKey(const QString &key) const;
+};
+
+Q_DECLARE_METATYPE(QnStatisticsColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
+
+
 #endif // QN_CLIENT_COLOR_TYPES

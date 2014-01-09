@@ -9,8 +9,6 @@
 
 #include <utils/common/property_storage.h>
 
-#include <ui/style/statistics_colors.h>
-
 #include <client/client_meta_types.h>
 
 /**
@@ -60,7 +58,6 @@ public:
 
         BACKGROUD_GRADIENT_COLOR,
 
-        STATISTICS_COLORS,
         ZOOM_WINDOW_COLORS,
 
         /** Color of system notifications */
@@ -145,7 +142,6 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0))
         QN_DECLARE_R_PROPERTY(QColor,   backgroundGradientColor,        BACKGROUD_GRADIENT_COLOR,               QColor(5, 5, 50))
 
-        QN_DECLARE_R_PROPERTY(QnStatisticsColors,   statisticsColors,   STATISTICS_COLORS,                      QnStatisticsColors())
         QN_DECLARE_R_PROPERTY(QVector<QColor>,      zoomWindowColors,   ZOOM_WINDOW_COLORS,                     defaultZoomWindowColors())
 
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorSystem,        NOTIFICATION_COLOR_SYSTEM,              QColor(255, 0, 0))
