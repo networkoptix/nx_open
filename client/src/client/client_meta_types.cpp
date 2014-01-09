@@ -65,6 +65,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
     QnJsonSerializer::registerSerializer<QnCalendarColors>();
+    QnJsonSerializer::registerSerializer<QnStatisticsColors>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     
     QnJsonSerializer::registerSerializer<QVector<QColor> >();

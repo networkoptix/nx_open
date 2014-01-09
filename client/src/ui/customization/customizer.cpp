@@ -300,6 +300,13 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
         }
     }
 
+    /* This can happen if an error has occured during deserialization.
+     * Note that normally this check would not be needed, but there is a bug
+     * in QObject::setProperty --- it could crash for user-defined types if 
+     * supplied the wrong type inside the variant. */ // TODO: #Elric #QTBUG write bugreport.
+    if(data->type != data->value.userType())
+        return; 
+
     if(type == QMetaType::QPalette) {
         static_cast<const QnPaletteData *>(data->value.data())->applyTo(static_cast<QPalette *>(value.data()));
     } else {
