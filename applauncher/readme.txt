@@ -43,7 +43,7 @@ Installation files are downloaded one-by-one
 Remote directory is defined by http url. E.g.: http://x.x.x.x/builds/networkoptix/2.1/. All directory/file names are relative to this directory
 
 Mirror list is read from predefined http url (can be overridden by parameter mirrorListUrl).
-Mirror list is defined by xml of folowing format:
+Mirror list is defined by xml of following format:
 
 
 

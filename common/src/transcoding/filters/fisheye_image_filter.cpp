@@ -84,7 +84,7 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
 
 void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
 {
-    if (!m_itemDewarping.enabled)
+    if (!m_itemDewarping.enabled || !m_mediaDewarping.enabled)
         return;
 
     int left = qPower2Floor(updateRect.left() * frame->width, 16);
