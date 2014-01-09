@@ -93,8 +93,8 @@ bool QnPropertyStorage::setValue(const QString &name, const QVariant &value) {
 QnPropertyStorage::UpdateStatus QnPropertyStorage::updateValue(int id, const QVariant &value) {
     QVariant newValue = value;
 
-    int type = m_typeById.value(id, QMetaType::Void);
-    if(type != QMetaType::Void && value.type() != type) {
+    int type = m_typeById.value(id, QMetaType::UnknownType);
+    if(type != QMetaType::UnknownType && value.type() != type) {
         if(!newValue.convert(static_cast<QVariant::Type>(type))) {
             qnWarning("Cannot assign a value of type '%1' to a property '%2' of type '%3'.", QMetaType::typeName(value.userType()), name(id), QMetaType::typeName(type));
             return Failed;
@@ -157,7 +157,7 @@ QStringList QnPropertyStorage::argumentNames(int id) const {
 int QnPropertyStorage::type(int id) const {
     QnPropertyStorageLocker locker(this);
 
-    return m_typeById.value(id, QMetaType::Void);
+    return m_typeById.value(id, QMetaType::UnknownType);
 }
 
 void QnPropertyStorage::setType(int id, int type) {
@@ -168,7 +168,7 @@ void QnPropertyStorage::setType(int id, int type) {
 
     m_typeById[id] = type;
 
-    if(type != QMetaType::Void)
+    if(type != QMetaType::UnknownType)
         updateValue(id, QVariant(type, static_cast<const void *>(NULL)));
 }
 
@@ -245,7 +245,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
             continue;
         }
 
-        int type = m_typeById.value(id, QMetaType::Void);
+        int type = m_typeById.value(id, QMetaType::UnknownType);
 
         foreach(const QString &name, m_argumentNamesById.value(id)) {
             parser.addParameter(
@@ -277,7 +277,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
             if(errorStream) {
                 QString message = tr("Invalid value for '%1' argument - expected %2, provided '%3'.").
                     arg(name).
-                    arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::Void)))).
+                    arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::UnknownType)))).
                     arg(value.toString());
 
                 *errorStream << message << endl;

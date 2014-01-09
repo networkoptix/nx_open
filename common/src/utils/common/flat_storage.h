@@ -4,6 +4,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QtAlgorithms> /* For qDeleteAll. */
 
+#include <boost/type_traits/is_pointer.hpp>
+
 #include "flat_map.h"
 
 /**
@@ -13,7 +15,8 @@
 template<class Key, class T>
 class QnFlatStorage: private QnFlatMap<Key, T> {
     typedef QnFlatMap<Key, T> base_type;
-    // TODO: #Elric static assert for pointer type T
+
+    static_assert(boost::is_pointer<T>::value, "Stored type must be a pointer.");
 
 public:
     QnFlatStorage() {}

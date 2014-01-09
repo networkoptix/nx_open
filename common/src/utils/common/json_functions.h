@@ -245,6 +245,7 @@ inline bool deserialize(const QJsonValue &value, TYPE *target) {                
 }
 
 QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(char);
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(signed char); /* char, signed char and unsigned char are distinct types. */
 QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(unsigned char);
 QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(short);
 QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(unsigned short);

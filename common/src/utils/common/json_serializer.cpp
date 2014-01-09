@@ -7,14 +7,15 @@
 // -------------------------------------------------------------------------- //
 // QnJsonSerializerStorage
 // -------------------------------------------------------------------------- //
-class QnJsonSerializerStorage: public QnSynchronizedFlatStorage<int, QnJsonSerializer *> {
-    typedef QnSynchronizedFlatStorage<int, QnJsonSerializer *> base_type;
+class QnJsonSerializerStorage: public QnSynchronizedFlatStorage<unsigned int, QnJsonSerializer *> {
+    typedef QnSynchronizedFlatStorage<unsigned int, QnJsonSerializer *> base_type;
 public:
     QnJsonSerializerStorage() {
         insert<QString>();
         insert<double>();
         insert<bool>();
         insert<char>();
+        insert<signed char>();
         insert<unsigned char>();
         insert<short>();
         insert<unsigned short>();
