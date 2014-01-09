@@ -186,7 +186,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
-    parameters.itemDewarpingParams = widget->itemDewarpingParams();
+    parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     //TODO: #GDM whay should we disable zoomrect on dewarping cameras? Ask Roma.

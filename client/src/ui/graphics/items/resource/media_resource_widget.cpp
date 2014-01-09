@@ -193,8 +193,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
     updateCursor();
     setImageEnhancement(item->imageEnhancement());
-
-    connect(item, SIGNAL(dewarpingParamsChanged()), this, SIGNAL(itemDewarpingParamsChanged()));
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -663,14 +661,6 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     m_dewarpingParams = params;
 
     emit dewarpingParamsChanged();
-}
-
-QnItemDewarpingParams QnMediaResourceWidget::itemDewarpingParams() const {
-    return item()->dewarpingParams();
-}
-
-void QnMediaResourceWidget::setItemDewarpingParams(const QnItemDewarpingParams &params) {
-    item()->setDewarpingParams(params);
 }
 
 
