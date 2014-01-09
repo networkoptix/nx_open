@@ -1092,6 +1092,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor = new QnRtspDataConsumer(this);
         d->dataProcessor->pauseNetwork();
         d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
+        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
     }
     else 
         d->dataProcessor->clearUnprocessedData();

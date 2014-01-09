@@ -44,6 +44,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_liveQuality(MEDIA_Quality_High),
   m_newLiveQuality(MEDIA_Quality_None),
   m_realtimeMode(false),
+  m_multiChannelVideo(false),
   m_adaptiveSleep(MAX_FRAME_DURATION*1000),
   m_useUTCTime(true),
   m_fastChannelZappingSize(0),
@@ -386,6 +387,11 @@ void QnRtspDataConsumer::setUseRealTimeStreamingMode(bool value)
     m_realtimeMode = value;
 }
 
+void QnRtspDataConsumer::setMultiChannelVideo(bool value)
+{
+    m_multiChannelVideo = value;
+}
+
 void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
 {
     if (m_rtStartTime == (qint64)AV_NOPTS_VALUE) {
@@ -466,7 +472,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
         }
     }
 
-    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
+    int trackNum = media->channelNumber;
+    if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
+        trackNum = 0; // multichannel video is going to be transcoded to a single track
+    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(trackNum);
+
     if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
     QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
