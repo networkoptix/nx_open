@@ -54,7 +54,7 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const Q
     m_logicalLimits.maxFov = hi.z();
 }
 
-bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
     if(value.type() == QJsonValue::Null) {
         /* That's null mapper. */
         *target = QnSpaceMapperPtr<qreal>();
@@ -62,7 +62,7 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
     }
 
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     /* Note: source == device space, target == logical space. */
@@ -72,12 +72,12 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
     qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0; 
     AngleSpace space = DegreesSpace;
     if(
-        !QJson::deserialize(map, "extrapolationMode", &extrapolationMode) || 
-        !QJson::deserialize(map, "device", &device) ||
-        !QJson::deserialize(map, "logical", &logical) ||
-        !QJson::deserialize(map, "deviceMultiplier", &deviceMultiplier, true) ||
-        !QJson::deserialize(map, "logicalMultiplier", &logicalMultiplier, true) ||
-        !QJson::deserialize(map, "space", &space, true)
+        !QJson::deserialize(ctx, map, lit("extrapolationMode"), &extrapolationMode) || 
+        !QJson::deserialize(ctx, map, lit("device"), &device) ||
+        !QJson::deserialize(ctx, map, lit("logical"), &logical) ||
+        !QJson::deserialize(ctx, map, lit("deviceMultiplier"), &deviceMultiplier, true) ||
+        !QJson::deserialize(ctx, map, lit("logicalMultiplier"), &logicalMultiplier, true) ||
+        !QJson::deserialize(ctx, map, lit("space"), &space, true)
     ) {
         return false;
     }
@@ -101,21 +101,21 @@ bool deserialize(const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
     return true;
 }
 
-bool deserialize(const QJsonValue &value, PtzMapperPart *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, PtzMapperPart *target) {
     if(value.type() == QJsonValue::Null) {
         *target = PtzMapperPart();
         return true;
     }
 
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     PtzMapperPart local;
     if(
-        !QJson::deserialize(map, "x", &local[0], true) || 
-        !QJson::deserialize(map, "y", &local[1], true) ||
-        !QJson::deserialize(map, "z", &local[2], true)
+        !QJson::deserialize(ctx, map, lit("x"), &local[0], true) || 
+        !QJson::deserialize(ctx, map, lit("y"), &local[1], true) ||
+        !QJson::deserialize(ctx, map, lit("z"), &local[2], true)
     ) {
             return false;
     }
@@ -124,7 +124,7 @@ bool deserialize(const QJsonValue &value, PtzMapperPart *target) {
     return true;
 }
 
-bool deserialize(const QJsonValue &value, QnPtzMapperPtr *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *target) {
     if(value.type() == QJsonValue::Null) {
         /* That's null mapper. */
         *target = QnPtzMapperPtr();
@@ -132,13 +132,13 @@ bool deserialize(const QJsonValue &value, QnPtzMapperPtr *target) {
     }
 
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     PtzMapperPart input, output;
     if(
-        !QJson::deserialize(map, "fromCamera", &output, true) ||
-        !QJson::deserialize(map, "toCamera", &input, true)
+        !QJson::deserialize(ctx, map, lit("fromCamera"), &output, true) ||
+        !QJson::deserialize(ctx, map, lit("toCamera"), &input, true)
     ) {
         return false;
     }

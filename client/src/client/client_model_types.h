@@ -5,11 +5,22 @@
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QDataStream>
+#include <QtGui/QVector3D>
 
 #include <utils/common/model_functions_fwd.h>
 #include <recording/time_period.h>
+
+
+// -------------------------------------------------------------------------- //
+// Qt-based
+// -------------------------------------------------------------------------- //
+typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
+
+Q_DECLARE_METATYPE(QnWeakObjectHash)
 
 
 // -------------------------------------------------------------------------- //
@@ -98,6 +109,8 @@ QN_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream));
  */
 typedef QHash<QString, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
+
+
 
 
 #endif // QN_CLIENT_MODEL_TYPES_H

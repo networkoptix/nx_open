@@ -4,7 +4,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/common/json.h> // TODO: use fwd here
+#include <utils/common/json.h>
 
 class QnJsonRestResult {
 public:

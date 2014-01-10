@@ -11,13 +11,13 @@ struct QnResourceDataPoolChunk {
     QnResourceData data;
 };
 
-bool deserialize(const QJsonValue &value, QnResourceDataPoolChunk *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPoolChunk *target) {
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     QnResourceDataPoolChunk result;
-    if(!QJson::deserialize(map, "keys", &result.keys) || !QJson::deserialize(value, &result.data))
+    if(!QJson::deserialize(ctx, map, lit("keys"), &result.keys) || !QJson::deserialize(ctx, value, &result.data))
         return false;
 
     *target = result;
@@ -77,17 +77,17 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
         return false;
 
     QString version;
-    if(!QJson::deserialize(map, "version", &version) || version != lit("1.0"))
+    if(!QJson::deserialize(map, lit("version"), &version) || version != lit("1.0"))
         return false;
 
     QList<QnResourceDataPoolChunk> chunks;
-    if(!QJson::deserialize(map, "data", &chunks))
+    if(!QJson::deserialize(map, lit("data"), &chunks))
         return false;
 
     QMutexLocker locker(&m_mutex);
     foreach(const QnResourceDataPoolChunk &chunk, chunks)
         foreach(const QString &key, chunk.keys)
-            m_dataByKey[key.toLower()].addData(chunk.data);
+            m_dataByKey[key.toLower()].add(chunk.data);
 
     return true;
 }

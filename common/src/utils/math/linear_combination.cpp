@@ -33,18 +33,17 @@ namespace {
 
     class NoopLinearCombinator: public LinearCombinator {
     public:
-        NoopLinearCombinator(): LinearCombinator(0) { initZero(); }
+        NoopLinearCombinator(): LinearCombinator(QMetaType::UnknownType) { initZero(); }
 
     protected:
         virtual void calculateInternal(qreal, const void *, qreal, const void *, void *) const override {}
     };
 
-    class Storage: public QnSynchronizedFlatStorage<int, LinearCombinator *> {
-        typedef QnSynchronizedFlatStorage<int, LinearCombinator *> base_type;
+    class Storage: public QnSynchronizedFlatStorage<unsigned int, LinearCombinator *> {
+        typedef QnSynchronizedFlatStorage<unsigned int, LinearCombinator *> base_type;
     public:
         Storage() {
             insert(new NoopLinearCombinator());
-            insert(QMetaType::Void, new NoopLinearCombinator());
             insert(new StandardLinearCombinator<int>());
             insert(new StandardLinearCombinator<long>());
             insert(new StandardLinearCombinator<long long>());

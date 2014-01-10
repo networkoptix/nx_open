@@ -26,10 +26,15 @@ namespace ParameterMetaType {
         Invalid = -1
     };
 
+    template<Type type>
+    struct ValueConstructor {
+        Type operator()() const { return type; }
+    };
+
 } // namespace ParameterMetaType
 
 namespace {
-    class QnActionMetaTypeMap: public QnFlatMap<int, ParameterMetaType::Type, QnValueConstructor<ParameterMetaType::Type, ParameterMetaType::Invalid> > {
+    class QnActionMetaTypeMap: public QnFlatMap<unsigned int, ParameterMetaType::Type, ParameterMetaType::ValueConstructor<ParameterMetaType::Invalid> > {
     public:
         QnActionMetaTypeMap() {
             using namespace ParameterMetaType;
