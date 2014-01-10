@@ -15,7 +15,7 @@ namespace {
         static QString anyCamera() { return tr("<Any Camera>"); }
         static QString selectCamera() { return tr("Select at least one camera"); }
         static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
-        static QString subsetCameras(int count, int total) { return tr("%1 of %n cameras", "...for", total).arg(count); }
+        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); }
     };
 
     template <typename CheckingPolicy>
@@ -31,13 +31,12 @@ namespace {
     }
 
     template <typename CheckingPolicy>
-    QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText) {
+    QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText, int invalid) {
         if (cameras.isEmpty())
             return CheckingPolicy::emptyListIsValid()
                     ? QnBusinessResourceValidationStrings::anyCamera()
                     : QnBusinessResourceValidationStrings::selectCamera();
 
-        int invalid = invalidResourcesCount<CheckingPolicy>(cameras);
         if (detailed && invalid > 0)
             return baseText.arg(
                         (cameras.size() == 1)
@@ -58,7 +57,8 @@ bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &came
 
 QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have not input ports", "", cameras.size()));
+    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have not input ports", "", invalid), invalid);
 }
 
 bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -67,7 +67,8 @@ bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &cam
 
 QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have not output relays", "", cameras.size()));
+    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have not output relays", "", invalid), invalid);
 }
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -78,7 +79,8 @@ bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &cam
 
 QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", cameras.size()));
+    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
 }
 
 bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -87,7 +89,8 @@ bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &
 
 QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", cameras.size()));
+    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", invalid), invalid);
 }
 
 bool QnUserEmailPolicy::isResourceValid(const QnUserResourcePtr &resource) {
@@ -95,33 +98,46 @@ bool QnUserEmailPolicy::isResourceValid(const QnUserResourcePtr &resource) {
 }
 
 QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool detailed, const QStringList &additional) {
+
+    QnUserResourceList users = resources.filtered<QnUserResource>();
+    if (users.isEmpty() && additional.isEmpty())
+        return tr("Select at least one user");
+
     QStringList receivers;
-    QnUserResourceList users =  resources.filtered<QnUserResource>();
+    int invalid = 0;
     foreach (const QnUserResourcePtr &user, users) {
         QString userMail = user->getEmail();
-        if (userMail.isEmpty())
-            return tr("User '%1' has empty E-Mail").arg(user->getName());
-        if (!QnEmail::isValid(userMail))
-            return tr("User '%1' has invalid E-Mail address: %2").arg(user->getName()).arg(userMail);
-        receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+        if (isResourceValid(user))
+            receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+        else
+            invalid++;
     }
 
+    if (detailed && invalid > 0)
+        return tr("%1 have invalid E-Mail address", "", invalid).arg(
+                    (users.size() == 1)
+                     ? tr("User %1").arg(users.first()->getName())
+                     : tr("%n of %1 users", "", invalid).arg(users.size())
+                       );
 
+    invalid = 0;
     foreach(const QString &email, additional) {
-        QString trimmed = email.trimmed();
-        if (trimmed.isEmpty())
-            continue;
-        if (!QnEmail::isValid(trimmed))
-            return tr("Invalid email address: %1").arg(trimmed);
-        receivers << trimmed;
+        if (QnEmail::isValid(email))
+            receivers << email;
+        else
+            invalid++;
     }
 
-    if (receivers.isEmpty())
-        return tr("Select at least one user");
+    if (detailed && invalid > 0)
+        return (additional.size() == 1)
+                ? tr("Invalid E-Mail address %1").arg(additional.first())
+                : tr("%n of %1 additional E-Mail addresses are invalid", "", invalid).arg(additional.size());
 
     if (detailed)
         return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
+
+    QString result = tr("%n User(s)", "", users.size());
     if (additional.size() > 0)
-        return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
-    return tr("%1 users").arg(users.size());
+        result = tr("%1, %n additional", "", additional.size()).arg(result);
+    return result;
 }

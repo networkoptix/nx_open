@@ -827,9 +827,16 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     switch(m_actionType) {
     case BusinessActionType::SendMail:
     {
+        QStringList additional;
+        foreach (QString address, m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts)) {
+            QString trimmed = address.trimmed();
+            if (trimmed.isEmpty())
+                continue;
+            additional << trimmed;
+        }
         return QnUserEmailPolicy::getText(m_actionResources,
-                                                 detailed,
-                                                 m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts));
+                                          detailed,
+                                          additional);
     }
     case BusinessActionType::ShowPopup:
     {
