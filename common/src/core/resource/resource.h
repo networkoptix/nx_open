@@ -305,6 +305,7 @@ signals:
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove bool param
+    void initialized(const QnResourcePtr &resource); // TODO: #Elric merge signals, convert to initializedChanged
 
 
 public:
