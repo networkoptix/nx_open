@@ -607,6 +607,7 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
 
         overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
         overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
+        overlayWidget->zoomOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         
         if (isFisheye) {
             int panoAngle = widget->item()
