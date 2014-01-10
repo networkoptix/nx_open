@@ -148,6 +148,7 @@ void QnStreamRecorder::close()
             avformat_close_input(&m_formatCtx);
         m_formatCtx = 0;
 
+        emit recordingFinished(m_lastError, m_fileName);
     }
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_motionFileList[i])
@@ -212,7 +213,10 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
             bool isOk = true;
             if (m_needCalcSignature && !m_firstTime)
                 isOk = addSignatureFrame();
-            emit recordingFinished(isOk ? NoError : m_lastError, m_fileName);
+
+            if (isOk)
+                m_lastError = NoError;
+
             m_endOfData = true;
         }
 
@@ -326,8 +330,6 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
             return true; // skip audio packets before first video packet
         if (!initFfmpegContainer(vd))
         {
-            if (!m_fileName.isEmpty())
-                emit recordingFinished(m_lastError, m_fileName); // ommit storageFailure because of exists separate error if no storages at all
             if (m_stopOnWriteError)
             {
                 m_needStop = true;
