@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.1.0-SNAPSHOT</version>
+	<version>2.2.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dependencies</artifactId>
 	<packaging>pom</packaging>
@@ -99,7 +99,32 @@
 					</exclusions>           
 				</dependency>
 			</dependencies>
-		</profile>		
+		</profile>	
+		<profile>	
+			<id>2.0.2</id>
+			<activation>
+				<property>
+					<name>2.0.2</name>
+					<value>true</value>
+				</property>			
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>client</artifactId>
+					<version>2.0.2-SNAPSHOT</version>
+					<type>zip</type>
+					<scope>runtime</scope>
+					<classifier>2.0-${platform}-${arch}-${customization}</classifier>
+					<exclusions>
+						<exclusion>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>cpp</artifactId>
+						</exclusion>                
+					</exclusions>           
+				</dependency>
+			</dependencies>
+		</profile>	        
 		<profile>
 			<id>windows</id>
 			<activation>

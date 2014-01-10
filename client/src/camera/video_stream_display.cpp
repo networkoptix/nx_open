@@ -1024,9 +1024,9 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
     if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
         return QImage();
 
-    // TODO: #GDM Uncomment when will implement feature #2563
-//    if (m_lastDisplayedFrame->flags && QnAbstractMediaData::MediaFlags_LowQuality)
-//        return QImage();    //screenshot will be received from the server
+    // feature #2563
+    if (m_lastDisplayedFrame->flags && QnAbstractMediaData::MediaFlags_LowQuality)
+        return QImage();    //screenshot will be received from the server
 
     // copy image
     QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());
@@ -1053,11 +1053,15 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
         sws_freeContext(convertor);
     }
 
-    QnContrastImageFilter filter(params);
-    filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    if (params.enabled) {
+        QnContrastImageFilter filter(params);
+        filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
 
-    QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
-    filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    if (mediaDewarping.enabled && itemDewarping.enabled) {
+        QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
+        filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
 
     // convert colorSpace
     SwsContext* convertor = sws_getContext(srcFrame->width, srcFrame->height, (PixelFormat) srcFrame->format,
