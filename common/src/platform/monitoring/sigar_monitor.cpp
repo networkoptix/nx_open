@@ -15,9 +15,6 @@ extern "C"
 #include <sigar_format.h>
 }
 
-#ifdef _MSC_VER
-#   pragma comment(lib, "sigar.lib")
-#endif
 
 namespace {
     /**
