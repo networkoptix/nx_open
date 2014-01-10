@@ -1,5 +1,5 @@
-#ifndef QN_COMMON_CUSTOMIZATION_H
-#define QN_COMMON_CUSTOMIZATION_H
+#ifndef QN_PRODUCT_FEATURES_H
+#define QN_PRODUCT_FEATURES_H
 
 #include <QtCore/QtGlobal>
 
@@ -40,4 +40,4 @@ inline QnProductFeatures qnProductFeatures() {
 }
 
 
-#endif // QN_COMMON_CUSTOMIZATION_H
+#endif // QN_PRODUCT_FEATURES_H

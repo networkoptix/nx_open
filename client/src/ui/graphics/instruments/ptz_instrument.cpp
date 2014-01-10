@@ -47,6 +47,8 @@
 #endif
 
 namespace {
+    // TODO: #Elric #customization
+
     const QColor ptzColor = qnGlobals->ptzColor();
 
     const QColor ptzArrowBorderColor = toTransparent(ptzColor, 0.75);

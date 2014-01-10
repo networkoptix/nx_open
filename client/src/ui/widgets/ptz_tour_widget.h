@@ -18,17 +18,21 @@ public:
     explicit QnPtzTourWidget(QWidget *parent = 0);
     ~QnPtzTourWidget();
 
+    // TODO: #GDM where are getters? Symmetry breaking.
+
     void setPtzTour(const QnPtzTour &tour);
     void setPtzPresets(const QnPtzPresetList &presets);
 
+    // TODO: #GDM signal is never emitted. Is it needed?
 signals:
-    void tourChanged(const QnPtzTour &tour);
+    void tourChanged(const QnPtzTour &tour); 
 
 private slots:
     void at_addSpotButton_clicked();
     void at_deleteSpotButton_clicked();
     void at_moveSpotUpButton_clicked();
     void at_moveSpotDownButton_clicked();
+
 private:
     QScopedPointer<Ui::PtzTourWidget> ui;
     QnPtzTourModel *m_model;

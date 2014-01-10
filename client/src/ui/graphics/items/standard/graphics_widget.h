@@ -121,6 +121,7 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
     virtual bool event(QEvent *event) override;
+    virtual void polishEvent() override;
     virtual void changeEvent(QEvent *event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

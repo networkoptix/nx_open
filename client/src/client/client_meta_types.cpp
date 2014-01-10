@@ -2,17 +2,21 @@
 
 #include <common/common_meta_types.h>
 
+#include <utils/color_space/image_correction.h>
+#include <utils/common/json_serializer.h>
+
 #include <camera/thumbnail.h>
+#include <ui/actions/actions.h>
+#include <ui/actions/action_parameters.h>
+#include <ui/customization/customization.h>
+#include <ui/customization/palette_data.h>
 
 #include "client_globals.h"
 #include "client_model_types.h"
-#include "utils/color_space/image_correction.h"
-#include "ui/actions/actions.h"
-#include "ui/actions/action_parameters.h"
+#include "client_color_types.h"
 #include "ui/common/weak_graphics_item_pointer.h"
 
 namespace {
-
     volatile bool qn_clientMetaTypes_initialized = false;
 
 }
@@ -52,7 +56,23 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+    qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
+    qRegisterMetaType<QnCustomization>();
+
+    qRegisterMetaType<QnTimeSliderColors>();
+    qRegisterMetaType<QnBackgroundColors>();
+    qRegisterMetaType<QnCalendarColors>();
+
+    QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
+    QnJsonSerializer::registerSerializer<QnBackgroundColors>();
+    QnJsonSerializer::registerSerializer<QnCalendarColors>();
+    QnJsonSerializer::registerSerializer<QnStatisticsColors>();
+    QnJsonSerializer::registerSerializer<QnPaletteData>();
+    
+    QnJsonSerializer::registerSerializer<QVector<QColor> >();
+    QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 
     qn_clientMetaTypes_initialized = true;
 }
+

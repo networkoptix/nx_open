@@ -20,7 +20,6 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <common/common_module.h>
-#include <common/customization.h>
 
 #include <mustache/mustache.h>
 
@@ -30,6 +29,7 @@
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
 #include <utils/common/json.h>
+#include <utils/common/product_features.h>
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),

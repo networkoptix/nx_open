@@ -27,7 +27,6 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/style/globals.h>
-#include <ui/style/statistics_colors.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -35,23 +34,6 @@ namespace {
     /** Convert angle from radians to degrees */
     qreal radiansToDegrees(qreal radian) {
         return (180 * radian) / M_PI;
-    }
-
-    /** Get corresponding color from config */
-    QColor getDeviceColor(QnStatisticsDeviceType deviceType, const QString &key) {
-        QnStatisticsColors colors = qnGlobals->statisticsColors();
-        switch (deviceType) {
-        case CPU:
-            return colors.cpu;
-        case RAM:
-            return colors.ram;
-        case HDD:
-            return colors.hddByKey(key);
-        case NETWORK:
-            return colors.networkByKey(key);
-        default:
-            return QColor(Qt::white);
-        }
     }
 
     qreal maxValue(const QLinkedList<qreal> &values) {
@@ -232,14 +214,14 @@ class LegendButtonWidget: public QnImageButtonWidget {
     typedef QnImageButtonWidget base_type;
 
 public:
-    LegendButtonWidget(QnStatisticsDeviceType deviceType, const QString &key):
-        base_type(NULL, 0),
-        m_deviceType(deviceType),
-        m_key(key)
+    LegendButtonWidget(const QString &text, const QColor &color, QGraphicsItem *parent = NULL):
+        base_type(parent, 0),
+        m_text(text),
+        m_color(color)
     {
         setCheckable(true);
         setProperty(Qn::NoBlockMotionSelection, true);
-        setToolTip(key);
+        setToolTip(m_text);
         setIcon(qnSkin->icon("item/check.png"));
     }
 
@@ -253,7 +235,7 @@ protected:
         case Qt::PreferredSize: {
             QFont font;
             font.setPixelSize(legendFontSize);
-            return QSizeF(legendImageSize + QFontMetrics(font).width(m_key) + itemSpacing*2, legendImageSize + itemSpacing);
+            return QSizeF(legendImageSize + QFontMetrics(font).width(m_text) + itemSpacing*2, legendImageSize + itemSpacing);
         }
         case Qt::MaximumSize: {
             QSizeF hint = base_type::sizeHint(which, constraint);
@@ -281,23 +263,22 @@ protected:
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
-            QColor keyColor = getDeviceColor(m_deviceType, m_key);
-            painter->setBrush(keyColor);
+            painter->setBrush(m_color);
             painter->drawRoundedRect(imgRect, 4, 4);
 
             QFont font;
             font.setPixelSize(legendFontSize);
             QnScopedPainterFontRollback fontRollback(painter, font);
-            painter->setPen(QPen(keyColor, 3));
-            painter->drawText(textRect, m_key);
+            painter->setPen(QPen(m_color, 3));
+            painter->drawText(textRect, m_text);
         }
         base_type::paint(painter, startState, endState, progress, widget, imgRect);
         painter->setOpacity(opacity);
     }
 
 private:
-    QnStatisticsDeviceType m_deviceType;
-    QString m_key;
+    QString m_text;
+    QColor m_color;
 };
 
 
@@ -308,11 +289,10 @@ class StatisticsOverlayWidget: public GraphicsWidget {
     Q_DECLARE_TR_FUNCTIONS(StatisticsOverlayWidget)
     typedef GraphicsWidget base_type;
 public:
-    StatisticsOverlayWidget(QnServerResourceWidget* widget):
+    StatisticsOverlayWidget(QnServerResourceWidget *widget):
         base_type(widget),
         m_widget(widget)
-    {
-    }
+    {}
 
     virtual ~StatisticsOverlayWidget() {}
 
@@ -360,7 +340,7 @@ protected:
         /* Draw grid */
         {
             QPen grid;
-            grid.setColor(qnGlobals->statisticsColors().grid);
+            grid.setColor(m_widget->colors().grid);
             grid.setWidthF(grid_pen_width);
 
             QPainterPath grid_path;
@@ -404,7 +384,7 @@ protected:
                 qreal currentValue = 0;
                 QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset), elapsed_step, &currentValue);
                 displayValues[key] = currentValue;
-                graphPen.setColor(toTransparent(getDeviceColor(stats.deviceType, key), data.opacity));
+                graphPen.setColor(toTransparent(m_widget->deviceColor(stats.deviceType, key), data.opacity));
                 painter->strokePath(path, graphPen);
             }
         }
@@ -415,7 +395,7 @@ protected:
             Q_UNUSED(penRollback)
 
             QPen main_pen;
-            main_pen.setColor(qnGlobals->statisticsColors().frame);
+            main_pen.setColor(m_widget->colors().frame);
             main_pen.setWidthF(frame_pen_width);
             main_pen.setJoinStyle(Qt::MiterJoin);
 
@@ -440,7 +420,7 @@ protected:
                         continue;
                     qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
 
-                    main_pen.setColor(toTransparent(getDeviceColor(stats.deviceType, key), data.opacity));
+                    main_pen.setColor(toTransparent(m_widget->deviceColor(stats.deviceType, key), data.opacity));
                     painter->setPen(main_pen);
                     painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
                 }
@@ -451,7 +431,7 @@ protected:
     }
 
 private:
-    QnServerResourceWidget* m_widget;
+    QnServerResourceWidget *m_widget;
 };
 
 
@@ -528,6 +508,29 @@ QnMediaServerResourcePtr QnServerResourceWidget::resource() const {
     return m_resource;
 }
 
+const QnStatisticsColors &QnServerResourceWidget::colors() const {
+    return m_colors;
+}
+
+void QnServerResourceWidget::setColors(const QnStatisticsColors &colors) {
+    m_colors = colors;
+}
+
+QColor QnServerResourceWidget::deviceColor(QnStatisticsDeviceType deviceType, const QString &key) const {
+    switch (deviceType) {
+    case CPU:
+        return m_colors.cpu;
+    case RAM:
+        return m_colors.ram;
+    case HDD:
+        return m_colors.hddByKey(key);
+    case NETWORK:
+        return m_colors.networkByKey(key);
+    default:
+        return QColor(Qt::white);
+    }
+}
+
 int QnServerResourceWidget::helpTopicAt(const QPointF &) const {
     return Qn::MainWindow_MonitoringItem_Help;
 }
@@ -584,7 +587,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
 }
 
 void QnServerResourceWidget::addOverlays() {
-    StatisticsOverlayWidget* statisticsOverlayWidget = new StatisticsOverlayWidget(this);
+    StatisticsOverlayWidget *statisticsOverlayWidget = new StatisticsOverlayWidget(this);
     statisticsOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
 
     QGraphicsLinearLayout *mainOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -631,7 +634,7 @@ void QnServerResourceWidget::updateLegend() {
             data.mask = data.bar->unusedMask();
             data.visible = true;
 
-            data.button = new LegendButtonWidget(stats.deviceType, key);
+            data.button = new LegendButtonWidget(key, deviceColor(stats.deviceType, key));
             data.button->setProperty(legendKeyPropertyName, key);
             data.button->setChecked(true);
             data.bar->addButton(data.mask, data.button);

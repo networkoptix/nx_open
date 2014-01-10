@@ -857,6 +857,11 @@ namespace Qn {
          */
         DebugCalibratePtzAction,
 
+        /**
+         * Opens up debug control panel.
+         */
+        DebugControlPanelAction,
+
 
         ActionCount,
 

@@ -11,6 +11,7 @@ public:
     QnMacAddress();
     QnMacAddress(const unsigned char *mac);
     QnMacAddress(const QString &mac);
+    QnMacAddress(const QLatin1String &mac);
     ~QnMacAddress();
 
     bool isNull() const;
@@ -26,6 +27,9 @@ public:
     bool operator<(const QnMacAddress &other) const;
 
 	friend uint qHash(const QnMacAddress &value);
+
+private:
+    void init(const QString &mac);
 
 private:
     unsigned char m_data[6];
