@@ -472,7 +472,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
         }
     }
 
-    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(m_multiChannelVideo ? media->channelNumber : 0);
+    int trackNum = media->channelNumber;
+    if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
+        trackNum = 0; // multichannel video is going to be transcoded to a single track
+    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(trackNum);
+
     if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
     QnRtspEncoderPtr codecEncoder = trackInfo->encoder;

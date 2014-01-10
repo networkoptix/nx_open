@@ -112,14 +112,15 @@ void QnFisheyePtzController::updateCapabilities() {
 }
 
 void QnFisheyePtzController::updateAspectRatio() {
+    if (!m_widget)
+        return;
+
     m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
 }
 
 void QnFisheyePtzController::updateMediaDewarpingParams() {
-    if (!m_widget) {
-        qWarning() << "updating params with null widget";
+    if (!m_widget)
         return;
-    }
 
     if (m_mediaDewarpingParams == m_widget->dewarpingParams())
         return;
@@ -130,7 +131,11 @@ void QnFisheyePtzController::updateMediaDewarpingParams() {
     updateCapabilities();
 }
 
+
 void QnFisheyePtzController::updateItemDewarpingParams() {
+    if (!m_widget)
+        return;
+
     int oldPanoFactor = m_itemDewarpingParams. panoFactor;
     m_itemDewarpingParams = m_widget->item()->dewarpingParams();
     int newPanoFactor = m_itemDewarpingParams.panoFactor;
@@ -183,7 +188,9 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
     m_itemDewarpingParams.xAngle = qDegreesToRadians(position.x());
     m_itemDewarpingParams.yAngle = qDegreesToRadians(position.y());
     m_itemDewarpingParams.fov = qDegreesToRadians(position.z());
-    m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
+
+    if (m_widget)
+        m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
 
