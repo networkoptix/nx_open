@@ -102,7 +102,7 @@ int nullGsoapFdisconnect(struct soap*)
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
     AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-    qSocket->sendTo(s, n, lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+    qSocket->sendTo(s, n, QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -155,7 +155,7 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
     QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
-    qSocket->sendTo(data.data(), data.size(), lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+    qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 

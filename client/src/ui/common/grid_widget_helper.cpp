@@ -131,7 +131,7 @@ void QnGridWidgetHelper::getGridData(QTableView* grid, QString& textData, QStrin
     {
         if(list[i].row() != prevRow) {
             prevRow = list[i].row();
-            textData.append(lit('\n'));
+            textData.append(lit("\n"));
             if (i > 0)
                 htmlData.append(lit("</tr>"));
             htmlData.append(lit("<tr>"));
@@ -150,5 +150,5 @@ void QnGridWidgetHelper::getGridData(QTableView* grid, QString& textData, QStrin
     htmlData.append(lit("</table>\n"));
     htmlData.append(lit("</body>\n"));
     htmlData.append(lit("</html>\n"));
-    textData.append(lit('\n'));
+    textData.append(lit("\n"));
 }

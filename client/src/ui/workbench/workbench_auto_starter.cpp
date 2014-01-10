@@ -68,7 +68,7 @@ QString QnWorkbenchAutoStarter::autoStartPath() const {
 
 QString QnWorkbenchAutoStarter::fromRegistryFormat(const QString &path) const {
     QString result = QDir::toNativeSeparators(path).toLower();
-    result.replace(lit('"'), QString());
+    result.replace(L'"', QString());
     return result;
 }
 

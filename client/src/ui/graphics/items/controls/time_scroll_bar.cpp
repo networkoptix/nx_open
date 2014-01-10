@@ -7,6 +7,7 @@
 #include <ui/style/noptix_style.h>
 
 namespace {
+    // TODO: #Elric #customization
     const QColor indicatorColor(255, 255, 255, 255);
 
     const QColor separatorColor(255, 255, 255, 64);

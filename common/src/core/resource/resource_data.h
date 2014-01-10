@@ -36,7 +36,7 @@ public:
         m_valueByKey.insert(key, QVariant::fromValue<T>(value));
     }
 
-    void addData(const QnResourceData &other) {
+    void add(const QnResourceData &other) {
         if(m_valueByKey.isEmpty()) {
             m_valueByKey = other.m_valueByKey;
         } else {
@@ -57,6 +57,6 @@ private:
 #endif
 };
 
-bool deserialize(const QJsonValue &value, QnResourceData *target);
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target);
 
 #endif // QN_RESOURCE_DATA_H

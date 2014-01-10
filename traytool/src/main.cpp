@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     QnTranslation translation = translationManager->loadTranslation(translationPath);
     QnTranslationManager::installTranslation(translation);
 
-    QString argument = argc > 1 ? lit(argv[1]) : QString();
+    QString argument = argc > 1 ? QLatin1String(argv[1]) : QString();
     if (argument == lit("quit"))
     {
         app.sendMessage(lit("quit"));

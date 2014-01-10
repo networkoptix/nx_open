@@ -75,7 +75,7 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
 QnServerCameraPtr QnServerCamera::findEnabledSibling()
 {
     if (!isDisabled())
-        return ::toSharedPointer(this);
+        return toSharedPointer().dynamicCast<QnServerCamera>();
 
     {
         QMutexLocker lock(&m_mutex);

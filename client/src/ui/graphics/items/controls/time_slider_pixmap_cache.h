@@ -11,7 +11,7 @@
 class QnTextPixmapCache;
 
 /**
- * Global pixmap cache for time slider.
+ * Pixmap cache for time slider.
  * 
  * \note This class is <b>not</t> thread-safe.
  * \see QnTextPixmapCache
@@ -22,7 +22,8 @@ public:
     QnTimeSliderPixmapCache(QObject *parent = NULL);
     virtual ~QnTimeSliderPixmapCache();
 
-    static QnTimeSliderPixmapCache *instance();
+    const QFont &font() const;
+    void setFont(const QFont &font);
 
     const QPixmap &positionShortPixmap(qint64 position, int height, const QnTimeStep &step);
     const QPixmap &positionLongPixmap(qint64 position, int height, const QnTimeStep &step);

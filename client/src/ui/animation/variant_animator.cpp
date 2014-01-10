@@ -8,7 +8,7 @@
 VariantAnimator::VariantAnimator(QObject *parent):
     AbstractAnimator(parent),
     m_easingCurveCorrection(0.0),
-    m_internalType(QMetaType::Void),
+    m_internalType(QMetaType::UnknownType),
     m_target(NULL),
     m_speed(1.0),
     m_magnitudeCalculator(NULL),
@@ -188,7 +188,7 @@ QVariant VariantAnimator::interpolated(const QVariant &from, const QVariant &to,
 
 QVariant VariantAnimator::currentValue() const {
     if(accessor() == NULL || targetObject() == NULL) {
-        if (internalType() == QMetaType::Void)
+        if (internalType() == QMetaType::UnknownType)
             return QVariant();
         return QVariant(internalType(), static_cast<void *>(NULL));
     }
@@ -238,10 +238,10 @@ void VariantAnimator::updateState(State newState) {
 void VariantAnimator::updateInternalType(int newInternalType) {
     m_internalType = newInternalType;
 
-    m_internalStartValue = (newInternalType == QMetaType::Void)
+    m_internalStartValue = (newInternalType == QMetaType::UnknownType)
             ? QVariant()
             : QVariant(newInternalType, static_cast<void *>(NULL));
-    m_internalTargetValue = (newInternalType == QMetaType::Void)
+    m_internalTargetValue = (newInternalType == QMetaType::UnknownType)
             ? QVariant()
             : QVariant(newInternalType, static_cast<void *>(NULL));
 
