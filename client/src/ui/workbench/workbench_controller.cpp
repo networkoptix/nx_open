@@ -558,7 +558,12 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     if(!m_menuEnabled)
         return;
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), display()->scene()->selectedItems()));
+    QMetaObject::invokeMethod(this, "showContextMenuAtInternal", Qt::QueuedConnection,
+                              Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
+}
+
+void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
