@@ -9,6 +9,7 @@
 #include "utils/color_space/image_correction.h"
 #include "ui/actions/actions.h"
 #include "ui/actions/action_parameters.h"
+#include "ui/common/weak_graphics_item_pointer.h"
 
 namespace {
 
@@ -51,6 +52,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+    qRegisterMetaType<WeakGraphicsItemPointerList>();
 
     qn_clientMetaTypes_initialized = true;
 }
