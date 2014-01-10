@@ -2201,28 +2201,6 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
     }
 }
 
-/*
-void QnWorkbenchActionHandler::at_setCurrentItemAspectRatioAutoAction_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
-    if(!widget)
-        return;
-    widget->display()->camDisplay()->setOverridenAspectRatio(0.0);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio4x3Action_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
-    if(!widget)
-        return;
-    widget->display()->camDisplay()->setOverridenAspectRatio(4.0 / 3.0);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio16x9Action_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
-    if(!widget)
-        return;
-    widget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
-}*/
-
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
     action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
