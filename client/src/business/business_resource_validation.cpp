@@ -7,93 +7,121 @@
 
 #include <utils/common/email.h>
 
-template <typename CheckingPolicy>
-int invalidResourcesCount(const QnResourceList &resources) {
-    QnSharedResourcePointerList<typename CheckingPolicy::resource_type > filtered = resources.filtered<typename CheckingPolicy::resource_type >();
-    int invalid = 0;
-    foreach (const QnSharedResourcePointer<typename CheckingPolicy::resource_type > &resource, filtered)
-        if (!CheckingPolicy::isResourceValid(resource))
-            invalid++;
-    return invalid;
+namespace {
+
+    class QnBusinessResourceValidationStrings {
+        Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
+    public:
+        static QString anyCamera() { return tr("<Any Camera>"); }
+        static QString selectCamera() { return tr("Select at least one camera"); }
+        static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
+        static QString subsetCameras(int count, int total) { return tr("%1 of %n cameras", "...for", total).arg(count); }
+    };
+
+    template <typename CheckingPolicy>
+    int invalidResourcesCount(const QnResourceList &resources) {
+        typedef typename CheckingPolicy::resource_type ResourceType;
+
+        QnSharedResourcePointerList<ResourceType> filtered = resources.filtered<ResourceType>();
+        int invalid = 0;
+        foreach (const QnSharedResourcePointer<ResourceType> &resource, filtered)
+            if (!CheckingPolicy::isResourceValid(resource))
+                invalid++;
+        return invalid;
+    }
+
+    template <typename CheckingPolicy>
+    QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool detailed, const QString &baseText) {
+        if (cameras.isEmpty())
+            return CheckingPolicy::emptyListIsValid()
+                    ? QnBusinessResourceValidationStrings::anyCamera()
+                    : QnBusinessResourceValidationStrings::selectCamera();
+
+        int invalid = invalidResourcesCount<CheckingPolicy>(cameras);
+        if (detailed && invalid > 0)
+            return baseText.arg(
+                        (cameras.size() == 1)
+                         ? getShortResourceName(cameras.first())
+                         : QnBusinessResourceValidationStrings::subsetCameras(invalid, cameras.size())
+                           );
+        if (cameras.size() == 1)
+            return getShortResourceName(cameras.first());
+        return QnBusinessResourceValidationStrings::multipleCameras(cameras.size());
+
+    }
+
 }
 
-
-bool QnCameraInputAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
 }
 
-QString QnCameraInputAllowedPolicy::getText(const QnResourceList &resources, const bool detailed) {
-return QString(); //  return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
-
+QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool detailed) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have not input ports", "", cameras.size()));
 }
 
-bool QnCameraOutputAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
 }
 
-QString QnCameraOutputAllowedPolicy::getText(const QnResourceList &resources, const bool detailed) {
+QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return tr("Select at least one camera");
-
-    int invalid = invalidResourcesCount<QnCameraOutputAllowedPolicy>(cameras);
-    if (detailed && invalid > 0)
-        return tr("%1 have not output relays", "", cameras.size())
-                .arg((cameras.size() == 1)
-                     ? getShortResourceName(cameras.first())
-                     : tr("%1 of %n cameras", "...for", cameras.size()).arg(invalid));
-    if (cameras.size() == 1)
-        return getShortResourceName(cameras.first());
-    return tr("%n Camera(s)", "", cameras.size());
+    return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have not output relays", "", cameras.size()));
 }
 
-bool QnCameraMotionAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled()
             && camera->getMotionType() != Qn::MT_NoMotion
             && camera->supportedMotionType() != Qn::MT_NoMotion;
 }
 
-QString QnCameraMotionAllowedPolicy::getText(const QnResourceList &resources, const bool detailed) {
+QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return tr("<Any Camera>");
-
-    int invalid = invalidResourcesCount<QnCameraMotionAllowedPolicy>(cameras);
-    if (detailed && invalid > 0)
-        return tr("Recording or motion detection is disabled for %1")
-                .arg((cameras.size() == 1)
-                     ? getShortResourceName(cameras.first())
-                     : tr("%1 of %n cameras", "...for", cameras.size()).arg(invalid));
-    if (cameras.size() == 1)
-        return getShortResourceName(cameras.first());
-    return tr("%n Camera(s)", "", cameras.size());
+    return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", cameras.size()));
 }
 
-
-bool QnCameraRecordingAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled();
 }
 
-QString QnCameraRecordingAllowedPolicy::getText(const QnResourceList &resources, const bool detailed) {
+QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return tr("Select at least one camera");
-
-    int invalid = invalidResourcesCount<QnCameraRecordingAllowedPolicy>(cameras);
-    if (detailed && invalid > 0)
-        return tr("Recording is disabled for %1")
-                .arg((cameras.size() == 1)
-                     ? getShortResourceName(cameras.first())
-                     : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
-    if (cameras.size() == 1)
-        return getShortResourceName(cameras.first());
-    return tr("%n Camera(s)", "", cameras.size());
+    return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", cameras.size()));
 }
 
-bool QnUserEmailAllowedPolicy::isResourceValid(const QnUserResourcePtr &resource) {
+bool QnUserEmailPolicy::isResourceValid(const QnUserResourcePtr &resource) {
     return QnEmail::isValid(resource->getEmail());
 }
 
-QString QnUserEmailAllowedPolicy::getText(const QnResourceList &resources, const bool detailed) {
-return QString(); //    return tr("%1 of %2 selected users have invalid email.").arg(invalid).arg(total);
+QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool detailed, const QStringList &additional) {
+    QStringList receivers;
+    QnUserResourceList users =  resources.filtered<QnUserResource>();
+    foreach (const QnUserResourcePtr &user, users) {
+        QString userMail = user->getEmail();
+        if (userMail.isEmpty())
+            return tr("User '%1' has empty E-Mail").arg(user->getName());
+        if (!QnEmail::isValid(userMail))
+            return tr("User '%1' has invalid E-Mail address: %2").arg(user->getName()).arg(userMail);
+        receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+    }
+
+
+    foreach(const QString &email, additional) {
+        QString trimmed = email.trimmed();
+        if (trimmed.isEmpty())
+            continue;
+        if (!QnEmail::isValid(trimmed))
+            return tr("Invalid email address: %1").arg(trimmed);
+        receivers << trimmed;
+    }
+
+    if (receivers.isEmpty())
+        return tr("Select at least one user");
+
+    if (detailed)
+        return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
+    if (additional.size() > 0)
+        return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
+    return tr("%1 users").arg(users.size());
 }

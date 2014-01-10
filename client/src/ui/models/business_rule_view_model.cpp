@@ -128,7 +128,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
-            return m_comments.isEmpty() ? QVariant() : m_comments;
+            return getToolTip(column);
 
         default:
             break;
@@ -731,9 +731,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     {
         switch (m_eventType) {
         case BusinessEventType::Camera_Motion:
-            return isResourcesListValid<QnCameraMotionAllowedPolicy>(m_eventResources);
+            return isResourcesListValid<QnCameraMotionPolicy>(m_eventResources);
         case BusinessEventType::Camera_Input:
-            return isResourcesListValid<QnCameraInputAllowedPolicy>(m_eventResources);
+            return isResourcesListValid<QnCameraInputPolicy>(m_eventResources);
         default:
             return true;
         }
@@ -762,10 +762,10 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return any;
         }
         case BusinessActionType::CameraRecording:
-            return isResourcesListValid<QnCameraRecordingAllowedPolicy>(m_actionResources);
+            return isResourcesListValid<QnCameraRecordingPolicy>(m_actionResources);
         case BusinessActionType::CameraOutput:
         case BusinessActionType::CameraOutputInstant:
-            return isResourcesListValid<QnCameraOutputAllowedPolicy>(m_actionResources);
+            return isResourcesListValid<QnCameraOutputPolicy>(m_actionResources);
         case BusinessActionType::PlaySound:
         case BusinessActionType::PlaySoundRepeated:
             return !m_actionParams.getSoundUrl().isEmpty();
@@ -800,16 +800,16 @@ void QnBusinessRuleViewModel::updateActionTypesModel() {
 }
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
-    if (m_eventType == BusinessEventType::Camera_Motion) {
-        return QnCameraMotionAllowedPolicy::getText(m_eventResources);
-    }
+    if (m_eventType == BusinessEventType::Camera_Motion)
+        return QnCameraMotionPolicy::getText(m_eventResources, detailed);
+    else if (m_eventType == BusinessEventType::Camera_Input)
+        return QnCameraInputPolicy::getText(m_eventResources, detailed);
 
     QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
     if (!BusinessEventType::isResourceRequired(m_eventType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
-        QnResourcePtr resource = resources.first();
-        return getResourceName(resource);
+        return getResourceName(resources.first());
     } else if (BusinessEventType::requiresServerResource(m_eventType)){
         if (resources.size() == 0)
             return tr("<Any Server>");
@@ -827,35 +827,9 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     switch(m_actionType) {
     case BusinessActionType::SendMail:
     {
-        QStringList receivers;
-        QnUserResourceList users =  m_actionResources.filtered<QnUserResource>();
-        foreach (const QnUserResourcePtr &user, users) {
-            QString userMail = user->getEmail();
-            if (userMail.isEmpty())
-                return tr("User '%1' has empty E-Mail").arg(user->getName());
-            if (!QnEmail::isValid(userMail))
-                return tr("User '%1' has invalid E-Mail address: %2").arg(user->getName()).arg(userMail);
-            receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
-        }
-
-        QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
-        foreach(const QString &email, additional) {
-            QString trimmed = email.trimmed();
-            if (trimmed.isEmpty())
-                continue;
-            if (!QnEmail::isValid(trimmed))
-                return tr("Invalid email address: %1").arg(trimmed);
-            receivers << trimmed;
-        }
-
-        if (receivers.isEmpty())
-            return tr("Select at least one user");
-
-        if (detailed)
-            return tr("Send mail to %1").arg(receivers.join(QLatin1String("; ")));
-        if (additional.size() > 0)
-            return tr("%1 users, %2 additional").arg(users.size()).arg(additional.size());
-        return tr("%1 users").arg(users.size());
+        return QnUserEmailPolicy::getText(m_actionResources,
+                                                 detailed,
+                                                 m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts));
     }
     case BusinessActionType::ShowPopup:
     {
@@ -866,12 +840,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case BusinessActionType::CameraRecording:
     {
-        return QnCameraRecordingAllowedPolicy::getText(m_actionResources, detailed);
+        return QnCameraRecordingPolicy::getText(m_actionResources, detailed);
     }
     case BusinessActionType::CameraOutput:
     case BusinessActionType::CameraOutputInstant:
     {
-        return QnCameraOutputAllowedPolicy::getText(m_actionResources, detailed);
+        return QnCameraOutputPolicy::getText(m_actionResources, detailed);
     }
     case BusinessActionType::PlaySound:
     case BusinessActionType::PlaySoundRepeated:

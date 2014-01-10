@@ -342,9 +342,9 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
 
     BusinessEventType::Value eventType = m_model->eventType();
     if (eventType == BusinessEventType::Camera_Motion)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionAllowedPolicy>(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
     else if (eventType == BusinessEventType::Camera_Input)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputAllowedPolicy>(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
     dialog.setSelectedResources(m_model->eventResources());
 
     if (dialog.exec() != QDialog::Accepted)
@@ -368,11 +368,11 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingAllowedPolicy>(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
     else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputAllowedPolicy>(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
     else if (actionType == BusinessActionType::SendMail)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailAllowedPolicy>(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
     dialog.setSelectedResources(m_model->actionResources());
 
     if (dialog.exec() != QDialog::Accepted)

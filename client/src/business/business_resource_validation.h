@@ -19,8 +19,8 @@ static bool isResourcesListValid(const QnResourceList &resources) {
     return true;
 }
 
-class QnCameraInputAllowedPolicy {
-    Q_DECLARE_TR_FUNCTIONS(QnCameraInputAllowedPolicy)
+class QnCameraInputPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnCameraInputPolicy)
 public:
     typedef QnVirtualCameraResource resource_type;
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
@@ -28,8 +28,8 @@ public:
     static inline bool emptyListIsValid() { return true; }
 };
 
-class QnCameraOutputAllowedPolicy {
-    Q_DECLARE_TR_FUNCTIONS(QnCameraOutputAllowedPolicy)
+class QnCameraOutputPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnCameraOutputPolicy)
 public:
     typedef QnVirtualCameraResource resource_type;
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
@@ -37,8 +37,8 @@ public:
     static inline bool emptyListIsValid() { return false; }
 };
 
-class QnCameraMotionAllowedPolicy {
-    Q_DECLARE_TR_FUNCTIONS(QnCameraMotionAllowedPolicy)
+class QnCameraMotionPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnCameraMotionPolicy)
 public:
     typedef QnVirtualCameraResource resource_type;
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
@@ -46,8 +46,8 @@ public:
     static inline bool emptyListIsValid() { return true; }
 };
 
-class QnCameraRecordingAllowedPolicy {
-    Q_DECLARE_TR_FUNCTIONS(QnCameraRecordingAllowedPolicy)
+class QnCameraRecordingPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnCameraRecordingPolicy)
 public:
     typedef QnVirtualCameraResource resource_type;
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
@@ -55,12 +55,12 @@ public:
     static inline bool emptyListIsValid() { return false; }
 };
 
-class QnUserEmailAllowedPolicy {
-    Q_DECLARE_TR_FUNCTIONS(QnUserEmailAllowedPolicy)
+class QnUserEmailPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnUserEmailPolicy)
 public:
     typedef QnUserResource resource_type;
     static bool isResourceValid(const QnUserResourcePtr &user);
-    static QString getText(const QnResourceList &resources, const bool detailed = true);
+    static QString getText(const QnResourceList &resources, const bool detailed = true, const QStringList &additional = QStringList());
     static inline bool emptyListIsValid() { return false; }
 };
 

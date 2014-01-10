@@ -125,9 +125,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 
         BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(Qn::EventTypeRole).toInt();
         if (eventType == BusinessEventType::Camera_Motion)
-            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionAllowedPolicy>(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
         else if (eventType == BusinessEventType::Camera_Input)
-            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputAllowedPolicy>(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
 
         return btn;
     }
@@ -160,13 +160,13 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
         if (actionType == BusinessActionType::CameraRecording) {
-            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingAllowedPolicy>(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
         }
         else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant) {
-            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputAllowedPolicy>(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
         }
         else if (actionType == BusinessActionType::SendMail) {
-            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailAllowedPolicy>(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(btn));
             btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
         }
         return btn;
