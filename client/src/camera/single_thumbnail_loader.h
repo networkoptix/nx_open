@@ -22,7 +22,7 @@ public:
      * \returns                         Newly created thumbnail loader.
      */
     static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource,
-                                                qint64 usecSinceEpoch,
+                                                qint64 microSecSinceEpoch,
                                                 const QSize &size,
                                                 QObject *parent = NULL);
 
@@ -36,7 +36,7 @@ public:
      */
     explicit QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
                                      QnNetworkResourcePtr resource,
-                                     qint64 usecSinceEpoch,
+                                     qint64 microSecSinceEpoch,
                                      const QSize &size,
                                      QObject *parent = NULL);
 
@@ -73,7 +73,8 @@ private:
 
     QImage m_image;
 
-    qint64 m_usecSinceEpoch;
+    /** Time in microseconds since epoch */
+    qint64 m_microSecSinceEpoch;
     QSize m_size;
 };
 

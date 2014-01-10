@@ -205,7 +205,7 @@ void QnFisheyeCalibrator::findCircleParams()
     qreal ma = (a2.y() - a1.y()) / (a2.x() - a1.x());
     qreal mb = (a3.y() - a2.y()) / (a3.x() - a2.x());
 
-    if (ma == 0 || mb == 0 || ma > 1e9 || mb > 1e9 || ma < -1e9 || mb < -1e9) {
+    if ((ma == 0 && mb == 0) || ma > 1e9 || mb > 1e9 || ma < -1e9 || mb < -1e9) {
         emit finished (ErrorNotFisheyeImage);
         return;
     }
@@ -338,7 +338,7 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
             break;
     }
     int result = midPos / 2 + left;
-    if (result < 28)
+    if (result < 16)
         return -1;
     else
         return qBound(28, result, 64);

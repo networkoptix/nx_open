@@ -17,7 +17,7 @@ class QPainter;
 class QnResourceDisplay;
 
 struct QnScreenshotParameters {
-    qint64 time;
+    qint64 time;    //in microseconds since epoch
     bool isUtc;
     QString filename;
     Qn::Corner timestampPosition;

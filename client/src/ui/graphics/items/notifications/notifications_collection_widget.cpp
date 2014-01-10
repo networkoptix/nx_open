@@ -577,12 +577,11 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = qnResPool->getResources().filtered<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
             if (!sampleServer)
                 continue;
             resource = sampleServer;
             break;
-        case QnSystemHealth::StoragesAreFull:
-            continue;
         default:
             break;
         }

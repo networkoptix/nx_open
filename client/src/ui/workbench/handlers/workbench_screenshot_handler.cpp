@@ -71,9 +71,10 @@ namespace {
 }
 
 QString QnScreenshotParameters::timeString() const {
+    qint64 timeMSecs = time / 1000;
     if (isUtc)
-        return QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
-    return QTime().addMSecs(time).toString(lit("hh.mm.ss"));
+        return QDateTime::fromMSecsSinceEpoch(timeMSecs).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
+    return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
 QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent):
@@ -182,11 +183,11 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.time = display->camDisplay()->getCurrentTime() / 1000;
+    parameters.time = display->camDisplay()->getCurrentTime();
     parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
-    parameters.itemDewarpingParams = widget->itemDewarpingParams();
+    parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     //TODO: #GDM whay should we disable zoomrect on dewarping cameras? Ask Roma.
@@ -194,7 +195,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, QSize(), this);
+        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, QSize());
     QnScreenshotLoader* loader = new QnScreenshotLoader(parameters, this);
     connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here

@@ -27,14 +27,9 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
 
-    connect(m_widget,       &QnResourceWidget::aspectRatioChanged,              this, &QnFisheyePtzController::updateAspectRatio);
-    connect(m_widget,       &QnMediaResourceWidget::dewarpingParamsChanged,     this, &QnFisheyePtzController::updateMediaDewarpingParams);
-    /* Actually we need QnWorkbenchItem::dewarpingParamsChanged signal here, but direct connection to item leads client to crash.
-       Shared pointer to this object should be stored only in m_widget, but it is stored somewhere else too.
-       So it's possible that m_widget is deleted when QnWorkbenchItem::dewarpingParamsChanged signal is emmited.
-       It will call updateItemDewarpingParams that uses m_widget inside.
-     */
-    connect(m_widget,       &QnMediaResourceWidget::itemDewarpingParamsChanged, this, &QnFisheyePtzController::updateItemDewarpingParams);
+    connect(m_widget,           &QnResourceWidget::aspectRatioChanged,          this, &QnFisheyePtzController::updateAspectRatio);
+    connect(m_widget,           &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnFisheyePtzController::updateMediaDewarpingParams);
+    connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
 
     updateAspectRatio();
     updateItemDewarpingParams();
@@ -117,14 +112,15 @@ void QnFisheyePtzController::updateCapabilities() {
 }
 
 void QnFisheyePtzController::updateAspectRatio() {
+    if (!m_widget)
+        return;
+
     m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
 }
 
 void QnFisheyePtzController::updateMediaDewarpingParams() {
-    if (!m_widget) {
-        qWarning() << "updating params with null widget";
+    if (!m_widget)
         return;
-    }
 
     if (m_mediaDewarpingParams == m_widget->dewarpingParams())
         return;
@@ -135,14 +131,13 @@ void QnFisheyePtzController::updateMediaDewarpingParams() {
     updateCapabilities();
 }
 
+
 void QnFisheyePtzController::updateItemDewarpingParams() {
-    if (!m_widget) {
-        qWarning() << "updating params with null widget";
+    if (!m_widget)
         return;
-    }
 
     int oldPanoFactor = m_itemDewarpingParams. panoFactor;
-    m_itemDewarpingParams = m_widget->itemDewarpingParams();
+    m_itemDewarpingParams = m_widget->item()->dewarpingParams();
     int newPanoFactor = m_itemDewarpingParams.panoFactor;
     if (newPanoFactor != oldPanoFactor) {
         m_itemDewarpingParams.fov *= static_cast<qreal>(newPanoFactor) / oldPanoFactor;
@@ -193,7 +188,9 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
     m_itemDewarpingParams.xAngle = qDegreesToRadians(position.x());
     m_itemDewarpingParams.yAngle = qDegreesToRadians(position.y());
     m_itemDewarpingParams.fov = qDegreesToRadians(position.z());
-    m_widget->setItemDewarpingParams(m_itemDewarpingParams);
+
+    if (m_widget)
+        m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
 

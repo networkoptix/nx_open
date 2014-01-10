@@ -14,6 +14,7 @@
 #include "client_globals.h"
 #include "client_model_types.h"
 #include "client_color_types.h"
+#include "ui/common/weak_graphics_item_pointer.h"
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -56,6 +57,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
     qRegisterMetaType<QnWeakObjectHash>();
+    qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
 
     qRegisterMetaType<QnTimeSliderColors>();
