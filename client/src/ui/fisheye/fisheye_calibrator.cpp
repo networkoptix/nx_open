@@ -338,7 +338,7 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
             break;
     }
     int result = midPos / 2 + left;
-    if (result < 28)
+    if (result < 16)
         return -1;
     else
         return qBound(28, result, 64);
