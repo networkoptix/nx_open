@@ -7,6 +7,7 @@
 
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
+#include <business/business_resource_validator.h>
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -143,7 +144,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
     case Qt::AccessibleDescriptionRole:
-        return m_comments.isEmpty() ? getText(column) : m_comments;
+        return getToolTip(column);
 
     case Qt::DecorationRole:
         return getIcon(column);
@@ -601,7 +602,7 @@ QStandardItemModel* QnBusinessRuleViewModel::actionTypesModel() {
 
 // utilities
 
-QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed) const {
+QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) const {
     switch (column) {
     case QnBusiness::ModifiedColumn:
         return (m_modified ? QLatin1String("*") : QString());
@@ -622,10 +623,32 @@ QVariant QnBusinessRuleViewModel::getText(const int column, const bool detailed)
     default:
         break;
     }
-    return QVariant();
+    return QString();
 }
 
-QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
+QString QnBusinessRuleViewModel::getToolTip(const int column) const {
+    if (isValid())
+        return m_comments.isEmpty() ? getText(column) : m_comments;
+
+    const QString errorMessage = tr("Error: %1");
+
+    switch (column) {
+    case QnBusiness::ModifiedColumn:
+    case QnBusiness::EventColumn:
+    case QnBusiness::SourceColumn:
+        if (!isValid(QnBusiness::SourceColumn))
+            return errorMessage.arg(getText(QnBusiness::SourceColumn));
+        return errorMessage.arg(getText(QnBusiness::TargetColumn));
+    default:
+        // at least one of them should be invalid
+        if (!isValid(QnBusiness::TargetColumn))
+            return errorMessage.arg(getText(QnBusiness::TargetColumn));
+        return errorMessage.arg(getText(QnBusiness::SourceColumn));
+    }
+    return QString();
+}
+
+QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
     switch (column) {
     case QnBusiness::SourceColumn:
     {
@@ -684,10 +707,10 @@ QVariant QnBusinessRuleViewModel::getIcon(const int column) const {
     default:
         break;
     }
-    return QVariant();
+    return QIcon();
 }
 
-QVariant QnBusinessRuleViewModel::getHelpTopic(const int column) const {
+int QnBusinessRuleViewModel::getHelpTopic(const int column) const {
     switch (column) {
     case QnBusiness::EventColumn:
         return QnBusiness::eventHelpId(m_eventType);
@@ -708,9 +731,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     {
         switch (m_eventType) {
         case BusinessEventType::Camera_Motion:
-            return QnMotionBusinessEvent::isResourcesListValid(m_eventResources);
+            return QnCameraMotionValidator::isResourcesListValid(m_eventResources);
         case BusinessEventType::Camera_Input:
-            return QnCameraInputEvent::isResourcesListValid(m_eventResources);
+            return QnCameraInputValidator::isResourcesListValid(m_eventResources);
         default:
             return true;
         }
@@ -739,10 +762,10 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return any;
         }
         case BusinessActionType::CameraRecording:
-            return QnRecordingBusinessAction::isResourcesListValid(m_actionResources);
+            return QnCameraRecordingValidator::isResourcesListValid(m_actionResources);
         case BusinessActionType::CameraOutput:
         case BusinessActionType::CameraOutputInstant:
-            return QnCameraOutputBusinessAction::isResourcesListValid(m_actionResources);
+            return QnCameraOutputValidator::isResourcesListValid(m_actionResources);
         case BusinessActionType::PlaySound:
         case BusinessActionType::PlaySoundRepeated:
             return !m_actionParams.getSoundUrl().isEmpty();
@@ -782,7 +805,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
         if (cameras.isEmpty())
             return tr("<Any Camera>");
 
-        int invalid = QnMotionBusinessEvent::invalidResourcesCount(m_eventResources);
+        int invalid = QnCameraMotionValidator::invalidResourcesCount(m_eventResources);
         if (detailed && invalid > 0)
             return tr("Recording or motion detection is disabled for %1")
                     .arg((cameras.size() == 1)
@@ -859,7 +882,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.isEmpty())
             return tr("Select at least one camera");
 
-        int invalid = QnRecordingBusinessAction::invalidResourcesCount(m_actionResources);
+        int invalid = QnCameraRecordingValidator::invalidResourcesCount(m_actionResources);
         if (detailed && invalid > 0)
             return tr("Recording is disabled for %1")
                     .arg((cameras.size() == 1)
@@ -876,7 +899,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         if (cameras.isEmpty())
             return tr("Select at least one camera");
 
-        int invalid = QnCameraOutputBusinessAction::invalidResourcesCount(m_actionResources);
+        int invalid = QnCameraOutputValidator::invalidResourcesCount(m_actionResources);
         if (detailed && invalid > 0)
             return tr("%1 have not output relays", "", cameras.size())
                     .arg((cameras.size() == 1)

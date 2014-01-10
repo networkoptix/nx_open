@@ -9,34 +9,12 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::
 {
 }
 
-bool QnMotionBusinessEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraMotionAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled()
             && camera->getMotionType() != Qn::MT_NoMotion
             && camera->supportedMotionType() != Qn::MT_NoMotion;
-
 }
 
-bool QnMotionBusinessEvent::isResourcesListValid(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return true; // should no check if any camera is selected
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-int QnMotionBusinessEvent::invalidResourcesCount(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return 0; // should no check if any camera is selected
-    int invalid = 0;
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            invalid++;
-        }
-    }
-    return invalid;
+QString QnCameraMotionAllowedPolicy::getErrorText(int invalid, int total) {
+    return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
 }

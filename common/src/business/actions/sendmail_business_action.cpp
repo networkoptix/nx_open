@@ -2,20 +2,10 @@
 * 29 nov 2012
 * a.kolesnikov
 ***********************************************************/
-
 #include "sendmail_business_action.h"
 
-#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
-
-#include <business/events/reasoned_business_event.h>
-#include <business/events/conflict_business_event.h>
-#include <business/events/camera_input_business_event.h>
-
-#include "version.h"
-#include "api/app_server_connection.h"
-#include "business/business_strings_helper.h"
+#include <utils/common/email.h>
 
 QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessEventParameters &runtimeParams):
     base_type(BusinessActionType::SendMail, runtimeParams)
@@ -30,3 +20,10 @@ void QnSendMailBusinessAction::setAggregationInfo(const QnBusinessAggregationInf
     m_aggregationInfo = info;
 }
 
+bool QnUserEmailAllowedPolicy::isResourceValid(const QnUserResourcePtr &resource) {
+    return QnEmail::isValid(resource->getEmail());
+}
+
+QString QnUserEmailAllowedPolicy::getErrorText(int invalid, int total) {
+    return tr("%1 of %2 selected users have invalid email.").arg(invalid).arg(total);
+}

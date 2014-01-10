@@ -26,25 +26,16 @@ bool QnCameraInputEvent::checkCondition(Qn::ToggleState state, const QnBusinessE
     return inputPort.isEmpty() || inputPort == m_inputPortID;
 }
 
-bool QnCameraInputEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
-}
-
-bool QnCameraInputEvent::isResourcesListValid(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return true; // should no check if any camera is selected
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 QnBusinessEventParameters QnCameraInputEvent::getRuntimeParams() const {
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.setInputPortId(m_inputPortID);
     return params;
 }
 
+bool QnCameraInputAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
+}
+
+QString QnCameraInputAllowedPolicy::getErrorText(int invalid, int total) {
+    return tr("%1 of %2 selected cameras have no input ports.").arg(invalid).arg(total);
+}

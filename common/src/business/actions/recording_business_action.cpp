@@ -4,6 +4,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_resource.h>
 
 QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessEventParameters &runtimeParams):
     base_type(BusinessActionType::CameraRecording, runtimeParams)
@@ -30,29 +31,10 @@ int QnRecordingBusinessAction::getRecordAfter() const {
     return m_params.getRecordAfter();
 }
 
-bool QnRecordingBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraRecordingAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled();
 }
 
-bool QnRecordingBusinessAction::isResourcesListValid(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return false;
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-int QnRecordingBusinessAction::invalidResourcesCount(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = 0;
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            invalid++;
-        }
-    }
-    return invalid;
+QString QnCameraRecordingAllowedPolicy::getErrorText(int invalid, int total) {
+    return tr("Recording is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
 }

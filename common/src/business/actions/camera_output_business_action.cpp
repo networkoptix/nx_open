@@ -25,29 +25,10 @@ QString QnCameraOutputBusinessAction::getExternalUniqKey() const
     return QnAbstractBusinessAction::getExternalUniqKey() + QString(L'_') + getRelayOutputId();
 }
 
-bool QnCameraOutputBusinessAction::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+bool QnCameraOutputAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
 }
 
-bool QnCameraOutputBusinessAction::isResourcesListValid(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return false;
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-int QnCameraOutputBusinessAction::invalidResourcesCount(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = 0;
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            invalid++;
-        }
-    }
-    return invalid;
+QString QnCameraOutputAllowedPolicy::getErrorText(int invalid, int total) {
+    return tr("%1 of %2 selected cameras have not output relays.").arg(invalid).arg(total);
 }
