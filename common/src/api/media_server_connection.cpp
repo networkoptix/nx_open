@@ -517,8 +517,8 @@ int QnMediaServerConnection::searchCameraAsyncStop(const QUuid &processUuid, QOb
 int QnMediaServerConnection::addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;
     for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
-        params << QnRequestParam("url", urls[i]);
-        params << QnRequestParam("manufacturer", manufacturers[i]);
+        params << QnRequestParam(lit("url") + QString::number(i), urls[i]);
+        params << QnRequestParam(lit("manufacturer") + QString::number(i), manufacturers[i]);
     }
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
