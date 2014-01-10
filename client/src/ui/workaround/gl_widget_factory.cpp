@@ -12,7 +12,8 @@ void QnGlWidgetFactory::enableVSync(QGLWidget *widget) {
     widget->makeCurrent();
 
 #if defined(Q_OS_WIN32)
-    WglSwapIntervalExt wglSwapIntervalExt = ((WglSwapIntervalExt)wglGetProcAddress("wglSwapIntervalEXT"));
+	typedef BOOL (WINAPI *fn_wglSwapIntervalExt)(int);
+    fn_wglSwapIntervalExt wglSwapIntervalExt = reinterpret_cast<fn_wglSwapIntervalExt>(wglGetProcAddress("wglSwapIntervalEXT"));
     if (wglSwapIntervalExt)
         wglSwapIntervalExt(1);
 #elif defined(Q_OS_MAC)
