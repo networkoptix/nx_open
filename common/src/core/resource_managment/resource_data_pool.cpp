@@ -87,7 +87,7 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     QMutexLocker locker(&m_mutex);
     foreach(const QnResourceDataPoolChunk &chunk, chunks)
         foreach(const QString &key, chunk.keys)
-            m_dataByKey[key.toLower()].addData(chunk.data);
+            m_dataByKey[key.toLower()].add(chunk.data);
 
     return true;
 }
