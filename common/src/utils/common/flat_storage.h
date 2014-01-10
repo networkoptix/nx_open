@@ -4,6 +4,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QtAlgorithms> /* For qDeleteAll. */
 
+#include <boost/type_traits/is_pointer.hpp>
+
 #include "flat_map.h"
 
 /**
@@ -13,6 +15,8 @@
 template<class Key, class T>
 class QnFlatStorage: private QnFlatMap<Key, T> {
     typedef QnFlatMap<Key, T> base_type;
+
+    static_assert(boost::is_pointer<T>::value, "Stored type must be a pointer.");
 
 public:
     QnFlatStorage() {}
@@ -24,6 +28,10 @@ public:
     using base_type::empty;
     using base_type::clear;
     using base_type::value;
+
+    QList<T> values() const {
+        return m_owned.toList();
+    }
 
     void insert(const Key &key, T value, bool claimOwnership = true) {
         base_type::insert(key, value);

@@ -12,6 +12,10 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+namespace {
+    const QString overrideArKey = lit("overrideAr"); //TODO: #GDM globalize
+}
+
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::AdvancedSettingsWidget),
@@ -42,6 +46,13 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     ui->highQualityWarningLabel->setVisible(false);
     ui->lowQualityWarningLabel->setVisible(false);
 
+    connect(ui->arOverrideCheckBox, &QCheckBox::toggled,                ui->arComboBox, &QWidget::setEnabled);
+    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
+    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
+    ui->arComboBox->addItem(tr("1:1"),  1.0);
+
+    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dataChanged()));
+
     connect(ui->restoreDefaultsButton, SIGNAL(clicked()), this, SLOT(at_restoreDefaultsButton_clicked()));
 
     connect(ui->settingsDisableControlCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dataChanged()));
@@ -63,6 +74,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 
     bool sameQuality = true;
     bool sameControlState = true;
+    bool sameArOverride = true;
 
     Qn::SecondStreamQuality quality = Qn::SSQualityNotDefined;
     bool controlDisabled = false;
@@ -70,8 +82,11 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     int arecontCamerasCount = 0;
     bool anyHasDualStreaming = false;
 
+    QString arOverride;
+
     bool isFirstQuality = true;
     bool isFirstControl = true;
+    bool isFirstAr      = true;
 
 
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
@@ -96,6 +111,14 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
                 sameControlState &= camera->isCameraControlDisabled() == controlDisabled;
             }
         }
+
+        QString changedAr = camera->getProperty(overrideArKey);
+        if (isFirstAr) {
+            isFirstAr = false;
+            arOverride = changedAr;
+        } else {
+            sameArOverride &= changedAr == arOverride;
+        }
     }
 
     ui->qualityGroupBox->setVisible(anyHasDualStreaming);
@@ -117,8 +140,20 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     else
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
+    ui->arOverrideCheckBox->setTristate(!sameArOverride);
+    if (sameArOverride) {
+        ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+
+        qreal ar = arOverride.toDouble();
+        int idx = ui->arComboBox->findData(ar, Qt::UserRole, Qt::MatchExactly);
+        ui->arComboBox->setCurrentIndex(idx);
+    }
+    else
+        ui->arOverrideCheckBox->setCheckState(Qt::PartiallyChecked);
+
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
-            && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium;
+            && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
+            && arOverride.isEmpty();
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -136,6 +171,9 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
 
+    bool overrideAr = ui->arOverrideCheckBox->checkState() == Qt::Checked;
+    bool clearAr = ui->arOverrideCheckBox->checkState() == Qt::Unchecked;
+
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
 
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
@@ -148,6 +186,11 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
 
         if (enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
             camera->setSecondaryStreamQuality(quality);
+
+        if (overrideAr)
+            camera->setProperty(overrideArKey, QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+        else if (clearAr)
+            camera->setProperty(overrideArKey, QString());
     }
 }
 

@@ -3,13 +3,10 @@
 
 #ifdef ENABLE_ACTI
 
-#include <QtCore/QHash>
 #include <QtCore/QMutex>
 
 #include <core/ptz/basic_ptz_controller.h>
 
-class CLSimpleHTTPClient;
-class QnActiParameterMap;
 
 class QnActiPtzController: public QnBasicPtzController {
     Q_OBJECT

@@ -37,6 +37,22 @@ const QObject *GraphicsStyle::currentTarget(const QWidget *widget) const {
     }
 }
 
+void GraphicsStyle::polish(QGraphicsWidget *widget) {
+    QnScopedValueRollback<const QGraphicsWidget *> rollback(&m_graphicsWidget, widget);
+
+    return baseStyle()->polish(static_cast<QWidget *>(NULL));
+}
+
+void GraphicsStyle::unpolish(QGraphicsWidget *widget) {
+    QnScopedValueRollback<const QGraphicsWidget *> rollback(&m_graphicsWidget, widget);
+
+    return baseStyle()->unpolish(static_cast<QWidget *>(NULL));
+}
+
+void GraphicsStyle::polish(QPalette &palette) {
+    baseStyle()->polish(palette);
+}
+
 QPixmap GraphicsStyle::standardPixmap(QStyle::StandardPixmap standardPixmap, const QStyleOption *option, const QGraphicsWidget *widget) const {
     QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
 

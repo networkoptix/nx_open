@@ -86,6 +86,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
+        <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -435,6 +436,29 @@
             <modules>
                 <module>ios-client</module>
             </modules>
+        </profile>
+        <profile>
+            <id>beta</id>
+            <activation>
+                <property>
+                    <name>!beta</name>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
+            </properties>
+        </profile>	      
+        <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <finalName>${artifact.name}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
+            </properties>       
         </profile>	        
     </profiles>	
 </project>

@@ -7,7 +7,7 @@ QnPtzMapperPtr QnResourceData::ptzMapper() {
     return m_valueByKey.value(lit("ptzMapper")).value<QnPtzMapperPtr>();
 }
 
-bool deserialize(const QJsonValue &value, QnResourceData *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target) {
     if(value.type() == QJsonValue::Null) {
         /* That's null data. */
         *target = QnResourceData();
@@ -15,14 +15,14 @@ bool deserialize(const QJsonValue &value, QnResourceData *target) {
     }
 
     QJsonObject map;
-    if(!QJson::deserialize(value, &map))
+    if(!QJson::deserialize(ctx, value, &map))
         return false;
 
     QnResourceData result;
     for(QJsonObject::const_iterator pos = map.begin(); pos != map.end(); pos++) {
         if(pos.key() == lit("ptzMapper")) {
             QnPtzMapperPtr mapper;
-            if(!QJson::deserialize(pos.value(), &mapper))
+            if(!QJson::deserialize(ctx, pos.value(), &mapper))
                 return false;
 
             result.setValue(pos.key(), mapper);

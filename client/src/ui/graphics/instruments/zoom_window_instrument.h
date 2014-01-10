@@ -18,11 +18,15 @@ class QnMediaResourceWidget;
 
 class ZoomWindowInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT
+    Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)
     typedef DragProcessingInstrument base_type;
 
 public:
     ZoomWindowInstrument(QObject *parent = NULL);
     virtual ~ZoomWindowInstrument();
+
+    const QVector<QColor> &colors() const { return m_colors; }
+    void setColors(const QVector<QColor> &colors) { m_colors = colors; }
 
 signals:
     void zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect);
@@ -97,7 +101,7 @@ private:
     };
 
     bool m_zoomWindowStartedEmitted;
-    QVector<QColor> m_zoomWindowColors;
+    QVector<QColor> m_colors;
     QPointer<FixedArSelectionItem> m_selectionItem;
     QPointer<QWidget> m_viewport;
     QColor m_zoomWindowColor;

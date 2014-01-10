@@ -3,87 +3,161 @@
 
 #include <cassert>
 
+#ifndef Q_MOC_RUN
+#include <boost/type_traits/is_empty.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <boost/functional/value_factory.hpp>
+#endif
+
 #include <QtCore/QVector>
 
-template<class T>
-struct QnDefaultConstructor {
-    T operator()() const {
-        return T();
-    }
-};
+namespace QnFlatMapDetail {
 
-template<class T, T value>
-struct QnValueConstructor {
-    T operator()() const {
-        return value;
+    /* FactoryData implements empty base optimization. */
+
+    template<class Factory, bool isEmpty = boost::is_empty<Factory>::value> 
+    class FactoryData {
+    public:
+        FactoryData(const Factory &factory): m_factory(factory) {}
+
+        const Factory &factory() const { return m_factory; }
+
+    private:
+        Factory m_factory;
+    };
+
+    template<class Factory>
+    class FactoryData<Factory, true> {
+    public:
+        FactoryData(const Factory &) {}
+
+        Factory factory() const { return Factory(); }
+    };
+
+    template<class Container, class Key, class Factory>
+    inline typename Container::value_type safe_value(const Container &list, const Key &key, const Factory &factory) {
+        assert(key >= 0);
+
+        if(key >= static_cast<Key>(list.size()))
+            return factory();
+
+        return list[key];
     }
-};
+
+    template<class Container, class Key, class Factory>
+    inline typename Container::value_type &safe_reference(Container &list, const Key &key, const Factory &factory) {
+        assert(key >= 0);
+
+        while(key >= static_cast<Key>(list.size()))
+            list.push_back(factory());
+
+        return list[key];
+    }
+
+    template<class Key, class T, class Factory, class Container, bool isUnsigned = boost::is_unsigned<Key>::value>
+    class Data: public FactoryData<Factory> {
+        typedef FactoryData<Factory> base_type;
+    public:
+        Data(const Factory &factory): base_type(factory) {}
+
+        using base_type::factory;
+
+        void clear() {
+            m_positive.clear();
+            m_negative.clear();
+        }
+
+        bool empty() const {
+            return m_positive.empty() && m_negative.empty();
+        }
+
+        T value(const Key &key) const {
+            if(key >= 0) {
+                return safe_value(m_positive, key, factory());
+            } else {
+                return safe_value(m_negative, ~key, factory());
+            }
+        }
+
+        T &reference(const Key &key) {
+            if(key >= 0) {
+                return safe_reference(m_positive, key, factory());
+            } else {
+                return safe_reference(m_negative, ~key, factory());
+            }
+        }
+
+    private:
+        Container m_positive, m_negative;
+    };
+
+    template<class Key, class T, class Factory, class Container>
+    class Data<Key, T, Factory, Container, true>: public FactoryData<Factory> {
+        typedef FactoryData<Factory> base_type;
+    public:
+        Data(const Factory &factory): base_type(factory) {}
+
+        using base_type::factory;
+
+        void clear() {
+            m_positive.clear();
+        }
+
+        bool empty() const {
+            return m_positive.empty();
+        }
+
+        T value(const Key &key) const {
+            return safe_value(m_positive, key, factory());
+        }
+
+        T &reference(const Key &key) {
+            return safe_reference(m_positive, key, factory());
+        }
+
+    private:
+        Container m_positive;
+    };
+
+} // namespace QnFlatMapDetail
 
 
 /**
  * Map with an integer key that uses arrays internally.
  */
-template<class Key, class T, class DefaultConstructor = QnDefaultConstructor<T>, class Container = QVector<T> >
+template<class Key, class T, class DefaultValueFactory = boost::value_factory<T>, class Container = QVector<T> >
 class QnFlatMap {
 public:
-    QnFlatMap() {}
+    QnFlatMap(const DefaultValueFactory &factory = DefaultValueFactory()): d(factory) {}
 
     /* Default copy constructor and assignment are OK. */
 
     void clear() {
-        m_positive.clear();
-        m_negative.clear();
+        d.clear();
     }
 
     bool empty() const {
-        return m_positive.empty() && m_negative.empty();
+        return d.empty();
     }
 
     T value(const Key &key) const {
-        if(key >= 0) {
-            return valueInternal(m_positive, key);
-        } else {
-            return valueInternal(m_negative, ~key);
-        }
+        return d.value(key);
     }
 
     void insert(const Key &key, const T &value) {
-        operator[](key) = value;
+        d.reference(key) = value;
     }
 
     T operator[](const Key &key) const {
-        return value(key);
+        return d.value(key);
     }
 
     T &operator[](const Key &key) {
-        if(key >= 0) {
-            return referenceInternal(m_positive, key);
-        } else {
-            return referenceInternal(m_negative, ~key);
-        }
+        return d.reference(key);
     }
 
 private:
-    T valueInternal(const Container &list, const Key &key) const {
-        assert(key >= 0);
-
-        if(key >= list.size())
-            return DefaultConstructor()();
-
-        return list[key];
-    }
-
-    T &referenceInternal(Container &list, const Key &key) {
-        assert(key >= 0);
-
-        while(key >= list.size())
-            list.push_back(DefaultConstructor()());
-
-        return list[key];
-    }
-
-private:
-    Container m_positive, m_negative;
+    QnFlatMapDetail::Data<Key, T, DefaultValueFactory, Container> d;
 };
 
 #endif // QN_FLAT_MAP_H
