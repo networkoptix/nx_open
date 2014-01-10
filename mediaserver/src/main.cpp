@@ -491,7 +491,7 @@ int serverMain(int argc, char *argv[])
         QDir().mkpath( logDir );
         const QString& logFileName = logDir + QLatin1String("/log_file");
         //MSSettings::roSettings()->setValue("logFile", logFileName);
-        if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
         {
             qApp->quit();
 
