@@ -12,11 +12,12 @@
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
 
-#include <business/events/motion_business_event.h>
-#include <business/events/camera_input_business_event.h>
-#include <business/actions/recording_business_action.h>
-#include <business/actions/camera_output_business_action.h>
-#include <business/actions/sendmail_business_action.h>
+#include <business/business_resource_validation.h>
+//#include <business/events/motion_business_event.h>
+//#include <business/events/camera_input_business_event.h>
+//#include <business/actions/recording_business_action.h>
+//#include <business/actions/camera_output_business_action.h>
+//#include <business/actions/sendmail_business_action.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>

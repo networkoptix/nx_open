@@ -7,7 +7,7 @@
 
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
-#include <business/business_resource_validator.h>
+#include <business/business_resource_validation.h>
 #include <business/events/abstract_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/motion_business_event.h>
@@ -731,9 +731,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     {
         switch (m_eventType) {
         case BusinessEventType::Camera_Motion:
-            return QnCameraMotionValidator::isResourcesListValid(m_eventResources);
+            return isResourcesListValid<QnCameraMotionAllowedPolicy>(m_eventResources);
         case BusinessEventType::Camera_Input:
-            return QnCameraInputValidator::isResourcesListValid(m_eventResources);
+            return isResourcesListValid<QnCameraInputAllowedPolicy>(m_eventResources);
         default:
             return true;
         }
@@ -762,10 +762,10 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return any;
         }
         case BusinessActionType::CameraRecording:
-            return QnCameraRecordingValidator::isResourcesListValid(m_actionResources);
+            return isResourcesListValid<QnCameraRecordingAllowedPolicy>(m_actionResources);
         case BusinessActionType::CameraOutput:
         case BusinessActionType::CameraOutputInstant:
-            return QnCameraOutputValidator::isResourcesListValid(m_actionResources);
+            return isResourcesListValid<QnCameraOutputAllowedPolicy>(m_actionResources);
         case BusinessActionType::PlaySound:
         case BusinessActionType::PlaySoundRepeated:
             return !m_actionParams.getSoundUrl().isEmpty();
@@ -801,19 +801,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel() {
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
     if (m_eventType == BusinessEventType::Camera_Motion) {
-        QnVirtualCameraResourceList cameras = m_eventResources.filtered<QnVirtualCameraResource>();
-        if (cameras.isEmpty())
-            return tr("<Any Camera>");
-
-        int invalid = QnCameraMotionValidator::invalidResourcesCount(m_eventResources);
-        if (detailed && invalid > 0)
-            return tr("Recording or motion detection is disabled for %1")
-                    .arg((cameras.size() == 1)
-                         ? getResourceName(cameras.first())
-                         : tr("%1 of %n cameras", "...for", cameras.size()).arg(invalid));
-        if (cameras.size() == 1)
-            return getResourceName(cameras.first());
-        return tr("%n Camera(s)", "", cameras.size());
+        return QnCameraMotionAllowedPolicy::getText(m_eventResources);
     }
 
     QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
@@ -878,36 +866,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case BusinessActionType::CameraRecording:
     {
-        QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
-        if (cameras.isEmpty())
-            return tr("Select at least one camera");
-
-        int invalid = QnCameraRecordingValidator::invalidResourcesCount(m_actionResources);
-        if (detailed && invalid > 0)
-            return tr("Recording is disabled for %1")
-                    .arg((cameras.size() == 1)
-                         ? getResourceName(cameras.first())
-                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
-        if (cameras.size() == 1)
-            return getResourceName(cameras.first());
-        return tr("%n Camera(s)", "", cameras.size());
+        return QnCameraRecordingAllowedPolicy::getText(m_actionResources, detailed);
     }
     case BusinessActionType::CameraOutput:
     case BusinessActionType::CameraOutputInstant:
     {
-        QnVirtualCameraResourceList cameras = m_actionResources.filtered<QnVirtualCameraResource>();
-        if (cameras.isEmpty())
-            return tr("Select at least one camera");
-
-        int invalid = QnCameraOutputValidator::invalidResourcesCount(m_actionResources);
-        if (detailed && invalid > 0)
-            return tr("%1 have not output relays", "", cameras.size())
-                    .arg((cameras.size() == 1)
-                         ? getResourceName(cameras.first())
-                         : tr("%1 of %2 cameras").arg(invalid).arg(cameras.size()));
-        if (cameras.size() == 1)
-            return getResourceName(cameras.first());
-        return tr("%n Camera(s)", "", cameras.size());
+        return QnCameraOutputAllowedPolicy::getText(m_actionResources, detailed);
     }
     case BusinessActionType::PlaySound:
     case BusinessActionType::PlaySoundRepeated:

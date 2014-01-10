@@ -6,9 +6,6 @@
 #ifndef SENDMAILBUSINESSACTION_H
 #define SENDMAILBUSINESSACTION_H
 
-#include <QtCore/QCoreApplication> //for Q_DECLARE_TR_FUNCTIONS
-
-#include <business/business_resource_validator.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/business_aggregation_info.h>
 
@@ -30,16 +27,5 @@ private:
 };
 
 typedef QSharedPointer<QnSendMailBusinessAction> QnSendMailBusinessActionPtr;
-
-class QnUserEmailAllowedPolicy {
-    Q_DECLARE_TR_FUNCTIONS(QnUserEmailAllowedPolicy)
-public:
-    typedef QnUserResource resource_type;
-    static inline bool emptyListIsValid() { return false; }
-    static bool isResourceValid(const QnUserResourcePtr &user);
-    static QString getErrorText(int invalid, int total);
-};
-
-typedef QnBusinessResourceValidator<QnUserEmailAllowedPolicy> QnUserEmailValidator;
 
 #endif  //SENDMAILBUSINESSACTION_H

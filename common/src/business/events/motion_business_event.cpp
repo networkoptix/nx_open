@@ -8,13 +8,3 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::
     m_metadata(metadata)
 {
 }
-
-bool QnCameraMotionAllowedPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled()
-            && camera->getMotionType() != Qn::MT_NoMotion
-            && camera->supportedMotionType() != Qn::MT_NoMotion;
-}
-
-QString QnCameraMotionAllowedPolicy::getErrorText(int invalid, int total) {
-    return tr("Recording or motion detection is disabled for %1 of %2 selected cameras.").arg(invalid).arg(total);
-}

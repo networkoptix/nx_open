@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
 
-#include <business/business_resource_validator.h>
+#include <business/business_resource_validation.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/style/warning_style.h>
 
@@ -35,21 +35,12 @@ public:
 template<typename CheckingPolicy>
 class QnCheckResourceAndWarnDelegate: public QnResourceSelectionDialogDelegate, private CheckingPolicy {
 
-    using CheckingPolicy::emptyListIsValid;
+    using CheckingPolicy::getText;
     using CheckingPolicy::isResourceValid;
-    using CheckingPolicy::getErrorText;
 
     typedef typename CheckingPolicy::resource_type ResourceType;
     typedef QnResourceSelectionDialogDelegate base_type;
 public:
-//    QnCheckResourceAndWarnDelegate(QWidget* parent = NULL);
-//    ~QnCheckResourceAndWarnDelegate();
-
-//    void init(QWidget* parent) override;
-//    bool validate(const QnResourceList &selected) override;
-//    bool isValid(const QnResourcePtr &resource) override;
-
-
     QnCheckResourceAndWarnDelegate(QWidget* parent):
         QnResourceSelectionDialogDelegate(parent),
         m_warningLabel(NULL)
@@ -66,14 +57,10 @@ public:
         if (!m_warningLabel)
             return true;
 
-        QnSharedResourcePointerList<ResourceType> filtered = selected.filtered<ResourceType>();
-        int invalid = 0;
-        foreach (const QnSharedResourcePointer<ResourceType> &resource, filtered)
-            if (!isResourceValid(resource))
-                invalid++;
-
-        m_warningLabel->setText(getErrorText(invalid, filtered.size()));
-        m_warningLabel->setVisible(invalid > 0 || !emptyListIsValid());
+        bool valid = isResourcesListValid<CheckingPolicy>(selected);
+        m_warningLabel->setVisible(!valid);
+        if (!valid)
+            m_warningLabel->setText(getText(selected));
         return true;
     }
 
