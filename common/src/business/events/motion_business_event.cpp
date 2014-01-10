@@ -8,35 +8,3 @@ QnMotionBusinessEvent::QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::
     m_metadata(metadata)
 {
 }
-
-bool QnMotionBusinessEvent::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled()
-            && camera->getMotionType() != Qn::MT_NoMotion
-            && camera->supportedMotionType() != Qn::MT_NoMotion;
-
-}
-
-bool QnMotionBusinessEvent::isResourcesListValid(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return true; // should no check if any camera is selected
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-int QnMotionBusinessEvent::invalidResourcesCount(const QnResourceList &resources) {
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.isEmpty())
-        return 0; // should no check if any camera is selected
-    int invalid = 0;
-    foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-        if (!isResourceValid(camera)) {
-            invalid++;
-        }
-    }
-    return invalid;
-}

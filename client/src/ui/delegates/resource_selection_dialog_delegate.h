@@ -4,7 +4,9 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
 
+#include <business/business_resource_validation.h>
 #include <core/resource/resource_fwd.h>
+#include <ui/style/warning_style.h>
 
 class QnResourceSelectionDialogDelegate: public QObject {
     Q_OBJECT
@@ -30,92 +32,47 @@ public:
     virtual bool isValid(const QnResourcePtr &resource);
 };
 
+template<typename CheckingPolicy>
+class QnCheckResourceAndWarnDelegate: public QnResourceSelectionDialogDelegate, private CheckingPolicy {
 
-template<class ResourceType>
-class QnCheckResourceAndWarnDelegate: public QnResourceSelectionDialogDelegate {
+    using CheckingPolicy::getText;
+    using CheckingPolicy::isResourceValid;
+
+    typedef typename CheckingPolicy::resource_type ResourceType;
     typedef QnResourceSelectionDialogDelegate base_type;
 public:
-    QnCheckResourceAndWarnDelegate(QWidget* parent);
-    ~QnCheckResourceAndWarnDelegate();
-    virtual void init(QWidget* parent) override;
-    virtual bool validate(const QnResourceList &selected) override;
-    virtual bool isValid(const QnResourcePtr &resource) override;
+    QnCheckResourceAndWarnDelegate(QWidget* parent):
+        QnResourceSelectionDialogDelegate(parent),
+        m_warningLabel(NULL)
+    {}
+    ~QnCheckResourceAndWarnDelegate() {}
 
-protected:
-    virtual bool isResourceValid(const QnSharedResourcePointer<ResourceType> &resource) const = 0;
-    virtual QString getText(int invalid, int total) const = 0;
+    void init(QWidget* parent) override {
+        m_warningLabel = new QLabel(parent);
+        setWarningStyle(m_warningLabel);
+        parent->layout()->addWidget(m_warningLabel);
+    }
 
+    bool validate(const QnResourceList &selected) override {
+        if (!m_warningLabel)
+            return true;
+
+        bool valid = isResourcesListValid<CheckingPolicy>(selected);
+        m_warningLabel->setVisible(!valid);
+        if (!valid)
+            m_warningLabel->setText(getText(selected));
+        return true;
+    }
+
+    bool isValid(const QnResourcePtr &resource) override {
+        QnSharedResourcePointer<ResourceType> derived = resource.dynamicCast<ResourceType>();
+
+        // return true for resources of other type - so root elements will not be highlighted
+        return !derived || isResourceValid(derived);
+    }
 private:
     QLabel* m_warningLabel;
 };
 
-class QnMotionEnabledDelegate: public QnCheckResourceAndWarnDelegate<QnVirtualCameraResource> {
-    Q_OBJECT
-    typedef QnCheckResourceAndWarnDelegate base_type;
-
-public:
-    QnMotionEnabledDelegate(QWidget* parent);
-    ~QnMotionEnabledDelegate();
-
-protected:
-    virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override;
-    virtual QString getText(int invalid, int total) const override;
-};
-
-
-class QnRecordingEnabledDelegate: public QnCheckResourceAndWarnDelegate<QnVirtualCameraResource> {
-    Q_OBJECT
-    typedef QnCheckResourceAndWarnDelegate base_type;
-
-public:
-    QnRecordingEnabledDelegate(QWidget* parent);
-    ~QnRecordingEnabledDelegate();
-
-protected:
-    virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override;
-    virtual QString getText(int invalid, int total) const override;
-};
-
-
-class QnInputEnabledDelegate: public QnCheckResourceAndWarnDelegate<QnVirtualCameraResource> {
-    Q_OBJECT
-    typedef QnCheckResourceAndWarnDelegate base_type;
-
-public:
-    QnInputEnabledDelegate(QWidget* parent);
-    ~QnInputEnabledDelegate();
-
-protected:
-    virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override;
-    virtual QString getText(int invalid, int total) const override;
-};
-
-
-class QnOutputEnabledDelegate: public QnCheckResourceAndWarnDelegate<QnVirtualCameraResource> {
-    Q_OBJECT
-    typedef QnCheckResourceAndWarnDelegate base_type;
-
-public:
-    QnOutputEnabledDelegate(QWidget* parent);
-    ~QnOutputEnabledDelegate();
-
-protected:
-    virtual bool isResourceValid(const QnVirtualCameraResourcePtr &camera) const override;
-    virtual QString getText(int invalid, int total) const override;
-};
-
-
-class QnEmailValidDelegate: public QnCheckResourceAndWarnDelegate<QnUserResource> {
-    Q_OBJECT
-    typedef QnCheckResourceAndWarnDelegate base_type;
-
-public:
-    QnEmailValidDelegate(QWidget* parent);
-    ~QnEmailValidDelegate();
-
-protected:
-    virtual bool isResourceValid(const QnUserResourcePtr &user) const override;
-    virtual QString getText(int invalid, int total) const override;
-};
 
 #endif // RESOURCE_SELECTION_DIALOG_DELEGATE_H

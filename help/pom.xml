@@ -27,7 +27,7 @@
 	<build>
 		<defaultGoal>compile</defaultGoal>
 		<directory>target</directory>
-
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
