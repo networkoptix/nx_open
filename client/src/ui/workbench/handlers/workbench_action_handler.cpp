@@ -263,9 +263,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::SetCurrentItemAspectRatioAutoAction),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatioAutoAction_triggered()));
-    connect(action(Qn::SetCurrentItemAspectRatio4x3Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio4x3Action_triggered()));
-    connect(action(Qn::SetCurrentItemAspectRatio16x9Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -2204,7 +2201,7 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
     }
 }
 
-
+/*
 void QnWorkbenchActionHandler::at_setCurrentItemAspectRatioAutoAction_triggered() {
     QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if(!widget)
@@ -2224,7 +2221,7 @@ void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio16x9Action_triggered(
     if(!widget)
         return;
     widget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
-}
+}*/
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);

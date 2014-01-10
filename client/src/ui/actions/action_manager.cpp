@@ -1078,27 +1078,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(hasFlags(QnResource::live_cam)).
         text(tr("Change Camera Aspect Ratio..."));
 
-    factory.beginSubMenu(); {
-        factory.beginGroup();
-
-        factory(Qn::SetCurrentItemAspectRatioAutoAction).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-            condition(hasFlags(QnResource::live_cam)).
-            text(tr("Auto"));
-
-        factory(Qn::SetCurrentItemAspectRatio4x3Action).
-            flags(Qn::Scene | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-            condition(hasFlags(QnResource::live_cam)).
-            text(tr("4:3"));
-
-        factory(Qn::SetCurrentItemAspectRatio16x9Action).
-            flags(Qn::Scene | Qn::SingleTarget |Qn::ResourceTarget | Qn::LayoutItemTarget).
-            condition(hasFlags(QnResource::live_cam)).
-            text(tr("16:9"));
-
-        factory.endGroup();
-    } factory.endSubMenu();
-
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Check Camera Issues...")).
