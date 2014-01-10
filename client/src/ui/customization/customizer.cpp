@@ -304,7 +304,7 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
      * Note that normally this check would not be needed, but there is a bug
      * in QObject::setProperty --- it could crash for user-defined types if 
      * supplied the wrong type inside the variant. */ // TODO: #Elric #QTBUG write bugreport.
-    if(data->type != data->value.userType())
+    if(data->value.userType() == QMetaType::UnknownType)
         return; 
 
     if(type == QMetaType::QPalette) {
