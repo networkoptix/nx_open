@@ -6,6 +6,15 @@
 
 class QApplication;
 
+// TODO: #Elric:
+// use three customization files:
+// 
+// customization_common
+// customization_base
+// customization_child
+// 
+// Add QnCustomization::add(const QnCustomization &other) method that would merge'em.
+
 class QnCustomization {
 public:
     QnCustomization();
