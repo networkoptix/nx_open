@@ -60,6 +60,8 @@ namespace QnFlatMapDetail {
     public:
         Data(const Factory &factory): base_type(factory) {}
 
+        using base_type::factory;
+
         void clear() {
             m_positive.clear();
             m_negative.clear();
@@ -94,6 +96,8 @@ namespace QnFlatMapDetail {
         typedef FactoryData<Factory> base_type;
     public:
         Data(const Factory &factory): base_type(factory) {}
+
+        using base_type::factory;
 
         void clear() {
             m_positive.clear();
