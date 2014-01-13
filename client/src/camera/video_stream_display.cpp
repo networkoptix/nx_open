@@ -1025,7 +1025,7 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
         return QImage();
 
     // feature #2563
-    if (m_lastDisplayedFrame->flags && QnAbstractMediaData::MediaFlags_LowQuality)
+    if (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality)
         return QImage();    //screenshot will be received from the server
 
     // copy image

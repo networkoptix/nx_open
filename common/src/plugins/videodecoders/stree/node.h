@@ -7,6 +7,8 @@
 
 #include "resourcecontainer.h"
 
+#include <utils/common/log.h>
+
 
 /*!
     Contains implementation of simple search tree
@@ -87,15 +89,24 @@ namespace stree
         //!Implementation of AbstractNode::get
         virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const
         {
+            NX_LOG( QString::fromLatin1("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2 );
+
             QVariant value;
             if( !in.get( m_matchResID, &value ) )
+            {
+                NX_LOG( QString::fromLatin1("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2 );
                 return;
+            }
 
             const typename ConditionContainer::key_type& typedValue = value.value<typename ConditionContainer::key_type>();
             typename ConditionContainer::const_iterator it = m_children.find( typedValue );
             if( it == m_children.end() )
+            {
+                NX_LOG( QString::fromLatin1("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2 );
                 return;
+            }
 
+            NX_LOG( QString::fromLatin1("Stree. Condition. Found child with value %1 by search value %2").arg(it->first).arg(value.toString()), cl_logDEBUG2 );
             it->second->get( in, out );
         }
 
