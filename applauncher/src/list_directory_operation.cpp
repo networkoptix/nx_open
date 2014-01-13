@@ -196,7 +196,7 @@ namespace detail
     {
         //starting download
         m_downloadUrl = baseUrl;
-        m_downloadUrl.setPath( baseUrl.path() + entryPath + "/" + CONTENTS_FILE_NAME );
+        m_downloadUrl.setPath( baseUrl.path() + (baseUrl.path().endsWith('/') ? "" : "/") + entryPath + "/" + CONTENTS_FILE_NAME );
         if( !m_httpClient->doGet( m_downloadUrl ) )
         {
             m_httpClient->terminate();
