@@ -133,7 +133,7 @@
             </Directory>
 
             <Directory Id="MyPicturesFolder">
-                <Directory Id="${installer.customization}BgDir" Name="${product.name} Backgrounds"/>
+                <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
