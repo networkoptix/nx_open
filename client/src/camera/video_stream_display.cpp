@@ -1011,7 +1011,8 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 
 QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
                                            const QnMediaDewarpingParams& mediaDewarping,
-                                           const QnItemDewarpingParams& itemDewarping) {
+                                           const QnItemDewarpingParams& itemDewarping,
+                                           bool anyQuality) {
     if (m_decoder.isEmpty())
         return QImage();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
@@ -1025,7 +1026,7 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
         return QImage();
 
     // feature #2563
-    if (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality)
+    if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return QImage();    //screenshot will be received from the server
 
     // copy image

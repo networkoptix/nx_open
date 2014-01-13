@@ -146,11 +146,13 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     QList<QImage> images;
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
+    bool anyQuality = layout->channelCount() > 1;   //screenshots for the panoramica cameras will be done localy
     for (int i = 0; i < layout->channelCount(); ++i) {
         QImage channelImage = display->camDisplay()->getScreenshot(i,
                                                                    parameters.imageCorrectionParams,
                                                                    parameters.mediaDewarpingParams,
-                                                                   parameters.itemDewarpingParams);
+                                                                   parameters.itemDewarpingParams,
+                                                                   anyQuality);
         if (channelImage.isNull())
             return NULL;    // async remote screenshoy provider will be used
         images.push_back(channelImage);
