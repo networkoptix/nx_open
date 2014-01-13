@@ -343,25 +343,24 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
     {
         case detail::RSyncOperationType::listDirectory: {
             //requesting file {taskToStart.entryPath}/contents.xml
-            detail::RDirSynchronizationOperation *op = new detail::ListDirectoryOperation(
-                        operationID,
-                        m_currentMirror,
-                        taskToStart.entryPath,
-                        m_localDirPath,
-                        this );
-            opCtx.reset( op );
+            opCtx = std::make_shared<detail::ListDirectoryOperation>(
+                operationID,
+                m_currentMirror,
+                taskToStart.entryPath,
+                m_localDirPath,
+                this );
             break;
         }
 
         case detail::RSyncOperationType::getFile: {
-            detail::RDirSynchronizationOperation *op = new detail::GetFileOperation(
-                        operationID,
-                        m_currentMirror,
-                        taskToStart.entryPath,
-                        m_localDirPath,
-                        taskToStart.hashTypeName,
-                        this );
-            opCtx.reset( op );
+            //opCtx = std::make_shared<detail::GetFileOperation>(
+            opCtx = std::shared_ptr<detail::GetFileOperation>( new detail::GetFileOperation(
+                operationID,
+                m_currentMirror,
+                taskToStart.entryPath,
+                m_localDirPath,
+                taskToStart.hashTypeName,
+                this ) );
             break;
         }
 
