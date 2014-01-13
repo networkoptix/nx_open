@@ -608,8 +608,8 @@ public:
                 const size_t bufSizeBak = recvBuffer->size();
                 recvBuffer->resize( recvBuffer->capacity() );
                 const int bytesRead = dynamic_cast<AbstractCommunicatingSocket*>(sock)->recv(
-                    recvBuffer->data() + recvBuffer->size(),
-                    recvBuffer->capacity() - recvBuffer->size() );
+                    recvBuffer->data() + bufSizeBak,
+                    recvBuffer->capacity() - bufSizeBak );
                 if( bytesRead == -1 )
                 {
                     recvBuffer->resize( bufSizeBak );
@@ -749,13 +749,13 @@ namespace
 #endif
 
 CommunicatingSocket::CommunicatingSocket(int type, int protocol)
-    : Socket(type, protocol),
+    : Socket(type, protocol, new CommunicatingSocketPrivate()),
       mConnected(false)
 {
 }
 
 CommunicatingSocket::CommunicatingSocket(int newConnSD) 
-    : Socket(newConnSD),
+    : Socket(newConnSD, new CommunicatingSocketPrivate()),
       mConnected(true)
 {
 }
@@ -983,10 +983,14 @@ unsigned short CommunicatingSocket::getForeignPort()  {
     return ntohs(addr.sin_port);
 }
 
+static const int DEFAULT_RESERVE_SIZE = 4*1024;
+
 bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler )
 {
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
 
+    if( buf->capacity() == buf->size() )
+        buf->reserve( DEFAULT_RESERVE_SIZE );
     d->recvBuffer = buf;
     d->recvHandler = std::move(handler);
     return aio::AIOService::instance()->watchSocket( this, PollSet::etRead, d );

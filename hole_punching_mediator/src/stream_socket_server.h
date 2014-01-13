@@ -32,6 +32,7 @@ public:
     :
         m_socket( SocketFactory::createStreamServerSocket() )
     {
+        m_socket->setRecvTimeout( 0 );
     }
 
     ~StreamSocketServer()
