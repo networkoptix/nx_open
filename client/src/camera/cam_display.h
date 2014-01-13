@@ -80,7 +80,8 @@ public:
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel, const ImageCorrectionParams& params,
                          const QnMediaDewarpingParams& mediaDewarping,
-                         const QnItemDewarpingParams& itemDewarping);
+                         const QnItemDewarpingParams& itemDewarping,
+                         bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
