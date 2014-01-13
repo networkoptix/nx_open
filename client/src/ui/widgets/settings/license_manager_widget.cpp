@@ -294,7 +294,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             } else if(messageId == lit("InvalidKey")) {
                 message = tr("The license key is invalid.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate {{brand}} license on %1. This is not allowed.").arg(QLatin1String(QN_PRODUCT_NAME_LONG));
+                message = tr("There was a problem activating your license. You are trying to activate an incompatible license with your software.");
             } else if(messageId == lit("AlreadyActivated")) {
                 message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
             }
