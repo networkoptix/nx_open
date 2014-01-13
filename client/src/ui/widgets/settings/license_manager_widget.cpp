@@ -93,20 +93,31 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         if (!helper.isValid()) {
             useRedLabel = true;
-            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Required at least %3 digital and %4 analog licenses."))
-                                   .arg(helper.totalDigital())
-                                   .arg(helper.totalAnalog())
-                                   .arg(helper.requiredDigital())
-                                   .arg(helper.requiredAnalog()));
+            if (helper.totalAnalog() > 0)
+                ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                                  "Required at least %3 licenses."))
+                                       .arg(helper.totalDigital())
+                                       .arg(helper.totalAnalog())
+                                       .arg(helper.required()));
+            else
+                ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras.\n"\
+                                                  "Required at least %2 licenses."))
+                                       .arg(helper.totalDigital())
+                                       .arg(helper.required()));
 
         } else {
-            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "%3 digital and %4 analog licenses are currently in use."))
-                                   .arg(helper.totalDigital())
-                                   .arg(helper.totalAnalog())
-                                   .arg(helper.usedDigital())
-                                   .arg(helper.usedAnalog()));
+            if (helper.totalAnalog() > 0)
+                ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
+                                                  "%3 digital and %4 analog licenses are currently in use."))
+                                       .arg(helper.totalDigital())
+                                       .arg(helper.totalAnalog())
+                                       .arg(helper.usedDigital())
+                                       .arg(helper.usedAnalog()));
+            else
+                ui->infoLabel->setText(QString(tr("The software is licensed to %1 cameras.\n"\
+                                                  "%2 licenses are currently in use."))
+                                       .arg(helper.totalDigital())
+                                       .arg(helper.usedDigital()));
 
         }
     } else {
