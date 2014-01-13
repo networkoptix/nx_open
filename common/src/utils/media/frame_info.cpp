@@ -1,18 +1,17 @@
-
 #include "frame_info.h"
-#include "../common/util.h"
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
+#include <utils/math/math.h>
 
 extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-#undef AVPixFmtDescriptor
+#   undef AVPixFmtDescriptor
 #endif
 };
 
@@ -160,7 +159,6 @@ void CLVideoDecoderOutput::fillRightEdge()
 void CLVideoDecoderOutput::memZerro()
 {
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
-    quint8 filler = 0;
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int w = linesize[i];
@@ -326,4 +324,39 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
         }
         copyPlane(data[i], frame->data[i], w, linesize[i], frame->linesize[i], h);
     }
+}
+
+
+CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image) 
+{
+    reallocate(image.width(), image.height(), PIX_FMT_YUV420P);
+    CLVideoDecoderOutput src;
+
+    src.reallocate(width, height, PIX_FMT_RGBA);
+    for (int y = 0; y < height; ++y)
+        memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
+
+    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_RGBA, 
+                                              width, height, PIX_FMT_YUV420P, 
+                                              SWS_BICUBIC, NULL, NULL, NULL);
+    sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
+    sws_freeContext(scaleContext);
+}
+
+QImage CLVideoDecoderOutput::toImage() const
+{
+    CLVideoDecoderOutput dst;
+    dst.reallocate(width, height, PIX_FMT_RGBA);
+
+    SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format, 
+                                              width, height, PIX_FMT_RGBA, 
+                                              SWS_BICUBIC, NULL, NULL, NULL);
+    sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
+    sws_freeContext(scaleContext);
+
+    QImage img(width, height, QImage::Format_ARGB32);
+    for (int y = 0; y < height; ++y)
+        memcpy(img.scanLine(y), dst.data[0] + dst.linesize[0]*y, width * 4);
+    
+    return img;
 }

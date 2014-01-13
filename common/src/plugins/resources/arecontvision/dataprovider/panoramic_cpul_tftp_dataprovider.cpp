@@ -351,7 +351,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     
 
     if (iFrame)
-        videoData->flags |= AV_PKT_FLAG_KEY;
+        videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
     videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;
     videoData->width = size.width;
@@ -378,32 +378,17 @@ bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnFps()
 {
     QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnFps();
-    if (getRole() == QnResource::Role_LiveVideo) {
-        QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-        if (avPanoResource)
-            avPanoResource->updateFlipState();
-    }
 }
 
 void AVPanoramicClientPullSSTFTPStreamreader::updateStreamParamsBasedOnQuality()
 {
     QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality();
     QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-    if (getRole() == QnResource::Role_LiveVideo) {
-        QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-        if (avPanoResource)
-            avPanoResource->updateFlipState();
-    }
 }
 
 void AVPanoramicClientPullSSTFTPStreamreader::beforeRun()
 {
     QnPlAVClinetPullStreamReader::beforeRun();
-    if (getRole() == QnResource::Role_LiveVideo) {
-        QnArecontPanoramicResourcePtr avPanoResource = m_resource.dynamicCast<QnArecontPanoramicResource>();
-        if (avPanoResource)
-            avPanoResource->updateFlipState();
-    }
 }
 
 #endif

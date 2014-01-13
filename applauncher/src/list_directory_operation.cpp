@@ -12,7 +12,6 @@
 #include <QtXml/QXmlSimpleReader>
 
 #include <utils/common/log.h>
-#include <utils/network/http/asynchttpclient.h>
 
 
 namespace detail
@@ -168,8 +167,14 @@ namespace detail
         m_httpClient( new nx_http::AsyncHttpClient() ),
         m_totalSize( -1 )
     {
-        connect( m_httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection );
-        connect( m_httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onHttpDone(nx_http::AsyncHttpClient*)), Qt::DirectConnection );
+        connect(
+            m_httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onResponseReceived(nx_http::AsyncHttpClientPtr)),
+            Qt::DirectConnection );
+        connect(
+            m_httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
+            this, SLOT(onHttpDone(nx_http::AsyncHttpClientPtr)),
+            Qt::DirectConnection );
     }
 
     ListDirectoryOperation::~ListDirectoryOperation()
@@ -177,8 +182,7 @@ namespace detail
         if( m_httpClient )
         {
             m_httpClient->terminate();
-            m_httpClient->scheduleForRemoval();
-            m_httpClient = nullptr;
+            m_httpClient.reset();
         }
     }
 
@@ -196,8 +200,7 @@ namespace detail
         if( !m_httpClient->doGet( m_downloadUrl ) )
         {
             m_httpClient->terminate();
-            m_httpClient->scheduleForRemoval();
-            m_httpClient = nullptr;
+            m_httpClient.reset();
             return false;
         }
         return true;
@@ -213,22 +216,20 @@ namespace detail
         return m_totalSize;
     }
 
-    void ListDirectoryOperation::onResponseReceived( nx_http::AsyncHttpClient* httpClient )
+    void ListDirectoryOperation::onResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
     {
-        if( (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) ||
-            !httpClient->startReadMessageBody() )
+        if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
         {
             setResult( ResultCode::downloadFailure );
             setErrorText( httpClient->response()->statusLine.reasonPhrase );
             m_httpClient->terminate();
-            m_httpClient->scheduleForRemoval();
-            m_httpClient = nullptr;
+            m_httpClient.reset();
             m_handler->operationDone( shared_from_this() );
             return;
         }
     }
 
-    void ListDirectoryOperation::onHttpDone( nx_http::AsyncHttpClient* httpClient )
+    void ListDirectoryOperation::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     {
         //check message body download result
         if( httpClient->failed() )
@@ -237,16 +238,14 @@ namespace detail
             setResult( ResultCode::downloadFailure );
             setErrorText( httpClient->response()->statusLine.reasonPhrase );
             m_httpClient->terminate();
-            m_httpClient->scheduleForRemoval();
-            m_httpClient = nullptr;
+            m_httpClient.reset();
             m_handler->operationDone( shared_from_this() );
             return;
         }
 
         nx_http::BufferType contentsXml = httpClient->fetchMessageBodyBuffer();
         m_httpClient->terminate();
-        m_httpClient->scheduleForRemoval();
-        m_httpClient = nullptr;
+        m_httpClient.reset();
 
         ContentsXmlSaxHandler xmlHandler( &m_entries );
 

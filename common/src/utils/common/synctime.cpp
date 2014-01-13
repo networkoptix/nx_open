@@ -78,6 +78,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         m_gotTimeTask == 0 && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
     {
         m_gotTimeTask = new QnSyncTimeTask(this);
+        m_gotTimeTask->setAutoDelete(true);
         QThreadPool::globalInstance()->start(m_gotTimeTask);
     }
     m_lastLocalTime = localTime;

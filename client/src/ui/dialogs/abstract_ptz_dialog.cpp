@@ -50,18 +50,24 @@ void QnAbstractPtzDialog::synchronize() {
         return;
     }
 
-    QDialog *synchronizeDialog = new QDialog(this, Qt::SplashScreen);
-    QLabel *label = new QLabel(tr("Synchronizing..."), synchronizeDialog);
-    QLayout *layout = new QHBoxLayout(synchronizeDialog);
-    layout->addWidget(label);
-    layout->setSizeConstraint(QLayout::SetFixedSize);
-    synchronizeDialog->setLayout(layout);
-    synchronizeDialog->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    synchronizeDialog->setModal(true);
-    synchronizeDialog->setGeometry(this->geometry().center().x(), this->geometry().center().y(), 1, 1); //TODO: #GDM make this on showEvent() and geometryChanged()
-    connect(m_controller, &QnAbstractPtzController::finished, synchronizeDialog, &QDialog::accept); // TODO: #Elric wrong, we need only one specific signal
-    m_controller->synchronize(requiredFields());
-    synchronizeDialog->exec();
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability)) {
+        QDialog *synchronizeDialog = new QDialog(this, Qt::SplashScreen);
+        QLabel *label = new QLabel(tr("Synchronizing..."), synchronizeDialog);
+        QLayout *layout = new QHBoxLayout(synchronizeDialog);
+        layout->addWidget(label);
+        layout->setSizeConstraint(QLayout::SetFixedSize);
+        synchronizeDialog->setLayout(layout);
+        synchronizeDialog->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        synchronizeDialog->setModal(true);
+        synchronizeDialog->setGeometry(this->geometry().center().x(), this->geometry().center().y(), 1, 1); //TODO: #GDM make this on showEvent() and geometryChanged()
+        connect(m_controller, &QnAbstractPtzController::finished, synchronizeDialog, &QDialog::accept); // TODO: #Elric wrong, we need only one specific signal
+        m_controller->synchronize(requiredFields());
+        synchronizeDialog->exec();
+    } else {
+        QnPtzData data;
+        m_controller->getData(requiredFields(), &data);
+        at_controller_finished(Qn::SynchronizePtzCommand, QVariant::fromValue(data));
+    }
 }
 
 void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {

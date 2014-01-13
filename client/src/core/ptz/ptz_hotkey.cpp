@@ -2,4 +2,4 @@
 
 #include <utils/common/json.h>
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(PtzPresetHotkey, (id)(hotkey))
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnPtzPresetHotkey, (id)(hotkey))

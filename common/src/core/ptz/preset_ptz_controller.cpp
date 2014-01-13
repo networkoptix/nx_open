@@ -40,22 +40,26 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), this))
-{}
+{
+    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
+    connect(this, &QnPresetPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
+}
 
 QnPresetPtzController::~QnPresetPtzController() {
     return;
 }
 
-bool QnPresetPtzController::extends(const QnPtzControllerPtr &baseController) {
+bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities) {
     return 
-        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
-        (baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) || baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability)) &&
-        !baseController->hasCapabilities(Qn::PresetsPtzCapability);
+        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Qn::PresetsPtzCapability);
 }
 
 Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
-    /* Note that this controller preserves the Qn::NonBlockingPtzCapability. */
-    return base_type::getCapabilities() | Qn::PresetsPtzCapability;
+    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::PresetsPtzCapability) : capabilities;
 }
 
 bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
@@ -73,6 +77,8 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
     records.insert(preset.id, QnPtzPresetRecord(preset, data));
     m_adaptor->setValue(records);
     
+    if(m_asynchronous)
+        emit finishedLater(Qn::CreatePresetPtzCommand, QVariant::fromValue(preset));
     return true;
 }
 
@@ -89,6 +95,9 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
     record.preset = preset;
     
     m_adaptor->setValue(records);
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::UpdatePresetPtzCommand, QVariant::fromValue(preset));
     return true;
 }
 
@@ -100,6 +109,9 @@ bool QnPresetPtzController::removePreset(const QString &presetId) {
         return false;
 
     m_adaptor->setValue(records);
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::RemovePresetPtzCommand, QVariant::fromValue(presetId));
     return true;
 }
 
@@ -117,6 +129,10 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
     if(!absoluteMove(data.space, data.position, speed))
         return false;
 
+    // TODO: #Elric maybe emit finished when we get absoluteMove finished?
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::ActivatePresetPtzCommand, QVariant::fromValue(presetId));
     return true;
 }
 
@@ -127,6 +143,8 @@ bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
     foreach(const QnPtzPresetRecord &record, m_adaptor->value())
         presets->push_back(record.preset);
 
+    if(m_asynchronous)
+        emit finishedLater(Qn::GetPresetsPtzCommand, QVariant::fromValue(*presets));
     return true;
 }
 

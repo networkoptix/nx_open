@@ -11,6 +11,7 @@
 class QnNoptixStyleAnimator;
 class QnSkin;
 class QnGlobals;
+class QnCustomizer;
 
 class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
     Q_OBJECT;
@@ -64,6 +65,7 @@ private:
     QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
     QnGlobals *m_globals;
+    QnCustomizer *m_customizer;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
     QPixmap m_grooveBorder, m_grooveBody, m_sliderHandleHovered, m_sliderHandle;
 };

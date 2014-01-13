@@ -126,7 +126,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
             if (m_nextDataPacket) 
             {
                 m_nextDataPacket->opaque = cseq;
-                m_nextDataPacket->flags = flags;
+                m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
 
                 if (context && context->ctx())
                     m_nextDataPacket->compressionType = context->ctx()->codec_id;

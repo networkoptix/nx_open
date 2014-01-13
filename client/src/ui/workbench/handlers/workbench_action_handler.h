@@ -187,10 +187,6 @@ protected slots:
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
 
-    void at_debugIncrementCounterAction_triggered();
-    void at_debugDecrementCounterAction_triggered();
-    void at_debugShowResourcePoolAction_triggered();
-
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
@@ -229,6 +225,7 @@ protected slots:
     void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
+    void at_pictureSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
@@ -240,8 +237,6 @@ protected slots:
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsDialog_advancedSettingChanged();
     void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_cameraSettingsDialog_cameraIssuesRequested();
-    void at_cameraSettingsDialog_cameraRulesRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
@@ -261,10 +256,6 @@ protected slots:
 
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
-
-    void at_setCurrentItemAspectRatioAutoAction_triggered();
-    void at_setCurrentItemAspectRatio4x3Action_triggered();
-    void at_setCurrentItemAspectRatio16x9Action_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();

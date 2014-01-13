@@ -15,6 +15,7 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
+class QnWorkbenchCustomizer;
 
 /**
  * This class simplifies access to workbench context. 

@@ -16,20 +16,7 @@
 #include <common/config.h>
 
 #include "fuzzy.h"
-#include "limits.h"
-
-#ifndef M_E
-#   define M_E 2.71828182845904523536
-#endif
-
-#ifndef M_LN2
-#   define M_LN2 0.693147180559945309417
-#endif
-
-#ifndef M_PI
-#   define M_PI 3.14159265358979323846
-#endif
-
+#include "defines.h"
 
 inline bool qIsNaN(const QVector2D &vector) {
     return qIsNaN(vector.x()) || qIsNaN(vector.y());

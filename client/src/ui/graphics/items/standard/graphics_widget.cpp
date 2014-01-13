@@ -411,6 +411,12 @@ bool GraphicsWidget::event(QEvent *event) {
     return QObject::event(event);
 }
 
+void GraphicsWidget::polishEvent() {
+    base_type::polishEvent();
+
+    style()->polish(this); // TODO: #Elric unpolish?
+}
+
 void GraphicsWidget::changeEvent(QEvent *event) {
     Q_D(GraphicsWidget);
 

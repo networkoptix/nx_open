@@ -54,9 +54,10 @@ struct QnManualCameraSearchSingleCamera {
     }
 };
 
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera)
+
 typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
 
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera)
 
 /**
  * Status of the manual camera search process: state and results by the time.
@@ -81,8 +82,7 @@ struct QnManualCameraSearchReply {
     QnManualCameraSearchCameraList cameras;
 };
 
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply)
-
 Q_DECLARE_METATYPE(QnManualCameraSearchReply)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply)
 
 #endif // QN_MANUAL_CAMERA_SEARCH_REPLY_H

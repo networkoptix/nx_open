@@ -161,6 +161,7 @@ namespace nx_http
             unauthorized = 401,
             notFound = 404,
             internalServerError = 500,
+            serviceUnavailable = 503,
             notImplemented = 501
         };
 

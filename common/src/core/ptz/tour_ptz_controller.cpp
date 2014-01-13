@@ -18,6 +18,7 @@ class QnPtzTourExecutorThread: public QnLongRunnable {
     typedef QnLongRunnable base_type;
 public:
     QnPtzTourExecutorThread() {
+        setObjectName(lit("QnPtzTourExecutorThread")); /* So that we see this thread's name in debug. */
         start();
     }
 
@@ -27,8 +28,8 @@ public:
 
     virtual void pleaseStop() override {
         base_type::pleaseStop();
-
-        QMetaObject::invokeMethod(this, "quit", Qt::QueuedConnection);
+        
+        quit(); /* This call is thread-safe. */
     }
 
     virtual void run() override {
@@ -50,23 +51,57 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_executor(new QnPtzTourExecutor(baseController))
 {
     m_executor->moveToThread(qn_ptzTourExecutorThread_instance());
+
+    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
+    connect(this, &QnTourPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 }
 
 QnTourPtzController::~QnTourPtzController() {
-    return;
+    m_executor->deleteLater();
 }
 
-bool QnTourPtzController::extends(const QnPtzControllerPtr &baseController) {
+bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
     return 
-        baseController->hasCapabilities(Qn::PresetsPtzCapability) &&
-        baseController->hasCapabilities(Qn::AbsolutePtzCapabilities) &&
-        (baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) || baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability)) &&
-        !baseController->hasCapabilities(Qn::ToursPtzCapability);
+        (capabilities & Qn::PresetsPtzCapability) &&
+        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        !(capabilities & Qn::ToursPtzCapability);
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
-    /* Note that this controller preserves the Qn::NonBlockingPtzCapability. */
-    return baseController()->getCapabilities() | Qn::ToursPtzCapability;
+    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::ToursPtzCapability) : capabilities;
+}
+
+bool QnTourPtzController::continuousMove(const QVector3D &speed) {
+    if(!supports(Qn::ContinuousMovePtzCommand))
+        return false;
+
+    m_executor->stopTour();
+    return base_type::continuousMove(speed);
+}
+
+bool QnTourPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+    if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
+        return false;
+    
+    m_executor->stopTour();
+    return base_type::absoluteMove(space, position, speed);
+}
+
+bool QnTourPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
+    if(!supports(Qn::ViewportMovePtzCommand))
+        return false;
+
+    m_executor->stopTour();
+    return base_type::viewportMove(aspectRatio, viewport, speed);
+}
+
+bool QnTourPtzController::activatePreset(const QString &presetId, qreal speed) {
+    /* This one is 100% supported, no need to check. */
+    m_executor->stopTour();
+    return base_type::activatePreset(presetId, speed);
 }
 
 bool QnTourPtzController::createTour(const QnPtzTour &tour) {
@@ -82,7 +117,7 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     if (!tour.isValid(presets))
         return false;
 
-    /* No so important so fix and continue. */
+    /* Not so important so fix and continue. */
     tour.optimize();
 
     /* Tour is fine, save it. */
@@ -91,6 +126,9 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     records.insert(tour.id, tour);
     
     m_adaptor->setValue(records);
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::CreateTourPtzCommand, QVariant::fromValue(tour));
     return true;
 }
 
@@ -102,6 +140,9 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
         return false;
     
     m_adaptor->setValue(records);
+    
+    if(m_asynchronous)
+        emit finishedLater(Qn::RemoveTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -116,6 +157,9 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
     }
 
     m_executor->startTour(tour);
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::ActivateTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -123,5 +167,8 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
     QMutexLocker locker(&m_mutex);
 
     *tours = m_adaptor->value().values();
+
+    if(m_asynchronous)
+        emit finishedLater(Qn::GetToursPtzCommand, QVariant::fromValue(*tours));
     return true;
 }

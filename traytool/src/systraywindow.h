@@ -157,7 +157,7 @@ private:
     void setAppServerURL(const QUrl& url);
     bool isAppServerParamChanged() const;
     bool isMediaServerParamChanged() const;
-
+    Qt::CheckState getDiscoveryState() const;
 private:
     QScopedPointer<Ui::SettingsDialog> ui;
     QScopedPointer<QDialog> m_findAppServerDialog;

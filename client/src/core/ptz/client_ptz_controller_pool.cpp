@@ -19,10 +19,13 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
     if(!camera)
         return QnPtzControllerPtr();
 
-    if(camera->isFisheye())
+    if(camera->getDewarpingParams().enabled)
         return QnPtzControllerPtr();
 
     if(camera->getPtzCapabilities() == Qn::NoPtzCapabilities)
+        return QnPtzControllerPtr();
+
+    if(camera->getPtzCapabilities() & Qn::VirtualPtzCapability)
         return QnPtzControllerPtr();
 
     QnPtzControllerPtr controller;

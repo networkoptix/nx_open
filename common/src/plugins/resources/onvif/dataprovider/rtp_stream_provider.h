@@ -12,7 +12,7 @@ public:
     virtual ~QnRtpStreamReader();
 
     void setRequest(const QString& request);
-    const QnResourceAudioLayout* getDPAudioLayout() const;
+    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 protected:
     
 

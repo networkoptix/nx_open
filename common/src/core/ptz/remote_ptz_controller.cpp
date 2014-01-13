@@ -49,6 +49,7 @@ int QnRemotePtzController::nextSequenceNumber() {
     return m_sequenceNumber.fetchAndAddOrdered(1);
 }
 
+// TODO: #Elric get rid of this macro hell
 #define RUN_COMMAND(COMMAND, RETURN_VALUE, FUNCTION, ... /* PARAMS */)          \
     {                                                                           \
         Qn::PtzCommand command = COMMAND;                                       \

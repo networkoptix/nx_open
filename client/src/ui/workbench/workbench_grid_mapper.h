@@ -5,6 +5,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QRect>
 #include <QtCore/QPoint>
+
 #include <ui/common/geometry.h>
 
 /**

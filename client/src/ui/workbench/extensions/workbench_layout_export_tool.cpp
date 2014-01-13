@@ -71,7 +71,7 @@ bool QnLayoutExportTool::start() {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {
             m_errorMessage = tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).baseName());
-            emit finished(false);   //file is not created, finishExport() is not required
+            emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
             return false;
         }
     }
@@ -256,17 +256,15 @@ void QnLayoutExportTool::finishExport(bool success) {
     } else {
         QFile::remove(m_realFilename);
     }
-    emit finished(success);
+    emit finished(success, m_targetFilename);
 }
 
 bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
     connect(camera,   SIGNAL(exportProgress(int)),        this, SLOT(at_camera_progressChanged(int)));
 
-    connect(camera,   SIGNAL(exportFailed(QString)),      this, SLOT(at_camera_exportFailed(QString)));
-    connect(camera,   SIGNAL(exportFinished(QString)),    this, SLOT(at_camera_exportFinished()));
-    connect(camera,   SIGNAL(exportFailed(QString)),      camera, SLOT(deleteLater()));
-    connect(camera,   SIGNAL(exportFinished(QString)),    camera, SLOT(deleteLater()));
+    connect(camera,   &QnClientVideoCamera::exportFinished, this,   &QnLayoutExportTool::at_camera_exportFinished);
+    connect(camera,   &QnClientVideoCamera::exportFinished, camera, &QObject::deleteLater);
 
     connect(this,     SIGNAL(stopped()),                  camera, SLOT(stopExport()));
     connect(this,     SIGNAL(stopped()),                  camera, SLOT(deleteLater()));
@@ -308,7 +306,14 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     return true;
 }
 
-void QnLayoutExportTool::at_camera_exportFinished() {
+void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &filename) {
+    Q_UNUSED(filename)
+    if (status != QnClientVideoCamera::NoError) {
+        m_errorMessage = QnClientVideoCamera::errorString(status);
+        finishExport(false);
+        return;
+    }
+
     QnClientVideoCamera* camera = dynamic_cast<QnClientVideoCamera*>(sender());
     if (!camera)
         return;
@@ -358,10 +363,4 @@ void QnLayoutExportTool::at_camera_exportFinished() {
 
 void QnLayoutExportTool::at_camera_progressChanged(int progress) {
     emit valueChanged(m_offset * 100 + progress);
-}
-
-
-void QnLayoutExportTool::at_camera_exportFailed(QString errorMessage) {
-    m_errorMessage = errorMessage;
-    finishExport(false);
 }

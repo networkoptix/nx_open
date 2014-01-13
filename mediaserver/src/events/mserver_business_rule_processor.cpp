@@ -1,5 +1,6 @@
-
 #include <QtCore/QList>
+
+#include <utils/math/math.h>
 
 #include "business/actions/panic_business_action.h"
 #include "mserver_business_rule_processor.h"

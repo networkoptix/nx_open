@@ -11,11 +11,16 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
 #include <utils/common/container.h>
+
 #include <client/client_settings.h>
+#include <client/client_globals.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/preset_ptz_controller.h>
+#include <core/ptz/tour_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -49,12 +54,11 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
-#include "core/ptz/ptz_controller_pool.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
-    Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
+    static std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() );
 
 } // anonymous namespace
 
@@ -77,11 +81,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
-    connect(m_renderer, SIGNAL(sourceSizeChanged()), this, SLOT(updateAspectRatio()));
-    connect(m_resource->toResource(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resource_resourceChanged()));
-    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
-    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
-    connect(this, SIGNAL(zoomTargetWidgetChanged()), this, SLOT(updateDisplay()));
+    connect(m_renderer,                 &QnResourceWidgetRenderer::sourceSizeChanged,   this, &QnMediaResourceWidget::updateAspectRatio);
+    connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
+    connect(m_resource->toResource(),   &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
+    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
+    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
+    connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
+    connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
+    connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
+    updateDewarpingParams();
     updateDisplay();
 
     /* Set up static text. */
@@ -92,8 +100,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up PTZ controller. */
     m_ptzController = qnPtzPool->controller(m_camera);
-    if(!m_ptzController)
+    if(!m_ptzController) {
         m_ptzController.reset(new QnFisheyePtzController(this));
+        m_ptzController.reset(new QnPresetPtzController(m_ptzController));
+        m_ptzController.reset(new QnTourPtzController(m_ptzController));
+    }
     connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
 
     /* Set up info updates. */
@@ -184,7 +195,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateIconButton();
     updateAspectRatio();
     updateCursor();
-    updateFisheye();
     setImageEnhancement(item->imageEnhancement());
 }
 
@@ -204,10 +214,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 QnMediaResourcePtr QnMediaResourceWidget::resource() const {
     return m_resource;
-}
-
-QnVirtualCameraResourcePtr QnMediaResourceWidget::camera() const {
-    return m_camera;
 }
 
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
@@ -313,7 +319,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
     bool changed = false;
     if (m_camera) {
-        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
+        QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->channelCount(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -339,7 +345,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
     int channel =0;
     QPoint channelPos = gridPos;
     if (m_camera) {
-        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
+        QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->channelCount(); ++i) {
             QRect r(channelGridOffset(i), QSize(MD_WIDTH, MD_HEIGHT));
@@ -413,8 +419,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
+        updateCustomAspectRatio();
     } else {
-        setChannelLayout(qn_resourceWidget_defaultContentLayout());
+        setChannelLayout(qn_resourceWidget_defaultContentLayout);
         m_renderer->setChannelCount(0);
     }
 
@@ -648,6 +655,18 @@ QnPtzControllerPtr QnMediaResourceWidget::ptzController() const {
     return m_ptzController;
 }
 
+QnMediaDewarpingParams QnMediaResourceWidget::dewarpingParams() const {
+    return m_dewarpingParams;
+}
+
+void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &params) {
+    if (m_dewarpingParams == params)
+        return;
+    m_dewarpingParams = params;
+
+    emit dewarpingParamsChanged();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -732,6 +751,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 QString QnMediaResourceWidget::calculateInfoText() const {
     qreal fps = 0.0;
     qreal mbps = 0.0;
+
     for(int i = 0; i < channelCount(); i++) {
         const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
@@ -801,13 +821,14 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result |= MotionSearchButton;
 
     if(m_camera
-        && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities)
+        && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
+        && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
     ) {
         result |= PtzButton;
     }
     
-    if (m_resource && m_resource->isFisheye()) {
+    if (m_dewarpingParams.enabled) {
         result |= FishEyeButton;
         result &= ~PtzButton;
     }
@@ -867,14 +888,21 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
     invalidateMotionSensitivity();
 }
 
+void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
+    if (resource != m_camera ||  key != Qn::customAspectRatioKey)
+        return;
+    updateCustomAspectRatio();
+}
+
 void QnMediaResourceWidget::updateAspectRatio() {
     if(!m_renderer)
         return; /* Not yet initialized. */
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (item() && item()->dewarpingParams().enabled && resource()->getDewarpingParams().enabled)
-        sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
+    if (!sourceSize.isEmpty())
+        if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
+            sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
 
     QString resourceId;
     if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
@@ -961,28 +989,58 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     updateAspectRatio();
     updateIconButton();
 
+    // TODO: #PTZ? Do we allow zoom boxes on fisheye cams? I don't think we should, at least at this point.
     /*if (m_fisheyePtz) {
         m_fisheyePtz->setEnabled(true);
         m_fisheyePtz->moveToRect(zoomRect());
     }*/
 }
 
-void QnMediaResourceWidget::updateFisheye() {
-    bool enabled = item()->dewarpingParams().enabled;
+void QnMediaResourceWidget::updateDewarpingParams() {
+    if (m_dewarpingParams == m_resource->getDewarpingParams())
+        return;
 
-    bool fisheyeEnabled = enabled
-            && m_resource
-            && m_resource->isFisheye();
+    m_dewarpingParams = m_resource->getDewarpingParams();
+    emit dewarpingParamsChanged();
+}
+
+void QnMediaResourceWidget::updateFisheye() {
+    QnItemDewarpingParams itemParams = item()->dewarpingParams();
+    bool enabled = itemParams.enabled;
+
+    bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
     setOption(ControlPtz, fisheyeEnabled);
     setOption(DisplayCrosshair, fisheyeEnabled);
-    buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
+    if (fisheyeEnabled && buttonBar()->button(FishEyeButton))
+        buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
     if(enabled)
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
 
     bool flip = fisheyeEnabled
-            && m_resource->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown;
+            && m_dewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown;
+
+    const QList<int> allowedPanoFactorValues = m_dewarpingParams.allowedPanoFactorValues();
+    if (!allowedPanoFactorValues.contains(itemParams.panoFactor)) {
+        itemParams.panoFactor = allowedPanoFactorValues.last();
+        item()->setDewarpingParams(itemParams);
+    }
     item()->setData(Qn::ItemFlipRole, flip);
+
+    updateAspectRatio();
+    emit fisheyeChanged();
+}
+
+void QnMediaResourceWidget::updateCustomAspectRatio() {
+    if (!m_camera || !m_display)
+        return;
+
+    QString customAr = m_camera->getProperty(Qn::customAspectRatioKey);
+    if (!customAr.isEmpty())
+        m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
+    else
+        m_display->camDisplay()->setOverridenAspectRatio(0.0);
+
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

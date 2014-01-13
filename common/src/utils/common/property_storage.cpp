@@ -43,28 +43,58 @@ QnPropertyStorage::~QnPropertyStorage() {
     return;
 }
 
+QList<int> QnPropertyStorage::variables() const {
+    return m_valueById.keys();
+}
+
+QVariant QnPropertyStorage::valueLocked(int id) const {
+    return m_valueById.value(id);
+}
+
+bool QnPropertyStorage::setValueLocked(int id, const QVariant &value) {
+    if(!isWritableLocked(id)) {
+        qnWarning("Property '%1' is not writeable.", name(id));
+        return false;
+    }
+
+    return updateValue(id, value) != Failed;
+}
+
 QVariant QnPropertyStorage::value(int id) const {
     QnPropertyStorageLocker locker(this);
-
-    return m_valueById.value(id);
+    return valueLocked(id);
 }
 
 bool QnPropertyStorage::setValue(int id, const QVariant &value) {
     QnPropertyStorageLocker locker(this);
-    
-    if(!isWriteable(id)) {
-        qnWarning("Property '%1' is not writeable.", name(id));
+    return setValueLocked(id, value);
+}
+
+QVariant QnPropertyStorage::value(const QString &name) const {
+    QnPropertyStorageLocker locker(this);
+
+    auto pos = m_idByName.find(name);
+    if(pos == m_idByName.end())
+        return QVariant();
+
+    return valueLocked(*pos);
+}
+
+bool QnPropertyStorage::setValue(const QString &name, const QVariant &value) {
+    QnPropertyStorageLocker locker(this);
+
+    auto pos = m_idByName.find(name);
+    if(pos == m_idByName.end())
         return false;
-    }
-    
-    return updateValue(id, value) == Changed;
+
+    return setValueLocked(*pos, value);
 }
 
 QnPropertyStorage::UpdateStatus QnPropertyStorage::updateValue(int id, const QVariant &value) {
     QVariant newValue = value;
 
-    int type = m_typeById.value(id, QMetaType::Void);
-    if(type != QMetaType::Void && value.type() != type) {
+    int type = m_typeById.value(id, QMetaType::UnknownType);
+    if(type != QMetaType::UnknownType && value.type() != type) {
         if(!newValue.convert(static_cast<QVariant::Type>(type))) {
             qnWarning("Cannot assign a value of type '%1' to a property '%2' of type '%3'.", QMetaType::typeName(value.userType()), name(id), QMetaType::typeName(type));
             return Failed;
@@ -99,6 +129,7 @@ void QnPropertyStorage::setName(int id, const QString &name) {
     QnPropertyStorageLocker locker(this);
 
     m_nameById[id] = name;
+    m_idByName[name] = id;
 }
 
 void QnPropertyStorage::addArgumentName(int id, const char *argumentName) {
@@ -126,7 +157,7 @@ QStringList QnPropertyStorage::argumentNames(int id) const {
 int QnPropertyStorage::type(int id) const {
     QnPropertyStorageLocker locker(this);
 
-    return m_typeById.value(id, QMetaType::Void);
+    return m_typeById.value(id, QMetaType::UnknownType);
 }
 
 void QnPropertyStorage::setType(int id, int type) {
@@ -137,24 +168,24 @@ void QnPropertyStorage::setType(int id, int type) {
 
     m_typeById[id] = type;
 
-    if(type != QMetaType::Void)
+    if(type != QMetaType::UnknownType)
         updateValue(id, QVariant(type, static_cast<const void *>(NULL)));
 }
 
 bool QnPropertyStorage::isWritableLocked(int id) const {
-    return m_writeableById.value(id, true); /* By default, properties are writable. */
+    return m_writableById.value(id, true); /* By default, properties are writable. */
 }
 
-bool QnPropertyStorage::isWriteable(int id) const {
+bool QnPropertyStorage::isWritable(int id) const {
     QnPropertyStorageLocker locker(this);
 
     return isWritableLocked(id);
 }
 
-void QnPropertyStorage::setWriteable(int id, bool writeable) {
+void QnPropertyStorage::setWritable(int id, bool writable) {
     QnPropertyStorageLocker locker(this);
 
-    m_writeableById[id] = writeable;
+    m_writableById[id] = writable;
 }
 
 bool QnPropertyStorage::isThreadSafe() const {
@@ -214,7 +245,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
             continue;
         }
 
-        int type = m_typeById.value(id, QMetaType::Void);
+        int type = m_typeById.value(id, QMetaType::UnknownType);
 
         foreach(const QString &name, m_argumentNamesById.value(id)) {
             parser.addParameter(
@@ -246,7 +277,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
             if(errorStream) {
                 QString message = tr("Invalid value for '%1' argument - expected %2, provided '%3'.").
                     arg(name).
-                    arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::Void)))).
+                    arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::UnknownType)))).
                     arg(value.toString());
 
                 *errorStream << message << endl;

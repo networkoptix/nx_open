@@ -72,6 +72,10 @@ Instrument *ResizingInstrument::resizeHoverInstrument() const {
     return m_resizeHoverInstrument;
 }
 
+void ResizingInstrument::rehandle() {
+    dragProcessor()->redrag();
+}
+
 void ResizingInstrument::enabledNotify() {
     m_resizeHoverInstrument->recursiveEnable();
 

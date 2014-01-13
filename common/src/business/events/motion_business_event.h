@@ -1,7 +1,7 @@
 #ifndef __MOTION_BUSINESS_EVENT_H__
 #define __MOTION_BUSINESS_EVENT_H__
 
-#include "prolonged_business_event.h"
+#include <business/events/prolonged_business_event.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/resource/resource_fwd.h>
@@ -11,10 +11,6 @@ class QnMotionBusinessEvent: public QnProlongedBusinessEvent
     typedef QnProlongedBusinessEvent base_type;
 public:
     QnMotionBusinessEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata);
-
-    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
-    static bool isResourcesListValid(const QnResourceList &resources);
-    static int  invalidResourcesCount(const QnResourceList &resources);
 private:
     QnConstAbstractDataPacketPtr m_metadata;
 };

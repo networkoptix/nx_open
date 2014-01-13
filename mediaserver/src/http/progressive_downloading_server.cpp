@@ -88,7 +88,7 @@ public:
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
         CLDataQueue tmpQueue(20);
-        camera->copyLastGop(true, 0, tmpQueue);
+        camera->copyLastGop(true, 0, tmpQueue, 0);
 
         if (tmpQueue.size() > 0)
         {

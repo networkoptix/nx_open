@@ -19,7 +19,7 @@ public:
     QnThreadedPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnThreadedPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 
@@ -48,8 +48,6 @@ public:
 private:
     template<class Functor>
     void runCommand(Qn::PtzCommand command, const Functor &functor) const;
-
-    Q_SLOT void at_command_finished(Qn::PtzCommand command, const QVariant &data);
 
 private:
     QScopedPointer<QnThreadedPtzControllerPrivate> d;

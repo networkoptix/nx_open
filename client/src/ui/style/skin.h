@@ -6,9 +6,13 @@
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
 
+#include <utils/common/singleton.h>
+
 class QStyle;
 
-class QnSkin {
+class QnSkin: public QObject, public Singleton<QnSkin> {
+    Q_OBJECT
+
 public:
     static const QIcon::Mode Normal = QIcon::Normal;
     static const QIcon::Mode Disabled = QIcon::Disabled;
@@ -19,7 +23,9 @@ public:
     static const QIcon::State On = QIcon::On;
     static const QIcon::State Off = QIcon::Off;
 
-    QnSkin();
+    QnSkin(QObject *parent = NULL);
+    QnSkin(const QString &basePath, QObject *parent = NULL);
+    virtual ~QnSkin();
 
     QIcon icon(const QString &name, const QString &checkedName = QString());
     
@@ -43,14 +49,16 @@ public:
     QPixmap pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
     QPixmap pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
 
+    // TODO: #Elric this one creates NEW style => naming is evil. Remove?
     QStyle *style();
 
-    static QnSkin *instance();
-
 private:
+    void init(const QString &basePath);
+
     QString path(const QString &name) const;
 
 private:
+    QString m_basePath;
     QHash<QString, QIcon> m_iconByNames;
     QHash<qint64, QIcon> m_pressedIconByKey;
 };

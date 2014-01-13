@@ -126,7 +126,7 @@ void QnActiPtzController::init() {
 
 bool QnActiPtzController::query(const QString &request, QByteArray *body, bool keepAllData) const {
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), lit("ZOOM=STOP"), status, keepAllData);
+    QByteArray data = m_resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body)
         *body = data;
     return status == CL_HTTP_SUCCESS;
@@ -152,25 +152,41 @@ int QnActiPtzController::toDevicePanTiltSpeed(qreal panTiltSpeed) const {
 }
 
 QString QnActiPtzController::zoomDirection(int deviceZoomSpeed) const {
-    if(deviceZoomSpeed == 0) {
-        return lit("STOP");
-    } else if(deviceZoomSpeed > 0) {
-        return lit("TELE");
-    } else {
+    if(deviceZoomSpeed < 0) {
         return lit("WIDE");
+    } else if(deviceZoomSpeed == 0) {
+        return lit("STOP");
+    } else {
+        return lit("TELE");
     }
 }
 
 QString QnActiPtzController::panTiltDirection(int devicePanSpeed, int deviceTiltSpeed) const {
-    static const QString directions[3][3] = {
-        { lit("UPLEFT"),   lit("UP"),   lit("UPRIGHT") },
-        { lit("LEFT"),     lit("STOP"), lit("RIGHT") },
-        { lit("DOWNLEFT"), lit("DOWN"), lit("DOWNRIGHT") }
-    };
-
-    int panSign = qBound(-1, devicePanSpeed, 1);
-    int tiltSign = qBound(-1, deviceTiltSpeed, 1);
-    return directions[1 - tiltSign][1 + panSign];
+    if(devicePanSpeed < 0) {
+        if(deviceTiltSpeed < 0) {
+            return lit("DOWNLEFT");
+        } else if(deviceTiltSpeed == 0) {
+            return lit("LEFT");
+        } else {
+            return lit("UPLEFT");
+        }
+    } else if(devicePanSpeed == 0) {
+        if(deviceTiltSpeed < 0) {
+            return lit("DOWN");
+        } else if(deviceTiltSpeed == 0) {
+            return lit("STOP");
+        } else {
+            return lit("UP");
+        }
+    } else {
+        if(deviceTiltSpeed < 0) {
+            return lit("DOWNRIGHT");
+        } else if(deviceTiltSpeed == 0) {
+            return lit("RIGHT");
+        } else {
+            return lit("UPRIGHT");
+        }
+    }
 }
 
 bool QnActiPtzController::stopZoomInternal() {
@@ -275,10 +291,6 @@ bool QnActiPtzController::getFlip(Qt::Orientations *flip) {
         *flip |= Qt::Horizontal;
 
     return true;
-}
-
-bool QnActiPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
-    return false;
 }
 
 #endif // ENABLE_ACTI

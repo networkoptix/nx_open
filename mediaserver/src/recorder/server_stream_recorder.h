@@ -70,7 +70,7 @@ private:
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(QnConstAbstractMediaDataPtr md);
 private slots:
-    void at_recordingFailed(QString msg);
+    void at_recordingFinished(int status, const QString &filename);
 private:
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;

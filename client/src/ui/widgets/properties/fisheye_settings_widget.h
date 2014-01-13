@@ -1,26 +1,31 @@
 #ifndef QN_FISHEYE_SETTINGS_WIDGET_H
 #define QN_FISHEYE_SETTINGS_WIDGET_H
 
+#include <QtGui/QImage>
 #include <QtWidgets/QWidget>
 
 #include <core/ptz/media_dewarping_params.h>
-
-#include <QWidget>
 
 namespace Ui {
     class FisheyeSettingsWidget;
 }
 
-class QnFisheyeSettingsWidget : public QWidget {
+class QnImageProvider;
+
+class QnFisheyeSettingsWidget : public QWidget{
     Q_OBJECT
+
+    typedef QWidget base_type;
 public:
     QnFisheyeSettingsWidget(QWidget* parent = 0);
     virtual ~QnFisheyeSettingsWidget();
 
-    void setMediaDewarpingParams(const QnMediaDewarpingParams &params);
-    QnMediaDewarpingParams getMediaDewarpingParams() const;
+    void updateFromParams(const QnMediaDewarpingParams &params, QnImageProvider *imageProvider);
+    void submitToParams(QnMediaDewarpingParams &params);
+
 signals:
     void dataChanged();
+
 private slots:
     void at_dataChanged();
 

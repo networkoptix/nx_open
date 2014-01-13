@@ -43,7 +43,7 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 
 QString QnDesktopCameraResource::gePhysicalIdPrefix() const
 {
-    return lit(ID_PREFIX) + serverGuid() + lit("_");
+    return QLatin1String(ID_PREFIX) + serverGuid() + lit("_");
 }
 
 QString QnDesktopCameraResource::getUserName() const 
@@ -51,7 +51,7 @@ QString QnDesktopCameraResource::getUserName() const
     return getPhysicalId().mid(gePhysicalIdPrefix().size());
 }
 
-const QnResourceAudioLayout* QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     const QnDesktopCameraStreamReader* deskopReader = dynamic_cast<const QnDesktopCameraStreamReader*>(dataProvider);
     if (deskopReader && deskopReader->getDPAudioLayout())

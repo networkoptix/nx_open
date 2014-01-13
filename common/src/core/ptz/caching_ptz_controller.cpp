@@ -2,26 +2,34 @@
 
 #include <common/common_meta_types.h>
 
-QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
-	base_type(baseController)
-{
-	connect(baseController.data(), &QnAbstractPtzController::finished, this, &QnCachingPtzController::at_baseController_finished);
+#include <core/resource/resource.h>
 
-	synchronize(Qn::AllPtzFields);
+QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
+	base_type(baseController),
+    m_initialized(false)
+{
+    if(!initialize()) {
+        /* Well, this is hacky. Sync can fail because we're behind a remote
+         * PTZ controller for an offline camera. But strictly speaking, 
+         * we don't know that. Should probably be fixed by adding a signal to
+         * PTZ controller. */ // TODO: #Elric
+        connect(resource(), &QnResource::statusChanged, this, &QnCachingPtzController::initialize);
+    }
 }
 
 QnCachingPtzController::~QnCachingPtzController() {
 	return;
 }
 
-bool QnCachingPtzController::extends(const QnPtzControllerPtr &baseController) {
+bool QnCachingPtzController::extends(Qn::PtzCapabilities capabilities) {
 	return 
-        baseController->hasCapabilities(Qn::AsynchronousPtzCapability) &&
-		!baseController->hasCapabilities(Qn::SynchronizedPtzCapability);
+        (capabilities & Qn::AsynchronousPtzCapability) &&
+		!(capabilities & Qn::SynchronizedPtzCapability);
 }
 
 Qn::PtzCapabilities QnCachingPtzController::getCapabilities() {
-	return baseController()->getCapabilities() | Qn::SynchronizedPtzCapability;
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::SynchronizedPtzCapability) : capabilities;
 }
 
 bool QnCachingPtzController::continuousMove(const QVector3D &speed) {
@@ -177,20 +185,7 @@ bool QnCachingPtzController::synchronize(Qn::PtzDataFields query) {
 	return base_type::synchronize(query);
 }
 
-void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
-	Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-	if(fields == Qn::NoPtzFields)
-		return;
-
-	if(fields & Qn::DeviceLimitsPtzField)	m_data.deviceLimits = data.deviceLimits;
-	if(fields & Qn::LogicalLimitsPtzField)	m_data.logicalLimits = data.logicalLimits;
-    if(fields & Qn::FlipPtzField)			m_data.flip = data.flip;
-    if(fields & Qn::PresetsPtzField)		m_data.presets = data.presets;
-    if(fields & Qn::ToursPtzField)			m_data.tours = data.tours;
-    m_data.fields |= fields;
-}
-
-void QnCachingPtzController::at_baseController_finished(Qn::PtzCommand command, const QVariant &data) {
+void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant &data) {
 	if(data.isValid()) {
 		QMutexLocker locker(&m_mutex);
 		switch (command) {
@@ -264,6 +259,30 @@ void QnCachingPtzController::at_baseController_finished(Qn::PtzCommand command, 
 		}
     }
 
-	emit finished(command, data);
+    base_type::baseFinished(command, data);
 }
 
+bool QnCachingPtzController::initialize() {
+    /* Note that this field is accessed from this object's thread only,
+     * so there is no need to lock. */
+    if(m_initialized)
+        return true;
+
+    return synchronize(Qn::AllPtzFields);
+}
+
+void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
+    if(data.query == Qn::AllPtzFields)
+        m_initialized = true;
+
+	Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
+	if(fields == Qn::NoPtzFields)
+		return;
+
+	if(fields & Qn::DeviceLimitsPtzField)	m_data.deviceLimits = data.deviceLimits;
+	if(fields & Qn::LogicalLimitsPtzField)	m_data.logicalLimits = data.logicalLimits;
+    if(fields & Qn::FlipPtzField)			m_data.flip = data.flip;
+    if(fields & Qn::PresetsPtzField)		m_data.presets = data.presets;
+    if(fields & Qn::ToursPtzField)			m_data.tours = data.tours;
+    m_data.fields |= fields;
+}

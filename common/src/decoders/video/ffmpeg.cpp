@@ -7,7 +7,8 @@
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
-#include "utils/math/math.h"
+
+#include <utils/math/math.h>
 
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
@@ -237,6 +238,12 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
 {
+    if (!(data->flags & AV_PKT_FLAG_KEY))
+    {
+        m_needRecreate = true;
+        return; // can't reset right now
+    }
+
     //closeDecoder();
     //openDecoder();
     //return;

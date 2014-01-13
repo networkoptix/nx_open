@@ -2,7 +2,7 @@
 #define QN_CLIENT_VIDEO_CAMERA_H
 
 #include "cam_display.h"
-#include "recording/stream_recorder.h"
+#include <recording/stream_recorder.h>
 #include "decoders/video/abstractdecoder.h"
 #include "core/resource/media_resource.h"
 #include "core/dataprovider/statistics.h"
@@ -11,12 +11,24 @@
 #include <core/ptz/item_dewarping_params.h>
 
 class QnResource;
-class QnStreamRecorder;
 class QnAbstractArchiveReader;
 
 class QnClientVideoCamera : public QObject {
     Q_OBJECT
+
+    Q_ENUMS(ClientVideoCameraError)
 public:
+    enum ClientVideoCameraError {
+        NoError = 0,
+        FirstError = QnStreamRecorder::LastError,
+
+        InvalidResourceType = FirstError,
+
+        ErrorCount
+    };
+
+    static QString errorString(int errCode);
+
     QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnClientVideoCamera();
 
@@ -61,10 +73,8 @@ public:
 
     bool isDisplayStarted() const { return m_displayStarted; }
 signals:
-    void recordingFailed(QString errMessage);
     void exportProgress(int progress);
-    void exportFailed(const QString &errMessage);
-    void exportFinished(const QString &fileName);
+    void exportFinished(int status, const QString &fileName);
 
 public slots:
     virtual void startDisplay();

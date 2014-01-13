@@ -101,7 +101,10 @@ extern "C"
 
 #include "text_to_wav.h"
 #include "common/common_module.h"
+#include "ui/style/noptix_style.h"
+#include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
+
 
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -268,8 +271,11 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #ifndef API_TEST_MAIN
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
+    // these functions should be called in every thread that wants to use rand() and qrand()
+    srand(::time(NULL));
+    qsrand(::time(NULL));
+
     int result = 0;
-    //(refactoring to QnResourcePool instanciation was required to make mediaserver exit without segfault)
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -284,6 +290,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath;
+        QString customizationPath = lit(":/skin");
     bool devBackgroundEditable = false;
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
@@ -302,6 +309,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
+    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
@@ -317,10 +325,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
+    QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
+    QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
+    customizer->customize(qnGlobals);
+
     /* Initialize application instance. */
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
+    application->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
@@ -446,8 +459,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
 
-    // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
-    qApp->setStyle(qnSkin->style());
 
     /* Load translation. */
     QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();

@@ -3,6 +3,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
+#include <utils/math/math.h>
 #include <utils/common/util.h>
 #include <utils/common/json.h>
 
@@ -214,14 +215,14 @@ QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
     return dbg.space();
 }
 
-void serialize(const QnTimePeriod &value, QJsonValue *target) {
-    detail::serialize(value, target);
+void serialize(QnJsonContext *ctx, const QnTimePeriod &value, QJsonValue *target) {
+    detail::serialize(ctx, value, target);
 }
 
-bool deserialize(const QJsonValue &value, QnTimePeriod *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnTimePeriod *target) {
     if(value.type() == QJsonValue::Null) {
         *target = QnTimePeriod();
         return false;
     }
-    return detail::deserialize(value, target);
+    return detail::deserialize(ctx, value, target);
 }

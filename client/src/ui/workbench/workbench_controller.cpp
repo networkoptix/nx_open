@@ -558,7 +558,12 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     if(!m_menuEnabled)
         return;
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    QMetaObject::invokeMethod(this, "showContextMenuAtInternal", Qt::QueuedConnection,
+                              Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
+}
+
+void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
@@ -575,13 +580,6 @@ void QnWorkbenchController::startRecording() {
     }
 
     if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
@@ -613,9 +611,8 @@ void QnWorkbenchController::at_recordingAnimation_finished() {
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
-        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            if (m_screenRecorder) // just in case =)
-                m_screenRecorder->startRecording(widget);
+        if (m_screenRecorder) // just in case =)
+            m_screenRecorder->startRecording();
     }
     m_countdownCanceled = false;
 }
@@ -764,12 +761,12 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_8:
     case Qt::Key_9: {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-        if(!widget || !widget->ptzController() || !widget->camera())
+        if(!widget || !widget->ptzController())
             break;
 
         int hotkey = e->key() - Qt::Key_0;
 
-        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->camera(), hotkey);
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->resource()->toResourcePtr(), hotkey);
         if (presetId.isEmpty())
             break;
 
@@ -1069,7 +1066,10 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
-    workbench()->currentLayout()->resource()->addItem(data);
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+        return;
+    layout->addItem(data);
     display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 

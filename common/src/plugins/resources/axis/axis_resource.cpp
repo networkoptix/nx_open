@@ -534,7 +534,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
     }
 }
 
-const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
@@ -547,8 +547,7 @@ const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractSt
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-
-int QnPlAxisResource::getChannelNum() const
+int QnPlAxisResource::getChannelNumAxis() const
 {
     QString phId = getPhysicalId();
 
@@ -903,6 +902,11 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     } else {
         return new QnAxisPtzController(toSharedPointer(this));
     }
+}
+
+int QnPlAxisResource::getChannel() const
+{
+    return getChannelNumAxis() - 1;
 }
 
 #endif // #ifdef ENABLE_AXIS

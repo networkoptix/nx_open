@@ -472,7 +472,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
         }
     }
 
-    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(m_multiChannelVideo ? media->channelNumber : 0);
+    int trackNum = media->channelNumber;
+    if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
+        trackNum = 0; // multichannel video is going to be transcoded to a single track
+    RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(trackNum);
+
     if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
     QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
@@ -605,7 +609,7 @@ void QnRtspDataConsumer::addData(QnAbstractMediaDataPtr data)
     m_dataQueue.push(data);
 }
 
-int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime)
+int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
@@ -617,7 +621,7 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
     }
     int copySize = 0;
     //if (camera && !res->hasFlags(QnResource::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 

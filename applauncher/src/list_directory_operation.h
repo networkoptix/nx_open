@@ -12,13 +12,10 @@
 #include <QString>
 #include <QUrl>
 
+#include <utils/network/http/asynchttpclient.h>
+
 #include "rdir_synchronization_operation.h"
 
-
-namespace nx_http
-{
-    class AsyncHttpClient;
-}
 
 namespace detail
 {
@@ -83,14 +80,14 @@ namespace detail
 
     private:
         const QString m_localTargetDirPath;
-        nx_http::AsyncHttpClient* m_httpClient;
+        nx_http::AsyncHttpClientPtr m_httpClient;
         int64_t m_totalSize;
         std::list<detail::RDirEntry> m_entries;
         QUrl m_downloadUrl;
 
     private slots:
-        void onResponseReceived( nx_http::AsyncHttpClient* );
-        void onHttpDone( nx_http::AsyncHttpClient* );
+        void onResponseReceived( nx_http::AsyncHttpClientPtr );
+        void onHttpDone( nx_http::AsyncHttpClientPtr );
     };
 }
 

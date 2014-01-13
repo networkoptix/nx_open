@@ -3,13 +3,10 @@
 
 #ifdef ENABLE_ACTI
 
-#include <QtCore/QHash>
 #include <QtCore/QMutex>
 
 #include <core/ptz/basic_ptz_controller.h>
 
-class CLSimpleHTTPClient;
-class QnActiParameterMap;
 
 class QnActiPtzController: public QnBasicPtzController {
     Q_OBJECT
@@ -24,7 +21,6 @@ public:
     virtual bool getFlip(Qt::Orientations *flip) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     
 private:
     void init();

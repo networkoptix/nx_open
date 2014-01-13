@@ -5,8 +5,11 @@
 
 #include <utils/math/functors.h>
 
+#include <client/client_color_types.h>
+
 #include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
+#include <camera/thumbnail.h>
 
 #include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
@@ -15,7 +18,6 @@
 #include <ui/animation/animated.h>
 
 #include "time_step.h"
-#include "camera/thumbnail.h"
 
 class QTimer;
 
@@ -24,9 +26,10 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
-    Q_OBJECT;
-    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart);
-    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd);
+    Q_OBJECT
+    Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
+    Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd)
+    Q_PROPERTY(QnTimeSliderColors colors READ colors WRITE setColors)
 
     typedef Animated<QnToolTipSlider> base_type;
 
@@ -164,6 +167,9 @@ public:
     qint64 localOffset() const;
     void setLocalOffset(qint64 utcOffset);
 
+    const QnTimeSliderColors &colors() const;
+    void setColors(const QnTimeSliderColors &colors);
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -186,6 +192,7 @@ protected:
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    virtual void changeEvent(QEvent *event) override;
 
     virtual void tick(int deltaMSecs) override;
 
@@ -273,6 +280,7 @@ private:
     void drawThumbnails(QPainter *painter, const QRectF &rect);
     void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
 
+    void updatePixmapCache();
     void updateVisibleLineCount();
     void updateToolTipVisibility();
     void updateToolTipText();
@@ -312,6 +320,8 @@ private:
 
     friend class QnTimeSliderChunkPainter;
     friend class QnTimeSliderStepStorage;
+    
+    QnTimeSliderColors m_colors;
 
     qint64 m_windowStart, m_windowEnd;
     qint64 m_minimalWindow;

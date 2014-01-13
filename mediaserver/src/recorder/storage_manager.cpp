@@ -793,7 +793,10 @@ void QnStorageManager::addDataToCatalog(DeviceFileCatalogPtr newCatalog, const Q
                     newCatalog->addChunk(existingCatalog->m_chunks[i]);
             }
 
+            qint64 recordingTime = existingCatalog->getLatRecordingTime();
             existingCatalog = catalog[mac] = newCatalog;
+            if (recordingTime > 0)
+                existingCatalog->setLatRecordingTime(recordingTime);
         }
         else if (existingCatalog->isEmpty())
         {

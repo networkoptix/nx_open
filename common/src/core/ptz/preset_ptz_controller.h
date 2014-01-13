@@ -19,7 +19,7 @@ public:
     QnPresetPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnPresetPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 
@@ -30,6 +30,10 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
+    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
+
+private:
+    bool m_asynchronous;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
 };

@@ -21,6 +21,28 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
 
+QString QnStreamRecorder::errorString(int errCode) {
+    switch (errCode) {
+    case NoError:
+        return QString();
+    case ContainerNotFoundError:
+        return tr("Corresponding container in FFMPEG library was not found.");
+    case FileCreateError:
+        return tr("Can't create output file for video recording.");
+    case VideoStreamAllocationError:
+        return tr("Can't allocate output stream for recording.");
+    case AudioStreamAllocationError:
+        return tr("Can't allocate output audio stream.");
+    case InvalidAudioCodecError:
+        return tr("Invalid audio codec information.");
+    case IncompatibleCodecError:
+        return tr("Video or audio codec is incompatible with the selected format.");
+    default:
+        break;
+    }
+    return QString();
+}
+
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
     m_device(dev),
@@ -187,13 +209,10 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
     {
         if (!m_endOfData) 
         {
-            bool isOK = true;
+            bool isOk = true;
             if (m_needCalcSignature && !m_firstTime)
-                isOK = addSignatureFrame(m_lastErrMessage);
-            if (isOK)
-                emit recordingFinished(m_fileName);
-            else
-                emit recordingFailed(m_lastErrMessage);
+                isOk = addSignatureFrame();
+            emit recordingFinished(isOk ? NoError : m_lastError, m_fileName);
             m_endOfData = true;
         }
 
@@ -308,7 +327,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
         if (!initFfmpegContainer(vd))
         {
             if (!m_fileName.isEmpty())
-                emit recordingFailed(m_lastErrMessage); // ommit storageFailure because of exists separate error if no storages at all
+                emit recordingFinished(m_lastError, m_fileName); // ommit storageFailure because of exists separate error if no storages at all
             if (m_stopOnWriteError)
             {
                 m_needStop = true;
@@ -432,8 +451,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = tr("No %1 container in FFMPEG library.").arg(m_container);
-        cl_log.log(m_lastErrMessage, cl_logERROR);
+        m_lastError = ContainerNotFoundError;
+        cl_log.log(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
         return false;
     }
 
@@ -451,8 +470,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, url.toUtf8().constData());
 
     if (err < 0) {
-        m_lastErrMessage = tr("Can't create output file '%1' for video recording.").arg(m_fileName);
-        cl_log.log(m_lastErrMessage, cl_logERROR);
+        m_lastError = FileCreateError;
+        cl_log.log(lit("Can't create output file '%1' for video recording.").arg(m_fileName), cl_logERROR);
         msleep(500); // avoid createFile flood
         return false;
     }
@@ -467,8 +486,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         m_contrastParams.enabled ||
         m_itemDewarpingParams.enabled;
 
-    const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
-    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
+    QnConstResourceVideoLayoutPtr layout = mediaDev->getVideoLayout(m_mediaProvider);
+    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.get());
     {
         if (!isTranscode)
             av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toLatin1().data(), 0);
@@ -503,10 +522,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         {
             // TODO: #vasilenko avoid using deprecated methods
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
-            if (videoStream == 0)
-            {
-                m_lastErrMessage = tr("Can't allocate output stream for recording.");
-                cl_log.log(m_lastErrMessage, cl_logERROR);
+            if (videoStream == 0) {
+                m_lastError = VideoStreamAllocationError;
+                cl_log.log(lit("Can't allocate output stream for recording."), cl_logERROR);
                 return false;
             }
 
@@ -586,25 +604,24 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             videoStream->first_dts = 0;
         }
 
-        const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
+        QnConstResourceAudioLayoutPtr audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         m_isAudioPresent = false;
         for (int i = 0; i < audioLayout->channelCount(); ++i) 
         {
             m_isAudioPresent = true;
             // TODO: #vasilenko avoid using deprecated methods
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
-            if (audioStream == 0)
-            {
-                m_lastErrMessage = tr("Can't allocate output audio stream.");
-                cl_log.log(m_lastErrMessage, cl_logERROR);
+            if (!audioStream) {
+                m_lastError = AudioStreamAllocationError;
+                cl_log.log(lit("Can't allocate output audio stream."), cl_logERROR);
                 return false;
             }
 
             CodecID srcAudioCodec = CODEC_ID_NONE;
             QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
             if (!mediaContext) {
-                m_lastErrMessage = tr("Internal server error: invalid audio codec information");
-                cl_log.log(m_lastErrMessage, cl_logERROR);
+                m_lastError = InvalidAudioCodecError;
+                cl_log.log(lit("Invalid audio codec information."), cl_logERROR);
                 return false;
             }
 
@@ -632,8 +649,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         if (m_ioContext == 0)
         {
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = tr("Can't create output file '%1'.").arg(url);
-            cl_log.log(m_lastErrMessage, cl_logERROR);
+            m_lastError = FileCreateError;
+            cl_log.log(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
             msleep(500); // avoid createFile flood
             return false;
         }
@@ -645,8 +662,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
             m_ioContext = 0;
             m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = tr("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container);
-            cl_log.log(m_lastErrMessage, cl_logERROR);
+            m_lastError = IncompatibleCodecError;
+            cl_log.log(lit("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container), cl_logERROR);
             return false;
         }
     }
@@ -745,8 +762,7 @@ QByteArray QnStreamRecorder::getSignature() const
     return m_mdctx.result();
 }
 
-bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
-{
+bool QnStreamRecorder::addSignatureFrame() {
 #ifndef SIGN_FRAME_ENABLED
     QByteArray signText = QnSignHelper::getSignPattern();
     if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)

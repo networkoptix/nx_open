@@ -420,7 +420,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
     videoData->height = vh->usWidth;
 
     if (vh->usCodingType==0)
-        videoData->flags |= AV_PKT_FLAG_KEY;
+        videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
     videoData->channelNumber = 0;
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
@@ -480,7 +480,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;
     videoData->height = 1088;
-    videoData->flags |= AV_PKT_FLAG_KEY;
+    videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     videoData->channelNumber = 0;
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 

@@ -9,6 +9,7 @@
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 #include <core/ptz/item_dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
@@ -16,8 +17,6 @@
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
-class QnAbstractPtzController;
-class QnVirtualPtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -44,11 +43,6 @@ public:
      * \returns                         Resource associated with this widget.
      */
     QnMediaResourcePtr resource() const;
-
-    /**
-     * \returns                         Camera associated with this widget (if any).
-     */
-    QnVirtualCameraResourcePtr camera() const;
 
     /**
      * \returns                         Display associated with this widget.
@@ -107,9 +101,6 @@ public:
     ImageCorrectionParams imageEnhancement() const;
     void setImageEnhancement(const ImageCorrectionParams &imageEnhancement);
 
-//    QnItemDewarpingParams itemDewarpingParams() const;
-//    void setItemDewarpingParams(const QnItemDewarpingParams &itemDewarpingParams);
-
     /**
      * This function returns a PTZ controller associated with this widget.
      * Note that this function never returns NULL. Also note that several
@@ -119,9 +110,14 @@ public:
      */
     QnPtzControllerPtr ptzController() const;
 
+    QnMediaDewarpingParams dewarpingParams() const;
+    void setDewarpingParams(const QnMediaDewarpingParams &params);
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
+    void fisheyeChanged();
+    void dewarpingParamsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -159,6 +155,7 @@ protected:
 
 private slots:
     void at_resource_resourceChanged();
+    void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
@@ -178,6 +175,8 @@ private:
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
     Q_SLOT void updateFisheye();
+    Q_SLOT void updateDewarpingParams();
+    Q_SLOT void updateCustomAspectRatio();
 
 private:
     /** Media resource. */
@@ -218,6 +217,8 @@ private:
     QStaticText m_sensStaticText[10];
 
     QnPtzControllerPtr m_ptzController;
+
+    QnMediaDewarpingParams m_dewarpingParams;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

@@ -13,10 +13,8 @@ class QnProxyPtzController: public QnAbstractPtzController {
     typedef QnAbstractPtzController base_type;
 
 public:
-    QnProxyPtzController(const QnPtzControllerPtr &baseController):
-        QnAbstractPtzController(baseController->resource()),
-        m_baseController(baseController)
-    {}
+    QnProxyPtzController(const QnPtzControllerPtr &baseController);
+    virtual ~QnProxyPtzController();
 
     QnPtzControllerPtr baseController() const                                                                   { return m_baseController; }
 
@@ -43,6 +41,10 @@ public:
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
     virtual bool synchronize(Qn::PtzDataFields query) override                                                  { return m_baseController->synchronize(query); }
+
+protected:
+    virtual void baseFinished(Qn::PtzCommand command, const QVariant &data)                                     { emit finished(command, data); }
+    virtual void baseCapabilitiesChanged()                                                                      { emit capabilitiesChanged(); }
 
 private:
     QnPtzControllerPtr m_baseController;

@@ -81,7 +81,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     rez->data.finishWriting(size);
     rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (isKeyData)
-        rez->flags |= AV_PKT_FLAG_KEY;
+        rez->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
     readed = receiveData((quint8*) rez->data.data(), size);
     if (readed != size) {

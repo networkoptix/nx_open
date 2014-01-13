@@ -81,7 +81,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other) {
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
     {
-        const QnResourceVideoLayout* layout = getVideoLayout();
+        QnConstResourceVideoLayoutPtr layout = getVideoLayout();
         int numChannels = layout->channelCount();
 
         m_motionType = other_casted->m_motionType;

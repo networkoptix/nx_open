@@ -1,5 +1,6 @@
 #include "workaround_ptz_controller.h"
 
+#include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
 
 #include <common/common_module.h>
@@ -16,6 +17,8 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         return;
 
     m_octagonal = qnCommon->dataPool()->data(camera).value<bool>(lit("octagonalPtz"), false);
+
+    // TODO: #Elric propert finished handling.
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
@@ -35,3 +38,8 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
         return base_type::continuousMove(QVector3D(cartesianSpeed, speed.z()));
     }
 }
+
+bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {
+    return true; // TODO: #Elric
+}
+

@@ -480,6 +480,11 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
+         * Opens picture settings dialog.
+         */
+        PictureSettingsAction,
+
+        /**
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,
@@ -653,6 +658,11 @@ namespace Qn {
          */
         PtzManageToursAction,
 
+        /**
+         * Starts fisheye calibration for the given widget.
+         */
+        PtzCalibrateFisheyeAction,
+
 
         /* Layout actions. */
 
@@ -695,11 +705,6 @@ namespace Qn {
          * Opens a layout creation dialog.
          */
         NewUserLayoutAction,
-
-
-        SetCurrentItemAspectRatioAutoAction,
-        SetCurrentItemAspectRatio4x3Action,
-        SetCurrentItemAspectRatio16x9Action,
 
         /**
          * Sets aspect ratio of current layout's cells to 16x9.
@@ -851,6 +856,11 @@ namespace Qn {
          * Generates PTZ calibration screenshots.
          */
         DebugCalibratePtzAction,
+
+        /**
+         * Opens up debug control panel.
+         */
+        DebugControlPanelAction,
 
 
         ActionCount,

@@ -160,6 +160,9 @@ QString QnTestCameraResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     Q_UNUSED(url)
     Q_UNUSED(auth)
     Q_UNUSED(doMultichannelCheck)

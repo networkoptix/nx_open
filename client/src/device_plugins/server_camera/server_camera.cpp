@@ -38,14 +38,14 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-const QnResourceVideoLayout* QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getVideoLayout();
 }
 
-const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archive)
@@ -75,7 +75,7 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
 QnServerCameraPtr QnServerCamera::findEnabledSibling()
 {
     if (!isDisabled())
-        return ::toSharedPointer(this);
+        return toSharedPointer().dynamicCast<QnServerCamera>();
 
     {
         QMutexLocker lock(&m_mutex);

@@ -17,9 +17,14 @@ public:
     QnTourPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnTourPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
+
+    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
+    virtual bool activatePreset(const QString &presetId, qreal speed) override;
 
     virtual bool createTour(const QnPtzTour &tour) override;
     virtual bool removeTour(const QString &tourId) override;
@@ -28,8 +33,10 @@ public:
 
 private:
     bool createTourInternal(QnPtzTour tour);
+    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 
 private:
+    bool m_asynchronous;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
     QnPtzTourExecutor *m_executor;

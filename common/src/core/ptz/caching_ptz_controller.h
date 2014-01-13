@@ -13,7 +13,7 @@ public:
     QnCachingPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnCachingPtzController();
 
-    static bool extends(const QnPtzControllerPtr &baseController);
+    static bool extends(Qn::PtzCapabilities capabilities);
 
     virtual Qn::PtzCapabilities getCapabilities() override;
 
@@ -39,11 +39,15 @@ public:
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
     virtual bool synchronize(Qn::PtzDataFields query) override;
 
-private:
-    void updateCacheLocked(const QnPtzData &data);
-    Q_SLOT void at_baseController_finished(Qn::PtzCommand command, const QVariant &data);
+protected:
+    virtual void baseFinished(Qn::PtzCommand command, const QVariant &data) override;
 
 private:
+    bool initialize();
+    void updateCacheLocked(const QnPtzData &data);
+
+private:
+    bool m_initialized;
     QMutex m_mutex;
     QnPtzData m_data;
 };

@@ -61,7 +61,7 @@ public:
     QnId getOnvifResourceType(const QString& manufacturer, const QString&  model) const;
 
     void pleaseStop();
-
+    static bool ignoreCamera(const QString& manufacturer, const QString& name);
 private:
 
 
@@ -74,7 +74,6 @@ private:
     QString fetchSerial(const DeviceInfoResp& response) const;
     static bool isAnalogOnvifResource(const QString& vendor, const QString& model);
     static bool isModelContainVendor(const QString& vendor, const QString& model);
-    bool ignoreCamera(const QString& manufacturer, const QString& name) const;
 private:
     static const char *ONVIF_RT;
     QnId onvifTypeId;
