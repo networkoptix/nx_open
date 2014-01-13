@@ -99,7 +99,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             QString val = params[i].second.toLower().trimmed(); 
             if (val == lit("before"))
                 roundMethod = IFrameBeforeTime;
-            else if (val == lit("exact"))
+            else if (val == lit("precise") || val == lit("exact"))
                 roundMethod = Precise;
             else if (val == lit("after"))
                 roundMethod = IFrameAfterTime;
