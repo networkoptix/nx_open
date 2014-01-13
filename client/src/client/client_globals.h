@@ -165,7 +165,6 @@ namespace Qn {
         NoDataOverlay,
         UnauthorizedOverlay,
         OfflineOverlay,
-        AnalogWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount

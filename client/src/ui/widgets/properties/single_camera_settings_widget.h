@@ -120,12 +120,10 @@ private slots:
     void at_motionRegionListChanged();
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
-    void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-    void updateLicenseText();
     void updateIpAddressText();
     void updateWebPageText();
 

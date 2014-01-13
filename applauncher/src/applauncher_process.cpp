@@ -358,8 +358,22 @@ bool ApplauncherProcess::getInstallationStatus(
     response->status = installationIter->second->getStatus();
     response->progress = installationIter->second->getProgress();
 
-    if( response->status > applauncher::api::InstallationStatus::inProgress )
+    if( response->status > applauncher::api::InstallationStatus::cancelInProgress )
+    {
+        switch( response->status )
+        {
+            case applauncher::api::InstallationStatus::success:
+                NX_LOG( QString::fromLatin1("Installation finished successfully"), cl_logDEBUG2 );
+                break;
+            case applauncher::api::InstallationStatus::failed:
+                NX_LOG( QString::fromLatin1("Installation has failed. %1").arg(installationIter->second->errorText()), cl_logDEBUG1 );
+                break;
+            case applauncher::api::InstallationStatus::cancelled:
+                NX_LOG( QString::fromLatin1("Installation has been cancelled"), cl_logDEBUG2 );
+                break;
+        }
         m_activeInstallations.erase( installationIter );
+    }
 
     return true;
 }

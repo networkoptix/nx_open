@@ -7,15 +7,15 @@
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
         
         <DirectoryRef Id="INSTALLDIR">
-        <Directory Id="${installer.customization}ClientDir" Name="Client">
-            <Directory Id="${installer.customization}HelpDir" Name="help"/>                         
+        <Directory Id="${customization}ClientDir" Name="Client">
+            <Directory Id="${customization}HelpDir" Name="help"/>                         
 
-            <Directory Id="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
+            <Directory Id="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
 
                 <Component Id="AppLauncherExecutable">
                     <File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
                         <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-                              WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
+                              WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
                         </Shortcut>
                     </File>
                 </Component>
@@ -33,7 +33,7 @@
                     <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
                     <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                          WorkingDirectory='${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+                          WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
                     </Shortcut>
                 </Component>                            
 
@@ -49,7 +49,7 @@
                 <Directory Id="Platforms" Name="platforms">
                 </Directory>                    
 
-                <Directory Id="${installer.customization}VoxDir" Name="vox"/>                                
+                <Directory Id="${customization}VoxDir" Name="vox"/>                                
 
                 <Component Id="ClientExecutable">
                     <File Id="client.exe" Name="${product.name}.exe" Source="$(var.SourceDir)/client.exe" KeyPath="yes">
@@ -83,7 +83,7 @@
         </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="ClientFFmpegLibraries" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientFFmpegLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
@@ -119,7 +119,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientQuickSync" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientQuickSync" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.SourceDir)/quicksyncdecoder.dll"/>
             </Component>
@@ -128,7 +128,7 @@
             </Component>
         </ComponentGroup>                            
 
-        <ComponentGroup Id="ClientQTLibraries" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
             </Component>
@@ -155,7 +155,7 @@
             </Component>             
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenAL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientOpenAL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll"/>
             </Component>
@@ -164,7 +164,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenSSL" Directory="${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientOpenSSL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>

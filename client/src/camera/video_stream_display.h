@@ -53,7 +53,8 @@ public:
     void setSpeed(float value);
     virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
                                  const QnMediaDewarpingParams& mediaDewarping,
-                                 const QnItemDewarpingParams& itemDewarping) override;
+                                 const QnItemDewarpingParams& itemDewarping,
+                                 bool anyQuality) override;
     virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);

@@ -83,9 +83,6 @@ public:
     int sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, int id, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
     int sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
-signals:
-    void replyReceived(int status);
-
 private:
     QUrl createApiUrl(const QUrl& baseUrl, const QString &objectName, const QnRequestParamList &params = QnRequestParamList()) const;
 
@@ -95,7 +92,6 @@ private slots:
     void at_aboutToBeStopped();
     void at_aboutToBeStarted();
     void at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
-    void at_replyProcessor_finished(const QnHTTPRawResponse& response, int handle);
 
 signals:
     void aboutToBeStopped();

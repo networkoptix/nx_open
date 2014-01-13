@@ -53,7 +53,6 @@ private:
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticSubText;
     QStaticText m_loadingStaticText;
-    QStaticText m_analogLicenseStaticText;
 
     Qn::ResourceStatusOverlay m_statusOverlay;
 

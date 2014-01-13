@@ -258,7 +258,8 @@ class ScreenshotInterface
 public:
     virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
                                  const QnMediaDewarpingParams& mediaDewarping,
-                                 const QnItemDewarpingParams& itemDewarping) = 0; // 8 bit Y channel only
+                                 const QnItemDewarpingParams& itemDewarping,
+                                 bool anyQuality) = 0; // 8 bit Y channel only
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

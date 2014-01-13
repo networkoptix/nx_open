@@ -191,7 +191,6 @@ int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QSt
     QnSessionManagerAsyncReplyProcessor *replyProcessor = new QnSessionManagerAsyncReplyProcessor(handle);
     replyProcessor->moveToThread(this->thread());
     connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(at_replyProcessor_finished(QnHTTPRawResponse, int)), Qt::QueuedConnection);
 
     emit asyncRequestQueued(operation, replyProcessor, url, objectName, headers, params, data);
 
@@ -332,8 +331,4 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
 
     connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
-}
-
-void QnSessionManager::at_replyProcessor_finished(const QnHTTPRawResponse& response, int) {
-    emit replyReceived(response.status);
 }
