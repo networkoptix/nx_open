@@ -2,7 +2,7 @@ import os, sys, subprocess
 from subprocess import Popen, PIPE
 
 if __name__ == '__main__':
-    p = subprocess.Popen(r'heat dir ${ClientVoxSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientVox.wxs -cg ClientVoxComponent -dr ${installer.customization}VoxDir -var var.ClientVoxSourceDir', shell=True, stdout=PIPE)
+    p = subprocess.Popen(r'heat dir ${ClientVoxSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientVox.wxs -cg ClientVoxComponent -dr ${customization}VoxDir -var var.ClientVoxSourceDir', shell=True, stdout=PIPE)
     out, err = p.communicate()
     print out
     p.wait()

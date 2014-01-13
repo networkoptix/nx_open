@@ -240,7 +240,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         return CODE_INTERNAL_ERROR;
     }
 
-    PixelFormat ffmpegColorFormat = PIX_FMT_RGBA;
+    PixelFormat ffmpegColorFormat = PIX_FMT_BGRA;
     QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
     int pixelBytes = 4;
     if (colorSpace == "gray8") {

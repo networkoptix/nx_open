@@ -252,6 +252,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 
 
     stree::ResourceContainer result;
+    NX_LOG( QString::fromLatin1("Searching mirrors.xml with following input data: %1").arg(inputData.toString(m_rns)), cl_logDEBUG2 );
     m_currentTree->get( inputData, &result );
 
     std::forward_list<QUrl> mirrorList;
@@ -265,7 +266,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     if( mirrorList.empty() )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
-        m_errorText = QString::fromLatin1( "Could not find mirror for [%1; %2; %3; %4]" ).arg(m_productName).arg(m_customization).arg(m_module).arg(m_version);
+        m_errorText = QString::fromLatin1( "Could not find mirror for %1" ).arg(inputData.toString(m_rns));
         m_state = State::finished;
         m_status = applauncher::api::InstallationStatus::failed;
         return;
