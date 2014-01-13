@@ -241,6 +241,16 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 #else
 #error "Unknown compiler"
 #endif
+
+#ifdef _WIN32
+    inputData.put( ProductParameters::platform, "windows" );
+#elif defined(__linux__)
+    inputData.put( ProductParameters::platform, "linux" );
+#elif defined(__APPLE__)
+    inputData.put( ProductParameters::platform, "macos" );
+#endif
+
+
     stree::ResourceContainer result;
     m_currentTree->get( inputData, &result );
 
