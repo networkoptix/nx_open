@@ -312,15 +312,6 @@ namespace QJsonDetail {
         QJson::serialize(ctx, getMember(object, getter), key, target);
     }
 
-    template<class Class, class Setter, class Getter>
-    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, QJson::Options localOptions = 0) {
-        using namespace QJsonAccessors;
-        unused(getter);
-
-        typedef boost::remove_reference<decltype(getMember(*object, getter))>::type member_type;
-        return deserializeMember(ctx, value, key, object, setter, globalOptions | localOptions, static_cast<const member_type *>(NULL));
-    }
-
     template<class Class, class Setter, class T>
     inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Setter &setter, QJson::Options options, const T *) {
         using namespace QJsonAccessors;
@@ -330,6 +321,15 @@ namespace QJsonDetail {
             return false;
         setMember(*object, setter, member);
         return true;
+    }
+
+    template<class Class, class Setter, class Getter>
+    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, QJson::Options localOptions = 0) {
+        using namespace QJsonAccessors;
+        unused(getter);
+
+        typedef typename boost::remove_reference<decltype(getMember(*object, getter))>::type member_type;
+        return deserializeMember(ctx, value, key, object, setter, globalOptions | localOptions, static_cast<const member_type *>(NULL));
     }
 
     template<class Class, class Setter, class T>

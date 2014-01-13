@@ -257,10 +257,6 @@ protected slots:
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
 
-    void at_setCurrentItemAspectRatioAutoAction_triggered();
-    void at_setCurrentItemAspectRatio4x3Action_triggered();
-    void at_setCurrentItemAspectRatio16x9Action_triggered();
-
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();

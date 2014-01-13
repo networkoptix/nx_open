@@ -12,6 +12,11 @@
 #include "customizer.h"
 
 
+namespace QnEvent {
+    static const QEvent::Type Customize = static_cast<QEvent::Type>(QEvent::User + 0x8A5E);
+}
+
+
 template<class Base, bool baseIsCustomized>
 class Customized;
 
@@ -59,10 +64,6 @@ class Customized<Base, true>: public Base {
 public:
     QN_FORWARD_CONSTRUCTOR(Customized, Base, {});
 };
-
-namespace QnEvent {
-    static const QEvent::Type Customize = static_cast<QEvent::Type>(QEvent::User + 0x8A5E);
-}
 
 
 #endif // QN_CUSTOMIZED_H

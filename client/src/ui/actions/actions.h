@@ -706,11 +706,6 @@ namespace Qn {
          */
         NewUserLayoutAction,
 
-
-        SetCurrentItemAspectRatioAutoAction,
-        SetCurrentItemAspectRatio4x3Action,
-        SetCurrentItemAspectRatio16x9Action,
-
         /**
          * Sets aspect ratio of current layout's cells to 16x9.
          */

@@ -211,7 +211,7 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
             if(line.isNull())
                 break;
 
-            int index = line.indexOf(lit('='));
+            int index = line.indexOf(L'=');
             if(index == -1)
                 continue;
 

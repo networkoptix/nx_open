@@ -5,7 +5,7 @@ COMPANY_NAME=${deb.customization.company.name}
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
-ARCHITECTURE=${arch}
+ARCHITECTURE=${os.arch}
 
 TARGET=/opt/$COMPANY_NAME/client
 USRTARGET=/usr

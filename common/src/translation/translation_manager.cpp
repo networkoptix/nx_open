@@ -129,7 +129,8 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
         if(!dir.exists())
             continue;
 
-        foreach(const QString &fileName, dir.entryList(QStringList(m_prefixes[0] + lit("*.qm")))) {
+        QString mask = m_prefixes[0] + lit("*.qm");
+        foreach(const QString &fileName, dir.entryList(QStringList(mask))) {
             QnTranslation translation = loadTranslationInternal(dir.absolutePath(), fileName);
             if(!translation.isEmpty())
                 result.push_back(translation);
@@ -140,7 +141,7 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
 }
 
 QnTranslation QnTranslationManager::loadTranslationInternal(const QString &translationDir, const QString &translationName) const {
-    QString filePath = translationDir + lit('/') + translationName;
+    QString filePath = translationDir + L'/' + translationName;
     QString suffix = translationName.mid(m_prefixes[0].size());
 
     QTranslator translator;
@@ -159,7 +160,7 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
 
     QStringList filePaths;
     for(int i = 0; i < m_prefixes.size(); i++)
-        filePaths.push_back(translationDir + lit('/') + m_prefixes[i] + suffix);
+        filePaths.push_back(translationDir + L'/' + m_prefixes[i] + suffix);
 
     return QnTranslation(languageName, localeCode, filePaths);
 }

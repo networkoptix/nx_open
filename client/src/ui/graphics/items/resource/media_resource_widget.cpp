@@ -416,6 +416,13 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
+
+        if (m_camera) {
+            QString overriddenAr = m_camera->getProperty(lit("overrideAr"));
+            if (!overriddenAr.isEmpty())
+                m_display->camDisplay()->setOverridenAspectRatio(overriddenAr.toDouble());
+        }
+
     } else {
         setChannelLayout(qn_resourceWidget_defaultContentLayout);
         m_renderer->setChannelCount(0);
