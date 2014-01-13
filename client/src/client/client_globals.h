@@ -218,6 +218,13 @@ namespace Qn {
         LayoutLocalSaveAs,
         LayoutExport
     };
+
+
+    /**
+     * Custom resource properties names.
+     */
+    const QString customAspectRatioKey = lit("overrideAr");
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
