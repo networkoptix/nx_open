@@ -12,6 +12,9 @@
 
 #include <client/client_settings.h>
 
+#include <transcoding/filters/contrast_image_filter.h>
+#include <transcoding/filters/fisheye_image_filter.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -136,7 +139,7 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
 
 
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(const QnScreenshotParameters &parameters, QnResourceDisplay *display) {
+QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay *display) {
     if (!display)
         return NULL;
 
@@ -155,17 +158,22 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(const 
     QSize channelSize = images[0].size();
     QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
 
-    QImage screenshot(totalSize.width() * parameters.zoomRect.width(), totalSize.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
+    QImage screenshot(totalSize.width(), totalSize.height(), QImage::Format_ARGB32);
     screenshot.fill(qRgba(0, 0, 0, 0));
 
     QScopedPointer<QPainter> painter(new QPainter(&screenshot));
     painter->setCompositionMode(QPainter::CompositionMode_Source);
     for (int i = 0; i < layout->channelCount(); ++i) {
         painter->drawImage(
-                    QnGeometry::cwiseMul(layout->position(i), channelSize) - QnGeometry::cwiseMul(parameters.zoomRect.topLeft(), totalSize),
+                    QnGeometry::cwiseMul(layout->position(i), channelSize),
                     images[i]
                     );
     }
+
+    // avoiding post-processing duplication
+    parameters.imageCorrectionParams.enabled = false;
+    parameters.mediaDewarpingParams.enabled = false;
+    parameters.itemDewarpingParams.enabled = false;
 
     return new QnBasicImageProvider(screenshot);
 }
@@ -187,11 +195,13 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
-    parameters.itemDewarpingParams = widget->item()->dewarpingParams();
+    if (widget->item()->zoomTargetItem())
+        parameters.itemDewarpingParams = widget->item()->zoomTargetItem()->dewarpingParams();
+    else
+        parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
-    //TODO: #GDM whay should we disable zoomrect on dewarping cameras? Ask Roma.
-    parameters.zoomRect =  (widget->zoomRect().isNull() || parameters.mediaDewarpingParams.enabled) ? QRectF(0, 0, 1, 1) : widget->zoomRect();
+    parameters.zoomRect = widget->zoomRect();
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
@@ -292,8 +302,33 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         return;
     loader->deleteLater();
 
-    QImage timestamped(image);
-    drawTimeStamp(timestamped, loader->parameters().timestampPosition, loader->parameters().timeString());
+    QnScreenshotParameters parameters = loader->parameters();
+
+    QImage resized;
+    if (!parameters.zoomRect.isNull()) {
+        resized = QImage(image.width() * parameters.zoomRect.width(), image.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
+        resized.fill(qRgba(0, 0, 0, 0));
+
+        QScopedPointer<QPainter> painter(new QPainter(&resized));
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+        painter->drawImage(QPointF(0, 0), image, QnGeometry::cwiseMul(parameters.zoomRect, image.size()));
+    } else {
+        resized = image;
+    }
+
+    QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
+    if (parameters.imageCorrectionParams.enabled) {
+        QnContrastImageFilter filter(parameters.imageCorrectionParams);
+        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
+
+    if (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) {
+        QnFisheyeImageFilter filter(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
+        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
+
+    QImage timestamped = frame->toImage();
+    drawTimeStamp(timestamped, parameters.timestampPosition, parameters.timeString());
 
     QString filename = loader->parameters().filename;
 
