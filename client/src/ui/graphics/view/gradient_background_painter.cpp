@@ -17,7 +17,7 @@
 
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_backgroundColorAnimator(NULL),
     m_cycleIntervalSecs(cycleIntervalSecs)
@@ -47,7 +47,7 @@ VariantAnimator *QnGradientBackgroundPainter::backgroundColorAnimator() {
     m_backgroundColorAnimator = new VariantAnimator(this);
     m_backgroundColorAnimator->setTimer(animationTimer);
     m_backgroundColorAnimator->setTargetObject(this);
-    m_backgroundColorAnimator->setAccessor(new PropertyAccessor("backgroundColor"));
+    m_backgroundColorAnimator->setAccessor(new PropertyAccessor("currentColor"));
     m_backgroundColorAnimator->setConverter(new QnColorToVectorConverter());
     m_backgroundColorAnimator->setSpeed(2.0);
     return m_backgroundColorAnimator;
@@ -77,34 +77,44 @@ void QnGradientBackgroundPainter::installedNotify() {
     QnLayerPainter::installedNotify();
 }
 
-QColor QnGradientBackgroundPainter::backgroundColor() const {
-    return m_backgroundColor;
+QColor QnGradientBackgroundPainter::currentColor() const {
+    return m_currentColor;
 }
 
-void QnGradientBackgroundPainter::setBackgroundColor(const QColor &backgroundColor) {
-    m_backgroundColor = backgroundColor;
+void QnGradientBackgroundPainter::setCurrentColor(const QColor &backgroundColor) {
+    m_currentColor = backgroundColor;
+}
+
+const QnBackgroundColors &QnGradientBackgroundPainter::colors() {
+    return m_colors;
+}
+
+void QnGradientBackgroundPainter::setColors(const QnBackgroundColors &colors) {
+    m_colors = colors;
+    
+    updateBackgroundColor(true);
 }
 
 void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
     QColor backgroundColor;
 
     if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()) {
-        backgroundColor = QColor(255, 0, 0, 255);
+        backgroundColor = m_colors.panic;
     } else {
-        backgroundColor = qnGlobals->backgroundGradientColor();
+        backgroundColor = m_colors.normal;
     }
 
     if(animate) {
         backgroundColorAnimator()->animateTo(backgroundColor);
     } else {
-        m_backgroundColor = backgroundColor;
+        m_currentColor = backgroundColor;
     }
 }
 
 void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & rect) {
     qreal pos = position();
 
-    QColor color = linearCombine(1.0 + 0.5 * pos, backgroundColor());
+    QColor color = linearCombine(1.0 + 0.5 * pos, currentColor());
 
     QPointF center1(rect.center().x() - pos * rect.width() / 2, rect.center().y());
     QPointF center2(rect.center().x() + pos * rect.width() / 2, rect.center().y());

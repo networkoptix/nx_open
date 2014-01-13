@@ -1128,7 +1128,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
             if (resourceDisplay->isPaused())
                 continue;
 
-            bool isLive = resourceDisplay->archiveReader()->isRealTimeSource();
+            bool isLive = resourceDisplay->archiveReader() && resourceDisplay->archiveReader()->isRealTimeSource();
             resourceDisplay->pause();
             m_autoPausedResourceDisplays.insert(resourceDisplay, isLive);
         }

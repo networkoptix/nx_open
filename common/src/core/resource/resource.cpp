@@ -903,6 +903,8 @@ bool QnResource::init()
     }
     m_initMutex.unlock();
 
+    emit initialized(toSharedPointer(this));
+
     return true;
 }
 

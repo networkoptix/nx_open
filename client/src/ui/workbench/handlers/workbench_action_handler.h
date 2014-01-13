@@ -187,10 +187,6 @@ protected slots:
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
 
-    void at_debugIncrementCounterAction_triggered();
-    void at_debugDecrementCounterAction_triggered();
-    void at_debugShowResourcePoolAction_triggered();
-
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
@@ -260,10 +256,6 @@ protected slots:
 
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
-
-    void at_setCurrentItemAspectRatioAutoAction_triggered();
-    void at_setCurrentItemAspectRatio4x3Action_triggered();
-    void at_setCurrentItemAspectRatio16x9Action_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();

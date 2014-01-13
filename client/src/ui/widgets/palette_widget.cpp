@@ -24,7 +24,9 @@ namespace {
         { "Highlight",       QPalette::Highlight },
         { "HighlightedText", QPalette::HighlightedText },
         { "Link",            QPalette::Link },
-        { "LinkVisited",     QPalette::LinkVisited }
+        { "LinkVisited",     QPalette::LinkVisited },
+        { "ToolTipBase",     QPalette::ToolTipBase },
+        { "ToolTipText",     QPalette::ToolTipText }
     };
 
     struct ColorGroup {

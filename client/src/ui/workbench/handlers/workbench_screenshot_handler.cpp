@@ -167,7 +167,7 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(const 
                     );
     }
 
-    return new QnBasicImageProvider(screenshot, this);
+    return new QnBasicImageProvider(screenshot);
 }
 
 void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {

@@ -235,7 +235,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
     while (true) {
-        QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), lit('_'));
+        QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
         QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
                 ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
                 : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));

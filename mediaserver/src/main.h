@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <QtCore/QTimer>
+#include <QtCore/QStringList>
 
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>

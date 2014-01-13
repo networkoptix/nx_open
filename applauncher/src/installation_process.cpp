@@ -226,6 +226,21 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     inputData.put( ProductParameters::customization, m_customization );
     inputData.put( ProductParameters::module, m_module );
     inputData.put( ProductParameters::version, m_version );
+#ifdef _MSC_VER
+#ifdef _WIN64
+    inputData.put( ProductParameters::arch, "x64" );
+#else
+    inputData.put( ProductParameters::arch, "x86" );
+#endif
+#elif defined(__GNUC__)
+#ifdef __x86_64
+    inputData.put( ProductParameters::arch, "x64" );
+#else
+    inputData.put( ProductParameters::arch, "x86" );
+#endif
+#else
+#error "Unknown compiler"
+#endif
     stree::ResourceContainer result;
     m_currentTree->get( inputData, &result );
 

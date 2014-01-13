@@ -12,8 +12,16 @@
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
 
+#include <business/business_resource_validation.h>
+//#include <business/events/motion_business_event.h>
+//#include <business/events/camera_input_business_event.h>
+//#include <business/actions/recording_business_action.h>
+//#include <business/actions/camera_output_business_action.h>
+//#include <business/actions/sendmail_business_action.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/palette.h>
@@ -334,9 +342,9 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked() {
 
     BusinessEventType::Value eventType = m_model->eventType();
     if (eventType == BusinessEventType::Camera_Motion)
-        dialog.setDelegate(new QnMotionEnabledDelegate(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
     else if (eventType == BusinessEventType::Camera_Input)
-        dialog.setDelegate(new QnInputEnabledDelegate(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
     dialog.setSelectedResources(m_model->eventResources());
 
     if (dialog.exec() != QDialog::Accepted)
@@ -360,11 +368,11 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
 
     BusinessActionType::Value actionType = m_model->actionType();
     if (actionType == BusinessActionType::CameraRecording)
-        dialog.setDelegate(new QnRecordingEnabledDelegate(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
     else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant)
-        dialog.setDelegate(new QnOutputEnabledDelegate(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
     else if (actionType == BusinessActionType::SendMail)
-        dialog.setDelegate(new QnEmailValidDelegate(this));
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
     dialog.setSelectedResources(m_model->actionResources());
 
     if (dialog.exec() != QDialog::Accepted)

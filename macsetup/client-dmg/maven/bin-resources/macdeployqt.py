@@ -84,6 +84,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                     tfolder = join(tlibdir, folder)
                     tpath = join(tfolder, name)
                     shutil.copy(fpath, tfolder)
+                    shutil.copytree(join(qlibdir, framework_name, 'Contents'), join(tlibdir, framework_name, 'Contents'))
                     fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
                 change_dep_path(binary, full_name, join(folder, name))
 

@@ -3,13 +3,15 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${product.name} ${release.version}"
-DMG_FILE="${product.name} ${release.version}.dmg"
+DMG_FILE="${project.build.finalName}.dmg"
 HELP=${libdir}/help
 
 ln -s /Applications $SRC/Applications
 mv $SRC/client.app "$SRC/${product.name}.app"
 mv "$SRC/DS_Store" "$SRC/.DS_Store"
 python macdeployqt.py "$SRC/${product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
+security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
+codesign -f -v --deep -s "${mac.sign.identity}" "$SRC/${product.name}.app"
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"
