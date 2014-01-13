@@ -60,7 +60,7 @@ public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
 private:
-    QnImageProvider* getLocalScreenshotProvider(const QnScreenshotParameters &parameters, QnResourceDisplay* display);
+    QnImageProvider* getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay* display);
 private slots:
     void at_takeScreenshotAction_triggered();
     void at_imageLoaded(const QImage &image);

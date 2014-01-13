@@ -329,6 +329,8 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image) 
 {
+    memset( this, 0, sizeof(*this) );
+
     reallocate(image.width(), image.height(), PIX_FMT_YUV420P);
     CLVideoDecoderOutput src;
 
