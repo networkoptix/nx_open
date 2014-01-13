@@ -47,7 +47,8 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_mode(mode),
     m_readOnly(readOnly),
     m_offset(-1),
-    m_stopped(false)
+    m_stopped(false),
+    m_currentCamera(0)
 {
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId());
@@ -195,8 +196,14 @@ void QnLayoutExportTool::stop() {
     m_stopped = true;
     m_resources.clear();
     m_errorMessage = QString(); //supress error by manual cancelling
+
+    if (m_currentCamera)
+        connect(m_currentCamera, SIGNAL(exportStopped()), this, SLOT(at_camera_exportStopped()));
+
     emit stopped();
-    finishExport(false);
+
+    if (!m_currentCamera)
+        finishExport(false);
 }
 
 Qn::LayoutExportMode QnLayoutExportTool::mode() const {
@@ -260,20 +267,20 @@ void QnLayoutExportTool::finishExport(bool success) {
 }
 
 bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
-    QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
-    connect(camera,   SIGNAL(exportProgress(int)),        this, SLOT(at_camera_progressChanged(int)));
+    m_currentCamera = new QnClientVideoCamera(resource);
+    connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this, SLOT(at_camera_progressChanged(int)));
 
-    connect(camera,   &QnClientVideoCamera::exportFinished, this,   &QnLayoutExportTool::at_camera_exportFinished);
-    connect(camera,   &QnClientVideoCamera::exportFinished, camera, &QObject::deleteLater);
+    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &QnLayoutExportTool::at_camera_exportFinished);
+    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   m_currentCamera, &QObject::deleteLater);
 
-    connect(this,     SIGNAL(stopped()),                  camera, SLOT(stopExport()));
-    connect(this,     SIGNAL(stopped()),                  camera, SLOT(deleteLater()));
+    connect(this,               SIGNAL(stopped()),                      m_currentCamera, SLOT(stopExport()));
+    connect(m_currentCamera,    SIGNAL(exportStopped()),                m_currentCamera, SLOT(deleteLater()));
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
         QSharedPointer<QBuffer> motionFileBuffer(new QBuffer());
         motionFileBuffer->open(QIODevice::ReadWrite);
-        camera->setMotionIODevice(motionFileBuffer, i);
+        m_currentCamera->setMotionIODevice(motionFileBuffer, i);
     }
 
     QString uniqId = resource->toResource()->getUniqueId();
@@ -290,7 +297,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 
-    camera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
+    m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
                                     (m_period.startTimeMs + m_period.durationMs) * 1000ll,
                                     uniqId,
                                     QLatin1String("mkv"),
@@ -359,6 +366,10 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     else {
         exportNextCamera();
     }
+}
+
+void QnLayoutExportTool::at_camera_exportStopped() {
+    finishExport(false);
 }
 
 void QnLayoutExportTool::at_camera_progressChanged(int progress) {
