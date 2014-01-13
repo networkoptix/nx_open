@@ -35,7 +35,7 @@ private:
  * <tt>QN_DECLARE_R_PROPERTY</tt> and <tt>QN_DECLARE_RW_PROPERTY</tt> macros,
  * wrapped in a pair of <tt>QN_BEGIN_PROPERTY_STORAGE</tt> and 
  * <tt>QN_END_PROPERTY_STORAGE</tt> invocations. These macros will generate
- * an <tt>init()</tt> function, that is the to be called from derived class's
+ * an <tt>init()</tt> function, that is then to be called from derived class's
  * constructor.
  */
 class QnPropertyStorage: public QObject {
@@ -44,8 +44,13 @@ public:
     QnPropertyStorage(QObject *parent = NULL);
     virtual ~QnPropertyStorage();
 
+    QList<int> variables() const;
+
     QVariant value(int id) const;
     bool setValue(int id, const QVariant &value);
+
+    QVariant value(const QString &name) const;
+    bool setValue(const QString &name, const QVariant &value);
 
     QnPropertyNotifier *notifier(int id) const;
 
@@ -60,8 +65,8 @@ public:
     int type(int id) const;
     void setType(int id, int type);
 
-    bool isWriteable(int id) const;
-    void setWriteable(int id, bool writeable);
+    bool isWritable(int id) const;
+    void setWritable(int id, bool writable);
 
     bool isThreadSafe() const;
     void setThreadSafe(bool threadSafe);
@@ -77,8 +82,6 @@ public:
 
     bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
     bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
-
-    // TODO: #Elric also need string-based interface
 
 signals:
     void valueChanged(int id);
@@ -110,14 +113,14 @@ private:                                                                        
                                                                                 \
     inline void init() { init(Dummy<LAST_ID>()); };                             \
 
-#define QN_DECLARE_PROPERTY(TYPE, ID, NAME, WRITEABLE, DEFAULT_VALUE)           \
+#define QN_DECLARE_PROPERTY(TYPE, ID, NAME, WRITABLE, DEFAULT_VALUE)            \
 private:                                                                        \
     inline void init(const Dummy<ID> &) {                                       \
         init(Dummy<ID - 1>());                                                  \
         setType(ID, qMetaTypeId<TYPE>());                                       \
         setName(ID, QLatin1String(NAME));                                       \
         setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
-        setWriteable(ID, WRITEABLE);                                            \
+        setWritable(ID, WRITABLE);                                              \
     }                                                                           \
 
 #define QN_DECLARE_R_PROPERTY(TYPE, GETTER, ID, DEFAULT_VALUE)                  \
@@ -143,6 +146,8 @@ private:
     void notify(int id) const;
 
     bool isWritableLocked(int id) const;
+    QVariant valueLocked(int id) const;
+    bool setValueLocked(int id, const QVariant &value);
 
 private:
     bool m_threadSafe;
@@ -152,9 +157,10 @@ private:
 
     QHash<int, QVariant> m_valueById;
     QHash<int, QString> m_nameById;
+    QHash<QString, int> m_idByName;
     QHash<int, QStringList> m_argumentNamesById;
     QHash<int, int> m_typeById;
-    QHash<int, bool> m_writeableById;
+    QHash<int, bool> m_writableById;
     mutable QHash<int, QnPropertyNotifier *> m_notifiers;
 };
 

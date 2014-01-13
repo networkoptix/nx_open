@@ -54,16 +54,16 @@ private:
 };
 
 
-QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent) :
+QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
-    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
-    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
-    connect(action(Qn::PtzStartTourAction),                     SIGNAL(triggered()),    this,   SLOT(at_ptzStartTourAction_triggered()));
-    connect(action(Qn::PtzManageToursAction),                   SIGNAL(triggered()),    this,   SLOT(at_ptzManageToursAction_triggered()));
-    connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
+    connect(action(Qn::PtzSavePresetAction),                    &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered);
+    connect(action(Qn::PtzGoToPresetAction),                    &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered);
+    connect(action(Qn::PtzManagePresetsAction),                 &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered);
+    connect(action(Qn::PtzStartTourAction),                     &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered);
+    connect(action(Qn::PtzManageToursAction),                   &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered);
+    connect(action(Qn::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
 }
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {

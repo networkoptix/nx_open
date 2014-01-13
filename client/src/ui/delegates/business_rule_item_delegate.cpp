@@ -6,6 +6,12 @@
 
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
+#include <business/business_resource_validation.h>
+//#include <business/events/motion_business_event.h>
+//#include <business/events/camera_input_business_event.h>
+//#include <business/actions/recording_business_action.h>
+//#include <business/actions/camera_output_business_action.h>
+//#include <business/actions/sendmail_business_action.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -119,9 +125,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 
         BusinessEventType::Value eventType = (BusinessEventType::Value)index.data(Qn::EventTypeRole).toInt();
         if (eventType == BusinessEventType::Camera_Motion)
-            btn->setDialogDelegate(new QnMotionEnabledDelegate(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
         else if (eventType == BusinessEventType::Camera_Input)
-            btn->setDialogDelegate(new QnInputEnabledDelegate(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
 
         return btn;
     }
@@ -154,13 +160,13 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
         if (actionType == BusinessActionType::CameraRecording) {
-            btn->setDialogDelegate(new QnRecordingEnabledDelegate(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
         }
         else if (actionType == BusinessActionType::CameraOutput || actionType == BusinessActionType::CameraOutputInstant) {
-            btn->setDialogDelegate(new QnOutputEnabledDelegate(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
         }
         else if (actionType == BusinessActionType::SendMail) {
-            btn->setDialogDelegate(new QnEmailValidDelegate(btn));
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(btn));
             btn->setSelectionTarget(QnResourceSelectionDialog::UserResourceTarget);
         }
         return btn;

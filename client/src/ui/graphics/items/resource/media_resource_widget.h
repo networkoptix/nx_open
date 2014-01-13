@@ -155,6 +155,7 @@ protected:
 
 private slots:
     void at_resource_resourceChanged();
+    void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
@@ -175,6 +176,7 @@ private:
     Q_SLOT void updateRendererEnabled();
     Q_SLOT void updateFisheye();
     Q_SLOT void updateDewarpingParams();
+    Q_SLOT void updateCustomAspectRatio();
 
 private:
     /** Media resource. */

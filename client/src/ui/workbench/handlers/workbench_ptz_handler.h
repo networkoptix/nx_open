@@ -3,18 +3,14 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
-#include <core/ptz/ptz_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchPtzHandler : public QObject, protected QnWorkbenchContextAware
-{
+class QnWorkbenchPtzHandler : public QObject, protected QnWorkbenchContextAware {
     Q_OBJECT
+    typedef QObject base_type;
+
 public:
     explicit QnWorkbenchPtzHandler(QObject *parent = 0);
-
-    typedef QObject base_type;
-signals:
 
 private slots:
     void at_ptzSavePresetAction_triggered();

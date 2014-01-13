@@ -8,14 +8,15 @@
 #include <memory>
 
 #include <QtCore/QDateTime>
-#include <QtNetwork/QNetworkInterface>
 #include <QtCore/QScopedArrayPointer>
+#include <QtNetwork/QNetworkInterface>
+
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/product_features.h>
 
 #include "socket.h"
 #include "system_socket.h"
-#include "../common/log.h"
-#include "../common/systemerror.h"
-#include "../../common/customization.h"
 
 
 #ifndef _WIN32

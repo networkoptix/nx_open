@@ -24,6 +24,9 @@
 #include <utils/common/util.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/common/geometry.h>
+#include <ui/customization/customizer.h>
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -51,7 +54,8 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_hoverAnimator(new QnNoptixStyleAnimator(this)),
     m_rotationAnimator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
-    m_globals(qnGlobals)
+    m_globals(qnGlobals),
+    m_customizer(qnCustomizer)
 {
     GraphicsStyle::setBaseStyle(this);
 
@@ -213,13 +217,6 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
-    QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
-
-    QPalette palette = application->palette();
-    palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
-    palette.setColor(QPalette::Button, activeColor);
-    application->setPalette(palette);
-
     QFont font;
     font.setPixelSize(12);
     font.setStyle(QFont::StyleNormal);
@@ -232,6 +229,8 @@ void QnNoptixStyle::polish(QApplication *application) {
     QFont menuFont;
     menuFont.setPixelSize(18);
     application->setFont(menuFont, "QMenu");
+
+    m_customizer->customize(application);
 }
 
 void QnNoptixStyle::unpolish(QApplication *application) {
@@ -241,15 +240,19 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 }
 
 void QnNoptixStyle::polish(QWidget *widget) {
-    base_type::polish(widget);
+    if(widget)
+        base_type::polish(widget);
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18));
+        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization?
     }
+
+    m_customizer->customize(const_cast<QObject *>(currentTarget(widget)));
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {
-    base_type::unpolish(widget);
+    if(widget)
+        base_type::unpolish(widget);
 }
 
 bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {

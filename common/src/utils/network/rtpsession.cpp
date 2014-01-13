@@ -804,10 +804,10 @@ void RTPSession::addAuth(QByteArray& request)
         QByteArray firstLine = request.left(request.indexOf('\n'));
         QList<QByteArray> methodAndUri = firstLine.split(' ');
         if (methodAndUri.size() >= 2) {
-            QString uri = lit(methodAndUri[1]);
+            QString uri = QLatin1String(methodAndUri[1]);
             if (uri.startsWith(lit("rtsp://")))
                 uri = QUrl(uri).path();
-            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, lit(methodAndUri[0]), uri ));
+            request.append(CLSimpleHTTPClient::digestAccess(m_auth, m_realm, m_nonce, QLatin1String(methodAndUri[0]), uri ));
         }
     }
     else {
@@ -1894,7 +1894,7 @@ void RTPSession::setAuth(const QAuthenticator& auth, DefaultAuthScheme defaultAu
     if (defaultAuthScheme == authDigest) {
         m_useDigestAuth = true;
         m_realm = DEFAULT_REALM;
-        m_nonce = lit(calcDefaultNonce());
+        m_nonce = QLatin1String(calcDefaultNonce());
     }
 }
 
@@ -1918,17 +1918,17 @@ void RTPSession::setProxyAddr(const QString& addr, int port)
 QString RTPSession::mediaTypeToStr(TrackType trackType)
 {
     if (trackType == TT_AUDIO)
-        return QLatin1String("audio");
+        return lit("audio");
     else if (trackType == TT_AUDIO_RTCP)
-        return QLatin1String("audio-rtcp");
+        return lit("audio-rtcp");
     else if (trackType == TT_VIDEO)
-        return QLatin1String("video");
+        return lit("video");
     else if (trackType == TT_VIDEO_RTCP)
-        return QLatin1String("video-rtcp");
+        return lit("video-rtcp");
     else if (trackType == TT_METADATA)
-        return QLatin1String("metadata");
+        return lit("metadata");
     else
-        return QLatin1String("TT_UNKNOWN");
+        return lit("TT_UNKNOWN");
 }
 
 void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)

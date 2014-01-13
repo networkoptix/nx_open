@@ -29,7 +29,7 @@ namespace {
 
     class NoopMagnitudeCalculator: public MagnitudeCalculator {
     public:
-        NoopMagnitudeCalculator(): MagnitudeCalculator(0) {}
+        NoopMagnitudeCalculator(): MagnitudeCalculator(QMetaType::UnknownType) {}
 
     private:
         virtual qreal calculateInternal(const void *) const override {
@@ -37,12 +37,11 @@ namespace {
         }
     };
 
-    class Storage: public QnSynchronizedFlatStorage<int, MagnitudeCalculator *> {
-        typedef QnSynchronizedFlatStorage<int, MagnitudeCalculator *> base_type;
+    class Storage: public QnSynchronizedFlatStorage<unsigned int, MagnitudeCalculator *> {
+        typedef QnSynchronizedFlatStorage<unsigned int, MagnitudeCalculator *> base_type;
     public:
         Storage() {
             insert(new NoopMagnitudeCalculator());
-            insert(QMetaType::Void, new NoopMagnitudeCalculator());
             insert(new StandardMagnitudeCalculator<int>());
             insert(new StandardMagnitudeCalculator<long>());
             insert(new StandardMagnitudeCalculator<long long>());

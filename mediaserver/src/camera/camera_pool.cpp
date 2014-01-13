@@ -2,10 +2,9 @@
 
 #include "video_camera.h"
 #include "core/resource/security_cam_resource.h"
-#include "common/customization.h"
 
 #ifdef Q_OS_WIN
-#include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
+#   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
 #include "version.h"

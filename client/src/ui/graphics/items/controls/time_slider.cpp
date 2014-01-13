@@ -180,30 +180,6 @@ namespace {
 
 
 
-    /* Colors. */
-    
-    const QColor tickmarkColor(255, 255, 255, 255);
-    const QColor positionMarkerColor(255, 255, 255, 196);
-    const QColor indicatorColor(128, 160, 192, 128);
-
-    const QColor selectionColor = qnGlobals->selectionColor();
-    const QColor selectionMarkerColor = selectionColor.lighter();
-
-    const QColor pastBackgroundColor(255, 255, 255, 24);
-    const QColor futureBackgroundColor(0, 0, 0, 0);
-
-    const QColor pastRecordingColor(64, 255, 64, 128);
-    const QColor futureRecordingColor(64, 255, 64, 64);
-
-    const QColor pastMotionColor(255, 0, 0, 128);
-    const QColor futureMotionColor(255, 0, 0, 64);
-
-    const QColor separatorColor(255, 255, 255, 64);
-
-    const QColor dateOverlayColorA(255, 255, 255, 48);
-    const QColor dateOverlayColorB = withAlpha(selectionColor, 48);
-
-
     bool checkLine(int line) {
         if(line < 0 || line >= maxLines) {
             qnWarning("Invalid line number '%1'.", line);
@@ -296,13 +272,15 @@ public:
     {
         assert(m_painter && m_slider);
 
-        m_pastColor[Qn::RecordingContent]           = pastRecordingColor;
-        m_pastColor[Qn::MotionContent]              = pastMotionColor;
-        m_pastColor[Qn::TimePeriodContentCount]     = pastBackgroundColor;
+        const QnTimeSliderColors &colors = slider->colors();
 
-        m_futureColor[Qn::RecordingContent]         = futureRecordingColor;
-        m_futureColor[Qn::MotionContent]            = futureMotionColor;
-        m_futureColor[Qn::TimePeriodContentCount]   = futureBackgroundColor;
+        m_pastColor[Qn::RecordingContent]           = colors.pastRecording;
+        m_pastColor[Qn::MotionContent]              = colors.pastMotion;
+        m_pastColor[Qn::TimePeriodContentCount]     = colors.pastBackground;
+
+        m_futureColor[Qn::RecordingContent]         = colors.futureRecording;
+        m_futureColor[Qn::MotionContent]            = colors.futureMotion;
+        m_futureColor[Qn::TimePeriodContentCount]   = colors.futureBackground;
 
         m_position = m_centralPosition = m_minChunkLength = 0;
     }
@@ -462,11 +440,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_thumbnailsVisible(false),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
 {
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
-
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnailsStepSizeTimer()));
@@ -506,6 +482,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Run handlers. */
     updateSteps();
     updateMinimalWindow();
+    updatePixmapCache();
     sliderChange(SliderRangeChange);
 }
 
@@ -1154,10 +1131,23 @@ void QnTimeSlider::setLocalOffset(qint64 localOffset) {
     updateToolTipText();
 }
 
+const QnTimeSliderColors &QnTimeSlider::colors() const {
+    return m_colors;
+}
+
+void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
+    m_colors = colors;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
 // -------------------------------------------------------------------------- //
+void QnTimeSlider::updatePixmapCache() {
+    m_pixmapCache->setFont(font());
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255)); // TODO: #Elric customize color
+}
+
 void QnTimeSlider::updateKineticProcessor() {
     KineticCuttingProcessor *kineticProcessor = checked_cast<KineticCuttingProcessor *>(this->kineticProcessor());
 
@@ -1571,7 +1561,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     /* Draw border. */
     {
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-        QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+        QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.separator, 0));
         QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
         painter->drawRect(rect());
     }
@@ -1606,18 +1596,18 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     drawDates(painter, dateBarRect);
 
     /* Draw position marker. */
-    drawMarker(painter, sliderPosition(), positionMarkerColor);
+    drawMarker(painter, sliderPosition(), m_colors.positionMarker);
 
     /* Draw indicators. */
     foreach(qint64 position, m_indicators)
-        drawMarker(painter, position, indicatorColor);
+        drawMarker(painter, position, m_colors.indicator);
 }
 
 void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
     if(qFuzzyCompare(rect.top(), this->rect().top()))
         return; /* Don't draw separator at the top of the widget. */
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(separatorColor, 0));
+    QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.separator, 0));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
     painter->drawLine(rect.topLeft(), rect.topRight());
 }
@@ -1627,7 +1617,7 @@ void QnTimeSlider::drawSelection(QPainter *painter) {
         return;
 
     if(m_selectionStart == m_selectionEnd) {
-        drawMarker(painter, m_selectionStart, selectionMarkerColor);
+        drawMarker(painter, m_selectionStart, m_colors.selectionMarker);
         return;
     }
 
@@ -1641,11 +1631,11 @@ void QnTimeSlider::drawSelection(QPainter *painter) {
         );
 
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-        painter->fillRect(selectionRect, selectionColor);
+        painter->fillRect(selectionRect, m_colors.selection);
     }
 
-    drawMarker(painter, m_selectionStart, selectionMarkerColor);
-    drawMarker(painter, m_selectionEnd, selectionMarkerColor);
+    drawMarker(painter, m_selectionStart, m_colors.selectionMarker);
+    drawMarker(painter, m_selectionEnd, m_colors.selectionMarker);
 }
 
 void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color) {
@@ -1739,9 +1729,9 @@ void QnTimeSlider::drawSolidBackground(QPainter *painter, const QRectF &rect) {
     qreal centralPos = quickPositionFromValue(sliderPosition());
 
     if(!qFuzzyCompare(leftPos, centralPos))
-        painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), pastBackgroundColor);
+        painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), m_colors.pastBackground);
     if(!qFuzzyCompare(rightPos, centralPos))
-        painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), futureBackgroundColor);
+        painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), m_colors.futureBackground);
 }
 
 void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
@@ -1808,7 +1798,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
     {
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
         for(int i = minStepIndex; i < stepCount; i++) {
-            painter->setPen(toTransparent(tickmarkColor, m_stepData[i].currentLineOpacity));
+            painter->setPen(toTransparent(m_colors.tickmark, m_stepData[i].currentLineOpacity));
             painter->drawLines(m_tickmarkLines[i]);
         }
     }
@@ -1842,7 +1832,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         qreal x1 = quickPositionFromValue(pos1 - m_localOffset);
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
+        painter->setBrush(number % 2 ? m_colors.dateOverlay : m_colors.dateOverlayAlternate);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
         QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
@@ -1858,7 +1848,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         if(pos1 >= m_windowEnd + m_localOffset)
             break;
 
-        painter->setPen(QPen(separatorColor, 0));
+        painter->setPen(QPen(m_colors.separator, 0));
         painter->drawLine(QPointF(x1, rect.top()), QPointF(x1, rect.bottom()));
 
         pos0 = pos1;
@@ -1945,7 +1935,7 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
     if(!rect.isEmpty()) {
         qreal a = data.selection;
         qreal width = 1.0 + a * 2.0;
-        QColor color = linearCombine(1.0 - a, QColor(255, 255, 255, 32), a, selectionMarkerColor);
+        QColor color = linearCombine(1.0 - a, QColor(255, 255, 255, 32), a, m_colors.selectionMarker); // TODO: #Elric customize
         rect = QnGeometry::eroded(rect, width / 2.0);
 
         painter->setPen(QPen(color, width));
@@ -2259,6 +2249,13 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 void QnTimeSlider::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
     event->ignore();
     return;
+}
+
+void QnTimeSlider::changeEvent(QEvent *event) {
+    base_type::changeEvent(event);
+
+    if(event->type() == QEvent::FontChange)
+        updatePixmapCache();
 }
 
 void QnTimeSlider::startDragProcess(DragInfo *) {

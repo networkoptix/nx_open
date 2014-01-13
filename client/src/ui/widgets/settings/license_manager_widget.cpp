@@ -20,7 +20,6 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <common/common_module.h>
-#include <common/customization.h>
 
 #include <mustache/mustache.h>
 
@@ -30,6 +29,7 @@
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
 #include <utils/common/json.h>
+#include <utils/common/product_features.h>
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
@@ -294,7 +294,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             } else if(messageId == lit("InvalidKey")) {
                 message = tr("The license key is invalid.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate {{brand}} license on %1. This is not allowed.").arg(QLatin1String(QN_PRODUCT_NAME_LONG));
+                message = tr("There was a problem activating your license. You are trying to activate an incompatible license with your software.");
             } else if(messageId == lit("AlreadyActivated")) {
                 message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
             }
