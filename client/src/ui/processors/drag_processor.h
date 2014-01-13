@@ -150,6 +150,9 @@ public:
 
     void mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
 
+
+    void redrag();
+
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
@@ -174,7 +177,7 @@ private:
 
     void transition(QEvent *event, QGraphicsItem *item, State state);
     
-    void drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos);
+    void drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos, bool alwaysHandle);
 
     QPoint screenPos(QWidget *widget, QMouseEvent *event);
 
@@ -207,6 +210,12 @@ private:
 private:
     /** Flags. */
     Flags m_flags;
+
+    /** Whether handler is currently running. */
+    bool m_handling;
+
+    /** Whether handler should be restarted. */
+    bool m_rehandle;
 
     /** Start drag distance. */
     int m_startDragDistance;

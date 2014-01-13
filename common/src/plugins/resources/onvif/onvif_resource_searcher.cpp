@@ -72,6 +72,9 @@ QString OnvifResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     if (url.port() == -1)
     {
         for (uint i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i)

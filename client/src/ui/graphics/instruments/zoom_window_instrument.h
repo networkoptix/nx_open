@@ -13,6 +13,7 @@ class FixedArSelectionItem;
 class ZoomOverlayWidget;
 class ZoomWindowWidget;
 class ResizingInfo;
+class ResizingInstrument;
 
 class QnMediaResourceWidget;
 
@@ -101,6 +102,7 @@ private:
     };
 
     bool m_zoomWindowStartedEmitted;
+    QPointer<ResizingInstrument> m_resizingInstrument;
     QVector<QColor> m_colors;
     QPointer<FixedArSelectionItem> m_selectionItem;
     QPointer<QWidget> m_viewport;
