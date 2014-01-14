@@ -107,7 +107,7 @@ int main( int argc, char* argv[] )
     QtSingleApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings settings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
     InstallationManager installationManager;
 
     if( displayHelp )
