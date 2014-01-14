@@ -17,29 +17,6 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 
-
-// -------------------------------------------------------------------------- //
-// Reply processors
-// -------------------------------------------------------------------------- //
-void QnSessionManagerAsyncReplyProcessor::at_replyReceived() {
-    QNetworkReply *reply = (QNetworkReply *)sender();
-
-    QString errorString = reply->errorString();
-    // Common EC error looks like:
-    // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
-    // displaying plain-text password is unsecure and strongly not recommended
-    if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
-        int n = errorString.lastIndexOf(QLatin1String(":"));
-        errorString = errorString.mid(n + 1).trimmed();
-    }
-    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), m_handle);
-    disconnect(reply, NULL, this, NULL);
-    disconnect(reply, NULL, reply, NULL);
-
-    qnDeleteLater(reply);
-    qnDeleteLater(this);
-}
-
 void QnSessionManagerSyncReplyProcessor::at_finished(const QnHTTPRawResponse& response, int handle) {
     Q_UNUSED(handle)
 
@@ -75,7 +52,7 @@ QnSessionManager::QnSessionManager(QObject *parent):
     m_accessManager(NULL),
     m_thread(new QThread())
 {
-    connect(this, SIGNAL(asyncRequestQueued(int, QnSessionManagerAsyncReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)), this, SLOT(at_asyncRequestQueued(int, QnSessionManagerAsyncReplyProcessor*, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)));
+    connect(this, SIGNAL(asyncRequestQueued(int, int, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)), this, SLOT(at_asyncRequestQueued(int, int, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)));
     connect(this, SIGNAL(aboutToBeStopped()), this, SLOT(at_aboutToBeStopped()));
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
 
@@ -96,6 +73,24 @@ QnSessionManager::~QnSessionManager() {
     m_thread->wait();
 
     at_aboutToBeStopped();
+}
+
+void QnSessionManager::at_replyReceived() 
+{
+    QNetworkReply *reply = (QNetworkReply *)sender();
+
+    QString errorString = reply->errorString();
+    // Common EC error looks like:
+    // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
+    // displaying plain-text password is unsecure and strongly not recommended
+    if (errorString.indexOf(QLatin1String("@")) > 0 && errorString.indexOf(QLatin1String(":")) > 0) {
+        int n = errorString.lastIndexOf(QLatin1String(":"));
+        errorString = errorString.mid(n + 1).trimmed();
+    }
+    int handle = m_handleInProgress.value(reply);
+    m_handleInProgress.remove(reply);
+    emit requestFinished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), handle);
+    qnDeleteLater(reply);
 }
 
 QnSessionManager *QnSessionManager::instance() {
@@ -145,7 +140,8 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
 // -------------------------------------------------------------------------- //
 // QnSessionManager :: sync API
 // -------------------------------------------------------------------------- //
-int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data, QnHTTPRawResponse &response) {
+int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data, QnHTTPRawResponse &response) 
+{
     QScopedPointer<QnSessionManagerSyncReplyProcessor, QScopedPointerLaterDeleter> syncProcessor(new QnSessionManagerSyncReplyProcessor());
     syncProcessor->moveToThread(this->thread());
 
@@ -158,6 +154,7 @@ int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QStr
         }
 
         connect(m_accessManager, SIGNAL(destroyed()), syncProcessor.data(), SLOT(at_destroy()));
+        connect(m_accessManager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(at_sslErrors(QNetworkReply*,QList<QSslError>)));
     }
 
     sendAsyncRequest(operation, url, objectName, headers, params, data, syncProcessor.data(), SLOT(at_finished(QnHTTPRawResponse,int)), Qt::AutoConnection);
@@ -184,16 +181,11 @@ int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &object
 // -------------------------------------------------------------------------- //
 // QnSessionManager :: async API
 // -------------------------------------------------------------------------- //
-int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
+int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) 
+{
     int handle = s_handle.fetchAndAddAcquire(1);
-
-    /* We need to create reply processor here as target could not exist when doAsyncGetRequest gets called. */
-    QnSessionManagerAsyncReplyProcessor *replyProcessor = new QnSessionManagerAsyncReplyProcessor(handle);
-    replyProcessor->moveToThread(this->thread());
-    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
-
-    emit asyncRequestQueued(operation, replyProcessor, url, objectName, headers, params, data);
-
+    connect(this, SIGNAL(requestFinished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
+    emit asyncRequestQueued(operation, handle, url, objectName, headers, params, data);
     return handle;
 }
 
@@ -201,7 +193,8 @@ int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &object
     return sendAsyncGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), target, slot, connectionType);
 }
 
-int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
+int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType) 
+{
     return sendAsyncRequest(QNetworkAccessManager::GetOperation, url, objectName, headers, params, QByteArray(), target, slot, connectionType);
 }
 
@@ -209,7 +202,9 @@ int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objec
     return sendAsyncPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, target, slot, connectionType);
 }
 
-int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
+int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, 
+                                           const char *slot, Qt::ConnectionType connectionType) 
+{
     return sendAsyncRequest(QNetworkAccessManager::PostOperation, url, objectName, headers, params, data, target, slot, connectionType);
 }
 
@@ -219,7 +214,9 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
     return sendAsyncDeleteRequest(url, objectName, QnRequestHeaderList(), params, target, slot, connectionType);
 }
 
-int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
+int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, 
+                                             const char *slot, Qt::ConnectionType connectionType) 
+{
     return sendAsyncRequest(QNetworkAccessManager::DeleteOperation, url, objectName, headers, params, QByteArray(), target, slot, connectionType);
 }
 
@@ -286,7 +283,9 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
     authenticator->setPassword(password);
 }
 
-void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyncReplyProcessor* replyProcessor, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data) {
+void QnSessionManager::at_asyncRequestQueued(int operation, int handle, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, 
+                                             const QnRequestParamList &params, const QByteArray& data) 
+{
     assert(QThread::currentThread() == this->thread());
 
     {
@@ -328,7 +327,12 @@ void QnSessionManager::at_asyncRequestQueued(int operation, QnSessionManagerAsyn
         qnWarning("Unknown HTTP operation '%1'.", static_cast<int>(operation));
         return;
     }
-
-    connect(reply, SIGNAL(finished()), replyProcessor, SLOT(at_replyReceived()));
-    connect(reply, SIGNAL(sslErrors(QList<QSslError>)), reply, SLOT(ignoreSslErrors()));
+    m_handleInProgress.insert(reply, handle);
+    connect(reply, SIGNAL(finished()), this, SLOT(at_replyReceived()));
 }
+
+void QnSessionManager::at_sslErrors(QNetworkReply* reply, const QList<QSslError> &)
+{
+    reply->ignoreSslErrors();
+}
+
