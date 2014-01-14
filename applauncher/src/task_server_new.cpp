@@ -51,6 +51,12 @@ bool TaskServerNew::listen( const QString& pipeName )
         return false;
     }
 
+#ifndef _WIN32
+    //removing unix socket file in case it hanged after process crash
+    const QByteArray filePath = (QLatin1String("/tmp/")+pipeName).toLatin1();
+    unlink( filePath.constData() );
+#endif
+
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )
     {
