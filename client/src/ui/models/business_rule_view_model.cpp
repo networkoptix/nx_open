@@ -28,6 +28,7 @@
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
+// TODO: #TR #GDM move these to QnBusinessRuleViewModel and provide proper contexts to tr (so that those are not QObject::tr).
 namespace {
 QString toggleStateToModelString(Qn::ToggleState value) {
     switch( value )
@@ -867,7 +868,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString text = m_actionParams.getSayText();
         if (text.isEmpty())
-            return tr("Enter the text");
+            return tr("Enter text");
         return text;
     }
     default:

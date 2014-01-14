@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Search string:</string>
+        <string>Filter:</string>
        </property>
       </widget>
      </item>

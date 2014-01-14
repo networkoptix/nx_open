@@ -62,7 +62,7 @@ namespace {
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
-    ui(new Ui::QnBusinessRuleWidget),
+    ui(new Ui::BusinessRuleWidget),
     m_model(NULL),
     m_eventParameters(NULL),
     m_actionParameters(NULL),

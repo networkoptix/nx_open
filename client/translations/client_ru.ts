@@ -332,7 +332,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="409"/>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation>Превышен , максимальный  размер диапазона IP адресов (255)</translation>
+        <translation type="unfinished">Превышен максимальный  размер диапазона IP адресов (255)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="451"/>
@@ -2734,8 +2734,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>%n of %1 cameras</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3231,16 +3229,12 @@ Camera addition is possible for online servers only.</source>
         <source>Scanning hosts... (%1)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="740"/>
         <source>%n cameras found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3371,8 +3365,6 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="61"/>
         <source>%1 have not input ports</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3523,8 +3515,6 @@ It might take a few moments to populate them in the tree.</source>
         <source>%1 have not output relays</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3573,16 +3563,12 @@ It might take a few moments to populate them in the tree.</source>
         <source>%n license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="655"/>
         <source>Activate %n more license(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3595,8 +3581,6 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="662"/>
         <source>%n more license(s) will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3968,16 +3952,12 @@ You will be asked to restart the client in compatibility mode.</source>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="366"/>
         <source>Event log for %1 - %n event(s) found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3990,8 +3970,6 @@ You will be asked to restart the client in compatibility mode.</source>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="406"/>
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4075,8 +4053,6 @@ You will be asked to restart the client in compatibility mode.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
         <source>%n license(s) will be used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5065,8 +5041,6 @@ Download version %3?</source>
         <source>%n item(s) more</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -5567,8 +5541,6 @@ Recording Schedule is always based on Server Time.</source>
         <location filename="../src/ui/models/ptz_tour_model.cpp" line="83"/>
         <source>%n seconds</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6343,8 +6315,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>%1 have invalid E-Mail address</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6356,8 +6326,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <location filename="../src/business/business_resource_validation.cpp" line="120"/>
         <source>%n of %1 users</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6371,8 +6339,6 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>%n of %1 additional E-Mail addresses are invalid</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6385,16 +6351,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>%n User(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="141"/>
         <source>%1, %n additional</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7626,8 +7588,6 @@ and you do not have the rights to overwrite it.</source>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="547"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

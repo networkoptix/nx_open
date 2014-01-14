@@ -515,7 +515,7 @@ void QnEventLogDialog::at_selectAllAction()
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()
