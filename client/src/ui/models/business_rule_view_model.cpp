@@ -104,7 +104,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (int i = 0; i < BusinessActionType::Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
 
-        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
         item->setData(val);
         item->setData(BusinessActionType::hasToggleState(val), ProlongedActionRole);
 
@@ -616,7 +616,7 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
     case QnBusiness::SpacerColumn:
         return QString();
     case QnBusiness::ActionColumn:
-        return BusinessActionType::toString(m_actionType);
+        return QnBusinessStringsHelper::actionName(m_actionType);
     case QnBusiness::TargetColumn:
         return getTargetText(detailed);
     case QnBusiness::AggregationColumn:
