@@ -504,6 +504,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (hasDbChanges) {
         connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        foreach(const QnResourcePtr &camera, cameras) {
+            QnAppServerConnectionFactory::createConnection()->saveAsync(camera->getId(),
+                                                                        camera->getProperties());
+        }
     }
 
     if (hasCameraChanges) {
