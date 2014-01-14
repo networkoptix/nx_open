@@ -52,13 +52,13 @@ QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
     case BusinessEventType::MediaServer_Conflict:
         return tr("Media Server Conflict");
     case BusinessEventType::MediaServer_Started:
-        return tr("Media Server started");
+        return tr("Media Server Started");
     case BusinessEventType::AnyCameraIssue:
-        return tr("Any camera issue");
+        return tr("Any Camera Issue");
     case BusinessEventType::AnyServerIssue:
-        return tr("Any server issue");
+        return tr("Any Server Issue");
     case BusinessEventType::AnyBusinessEvent:
-        return tr("Any event");
+        return tr("Any Event");
     default:
         return QString();
     }
@@ -69,7 +69,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     QString resourceName = eventSource(params, useIp);
     switch (eventType) {
     case BusinessEventType::NotDefined:
-        return tr("Undefined event has occured on %1").arg(resourceName);
+        return tr("Undefined event has occurred on %1").arg(resourceName);
 
     case BusinessEventType::Camera_Disconnect:
         return tr("Camera %1 was disconnected").arg(resourceName);
@@ -96,12 +96,12 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Media Server \"%1\" Conflict").arg(resourceName);
 
     case BusinessEventType::MediaServer_Started:
-        return tr("Media Server \"%1\" started").arg(resourceName);
+        return tr("Media Server \"%1\" Started").arg(resourceName);
 
     default:
         break;
     }
-    return tr("Unknown Event has occured");
+    return tr("Unknown event has occurred");
 }
 
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
@@ -280,7 +280,7 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
             .arg(time.time().toString())
             .arg(time.date().toString());
     else
-        return tr("First occurence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
+        return tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
             .arg(time.time().toString())
             .arg(time.date().toString());
 }
@@ -301,7 +301,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     switch (reasonCode) {
         case QnBusiness::NetworkIssueNoFrame:
             if (eventType == BusinessEventType::Network_Issue)
-                result = QString(tr("No video frame received during last %1 seconds")).arg(reasonText);
+                result = QString(tr("No video frame received during last %1 seconds")).arg(reasonText); // TODO: #TR #GDM use %n here
             break;
         case QnBusiness::NetworkIssueConnectionClosed:
             if (eventType == BusinessEventType::Network_Issue) {

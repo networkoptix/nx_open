@@ -123,7 +123,7 @@ QnSystrayWindow::QnSystrayWindow(FoundEnterpriseControllersModel *const foundEnt
 
     m_trayIcon->show();
 
-    setWindowTitle(QString(lit(QN_ORGANIZATION_NAME)) + tr(" Tray Assistant"));
+    setWindowTitle(tr("%1 Tray Assistant").arg(lit(QN_ORGANIZATION_NAME)));
 
     connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
@@ -229,17 +229,17 @@ void QnSystrayWindow::findServiceInfo()
         switch (error)
         {
             case ERROR_ACCESS_DENIED:
-                m_detailedErrorText = tr("The requested access was denied");
+                m_detailedErrorText = tr("Access denied.");
                 break;
             case ERROR_DATABASE_DOES_NOT_EXIST:
-                m_detailedErrorText = tr("The specified database does not exist.");
+                m_detailedErrorText = tr("Specified database does not exist.");
                 break;
             case ERROR_INVALID_PARAMETER:
-                m_detailedErrorText =  tr("A specified parameter is invalid.");
+                m_detailedErrorText =  tr("Specified parameter is invalid.");
                 break;
         }
         if (m_firstTimeToolTipError) {
-            m_trayIcon->showMessage(tr("Insufficient permissions to start/stop services"), m_detailedErrorText, QSystemTrayIcon::Critical, MESSAGE_DURATION);
+            m_trayIcon->showMessage(tr("Could not access installed services"), tr("An error has occurred while trying to access installed services:\n %1").arg(m_detailedErrorText), QSystemTrayIcon::Critical, MESSAGE_DURATION);
             m_trayIcon->setIcon(m_iconBad);
             m_firstTimeToolTipError = false;
         }
@@ -292,7 +292,7 @@ void QnSystrayWindow::closeEvent(QCloseEvent *event)
     if (m_trayIcon->isVisible()) 
     {
         /*
-        QMessageBox::information(this, tr("Systray"),
+        QMessageBox::information(this, 
                                  tr("The program will keep running in the "
                                     "system tray. To terminate the program, "
                                     "choose <b>Quit</b> in the context menu "
@@ -330,7 +330,7 @@ void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 void QnSystrayWindow::showMessage(const QString& message)
 {
     if (m_lastMessageTimer.elapsed() >= 1000) {
-        m_trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION);
+        m_trayIcon->showMessage(message, message, QSystemTrayIcon::Information, MESSAGE_DURATION); // TODO: message, message? pass adequate title here
         m_lastMessageTimer.restart();
     }
     else {
@@ -530,7 +530,7 @@ void QnSystrayWindow::at_mediaServerStopAction()
     //SERVICE_STATUS serviceStatus;
     if (m_mediaServerHandle) 
     {
-        if (QMessageBox::question(0, tr("Systray"), tr("Media server is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::question(0, tr(""), tr("Media server is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
             StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
@@ -552,7 +552,7 @@ void QnSystrayWindow::at_appServerStopAction()
 {
     if (m_appServerHandle) 
     {
-        if (QMessageBox::question(0, tr("Systray"), tr("Enterprise controller is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (QMessageBox::question(0, windowTitle(), tr("Enterprise controller is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_appServerHandle);
             connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
@@ -583,6 +583,7 @@ void QnElevationChecker::triggered()
     {
         // already elevated, but not admin. Prevent recursion calls here
         QnSystrayWindow *systray = static_cast<QnSystrayWindow*> (parent());
+        // TODO: #TR uac must be enabled? why? maybe disabled?
         systray->trayIcon()->showMessage(tr("Insufficient privileges to manage services"), tr("UAC must be enabled to request privileges for non-admin users"), QSystemTrayIcon::Warning, MESSAGE_DURATION);
         m_rightWarnShowed = true;
     }
@@ -629,12 +630,12 @@ void QnSystrayWindow::createActions()
     connectElevatedAction(m_settingsAction, SIGNAL(triggered()), this, SLOT(onSettingsAction()));
     m_settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
 
-    m_showMediaServerLogAction = new QAction(tr("&Show Media Server Log"), this);
+    m_showMediaServerLogAction = new QAction(tr("Show &Media Server Log"), this);
     m_showMediaServerLogAction->setObjectName(lit("showMediaServerLog"));
     m_actions.push_back(m_showMediaServerLogAction);
     connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
 
-    m_showAppLogAction = new QAction(tr("&Show Enterprise Controller Log"), this);
+    m_showAppLogAction = new QAction(tr("Show &Enterprise Controller Log"), this);
     m_showAppLogAction->setObjectName(lit("showAppServerLog"));
     m_actions.push_back(m_showAppLogAction);
     connectElevatedAction(m_showAppLogAction, SIGNAL(triggered()), this, SLOT(onShowAppServerLogAction()));
@@ -873,7 +874,7 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
                     requestStr = tr("The changes you made require media server to be restarted. Would you like to restart now?");
                 }
 
-                if (QMessageBox::question(this, tr("Systray"), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+                if (QMessageBox::question(this, windowTitle(), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
                 {
                     //SERVICE_STATUS serviceStatus;
                     if (appServerParamChanged) {
@@ -906,7 +907,7 @@ bool QnSystrayWindow::checkPortNum(int port, const QString& message)
 {
     if (port < 1 || port > 65535)
     {
-        QMessageBox::warning(this, tr("Systray"), tr("Invalid %1 port specified.").arg(message));
+        QMessageBox::warning(this, windowTitle(), tr("Invalid %1 port specified.").arg(message));
         return false;
     }
     return true;
@@ -953,7 +954,7 @@ bool QnSystrayWindow::validateData()
         for (int j = i+1; j < checkedPorts.size(); ++j) {
             if (checkedPorts[i].newPort == checkedPorts[j].newPort)
             {
-                QMessageBox::warning(this, tr("Systray"), tr("%1 port is same as %2 port").arg(checkedPorts[i].descriptor).arg(checkedPorts[j].descriptor));
+                QMessageBox::warning(this, windowTitle(), tr("%1 port is same as %2 port").arg(checkedPorts[i].descriptor).arg(checkedPorts[j].descriptor));
                 return false;
             }
         }
@@ -963,14 +964,14 @@ bool QnSystrayWindow::validateData()
                 isNewPort = false;
         }
         if (isNewPort && !isPortFree(checkedPorts[i].newPort)) {
-            QMessageBox::warning(this, tr("Systray"), tr("%1 port already used by another process").arg(checkedPorts[i].descriptor));
+            QMessageBox::warning(this, windowTitle(), tr("%1 port is already used by another process").arg(checkedPorts[i].descriptor));
             return false;
         }
     }
     QString staticPublicIP = ui->staticPublicIPEdit->text().trimmed();
     if (!staticPublicIP.isEmpty() && QHostAddress(staticPublicIP).isNull())
     {
-        QMessageBox::warning(this, tr("Systray"), tr("Invalid IP address specified for public IP address"));
+        QMessageBox::warning(this, windowTitle(), tr("Invalid IP address specified for public IP address"));
         return false;
     }
 

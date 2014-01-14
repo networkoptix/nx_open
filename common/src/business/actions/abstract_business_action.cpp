@@ -1,28 +1,39 @@
 #include "abstract_business_action.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+// TODO: #Elric move to BusinessStringsHelper?
+class QnBusinessActionStrings {
+    Q_DECLARE_TR_FUNCTIONS(QnBusinessActionStrings)
+public:
+    static QString toString(BusinessActionType::Value type) {
+        //do not use 'default' keyword: warning should be raised on unknown enumeration values
+        using namespace BusinessActionType;
+        switch(type) {
+        case NotDefined:            return QString();
+        case CameraOutput:          return tr("Camera output");
+        case CameraOutputInstant:   return tr("Camera output for 30 sec");
+        case Bookmark:              return tr("Bookmark");
+        case CameraRecording:       return tr("Camera recording");
+        case PanicRecording:        return tr("Panic recording");
+        case SendMail:              return tr("Send mail");
+        case Diagnostics:           return tr("Write to log");
+        case ShowPopup:             return tr("Show notification");
+        case PlaySound:             return tr("Play sound");
+        case PlaySoundRepeated:     return tr("Repeat sound");
+        case SayText:               return tr("Say");
+        }
+        return tr("Unknown (%1)").arg(static_cast<int>(type));
+    }
+};
+
 namespace BusinessActionType {
 
-    //do not use 'default' keyword: warning should be raised on unknown enumeration values
-
-    QString toString(Value val) {
-        switch(val) {
-        case NotDefined:            return QString();
-        case CameraOutput:          return QObject::tr("Camera output");
-        case CameraOutputInstant:   return QObject::tr("Camera output for 30 sec");
-        case Bookmark:              return QObject::tr("Bookmark");
-        case CameraRecording:       return QObject::tr("Camera recording");
-        case PanicRecording:        return QObject::tr("Panic recording");
-        case SendMail:              return QObject::tr("Send mail");
-        case Diagnostics:           return QObject::tr("Write to log");
-        case ShowPopup:             return QObject::tr("Show notification");
-        case PlaySound:             return QObject::tr("Play sound");
-        case PlaySoundRepeated:     return QObject::tr("Repeat sound");
-        case SayText:               return QObject::tr("Say");
-        }
-        return QObject::tr("Unknown (%1)").arg((int)val);
+    QString toString(Value type) {
+        return QnBusinessActionStrings::toString(type);
     }
 
     bool requiresCameraResource(Value val) {

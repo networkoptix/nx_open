@@ -58,7 +58,7 @@ bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &came
 QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
-    return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have not input ports", "", invalid), invalid);
+    return genericCameraText<QnCameraInputPolicy>(cameras, detailed, tr("%1 have no input ports", "", invalid), invalid);
 }
 
 bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
@@ -68,7 +68,7 @@ bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &cam
 QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
-    return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have not output relays", "", invalid), invalid);
+    return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
 }
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {

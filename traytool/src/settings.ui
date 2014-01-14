@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>HDWitness settings</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
