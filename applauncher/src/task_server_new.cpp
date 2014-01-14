@@ -2,8 +2,6 @@
 // 14 aug 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef _WIN32
-
 #include "task_server_new.h"
 
 #ifndef _WIN32
@@ -127,5 +125,3 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
     clientConnection->write( responseMsg.constData(), responseMsg.size(), &bytesWritten );
     clientConnection->flush();
 }
-
-#endif

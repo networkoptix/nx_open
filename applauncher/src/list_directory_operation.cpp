@@ -41,9 +41,9 @@ namespace detail
 
         ContentsXmlSaxHandler( std::list<detail::RDirEntry>* const entries )
         :
+            totalSize( -1 ),
             m_readingContents( false ),
-            m_entries( entries ),
-            totalSize( -1 )
+            m_entries( entries )
         {
         }
 
