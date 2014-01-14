@@ -65,10 +65,10 @@ mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
-cp $LIBS_DIR/libisd_native_plugin.so.2.1.0 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
-pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
-ln -s libisd_native_plugin.so.2.1.0 libisd_native_plugin.so
-popd
+cp $LIBS_DIR/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
+#pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
+#ln -s libisd_native_plugin.so libisd_native_plugin.so
+#popd
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
