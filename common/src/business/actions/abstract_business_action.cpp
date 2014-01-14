@@ -5,37 +5,9 @@
 #include <core/resource/resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-// TODO: #Elric move to BusinessStringsHelper?
-class QnBusinessActionStrings {
-    Q_DECLARE_TR_FUNCTIONS(QnBusinessActionStrings)
-public:
-    static QString toString(BusinessActionType::Value type) {
-        //do not use 'default' keyword: warning should be raised on unknown enumeration values
-        using namespace BusinessActionType;
-        switch(type) {
-        case NotDefined:            return QString();
-        case CameraOutput:          return tr("Camera output");
-        case CameraOutputInstant:   return tr("Camera output for 30 sec");
-        case Bookmark:              return tr("Bookmark");
-        case CameraRecording:       return tr("Camera recording");
-        case PanicRecording:        return tr("Panic recording");
-        case SendMail:              return tr("Send mail");
-        case Diagnostics:           return tr("Write to log");
-        case ShowPopup:             return tr("Show notification");
-        case PlaySound:             return tr("Play sound");
-        case PlaySoundRepeated:     return tr("Repeat sound");
-        case SayText:               return tr("Say");
-        }
-        return tr("Unknown (%1)").arg(static_cast<int>(type));
-    }
-};
+#include <business/business_strings_helper.h>
 
 namespace BusinessActionType {
-
-    QString toString(Value type) {
-        return QnBusinessActionStrings::toString(type);
-    }
-
     bool requiresCameraResource(Value val) {
         switch(val) {
         case NotDefined:
@@ -177,5 +149,5 @@ void QnAbstractBusinessAction::setAggregationCount(int value)
 
 QString QnAbstractBusinessAction::getExternalUniqKey() const
 {
-    return BusinessActionType::toString(m_actionType);
+    return QnBusinessStringsHelper::actionName(m_actionType); // TODO: #TR #GDM returning translated string as a unique key? WTF????
 }

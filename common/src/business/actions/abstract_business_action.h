@@ -12,8 +12,6 @@
 
 namespace BusinessActionType
 {
-    QString toString(Value type);
-
     //TODO: #GDM fix to resourceTypeRequired: None, Camera, Server, User, etc
     bool requiresCameraResource(Value val);
     bool requiresUserResource(Value val);
