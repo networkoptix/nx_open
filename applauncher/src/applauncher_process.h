@@ -19,11 +19,7 @@
 #include "abstract_request_processor.h"
 #include "installation_manager.h"
 #include "installation_process.h"
-#ifdef _WIN32
 #include "task_server_new.h"
-#else
-#include "task_server.h"
-#endif
 
 
 class ApplauncherProcess

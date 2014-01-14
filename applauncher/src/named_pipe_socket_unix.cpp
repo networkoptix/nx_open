@@ -6,6 +6,7 @@
 
 #include "named_pipe_socket.h"
 
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
@@ -63,7 +64,7 @@ SystemError::ErrorCode NamedPipeSocket::connectToServerSync( const QString& pipe
     memset( &addr, 0, sizeof(addr) );
     addr.sun_family = AF_UNIX;
     sprintf( addr.sun_path, "/tmp/%s", pipeName.toLatin1().constData() );
-    if( connect( m_impl->hPipe, &addr, sizeof(addr) ) != 0 )
+    if( connect( m_impl->hPipe, (sockaddr*)&addr, sizeof(addr) ) != 0 )
     {
         const int connectErrorCode = errno;
         ::close( m_impl->hPipe );
@@ -80,7 +81,7 @@ SystemError::ErrorCode NamedPipeSocket::write( const void* buf, unsigned int byt
     *bytesWritten = 0;
     while( *bytesWritten < bytesToWrite )
     {
-        ssize_t numberOfBytesWritten = ::write( m_impl->hPipe, buf + *bytesWritten, bytesToWrite - *bytesWritten );
+        ssize_t numberOfBytesWritten = ::write( m_impl->hPipe, (const char*)buf + *bytesWritten, bytesToWrite - *bytesWritten );
         if( numberOfBytesWritten < 0 )
         {
             const int errCode = errno;
@@ -114,7 +115,8 @@ SystemError::ErrorCode NamedPipeSocket::read( void* buf, unsigned int bytesToRea
 
 SystemError::ErrorCode NamedPipeSocket::flush()
 {
-    return FlushFileBuffers( m_impl->hPipe );
+    //TODO/IMPL
+    return SystemError::noError;
 }
 
 NamedPipeSocket::NamedPipeSocket( NamedPipeSocketImpl* implToUse )

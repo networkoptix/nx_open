@@ -10,7 +10,7 @@
 class NamedPipeSocketImpl
 {
 public:
-    static const DWORD BUFSIZE = 4*1024;
+    static const size_t BUFSIZE = 4*1024;
 
     int hPipe;
 
