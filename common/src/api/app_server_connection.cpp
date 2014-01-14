@@ -749,7 +749,7 @@ int QnAppServerConnection::requestStoredFileAsync(const QString &filename, QObje
                                                              m_requestHeaders,
                                                              m_requestParams,
                                                              processor,
-                                                             SLOT(processReply(QnHTTPRawResponse, int)));
+                                                             "processReply");
 }
 
 int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QByteArray &filedata, QObject *target, const char *slot)
@@ -779,7 +779,7 @@ int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QBy
                                                               m_requestParams,
                                                               data,
                                                               processor,
-                                                              SLOT(processReply(QnHTTPRawResponse, int)));
+                                                              "processReply");
 }
 
 int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot)
@@ -792,7 +792,7 @@ int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObjec
                                                                 m_requestHeaders,
                                                                 m_requestParams,
                                                                 processor,
-                                                                SLOT(processReply(QnHTTPRawResponse, int)));
+                                                                "processReply");
 }
 
 int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot) {
@@ -804,7 +804,7 @@ int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderNam
                                                              m_requestHeaders,
                                                              m_requestParams,
                                                              processor,
-                                                             SLOT(processReply(QnHTTPRawResponse, int)));
+                                                             "processReply");
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

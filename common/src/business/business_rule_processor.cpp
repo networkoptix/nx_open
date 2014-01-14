@@ -516,7 +516,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRaw
 bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_broadcastBusinessActionFinished(QnHTTPRawResponse, int)));
+    appServerConnection->broadcastBusinessAction(action, this, "at_broadcastBusinessActionFinished");
     return true;
 }
 
