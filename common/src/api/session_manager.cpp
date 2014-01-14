@@ -17,16 +17,7 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 
-void QnSessionManagerSyncReplyProcessor::at_finished(const QnHTTPRawResponse& response, int handle) {
-    Q_UNUSED(handle)
-
-    QMutexLocker locker(&m_mutex);
-    m_response = response;
-    m_finished = true;
-    m_condition.wakeOne();
-}
-
-int QnSessionManagerSyncReplyProcessor::wait(QnHTTPRawResponse& response) {
+int QnSessionManagerSyncReply::wait(QnHTTPRawResponse& response) {
     QMutexLocker locker(&m_mutex);
     while (!m_finished)
         m_condition.wait(&m_mutex);
@@ -35,12 +26,19 @@ int QnSessionManagerSyncReplyProcessor::wait(QnHTTPRawResponse& response) {
     return m_response.status;
 }
 
-void QnSessionManagerSyncReplyProcessor::at_destroy() {
+void QnSessionManagerSyncReply::terminate() {
     QMutexLocker locker(&m_mutex);
     m_finished = true;
     m_condition.wakeOne();
 }
 
+void QnSessionManagerSyncReply::requestFinished(const QnHTTPRawResponse& response, int handle) 
+{
+    QMutexLocker locker(&m_mutex);
+    m_response = response;
+    m_finished = true;
+    m_condition.wakeOne();
+}
 
 // -------------------------------------------------------------------------- //
 // QnSessionManager
@@ -67,6 +65,12 @@ QnSessionManager::QnSessionManager(QObject *parent):
 
 QnSessionManager::~QnSessionManager() {
     disconnect(this, NULL, this, NULL);
+
+    {
+        QMutexLocker lock(&m_syncReplyMutex);
+        foreach(QnSessionManagerSyncReply* syncReply, m_syncReplyInProgress)
+            syncReply->terminate();
+    }
 
     QScopedPointer<QnObjectThreadPuller> puller(new QnObjectThreadPuller());
     puller->pull(this);
@@ -150,23 +154,36 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
 // -------------------------------------------------------------------------- //
 int QnSessionManager::sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data, QnHTTPRawResponse &response) 
 {
-    QScopedPointer<QnSessionManagerSyncReplyProcessor, QScopedPointerLaterDeleter> syncProcessor(new QnSessionManagerSyncReplyProcessor());
-    syncProcessor->moveToThread(this->thread());
 
-    {
-        QMutexLocker locker(&m_accessManagerMutex);
+    AsyncRequestInfo reqInfo;
+    reqInfo.handle = s_handle.fetchAndAddAcquire(1);
+    reqInfo.object = this;
+    reqInfo.slot   = "at_SyncRequestFinished";
+    reqInfo.connectionType = Qt::AutoConnection;
 
-        if (!m_accessManager) {
-            response.errorString = "Network client is not ready yet.";
-            return -1;
-        }
+    QnSessionManagerSyncReply syncReply;
+    m_syncReplyMutex.lock();
+    m_syncReplyInProgress.insert(reqInfo.handle, &syncReply);
+    m_syncReplyMutex.unlock();
 
-        connect(m_accessManager, SIGNAL(destroyed()), syncProcessor.data(), SLOT(at_destroy()));
-    }
+    emit asyncRequestQueued(operation, reqInfo, url, objectName, headers, params, data);
 
-    sendAsyncRequest(operation, url, objectName, headers, params, data, syncProcessor.data(), "at_finished", Qt::AutoConnection);
-    return syncProcessor->wait(response);
+    int result = syncReply.wait(response);
+   
+    QMutexLocker lock(&m_syncReplyMutex);
+    m_syncReplyInProgress.remove(reqInfo.handle);
+    
+    return result;
 }
+
+void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response, int handle) 
+{
+    QMutexLocker lock(&m_syncReplyMutex);
+    QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
+    if (reply)
+        reply->requestFinished(response, handle);
+}
+
 
 int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response) {
     return sendSyncGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
@@ -195,7 +212,6 @@ int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QSt
     reqInfo.object = target;
     reqInfo.slot = slot;
     reqInfo.connectionType = connectionType;
-    //connect(this, SIGNAL(requestFinished(QnHTTPRawResponse, int)), target, slot, connectionType == Qt::AutoConnection ? Qt::QueuedConnection : connectionType);
     emit asyncRequestQueued(operation, reqInfo, url, objectName, headers, params, data);
     return reqInfo.handle;
 }

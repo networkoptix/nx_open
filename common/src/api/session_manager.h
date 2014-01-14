@@ -22,18 +22,14 @@ struct AsyncRequestInfo {
 };
 Q_DECLARE_METATYPE(AsyncRequestInfo);
 
-class QnSessionManagerSyncReplyProcessor: public QObject {
-    Q_OBJECT
-
+class QnSessionManagerSyncReply
+{
 public:
-    QnSessionManagerSyncReplyProcessor(QObject *parent = NULL): QObject(parent), m_finished(false) {}
+    QnSessionManagerSyncReply(): m_finished(false) {}
 
-    int wait(QnHTTPRawResponse& response);
-
-private slots:
-    void at_finished(const QnHTTPRawResponse&, int handle);
-    void at_destroy();
-
+    int wait(QnHTTPRawResponse &response);
+    void terminate();
+    void requestFinished(const QnHTTPRawResponse& response, int handle);
 private:
     bool m_finished;
     QnHTTPRawResponse m_response;
@@ -85,6 +81,7 @@ private slots:
     void at_asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
     void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
     void at_replyReceived();
+    void at_SyncRequestFinished(const QnHTTPRawResponse& response, int handle);
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
@@ -97,6 +94,9 @@ private:
     
     QScopedPointer<QThread> m_thread;
     QHash<QNetworkReply*, AsyncRequestInfo> m_handleInProgress;
+
+    QHash<int, QnSessionManagerSyncReply*>  m_syncReplyInProgress;
+    QMutex m_syncReplyMutex;
 };
 
 #endif // __SESSION_MANAGER_H__
