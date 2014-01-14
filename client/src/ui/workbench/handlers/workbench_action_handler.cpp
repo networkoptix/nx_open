@@ -1845,6 +1845,11 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     if (!resource)
         return;
 
+//    QnConnectionTestingDialog dialog;
+//    dialog.testResource(QUrl::fromUserInput(resource->getUrl()));
+//    dialog.exec();
+
+
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
 #ifdef Q_OS_WIN
