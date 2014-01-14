@@ -52,7 +52,7 @@
          <item>
           <widget class="QLabel" name="settingsWarningLabel">
            <property name="text">
-            <string>Warning! FPS/Quality settings in Recording Schedule will not work!</string>
+            <string>Warning! FPS and quality settings in Recording Schedule will not work!</string>
            </property>
           </widget>
          </item>
@@ -272,7 +272,7 @@
         <item>
          <widget class="QLabel" name="generalWarningLabel">
           <property name="text">
-           <string>Warning! Please read documentation prior to change these settings!</string>
+           <string>Warning! Please read documentation before changing these settings!</string>
           </property>
          </widget>
         </item>

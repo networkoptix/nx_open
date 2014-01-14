@@ -231,22 +231,13 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
 
 QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const
 {
-    QString displayString;
-    //displayString += tr("Enterprise controller (");
-    displayString += tr("Port ");
-    displayString += QString::fromLatin1(" ") + moduleData.params[QString::fromLatin1("port")];
-    displayString += tr(", Ip: ");
-    for( std::vector<QString>::size_type
-        i = 0;
-        i < moduleData.ipAddresses.size();
-        ++i )
-    {
+    QString ipString;
+    for( std::vector<QString>::size_type i = 0; i < moduleData.ipAddresses.size();++i ) {
         if( i > 0 )
-            displayString += QString::fromLatin1(", ");
-        displayString += moduleData.ipAddresses[i];
+            ipString += lit(", ");
+        ipString += moduleData.ipAddresses[i];
     }
-    //displayString += QString::fromLatin1(")");
-    return displayString;
+    return tr("Port: %1, IP: %2").arg(moduleData.params[lit("port")]).arg(ipString);
 }
 
 QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerAddressNode( const FoundModuleData& /*moduleData*/, const QString& address ) const

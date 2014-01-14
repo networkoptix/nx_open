@@ -9,7 +9,7 @@
 
 QnCameraInputBusinessEventWidget::QnCameraInputBusinessEventWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnCameraInputBusinessEventWidget)
+    ui(new Ui::CameraInputBusinessEventWidget)
 {
     ui->setupUi(this);
 

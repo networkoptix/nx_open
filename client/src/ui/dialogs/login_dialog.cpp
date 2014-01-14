@@ -483,8 +483,8 @@ void QnLoginDialog::at_testButton_clicked() {
         return;
     }
 
-    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
-    dialog->setModal(true);
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
+    dialog->testEnterpriseController(url);
     dialog->exec();
 
     updateFocus();

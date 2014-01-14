@@ -4,8 +4,8 @@
 #include <QWidget>
 
 namespace Ui {
-    class QnAggregationWidget;
-    }
+    class AggregationWidget;
+}
 
 class QnAggregationWidget : public QWidget
 {
@@ -24,7 +24,7 @@ signals:
     void valueChanged();
 
 private:
-    QScopedPointer<Ui::QnAggregationWidget> ui;
+    QScopedPointer<Ui::AggregationWidget> ui;
 };
 
 #endif // AGGREGATION_WIDGET_H

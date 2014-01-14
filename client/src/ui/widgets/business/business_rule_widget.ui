@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnBusinessRuleWidget</class>
- <widget class="QWidget" name="QnBusinessRuleWidget">
+ <class>BusinessRuleWidget</class>
+ <widget class="QWidget" name="BusinessRuleWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -20,7 +20,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>

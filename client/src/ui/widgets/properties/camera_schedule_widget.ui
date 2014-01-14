@@ -534,7 +534,7 @@
           <item row="0" column="1">
            <widget class="QSpinBox" name="recordBeforeSpinBox">
             <property name="suffix">
-             <string> s</string>
+             <string extracomment="Short for &quot;seconds&quot;"> s</string>
             </property>
             <property name="minimum">
              <number>3</number>
@@ -557,7 +557,7 @@
           <item row="1" column="1">
            <widget class="QSpinBox" name="recordAfterSpinBox">
             <property name="suffix">
-             <string> s</string>
+             <string extracomment="Short for &quot;seconds&quot;"> s</string>
             </property>
             <property name="minimum">
              <number>3</number>

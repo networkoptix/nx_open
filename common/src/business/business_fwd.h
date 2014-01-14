@@ -8,6 +8,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
+#undef PlaySound // TODO: #Elric who includes windows.h?
+
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
 typedef QList<QnAbstractBusinessEventPtr> QnAbstractBusinessEventList;

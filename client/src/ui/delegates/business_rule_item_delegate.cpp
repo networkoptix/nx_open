@@ -188,7 +188,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             BusinessActionType::Value val = (BusinessActionType::Value)i;
             if (instant && BusinessActionType::hasToggleState(val))
                 continue;
-            comboBox->addItem(BusinessActionType::toString(val), val);
+            comboBox->addItem(QnBusinessStringsHelper::actionName(val), val);
         }
         return comboBox;
     }

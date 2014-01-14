@@ -47,7 +47,7 @@ namespace {
 // Node
 // -------------------------------------------------------------------------- //
 class QnResourcePoolModel::Node {
-    Q_DECLARE_TR_FUNCTIONS(Node)
+    Q_DECLARE_TR_FUNCTIONS(QnResourcePoolModel::Node)
 public:
     enum State {
         Normal,     /**< Normal node. */

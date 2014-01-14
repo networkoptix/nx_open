@@ -89,7 +89,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 continue;
 
             int videoPort = params[1].toInt();
-            const QString resName(tr("TestCameraLive"));
+            const QString resName(lit("TestCameraLive"));
             for (int j = 2; j < params.size(); ++j)
             {
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );

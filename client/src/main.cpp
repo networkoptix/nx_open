@@ -290,8 +290,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath;
-        QString customizationPath = lit(":/skin");
-    bool devBackgroundEditable = false;
+    QString customizationPath = lit(":/skin");
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
@@ -303,13 +302,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
-    commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+    //commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString()); // TODO: #Elric
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
-    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
-    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+    //commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString()); // TODO: #Elric
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
