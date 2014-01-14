@@ -22,7 +22,9 @@ namespace Qn {
         QualityHigh,
         QualityHighest,
         QualityPreSet,
-        QualityNotDefined
+        QualityNotDefined,
+
+        StreamQualityCount
     };
 
     enum SecondStreamQuality { 

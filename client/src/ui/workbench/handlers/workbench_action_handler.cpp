@@ -504,6 +504,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (hasDbChanges) {
         connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        foreach(const QnResourcePtr &camera, cameras) {
+            QnAppServerConnectionFactory::createConnection()->saveAsync(camera->getId(),
+                                                                        camera->getProperties());
+        }
     }
 
     if (hasCameraChanges) {
@@ -1844,6 +1848,11 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if (!resource)
         return;
+
+//    QnConnectionTestingDialog dialog;
+//    dialog.testResource(QUrl::fromUserInput(resource->getUrl()));
+//    dialog.exec();
+
 
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();

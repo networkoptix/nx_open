@@ -43,7 +43,7 @@ QString QnBusinessStringsHelper::actionName(BusinessActionType::Value value) {
     case ShowPopup:             return tr("Show notification");
     case PlaySound:             return tr("Play sound");
     case PlaySoundRepeated:     return tr("Repeat sound");
-    case SayText:               return tr("Say");
+    case SayText:               return tr("Speak");
     }
     return tr("Unknown (%1)").arg(static_cast<int>(value));
 }

@@ -36,8 +36,8 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
 
     connectToGridWidget();
 
-    ui->gridWidget->setShowSecondParam(false);
-    ui->gridWidget->setShowFirstParam(false);
+    ui->gridWidget->setShowQuality(false);
+    ui->gridWidget->setShowFps(false);
 }
 
 QnWeekTimeScheduleDialog::~QnWeekTimeScheduleDialog()

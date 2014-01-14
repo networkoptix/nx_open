@@ -149,7 +149,7 @@ void RDirSyncher::downloadProgress(
 class RSyncEventTrigger
 {
 public:
-    ~RSyncEventTrigger() {}
+    virtual ~RSyncEventTrigger() {}
 
     virtual void doAction() = 0;
 };
