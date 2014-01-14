@@ -51,14 +51,13 @@ private:
     QMap<QString, CasheInfo> m_cachedXml;
     QMap<QString, CashedDevInfo> m_cashedDevInfo;
 
-    QSet<QString >m_httpInProgress;
+    QMap<QString, std::shared_ptr<nx_http::AsyncHttpClient> > m_httpInProgress;
     QMutex m_mutex;
 
     QByteArray getDeviceXml(const QUrl& url);
 
 private slots:
-    void at_replyReceived(nx_http::AsyncHttpClient* reply);
-    void at_httpConnectionDone(nx_http::AsyncHttpClient* reply);
+    void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
 };
 
 #endif // #ifdef ENABLE_ACTI

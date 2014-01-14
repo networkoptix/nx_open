@@ -5,16 +5,17 @@
 #include <QtWidgets/QDialogButtonBox>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/dewarping_params.h>
 
 #include <ui/widgets/properties/camera_settings_widget.h>
+
+#include <ui/workbench/workbench_context_aware.h>
 
 class QAbstractButton;
 
 class QnCameraSettingsWidget;
 class QnWorkbenchContext;
 
-class QnCameraSettingsDialog: public QDialog {
+class QnCameraSettingsDialog: public QDialog, protected QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags =  Qt::Tool);
@@ -31,17 +32,17 @@ public:
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
-    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
-    void cameraIssuesRequested();
-    void cameraRulesRequested();
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *button);
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
     void at_advancedSettingChanged();
+
+    void at_diagnoseButton_clicked();
+    void at_rulesButton_clicked();
 
     void acceptIfSafe();
 

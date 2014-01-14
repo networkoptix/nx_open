@@ -10,8 +10,6 @@
 #include "media_encoder.h"
 
 
-static const int FRAME_DURATION_USEC = 1*1000*1000;
-
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
 :
     m_refManager( this ),
@@ -58,20 +56,20 @@ unsigned int CameraManager::releaseRef()
 //!Implementation of nxcip::BaseCameraManager::getEncoderCount
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = 2;
+    *encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 
 //!Implementation of nxcip::BaseCameraManager::getEncoder
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if( encoderIndex > 1 )
+    if( encoderIndex > 0 )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder[encoderIndex].get() )
-        m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex, FRAME_DURATION_USEC) );
-    m_encoder[encoderIndex]->addRef();
-    *encoderPtr = m_encoder[encoderIndex].get();
+    if( !m_encoder.get() )
+        m_encoder.reset( new MediaEncoder(this, encoderIndex) );
+    m_encoder->addRef();
+    *encoderPtr = m_encoder.get();
 
     return nxcip::NX_NO_ERROR;
 }
@@ -91,9 +89,10 @@ int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 }
 
 //!Implementation of nxcip::BaseCameraManager::setCredentials
-void CameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
+void CameraManager::setCredentials( const char* username, const char* password )
 {
-    //TODO/IMPL
+    strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
+    strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled

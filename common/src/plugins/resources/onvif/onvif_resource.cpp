@@ -28,6 +28,7 @@
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
 #include "soapStub.h"
+#include "onvif_ptz_controller.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -68,13 +69,6 @@ StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
 };
-
-// disable PTZ for this cameras
-QString strictPTZList[] =
-{
-    lit("N53F-F")
-};
-
 
 struct StrictBitrateInfo {
     const char* model;
@@ -205,7 +199,6 @@ QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
 
 QnPlOnvifResource::QnPlOnvifResource()
 :
-    m_onvifAdditionalSettings(0),
     m_physicalParamsMutex(QMutex::Recursive),
     m_advSettingsLastUpdated(),
     m_iframeDistance(-1),
@@ -257,7 +250,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
     stopInputPortMonitoring();
 
-    delete m_onvifAdditionalSettings;
+    m_onvifAdditionalSettings.reset();
 }
 
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
@@ -480,9 +473,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         return CameraDiagnostics::ServerTerminatedResult();
 
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
-    Qn::PtzCapabilities ptzCaps = Qn::NoPtzCapabilities;
+    /*Qn::PtzCapabilities ptzCaps = Qn::NoPtzCapabilities; // TODO: #PTZ
     if (m_ptzController)
-        ptzCaps = m_ptzController->getCapabilities();
+        ptzCaps = m_ptzController->getCapabilities();*/
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming2())
@@ -491,8 +484,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
-    if (ptzCaps != Qn::NoPtzCapabilities)
-        setPtzCapabilities(ptzCaps);
+    /*if (ptzCaps != Qn::NoPtzCapabilities)
+        setPtzCapabilities(ptzCaps);*/ // TODO: #PTZ
 
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
@@ -517,6 +510,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     fetchRelayInputInfo();
 
+    if (m_appStopping)
+        return CameraDiagnostics::ServerTerminatedResult();
+
+    fetchPtzInfo();
+    
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -554,7 +552,7 @@ int QnPlOnvifResource::strictBitrate(int bitrate) const
 {
     for (uint i = 0; i < sizeof(strictBitrateList) / sizeof(strictBitrateList[0]); ++i)
     {
-        if (getModel() == lit(strictBitrateList[i].model))
+        if (getModel() == QLatin1String(strictBitrateList[i].model))
             return qMin(strictBitrateList[i].maxBitrate, qMax(strictBitrateList[i].minBitrate, bitrate));
     }
     return bitrate;
@@ -567,16 +565,6 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
         if (getModel() == QLatin1String(strictResolutionList[i].model))
             primaryResolution = strictResolutionList[i].maxRes;
     }
-}
-
-bool QnPlOnvifResource::isPTZDisabled() const
-{
-    for (uint i = 0; i < sizeof(strictPTZList) / sizeof(QString); ++i)
-    {
-        if (getModel() == strictPTZList[i])
-            return true;
-    }
-    return false;
 }
 
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
@@ -1098,16 +1086,38 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
     m_imagingUrl = src;
 }
 
+QString QnPlOnvifResource::getPtzfUrl() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_ptzUrl;
+}
+
 void QnPlOnvifResource::setPtzfUrl(const QString& src) 
 {
     QMutexLocker lock(&m_mutex);
     m_ptzUrl = src;
 }
 
-QString QnPlOnvifResource::getPtzfUrl() const
+QString QnPlOnvifResource::getPtzConfigurationToken() const {
+    QMutexLocker lock(&m_mutex);
+    return m_ptzConfigurationToken;
+}
+
+void QnPlOnvifResource::setPtzConfigurationToken(const QString &src) {
+    QMutexLocker lock(&m_mutex);
+    m_ptzConfigurationToken = src;
+}
+
+QString QnPlOnvifResource::getPtzProfileToken() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_ptzUrl;
+    return m_ptzProfileToken;
+}
+
+void QnPlOnvifResource::setPtzProfileToken(const QString& src) 
+{
+    QMutexLocker lock(&m_mutex);
+    m_ptzProfileToken = src;
 }
 
 void QnPlOnvifResource::setMinMaxQuality(int min, int max)
@@ -1245,6 +1255,21 @@ bool QnPlOnvifResource::fetchRelayInputInfo()
         cl_log.log( QString::fromLatin1("Failed to get relay digital input list. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
         return true;
     }
+
+    return true;
+}
+
+bool QnPlOnvifResource::fetchPtzInfo() {
+    if(m_ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(getAuth());
+    PtzSoapWrapper ptz (getPtzfUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+
+    _onvifPtz__GetConfigurations request;
+    _onvifPtz__GetConfigurationsResponse response;
+    if (ptz.doGetConfigurations(request, response) == SOAP_OK && response.PTZConfiguration.size() > 0)
+        m_ptzConfigurationToken = QString::fromStdString(response.PTZConfiguration[0]->token);
 
     return true;
 }
@@ -1713,7 +1738,8 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
         qWarning() << "QnOnvifStreamReader::setVideoSourceConfiguration: can't set required values into ONVIF physical device (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("setVideoSourceConfiguration"), soapWrapper.getLastError());
+        return CameraDiagnostics::NoErrorResult(); // ignore error because of some cameras is not ONVIF profile S compatible and doesn't support this request
+        //return CameraDiagnostics::RequestFailedResult(QLatin1String("setVideoSourceConfiguration"), soapWrapper.getLastError());
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -1879,7 +1905,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
         QRect currentRect(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
         QRect maxRect = getVideoSourceMaxSize(QString::fromStdString(conf->token));
         m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
-        if (maxRect.isValid() && currentRect != maxRect)
+        if (maxRect.isValid() && currentRect != maxRect && !isCameraControlDisabled())
         {
             updateVideoSource(conf, maxRect);
             return sendVideoSourceToCamera(conf);
@@ -1933,7 +1959,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
     return CameraDiagnostics::RequestFailedResult(QLatin1String("getAudioSourceConfigurations"), QLatin1String("missing channel configuration (2)"));
 }
 
-const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnOnvifStreamReader* onvifReader = dynamic_cast<const QnOnvifStreamReader*>(dataProvider);
@@ -1990,9 +2016,8 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
     QMutexLocker lock(&m_physicalParamsMutex);
-    if (!m_onvifAdditionalSettings) {
+    if (!m_onvifAdditionalSettings)
         return false;
-    }
 
     CameraSetting tmp;
     tmp.deserializeFromStr(val.toString());
@@ -2039,8 +2064,9 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
     QAuthenticator auth(getAuth());
-    OnvifCameraSettingsResp* settings = new OnvifCameraSettingsResp(getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
-        auth.user(), auth.password(), m_videoSourceToken.toStdString(), getUniqueId(), m_timeDrift);
+    std::unique_ptr<OnvifCameraSettingsResp> settings( new OnvifCameraSettingsResp(
+        getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
+        auth.user(), auth.password(), m_videoSourceToken.toStdString(), getUniqueId(), m_timeDrift) );
 
     if (!imagingUrl.isEmpty()) {
         settings->makeGetRequest();
@@ -2062,21 +2088,9 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
             return;
     }
 
-
-    if (!getPtzfUrl().isEmpty() && !m_ptzController && !isPTZDisabled())
-    {
-        QScopedPointer<QnOnvifPtzController> controller(new QnOnvifPtzController(this));
-        if (!controller->getPtzConfigurationToken().isEmpty())
-            m_ptzController.reset(controller.take());
-    }
-
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    if (m_onvifAdditionalSettings) {
-        delete m_onvifAdditionalSettings;
-    }
-
-    m_onvifAdditionalSettings = settings;    
+    m_onvifAdditionalSettings = std::move(settings);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
@@ -2217,9 +2231,16 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
-QnAbstractPtzController* QnPlOnvifResource::getPtzController()
+QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 {
-    return m_ptzController.data();
+    if(getPtzfUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
+        return NULL;
+
+    QScopedPointer<QnOnvifPtzController> result(new QnOnvifPtzController(toSharedPointer(this)));
+    if(result->getCapabilities() == Qn::NoPtzCapabilities)
+        return NULL;
+    
+    return result.take();
 }
 
 bool QnPlOnvifResource::startInputPortMonitoring()

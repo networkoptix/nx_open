@@ -17,14 +17,10 @@
 
 #include <utils/common/systemerror.h>
 #include <utils/fs/file.h>
+#include <utils/network/http/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
 
-
-namespace nx_http
-{
-    class AsyncHttpClient;
-}
 
 namespace detail
 {
@@ -72,7 +68,7 @@ namespace detail
         };
 
         const QString m_filePath;
-        nx_http::AsyncHttpClient* m_httpClient;
+        nx_http::AsyncHttpClientPtr m_httpClient;
         State m_state;
         const QString m_localDirPath;
         const QString m_hashTypeName;
@@ -95,9 +91,9 @@ namespace detail
         void onSomeMessageBodyAvailableNonSafe();
 
     private slots:
-        void onResponseReceived( nx_http::AsyncHttpClient* );
-        void onSomeMessageBodyAvailable( nx_http::AsyncHttpClient* );
-        void onHttpDone( nx_http::AsyncHttpClient* );
+        void onResponseReceived( nx_http::AsyncHttpClientPtr );
+        void onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
+        void onHttpDone( nx_http::AsyncHttpClientPtr );
     };
 }
 

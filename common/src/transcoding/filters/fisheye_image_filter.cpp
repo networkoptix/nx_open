@@ -1,15 +1,16 @@
-
 #include "fisheye_image_filter.h"
 
 #include <QtGui/QMatrix4x4>
 
+#include <utils/math/math.h>
+
 extern "C" {
 #ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
 #ifdef WIN32
-#undef AVPixFmtDescriptor
+#   undef AVPixFmtDescriptor
 #endif
 };
 
@@ -71,9 +72,11 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 
 // ------------ QnFisheyeImageFilter ----------------------
 
-QnFisheyeImageFilter::QnFisheyeImageFilter(const DewarpingParams& params):
+QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping,
+                                           const QnItemDewarpingParams& itemDewarping):
     QnAbstractImageFilter(),
-    m_params(params),
+    m_mediaDewarping(mediaDewarping),
+    m_itemDewarping(itemDewarping),
     m_lastImageFormat(-1)
 {
     memset (m_transform, 0, sizeof(m_transform));
@@ -81,7 +84,7 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const DewarpingParams& params):
 
 void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect)
 {
-    if (!m_params.enabled)
+    if (!m_itemDewarping.enabled || !m_mediaDewarping.enabled)
         return;
 
     int left = qPower2Floor(updateRect.left() * frame->width, 16);
@@ -153,7 +156,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
     delete m_transform[plane];
     m_transform[plane] = new QPointF[imageSize.width() * imageSize.height()];
 
-    if (m_params.panoFactor == 1)
+    if (m_itemDewarping.panoFactor == 1)
         updateFisheyeTransformRectilinear(imageSize, plane);
     else
         updateFisheyeTransformEquirectangular(imageSize, plane);
@@ -163,23 +166,26 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 {
     qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
 
-    qreal kx = 2.0*tan(m_params.fov/2.0);
+    qreal kx = 2.0*tan(m_itemDewarping.fov/2.0);
     qreal ky = kx/aspectRatio;
 
-    float fovRot = sin(m_params.xAngle)*m_params.fovRot;
-    qreal xShift, yShift, yCenter;
-    if (m_params.viewMode == DewarpingParams::Horizontal) {
-        yShift = m_params.yAngle;
-        yCenter = 0.5;
-        xShift = m_params.xAngle;
+    float fovRot = sin(m_itemDewarping.xAngle)*m_mediaDewarping.fovRot;
+    qreal xShift, yShift, yPos;
+    if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::Horizontal) {
+        yShift = m_itemDewarping.yAngle;
+        yPos = 0.5;
+        xShift = m_itemDewarping.xAngle;
         fovRot = fovRot;
     }
     else {
-        yShift = m_params.yAngle - M_PI/2.0;
-        yCenter =  1.0;
+        yShift = m_itemDewarping.yAngle - M_PI/2.0 - m_itemDewarping.fov/2.0;
+        yPos =  1.0;
         xShift = fovRot;
-        fovRot =  -m_params.xAngle;
+        fovRot =  -m_itemDewarping.xAngle;
     }
+    qreal radius = m_mediaDewarping.radius;
+    qreal xCenter = m_mediaDewarping.xCenter;
+    qreal yCenter = m_mediaDewarping.yCenter;
 
 
     QVector3D dx = sphericalToCartesian(xShift + M_PI/2.0, 0.0) * kx;
@@ -193,16 +199,20 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 
     QPointF* dstPos = m_transform[plane];
     int dstDelta = 1;
-    if (m_params.viewMode == DewarpingParams::VerticalDown) {
+    if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::VerticalDown) {
         dstPos += imageSize.height()*imageSize.width() - 1;
         dstDelta = -1;
     }
 
     QVector2D xy1 = QVector2D(1.0,         1.0 / aspectRatio);
-    QVector2D xy2 = QVector2D(-0.5,        -yCenter/ aspectRatio);
+    QVector2D xy2 = QVector2D(-0.5,        -yPos/ aspectRatio);
 
-    QVector2D xy3 = QVector2D(1.0 / M_PI,  aspectRatio / M_PI);
-    QVector2D xy4 = QVector2D(1.0 / 2.0,   1.0 / 2.0);
+    //QVector2D xy3 = QVector2D(1.0 / M_PI,  aspectRatio / M_PI);
+    //QVector2D xy4 = QVector2D(1.0 / 2.0,   1.0 / 2.0);
+
+    QVector2D xy3 = QVector2D(1.0 / M_PI * radius*2.0,  1.0 / M_PI * radius*2.0*aspectRatio);
+    QVector2D xy4 = QVector2D(xCenter, yCenter);
+
 
     for (int y = 0; y < imageSize.height(); ++y)
     {
@@ -239,37 +249,42 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane)
 {
     QMatrix4x4 perspectiveMatrix( 
-        1.0,    0.0,                       0.0,                         0.0,
-        0.0,    cos(-m_params.fovRot),     -sin(-m_params.fovRot),      0.0,
-        0.0,    sin(-m_params.fovRot),     cos(-m_params.fovRot),       0.0,
-        0.0,    0.0,                       0.0,                         1.0
+        1.0,    0.0,                                0.0,                                0.0,
+        0.0,    cos(-m_mediaDewarping.fovRot),     -sin(-m_mediaDewarping.fovRot),      0.0,
+        0.0,    sin(-m_mediaDewarping.fovRot),      cos(-m_mediaDewarping.fovRot),      0.0,
+        0.0,    0.0,                                0.0,                                1.0
     );
 
-    qreal aspectRatio = (imageSize.width()/m_params.panoFactor) / (qreal) imageSize.height();
-    qreal yCenter;
+    qreal aspectRatio = (imageSize.width()/m_itemDewarping.panoFactor) / (qreal) imageSize.height();
+    qreal yPos;
     qreal phiShiftSign;
-    if (m_params.viewMode == DewarpingParams::Horizontal) {
-        yCenter = 0.5;
+    qreal yAngle = m_itemDewarping.yAngle;
+    if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::Horizontal) {
+        yPos = 0.5;
         phiShiftSign = 1.0;
     }
     else {
-        yCenter =  1.0;
+        yPos =  1.0;
         phiShiftSign = -1.0;
+        yAngle -= m_itemDewarping.fov/m_itemDewarping.panoFactor/2.0;
     }
+    qreal radius = m_mediaDewarping.radius;
+    qreal xCenter = m_mediaDewarping.xCenter;
+    qreal yCenter = m_mediaDewarping.yCenter;
 
     QPointF* dstPos = m_transform[plane];
     
     int dstDelta = 1;
-    if (m_params.viewMode == DewarpingParams::VerticalDown) {
+    if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::VerticalDown) {
         dstPos += imageSize.height()*imageSize.width() - 1;
         dstDelta = -1;
     }
 
-    QVector2D xy1 = QVector2D(m_params.fov, (m_params.fov / m_params.panoFactor) / aspectRatio);
-    QVector2D xy2 = QVector2D(-0.5,  -yCenter)*xy1 + QVector2D(m_params.xAngle, 0.0);
+    QVector2D xy1 = QVector2D(m_itemDewarping.fov, (m_itemDewarping.fov / m_itemDewarping.panoFactor) / aspectRatio);
+    QVector2D xy2 = QVector2D(-0.5,  -yPos)*xy1 + QVector2D(m_itemDewarping.xAngle, 0.0);
 
-    QVector2D xy3 = QVector2D(1.0 / M_PI,    aspectRatio / M_PI);
-    QVector2D xy4 = QVector2D(1.0 / 2.0,     1.0 / 2.0);
+    QVector2D xy3 = QVector2D(1.0 / M_PI * radius*2.0,  1.0 / M_PI * radius*2.0*aspectRatio);
+    QVector2D xy4 = QVector2D(xCenter, yCenter);
 
     for (int y = 0; y < imageSize.height(); ++y)
     {
@@ -278,13 +293,13 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             QVector2D pos = QVector2D(x / (qreal) (imageSize.width()-1), y / (qreal) (imageSize.height()-1)) * xy1 + xy2;
 
             float cosTheta = cos(pos.x());
-            float roty = -m_params.fovRot * cosTheta;
-            float phi   = phiShiftSign * (pos.y() * (1.0 - roty*xy1.y())  - roty - m_params.yAngle);
+            float roty = -m_mediaDewarping.fovRot * cosTheta;
+            float phi   = phiShiftSign * (pos.y() * (1.0 - roty*xy1.y())  - roty - yAngle);
             float cosPhi = cos(phi);
 
             // Vector in 3D space
             QVector3D pos3d;
-            if (m_params.viewMode == DewarpingParams::Horizontal)
+            if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::Horizontal)
                 pos3d = QVector3D(cosPhi * sin(pos.x()),    cosPhi * cosTheta, sin(phi));
             else
                 pos3d = QVector3D(cosPhi * sin(pos.x()),    sin(phi),          cosPhi * cosTheta);
@@ -316,13 +331,13 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     }
 }
 
-QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const DewarpingParams& dewarpingParams)
+QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const QnItemDewarpingParams &itemDewarpingParams)
 {
-    if (!dewarpingParams.enabled || dewarpingParams.panoFactor == 1)
+    if (!itemDewarpingParams.enabled || itemDewarpingParams.panoFactor == 1)
         return srcResolution;
 
     int square = srcResolution.width() * srcResolution.height();
-    float aspect = srcResolution.width() / (float) srcResolution.height() * dewarpingParams.panoFactor;
+    float aspect = srcResolution.width() / (float) srcResolution.height() * itemDewarpingParams.panoFactor;
     int x = int(sqrt(square * aspect) + 0.5);
     int y = int(x /aspect + 0.5);
     return QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));

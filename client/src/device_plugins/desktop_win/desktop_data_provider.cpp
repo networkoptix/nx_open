@@ -4,6 +4,7 @@
 
 #include <intrin.h>
 
+
 static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
@@ -596,7 +597,7 @@ int QnDesktopDataProvider::processData(bool flush)
         video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
 
         if(m_videoCodecCtx->coded_frame->key_frame)
-            video->flags |= AV_PKT_FLAG_KEY;
+            video->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         video->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         video->dataProvider = this;
         putData(video);

@@ -101,11 +101,11 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout);
+    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout);
     QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
-    void createPredefinedTracks(const QnResourceVideoLayout* videoLayout);
+    void createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout);
 
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);

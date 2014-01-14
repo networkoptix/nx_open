@@ -1,20 +1,23 @@
 #ifndef QN_LEXICAL_FUNCTIONS_H
 #define QN_LEXICAL_FUNCTIONS_H
 
+#include <QtCore/QUuid>
+#include <QtGui/QColor>
+
 #include "lexical.h"
 
 namespace QnLexicalDetail {
-    template<class T, class Numeric>
-    void serialize_numeric(const T &value, QString *target) {
-        *target = QString::number(static_cast<Numeric>(value));
+    template<class T, class Temporary>
+    void serialize_integer(const T &value, QString *target) {
+        *target = QString::number(static_cast<Temporary>(value));
     }
 
-    template<class T, class Numeric>
-    bool deserialize_numeric(const QString &value, T *target) {
-        Numeric tmp;
+    template<class T, class Temporary>
+    bool deserialize_integer(const QString &value, T *target) {
+        Temporary tmp;
         if(!QnLexical::deserialize(value, &tmp))
             return false;
-        if(tmp < static_cast<Numeric>(std::numeric_limits<T>::min()) || tmp > static_cast<Numeric>(std::numeric_limits<T>::max()))
+        if(tmp < static_cast<Temporary>(std::numeric_limits<T>::min()) || tmp > static_cast<Temporary>(std::numeric_limits<T>::max()))
             return false;
 
         *target = static_cast<T>(tmp);
@@ -62,38 +65,26 @@ QN_DEFINE_DIRECT_LEXICAL_SERIALIZATION_FUNCTIONS(double,                toDouble
 #undef QN_DEFINE_DIRECT_LEXICAL_SERIALIZATION_FUNCTIONS
 
 
-#define QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE)      \
+#define QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE)      \
 inline void serialize(const TYPE &value, QString *target) {                     \
-    QnLexicalDetail::serialize_numeric<TYPE, int>(value, target);               \
+    QnLexicalDetail::serialize_integer<TYPE, int>(value, target);               \
 }                                                                               \
                                                                                 \
 inline bool deserialize(const QString &value, TYPE *target) {                   \
-    return QnLexicalDetail::deserialize_numeric<TYPE, int>(value, target);      \
+    return QnLexicalDetail::deserialize_integer<TYPE, int>(value, target);      \
 }
 
-QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(char)
-QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned char)
-QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(short)
-QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned short)
-#undef QN_DEFINE_NUMERIC_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS
+QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(char)
+QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(signed char) /* char, signed char and unsigned char are distinct types. */
+QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned char)
+QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(short)
+QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned short)
+#undef QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS
 
 
-inline void serialize(const bool &value, QString *target) {
-    *target = value ? QLatin1String("true") : QLatin1String("false");
-}
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(bool)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(QUuid)
+QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(QColor)
 
-inline bool deserialize(const QString &value, bool *target) {
-    /* Also support "0" & "1" during deserialization. */
-
-    if(value == QLatin1String("0") || value == QLatin1String("false")) {
-        *target = false;
-        return true;
-    } else if(value == QLatin1String("1") || value == QLatin1String("true")) {
-        *target = true;
-        return true;
-    } else {
-        return false;
-    }
-}
 
 #endif // QN_LEXICAL_FUNCTIONS_H

@@ -2,10 +2,15 @@
 #define MAIN_H
 
 #include <QtCore/QTimer>
-#include "utils/common/long_runnable.h"
-#include "core/resource/media_server_resource.h"
+#include <QtCore/QStringList>
+
+#include <business/business_fwd.h>
+#include <core/resource/resource_fwd.h>
+
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
+
+#include "utils/common/long_runnable.h"
 
 
 class QnAppserverResourceProcessor;

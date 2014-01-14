@@ -71,6 +71,11 @@ public:
 
     QnResourceWidget *widget(int key = -1) const;
 
+    template<class WidgetClass>
+    WidgetClass *widget(int key = -1) const { 
+        return dynamic_cast<WidgetClass *>(widget(key));
+    }
+
     QnResourceWidgetList widgets(int key = -1) const;
 
     const ArgumentHash &arguments() const {

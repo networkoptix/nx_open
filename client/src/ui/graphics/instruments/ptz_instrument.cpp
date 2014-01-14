@@ -8,6 +8,7 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QApplication>
 
+#include <utils/common/executor.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/fuzzy.h>
@@ -31,11 +32,10 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_ptz_controller.h>
 #include <ui/workbench/watchers/workbench_ptz_camera_watcher.h>
-#include <ui/workbench/watchers/workbench_ptz_mapper_watcher.h>
 
 #include "selection_item.h"
 
@@ -47,6 +47,8 @@
 #endif
 
 namespace {
+    // TODO: #Elric #customization
+
     const QColor ptzColor = qnGlobals->ptzColor();
 
     const QColor ptzArrowBorderColor = toTransparent(ptzColor, 0.75);
@@ -62,6 +64,7 @@ namespace {
     const double minPtzZoomRectSize = 0.08;
 
     const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
+
 }
 
 
@@ -79,7 +82,7 @@ public:
     {
         setAcceptedMouseButtons(0);
 
-        setPen(ptzArrowBorderColor);
+        setPen(QPen(ptzArrowBorderColor, 0.0));
         setBrush(ptzArrowBaseColor);
     }
 
@@ -88,7 +91,7 @@ public:
     }
 
     void setSize(const QSizeF &size) {
-        if(qFuzzyCompare(size, m_size))
+        if(qFuzzyEquals(size, m_size))
             return;
 
         m_size = size;
@@ -156,7 +159,7 @@ public:
 
         setSize(QSizeF(32, 32));
         setBrush(Qt::NoBrush);
-        setPen(ptzItemBorderColor);
+        setPen(QPen(ptzItemBorderColor, 0.0));
     }
 
     const QSizeF &size() const {
@@ -164,7 +167,7 @@ public:
     }
 
     void setSize(const QSizeF &size) {
-        if(qFuzzyCompare(size, m_size))
+        if(qFuzzyEquals(size, m_size))
             return;
 
         m_size = size;
@@ -303,21 +306,19 @@ public:
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setText(lit("90"));
         m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
 
         updateLayout();
+        showCursor();
     }
 
-    void hideCursor()
-    {
+    void hideCursor() {
         manipulatorWidget()->setCursor(Qt::BlankCursor);
         zoomInButton()->setCursor(Qt::BlankCursor);
         zoomOutButton()->setCursor(Qt::BlankCursor);
     }
 
-    void showCursor()
-    {
+    void showCursor() {
         manipulatorWidget()->setCursor(Qt::SizeAllCursor);
         zoomInButton()->setCursor(Qt::ArrowCursor);
         zoomOutButton()->setCursor(Qt::ArrowCursor);
@@ -352,7 +353,7 @@ public:
 
         base_type::setGeometry(rect);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             updateLayout();
     }
 
@@ -404,7 +405,7 @@ public:
         }
 #endif
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor));
+        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor, 0.0));
         painter->drawLines(crosshairLines);
         Q_UNUSED(penRollback)
     }
@@ -477,32 +478,25 @@ PtzInstrument::PtzInstrument(QObject *parent):
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMouseDoubleClick, QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
         parent
     ),
     QnWorkbenchContextAware(parent),
-    m_ptzController(context()->instance<QnWorkbenchPtzController>()),
-    m_mapperWatcher(context()->instance<QnWorkbenchPtzMapperWatcher>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
-    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
-{
-    connect(m_ptzController, SIGNAL(positionChanged(const QnMediaResourceWidget*)), this, SLOT(at_ptzController_positionChanged(const QnMediaResourceWidget*)));
-    connect(m_mapperWatcher, SIGNAL(mapperChanged(const QnVirtualCameraResourcePtr &)), this, SLOT(at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &)));
-    connect(display(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_display_resourceAdded(const QnResourcePtr &)));
-    connect(display(), SIGNAL(resourceAboutToBeRemoved(const QnResourcePtr &)), this, SLOT(at_display_resourceAboutToBeRemoved(const QnResourcePtr &)));
-}
+    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0),
+    m_movement(NoMovement)
+{}
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
 }
 
-
 QnMediaResourceWidget *PtzInstrument::target() const {
     return m_target.data();
 }
 
-PtzManipulatorWidget *PtzInstrument::manipulator() const {
-    return m_manipulator.data();
+PtzManipulatorWidget *PtzInstrument::targetManipulator() const {
+    return overlayWidget(target())->manipulatorWidget();
 }
 
 QnSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
@@ -532,14 +526,18 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     if(data.overlayWidget)
         return data.overlayWidget;
 
+    bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
+    bool isFisheyeEnabled = widget->dewarpingParams().enabled;
+
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
     overlay->modeButton()->setTarget(widget);
-    overlay->modeButton()->setVisible(widget->virtualPtzController() != NULL);
-    overlay->setMarkersVisible(widget->virtualPtzController() == NULL);
+    overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
+    overlay->setMarkersVisible(!isFisheye);
+
     data.overlayWidget = overlay;
 
     connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
@@ -557,14 +555,13 @@ FixedArSelectionItem *PtzInstrument::selectionItem() const {
     return m_selectionItem.data();
 }
 
-
 void PtzInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
 
     m_selectionItem = new FixedArSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(ptzItemBorderColor);
+    selectionItem()->setPen(QPen(ptzItemBorderColor, 0.0));
     selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);
@@ -600,41 +597,38 @@ void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
 
     QnResourceWidget::OverlayVisibility visibility = hasCrosshair ? QnResourceWidget::AutoVisible : QnResourceWidget::Invisible;
 
-    if(PtzOverlayWidget *staticOverlay = overlayWidget(widget)) {
-        widget->setOverlayWidgetVisibility(staticOverlay, visibility);
-        staticOverlay->manipulatorWidget()->setVisible(m_dataByWidget[widget].capabilities & Qn::ContinuousPanTiltCapability);
-        
-        if (widget->virtualPtzController())
-            staticOverlay->setModeButtonText(widget->virtualPtzController()->getPanoModeText());
-    }
-}
+    if(PtzOverlayWidget *overlayWidget = this->overlayWidget(widget)) {
+        widget->setOverlayWidgetVisibility(overlayWidget, visibility);
 
-void PtzInstrument::updateCapabilities(const QnResourcePtr &resource) {
-    foreach(QnResourceWidget *widget, display()->widgets(resource))
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-            updateCapabilities(mediaWidget);
+        const PtzData &data = m_dataByWidget[widget];
+
+        bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
+        bool isFisheyeEnabled = widget->dewarpingParams().enabled;
+
+        overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
+        overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
+        overlayWidget->zoomOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
+        
+        if (isFisheye) {
+            int panoAngle = widget->item()
+                    ? 90 * widget->item()->dewarpingParams().panoFactor
+                    : 90;
+            overlayWidget->modeButton()->setText(QString::number(panoAngle));
+        }
+        overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
+        overlayWidget->setMarkersVisible(!isFisheye);
+    }
 }
 
 void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
-    Qn::PtzCapabilities oldCapabilities = data.capabilities;
+    
+    Qn::PtzCapabilities capabilities = widget->ptzController()->getCapabilities();
+    if(data.capabilities == capabilities)
+        return;
 
-    const QnPtzSpaceMapper* mapper = 0;
-    if (widget->virtualPtzController()) {
-        mapper = widget->virtualPtzController()->getSpaceMapper();
-        data.capabilities = widget->virtualPtzController()->getCapabilities();
-    } else {
-        data.capabilities = widget->resource()->toResource()->getPtzCapabilities();
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if (camera)
-            mapper = m_mapperWatcher->mapper(camera);
-    }
-
-    if((data.capabilities & Qn::AbsolutePtzCapability) && !mapper)
-        data.capabilities &= ~Qn::AbsolutePtzCapability; /* No mapper? Can't use absolute movement. */
-
-    if(oldCapabilities != data.capabilities)
-        updateOverlayWidget(widget);
+    data.capabilities = capabilities;
+    updateOverlayWidget(widget);
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
@@ -642,96 +636,14 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
-    QVector3D newPhysicalPosition = physicalPositionForRect(widget, rect);
-    if(qIsNaN(newPhysicalPosition)) {
-        m_ptzController->setMovement(widget, QVector3D());
-        PtzData &data = m_dataByWidget[widget];
-        data.pendingAbsoluteMove = rect;
-        return; 
-    }
-
-    TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
-    m_ptzController->setPhysicalPosition(widget, newPhysicalPosition);
-}
-
-QVector3D PtzInstrument::physicalPositionForPos(QnMediaResourceWidget *widget, const QPointF &pos) {
-    return physicalPositionForRect(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
-}
-
-QVector3D PtzInstrument::physicalPositionForRect(QnMediaResourceWidget *widget, const QRectF &rect) 
-{
-    const QnPtzSpaceMapper *mapper = 0;
-    if (widget->virtualPtzController())
-        mapper = widget->virtualPtzController()->getSpaceMapper();
-    else {
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if (camera)
-            mapper = m_mapperWatcher->mapper(camera);
-    }
-
-    QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(widget);
-
-    if(!mapper || qIsNaN(oldPhysicalPosition))
-        return oldPhysicalPosition;
-
-
-    qreal zoom = widget->rect().width() / rect.width(); // For 2x zoom we'll get 2.0 here.
-    QPointF pos = rect.center();
-#if 1
-    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
-    qreal sideSize;
-    if (mapper->flags() & Qn::FovBasedMapper)
-        sideSize = oldPhysicalPosition.z(); // 35mm equivalent is not compatible with large view angle > PI
-    else
-        sideSize = 36.0 / oldPhysicalPosition.z();
-
-    QVector3D r = sphericalToCartesian<QVector3D>(1.0, gradToRad(oldPhysicalPosition.x()), gradToRad(oldPhysicalPosition.y()));
-    QVector3D x = sphericalToCartesian<QVector3D>(1.0, gradToRad(oldPhysicalPosition.x() + 90), 0.0) * sideSize;
-    QVector3D y = sphericalToCartesian<QVector3D>(1.0, gradToRad(oldPhysicalPosition.x()), gradToRad(oldPhysicalPosition.y() - 90)) * sideSize;
-
-    QVector3D r1 = r + x * delta.x() + y * delta.y();
-    QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
-#elif 0
-    // equal angles projection
-    QVector2D delta = QVector2D(pos - widget->rect().center()); // / widget->size().width();
-    delta.setX(delta.x() / widget->size().width());
-    delta.setY(delta.y() / widget->size().height());
-    qreal aspectRatio = widget->size().width() / (qreal) widget->size().height();
-
-    qreal fov = mm35EquivToFov(oldPhysicalPosition.z());
-    QnSphericalPoint<float> spherical;
-    spherical.phi = gradToRad(oldPhysicalPosition.x()) + fov * delta.x();
-    spherical.psi = gradToRad(oldPhysicalPosition.y()) + fov/aspectRatio * delta.y();
-#else
-    // equal lines projection
-    QVector2D delta = QVector2D(pos - widget->rect().center()); // / widget->size().width();
-    delta.setX(delta.x() / widget->size().width());
-    delta.setY(delta.y() / widget->size().height());
-    qreal aspectRatio = widget->size().width() / (qreal) widget->size().height();
-
-    qreal fov = mm35EquivToFov(oldPhysicalPosition.z());
-    float rx = 2*tan(fov/2.0);
-    float ry = 2*tan(fov/aspectRatio/2.0);
-    QnSphericalPoint<float> spherical;
-    spherical.phi = gradToRad(oldPhysicalPosition.x()) + atan(rx * delta.x());
-    spherical.psi = gradToRad(oldPhysicalPosition.y()) + atan(ry * delta.y());
-#endif
-
-    QVector3D newPhysicalPosition = QVector3D(radToGrad(spherical.phi), radToGrad(spherical.psi), oldPhysicalPosition.z() * zoom);
-    QVector3D newLogicalPosition = mapper->toCamera().physicalToLogical(newPhysicalPosition);
-    newPhysicalPosition = mapper->toCamera().logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
-
-    return newPhysicalPosition;
+    qreal aspectRatio = QnGeometry::aspectRatio(widget->size());
+    QRectF viewport = QnGeometry::cwiseDiv(rect, widget->size());
+    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     QSizeF size = widget->size() * 100;
-
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
-}
-
-void PtzInstrument::ptzUpdate(QnMediaResourceWidget *widget) {
-    m_ptzController->updatePosition(widget);
 }
 
 void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant) {
@@ -746,9 +658,8 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
         (data.currentSpeed - data.requestedSpeed).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
 
     if(instant) {
-        m_ptzController->setMovement(widget, data.requestedSpeed);
+        widget->ptzController()->continuousMove(data.requestedSpeed);
         data.currentSpeed = data.requestedSpeed;
-        data.pendingAbsoluteMove = QRectF();
 
         m_movementTimer.stop();
     } else {
@@ -761,16 +672,11 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
 
-    if (!target()->virtualPtzController()) {
-        // built in virtual PTZ execute command too fast. animation looks bad
-        QnSplashItem *splashItem = newSplashItem(target());
-        splashItem->setSplashType(QnSplashItem::Circular);
-        splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
-        splashItem->setPos(pos);
-        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
-    } else {
-        target()->virtualPtzController()->setAnimationEnabled(true);
-    }
+    QnSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(QnSplashItem::Circular);
+    splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
+    splashItem->setPos(pos);
+    m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
     ptzMoveTo(target(), pos);
 }
@@ -792,23 +698,20 @@ void PtzInstrument::processPtzDoubleClick() {
     if(!target() || m_skipNextAction)
         return;
 
-    if (!target()->virtualPtzController()) {
-        QnSplashItem *splashItem = newSplashItem(target());
-        splashItem->setSplashType(QnSplashItem::Rectangular);
-        splashItem->setPos(target()->rect().center());
-        QSizeF size = target()->size() * 1.1;
-        splashItem->setRect(QRectF(-toPoint(size) / 2, size));
-        m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
-        ptzUnzoom(target());
+    QnSplashItem *splashItem = newSplashItem(target());
+    splashItem->setSplashType(QnSplashItem::Rectangular);
+    splashItem->setPos(target()->rect().center());
+    QSizeF size = target()->size() * 1.1;
+    splashItem->setRect(QRectF(-toPoint(size) / 2, size));
+    m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
 
-        /* Also do item unzoom if we're zoomed in. */
-        QRectF viewportGeometry = display()->viewportGeometry();
-        QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
-        if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold)
-            emit doubleClicked(target());
-    } else {
+    ptzUnzoom(target());
+
+    /* Also do item unzoom if we're zoomed in. */
+    QRectF viewportGeometry = display()->viewportGeometry();
+    QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
+    if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold)
         emit doubleClicked(target());
-    }
 }
 
 
@@ -845,9 +748,16 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
         if(widget->resource()) {
             connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
+            connect(widget, SIGNAL(fisheyeChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
-            data.currentSpeed = data.requestedSpeed = m_ptzController->movement(widget);
+            // TODO: #5.2 remove executor, use context in QObject::connect
+            data.capabilitiesConnection = QObject::connect(
+                widget->ptzController().data(), 
+                &QnAbstractPtzController::capabilitiesChanged, 
+                newExecutor([=] { this->updateCapabilities(widget); }, widget),
+                &QnExecutor::execute
+            );
 
             updateCapabilities(widget);
             updateOverlayWidget(widget);
@@ -866,6 +776,9 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
 
+    PtzData &data = m_dataByWidget[object];
+    QObject::disconnect(data.capabilitiesConnection);
+    
     m_dataByWidget.remove(object);
 }
 
@@ -922,10 +835,6 @@ bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
     return false;
 }
 
-bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    return mousePressEvent(item, event);
-}
-
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     bool clickTimerWasActive = m_clickTimer.isActive();
     m_clickTimer.stop();
@@ -950,15 +859,24 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             manipulator = NULL;
     }
 
-    if(!manipulator && !(m_dataByWidget[target].capabilities & Qn::AbsolutePtzCapability))
-        return false;
+    if(manipulator) {
+        m_movement = ContinuousMovement;
+    } else {
+        const PtzData &data = m_dataByWidget[target];
+        if(data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability)) {
+            m_movement = VirtualMovement;
+        } else if(data.hasCapabilities(Qn::ViewportPtzCapability)) {
+            m_movement = ViewportMovement;
+        } else {
+            m_movement = NoMovement;
+            return false;
+        }
+    }
 
     m_skipNextAction = false;
-    m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
     m_target = target;
-    m_manipulator = manipulator;
+    m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
 
-    ptzUpdate(target);
     dragProcessor()->mousePressEvent(target, event);
     
     event->accept();
@@ -980,24 +898,29 @@ void PtzInstrument::startDrag(DragInfo *) {
         return;
     }
 
-    if(manipulator()) {
-        manipulator()->setCursor(Qt::BlankCursor);
+    switch(m_movement) {
+    case ContinuousMovement:
+        targetManipulator()->setCursor(Qt::BlankCursor);
         target()->setCursor(Qt::BlankCursor);
 
         ensureElementsWidget();
         opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
-        /* Everything else will be initialized in the first call to drag(). */
-    } else if (target()->virtualPtzController()) {
-        target()->virtualPtzController()->setAnimationEnabled(false);
-        target()->setCursor(Qt::BlankCursor);
-    } else {
+        break;
+    case ViewportMovement:
         ensureSelectionItem();
         selectionItem()->setParentItem(target());
         selectionItem()->setViewport(m_viewport.data());
         opacityAnimator(selectionItem())->stop();
         selectionItem()->setOpacity(1.0);
-        /* Everything else will be initialized in the first call to drag(). */
+        break;
+    case VirtualMovement:
+        target()->setCursor(Qt::BlankCursor);
+        break;
+    default:
+        break;
     }
+
+    /* Everything else will be initialized in the first call to drag(). */
 
     emit ptzStarted(target());
     m_ptzStartedEmitted = true;
@@ -1009,24 +932,12 @@ void PtzInstrument::dragMove(DragInfo *info) {
         return;
     }
 
-    if(manipulator()) {
+    switch(m_movement) {
+    case ContinuousMovement: {
         QPointF delta = info->mouseItemPos() - target()->rect().center();
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
         QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
-
-        /* Adjust speed in case we're dealing with octagonal ptz. */
-        const PtzData &data = m_dataByWidget[target()];
-        if(data.capabilities & Qn::OctagonalPtzCapability) {
-            QnPolarPoint<double> polarSpeed = cartesianToPolar(speed);
-            polarSpeed.alpha = qRound(polarSpeed.alpha, M_PI / 4.0); /* Rounded to 45 degrees. */
-            speed = polarToCartesian<QPointF>(polarSpeed.r, polarSpeed.alpha);
-            if(qFuzzyIsNull(speed.x())) // TODO: #Elric use lower null threshold
-                speed.setX(0.0);
-            if(qFuzzyIsNull(speed.y()))
-                speed.setY(0.0);
-            // TODO: #Elric rebound to 1.0
-        }
 
         qreal speedMagnitude = length(speed);
         qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
@@ -1037,37 +948,46 @@ void PtzInstrument::dragMove(DragInfo *info) {
         arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
-    } else if (target()->virtualPtzController()) {
-        QCursor::setPos(info->mousePressScreenPos());
-        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
-            QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
-            QSizeF size = target()->size();
-            qreal scale = qMax(size.width(), size.height()) / 2.0;
-            QPointF shift(delta.x() / scale, -delta.y() / scale);
-
-            QVector3D position = m_ptzController->physicalPosition(target());
-            qreal speed = 10.0 * mm35EquivToFov(position.z());
-            QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
-            m_ptzController->setPhysicalPosition(target(), position + positionDelta);
-        }
-    } else {
+        break;
+    }
+    case ViewportMovement: 
         ensureSelectionItem();
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
+        break;
+    case VirtualMovement:
+        // TODO: #PTZ for some reason uncommenting these calls makes the movement look crappy... investigate!
+        /*if(info->mouseScreenPos() != info->mousePressScreenPos())*/ {
+            //QCursor::setPos(info->mousePressScreenPos());
+
+            QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
+            qreal scale = target()->size().width() / 2.0;
+            QPointF shift(delta.x() / scale, -delta.y() / scale);
+
+            QVector3D position;
+            target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
+            
+            qreal speed = 0.5 * position.z();
+            QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
+            target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
+        }
+        break;
+    default:
+        break;
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo * info) {
-    Q_UNUSED(info)
+void PtzInstrument::finishDrag(DragInfo *) {
+    
     if(target()) {
-        if(manipulator()) {
-            manipulator()->setCursor(Qt::SizeAllCursor);
+        switch (m_movement) {
+        case ContinuousMovement:
+            targetManipulator()->setCursor(Qt::SizeAllCursor);
             target()->unsetCursor();
 
             ensureElementsWidget();
             opacityAnimator(elementsWidget()->arrowItem())->animateTo(0.0);
-        } else if (target()->virtualPtzController()) {
-            target()->unsetCursor();
-        } else {
+            break;
+        case ViewportMovement: {
             ensureSelectionItem();
             opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
@@ -1077,6 +997,13 @@ void PtzInstrument::finishDrag(DragInfo * info) {
             qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
             if(relativeSize >= minPtzZoomRectSize)
                 processPtzDrag(selectionRect);
+            break;
+        }
+        case VirtualMovement:
+            target()->unsetCursor();
+            break;
+        default:
+            break;
         }
     }
 
@@ -1086,43 +1013,26 @@ void PtzInstrument::finishDrag(DragInfo * info) {
 
 void PtzInstrument::finishDragProcess(DragInfo *info) {
     if(target()) {
-        if(!manipulator() && m_isClick && m_isDoubleClick) {
-            processPtzDoubleClick();
-        } else if(!manipulator() && m_isClick) {
-            m_clickTimer.start(m_clickDelayMSec, this);
-            m_clickPos = info->mousePressItemPos();
-        } else if(manipulator()) {
+        switch (m_movement) {
+        case ContinuousMovement:
             ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
+            break;
+        case PtzInstrument::ViewportMovement:
+            if(m_isClick && m_isDoubleClick) {
+                processPtzDoubleClick();
+            } else if(m_isClick) {
+                m_clickTimer.start(m_clickDelayMSec, this);
+                m_clickPos = info->mousePressItemPos();
+            }
+            break;
+        case PtzInstrument::VirtualMovement:
+            break;
+        default:
+            break;
         }
     }
 
     emit ptzProcessFinished(target());
-}
-
-void PtzInstrument::at_display_resourceAdded(const QnResourcePtr &resource) {
-    connect(resource, SIGNAL(ptzCapabilitiesChanged(const QnResourcePtr &)), this, SLOT(updateCapabilities(const QnResourcePtr  &)));
-}
-
-void PtzInstrument::at_display_resourceAboutToBeRemoved(const QnResourcePtr &resource) {
-    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-        disconnect(camera, NULL, this, NULL);
-}
-
-void PtzInstrument::at_ptzController_positionChanged(const QnMediaResourceWidget* widget) {
-    if(!target() || target() != widget)
-        return;
-
-    PtzData &data = m_dataByWidget[target()];
-    QRectF rect = data.pendingAbsoluteMove;
-    if(rect.isNull())
-        return;
-
-    data.pendingAbsoluteMove = QRectF();
-    ptzMoveTo(target(), rect);
-}
-
-void PtzInstrument::at_mapperWatcher_mapperChanged(const QnVirtualCameraResourcePtr &resource) {
-    updateCapabilities(resource);
 }
 
 void PtzInstrument::at_splashItem_destroyed() {
@@ -1136,9 +1046,18 @@ void PtzInstrument::at_modeButton_clicked() {
     PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
 
     if(QnMediaResourceWidget *widget = button->target()) {
-        m_ptzController->changePanoMode(widget);
         ensureOverlayWidget(widget);
-        overlayWidget(widget)->setModeButtonText(m_ptzController->getPanoModeText(widget));
+
+        QnItemDewarpingParams iparams = widget->item()->dewarpingParams();
+        QnMediaDewarpingParams mparams = widget->dewarpingParams();
+
+        const QList<int> allowed = mparams.allowedPanoFactorValues();
+
+        int idx = (allowed.indexOf(iparams.panoFactor) + 1) % allowed.size();
+        iparams.panoFactor = allowed[idx];
+        widget->item()->setDewarpingParams(iparams);
+
+        updateOverlayWidget(widget);
     }
 }
 

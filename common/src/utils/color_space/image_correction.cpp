@@ -1,6 +1,8 @@
 #include "image_correction.h"
-#include "utils/math/math.h"
+
 #include <memory>
+
+#include <utils/math/math.h>
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0
@@ -35,7 +37,7 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     return qBound<double>(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
 }
 
-void ImageCorrectionResult::analizeImage(const quint8* yPlane, int width, int height, int stride, 
+void ImageCorrectionResult::analyseImage(const quint8* yPlane, int width, int height, int stride, 
                                          const ImageCorrectionParams& data, const QRectF& srcRect)
 {
     if (!data.enabled || yPlane == 0)

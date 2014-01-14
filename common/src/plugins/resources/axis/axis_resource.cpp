@@ -83,33 +83,23 @@ bool QnPlAxisResource::startInputPortMonitoring()
         ++it )
     {
         QMutexLocker lk( &m_inputPortMutex );
-
-        pair<map<unsigned int, nx_http::AsyncHttpClient*>::iterator, bool>
-            p = m_inputPortHttpMonitor.insert( make_pair( it->second, (nx_http::AsyncHttpClient*)NULL ) );
+        auto p = m_inputPortHttpMonitor.insert( make_pair( it->second, std::shared_ptr<nx_http::AsyncHttpClient>() ) );
         if( !p.second )
             continue;   //port already monitored
 
-        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
-            //and forgetHttpClient cannot be called before doGet call
-
         requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
-        nx_http::AsyncHttpClient* httpClient = new nx_http::AsyncHttpClient();
-        connect( httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
-        connect( httpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
-        connect( httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        connect( httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
+        connect( httpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),    Qt::DirectConnection );
+        connect( httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
         httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
         httpClient->setUserName( auth.user() );
         httpClient->setUserPassword( auth.password() );
         
         if( httpClient->doGet( requestUrl ) )
-        {
             p.first->second = httpClient;
-        }
         else
-        {
-            httpClient->scheduleForRemoval();
             m_inputPortHttpMonitor.erase( p.first );
-        }
     }
 
     return true;
@@ -119,14 +109,14 @@ void QnPlAxisResource::stopInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    nx_http::AsyncHttpClient* httpClient = NULL;
+    std::shared_ptr<nx_http::AsyncHttpClient> httpClient;
     while( !m_inputPortHttpMonitor.empty() )
     {
         httpClient = m_inputPortHttpMonitor.begin()->second;
         m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
         lk.unlock();
         httpClient->terminate();
-        httpClient->scheduleForRemoval();
+        httpClient.reset();
         lk.relock();
     }
 }
@@ -380,7 +370,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
     {
         QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0)
+        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
             qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
     }
 
@@ -544,7 +534,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
     }
 }
 
-const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
@@ -557,8 +547,7 @@ const QnResourceAudioLayout* QnPlAxisResource::getAudioLayout(const QnAbstractSt
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-
-int QnPlAxisResource::getChannelNum() const
+int QnPlAxisResource::getChannelNumAxis() const
 {
     QString phId = getPhysicalId();
 
@@ -702,7 +691,7 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
     return status;
 }
 
-void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* const httpClient )
+void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
     Q_ASSERT( httpClient );
 
@@ -714,51 +703,22 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* cons
         return;
     }
 
-    static const char* multipartContentType = "multipart/x-mixed-replace";
-
     //analyzing response headers (if needed)
-    const nx_http::StringType& contentType = httpClient->contentType();
-    const nx_http::StringType::value_type* sepPos = std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
-    if( sepPos == contentType.constData()+contentType.size() ||
-        nx_http::ConstBufferRefType(contentType, 0, sepPos-contentType.constData()) != multipartContentType )
+    if( !m_multipartContentParser.setContentType(httpClient->contentType()) )
     {
+        static const char* multipartContentType = "multipart/x-mixed-replace";
+
         //unexpected content type
-        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Unexpected Content-Type (%2) in monitor response, Expected: %3").
-            arg(getUrl()).arg(QLatin1String(contentType)).arg(QLatin1String(multipartContentType)), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("Error monitoring axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
+            arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
         //deleting httpClient
         forgetHttpClient( httpClient );
         return;
     }
 
-    const nx_http::StringType::value_type* boundaryStart = std::find_if(
-        sepPos+1,
-        contentType.constData()+contentType.size(),
-        std::not1( std::bind1st( std::equal_to<nx_http::StringType::value_type>(), ' ' ) ) );   //searching first non-space
-    if( boundaryStart == contentType.constData()+contentType.size() )
-    {
-        //failed to read boundary marker
-        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Missing boundary marker in content-type %2 (1)").
-            arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
-        //deleting httpClient
-        forgetHttpClient( httpClient );
-        return;
-    }
-    if( !nx_http::ConstBufferRefType(contentType, boundaryStart-contentType.constData()).startsWith("boundary=") )
-    {
-        //failed to read boundary marker
-        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Missing boundary marker in content-type %2 (2)").
-            arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
-        //deleting httpClient
-        forgetHttpClient( httpClient );
-        return;
-    }
-    boundaryStart += sizeof("boundary=")-1;
-    m_multipartContentParser.setBoundary( contentType.mid( boundaryStart-contentType.constData() ) );
-
-    httpClient->startReadMessageBody();
 }
 
-void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* const httpClient )
+void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
     Q_ASSERT( httpClient );
 
@@ -766,13 +726,13 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
     for( int offset = 0; offset < msgBodyBuf.size(); )
     {
         size_t bytesProcessed = 0;
-        nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
+        nx_http::MultipartContentParserHelper::ResultCode resultCode = m_multipartContentParser.parseBytes(
             nx_http::ConstBufferRefType(msgBodyBuf, offset),
             &bytesProcessed );
         offset += (int) bytesProcessed;
         switch( resultCode )
         {
-            case nx_http::MultipartContentParser::partDataDone:
+            case nx_http::MultipartContentParserHelper::partDataDone:
                 if( m_currentMonitorData.isEmpty() )
                 {
                     if( !m_multipartContentParser.prevFoundData().isEmpty() )
@@ -789,14 +749,14 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
                 }
                 break;
 
-            case nx_http::MultipartContentParser::someDataAvailable:
+            case nx_http::MultipartContentParserHelper::someDataAvailable:
                 if( !m_multipartContentParser.prevFoundData().isEmpty() )
                     m_currentMonitorData.append(
                         m_multipartContentParser.prevFoundData().data(),
                         (int) m_multipartContentParser.prevFoundData().size() );
                 break;
 
-            case nx_http::MultipartContentParser::eof:
+            case nx_http::MultipartContentParserHelper::eof:
                 //TODO/IMPL reconnect
                 break;
 
@@ -806,7 +766,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
     }
 }
 
-void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClient* const /*httpClient*/ )
+void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr /*httpClient*/ )
 {
     //TODO/IMPL reconnect
 }
@@ -905,18 +865,16 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
     }
 }
 
-void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpClient )
+void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient )
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    for( std::map<unsigned int, nx_http::AsyncHttpClient*>::iterator
-        it = m_inputPortHttpMonitor.begin();
+    for( auto it = m_inputPortHttpMonitor.begin();
         it != m_inputPortHttpMonitor.end();
         ++it )
     {
         if( it->second == httpClient )
         {
-            it->second->scheduleForRemoval();
             m_inputPortHttpMonitor.erase( it );
             return;
         }
@@ -926,7 +884,7 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
 void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
     Q_UNUSED(http)
     // TODO: #Elric make configurable.
-    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL};
+    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL}; // TODO
 
     // TODO: #Elric use QHash here, +^
     QString localModel = getModel();
@@ -934,15 +892,21 @@ void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
         if(localModel == QLatin1String(*model))
             return;
 
-    m_ptzController.reset(new QnAxisPtzController(this));
-    Qn::PtzCapabilities ptzCapabilities = m_ptzController->getCapabilities();
-    if(ptzCapabilities == Qn::NoCapabilities)
-        m_ptzController.reset();
-    setPtzCapabilities(ptzCapabilities);
+    QScopedPointer<QnAxisPtzController> controller(new QnAxisPtzController(toSharedPointer(this)));
+    setPtzCapabilities(controller->getCapabilities());
 }
 
-QnAbstractPtzController* QnPlAxisResource::getPtzController() {
-    return m_ptzController.data();
+QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
+    if(getPtzCapabilities() == 0) {
+        return NULL;
+    } else {
+        return new QnAxisPtzController(toSharedPointer(this));
+    }
+}
+
+int QnPlAxisResource::getChannel() const
+{
+    return getChannelNumAxis() - 1;
 }
 
 #endif // #ifdef ENABLE_AXIS

@@ -31,7 +31,7 @@ void GraphicsLabelPrivate::updateCachedData() {
         newRect.moveTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
     }
     
-    if (!qFuzzyCompare(newRect, rect)) {
+    if (!qFuzzyEquals(newRect, rect)) {
         rect = newRect;
 
         q->updateGeometry();

@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "decoders/video/abstractdecoder.h"
-#include "utils/common/util.h"
+#include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
 #include "abstract_renderer.h"
@@ -1009,25 +1009,32 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping)
-{
+QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
+                                           const QnMediaDewarpingParams& mediaDewarping,
+                                           const QnItemDewarpingParams& itemDewarping,
+                                           bool anyQuality) {
     if (m_decoder.isEmpty())
         return QImage();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
     QMutexLocker mutex(&m_mtx);
     const AVFrame* lastFrame = dec->lastFrame();
+
     if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
         lastFrame = m_lastDisplayedFrame.data();
 
     if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
         return QImage();
 
+    // feature #2563
+    if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
+        return QImage();    //screenshot will be received from the server
+
     // copy image
     QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());
     srcFrame->setUseExternalData(false);
 
     QSize srcSize(QSize(lastFrame->width, lastFrame->height));
-    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, dewarping);
+    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, itemDewarping);
 
     srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
 
@@ -1047,11 +1054,15 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params, 
         sws_freeContext(convertor);
     }
 
-    QnContrastImageFilter filter(params);
-    filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    if (params.enabled) {
+        QnContrastImageFilter filter(params);
+        filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
 
-    QnFisheyeImageFilter filter2(dewarping);
-    filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    if (mediaDewarping.enabled && itemDewarping.enabled) {
+        QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
+        filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
 
     // convert colorSpace
     SwsContext* convertor = sws_getContext(srcFrame->width, srcFrame->height, (PixelFormat) srcFrame->format,

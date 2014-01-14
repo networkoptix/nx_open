@@ -189,14 +189,14 @@ QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layo
     return rez;
 }
 
-const QnResourceVideoLayout* QnArchiveStreamReader::getDPVideoLayout() const
+QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
         m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
-const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnArchiveStreamReader::getDPAudioLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
         m_delegate->open(m_resource);

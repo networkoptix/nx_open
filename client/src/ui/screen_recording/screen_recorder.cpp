@@ -38,7 +38,7 @@ bool QnScreenRecorder::isRecording() const {
     return m_recording;
 }
 
-void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
+void QnScreenRecorder::startRecording() {
     if(m_recording) {
         qnWarning("Screen recording already in progress.");
         return;
@@ -49,7 +49,6 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
         return;
     }
 
-#ifdef Q_OS_WIN
     QnVideoRecorderSettings recorderSettings;
 
     QString filePath = recorderSettings.recordingFolder() + QLatin1String("/video_recording.avi");
@@ -61,38 +60,10 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
         audioDevice = QnAudioDeviceInfo(); // no audio devices
         secondAudioDevice = QnAudioDeviceInfo();
     }
-    int screen = QnVideoRecorderSettings::screenToAdapter(recorderSettings.screen());
-    bool captureCursor = recorderSettings.captureCursor();
-    QSize encodingSize = QnVideoRecorderSettings::resolutionToSize(recorderSettings.resolution());
-    float encodingQuality = QnVideoRecorderSettings::qualityToNumeric(recorderSettings.decoderQuality());
-    Qn::CaptureMode captureMode = recorderSettings.captureMode();
-
-    QPixmap logo;
-#if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)
-    //QString logoName = QString("logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
-    QString logoName = QLatin1String("logo_1920_1080.png");
-    logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
-#endif
-    //delete m_encoder;
-
-    /*
-    m_encoder = new QnDesktopFileEncoder(
-        filePath,
-        screen,
-        audioDevice.isNull() ? 0 : &audioDevice,
-        secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
-        captureMode,
-        captureCursor,
-        encodingSize,
-        encodingQuality,
-        appWidget,
-        logo
-    );
-    */
 
     QnDesktopResourcePtr res = qnResPool->getResourceByGuid(QnDesktopResource().getGuid()).dynamicCast<QnDesktopResource>();
     if (!res) {
-        emit error(tr("Screen capturing subsystem is not initialized yet. Please try latter"));
+        emit error(tr("Screen capturing subsystem is not initialized yet. Please try again later."));
         return;
     }
 
@@ -103,8 +74,7 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     m_recorder->setContainer(lit("avi"));
     m_recorder->setRole(QnStreamRecorder::Role_FileExport);
 
-    connect(m_recorder, SIGNAL(recordingFailed(QString)), this, SLOT(onRecordingFailed(QString)));
-    connect(m_recorder, SIGNAL(recordingFinished(QString)), this, SLOT(onRecordingFinished(QString)));
+    connect(m_recorder, &QnStreamRecorder::recordingFinished, this, &QnScreenRecorder::at_recorder_recordingFinished);
 
     m_dataProvider->start();
 
@@ -117,13 +87,8 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     }
 
     m_recorder->start();
-
-
     m_recording = true;
     emit recordingStarted();
-#else
-    Q_UNUSED(appWidget)
-#endif
 }
 
 void QnScreenRecorder::cleanupRecorder()
@@ -136,14 +101,13 @@ void QnScreenRecorder::cleanupRecorder()
     m_dataProvider = 0;
 }
 
-void QnScreenRecorder::onRecordingFailed(QString msg)
-{
-    emit error(msg);
-    cleanupRecorder();
-}
+void QnScreenRecorder::at_recorder_recordingFinished(int status, const QString &filename) {
+    Q_UNUSED(filename)
+    if (status == QnStreamRecorder::NoError)
+        return;
 
-void QnScreenRecorder::onRecordingFinished(QString)
-{
+    emit error(QnStreamRecorder::errorString(status));
+    cleanupRecorder();
 }
 
 void QnScreenRecorder::stopRecording() {
@@ -155,7 +119,6 @@ void QnScreenRecorder::stopRecording() {
     if(!m_recording)
         return; /* Stopping when nothing is being recorded is OK. */
 
-#ifdef Q_OS_WIN
     QString recordedFileName = m_recorder->getFileName();
     
     m_dataProvider->removeDataProcessor(m_recorder);
@@ -168,5 +131,4 @@ void QnScreenRecorder::stopRecording() {
 
     m_recording = false;
     emit recordingFinished(recordedFileName);
-#endif
 }

@@ -35,4 +35,5 @@ public slots:
     virtual void slot(const QVariant &) {};
 };
 
+
 #endif // QN_EMITTER_H

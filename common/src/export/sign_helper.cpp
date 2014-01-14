@@ -662,7 +662,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     generatedFrame = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
     generatedFrame->compressionType = videoCodecCtx->codec_id;
     generatedFrame->data.write((const char*) videoBuf, out_size);
-    generatedFrame->flags = AV_PKT_FLAG_KEY;
+    generatedFrame->flags = QnAbstractMediaData::MediaFlags_AVKey;
     generatedFrame->channelNumber = 0; 
 error_label:
     delete [] videoBuf;

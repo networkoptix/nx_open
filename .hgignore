@@ -74,6 +74,9 @@ axiscamplugin/x86
 axiscamplugin/x64
 axiscamplugin/arm
 
+build_environment/dependencies/x86
+build_environment/dependencies/x64
+
 client/bin
 client/build
 client/src/Info.plist
@@ -213,6 +216,8 @@ ios-client/build
 ios-client/dist
 ios-client/target
 ios-client/ihdwitness.xcworkspace/xcuserdata
+ios-client/deploy.plist
+ios-client/deploy_index.html
 
 ios-client/Settings.bundle/Root.plist
 ios-client/HDWitness/HDWitness/HDWitness-Info.plist

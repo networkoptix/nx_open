@@ -142,7 +142,7 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
                 videoData->width = 1920;
                 videoData->height = 1088;
 
-                videoData->flags |= AV_PKT_FLAG_KEY;
+                videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
                 videoData->channelNumber = 0;
                 videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
 

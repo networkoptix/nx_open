@@ -13,6 +13,7 @@
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resource_managment/resource_pool.h"
+#include "core/ptz/abstract_ptz_controller.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
@@ -415,7 +416,7 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) c
                 //param.setValue(newValue);
                 m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
-                emit parameterValueChanged(::toSharedPointer(const_cast<QnResource*>(this)), param);
+                const_cast<QnResource *>(this)->parameterValueChangedNotify(param); // TODO: wtf???
             }
             emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, newValue, true);
             return true;
@@ -432,6 +433,13 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) c
 
     emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
     return false;
+}
+
+void QnResource::parameterValueChangedNotify(const QnParam &param) {
+    if(param.name() == lit("ptzCapabilities"))
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+
+    emit parameterValueChanged(::toSharedPointer(this), param);
 }
 
 bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
@@ -487,7 +495,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     }
 
     if (oldValue != val)
-        emit parameterValueChanged(::toSharedPointer(this), param);
+        parameterValueChangedNotify(param);
 
     emit asyncParamSetDone(toSharedPointer(this), name, val, true);
     return true;
@@ -664,16 +672,12 @@ QString QnResource::getUrl() const
 
 void QnResource::setUrl(const QString &url)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-
-    if(m_url == url)
-        return;
-
-    QString oldUrl = m_url;
-    m_url = url;
-
-    mutexLocker.unlock();
-
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if(m_url == url)
+            return;
+        m_url = url;
+    }
     emit urlChanged(toSharedPointer(this));
 }
 
@@ -772,11 +776,58 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
 QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole role)
 {
     Q_UNUSED(role)
-    return 0;
+    return NULL;
+}
+
+QnAbstractPtzController *QnResource::createPtzController() {
+    QnAbstractPtzController *result = createPtzControllerInternal();
+    if(!result)
+        return result;
+
+    /* Do some sanity checking. */
+    Qn::PtzCapabilities capabilities = result->getCapabilities();
+    if((capabilities & Qn::LogicalPositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
+        qnCritical("Logical position space capability is defined for a PTZ controller that does not support absolute movement.");
+    if((capabilities & Qn::DevicePositioningPtzCapability) && !(capabilities & Qn::AbsolutePtzCapabilities))
+        qnCritical("Device position space capability is defined for a PTZ controller that does not support absolute movement.");
+    
+    return result;
+}
+
+QnAbstractPtzController *QnResource::createPtzControllerInternal() {
+    return NULL;
 }
 
 void QnResource::initializationDone()
 {
+}
+
+QString QnResource::getProperty(const QString &key, const QString &defaultValue) const {
+    QMutexLocker mutexLocker(&m_mutex);
+    return m_propertyByKey.value(key, defaultValue);
+}
+
+void QnResource::setProperty(const QString &key, const QString &value) {
+    {
+        QMutexLocker mutexLocker(&m_mutex);
+        if (m_propertyByKey.value(key) == value)
+            return;
+        if(value.isEmpty()) {
+            m_propertyByKey.remove(key);
+        } else {
+            m_propertyByKey[key] = value;
+        }
+    }
+    emit propertyChanged(toSharedPointer(this), key);
+}
+
+QnKvPairList QnResource::getProperties() const {
+    QMutexLocker mutexLocker(&m_mutex);
+    
+    QnKvPairList result;
+    for(auto pos = m_propertyByKey.begin(); pos != m_propertyByKey.end(); pos++)
+        result.push_back(QnKvPair(pos.key(), pos.value()));
+    return result;
 }
 
 // -----------------------------------------------------------------------------
@@ -851,6 +902,8 @@ bool QnResource::init()
             setStatus(Offline);
     }
     m_initMutex.unlock();
+
+    emit initialized(toSharedPointer(this));
 
     return true;
 }
@@ -941,11 +994,6 @@ bool QnResource::isInitialized() const
     return m_initialized;
 }
 
-QnAbstractPtzController* QnResource::getPtzController()
-{
-    return 0;
-}
-
 void QnResource::setUniqId(const QString& value)
 {
     Q_UNUSED(value)
@@ -957,7 +1005,7 @@ Qn::PtzCapabilities QnResource::getPtzCapabilities() const
     QVariant mediaVariant;
     QnResource* thisCasted = const_cast<QnResource*>(this);
     thisCasted->getParam(QLatin1String("ptzCapabilities"), mediaVariant, QnDomainMemory);
-    return Qn::undeprecatePtzCapabilities(static_cast<Qn::PtzCapabilities>(mediaVariant.toInt()));
+    return static_cast<Qn::PtzCapabilities>(mediaVariant.toInt());
 }
 
 bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
@@ -968,7 +1016,6 @@ bool QnResource::hasPtzCapabilities(Qn::PtzCapabilities capabilities) const
 void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
     if (hasParam(lit("ptzCapabilities")))
         setParam(lit("ptzCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
-    emit ptzCapabilitiesChanged(::toSharedPointer(this)); // TODO: #Elric we don't check whether they have actually changed. This better be fixed.
 }
 
 void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {

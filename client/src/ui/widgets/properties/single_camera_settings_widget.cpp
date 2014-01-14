@@ -10,25 +10,36 @@
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QSplitter>
 
+#include <camera/single_thumbnail_loader.h>
+
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/read_only.h>
+
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/warning_style.h>
+
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/widgets/properties/camera_settings_widget_p.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/style/warning_style.h>
+
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 #include <utils/license_usage_helper.h>
-#include "core/resource/media_resource.h"
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
@@ -99,15 +110,11 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
-    connect(ui->moreLicensesButton,     SIGNAL(clicked()),                      this,   SIGNAL(moreLicensesRequested()));
 
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
+    connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
-    connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
+    connect(ui->checkBoxDewarping,      &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
     updateFromResource();
 }
@@ -334,11 +341,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-        if (m_camera->isAnalog()) {
-            m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
-        } else {
-            m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
-        }
+        m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
 
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
@@ -358,11 +361,10 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
-        DewarpingParams dewarping = ui->fisheyeSettingsWidget->dewarpingParams();
-        dewarping.enabled = ui->checkBoxDewarping->isChecked();
-        m_camera->setDewarpingParams(dewarping);
-        ui->fisheyeSettingsWidget->updateFromResource(m_camera);
-        m_dewarpingParamsBackup = dewarping;
+        QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
+        ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
+        dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
+        m_camera->setDewarpingParams(dewarpingParams);
 
         setHasDbChanges(false);
     }
@@ -379,8 +381,6 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
 void QnSingleCameraSettingsWidget::reject()
 {
-    if (m_camera)
-        m_camera->setDewarpingParams(m_dewarpingParamsBackup);
     updateFromResource();
 }
 
@@ -419,7 +419,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
-        ui->analogGroupBox->setVisible(false);
     } else {
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
@@ -430,10 +429,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
 
         Qn::PtzCapabilities ptzCaps = m_camera->getPtzCapabilities();
-        ui->checkBoxDewarping->setEnabled(m_camera->hasParam(lit("ptzCapabilities")) &&
-                                          (ptzCaps == 0 || m_camera->getDewarpingParams().enabled) &&
-                                          m_camera->getVideoLayout()->channelCount() == 1);
-        
+        ui->checkBoxDewarping->setEnabled(ptzCaps == 0 || (ptzCaps & Qn::VirtualPtzCapability));
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->loginEdit->setText(m_camera->getAuth().user());
@@ -444,9 +440,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
-
-        ui->analogGroupBox->setVisible(m_camera->isAnalog());
-        ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
@@ -486,8 +479,10 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
-            ui->fisheyeSettingsWidget->updateFromResource(m_camera);
-            m_dewarpingParamsBackup = m_camera->getDewarpingParams();
+
+            if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
+                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, QSize(), this);
+            ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
 
@@ -495,7 +490,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
-    updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
     updateRecordingParamsAvailability();
@@ -508,6 +502,13 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     if (m_camera)
         updateMaxFPS();
+
+    // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm
+    QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
+        mediaWidget->setDewarpingParams(mediaWidget->resource()->getDewarpingParams());
+    }
+
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
@@ -648,32 +649,6 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetSensitivity() {
     m_hasMotionControlsChanges = true;
 }
 
-void QnSingleCameraSettingsWidget::updateLicenseText() {
-    if (!m_camera || !m_camera->isAnalog())
-        return;
-
-    QnLicenseUsageHelper helper(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
-
-    //TODO: #GDM refactor duplicated code
-    { // digital licenses
-        QString usageText = tr("%n digital license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
-        ui->digitalLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.requiredDigital() > 0)
-            setWarningStyle(&palette);
-        ui->digitalLicensesLabel->setPalette(palette);
-    }
-
-    { // analog licenses
-        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
-        ui->analogLicensesLabel->setText(usageText);
-        QPalette palette = this->palette();
-        if (!helper.isValid() && helper.requiredAnalog() > 0)
-            setWarningStyle(&palette);
-        ui->analogLicensesLabel->setPalette(palette);
-    }
-}
-
 bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
     if (!m_motionWidget)
         return true;
@@ -785,10 +760,6 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));
 }
 
-void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
-    ui->cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
-}
-
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
@@ -809,16 +780,6 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
             : Qn::MT_SoftwareGrid;
 
     d->calculateMaxFps(&maxFps, &maxDualStreamingFps, motionType);
-/*
-    int maxFps = m_camera->getMaxFps();
-    if (ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
-        maxFps -= MIN_SECOND_STREAM_FPS;
-
-    int maxDualStreamingFps;
-    if (m_camera->streamFpsSharingMethod() == Qn::shareFps)
-        maxDualStreamingFps = m_camera->getMaxFps() - MIN_SECOND_STREAM_FPS;
-    else
-        maxDualStreamingFps = maxFps;*/
 
     ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
@@ -933,9 +894,6 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
-    if (m_camera && m_camera->isAnalog())
-        ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
-
     m_scheduleEnabledChanged = true;
 }
 
@@ -968,7 +926,23 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
 void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
 {
     at_dbDataChanged();
-    m_camera->setDewarpingParams(ui->fisheyeSettingsWidget->dewarpingParams());
+    at_cameraDataChanged();
 
-    emit fisheyeSettingChanged();
+    // Preview the changes on the central widget
+
+    QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (!m_camera || !centralWidget || centralWidget->resource() != m_camera)
+        return;
+
+    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
+        QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
+        ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
+        dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
+        mediaWidget->setDewarpingParams(dewarpingParams);
+
+        QnWorkbenchItem *item = mediaWidget->item();
+        QnItemDewarpingParams itemParams = item->dewarpingParams();
+        itemParams.enabled = dewarpingParams.enabled;
+        item->setDewarpingParams(itemParams);
+    }
 }

@@ -38,7 +38,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
     outData->data.write(srcData);
 
     outData->compressionType = compressionType;
-    outData->flags |= AV_PKT_FLAG_KEY | QnAbstractMediaData::MediaFlags_StillImage;
+    outData->flags |= QnAbstractMediaData::MediaFlags_AVKey | QnAbstractMediaData::MediaFlags_StillImage;
     outData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     outData->dataProvider = this;
     outData->channelNumber = 0;
@@ -49,7 +49,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 
 void QnSingleShotFileStreamreader::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     QnAbstractMediaDataPtr data;
     try {
         data = getNextData();

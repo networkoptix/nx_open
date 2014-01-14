@@ -1,6 +1,8 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
+//#define TEST_FISHEYE_CALIBRATOR
+
 #include <vector>
 
 #include <QtCore/QObject>
@@ -100,6 +102,7 @@ signals:
      */
     void sourceSizeChanged();
     void beforeDestroy();
+    void fisheyeCenterChanged(QPointF center, qreal radius);
 private:
     struct RenderingTools
     {
@@ -138,6 +141,10 @@ private:
 
     std::vector<bool> m_renderingEnabled;
     ScreenshotInterface* m_screenshotInterface;
+
+#ifdef TEST_FISHEYE_CALIBRATOR
+    bool m_isCircleDetected;
+#endif
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H

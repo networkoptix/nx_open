@@ -68,8 +68,6 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_unauthorizedStaticSubText.setTextOption(QTextOption(Qt::AlignCenter));
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_analogLicenseStaticText.setText(tr("Activate analog license to remove this message"));
-    m_analogLicenseStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
     /* Init buttons. */
     m_diagnosticsButton = new QnTextButtonWidget(this);
@@ -144,7 +142,7 @@ void QnStatusOverlayWidget::setGeometry(const QRectF &geometry) {
 
     base_type::setGeometry(geometry);
 
-    if(!qFuzzyCompare(oldSize, size()))
+    if(!qFuzzyEquals(oldSize, size()))
         updateLayout();
 }
 
@@ -213,13 +211,6 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         paintFlashingText(painter, m_unauthorizedStaticText, 0.125);
         paintFlashingText(painter, m_unauthorizedStaticSubText, 0.05, QPointF(0.0, 0.25));
         break;
-    case Qn::AnalogWithoutLicenseOverlay: {
-        QRectF rect = this->rect();
-        int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
-        for (int i = -count; i <= count; i++)
-            paintFlashingText(painter, m_analogLicenseStaticText, 0.035, QPointF(0.0, 0.06 * i));
-        break;
-        }
     case Qn::ServerOfflineOverlay:
         paintFlashingText(painter, m_serverOfflineStaticText, 0.125);
         break;

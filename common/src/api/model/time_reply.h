@@ -3,8 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/camera/camera_diagnostics.h>
-#include <utils/common/json.h>
+#include <utils/common/json_fwd.h>
 
 struct QnTimeReply {
     /** Utc time in msecs since epoch. */
@@ -14,8 +13,7 @@ struct QnTimeReply {
     qint64 timeZoneOffset;
 };
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimeReply, (utcTime)(timeZoneOffset), inline)
-
 Q_DECLARE_METATYPE(QnTimeReply)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimeReply)
 
 #endif // QN_TIME_REPLY_H

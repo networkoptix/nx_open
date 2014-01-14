@@ -480,6 +480,11 @@ namespace Qn {
         CameraSettingsAction,
 
         /**
+         * Opens picture settings dialog.
+         */
+        PictureSettingsAction,
+
+        /**
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,
@@ -615,6 +620,8 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /* PTZ Actions */
+
         /**
          * Opens preset name editing dialog and saves current position as a new PTZ preset.
          */
@@ -629,7 +636,7 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          *
          * Parameters:
-         * <tt>QString ResourceNameRole</tt> --- name of the PTZ preset.
+         * <tt>QString PtzPresetIdRole</tt> --- id of the PTZ preset.
          */
         PtzGoToPresetAction,
 
@@ -639,12 +646,30 @@ namespace Qn {
         PtzManagePresetsAction,
 
         /**
-         * Sets the current picture as a layout background.
+         * Starts given PTZ tour.
+         *
+         * Parameters:
+         * <tt>QString PtzTourIdRole</tt> --- id of the PTZ tour.
          */
-        SetAsBackgroundAction,
+        PtzStartTourAction,
+
+        /**
+         * Opens PTZ tours management dialog.
+         */
+        PtzManageToursAction,
+
+        /**
+         * Starts fisheye calibration for the given widget.
+         */
+        PtzCalibrateFisheyeAction,
 
 
         /* Layout actions. */
+
+        /**
+         * Sets the current picture as a layout background.
+         */
+        SetAsBackgroundAction,
 
         /**
          * Deletes the file from disk.
@@ -680,11 +705,6 @@ namespace Qn {
          * Opens a layout creation dialog.
          */
         NewUserLayoutAction,
-
-
-        SetCurrentItemAspectRatioAutoAction,
-        SetCurrentItemAspectRatio4x3Action,
-        SetCurrentItemAspectRatio16x9Action,
 
         /**
          * Sets aspect ratio of current layout's cells to 16x9.
@@ -836,6 +856,11 @@ namespace Qn {
          * Generates PTZ calibration screenshots.
          */
         DebugCalibratePtzAction,
+
+        /**
+         * Opens up debug control panel.
+         */
+        DebugControlPanelAction,
 
 
         ActionCount,

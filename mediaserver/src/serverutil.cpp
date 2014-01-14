@@ -3,13 +3,15 @@
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
 
+#include <core/resource/media_server_resource.h>
+
 #include "serverutil.h"
 #include "settings.h"
 #include "version.h"
 
 static QnMediaServerResourcePtr m_server;
 
-void syncStoragesToSettings(QnMediaServerResourcePtr server)
+void syncStoragesToSettings(const QnMediaServerResourcePtr &server)
 {
     const QnAbstractStorageResourceList& storages = server->getStorages();
 

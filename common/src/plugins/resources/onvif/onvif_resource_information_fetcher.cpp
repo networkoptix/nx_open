@@ -35,9 +35,9 @@ bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendo
 {
     for (uint i = 0; i < sizeof(ANALOG_CAMERAS)/sizeof(ANALOG_CAMERAS[0]); ++i)
     {
-        QString vendorAnalog = lit(ANALOG_CAMERAS[i][0]);
+        QString vendorAnalog = QLatin1String(ANALOG_CAMERAS[i][0]);
         if ((vendor.compare(vendorAnalog, Qt::CaseInsensitive) == 0 || vendorAnalog == lit("*")) && 
-            model.compare(QString(lit(ANALOG_CAMERAS[i][1])), Qt::CaseInsensitive) == 0)
+            model.compare(QString(QLatin1String(ANALOG_CAMERAS[i][1])), Qt::CaseInsensitive) == 0)
             return true;
     }
     return false;
@@ -65,7 +65,7 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
         qCritical() << "Can't find " << ONVIF_RT << " resource type in resource type pool";
     }
 
-    typePtr = QnResourceTypePtr (qnResTypePool->getResourceTypeByName(lit(ONVIF_ANALOG_RT)));
+    typePtr = QnResourceTypePtr (qnResTypePool->getResourceTypeByName(QLatin1String(ONVIF_ANALOG_RT)));
     if (!typePtr.isNull()) {
         onvifAnalogTypeId = typePtr->getId();
     } else {
@@ -90,7 +90,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     }
 }
 
-bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name) const
+bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
@@ -157,8 +157,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         if (manufacturer.isEmpty())
             manufacturer = resType->getName();
     }
-    else if (model.isEmpty() || manufacturer.isEmpty())
+    else // if (model.isEmpty() || manufacturer.isEmpty())
     {
+        // always call getDeviceInformation to filter non-onvif devices
         DeviceInfoReq request;
         DeviceInfoResp response;
         int soapRes = soapWrapper.getDeviceInformation(request, response);
@@ -166,6 +167,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
                      << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
                      << ". " << soapWrapper.getLastError();
+            return; // non onvif device
         } 
         else {
             if (!response.Manufacturer.empty())

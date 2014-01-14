@@ -387,7 +387,7 @@ void QnSystrayWindow::appServerInfoUpdated(quint64 status) {
         if (m_needStartAppServer)
         {
             m_needStartAppServer = false;
-            StartService(m_appServerHandle, NULL, 0);
+            StartService(m_appServerHandle, 0, 0);
         }
 
         if (m_prevAppServerStatus >= 0 && m_prevAppServerStatus != SERVICE_STOPPED && !m_needStartAppServer)
@@ -413,7 +413,7 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
         if (m_needStartMediaServer) 
         {
             m_needStartMediaServer = false;
-            StartService(m_mediaServerHandle, NULL, 0);
+            StartService(m_mediaServerHandle, 0, 0);
         }
 
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_STOPPED && !m_needStartMediaServer)
@@ -520,7 +520,7 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
 void QnSystrayWindow::at_mediaServerStartAction()
 {
     if (m_mediaServerHandle) {
-        StartService(m_mediaServerHandle, NULL, 0);
+        StartService(m_mediaServerHandle, 0, 0);
         updateServiceInfo();
     }
 }
@@ -544,7 +544,7 @@ void QnSystrayWindow::at_mediaServerStopAction()
 void QnSystrayWindow::at_appServerStartAction()
 {
     if (m_appServerHandle) {
-        StartService(m_appServerHandle, NULL, 0);
+        StartService(m_appServerHandle, 0, 0);
     }
 }
 
@@ -601,14 +601,14 @@ void QnElevationChecker::triggered()
 
         shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 
-        shExecInfo.fMask = NULL;
-        shExecInfo.hwnd = NULL;
+        shExecInfo.fMask = 0;
+        shExecInfo.hwnd = 0;
         shExecInfo.lpVerb = L"runas";
         shExecInfo.lpFile = name;
         shExecInfo.lpParameters = args;
-        shExecInfo.lpDirectory = NULL;
+        shExecInfo.lpDirectory = 0;
         shExecInfo.nShow = SW_NORMAL;
-        shExecInfo.hInstApp = NULL;
+        shExecInfo.hInstApp = 0;
 
         // In case of success new process will send us "quit" signal
         ShellExecuteEx(&shExecInfo);
@@ -730,6 +730,17 @@ void QnSystrayWindow::onShowAppServerLogAction()
     QProcess::startDetached(lit("notepad ") + logFileName);
 }
 
+Qt::CheckState QnSystrayWindow::getDiscoveryState() const
+{
+    Qt::CheckState discoveryState = Qt::Checked;
+    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
+    if (disabledVendors == lit("all"))
+        discoveryState = Qt::Unchecked;
+    else if (!disabledVendors.isEmpty())
+        discoveryState = Qt::PartiallyChecked;
+    return discoveryState;
+}
+
 void QnSystrayWindow::onSettingsAction()
 {
     QUrl appServerUrl = getAppServerURL();
@@ -756,12 +767,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
     ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
     
-    Qt::CheckState discoveryState = Qt::Checked;
-    QString disabledVendors = m_mediaServerSettings.value(lit("disabledVendors")).toString().trimmed();
-    if (disabledVendors == lit("all"))
-        discoveryState = Qt::Unchecked;
-    else if (!disabledVendors.isEmpty())
-        discoveryState = Qt::PartiallyChecked;
+    Qt::CheckState discoveryState = getDiscoveryState();
     ui->checkBoxDiscovery->setCheckState(discoveryState);
 
     onRadioButtonPublicIpChanged();
@@ -839,6 +845,9 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
     else
         publicIPState = 2;
     if (m_mediaServerSettings.value(lit("publicIPEnabled")).toInt() != publicIPState)
+        return true;
+
+    if (getDiscoveryState() != ui->checkBoxDiscovery->checkState())
         return true;
 
     return false;

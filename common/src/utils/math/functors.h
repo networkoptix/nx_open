@@ -22,6 +22,10 @@ public:
         return m_a * value + m_b;
     }
 
+    QnLinearFunction inversed() const {
+        return QnLinearFunction(1.0 / m_a, -m_b / m_a);
+    }
+
 private:
     qreal m_a, m_b;
 };

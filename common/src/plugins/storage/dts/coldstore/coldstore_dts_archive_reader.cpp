@@ -228,7 +228,7 @@ QnAbstractMediaDataPtr QnColdStoreDelegate::getNextData()
     videoData->timestamp = fi.time;
 
     if (fi.i_frame)
-        videoData->flags |= AV_PKT_FLAG_KEY;
+        videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
     ++m_curr_frame;
     if (m_curr_frame == m_frameInfo.size())
@@ -305,16 +305,16 @@ qint64 QnColdStoreDelegate::seek(qint64 time, bool findIFrame)
 
 }
 
-QnResourceVideoLayout* QnColdStoreDelegate::getVideoLayout()
+static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+QnResourceVideoLayoutPtr QnColdStoreDelegate::getVideoLayout()
 {
-    static  QnDefaultResourceVideoLayout l;
-    return &l;
+    return defaultVideoLayout;
 }
 
-QnResourceAudioLayout* QnColdStoreDelegate::getAudioLayout()
+static std::shared_ptr<QnEmptyResourceAudioLayout> defaultAudioLayout( new QnEmptyResourceAudioLayout() );
+QnResourceAudioLayoutPtr QnColdStoreDelegate::getAudioLayout()
 {
-    static QnEmptyResourceAudioLayout l;
-    return &l;
+    return defaultAudioLayout;
 }
 
 //===private================================================================

@@ -3,6 +3,16 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
+#include <business/business_event_rule.h>
+
+#include "core/resource/resource_type.h"
+#include "core/resource/resource.h"
+#include "core/resource/network_resource.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource/camera_resource.h"
+#include "core/resource/layout_resource.h"
+#include "core/resource/user_resource.h"
+
 #include "utils/common/sleep.h"
 #include "utils/common/enum_name_mapper.h"
 #include "utils/common/synctime.h"
@@ -16,6 +26,7 @@ namespace {
         ((ResourceObject,           "resource"))
         ((ResourceTypeObject,       "resourceType"))
         ((ServerObject,             "server"))
+        ((ServerAuthObject,         "server"))
         ((UserObject,               "user"))
         ((LayoutObject,             "layout"))
         ((LicenseObject,            "license"))
@@ -63,29 +74,29 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         m_errorString += QLatin1String(response.errorString) + lit("\n");
 
     switch(object()) {
+    case ServerAuthObject:
     case ServerObject: {
         int status = response.status;
 
-        QnMediaServerResourceList reply;
+        QnServersReply reply;
         if(status == 0) {
             try {
-                m_serializer.deserializeServers(reply, response.data, m_resourceFactory);
+                m_serializer.deserializeServers(reply.servers, response.data, m_resourceFactory);
 
-                QByteArray authKey;
                 foreach(QNetworkReply::RawHeaderPair rawHeader, response.headers)
                     if (rawHeader.first == "X-NetworkOptix-AuthKey")
-                        authKey = rawHeader.second;
-
-                if(!authKey.isEmpty())
-                    foreach(QnMediaServerResourcePtr resource, reply)
-                        resource->setProperty("authKey", authKey);
+                        reply.authKey = rawHeader.second;
             } catch (const QnSerializationException& e) {
                 m_errorString += e.message();
                 status = -1;
             }
         }
 
-        emitFinished(this, status, QnResourceList(reply), handle);
+        if(object() == ServerObject) {
+            emitFinished(this, status, QnResourceList(reply.servers), handle);
+        } else {
+            emitFinished(this, status, reply, handle);
+        }
         break;
     }
     case CameraObject: {
@@ -219,7 +230,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
     case KvPairObject: {
         int status = response.status;
 
-        QnKvPairs reply;
+        QnKvPairListsById reply;
         if(status == 0) {
             try {
                 m_serializer.deserializeKvPairs(reply, response.data);
@@ -321,7 +332,7 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory 
     m_serializer(serializer)
 {
     setUrl(url);
-    setNameMapper(new QnEnumNameMapper(createEnumNameMapper<RequestObject>()));
+    setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     m_requestParams.append(QnRequestParam("format", m_serializer.format()));
     m_requestParams.append(QnRequestParam("guid", guid));
@@ -422,11 +433,11 @@ int QnAppServerConnection::saveServer(const QnMediaServerResourcePtr &serverPtr,
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
-    QnResourceList reply;
-    int status = sendSyncRequest(QNetworkAccessManager::PostOperation, ServerObject, m_requestHeaders, m_requestParams, data, &reply);
+    QnServersReply reply;
+    int status = sendSyncRequest(QNetworkAccessManager::PostOperation, ServerAuthObject, m_requestHeaders, m_requestParams, data, &reply);
     if (status == 0) {
-        servers = reply.filtered<QnMediaServerResource>();
-        authKey = servers.isEmpty() ? QByteArray() : servers[0]->property("authKey").toByteArray();
+        servers = reply.servers;
+        authKey = reply.authKey;
     }
 
     return status;
@@ -465,12 +476,12 @@ int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses,
     return addObjectAsync(LicenseObject, data, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
 }
 
-int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, const QnKvPairList &kvPairs, QObject *target, const char *slot)
+int QnAppServerConnection::saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot)
 {
     QByteArray data;
-    m_serializer.serializeKvPairs(resource, kvPairs, data);
+    m_serializer.serializeKvPairs(resourceId, kvPairs, data);
 
-    return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
+    return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
 }
 
 int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
@@ -491,9 +502,16 @@ int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *sl
     return sendAsyncGetRequest(BusinessRuleObject, m_requestParams, QN_STRINGIZE_TYPE(QnBusinessEventRuleList), target, slot);
 }
 
-int QnAppServerConnection::getKvPairsAsync(QObject *target, const char *slot) 
+int QnAppServerConnection::getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot)
 {
-    return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairs), target, slot);
+    QnRequestParamList params(m_requestParams);
+    params.append(QnRequestParam("resource_id", resource->getId().toString()));
+    return sendAsyncGetRequest(KvPairObject, params, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
+}
+
+int QnAppServerConnection::getAllKvPairsAsync(QObject *target, const char *slot)
+{
+    return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
 }
 
 int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
@@ -840,7 +858,7 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", response);
 }
 
-bool QnAppServerConnection::setPanicMode(QnMediaServerResource::PanicMode value)
+bool QnAppServerConnection::setPanicMode(int value)
 {
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);

@@ -56,6 +56,10 @@
          <property name="text">
           <string>&amp;Add...</string>
          </property>
+         <property name="icon">
+          <iconset resource="../../../x64/build/client.qrc">
+           <normaloff>:/skin/buttons/add.png</normaloff>:/skin/buttons/add.png</iconset>
+         </property>
         </widget>
        </item>
        <item>
@@ -69,6 +73,10 @@
         <widget class="QPushButton" name="deleteButton">
          <property name="text">
           <string>&amp;Delete...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../x64/build/client.qrc">
+           <normaloff>:/skin/buttons/remove.png</normaloff>:/skin/buttons/remove.png</iconset>
          </property>
         </widget>
        </item>
@@ -107,7 +115,9 @@
   <tabstop>deleteButton</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../../x64/build/client.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

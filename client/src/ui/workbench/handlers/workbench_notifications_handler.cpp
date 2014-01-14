@@ -1,9 +1,13 @@
 #include "workbench_notifications_handler.h"
 
+#include <api/app_server_connection.h>
+
 #include <client/client_settings.h>
 #include <client_message_processor.h>
 
 #include <business/business_strings_helper.h>
+
+#include <core/kvpair/business_events_filter_kvpair_adapter.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -17,24 +21,10 @@
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
-QnShowBusinessEventsHelper::QnShowBusinessEventsHelper(QObject *parent) :
-    base_type(QnResourcePtr(),
-              QLatin1String("showBusinessEvents"),
-              0xFFFFFFFFFFFFFFFFull,
-              parent)
-{
-}
-
-QnShowBusinessEventsHelper::~QnShowBusinessEventsHelper(){}
-
-
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    m_showBusinessEventsHelper = context()->instance<QnShowBusinessEventsHelper>();
-    m_showBusinessEventsHelper->setResource(context()->user());
-
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, SIGNAL(userEmailValidityChanged(const QnUserResourcePtr &, bool)),
             this,               SLOT(at_userEmailValidityChanged(const QnUserResourcePtr &, bool)));
@@ -85,9 +75,12 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
     }
 
-    if (!(m_showBusinessEventsHelper->value() & (1ull << eventType))) {
+    if (!context()->user())
         return;
-    }
+
+    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+        return;
+
 
     emit businessActionAdded(businessAction);
 }
@@ -169,8 +162,6 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    m_showBusinessEventsHelper->setResource(context()->user());
-
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
         QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
                        this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));

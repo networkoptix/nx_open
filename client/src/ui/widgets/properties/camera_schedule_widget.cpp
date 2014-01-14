@@ -84,9 +84,12 @@ namespace {
             m_licensesLabel->setPalette(palette);
 
             QString usageText =
-                    tr("%n digital license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital()) +
-                    QLatin1Char('\n') +
-                    tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+                    tr("%n license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
+
+            if (helper.totalAnalog() > 0) {
+                usageText += L'\n';
+                usageText += tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+            }
             m_licensesLabel->setText(usageText);
 
             bool motionOk = true;
@@ -345,8 +348,8 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
             Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
             Qn::StreamQuality streamQuality = Qn::QualityHighest;
             if (recordType != Qn::RecordingType_Never)
-                streamQuality = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toInt();
-            int fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
+                streamQuality = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::QualityParam).toInt();
+            int fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FpsParam).toInt();
             if (fps == 0 && recordType != Qn::RecordingType_Never)
                 fps = 10;
 
@@ -436,8 +439,8 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             const QPoint cell(col, row);
 
             ui->gridWidget->setCellRecordingType(cell, task.m_recordType);
-            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::SecondParam, q);
-            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FirstParam, fps);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::QualityParam, q);
+            ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::FpsParam, fps);
             ui->gridWidget->setCellValue(cell, QnScheduleGridWidget::DiffersFlagParam, emptySource);
         }
     }
@@ -488,13 +491,13 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::DiffersFlagParam, false);
         if (ui->noRecordButton->isChecked())
         {
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QLatin1String("-"));
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, Qn::QualityNotDefined);
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FpsParam, QLatin1String("-"));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::QualityParam, Qn::QualityNotDefined);
         }
         else
         {
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FirstParam, QString::number(ui->fpsSpinBox->value()));
-            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::FpsParam, QString::number(ui->fpsSpinBox->value()));
+            ui->gridWidget->setDefaultParam(QnScheduleGridWidget::QualityParam, ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()));
         }
     }
 
@@ -568,8 +571,8 @@ void QnCameraScheduleWidget::setRecordingParamsAvailability(bool available)
 
     updateGridEnabledState();
 
-    ui->gridWidget->setShowSecondParam(ui->displayQualityCheckBox->isChecked() && m_recordingParamsAvailable);
-    ui->gridWidget->setShowFirstParam(ui->displayFpsCheckBox->isChecked() && m_recordingParamsAvailable);
+    ui->gridWidget->setShowQuality(ui->displayQualityCheckBox->isChecked() && m_recordingParamsAvailable);
+    ui->gridWidget->setShowFps(ui->displayFpsCheckBox->isChecked() && m_recordingParamsAvailable);
     ui->fpsSpinBox->setEnabled(m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(m_recordingParamsAvailable);
 }
@@ -617,10 +620,10 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
 
     { // digital licenses
-        QString usageText = tr("%n digital license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
+        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
         ui->digitalLicensesLabel->setText(usageText);
         QPalette palette = this->palette();
-        if (!helper.isValid() && helper.requiredDigital() > 0)
+        if (!helper.isValid() && helper.required() > 0)
             setWarningStyle(&palette);
         ui->digitalLicensesLabel->setPalette(palette);
     }
@@ -629,9 +632,10 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
         ui->analogLicensesLabel->setText(usageText);
         QPalette palette = this->palette();
-        if (!helper.isValid() && helper.requiredAnalog() > 0)
+        if (!helper.isValid() && helper.required() > 0)
             setWarningStyle(&palette);
         ui->analogLicensesLabel->setPalette(palette);
+        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
     }
 
     if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
@@ -647,22 +651,15 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         ui->requiredLicensesLabel->setVisible(true);
     }
 
-    if (helper.requiredDigital() > 0 && helper.requiredAnalog() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %1 more digital and %2 more analog licenses.")
-                                           .arg(helper.requiredDigital())
-                                           .arg(helper.requiredAnalog())
-                                           );
-    } else if (helper.requiredDigital() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %n more digital license(s).", "", helper.requiredDigital()));
-    } else if (helper.requiredAnalog() > 0) {
-        ui->requiredLicensesLabel->setText(tr("Activate %n more analog license(s).", "", helper.requiredAnalog()));
+    if (helper.required() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
     } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%1 more digital and %2 more analog licenses will be used.")
+        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
                                            .arg(usedDigitalChange)
                                            .arg(usedAnalogChange)
                                            );
     } else if (usedDigitalChange > 0) {
-        ui->requiredLicensesLabel->setText(tr("%n more digital license(s) will be used.", "", usedDigitalChange));
+        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
     } else if (usedAnalogChange > 0) {
         ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
     }
@@ -737,8 +734,8 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     m_disableUpdateGridParams = true;
 
     Qn::RecordingType recordType = ui->gridWidget->cellRecordingType(cell);
-    double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
-    Qn::StreamQuality q = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toInt();
+    double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FpsParam).toDouble());
+    Qn::StreamQuality q = (Qn::StreamQuality) ui->gridWidget->cellValue(cell, QnScheduleGridWidget::QualityParam).toInt();
 
     switch (recordType) {
         case Qn::RecordingType_Run:
@@ -775,12 +772,12 @@ void QnCameraScheduleWidget::at_enableRecordingCheckBox_clicked()
 
 void QnCameraScheduleWidget::at_displayQualiteCheckBox_stateChanged(int state)
 {
-    ui->gridWidget->setShowSecondParam(state && m_recordingParamsAvailable);
+    ui->gridWidget->setShowQuality(state && m_recordingParamsAvailable);
 }
 
 void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 {
-    ui->gridWidget->setShowFirstParam(state && m_recordingParamsAvailable);
+    ui->gridWidget->setShowFps(state && m_recordingParamsAvailable);
 }
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()

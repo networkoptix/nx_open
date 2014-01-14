@@ -5,7 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
-#include <utils/common/color.h>
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QColor)
 
 QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QSize, 
     ((&QSize::width, &QSize::setWidth, "width"))
@@ -41,29 +41,47 @@ QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QPointF,
     ((&QPointF::y, &QPointF::setY, "y"))
 )
 
-void serialize(const QRegion &value, QJsonValue *target) {
-    QJson::serialize(value.rects(), target);
+QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector2D, 
+    ((&QVector2D::x, &QVector2D::setX, "x"))
+    ((&QVector2D::y, &QVector2D::setY, "y"))
+)
+
+QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector3D, 
+    ((&QVector3D::x, &QVector3D::setX, "x"))
+    ((&QVector3D::y, &QVector3D::setY, "y"))
+    ((&QVector3D::z, &QVector3D::setZ, "z"))
+)
+
+QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector4D, 
+    ((&QVector4D::x, &QVector4D::setX, "x"))
+    ((&QVector4D::y, &QVector4D::setY, "y"))
+    ((&QVector4D::z, &QVector4D::setZ, "z"))
+    ((&QVector4D::w, &QVector4D::setW, "w"))
+)
+
+void serialize(QnJsonContext *ctx, const QRegion &value, QJsonValue *target) {
+    QJson::serialize(ctx, value.rects(), target);
 }
 
-bool deserialize(const QJsonValue &value, QRegion *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QRegion *target) {
     if(value.type() == QJsonValue::Null) {
         *target = QRegion();
         return true;
     }
 
     QVarLengthArray<QRect, 32> rects;
-    if(!QJson::deserialize(value, &rects))
+    if(!QJson::deserialize(ctx, value, &rects))
         return false;
 
     target->setRects(rects.data(), rects.size());
     return true;
 }
 
-void serialize(const QUuid &value, QJsonValue *target) {
-    *target = value.toString();
+void serialize(QnJsonContext *, const QUuid &value, QJsonValue *target) {
+    *target = QnLexical::serialized(value);
 }
 
-bool deserialize(const QJsonValue &value, QUuid *target) {
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QUuid *target) {
     /* Support JSON null for QUuid, even though we don't generate it on
      * serialization. */
     if(value.type() == QJsonValue::Null) {
@@ -72,26 +90,37 @@ bool deserialize(const QJsonValue &value, QUuid *target) {
     }
 
     QString jsonString;
-    if(!QJson::deserialize(value, &jsonString))
+    if(!::deserialize(ctx, value, &jsonString)) /* Note the direct call instead of invocation through QJson. */
         return false;
 
-    QUuid result(jsonString);
-    if(result.isNull() && jsonString != QLatin1String("00000000-0000-0000-0000-000000000000") && jsonString != QLatin1String("{00000000-0000-0000-0000-000000000000}"))
-        return false;
-
-    *target = result;
-    return true;
+    return QnLexical::deserialize(jsonString, target);
 }
 
-void serialize(const QColor &value, QJsonValue *target) {
-    *target = value.name();
+void serialize(QnJsonContext *, const QFont &, QJsonValue *) {
+    assert(false); /* Won't need for now. */ // TODO: #Elric
 }
 
-bool deserialize(const QJsonValue &value, QColor *target) {
-    if(value.type() != QJsonValue::String)
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
+    if(value.type() == QJsonValue::String) {
+        *target = QFont(value.toString());
+        return true;
+    } else if(value.type() == QJsonValue::Object) {
+        QJsonObject map = value.toObject();
+        
+        QString family;
+        int pointSize = -1;
+        if(
+            !QJson::deserialize(ctx, map, lit("family"), &family) ||
+            !QJson::deserialize(ctx, map, lit("pointSize"), &pointSize, true)
+        ) {
+            return false;
+        }
+
+        *target = QFont(family, pointSize);
+        return true;
+    } else {
         return false;
-    *target = parseColor(value);
-    return true;
+    }
 }
 
 #define TEST_VALUE(TYPE)                                            \
@@ -125,9 +154,8 @@ void testRegion(int len) {
 
     QByteArray json;
     QJson::serialize(region, &json);
-    QString result = QString::fromUtf8(json);
     QRegion newValue;
-    QJson::deserialize(result.toUtf8(), &newValue);
+    QJson::deserialize(json, &newValue);
     Q_ASSERT(region == newValue);
 }
 

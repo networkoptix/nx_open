@@ -11,7 +11,7 @@ namespace Ui {
     class QnPopupSettingsWidget;
 }
 
-class QnShowBusinessEventsHelper;
+class QnBusinessEventsFilterKvPairAdapter;
 
 class QnPopupSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
@@ -33,8 +33,7 @@ private:
     QScopedPointer<Ui::QnPopupSettingsWidget> ui;
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
-
-    QnShowBusinessEventsHelper* m_showBusinessEventsHelper;
+    QScopedPointer<QnBusinessEventsFilterKvPairAdapter> m_adapter;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H

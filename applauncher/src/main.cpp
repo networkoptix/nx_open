@@ -30,8 +30,6 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-QSettings qSettings;    //TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettings to be defined somewhere...
-
 static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
 
 static void printHelp( const InstallationManager& installationManager )
@@ -154,11 +152,14 @@ int main( int argc, char* argv[] )
     int status = applauncherProcess.run();
 
 #ifdef _WIN32
-    // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
-    while (app.isRunning()) {
+    if( quitMode )
+    {
+        // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
+        while (app.isRunning()) {
+            Sleep(100);
+        } 
         Sleep(100);
-    } 
-    Sleep(100);
+    }
 #endif
 
     return status;
@@ -298,7 +299,6 @@ int testHttpClient()
         return 1;
     }
 
-    httpClient.startReadMessageBody();
     while( !httpClient.eof() )
     {
         const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();

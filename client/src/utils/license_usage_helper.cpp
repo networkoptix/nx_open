@@ -8,8 +8,7 @@ QnLicenseUsageHelper::QnLicenseUsageHelper():
     m_licenses(qnLicensePool->getLicenses()),
     m_usedDigital(0),
     m_usedAnalog(0),
-    m_requiredDigital(0),
-    m_requiredAnalog(0),
+    m_required(0),
     m_proposedDigital(0),
     m_proposedAnalog(0),
     m_isValid(true)
@@ -21,8 +20,7 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(const QnVirtualCameraResourceList &pr
     m_licenses(qnLicensePool->getLicenses()),
     m_usedDigital(0),
     m_usedAnalog(0),
-    m_requiredDigital(0),
-    m_requiredAnalog(0),
+    m_required(0),
     m_proposedDigital(0),
     m_proposedAnalog(0),
     m_isValid(true)
@@ -51,35 +49,20 @@ void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCa
 void QnLicenseUsageHelper::update() {
     int activeAnalog = qnResPool->activeAnalog() + m_proposedAnalog;
     int activeDigital = qnResPool->activeDigital() + m_proposedDigital;
-    int freeDigital = totalDigital() - activeDigital;
-    if (freeDigital < 0) {
-        m_isValid = false;
-        m_usedDigital = activeDigital;
-        m_requiredDigital = -freeDigital;
+    int active = activeDigital + activeAnalog;
 
-        m_usedAnalog = activeAnalog;
-        m_requiredAnalog = qMax(activeAnalog - totalAnalog(), 0);
-        return;
+    if (totalAnalog() == 0) {
+        int free = totalDigital() - active;
+        m_usedDigital = active;
+        m_usedAnalog = 0;
+        m_required = -free;
+    } else {
+        m_usedAnalog = qMin(activeAnalog, totalAnalog());
+        m_usedDigital = activeDigital + (activeAnalog - m_usedAnalog);
+        int free = totalDigital() - m_usedDigital;
+        m_required = -free;
     }
-
-    int freeAnalog = totalAnalog() + freeDigital - activeAnalog;
-    if (freeAnalog < 0) {
-        m_isValid = false;
-        m_usedDigital = totalDigital();
-        m_requiredDigital = 0;
-
-        m_usedAnalog = activeAnalog - freeDigital;
-        m_requiredAnalog = -freeAnalog;
-        return;
-    }
-
-    m_isValid = true;
-
-    int requiredDigitalInsteadAnalog = qMax(activeAnalog - totalAnalog(), 0);
-    m_usedDigital = activeDigital + requiredDigitalInsteadAnalog;
-    m_usedAnalog = activeAnalog - requiredDigitalInsteadAnalog;
-
-    m_requiredDigital = m_requiredAnalog = 0;
+    m_isValid = m_required < 0;
 }
 
 int QnLicenseUsageHelper::totalDigital() const {
@@ -98,14 +81,9 @@ int QnLicenseUsageHelper::usedAnalog() const {
     return m_usedAnalog;
 }
 
-int QnLicenseUsageHelper::requiredDigital() const {
-    return m_requiredDigital;
+int QnLicenseUsageHelper::required() const {
+    return m_required;
 }
-
-int QnLicenseUsageHelper::requiredAnalog() const {
-    return m_requiredAnalog;
-}
-
 
 bool QnLicenseUsageHelper::isValid() const {
     return m_isValid;

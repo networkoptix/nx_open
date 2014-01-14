@@ -55,6 +55,9 @@ static const QLatin1String DEFAULT_ISD_PASSWORD( "admin" );
 
 QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& authOriginal, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     QAuthenticator auth( authOriginal );
 
     if( auth.user().isEmpty() )

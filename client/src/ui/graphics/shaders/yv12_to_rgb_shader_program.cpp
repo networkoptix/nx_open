@@ -68,7 +68,8 @@ bool QnYv12ToRgbWithGammaShaderProgram::link()
 }
 
 QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLContext *context, QObject *parent, bool final): 
-    QnAbstractYv12ToRgbShaderProgram(context, parent) 
+    QnAbstractYv12ToRgbShaderProgram(context, parent),
+    m_gammaStr(lit("y"))
 {
     if (!final)
         return;
@@ -82,9 +83,9 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
         uniform float yGamma;
 
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-        1.0, -0.344, -0.714,  0.529,
-        1.0,  1.772,  0.0,   -0.886,
-        0.0,  0.0,    0.0,    opacity);
+                                1.0, -0.344, -0.714,  0.529,
+                                1.0,  1.772,  0.0,   -0.886,
+                                0.0,  0.0,    0.0,    opacity);
 
     void main() {
         float y = texture2D(yTexture, gl_TexCoord[0].st).p;
@@ -101,82 +102,17 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 
 // ============================= QnYv12ToRgbWithFisheyeShaderProgram ==================
 
-const QString QnFisheyeShaderProgram::GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
-
-QnFisheyeShaderProgram::QnFisheyeShaderProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
-    QnYv12ToRgbWithGammaShaderProgram(context, parent, false),
-    m_gammaStr(gammaStr)
-{
-}
-
-
-void QnFisheyeShaderProgram::setDewarpingParams(const DewarpingParams& params, float aspectRatio, float maxX, float maxY)
-{
-    if (params.panoFactor == 1.0)
-    {
-        float fovRot = sin(params.xAngle)*params.fovRot;
-        if (params.viewMode == DewarpingParams::Horizontal) {
-            setUniformValue(m_yShiftLocation, (float) (params.yAngle));
-            setUniformValue(m_yCenterLocation, (float) 0.5);
-            setUniformValue(m_xShiftLocation, (float) params.xAngle);
-            setUniformValue(m_fovRotLocation, (float) fovRot);
-        }
-        else {
-            setUniformValue(m_yShiftLocation, (float) (params.yAngle - M_PI/2.0));
-            setUniformValue(m_yCenterLocation, (float) 1.0);
-            setUniformValue(m_xShiftLocation, (float) fovRot);
-            setUniformValue(m_fovRotLocation, (float) -params.xAngle);
-        }
-    }
-    else {
-        setUniformValue(m_xShiftLocation, (float) params.xAngle);
-        setUniformValue(m_fovRotLocation, (float) params.fovRot);
-        //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
-        setUniformValue(m_yShiftLocation, (float) (params.yAngle));
-        if (params.viewMode == DewarpingParams::Horizontal)
-            setUniformValue(m_yCenterLocation, (float) 0.5);
-        else
-            setUniformValue(m_yCenterLocation, (float) 1.0);
-    }
-
-    setUniformValue(m_aspectRatioLocation, (float) (aspectRatio));
-    setUniformValue(m_panoFactorLocation, (float) (params.panoFactor));
-    setUniformValue(m_dstFovLocation, (float) params.fov);
-
-    setUniformValue(m_maxXLocation, maxX);
-    setUniformValue(m_maxYLocation, maxY);
-}
-
-bool QnFisheyeShaderProgram::link()
-{
-    addShaderFromSourceCode(QGLShader::Fragment, getShaderText().arg(m_gammaStr));
-    bool rez = QnYv12ToRgbWithGammaShaderProgram::link();
-    if (rez) {
-        m_xShiftLocation = uniformLocation("xShift");
-        m_yShiftLocation = uniformLocation("yShift");
-        m_fovRotLocation = uniformLocation("fovRot");
-        m_dstFovLocation = uniformLocation("dstFov");
-        m_aspectRatioLocation = uniformLocation("aspectRatio");
-        m_panoFactorLocation = uniformLocation("panoFactor");
-        m_yCenterLocation = uniformLocation("yCenter");
-
-        m_maxXLocation = uniformLocation("maxX");
-        m_maxYLocation = uniformLocation("maxY");
-    }
-    return rez;
-}
-
 // ---------------------------- QnFisheyeRectilinearProgram ------------------------------------
 
 QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(const QGLContext *context, QObject *parent, const QString& gammaStr):
-    QnFisheyeShaderProgram(context, parent, gammaStr)
+    QnFisheyeShaderProgram(context, parent)
 {
-
+    setGammaStr(gammaStr);
 }
 
 QString QnFisheyeRectilinearProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QString(QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -186,7 +122,10 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         uniform float fovRot;
         uniform float dstFov;
         uniform float aspectRatio;
+        uniform float yPos;
+        uniform float xCenter;
         uniform float yCenter;
+        uniform float radius;
         uniform float yLevels1;
         uniform float yLevels2;
         uniform float yGamma;
@@ -201,16 +140,9 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
     float kx =  2.0*tan(dstFov/2.0);
 
-    //vec3 sphericalToCartesian(in float theta, in float phi) {
-    //    return vec3(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
-    //}
-    //vec3 xVect  = vec3(sphericalToCartesian(xShift + PI/2.0, 0.0)) * kx;
-    //vec3 yVect  = vec3(sphericalToCartesian(xShift, -yShift + PI/2.0)) * kx /aspectRatio;
-    //vec3 center = vec3(sphericalToCartesian(xShift, -yShift));
-
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx; // /aspectRatio;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
@@ -218,10 +150,11 @@ QString QnFisheyeRectilinearProgram::getShaderText()
                      xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
     
     vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5,       -yCenter/ aspectRatio);
+    vec2 xy2 = vec2(-0.5,       -yPos/ aspectRatio);
 
-    vec2 xy3 = vec2(maxX / PI,  maxY*aspectRatio / PI);
-    vec2 xy4 = vec2(maxX / 2.0, maxY / 2.0);
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
 
     void main() 
     {
@@ -243,21 +176,21 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    ))).arg(gammaStr());
 }
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
 
 QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(const QGLContext *context, QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(context, parent, gammaStr)
+    :QnFisheyeShaderProgram(context, parent)
 {
-
+    setGammaStr(gammaStr);
 }
 
 QString QnFisheyeEquirectangularHProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
-        uniform sampler2D yTexture;
+    return QString(QLatin1String(QN_SHADER_SOURCE(
+    uniform sampler2D yTexture;
     uniform sampler2D uTexture;
     uniform sampler2D vTexture;
     uniform float opacity;
@@ -267,7 +200,10 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     uniform float dstFov;
     uniform float aspectRatio;
     uniform float panoFactor;
+    uniform float yPos;
+    uniform float xCenter;
     uniform float yCenter;
+    uniform float radius;
     uniform float yLevels1;
     uniform float yLevels2;
     uniform float yGamma;
@@ -285,10 +221,10 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
                                    vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
-    vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
     void main() 
     {
@@ -324,21 +260,20 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ));
+    ))).arg(gammaStr());
 }
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
 
 QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(const QGLContext *context, QObject *parent, const QString& gammaStr)
-    :QnFisheyeShaderProgram(context, parent, gammaStr)
+    :QnFisheyeShaderProgram(context, parent)
 {
-
+    setGammaStr(gammaStr);
 }
-
 
 QString QnFisheyeEquirectangularVProgram::getShaderText()
 {
-    return lit(QN_SHADER_SOURCE(
+    return QString(QLatin1String(QN_SHADER_SOURCE(
         uniform sampler2D yTexture;
         uniform sampler2D uTexture;
         uniform sampler2D vTexture;
@@ -349,7 +284,10 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         uniform float dstFov;
         uniform float aspectRatio;
         uniform float panoFactor;
+        uniform float yPos;
+        uniform float xCenter;
         uniform float yCenter;
+        uniform float radius;
         uniform float yLevels1;
         uniform float yLevels2;
         uniform float yGamma;
@@ -367,10 +305,10 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
                                    vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yCenter*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
 
-    vec2 xy3 = vec2(maxX / PI,      maxY*aspectRatio / PI);
-    vec2 xy4 = vec2(maxX / 2.0,     maxY / 2.0);
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
 
     void main() 
     {
@@ -403,6 +341,234 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
             texture2D(uTexture, pos).p,
             texture2D(vTexture, pos).p,
             1.0) * colorTransform;
+        else 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    ))).arg(gammaStr());
+}
+
+// ------------------------- QnAbstractRGBAShaderProgram ------------------------------
+
+QnAbstractRGBAShaderProgram::QnAbstractRGBAShaderProgram(const QGLContext *context, QObject *parent, bool final):
+    QGLShaderProgram(context, parent) 
+{
+    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+        void main() {
+            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+            gl_TexCoord[0] = gl_MultiTexCoord0;
+    }
+    ));
+
+}
+
+bool QnAbstractRGBAShaderProgram::link()
+{
+    bool rez = QGLShaderProgram::link();
+    if (rez) {
+        m_rgbaTextureLocation = uniformLocation("rgbaTexture");
+        m_opacityLocation = uniformLocation("opacity");
+    }
+    return rez;
+}
+
+
+// ---------------------------- QnFisheyeRGBRectilinearProgram ------------------------------------
+
+QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(const QGLContext *context, QObject *parent):
+    QnFisheyeShaderProgram(context, parent)
+{
+
+}
+
+QString QnFisheyeRGBRectilinearProgram::getShaderText()
+{
+    return QLatin1String(QN_SHADER_SOURCE(
+    uniform sampler2D rgbaTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float fovRot;
+    uniform float dstFov;
+    uniform float aspectRatio;
+    uniform float yPos;
+    uniform float xCenter;
+    uniform float yCenter;
+    uniform float radius;
+    uniform float maxX;
+    uniform float maxY;
+
+    const float PI = 3.1415926535;
+
+    float kx =  2.0*tan(dstFov/2.0);
+
+    // avoid function call for better shader compatibility
+    vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
+    vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
+
+    mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
+        xVect.y,   yVect.y,    center.y,
+        xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
+
+    vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
+    vec2 xy2 = vec2(-0.5,       -yPos/ aspectRatio);
+
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
+
+    void main() 
+    {
+        vec3 pos3d = vec3(gl_TexCoord[0].xy * xy1 + xy2, 1.0) * to3d; // point on the surface
+
+        float theta = atan(pos3d.z, pos3d.x) + fovRot;            // fisheye angle
+        float r     = acos(pos3d.y / length(pos3d));              // fisheye radius
+
+        vec2 pos = vec2(cos(theta), sin(theta)) * r;
+        pos = pos * xy3 + xy4;
+
+        if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
+            gl_FragColor = texture2D(rgbaTexture, pos);
+        else 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    ));
+}
+
+// ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
+
+QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(const QGLContext *context, QObject *parent)
+    :QnFisheyeShaderProgram(context, parent)
+{
+
+}
+
+QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
+{
+    return QLatin1String(QN_SHADER_SOURCE(
+    uniform sampler2D rgbaTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float fovRot;
+    uniform float dstFov;
+    uniform float aspectRatio;
+    uniform float panoFactor;
+    uniform float yPos;
+    uniform float xCenter;
+    uniform float yCenter;
+    uniform float radius;
+    uniform float maxX;
+    uniform float maxY;
+
+    const float PI = 3.1415926535;
+
+    mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
+        vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+        vec3(0.0, sin(-fovRot),  cos(-fovRot)));
+
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
+    void main() 
+    {
+        vec2 pos = gl_TexCoord[0].xy * xy1 + xy2;
+
+        float cosTheta = cos(pos.x);
+        float roty = -fovRot * cosTheta;
+        float phi   = pos.y * (1.0 - roty*xy1.y)  - roty - yShift;
+        float cosPhi = cos(phi);
+
+        // Vector in 3D space
+        vec3 psph = vec3(cosPhi * sin(pos.x),
+            cosPhi * cosTheta,  // only one difference between H and V shaders: this 2 lines in back order
+            sin(phi))  * perspectiveMatrix;
+
+        // Calculate fisheye angle and radius
+        float theta   = atan(psph.z, psph.x);
+        float r = acos(psph.y);
+
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r;
+
+        // AR and non [0..1] range correction
+        pos = pos * xy3 + xy4;
+
+        if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
+            gl_FragColor = texture2D(rgbaTexture, pos);
+        else 
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    ));
+}
+
+// ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
+
+QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(const QGLContext *context, QObject *parent)
+    :QnFisheyeShaderProgram(context, parent)
+{
+
+}
+
+QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
+{
+    return QLatin1String(QN_SHADER_SOURCE(
+    uniform sampler2D rgbaTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float fovRot;
+    uniform float dstFov;
+    uniform float aspectRatio;
+    uniform float panoFactor;
+    uniform float yPos;
+    uniform float xCenter;
+    uniform float yCenter;
+    uniform float radius;
+    uniform float maxX;
+    uniform float maxY;
+
+    const float PI = 3.1415926535;
+
+    mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0, 0.0),
+        vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+        vec3(0.0, sin(-fovRot),  cos(-fovRot)));
+
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+
+    vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
+    vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
+
+    void main() 
+    {
+        vec2 pos = gl_TexCoord[0].xy * xy1 + xy2;
+
+        float cosTheta = cos(pos.x);
+        float roty = -fovRot * cosTheta;
+        float phi   = -(pos.y * (1.0 - roty*xy1.y)  - roty - yShift);
+        float cosPhi = cos(phi);
+
+        // Vector in 3D space
+        vec3 psph = vec3(cosPhi * sin(pos.x),
+            sin(phi),  // only one difference between H and V shaders: this 2 lines in back order
+            cosPhi * cosTheta)  * perspectiveMatrix;
+
+        // Calculate fisheye angle and radius
+        float theta    = atan(psph.z, psph.x);
+        float r  = acos(psph.y);
+
+        // return from polar coordinates
+        pos = vec2(cos(theta), sin(theta)) * r;
+
+        // AR and non [0..1] range correction
+        pos = pos * xy3 + xy4;
+
+        if (all(bvec4(pos.x >= 0.0, pos.y >= 0.0, pos.x <= maxX, pos.y <= maxY)))
+            gl_FragColor = texture2D(rgbaTexture, pos);
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }

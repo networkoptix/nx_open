@@ -5,11 +5,22 @@
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
 #include <QtCore/QMetaType>
 #include <QtCore/QDataStream>
+#include <QtGui/QVector3D>
 
-#include <utils/common/struct_functions.h>
+#include <utils/common/model_functions_fwd.h>
 #include <recording/time_period.h>
+
+
+// -------------------------------------------------------------------------- //
+// Qt-based
+// -------------------------------------------------------------------------- //
+typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
+
+Q_DECLARE_METATYPE(QnWeakObjectHash)
 
 
 // -------------------------------------------------------------------------- //
@@ -44,8 +55,6 @@ public:
     QList<QString> layoutUuids;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnWorkbenchState, (qdatastream), (currentLayoutIndex)(layoutUuids), inline);
-
 /**
  * Mapping from user name to workbench state.
  */
@@ -53,6 +62,7 @@ typedef QHash<QString, QnWorkbenchState> QnWorkbenchStateHash;
 
 Q_DECLARE_METATYPE(QnWorkbenchState);
 Q_DECLARE_METATYPE(QnWorkbenchStateHash);
+QN_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream));
 
 
 // -------------------------------------------------------------------------- //
@@ -66,12 +76,11 @@ struct QnServerStorageKey {
     QString storagePath;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnServerStorageKey, (qdatastream)(eq)(qhash), (serverUuid)(storagePath), inline);
-
 typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
 
 Q_DECLARE_METATYPE(QnServerStorageKey);
 Q_DECLARE_METATYPE(QnServerStorageStateHash);
+QN_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash));
 
 
 // -------------------------------------------------------------------------- //
@@ -85,8 +94,6 @@ struct QnLicenseWarningState {
     bool ignore;
 };
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (qdatastream), (lastWarningTime)(ignore), inline);
-
 /**
  * Mapping from license key to license warning state.
  */
@@ -94,12 +101,16 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 
 Q_DECLARE_METATYPE(QnLicenseWarningState);
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
+QN_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream));
+
 
 /**
  * Mapping from resource physical id to aspect ratio.
  */
 typedef QHash<QString, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
+
+
 
 
 #endif // QN_CLIENT_MODEL_TYPES_H

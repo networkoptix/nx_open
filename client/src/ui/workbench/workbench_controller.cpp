@@ -24,6 +24,8 @@
 #include <utils/common/toggle.h>
 #include <utils/math/color_transformations.h>
 
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -90,8 +92,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
-#include "workbench_ptz_preset_manager.h"
-
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -558,7 +558,12 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     if(!m_menuEnabled)
         return;
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    QMetaObject::invokeMethod(this, "showContextMenuAtInternal", Qt::QueuedConnection,
+                              Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
+}
+
+void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
@@ -575,13 +580,6 @@ void QnWorkbenchController::startRecording() {
     }
 
     if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
@@ -613,9 +611,8 @@ void QnWorkbenchController::at_recordingAnimation_finished() {
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
-        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            if (m_screenRecorder) // just in case =)
-                m_screenRecorder->startRecording(widget);
+        if (m_screenRecorder) // just in case =)
+            m_screenRecorder->startRecording();
     }
     m_countdownCanceled = false;
 }
@@ -763,20 +760,18 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_7:
     case Qt::Key_8:
     case Qt::Key_9: {
-        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-        if(!widget)
-            break;
-
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if(!camera)
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+        if(!widget || !widget->ptzController())
             break;
 
         int hotkey = e->key() - Qt::Key_0;
-        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
-        if(preset.isNull())
+
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->resource()->toResourcePtr(), hotkey);
+        if (presetId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::PtzPresetIdRole, presetId));
+        break;
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
@@ -1071,7 +1066,10 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
-    workbench()->currentLayout()->resource()->addItem(data);
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+        return;
+    layout->addItem(data);
     display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
@@ -1386,7 +1384,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
         if (m_tourModeHintLabel) {
             m_tourModeHintLabel->hideImmideately();
-            disconnect(m_tourModeHintLabel, 0, this, 0);
+            disconnect(m_tourModeHintLabel, NULL, this, NULL);
             m_tourModeHintLabel = NULL;
         }
         return;

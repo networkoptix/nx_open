@@ -43,7 +43,7 @@ bool QnRtpStreamReader::isStreamOpened() const
     return m_rtpReader.isStreamOpened();
 }
 
-const QnResourceAudioLayout* QnRtpStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnRtpStreamReader::getDPAudioLayout() const
 {
     return m_rtpReader.getAudioLayout();
 }

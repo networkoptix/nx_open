@@ -24,6 +24,9 @@
 #include <utils/common/util.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/common/geometry.h>
+#include <ui/customization/customizer.h>
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -51,7 +54,8 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_hoverAnimator(new QnNoptixStyleAnimator(this)),
     m_rotationAnimator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
-    m_globals(qnGlobals)
+    m_globals(qnGlobals),
+    m_customizer(qnCustomizer)
 {
     GraphicsStyle::setBaseStyle(this);
 
@@ -213,22 +217,20 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
-    QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
-
-    QPalette palette = application->palette();
-    palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
-    palette.setColor(QPalette::Button, activeColor);
-    application->setPalette(palette);
-
     QFont font;
     font.setPixelSize(12);
     font.setStyle(QFont::StyleNormal);
     font.setWeight(QFont::Normal);
+#ifdef Q_OS_LINUX
+    font.setFamily(lit("Ubuntu")); // TODO: #Elric implement properly
+#endif
     application->setFont(font);
 
     QFont menuFont;
     menuFont.setPixelSize(18);
     application->setFont(menuFont, "QMenu");
+
+    m_customizer->customize(application);
 }
 
 void QnNoptixStyle::unpolish(QApplication *application) {
@@ -238,15 +240,19 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 }
 
 void QnNoptixStyle::polish(QWidget *widget) {
-    base_type::polish(widget);
+    if(widget)
+        base_type::polish(widget);
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18));
+        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization?
     }
+
+    m_customizer->customize(const_cast<QObject *>(currentTarget(widget)));
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {
-    base_type::unpolish(widget);
+    if(widget)
+        base_type::unpolish(widget);
 }
 
 bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {
@@ -465,11 +471,8 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
     const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
     if (!sliderOption) 
         return false;
-    
-    if (sliderOption->orientation != Qt::Horizontal) 
-        return false; /* Non-horizontal sliders are not implemented. */
-    
-    const QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
+
+    QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
     QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
     const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
@@ -487,19 +490,39 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
-    int d = grooveRect.height();
+    bool vertical = sliderOption->orientation != Qt::Horizontal;
 
+    QTransform horizontalTransform(painter->transform());
+    if (vertical){
+        int x,y,w,h;
+        sliderOption->rect.getRect(&x, &y, &w, &h);
+
+        QTransform transform(horizontalTransform);
+        painter->setTransform(transform.translate(w, 0.0).rotate(90));
+
+        grooveRect.getRect(&x, &y, &w, &h);
+        grooveRect = QRect(y, x, h, w);
+
+        handleRect.getRect(&x, &y, &w, &h);
+        handleRect = QRect(y, x, h, w);
+    }
+
+    int d = grooveRect.height();
     painter->drawPixmap(grooveRect.adjusted(d, 0, -d, 0), grooveBodyPic, grooveBodyPic.rect());
+
     painter->drawPixmap(QRectF(grooveRect.topLeft(), QSizeF(d, d)), grooveBorderPic, grooveBorderPic.rect());
     {
-        QTransform oldTransform = painter->transform();
-        painter->translate(grooveRect.left() + grooveRect.width(), grooveRect.top());
-        painter->scale(-1.0, 1.0);
+        QTransform transform(painter->transform());
+        transform.translate(grooveRect.left() + grooveRect.width(), grooveRect.top()).scale(-1.0, 1.0);
+
+        QnScopedPainterTransformRollback transformRollback(painter, transform); Q_UNUSED(transformRollback)
         painter->drawPixmap(QRectF(QPointF(0, 0), QSizeF(d, d)), grooveBorderPic, grooveBorderPic.rect());
-        painter->setTransform(oldTransform);
     }
 
     painter->drawPixmap(handleRect, handlePic);
+    if (vertical)
+        painter->setTransform(horizontalTransform);
+
     return true;
 }
 

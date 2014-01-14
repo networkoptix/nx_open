@@ -15,7 +15,9 @@ extern "C"
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
-#include "utils/math/math.h"
+
+#include <utils/math/math.h>
+
 #include "utils/media/sse_helper.h"
 
 

@@ -19,6 +19,17 @@ class QnWorkbenchExportHandler: public QObject, protected QnWorkbenchContextAwar
 public:
     QnWorkbenchExportHandler(QObject *parent = NULL);
 
+    bool saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target = NULL, const char *slot = NULL);
+
+    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode);
+private:
+#ifdef Q_OS_WIN
+    QString binaryFilterName() const;
+#endif
+
+    bool validateItemTypes(const QnLayoutResourcePtr &layout); // used for export local layouts. Disable cameras and local items for same layout
+    void removeLayoutFromPool(const QnLayoutResourcePtr &existingLayout);
+
     bool saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
                                const QnTimePeriod& exportPeriod,
                                const QString& layoutFileName,
@@ -28,24 +39,18 @@ public:
                                QObject *target = NULL,
                                const char *slot = NULL);
 
-    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, Qn::LayoutExportMode mode);
-private:
-#ifdef Q_OS_WIN
-    QString binaryFilterName() const;
-#endif
-
-    bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-    void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
+    bool lockFile(const QString &filename);
+    void unlockFile(const QString &filename);
 
 private slots:
     void at_exportTimeSelectionAction_triggered();
 
     void at_exportLayoutAction_triggered();
-    void at_layout_exportFinished(bool success);
+    void at_layout_exportFinished(bool success, const QString &filename);
 
-    void at_camera_exportFinished(QString fileName);
-    void at_camera_exportFailed(QString errorMessage);
-
+    void at_camera_exportFinished(int status, const QString &fileName);
+private:
+    QSet<QString> m_filesIsUse;
 };
 
 #endif // WORKBENCH_EXPORT_HANDLER_H

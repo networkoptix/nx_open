@@ -8,8 +8,6 @@
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
-#include "core/resource/dewarping_params.h"
-
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -18,6 +16,7 @@ namespace Ui {
 class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
+class QnImageProvider;
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -98,7 +97,6 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
-    void fisheyeSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -122,12 +120,10 @@ private slots:
     void at_motionRegionListChanged();
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
-    void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-    void updateLicenseText();
     void updateIpAddressText();
     void updateWebPageText();
 
@@ -184,7 +180,8 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
-    DewarpingParams m_dewarpingParamsBackup;
+
+    QHash<int, QnImageProvider*> m_imageProvidersByResourceId;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

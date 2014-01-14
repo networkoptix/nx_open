@@ -174,7 +174,7 @@ void QnTcpListener::removeAllConnections()
     for (QList<QnLongRunnable*>::iterator itr = oldConnections.begin(); itr != oldConnections.end(); ++itr)
     {
         QnLongRunnable* processor = *itr;
-        NX_LOG( QString::fromLatin1("TCPListener. Stopping processor (sysThreadID %1)").arg(processor->sysThreadID()), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("TCPListener. Stopping processor (sysThreadID %1)").arg(processor->systemThreadId()), cl_logWARNING );
         delete processor;
     }
 }
@@ -196,7 +196,7 @@ void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
     //d->serverSocket = new TCPServerSocket(address.toString(), port, 5, true);
@@ -218,7 +218,7 @@ void QnTcpListener::run()
     }
 
 
-    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(sysThreadID()), cl_logWARNING );
+    NX_LOG( QString::fromLatin1("Entered QnTcpListener::run. %1:%2, system thread id %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logWARNING );
     try
     {
         if (!d->serverSocket)

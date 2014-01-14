@@ -341,14 +341,14 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnectio
     return QnMotionHelper::instance()->createConnection(m_resource, channel);
 }
 
-QnResourceVideoLayout* QnServerArchiveDelegate::getVideoLayout()
+QnResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()
 {
     QMutexLocker lk( &m_mutex );
 
     return m_aviDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayout* QnServerArchiveDelegate::getAudioLayout()
+QnResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
 {
     QMutexLocker lk( &m_mutex );
 

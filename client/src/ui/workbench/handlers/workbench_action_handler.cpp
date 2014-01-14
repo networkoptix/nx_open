@@ -15,6 +15,21 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QImageWriter>
 
+#include <utils/license_usage_helper.h>
+#include <utils/app_server_image_cache.h>
+#include <utils/app_server_notification_cache.h>
+#include <utils/applauncher_utils.h>
+#include <utils/local_file_cache.h>
+#include <utils/common/environment.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/mime_data.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/string.h>
+#include <utils/common/time.h>
+#include <utils/common/email.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+
 #include <api/session_manager.h>
 
 #include <business/business_action_parameters.h>
@@ -25,13 +40,13 @@
 
 #include <client/client_connection_data.h>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
 
 #include <device_plugins/server_camera/appserver.h>
-
-#include <ui/dialogs/notification_sound_manager_dialog.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
@@ -58,12 +73,12 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
-#include <ui/dialogs/ptz_presets_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
+#include <ui/dialogs/notification_sound_manager_dialog.h>
+#include <ui/dialogs/picture_settings_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -89,8 +104,6 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_ptz_preset_manager.h>
-#include <ui/workbench/workbench_ptz_controller.h>
 
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
@@ -102,21 +115,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
-#include <utils/license_usage_helper.h>
-#include <utils/app_server_image_cache.h>
-#include <utils/app_server_notification_cache.h>
-#include <utils/applauncher_utils.h>
-#include <utils/local_file_cache.h>
-#include <utils/common/environment.h>
-#include <utils/common/delete_later.h>
-#include <utils/common/mime_data.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/string.h>
-#include <utils/common/time.h>
-#include <utils/common/email.h>
-#include <utils/common/synctime.h>
-#include <utils/common/util.h>
-
 #include "client_message_processor.h"
 #include "file_processor.h"
 #include "version.h"
@@ -127,6 +125,7 @@
 #include "core/resource/layout_item_data.h"
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
+#include "ui/widgets/palette_widget.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -198,10 +197,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
-    connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
-    connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
-    connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
-    connect(action(Qn::DebugCalibratePtzAction),                SIGNAL(triggered()),    this,   SLOT(at_debugCalibratePtzAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -237,6 +232,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::PictureSettingsAction),                  SIGNAL(triggered()),    this,   SLOT(at_pictureSettingsAction_triggered()));
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
@@ -265,9 +261,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::SetCurrentItemAspectRatioAutoAction),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatioAutoAction_triggered()));
-    connect(action(Qn::SetCurrentItemAspectRatio4x3Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio4x3Action_triggered()));
-    connect(action(Qn::SetCurrentItemAspectRatio16x9Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentItemAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -282,9 +275,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
     connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
     connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
-    connect(action(Qn::PtzSavePresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzSavePresetAction_triggered()));
-    connect(action(Qn::PtzGoToPresetAction),                    SIGNAL(triggered()),    this,   SLOT(at_ptzGoToPresetAction_triggered()));
-    connect(action(Qn::PtzManagePresetsAction),                 SIGNAL(triggered()),    this,   SLOT(at_ptzManagePresetsAction_triggered()));
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
@@ -302,7 +292,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
-    context()->instance<QnWorkbenchPtzPresetManager>(); /* The sooner we create this one, the better. */
     context()->instance<QnAppServerNotificationCache>();
 
     /* Run handlers that update state. */
@@ -355,6 +344,9 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
+
+    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+        return;
 
     {
         //TODO: #GDM refactor duplicated code
@@ -512,6 +504,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (hasDbChanges) {
         connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        foreach(const QnResourcePtr &camera, cameras) {
+            QnAppServerConnectionFactory::createConnection()->saveAsync(camera->getId(),
+                                                                        camera->getProperties());
+        }
     }
 
     if (hasCameraChanges) {
@@ -764,7 +760,7 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
-    m_mainMenu = menu()->newMenu(Qn::MainScope);
+    m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
@@ -777,48 +773,6 @@ void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
 
 void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
     action(Qn::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
-}
-
-void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
-    qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
-}
-
-void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
-    qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
-}
-
-void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
-    QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
-    dialog->setResources(resourcePool()->getResources());
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_debugCalibratePtzAction_triggered() {
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*> (menu()->currentParameters(sender()).widget());
-    if(!widget)
-        return;
-    QPointer<QnResourceWidget> guard(widget);
-
-    
-
-    QnWorkbenchPtzController *ptzController = context()->instance<QnWorkbenchPtzController>();
-    QVector3D position = ptzController->position(widget);
-
-    for(int i = 0; i <= 20; i++) {
-        qreal zoom = i / 20.0;
-
-        position.setZ(zoom);
-        ptzController->setPosition(widget, position);
-
-        QEventLoop loop;
-        QTimer::singleShot(10000, &loop, SLOT(quit()));
-        loop.exec();
-
-        if(!guard)
-            break;
-
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(zoom, 0, 'f', 2)));
-    }
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -858,8 +812,12 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
                 pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
 
         /* Add to layout. */
-        foreach(const QnLayoutItemData &data, itemDataByUuid)
+        foreach(const QnLayoutItemData &data, itemDataByUuid) {
+            if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+                return;
+
             layout->addItem(data);
+        }
 
         return;
     }
@@ -1398,12 +1356,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
         QnConnectionRequestResult result;
         connection->connectAsync(&result, SLOT(processReply(int, const QVariant &, int)));
-
-        QEventLoop loop;
-        connect(&result, SIGNAL(replyProcessed()), &loop, SLOT(quit()));
-        loop.exec();
-
-        if(result.status() != 0)
+        if(result.exec() != 0)
             return;
 
         connectionInfo = result.reply<QnConnectInfoPtr>();
@@ -1552,7 +1505,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 16; // TODO: #Elric take it from config?
+
+    const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
         QMessageBox::warning(mainWindow(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
@@ -1686,8 +1640,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                               this, SLOT(at_cameraSettingsDialog_advancedSettingChanged()));
         connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraIssuesRequested()),                                this, SLOT(at_cameraSettingsDialog_cameraIssuesRequested()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraRulesRequested()),                                 this, SLOT(at_cameraSettingsDialog_cameraRulesRequested()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -1712,6 +1664,26 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->show();
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
+}
+
+void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
+    QnResourcePtr resource = menu()->currentParameters(sender()).resource();
+    if (!resource)
+        return;
+
+    QnMediaResourcePtr media = resource.dynamicCast<QnMediaResource>();
+    if (!media)
+        return;
+
+    QScopedPointer<QnPictureSettingsDialog> dialog(new QnPictureSettingsDialog(mainWindow()));
+    dialog->updateFromResource(media);
+    if (dialog->exec()) {
+        dialog->submitToResource(media);
+    } else {
+        QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+        if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
+            mediaWidget->setDewarpingParams(media->getDewarpingParams());
+    }
 }
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
@@ -1759,22 +1731,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
     QnResourceList resources = cameraSettingsDialog()->widget()->resources();
     menu()->trigger(Qn::OpenInNewLayoutAction, resources);
-
-    cameraSettingsDialog()->widget()->setResources(resources);
-    m_selectionUpdatePending = false;
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraIssuesRequested() {
-    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
-    menu()->trigger(Qn::CameraIssuesAction, resources);
-
-    cameraSettingsDialog()->widget()->setResources(resources);
-    m_selectionUpdatePending = false;
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraRulesRequested() {
-    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
-    menu()->trigger(Qn::CameraBusinessRulesAction, resources);
 
     cameraSettingsDialog()->widget()->setResources(resources);
     m_selectionUpdatePending = false;
@@ -1892,6 +1848,11 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if (!resource)
         return;
+
+//    QnConnectionTestingDialog dialog;
+//    dialog.testResource(QUrl::fromUserInput(resource->getUrl()));
+//    dialog.exec();
+
 
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
@@ -2108,10 +2069,11 @@ QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
 
 void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    QnMediaResourceWidget *w = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
+    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    if(!widget)
+        return;
 
-    adjustVideoDialog()->setWidget(w);
+    adjustVideoDialog()->setWidget(widget);
     adjustVideoDialog()->show();
 }
 
@@ -2232,40 +2194,6 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
     }
 }
 
-
-void QnWorkbenchActionHandler::at_setCurrentItemAspectRatioAutoAction_triggered() {
-
-    QnActionParameters params = menu()->currentParameters(sender());
-
-    QnResourceWidget *widget = params.widget();
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-    if(!mediaWidget)
-        return;
-    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(0.0);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio4x3Action_triggered() {
-
-    QnActionParameters params = menu()->currentParameters(sender());
-
-    QnResourceWidget *widget = params.widget();
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-    if(!mediaWidget)
-        return;
-    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(4.0 / 3.0);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentItemAspectRatio16x9Action_triggered() {
-
-    QnActionParameters params = menu()->currentParameters(sender());
-
-    QnResourceWidget *widget = params.widget();
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-    if(!mediaWidget)
-        return;
-    mediaWidget->display()->camDisplay()->setOverridenAspectRatio(16.0 / 9.0);
-}
-
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
     action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -2341,90 +2269,6 @@ void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
     setResolutionMode(Qn::HighResolution);
-}
-
-void QnWorkbenchActionHandler::at_ptzSavePresetAction_triggered() {
-    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(menu()->currentParameters(sender()).widget());
-    if(!camera || !widget)
-        return;
-
-    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
-        );
-        return;
-    }
-
-    QVector3D position = context()->instance<QnWorkbenchPtzController>()->position(widget);
-    if(qIsNaN(position)) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\nThe camera is probably in continuous movement mode. Please stop the camera and try again.").arg(camera->getName())
-        );
-        return;
-    }
-
-    QList<int> forbiddenHotkeys;
-    foreach(const QnPtzPreset &preset, context()->instance<QnWorkbenchPtzPresetManager>()->ptzPresets(camera))
-        forbiddenHotkeys.push_back(preset.hotkey);
-
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
-    dialog->setForbiddenHotkeys(forbiddenHotkeys);
-    dialog->setPreset(QnPtzPreset(-1, QString(), position));
-    dialog->setWindowTitle(tr("Save Position"));
-    if(dialog->exec() != QDialog::Accepted)
-        return;
-
-    context()->instance<QnWorkbenchPtzPresetManager>()->addPtzPreset(camera, dialog->preset());
-}
-
-void QnWorkbenchActionHandler::at_ptzGoToPresetAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-
-    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
-    
-    QList<QnResourceWidget *> widgets = display()->widgets(camera);
-    if(widgets.empty())
-        return;
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
-    if(!widget)
-        return;
-
-    QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
-    if(name.isEmpty())
-        return;
-
-    QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, name);
-    if(preset.isNull())
-        return;
-
-    if(camera->getStatus() == QnResource::Offline || camera->getStatus() == QnResource::Unauthorized) {
-        QMessageBox::critical(
-            mainWindow(),
-            tr("Could not set position from camera"),
-            tr("An error has occurred while trying to set current position for camera %1.\n\nPlease wait for the camera to go online.").arg(camera->getName())
-        );
-        return;
-    }
-
-    action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
-    context()->instance<QnWorkbenchPtzController>()->setPosition(widget, preset.logicalPosition);
-}
-
-void QnWorkbenchActionHandler::at_ptzManagePresetsAction_triggered() {
-    QnVirtualCameraResourcePtr camera = menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return;
-
-    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
-    dialog->setCamera(camera);
-    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {

@@ -7,9 +7,10 @@ QnClientTranslationManager::QnClientTranslationManager(QObject *parent):
 {
     addPrefix(lit("client"));
 
-    QString extraPath = qnSettings->extraTranslationsPath();
+    // Closing a backdoor for custom translations --Elric
+    /*QString extraPath = qnSettings->extraTranslationsPath();
     if(!extraPath.isEmpty())
-        addSearchPath(extraPath);
+        addSearchPath(extraPath);*/
 }
 
 QnClientTranslationManager::~QnClientTranslationManager() {

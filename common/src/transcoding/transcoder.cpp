@@ -1,6 +1,9 @@
 #include "transcoder.h"
+
+#include <utils/math/math.h>
+#include <core/resource/media_resource.h>
+
 #include "ffmpeg_transcoder.h"
-#include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
@@ -77,7 +80,7 @@ QnVideoTranscoder::~QnVideoTranscoder()
         delete filter;
 }
 
-void QnVideoTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+void QnVideoTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_layout = layout;
 }
@@ -256,7 +259,7 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
-void QnTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_vLayout = layout;
 }

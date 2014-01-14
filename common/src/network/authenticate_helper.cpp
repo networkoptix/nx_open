@@ -219,7 +219,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Ht
 void QnAuthHelper::addAuthHeader(nx_http::HttpResponse& response)
 {
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
-    response.headers.insert( nx_http::HttpHeader( "WWW-Authenticate", auth.arg(REALM).arg(lit(getNonce())).toLatin1() ) );
+    response.headers.insert( nx_http::HttpHeader( "WWW-Authenticate", auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
 }
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const

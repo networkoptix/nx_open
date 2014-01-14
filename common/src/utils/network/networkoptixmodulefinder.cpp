@@ -8,14 +8,15 @@
 #include <memory>
 
 #include <QtCore/QDateTime>
-#include <QtNetwork/QNetworkInterface>
 #include <QtCore/QScopedArrayPointer>
+#include <QtNetwork/QNetworkInterface>
+
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/product_features.h>
 
 #include "socket.h"
 #include "system_socket.h"
-#include "../common/log.h"
-#include "../common/systemerror.h"
-#include "../../common/customization.h"
 
 
 #ifndef _WIN32
@@ -106,7 +107,7 @@ static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
 
 void NetworkOptixModuleFinder::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder started"), cl_logDEBUG1 );
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;

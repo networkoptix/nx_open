@@ -18,8 +18,7 @@ public:
     int usedDigital() const;
     int usedAnalog() const;
 
-    int requiredDigital() const;
-    int requiredAnalog() const;
+    int required() const;
 
     bool isValid() const;
 private:
@@ -30,8 +29,7 @@ private:
     int m_usedDigital;
     int m_usedAnalog;
 
-    int m_requiredDigital;
-    int m_requiredAnalog;
+    int m_required;
 
     int m_proposedDigital;
     int m_proposedAnalog;

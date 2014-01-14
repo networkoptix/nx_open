@@ -2,11 +2,15 @@
 #define QN_CORE_CHECKED_CAST_H
 
 #include <cassert>
-#include <QSharedPointer>
+
+#include <boost/type_traits/is_pointer.hpp>
+#include <boost/type_traits/is_reference.hpp>
+
+#include <QtCore/QSharedPointer>
 
 template<class Target, class Source>
 Target checked_cast(Source *source) {
-    // static_assert(boost::is_pointer<Target>::value, "Target type must be a pointer");
+    static_assert(boost::is_pointer<Target>::value, "Target type must be a pointer");
 #ifdef _DEBUG
     Target result = dynamic_cast<Target>(source);
     assert(source == NULL || result != NULL);
@@ -18,7 +22,7 @@ Target checked_cast(Source *source) {
 
 template<class Target, class Source>
 Target checked_cast(Source &source) {
-    // static_assert(boost::is_reference<Target>::value, "Target type must be a reference");
+    static_assert(boost::is_reference<Target>::value, "Target type must be a reference");
 #ifdef _DEBUG
     return dynamic_cast<Target>(source);
 #else

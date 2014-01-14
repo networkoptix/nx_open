@@ -181,7 +181,7 @@ PartialFileLoader::PartialFileLoader(const QString& basePath)
 QString PartialFileLoader::getPartial(const QString& name)
 {
 	if (!m_cache.contains(name)) {
-		QString path = m_basePath + lit('/') + name + lit(".mustache");
+        QString path = m_basePath + L'/' + name + lit(".mustache");
 		QFile file(path);
 		if (file.open(QIODevice::ReadOnly)) {
 			QTextStream stream(&file);
@@ -357,31 +357,31 @@ Tag Renderer::findTag(const QString& content, int pos, int endPos)
 
 	QChar typeChar = content.at(pos);
 
-	if (typeChar == lit('#')) {
+    if (typeChar == L'#') {
 		tag.type = Tag::SectionStart;
 		tag.key = readTagName(content, pos+1, endPos);
-	} else if (typeChar == lit('^')) {
+    } else if (typeChar == L'^') {
 		tag.type = Tag::InvertedSectionStart;
 		tag.key = readTagName(content, pos+1, endPos);
-	} else if (typeChar == lit('/')) {
+    } else if (typeChar == L'/') {
 		tag.type = Tag::SectionEnd;
 		tag.key = readTagName(content, pos+1, endPos);
-	} else if (typeChar == lit('!')) {
+    } else if (typeChar == L'!') {
 		tag.type = Tag::Comment;
-	} else if (typeChar == lit('>')) {
+    } else if (typeChar == L'>') {
 		tag.type = Tag::Partial;
 		tag.key = readTagName(content, pos+1, endPos);
-	} else if (typeChar == lit('=')) {
+    } else if (typeChar == L'=') {
 		tag.type = Tag::SetDelimiter;
 		readSetDelimiter(content, pos+1, tagEndPos - m_tagEndMarker.length());
 	} else {
-		if (typeChar == lit('&')) {
+        if (typeChar == L'&') {
 			tag.escapeMode = Tag::Unescape;
 			++pos;
-		} else if (typeChar == lit('{')) {
+        } else if (typeChar == L'{') {
 			tag.escapeMode = Tag::Raw;
 			++pos;
-			int endTache = content.indexOf(lit('}'), pos);
+            int endTache = content.indexOf(L'}', pos);
 			if (endTache == tag.end - m_tagEndMarker.length()) {
 				++tag.end;
 			} else {
@@ -415,7 +415,7 @@ void Renderer::readSetDelimiter(const QString& content, int pos, int endPos)
 	QString endMarker;
 
 	while (!content.at(pos).isSpace() && pos < endPos) {
-		if (content.at(pos) == lit('=')) {
+        if (content.at(pos) == L'=') {
 			setError(lit("Custom delimiters may not contain '=' or spaces."), pos);
 			return;
 		}
@@ -428,7 +428,7 @@ void Renderer::readSetDelimiter(const QString& content, int pos, int endPos)
 	}
 
 	while (pos < endPos - 1) {
-		if (content.at(pos) == lit('=') || content.at(pos).isSpace()) {
+        if (content.at(pos) == L'=' || content.at(pos).isSpace()) {
 			setError(lit("Custom delimiters may not contain '=' or spaces."), pos);
 			return;
 		}

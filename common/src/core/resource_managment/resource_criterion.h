@@ -204,10 +204,6 @@ namespace QnResourceCriterionExpressions {
         return QnResourceCriterion(capabilities);
     }
 
-    inline QnResourceCriterionExpression hasPtzCapabilities(Qn::PtzCapabilities capabilities) {
-        return QnResourceCriterion(capabilities);
-    }
-
     inline QnResourceCriterionExpression operator||(const QnResourceCriterionExpression &le, const QnResourceCriterionExpression &re) {
         QnResourceCriterion l = le, r = re;
 

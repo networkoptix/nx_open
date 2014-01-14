@@ -1,10 +1,9 @@
 #ifdef ENABLE_ISD
 
-#include "isd_resource.h"
-#include "../onvif/dataprovider/rtp_stream_provider.h"
-#include "utils/math/math.h"
-#include "api/app_server_connection.h"
+#include <utils/math/math.h>
+
 #include "isd_stream_reader.h"
+#include "isd_resource.h"
 
 
 const char* QnPlIsdResource::MANUFACTURE = "ISD";
@@ -215,7 +214,7 @@ void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
 
-const QnResourceAudioLayout* QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     if (isAudioEnabled()) {
         const QnISDStreamReader* rtspReader = dynamic_cast<const QnISDStreamReader*>(dataProvider);

@@ -51,6 +51,8 @@ class QnWorkbenchGridMapper;
 class QnScreenRecorder;
 class QnGraphicsMessageBox;
 
+class WeakGraphicsItemPointerList;
+
 /**
  * This class implements default scene manipulation logic.
  */
@@ -124,6 +126,7 @@ protected:
 
     void moveCursor(const QPoint &aAxis, const QPoint &bAxis);
     void showContextMenuAt(const QPoint &pos);
+    Q_SLOT void showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);

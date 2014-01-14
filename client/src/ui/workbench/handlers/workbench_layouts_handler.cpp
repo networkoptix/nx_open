@@ -87,12 +87,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
     if (snapshotManager()->isFile(layout)) {
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
-        exportHandler->saveLayoutToLocalFile(layout,
-                                             layout->getLocalRange(),
-                                             layout->getUrl(),
-                                             Qn::LayoutLocalSave,
-                                             isReadOnly,
-                                             true); // overwrite layout file
+        exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
     } else {
         //TODO: #GDM check existing layouts.
         //TODO: #GDM all remotes layout checking and saving should be done in one place
@@ -391,14 +386,11 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
 
-            if(exportHandler->saveLayoutToLocalFile(fileResource,
-                                                    fileResource->getLocalRange(),
-                                                    fileResource->getUrl(),
-                                                    Qn::LayoutLocalSave,  // overwrite layout file
-                                                    isReadOnly,
-                                                    false,
-                                                    counter,
-                                                    SLOT(decrement())))
+            if(exportHandler->saveLocalLayout(fileResource,
+                                              isReadOnly,
+                                              false,
+                                              counter,
+                                              SLOT(decrement())))
                 counter->increment();
         }
 
@@ -439,7 +431,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(user, tr("New Layout")));
+    dialog->setName(generateUniqueLayoutName(user, tr("New layout")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     QMessageBox::Button button;
@@ -460,6 +452,14 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         }
 
         if (!existing.isEmpty()) {
+            bool allAreLocal = true;
+            foreach (const QnLayoutResourcePtr &layout, existing)
+                allAreLocal &= snapshotManager()->isLocal(layout);
+            if (allAreLocal) {
+                removeLayouts(existing);
+                break;
+            }
+
             button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
             if (button == QMessageBox::Cancel)
                 return;

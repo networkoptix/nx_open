@@ -13,6 +13,7 @@
 #include "api/serializer/pb_serializer.h"
 #include "client/client_globals.h"
 
+#include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
 
 namespace {

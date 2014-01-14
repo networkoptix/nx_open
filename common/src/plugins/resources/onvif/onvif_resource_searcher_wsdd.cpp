@@ -102,7 +102,7 @@ int nullGsoapFdisconnect(struct soap*)
 int gsoapFsend(struct soap *soap, const char *s, size_t n)
 {
     AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-    qSocket->sendTo(s, n, lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+    qSocket->sendTo(s, n, QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -155,7 +155,7 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
     QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
 
-    qSocket->sendTo(data.data(), data.size(), lit(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+    qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
 }
 
@@ -320,8 +320,6 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
     // if interface list is changed, remove old sockets
     std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
     for(; itr != m_ifaceToSock.end() ; ++itr) {
-        ProbeContext& ctx = *itr->second;
-        ctx.sock.reset();
         delete itr->second;
     }
     m_ifaceToSock.clear();
@@ -751,7 +749,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
         if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
-            ctx->sock.reset();
             delete ctx;
             m_ifaceToSock.erase( p.first );
             return false;
@@ -800,7 +797,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
         return true;
 
     //removing socket for it to be recreated on next sendProbe call
-    ctx->sock.reset();
     delete ctx;
     m_ifaceToSock.erase( p.first );
     return false;

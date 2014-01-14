@@ -20,6 +20,7 @@ public:
 
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
+    typedef QnNetworkResource base_type;
     Q_OBJECT
 
 public:
@@ -92,7 +93,6 @@ public:
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
-    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain) override;
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -227,6 +227,8 @@ protected:
     */
     virtual void stopInputPortMonitoring();
     virtual bool isInputPortMonitored() const;
+
+    virtual void parameterValueChangedNotify(const QnParam &param) override;
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;

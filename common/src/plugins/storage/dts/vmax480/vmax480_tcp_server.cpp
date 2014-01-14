@@ -200,7 +200,7 @@ bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
 void QnVMax480ConnectionProcessor::run()
 {
     Q_D(QnVMax480ConnectionProcessor);
-    saveSysThreadID();
+    //saveSysThreadID();
 
     char uuidBuffer[UUID_LEN+1];
 
@@ -339,7 +339,7 @@ void QnVMax480ConnectionProcessor::run()
             break;
 
         if (vMaxHeader[3] & 1)
-            media->flags = AV_PKT_FLAG_KEY;
+            media->flags = QnAbstractMediaData::MediaFlags_AVKey;
         media->channelNumber = vMaxHeader[3] >> 4;
         media->timestamp = timestamp;
         media->compressionType = codecID;

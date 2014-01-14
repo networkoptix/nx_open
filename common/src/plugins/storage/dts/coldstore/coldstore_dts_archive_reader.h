@@ -43,8 +43,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnResourceVideoLayout* getVideoLayout();
-    virtual QnResourceAudioLayout* getAudioLayout();
+    virtual QnResourceVideoLayoutPtr getVideoLayout() override;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
 
 private:    
 

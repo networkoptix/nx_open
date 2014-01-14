@@ -1128,7 +1128,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
             if (resourceDisplay->isPaused())
                 continue;
 
-            bool isLive = resourceDisplay->archiveReader()->isRealTimeSource();
+            bool isLive = resourceDisplay->archiveReader() && resourceDisplay->archiveReader()->isRealTimeSource();
             resourceDisplay->pause();
             m_autoPausedResourceDisplays.insert(resourceDisplay, isLive);
         }
@@ -1172,7 +1172,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
 
     QScopedPointer<QMenu> menu(manager->newMenu(
-        Qn::SliderScope, 
+        Qn::SliderScope,
+        mainWindow(),
         QnActionParameters(currentTarget(Qn::SliderScope)).
             withArgument(Qn::TimePeriodRole, selection).
             withArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)). // TODO: #Elric move this out into global scope!

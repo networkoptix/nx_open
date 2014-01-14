@@ -85,9 +85,6 @@ private:
     bool m_system;
 };
 
-typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
-typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
-
 Q_DECLARE_METATYPE(QnBusinessEventRulePtr)
 Q_DECLARE_METATYPE(QnBusinessEventRuleList)
 

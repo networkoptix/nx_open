@@ -257,7 +257,7 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
 
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
     if (m_blinker)
-        disconnect(m_list, 0, m_blinker, 0);
+        disconnect(m_list, NULL, m_blinker, NULL);
     
     m_blinker = blinker;
     
@@ -577,12 +577,11 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = qnResPool->getResources().filtered<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
             if (!sampleServer)
                 continue;
             resource = sampleServer;
             break;
-        case QnSystemHealth::StoragesAreFull:
-            continue;
         default:
             break;
         }

@@ -5,35 +5,47 @@
 
 #include <QtCore/QHash>
 
-#include <core/resource/interface/abstract_ptz_controller.h>
+#include <core/ptz/basic_ptz_controller.h>
+#include <utils/math/functors.h>
 
 class CLSimpleHTTPClient;
 class QnAxisParameterMap;
 
-class QnAxisPtzController: public QnAbstractPtzController {
-    Q_OBJECT;
+class QnAxisPtzController: public QnBasicPtzController {
+    Q_OBJECT
+    typedef QnBasicPtzController base_type;
+
 public:
-    QnAxisPtzController(QnPlAxisResource* resource);
+    QnAxisPtzController(const QnPlAxisResourcePtr &resource);
     virtual ~QnAxisPtzController();
 
-    virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
-    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
-    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
-    virtual int stopMove() override;
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual const QnPtzSpaceMapper *getSpaceMapper() override;
+
+    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
+    
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
+    virtual bool getFlip(Qt::Orientations *flip) override;
+
+    virtual bool synchronize(Qn::PtzDataFields fields) override;
 
 private:
-    void init(const QnAxisParameterMap &params);
+    void updateState();
+    void updateState(const QnAxisParameterMap &params);
 
     CLSimpleHTTPClient *newHttpClient() const;
     bool query(const QString &request, QByteArray *body = NULL) const;
     bool query(const QString &request, QnAxisParameterMap *params) const;
-
+    QString getCameraNum();
+    
 private:
-    QnPlAxisResource* m_resource;
+    QnPlAxisResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
-    QnPtzSpaceMapper *m_spaceMapper;
+    Qt::Orientations m_flip;
+    QnPtzLimits m_limits;
+    QnLinearFunction m_logicalToCameraZoom, m_cameraToLogicalZoom;
+    mutable QByteArray ptz_ctl_id; // TODO: #Elric wtf?
 };
 
 #endif // #ifdef ENABLE_AXIS
