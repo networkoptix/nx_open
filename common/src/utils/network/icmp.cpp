@@ -1,3 +1,4 @@
+#ifdef __APPLE__
 #include "icmp.h"
 
 #include <QtGlobal>
@@ -105,3 +106,4 @@ bool Icmp::ping(const QString& hostAddr, int timeoutMSec) {
 
     return false;
 }
+#endif
