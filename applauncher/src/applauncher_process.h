@@ -54,11 +54,7 @@ private:
     bool m_terminated;
     InstallationManager* const m_installationManager;
     const bool m_quitMode;
-#ifdef _WIN32
     TaskServerNew m_taskServer;
-#else
-    TaskServer m_taskServer;
-#endif
     QSettings* const m_settings;
     int m_bindTriesCount;
     bool m_isLocalServerWasNotFound;
