@@ -45,7 +45,10 @@
             <item>
              <widget class="QLabel" name="infoLabel">
               <property name="text">
-               <string>...</string>
+               <string notr="true">...</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
