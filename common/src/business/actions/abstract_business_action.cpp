@@ -20,7 +20,7 @@ namespace BusinessActionType {
         case ShowPopup:             return QObject::tr("Show notification");
         case PlaySound:             return QObject::tr("Play sound");
         case PlaySoundRepeated:     return QObject::tr("Repeat sound");
-        case SayText:               return QObject::tr("Say");
+        case SayText:               return QObject::tr("Speak");
         }
         return QObject::tr("Unknown (%1)").arg((int)val);
     }

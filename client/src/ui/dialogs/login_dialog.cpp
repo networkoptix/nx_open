@@ -326,15 +326,26 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
 
     bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
             || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool success = (status == 0) && compatibleProduct;
 
-    if(status != 0 || !compatibleProduct) {
+    QString detail;
+
+    if (status == 202) {
+        detail = tr("Login or password you have entered are incorrect, please try again.");
+    } else if (status != 0) {
+        detail = tr("Connection to the Enterprise Controller could not be established.\n"
+                               "Connection details that you have entered are incorrect, please try again.\n\n"
+                               "If this error persists, please contact your VMS administrator.");
+    } else {
+        detail = tr("You are trying to connect to incompatible Enterprise Controller.");
+    }
+
+    if(!success) {
         QnMessageBox::warning(
-            this, 
+            this,
             Qn::Login_Help,
-            tr("Could not connect to Enterprise Controller"), 
-            tr("Connection to the Enterprise Controller could not be established.\n"
-               "Connection details that you have entered are incorrect, please try again.\n\n"
-               "If this error persists, please contact your VMS administrator.")
+            tr("Could not connect to Enterprise Controller"),
+            detail
         );
         updateFocus();
         return;

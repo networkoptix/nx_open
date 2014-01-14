@@ -97,11 +97,19 @@ void QnConnectionTestingDialog::testResults(int status, QnConnectInfoPtr connect
     bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
             || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
 
-    if (status != 0 || !compatibleProduct) {
+    if (status == 202) {
+        success = false;
+        detail = tr("Login or password you have entered are incorrect, please try again.");
+        helpTopicId = Qn::Login_Help;
+    } else if (status != 0) {
         success = false;
         detail = tr("Connection to the Enterprise Controller could not be established.\n"\
                     "Connection details that you have entered are incorrect, please try again.\n\n"\
                     "If this error persists, please contact your VMS administrator.");
+        helpTopicId = Qn::Login_Help;
+    } else if (!compatibleProduct) {
+        success = false;
+        detail = tr("You are trying to connect to incompatible Enterprise Controller.");
         helpTopicId = Qn::Login_Help;
     } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
         QnSoftwareVersion minSupportedVersion("1.4");

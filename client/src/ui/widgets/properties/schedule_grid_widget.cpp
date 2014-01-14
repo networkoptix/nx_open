@@ -19,6 +19,16 @@ namespace {
     QColor SELECTED_LABEL_COLOR(64,128, 192);
     const int DISABLED_COLOR_SHIFT = -72;
 
+    const int WEEK_SIZE = 7;
+    const int TEXT_SPACING = 4;
+
+    const qreal minimumLabelsFontSize = 10.0;
+    const qreal maximumLabelsFontSize = 14.0;
+    const qreal minimumGridFontSize = 7.0;
+    const qreal maximumGridFontSize = 12.0;
+
+    const qreal fontIncreaseStep = 0.5;
+
 } // anonymous namespace
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
@@ -27,8 +37,8 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_mouseMoveCell = QPoint(-2, -2);
     m_enabled = true;
     m_readOnly = false;
-    m_defaultParams[FirstParam] = 10;
-    m_defaultParams[SecondParam] = Qn::QualityNormal;
+    m_defaultParams[FpsParam] = 10;
+    m_defaultParams[QualityParam] = Qn::QualityNormal;
     m_defaultParams[RecordTypeParam] = Qn::RecordingType_Run;
 
     m_insideColors[Qn::RecordingType_Never] = m_colors[Qn::RecordingType_Never] = qnGlobals->noRecordColor();
@@ -42,7 +52,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
 
     QDate date(2010,1,1);
     date = date.addDays(1 - date.dayOfWeek());
-    for (int i = 0; i < 7; ++i) {
+    for (int i = 0; i < WEEK_SIZE; ++i) {
         m_weekDays << date.toString(QLatin1String("ddd"));
         date = date.addDays(1);
     }
@@ -54,8 +64,8 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_mousePressed = false;
     setMouseTracking(true);
 
-    m_showFirstParam = true;
-    m_showSecondParam = true;
+    m_showFps = true;
+    m_showQuality = true;
 
     m_labelsFont = font();
 }
@@ -64,57 +74,77 @@ QnScheduleGridWidget::~QnScheduleGridWidget() {
     return;
 }
 
-qreal QnScheduleGridWidget::cellSize() const
-{
+qreal QnScheduleGridWidget::cellSize() const {
     qreal cellWidth = ((qreal)width() - 0.5 - m_gridLeftOffset)/columnCount();
     qreal cellHeight = ((qreal)height() - 0.5 - m_gridTopOffset)/rowCount();
     return qMin(cellWidth, cellHeight);
 }
 
-void QnScheduleGridWidget::initMetrics()
-{
+void QnScheduleGridWidget::initMetrics() {
     // determine labels font size
     m_labelsFont.setBold(true);
-    qreal fontSize = 10.0;
-    do
-    {
+    m_labelsFont.setPointSizeF(minimumLabelsFontSize);
+
+    do {
         m_gridLeftOffset = 0;
         m_gridTopOffset = 0;
         m_weekDaysSize.clear();
-        m_labelsFont.setPointSizeF(fontSize);
         QFontMetrics metric(m_labelsFont);
-        for (int i = 0; i < 7; ++i) {
-            QSize sz = metric.size(Qt::TextSingleLine, m_weekDays[i]);
+        foreach (const QString &weekDay, m_weekDays) {
+            QSize sz = metric.size(Qt::TextSingleLine, weekDay);
             m_weekDaysSize << sz;
             m_gridLeftOffset = qMax(sz.width(), m_gridLeftOffset);
             m_gridTopOffset = qMax(sz.height(), m_gridTopOffset);
         }
         m_gridLeftOffset += TEXT_SPACING;
         m_gridTopOffset += TEXT_SPACING;
-        fontSize += 0.5;
-    } while (m_gridLeftOffset < cellSize()*0.5);
+        m_labelsFont.setPointSizeF(m_labelsFont.pointSizeF() + fontIncreaseStep);
+    } while (m_gridLeftOffset < cellSize()*0.5 && m_labelsFont.pointSizeF() < maximumLabelsFontSize);
+
+    qreal cellSize = this->cellSize();
+
+    qreal totalWidth = m_gridLeftOffset + (cellSize * columnCount());
+    qreal space = (width() - totalWidth) * 0.5;
+    if (space > 0)
+        m_gridLeftOffset += space;
+
+    // we do not need grid font if all is hidden
+    if (!m_showFps && !m_showQuality)
+        return;
 
     // determine grid font size
-    m_gridFont.setPointSizeF(7.0);
-    qreal cellSize = this->cellSize();
-    while (1)
-    {
+    m_gridFont.setPointSizeF(minimumGridFontSize);
+    qreal maxLength = m_showFps && m_showQuality
+            ? cellSize * .4545
+            : cellSize * .85;
+
+    while (true) {
         QFontMetrics metrics(m_gridFont);
-        if (metrics.width(QLatin1String("Me")) > cellSize/2.2)
+
+        bool tooBig = m_gridFont.pointSizeF() >= maximumGridFontSize;
+
+        // checking all variants of quality string
+        if (m_showQuality)
+            for (int i = 0; i < Qn::StreamQualityCount && !tooBig; i++)
+                tooBig |= (metrics.width(Qn::toShortDisplayString(static_cast<Qn::StreamQuality>(i))) > maxLength);
+
+        // checking numbers like 11, 22, .. 99
+        if (m_showFps)
+            for (int i = 0; i < 9 && !tooBig; i++)
+                tooBig |= (metrics.width(QString::number(i*11)) > maxLength);
+
+        if (tooBig)
             break;
-        m_gridFont.setPointSizeF(m_gridFont.pointSizeF()+0.5);
+        m_gridFont.setPointSizeF(m_gridFont.pointSizeF() + fontIncreaseStep);
     }
 }
 
-QSize QnScheduleGridWidget::minimumSizeHint() const
-{
+QSize QnScheduleGridWidget::minimumSizeHint() const {
     QSize sz;
-
-    qreal fontSize = 14.0;
 
     QFont font = m_labelsFont;
     font.setBold(true);
-    font.setPointSizeF(fontSize);
+    font.setPointSizeF(maximumLabelsFontSize);
 
     QFontMetrics fm(font);
     sz = fm.size(Qt::TextSingleLine, QLatin1String("xXx"));
@@ -201,23 +231,21 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
             }
 
             QPointF leftTop(cellSize*x, cellSize*y);
-            QPointF rightBottom(leftTop.x() + cellSize, leftTop.y() + cellSize);
-            p.fillRect(QRectF(leftTop.x(), leftTop.y(), cellSize, cellSize), color);
+            p.translate(leftTop);
+
+            p.fillRect(QRectF(0.0, 0.0, cellSize, cellSize), color);
 
             QColor penClr(255, 255, 255, 128);
             if (!m_enabled)
                 penClr = toGrayscale(penClr);
-            if (m_showFirstParam && m_showSecondParam)
-            {
-                QPoint p1 = QPointF(leftTop.x(), rightBottom.y()).toPoint();
-                QPoint p2(p1.x() + int(cellSize+0.5), p1.y() - int(cellSize+0.5));
+
+            if (m_showFps && m_showQuality) {
+                QPointF p1(0.0, cellSize);
+                QPointF p2(cellSize, 0.0);
                 p.drawLine(p1, p2);
             }
 
             if (colorInside.toRgb() != color.toRgb()) {
-                //p.fillRect(QRectF(leftTop.x() + cellSize/3, leftTop.y() + cellSize/3, cellSize/3, cellSize/3), colorInside);
-                p.translate(leftTop);
-
                 p.setBrush(m_enabled ? colorInside : toGrayscale(colorInside));
                 QColor penClr(shiftColor(color, -32,-32,-32));
                 if (!m_enabled)
@@ -230,13 +258,11 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                 QPointF points[6];
                 points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
                 points[1] = QPointF(cellSize - trOffset, trOffset);
-                points[2] = QPointF(cellSize-trOffset, trOffset + trSize);
+                points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
                 points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
                 points[4] = QPointF(trOffset, cellSize - trOffset);
                 points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
                 p.drawPolygon(points, 6);
-
-                p.translate(-leftTop.x(),-leftTop.y());
             }
 
             // draw text parameters
@@ -245,19 +271,21 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                 penClr = toGrayscale(penClr);
 
             p.setPen(penClr);
-            Qn::StreamQuality q = (Qn::StreamQuality) m_gridParams[x][y][SecondParam].toInt();
-            if (m_showFirstParam && m_showSecondParam)
+            Qn::StreamQuality quality = (Qn::StreamQuality) m_gridParams[x][y][QualityParam].toInt();
+            if (m_showFps && m_showQuality)
             {
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize/2.0, cellSize/2.0)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
-                p.drawText(QRectF(leftTop+QPointF(cellSize/2.0, cellSize/2.0), rightBottom), Qt::AlignCenter | Qt::AlignHCenter, toShortDisplayString(q));
+                p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
+                p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
             }
-            else if (m_showFirstParam)
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, m_gridParams[x][y][FirstParam].toString());
-            else if (m_showSecondParam)
-                p.drawText(QRectF(leftTop, leftTop+QPointF(cellSize, cellSize)), Qt::AlignCenter | Qt::AlignHCenter, toShortDisplayString(q));
+            else if (m_showFps)
+                p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
+            else if (m_showQuality)
+                p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
 
 
             p.setPen(QColor(255, 255, 255));
+
+            p.translate(-leftTop.x(),-leftTop.y());
 
         }
     }
@@ -275,17 +303,26 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
     p.translate(-m_gridLeftOffset, -m_gridTopOffset);
 
+
+    QSize max = *(std::max_element(m_weekDaysSize.begin(), m_weekDaysSize.end(),
+        [](QSize a, QSize b){ return a.width() < b.width() || a.height() < b.height(); }));
+
+    QSize spacing(m_gridLeftOffset, m_gridTopOffset);
+    spacing -= max;
+    spacing -= QSize(TEXT_SPACING, TEXT_SPACING);
+
     penClr = QColor(255, 255, 255, 128);
     if (!m_enabled)
         penClr = toGrayscale(penClr);
-
     p.setPen(penClr);
-    p.drawLine(QPoint(4, m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
-    p.drawLine(QPoint(m_gridLeftOffset, 4), QPoint(m_gridLeftOffset, m_gridTopOffset));
+    p.drawLine(QPoint(spacing.width(), m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
+    p.drawLine(QPoint(m_gridLeftOffset, spacing.height()), QPoint(m_gridLeftOffset, m_gridTopOffset));
     
     if(m_cornerText.isEmpty())
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
-            p.fillRect(QRectF(QPointF(4,4), QPointF(m_gridLeftOffset-4, m_gridTopOffset-4)), SELECTED_LABEL_COLOR);
+            p.fillRect(QRectF(QPointF(spacing.width(), spacing.height()),
+                              QPointF(m_gridLeftOffset - TEXT_SPACING, m_gridTopOffset - TEXT_SPACING)),
+                       SELECTED_LABEL_COLOR);
 
 
     // draw selection
@@ -419,15 +456,21 @@ void QnScheduleGridWidget::setDefaultParam(ParamType number, const QVariant& val
     m_defaultParams[number] = value;
 }
 
-void QnScheduleGridWidget::setShowFirstParam(bool value)
-{
-    m_showFirstParam = value;
+void QnScheduleGridWidget::setShowFps(bool value) {
+    if (m_showFps == value)
+        return;
+
+    m_showFps = value;
+    initMetrics();
     update();
 }
 
-void QnScheduleGridWidget::setShowSecondParam(bool value)
-{
-    m_showSecondParam = value;
+void QnScheduleGridWidget::setShowQuality(bool value) {
+    if (m_showQuality == value)
+        return;
+
+    m_showQuality = value;
+    initMetrics();
     update();
 }
 
@@ -505,11 +548,10 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, ParamType ty
     emit cellValueChanged(cell);
 }
 
-void QnScheduleGridWidget::resetCellValues()
-{
+void QnScheduleGridWidget::resetCellValues() {
     CellParams emptyParams;
-    emptyParams[FirstParam] = QLatin1String("-");
-    emptyParams[SecondParam] = Qn::QualityNotDefined;
+    emptyParams[FpsParam] = QLatin1String("-");
+    emptyParams[QualityParam] = Qn::QualityNotDefined;
     emptyParams[RecordTypeParam] = Qn::RecordingType_Never;
 
     for (int col = 0; col < columnCount(); ++col)
@@ -558,12 +600,12 @@ void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
-            int fps = m_gridParams[x][y][FirstParam].toInt();
+            int fps = m_gridParams[x][y][FpsParam].toInt();
             int value = maxFps;
             if (m_gridParams[x][y][RecordTypeParam] == Qn::RecordingType_MotionPlusLQ)
                 value = maxDualStreamFps;
             if(fps > value)
-                setCellValueInternal(QPoint(x, y), FirstParam, value);
+                setCellValueInternal(QPoint(x, y), FpsParam, value);
         }
     }
 }
@@ -578,7 +620,7 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
                 continue;
             if (rt == Qn::RecordingType_Never)
                 continue;
-            fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+            fps = qMax(fps, m_gridParams[x][y][FpsParam].toInt());
         }
     }
     return fps;

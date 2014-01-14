@@ -8,7 +8,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/av/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/av/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -18,7 +18,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/av/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/av/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -31,7 +31,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -41,7 +41,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -54,7 +54,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default_zh_CN/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default_zh_CN/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -64,7 +64,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default_zh_CN/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/default_zh_CN/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -77,7 +77,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/digitalwatchdog/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/digitalwatchdog/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -87,7 +87,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/digitalwatchdog/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/digitalwatchdog/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -100,7 +100,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/ipera/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/ipera/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -110,7 +110,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/ipera/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/ipera/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -123,7 +123,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nnodal/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nnodal/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -133,7 +133,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nnodal/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nnodal/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -146,7 +146,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nutech/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nutech/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -156,7 +156,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nutech/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/nutech/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -169,7 +169,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/pivothead/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/pivothead/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -179,7 +179,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/pivothead/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/pivothead/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -192,7 +192,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/relong/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/relong/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -202,7 +202,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/relong/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/relong/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -215,7 +215,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/win4net/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/win4net/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -225,7 +225,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/win4net/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.4/win4net/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -241,7 +241,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/av/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/av/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -251,7 +251,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/av/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/av/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -264,7 +264,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -274,7 +274,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -287,7 +287,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default_zh_CN/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default_zh_CN/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -297,7 +297,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default_zh_CN/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/default_zh_CN/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -310,7 +310,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/digitalwatchdog/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/digitalwatchdog/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -320,7 +320,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/digitalwatchdog/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/digitalwatchdog/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -333,7 +333,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/ipera/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/ipera/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -343,7 +343,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/ipera/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/ipera/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -356,7 +356,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nnodal/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nnodal/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -366,7 +366,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nnodal/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nnodal/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -379,7 +379,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nutech/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nutech/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -389,7 +389,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nutech/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/nutech/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -402,7 +402,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/pivothead/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/pivothead/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -412,7 +412,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/pivothead/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/pivothead/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -425,7 +425,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/relong/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/relong/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -435,7 +435,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/relong/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/relong/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -448,7 +448,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/win4net/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/win4net/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -458,7 +458,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/win4net/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/1.5/win4net/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -474,7 +474,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/av/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/av/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -484,7 +484,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/av/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/av/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -497,7 +497,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -507,7 +507,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -520,7 +520,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default_zh_CN/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default_zh_CN/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -530,7 +530,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default_zh_CN/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/default_zh_CN/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -543,7 +543,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/digitalwatchdog/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/digitalwatchdog/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -553,7 +553,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/digitalwatchdog/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/digitalwatchdog/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -566,7 +566,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/ipera/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/ipera/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -576,7 +576,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/ipera/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/ipera/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -589,7 +589,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nnodal/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nnodal/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -599,7 +599,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nnodal/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nnodal/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -612,7 +612,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nutech/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nutech/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -622,7 +622,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nutech/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/nutech/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -635,7 +635,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/pivothead/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/pivothead/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -645,7 +645,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/pivothead/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/pivothead/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -658,7 +658,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/relong/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/relong/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -668,7 +668,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/relong/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/relong/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -681,7 +681,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/win4net/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/win4net/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -691,7 +691,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/win4net/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.0/win4net/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -707,7 +707,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/av/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/av/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -717,7 +717,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/av/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/av/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -730,7 +730,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -740,7 +740,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -753,7 +753,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default_zh_CN/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default_zh_CN/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -763,7 +763,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default_zh_CN/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/default_zh_CN/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -776,7 +776,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/digitalwatchdog/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/digitalwatchdog/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -786,7 +786,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/digitalwatchdog/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/digitalwatchdog/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -799,7 +799,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/ipera/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/ipera/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -809,7 +809,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/ipera/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/ipera/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -822,7 +822,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nnodal/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nnodal/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -832,7 +832,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nnodal/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nnodal/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -845,7 +845,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nutech/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nutech/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -855,7 +855,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nutech/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/nutech/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -868,7 +868,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/pivothead/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/pivothead/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -878,7 +878,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/pivothead/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/pivothead/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -891,7 +891,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/relong/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/relong/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -901,7 +901,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/relong/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/relong/linux/x64/"/>
                     </sequence>
                 </condition>
@@ -914,7 +914,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/win4net/windows/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/win4net/windows/x64/"/>
                     </sequence>
                 </condition>
@@ -924,7 +924,7 @@
                     <sequence value="x86">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/win4net/linux/x86/"/>
                     </sequence>
-                    <sequence name="x64">
+                    <sequence value="x64">
                         <set resName="mirrorUrl" resValue="http://enk.me/clients/2.1/win4net/linux/x64/"/>
                     </sequence>
                 </condition>
