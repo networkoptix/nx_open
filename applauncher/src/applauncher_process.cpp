@@ -12,8 +12,6 @@
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
 
-#include "version.h"
-
 
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
@@ -234,16 +232,6 @@ bool ApplauncherProcess::addTaskToThePipe( const QByteArray& serializedTask )
     return true;
 #endif
 }
-
-#ifdef AK_DEBUG
-#ifdef _WIN32
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client")) );
-#endif
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
-#endif
 
 static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
 static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
