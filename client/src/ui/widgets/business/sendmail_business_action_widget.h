@@ -7,7 +7,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnSendmailBusinessActionWidget;
+    class SendmailBusinessActionWidget;
 }
 
 class QnSendmailBusinessActionWidget : public QnAbstractBusinessParamsWidget, public QnWorkbenchContextAware
@@ -28,7 +28,7 @@ private slots:
     void paramsChanged();
 
 private:
-    QScopedPointer<Ui::QnSendmailBusinessActionWidget> ui;
+    QScopedPointer<Ui::SendmailBusinessActionWidget> ui;
 };
 
 #endif // SENDMAIL_BUSINESS_ACTION_WIDGET_H

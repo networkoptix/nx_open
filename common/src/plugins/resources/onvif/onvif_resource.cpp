@@ -340,11 +340,6 @@ QString QnPlOnvifResource::getDriverName() const
     return QLatin1String(MANUFACTURE);
 }
 
-QString QnPlOnvifResource::getVendorInternal() const
-{
-    return m_vendorName;
-}
-
 bool QnPlOnvifResource::hasDualStreaming() const
 {
     QVariant mediaVariant;
@@ -541,11 +536,6 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
 int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
     return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
-}
-
-void QnPlOnvifResource::setVendorName( const QString& vendorName )
-{
-    m_vendorName = vendorName;
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate) const
@@ -2897,6 +2887,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
             if (getModel().isEmpty())
                 setModel(QLatin1String(response.Model.c_str()));
             setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
+            setVendor(QLatin1String(response.Manufacturer.c_str()));
             hardwareId = QString::fromStdString(response.HardwareId);
 
             if (performSimpleCheck)
