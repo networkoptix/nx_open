@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 namespace Ui {
-    class QnLayoutSettingsDialog;
+    class LayoutSettingsDialog;
 }
 
 class QnAppServerImageCache;
@@ -70,7 +70,7 @@ private:
     Q_DECLARE_PRIVATE(QnLayoutSettingsDialog)
 
 private:
-    QScopedPointer<Ui::QnLayoutSettingsDialog> ui;
+    QScopedPointer<Ui::LayoutSettingsDialog> ui;
     QnLayoutSettingsDialogPrivate *const d_ptr;
 
     QnAppServerImageCache *m_cache;

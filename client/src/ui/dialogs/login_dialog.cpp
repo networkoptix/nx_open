@@ -169,7 +169,7 @@ bool QnLoginDialog::restartPending() const {
 void QnLoginDialog::accept() {
     QUrl url = currentUrl();
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid Login Information"), tr("The login information you have entered is not valid."));
         return;
     }
 
@@ -394,7 +394,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         tr("You are about to connect to Enterprise Controller which has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Unable to connect to applauncher to enable client compatibility mode"
+                            "Unable to connect to applauncher to enable client compatibility mode."
                         ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
                         QMessageBox::Ok
                     );
@@ -519,7 +519,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
-                                                                  tr("Connection with the same name already exists. Overwrite it?"),
+                                                                  tr("Connection with this name already exists. Do you want to overwrite it?"),
                                                                   QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                                                                   QMessageBox::Yes);
         switch(button) {
