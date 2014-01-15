@@ -371,12 +371,11 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                 Qn::VersionMismatch_Help,
                 tr("Could not connect to Enterprise Controller"),
                 tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                   " - Client version: %1.\n"
-                   " - EC version: %2.\n"
-                   "Compatibility mode for versions lower than %3 is not supported.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version.toString())
-                    .arg(minSupportedVersion.toString())
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "Compatibility mode for versions lower than %3 is not supported."
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()).arg(minSupportedVersion.toString()),
+                QMessageBox::Ok
             );
             m_restartPending = false;
         }
@@ -391,10 +390,10 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         this,
                         Qn::VersionMismatch_Help,
                         tr("Could not connect to Enterprise Controller"),
-                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                        tr("Selected Enterprise controller has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Unable to connect to applauncher to enable client compatibility mode."
+                            "An error has occurred while trying to restart in compatibility mode."
                         ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
                         QMessageBox::Ok
                     );
@@ -408,7 +407,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         tr("You are about to connect to Enterprise Controller which has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Would you like to restart client in compatibility mode?"
+                            "Would you like to restart in compatibility mode?"
                         ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
                         QMessageBox::Cancel
@@ -416,11 +415,11 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                     if(button == QMessageBox::Ok) {
                         if (applauncher::restartClient(connectInfo->version, currentUrl().toEncoded()) != applauncher::api::ResultType::ok) {
                             QMessageBox::critical(
-                                        this,
-                                        tr("Launcher process is not found"),
-                                        tr("Cannot restart the client in compatibility mode.\n"
-                                           "Please close the application and start it again using the shortcut in the start menu.")
-                                        );
+                                this,
+                                tr("Launcher process is not found"),
+                                tr("Cannot restart the client in compatibility mode.\n"
+                                    "Please close the application and start it again using the shortcut in the start menu.")
+                            );
                         }
                     } else {
                         m_restartPending = false;
@@ -433,7 +432,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         tr("You are about to connect to Enterprise Controller which has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Client Version %3 is required to connect to this Enterprise Controller.\n"
+                            "Client version %3 is required to connect to this Enterprise Controller.\n"
                             "Download version %3?"
                         ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()).arg(connectInfo->version.toString(QnSoftwareVersion::MinorFormat)),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
