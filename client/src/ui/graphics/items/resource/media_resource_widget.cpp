@@ -11,7 +11,9 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
 #include <utils/common/container.h>
+
 #include <client/client_settings.h>
+#include <client/client_globals.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -81,6 +83,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer,                 &QnResourceWidgetRenderer::sourceSizeChanged,   this, &QnMediaResourceWidget::updateAspectRatio);
     connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
+    connect(m_resource->toResource(),   &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
     connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
     connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
@@ -416,13 +419,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
-
-        if (m_camera) {
-            QString overriddenAr = m_camera->getProperty(lit("overrideAr"));
-            if (!overriddenAr.isEmpty())
-                m_display->camDisplay()->setOverridenAspectRatio(overriddenAr.toDouble());
-        }
-
+        updateCustomAspectRatio();
     } else {
         setChannelLayout(qn_resourceWidget_defaultContentLayout);
         m_renderer->setChannelCount(0);
@@ -677,9 +674,7 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
 
-    if(statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
-        return Qn::MainWindow_MediaItem_AnalogLicense_Help;
-    } else if(statusOverlay == Qn::OfflineOverlay) {
+    if(statusOverlay == Qn::OfflineOverlay) {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
@@ -698,8 +693,6 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
     } else if(m_resource->toResource()->flags() & QnResource::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
-    } else if(m_camera && m_camera->isAnalog()) {
-        return Qn::MainWindow_MediaItem_AnalogCamera_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }
@@ -864,8 +857,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return Qn::NoDataOverlay;
-    } else if (m_camera && m_camera->isAnalog() && m_camera->isScheduleDisabled()) {
-        return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
         return Qn::PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
@@ -889,6 +880,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
 
 void QnMediaResourceWidget::at_resource_resourceChanged() {
     invalidateMotionSensitivity();
+}
+
+void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
+    if (resource != m_camera ||  key != Qn::customAspectRatioKey)
+        return;
+    updateCustomAspectRatio();
 }
 
 void QnMediaResourceWidget::updateAspectRatio() {
@@ -1026,6 +1023,18 @@ void QnMediaResourceWidget::updateFisheye() {
 
     updateAspectRatio();
     emit fisheyeChanged();
+}
+
+void QnMediaResourceWidget::updateCustomAspectRatio() {
+    if (!m_camera || !m_display)
+        return;
+
+    QString customAr = m_camera->getProperty(Qn::customAspectRatioKey);
+    if (!customAr.isEmpty())
+        m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
+    else
+        m_display->camDisplay()->setOverridenAspectRatio(0.0);
+
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

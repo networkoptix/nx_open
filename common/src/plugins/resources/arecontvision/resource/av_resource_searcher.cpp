@@ -205,6 +205,9 @@ QByteArray downloadFileWithRetry(CLHttpStatus& status, const QString& fileName, 
 
 QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     Q_UNUSED(doMultichannelCheck)
     QString host = url.host();
     int port = url.port();

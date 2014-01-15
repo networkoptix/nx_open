@@ -657,7 +657,7 @@ bool CommunicatingSocket::connect( const QString& foreignAddress, unsigned short
     {
         if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
         {
-            m_lastError = tr("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
+            m_lastError = tr("Couldn't connect to %1: %2.").arg(foreignAddress).arg(SystemError::getLastOSErrorText());
             return false;
         }
         if( isNonBlockingModeBak )

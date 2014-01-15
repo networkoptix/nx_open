@@ -1,5 +1,7 @@
 #include "version.h"
 
+#undef PlaySound // TODO: #Elric wtf??????
+
 #include "camera.pb.h"
 #include "server.pb.h"
 #include "user.pb.h"

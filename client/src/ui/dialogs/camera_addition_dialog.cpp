@@ -525,13 +525,13 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         QHostAddress endAddr(endAddrStr);
 
         if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
-            ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
+            ui->validateLabelSearch->setText(tr("First address in range is greater than the last one."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
 
         if (!endAddr.isInSubnet(startAddr, 8)){
-            ui->validateLabelSearch->setText(tr("Ip address range is too big, maximum of 255 addresses is allowed"));
+            ui->validateLabelSearch->setText(tr("Specified IP address range contains more than 255 addresses."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -539,7 +539,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         QString userInput = ui->singleCameraLineEdit->text();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url, ip address or rtsp link"));
+            ui->validateLabelSearch->setText(tr("Camera address field must contain valid URL, IP address or RTSP link."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -618,7 +618,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)", "", urls.size()));
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s).", "", urls.size()));
         }
     }
     setState(CamerasFound);

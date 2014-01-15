@@ -28,6 +28,7 @@
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
+// TODO: #TR #GDM move these to QnBusinessRuleViewModel and provide proper contexts to tr (so that those are not QObject::tr).
 namespace {
 QString toggleStateToModelString(Qn::ToggleState value) {
     switch( value )
@@ -103,7 +104,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (int i = 0; i < BusinessActionType::Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
 
-        QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
         item->setData(val);
         item->setData(BusinessActionType::hasToggleState(val), ProlongedActionRole);
 
@@ -615,7 +616,7 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
     case QnBusiness::SpacerColumn:
         return QString();
     case QnBusiness::ActionColumn:
-        return BusinessActionType::toString(m_actionType);
+        return QnBusinessStringsHelper::actionName(m_actionType);
     case QnBusiness::TargetColumn:
         return getTargetText(detailed);
     case QnBusiness::AggregationColumn:
@@ -867,7 +868,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     {
         QString text = m_actionParams.getSayText();
         if (text.isEmpty())
-            return tr("Enter the text");
+            return tr("Enter text");
         return text;
     }
     default:

@@ -86,7 +86,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         for (int i = 0; i < BusinessActionType::Count; i++) {
             BusinessActionType::Value val = (BusinessActionType::Value)i;
 
-            QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
             item->setData(val);
             item->setData(BusinessActionType::hasToggleState(val), ProlongedActionRole);
 
@@ -515,7 +515,7 @@ void QnEventLogDialog::at_selectAllAction()
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()

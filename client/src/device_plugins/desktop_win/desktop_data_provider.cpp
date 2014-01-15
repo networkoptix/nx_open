@@ -388,12 +388,12 @@ bool QnDesktopDataProvider::init()
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().constData());
     if(videoCodec == 0)
     {
-        m_lastErrorStr = tr("Can't find video encoder ") + videoCodecName;
+        m_lastErrorStr = tr("Could not find video encoder %1.").arg(videoCodecName);
         return false;
     }
 
     if (m_grabber->width() % 8 != 0) {
-        m_lastErrorStr = QLatin1String("Unalignment screen width. Width MUST be multipler of 8");
+        m_lastErrorStr = tr("Screen width must be a multiplier of 8.");
         return false;
     }
 
@@ -470,7 +470,7 @@ bool QnDesktopDataProvider::init()
 
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
-        m_lastErrorStr = QLatin1String("Can't initialize video encoder");
+        m_lastErrorStr = tr("Could not initialize video encoder.");
         return false;
     }
 
@@ -489,7 +489,7 @@ bool QnDesktopDataProvider::init()
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toLatin1().constData());
         if(audioCodec == 0)
         {
-            m_lastErrorStr = QLatin1String("Can't find audio encoder") + audioCodecName;
+            m_lastErrorStr = tr("Could not find audio encoder '%1'.").arg(audioCodecName);
             return false;
         }
 
@@ -508,7 +508,7 @@ bool QnDesktopDataProvider::init()
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
-            m_lastErrorStr = QLatin1String("Can't initialize audio encoder");
+            m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;
         }
 
@@ -516,7 +516,7 @@ bool QnDesktopDataProvider::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + audioChannel->m_audioDevice.fullName() + QLatin1Char('\'');
+                m_lastErrorStr = tr("Could not initialize audio device '%1'.").arg(audioChannel->m_audioDevice.fullName());
                 return false;
             }
         }
@@ -537,7 +537,7 @@ bool QnDesktopDataProvider::init()
     {
         if (!info->start())
         {
-            m_lastErrorStr = QLatin1String("Can't start primary audio device");
+            m_lastErrorStr = tr("Could not start primary audio device.");
             return false;
         }
     }

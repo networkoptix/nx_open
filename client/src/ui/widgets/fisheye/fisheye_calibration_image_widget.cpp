@@ -162,8 +162,6 @@ void QnFisheyeCalibrationImageWidget::paintCircle(QPainter *painter, const QRect
     if (qFuzzyIsNull(relativeRadius))
         return;
 
-    qDebug() << "painting circle within" << targetRect << "at" << relativeCenter << "by" << relativeRadius;
-
     int halfLineWidth = m_lineWidth / 2;
     qreal radius = relativeRadius * targetRect.width();
     QPointF center(relativeCenter.x() * targetRect.width(), relativeCenter.y() * targetRect.height());

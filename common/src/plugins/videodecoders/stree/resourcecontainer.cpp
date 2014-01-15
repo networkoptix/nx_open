@@ -55,6 +55,18 @@ namespace stree
         return m_curIter->second;
     }
 
+    QString ResourceContainer::toString( const stree::ResourceNameSet& rns ) const
+    {
+        QString str;
+        for( auto resPair: m_mediaStreamPameters )
+        {
+            if( !str.isEmpty() )
+                str += QLatin1String(", ");
+            str += QString::fromLatin1("%1:%2").arg(rns.findResourceByID(resPair.first).name).arg(resPair.second.toString());
+        }
+        return str;
+    }
+
 
     SingleResourceContainer::SingleResourceContainer()
     :

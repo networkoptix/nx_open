@@ -24,7 +24,7 @@ public:
         {
             case noError:
                 requiredParamCount = 0;
-                errorMessage = tr("ok");
+                errorMessage = tr("OK");
                 break;
             case mediaServerUnavailable:
                 requiredParamCount = 1;
@@ -41,62 +41,62 @@ public:
             case cannotOpenCameraMediaPort:
                 requiredParamCount = 2;
                 errorMessage = tr("Cannot open media url %1. Failed to connect to media port %2.\n "
-                    "Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.");
+                    "Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.");
                 break;
             case connectionClosedUnexpectedly:
                 requiredParamCount = 2;
                 errorMessage = tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.\n "
-                                  "Make sure the camera is plugged into the network. Try to reboot camera.");
+                                  "Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case responseParseError:
                 requiredParamCount = 2;
-                errorMessage = tr("Error parsing camera response. Url %1, request name %2.\n Please try to reboot the camera, "
-                    "then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support");
+                errorMessage = tr("Could not parse camera response. Url %1, request name %2.\n Please try to reboot the camera, "
+                    "then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case noMediaTrack:
                 requiredParamCount = 1;
-                errorMessage = tr("No supported media track(s) at url %1.\n Please try to reboot the camera, then restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, contact support");
+                errorMessage = tr("No supported media tracks at url %1.\n Please try to reboot the camera, then restore factory defaults on the web-page. "
+                    "Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case notAuthorised:
                 requiredParamCount = 1;
-                errorMessage = tr("Not authorized. Url %1");
+                errorMessage = tr("Not authorized. Url %1.");
                 break;
             case unsupportedProtocol:
                 requiredParamCount = 2;
                 errorMessage = tr("Cannot open media url %1. Unsupported media protocol %2.\n Please try to restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, contact support.");
+                    "Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case cannotConfigureMediaStream:
                 requiredParamCount = 1;
                 errorMessage = tr("Failed to configure parameter %1.\n First, try to turn on recording (if it's off) and decrease fps in camera settings. "
-                    "If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.");
+                    "If it doesn't help, restore factory defaults on the camera web-page. If the problem persists, please contact support.");
                 break;
             case requestFailed:
                 requiredParamCount = 2;
                 errorMessage = tr("Camera request \"%1\" failed with error \"%2\".\n Please try to reboot the camera, then restore factory defaults on the web-page. "
-                    "Finally, try to update firmware. If the problem persists, contact support.");
+                    "Finally, try to update firmware. If the problem persists, please contact support.");
                 break;
             case notImplemented:
                 requiredParamCount = 0;
-                errorMessage = tr("Unknown Camera Issue.\n Please, contact support."); // TODO: #Elric Please without ","
+                errorMessage = tr("Unknown Camera Issue.\n Please contact support.");
                 break;
             case ioError:
                 requiredParamCount = 1;
-                errorMessage = tr("I/O error. OS message: \"%1\".\n Make sure the camera is plugged into the network. Try to reboot the camera.");
+                errorMessage = tr("An input/output error has occurred. OS message: \"%1\".\n Make sure the camera is plugged into the network. Try to reboot the camera.");
                 break;
             case serverTerminated:
                 errorMessage = tr("Server has been stopped.");
                 break;
             case cameraInvalidParams:
                 requiredParamCount = 1;
-                errorMessage = tr("Invalid data received from camera: %1");
+                errorMessage = tr("Invalid data was received from the camera: %1.");
                 break;
             case badMediaStream:
-                errorMessage = tr("Too many media errors. Please open camera issues dialog for more details");
+                errorMessage = tr("Too many media errors. Please open camera issues dialog for more details.");
                 break;
             case noMediaStream:
-                errorMessage = tr("Media stream is opened but no media data was received");
+                errorMessage = tr("Media stream is opened but no media data was received.");
                 break;
             default:
             {
@@ -111,7 +111,7 @@ public:
 
                 errorMessage = tr("Unknown error. Please contact support.");
                 if( nonEmptyParamCount )
-                    errorMessage += tr(" Parameters: ");
+                    errorMessage += tr("\n\nParameters: ");
                 for( int i = 0; i < nonEmptyParamCount; ++i )
                 {
                     if( i > 0 )
@@ -135,34 +135,36 @@ namespace CameraDiagnostics
 {
     namespace Step
     {
+        // TODO : #Elric classic enum name mapping
+
         QString toString( Value val )
         {
             switch( val )
             {
                 case none:
-                    return QString::fromLatin1("none");
+                    return lit("none");
                 case mediaServerAvailability:
-                    return QString::fromLatin1("mediaServerAvailability");
+                    return lit("mediaServerAvailability");
                 case cameraAvailability:
-                    return QString::fromLatin1("cameraAvailability");
+                    return lit("cameraAvailability");
                 case mediaStreamAvailability:
-                    return QString::fromLatin1("mediaStreamAvailability");
+                    return lit("mediaStreamAvailability");
                 case mediaStreamIntegrity:
-                    return QString::fromLatin1("mediaStreamIntegrity");
+                    return lit("mediaStreamIntegrity");
                 default:
-                    return QString::fromLatin1("unknown");
+                    return lit("unknown");
             }
         }
 
         Value fromString( const QString& str )
         {
-            if( str == QString::fromLatin1("mediaServerAvailability") )
+            if( str == lit("mediaServerAvailability") )
                 return mediaServerAvailability;
-            else if( str == QString::fromLatin1("cameraAvailability") )
+            else if( str == lit("cameraAvailability") )
                 return cameraAvailability;
-            else if( str == QString::fromLatin1("mediaStreamAvailability") )
+            else if( str == lit("mediaStreamAvailability") )
                 return mediaStreamAvailability;
-            else if( str == QString::fromLatin1("mediaStreamIntegrity") )
+            else if( str == lit("mediaStreamIntegrity") )
                 return mediaStreamIntegrity;
             else
                 return none;

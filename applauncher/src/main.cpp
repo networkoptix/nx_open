@@ -30,8 +30,6 @@ static BOOL WINAPI stopServer_WIN(DWORD /*dwCtrlType*/)
 }
 #endif
 
-QSettings qSettings;    //TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettings to be defined somewhere...
-
 static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_CUSTOMIZATION_NAME)).arg(QLatin1String("AppLauncher"));
 
 static void printHelp( const InstallationManager& installationManager )
@@ -109,7 +107,7 @@ int main( int argc, char* argv[] )
     QtSingleApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings settings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
     InstallationManager installationManager;
 
     if( displayHelp )

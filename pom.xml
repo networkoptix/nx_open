@@ -198,9 +198,9 @@
         <profile>
             <id>build-env</id>
             <activation>
-                <file>
-                    <missing>build_environment/target/version.h</missing>
-                </file>
+                <property>
+                    <name>!skipBuildenv</name>
+                </property>
             </activation>
             <modules>	
                 <module>build_environment</module>       

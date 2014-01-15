@@ -536,10 +536,11 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 void ZoomWindowInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
-    if(ResizingInstrument *resizingInstrument = manager()->instrument<ResizingInstrument>()) {
-        connect(resizingInstrument, SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
-        connect(resizingInstrument, SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
-        connect(resizingInstrument, SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
+    m_resizingInstrument = manager()->instrument<ResizingInstrument>();
+    if(m_resizingInstrument) {
+        connect(m_resizingInstrument,   &ResizingInstrument::resizingStarted,   this, &ZoomWindowInstrument::at_resizingStarted);
+        connect(m_resizingInstrument,   &ResizingInstrument::resizing,          this, &ZoomWindowInstrument::at_resizing);
+        connect(m_resizingInstrument,   &ResizingInstrument::resizingFinished,  this, &ZoomWindowInstrument::at_resizingFinished);
     }
 
     base_type::installedNotify();
@@ -763,6 +764,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     }
 
     emit zoomTargetChanged(widget, zoomRect, newTargetWidget);
+    m_resizingInstrument->rehandle();
 }
 
 void ZoomWindowInstrument::at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *) {

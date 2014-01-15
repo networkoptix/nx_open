@@ -12,7 +12,7 @@
 
 QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnCameraOutputBusinessActionWidget)
+    ui(new Ui::CameraOutputBusinessActionWidget)
 {
     ui->setupUi(this);
 
