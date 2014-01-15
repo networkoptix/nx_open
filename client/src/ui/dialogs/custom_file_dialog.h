@@ -8,6 +8,12 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QLineEdit>
 
+#ifdef Q_OS_MAC
+#define QN_NO_CUSTOM_DIALOGS
+#endif
+
+
+#ifndef QN_NO_CUSTOM_DIALOGS
 class QnWidgetControlAbstractDelegate: public QObject
 {
     Q_OBJECT
@@ -77,6 +83,7 @@ public:
      */
     void addWidget(QWidget *widget, bool newRow = true, QnWidgetControlAbstractDelegate* delegate = NULL);
 
+    static QString valueSpacer() {return lit("%value%"); }
 private slots:
     void at_accepted();
 
@@ -86,5 +93,6 @@ private:
     QMap<QLineEdit*, QString *> m_lineEdits;
     int m_currentCol;
 };
+#endif
 
 #endif // CUSTOM_FILE_DIALOG_H

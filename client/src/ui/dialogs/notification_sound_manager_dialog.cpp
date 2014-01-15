@@ -66,7 +66,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     int cropSoundSecs = 5;
     QString title;
 
-    dialog->addSpinBox(tr("Clip sound up to %n seconds"), 1, 10, &cropSoundSecs); // TODO: #GDM using %n is confusing for translators as he would expect multiple (singular/plural) translations to be generated.
+    dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
     dialog->addLineEdit(tr("Custom Title"), &title);
     if(!dialog->exec())
         return;
