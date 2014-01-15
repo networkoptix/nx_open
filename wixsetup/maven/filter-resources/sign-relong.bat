@@ -1,1 +1,0 @@
-${environment.dir}\bin\signtool.exe sign /a /v /p wanjiaan201312 /d "${company.name} ${product.name}" /f app.pfx bin\${project.build.finalName}.msi
