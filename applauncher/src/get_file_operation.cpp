@@ -5,7 +5,13 @@
 
 #include "get_file_operation.h"
 
+#ifndef _WIN32
+#include <sys/stat.h>
+#endif
+
 #include <utils/common/log.h>
+
+#include "applauncher_process.h"
 
 
 namespace detail
@@ -134,6 +140,13 @@ namespace detail
             m_state = State::sFinished;
         }
         NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1,  bytes written %2").arg(entryPath).arg(m_totalBytesWritten), cl_logDEBUG2 );
+
+#ifndef _WIN32
+        //setting execution rights to file
+        if( entryPath.endsWith(APPLICATION_BIN_NAME) )
+            chmod( (m_localDirPath + "/" + entryPath).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
+#endif
+
         m_handler->operationDone( shared_from_this() );
     }
 
