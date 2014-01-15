@@ -98,9 +98,9 @@
                             <arguments>
                                 <argument>configure.py</argument>
                                 <argument>--cst</argument>
-                                <argument>${customization}</argument>
+                                <argument>${parent.customization}</argument>
                                 <argument>--chld</argument>
-                                <argument>${child.customization}</argument>                                
+                                <argument>${customization}</argument>                                
                                 <argument>--cfg</argument>
                                 <argument>${build.configuration}</argument>                                
                             </arguments>
@@ -254,7 +254,7 @@
                     <artifactId>help</artifactId>
                     <version>${project.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${child.customization}-${help.language}</classifier>
+                    <classifier>${customization}-${help.language}</classifier>
                 </dependency>
 
                 <dependency>
