@@ -302,12 +302,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
-    //commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString()); // TODO: #Elric
+#ifdef ENABLE_DYNAMIC_TRANSLATION
+    commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+#endif
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
-    //commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString()); // TODO: #Elric
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
+    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+#endif
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */

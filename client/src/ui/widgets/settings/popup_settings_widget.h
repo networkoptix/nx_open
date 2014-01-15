@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnPopupSettingsWidget;
+    class PopupSettingsWidget;
 }
 
 class QnBusinessEventsFilterKvPairAdapter;
@@ -30,7 +30,7 @@ private slots:
     void at_showBusinessEvents_valueChanged(quint64 value);
 
 private:
-    QScopedPointer<Ui::QnPopupSettingsWidget> ui;
+    QScopedPointer<Ui::PopupSettingsWidget> ui;
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
     QScopedPointer<QnBusinessEventsFilterKvPairAdapter> m_adapter;

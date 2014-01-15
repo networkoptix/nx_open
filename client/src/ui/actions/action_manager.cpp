@@ -1588,13 +1588,13 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         }
     }
 
-    if (!result->isEmpty())
-        result->addSeparator();
-
     if(parent->childFactory()) {
         QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
+            if (!result->isEmpty())
+                result->addSeparator();
+
             foreach(QAction *action, actions) {
                 action->setParent(result);
                 result->addAction(action);

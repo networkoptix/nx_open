@@ -29,9 +29,9 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    int index = text.indexOf(QLatin1String("%n"));
+    int index = text.indexOf(valueSpacer());
     QString prefix = text.mid(0, index).trimmed();
-    QString postfix = index >= 0 ? text.mid(index + 2).trimmed() : QString();
+    QString postfix = index >= 0 ? text.mid(index + valueSpacer().length()).trimmed() : QString();
 
     QLabel* labelPrefix = new QLabel(widget);
     labelPrefix->setText(prefix);

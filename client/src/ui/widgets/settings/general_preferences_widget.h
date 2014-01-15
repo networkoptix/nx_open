@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-class QnGeneralPreferencesWidget;
+    class GeneralPreferencesWidget;
 }
 
 class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, protected QnWorkbenchContextAware
@@ -40,7 +40,7 @@ private slots:
 
 
 private:
-    QScopedPointer<Ui::QnGeneralPreferencesWidget> ui;
+    QScopedPointer<Ui::GeneralPreferencesWidget> ui;
 
     bool m_oldDownmix;
     int m_oldLanguage;

@@ -64,7 +64,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
     m_screenshotIndex = 0;
     m_target = target;
 
-    ui.reset(new Ui::QnResourceSelectionDialog);
+    ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
     bool flat;

@@ -66,7 +66,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     int cropSoundSecs = 5;
     QString title;
 
-    dialog->addSpinBox(tr("Clip sound up to %n seconds"), 1, 10, &cropSoundSecs); // TODO: #GDM using %n is confusing for translators as he would expect multiple (singular/plural) translations to be generated.
+    dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
     dialog->addLineEdit(tr("Custom Title"), &title);
     if(!dialog->exec())
         return;
@@ -105,7 +105,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
         QMessageBox::warning(this,
                              tr("Error"),
-                             tr("New title could not be set"));
+                             tr("New title could not be set."));
 
 }
 
@@ -122,7 +122,7 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
     QString title = soundModel->titleByFilename(filename);
     if (QMessageBox::question(this,
                               tr("Confirm file deletion"),
-                              tr("Are you sure you want to delete\n%1").arg(title),
+                              tr("Are you sure you want to delete '%1'?").arg(title),
                               QMessageBox::Ok,
                               QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnPopupSettingsWidget</class>
- <widget class="QWidget" name="QnPopupSettingsWidget">
+ <class>PopupSettingsWidget</class>
+ <widget class="QWidget" name="PopupSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -31,7 +31,7 @@
    <item>
     <widget class="QGroupBox" name="businessEventsGroupBox">
      <property name="title">
-      <string>Show Alarms/Events</string>
+      <string>Alarms/Events</string>
      </property>
      <layout class="QVBoxLayout" name="businessEventsLayout"/>
     </widget>
@@ -39,7 +39,7 @@
    <item>
     <widget class="QGroupBox" name="systemHealthGroupBox">
      <property name="title">
-      <string>Show System Notifications</string>
+      <string>System Notifications</string>
      </property>
      <layout class="QVBoxLayout" name="systemHealthLayout"/>
     </widget>

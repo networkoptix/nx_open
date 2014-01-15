@@ -9,7 +9,7 @@
 
 QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnRecordingBusinessActionWidget)
+    ui(new Ui::RecordingBusinessActionWidget)
 {
     ui->setupUi(this);
 
