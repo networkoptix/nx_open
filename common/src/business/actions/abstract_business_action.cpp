@@ -149,5 +149,5 @@ void QnAbstractBusinessAction::setAggregationCount(int value)
 
 QString QnAbstractBusinessAction::getExternalUniqKey() const
 {
-    return QnBusinessStringsHelper::actionName(m_actionType); // TODO: #TR #GDM returning translated string as a unique key? WTF????
+    return lit("action_") + QString::number(static_cast<int>(m_actionType)) + L'_';
 }

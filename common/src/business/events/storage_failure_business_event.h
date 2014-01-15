@@ -12,6 +12,7 @@ public:
                           QnBusiness::EventReason reasonCode,
                           QnResourcePtr storageResource
                           );
+
 };
 
 typedef QSharedPointer<QnStorageFailureBusinessEvent> QnStorageFailureBusinessEventPtr;

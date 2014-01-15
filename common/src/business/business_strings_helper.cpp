@@ -5,6 +5,7 @@
 
 #include <business/business_aggregation_info.h>
 #include <business/events/reasoned_business_event.h>
+#include <business/events/network_issue_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/conflict_business_event.h>
 
@@ -301,51 +302,57 @@ QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &pa
 
 QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) {
     QnBusiness::EventReason reasonCode = params.getReasonCode();
-    BusinessEventType::Value eventType = params.getEventType();
-    QString reasonText = params.getReasonText();
+    QString reasonParamsEncoded = params.getReasonParamsEncoded();
 
     QString result;
 
     switch (reasonCode) {
-        case QnBusiness::NetworkIssueNoFrame:
-            if (eventType == BusinessEventType::Network_Issue)
-                result = tr("No video frame received during last %1 seconds.").arg(reasonText); // TODO: #TR #GDM use %n here
-            break;
-        case QnBusiness::NetworkIssueConnectionClosed:
-            if (eventType == BusinessEventType::Network_Issue) {
-                result = tr("Connection to camera was unexpectedly closed %1.").arg(reasonText); // TODO: #TR #GDM not clear what %1 is. Translators won't figure it out.
-            }
-            break;
-        case QnBusiness::NetworkIssueRtpPacketLoss:
-            if (eventType == BusinessEventType::Network_Issue) {
-                QStringList seqs = reasonText.split(QLatin1Char(';'));
-                if (seqs.size() != 2)
-                    break;
-                result = tr("RTP packet loss detected, prev seq.=%1 next seq.=%2.").arg(seqs[0]).arg(seqs[1]);
-            }
-            break;
-        case QnBusiness::MServerIssueTerminated:
-            if (eventType == BusinessEventType::MediaServer_Failure)
-                result = tr("Server terminated.");
-            break;
-        case QnBusiness::MServerIssueStarted:
-            if (eventType == BusinessEventType::MediaServer_Failure)
-                result = tr("Server started after crash.");
-            break;
-        case QnBusiness::StorageIssueIoError:
-            if (eventType == BusinessEventType::Storage_Failure)
-                result = tr("I/O error has occurred at %1.").arg(reasonText);
-            break;
-        case QnBusiness::StorageIssueNotEnoughSpeed:
-            if (eventType == BusinessEventType::Storage_Failure)
-                result = tr("Not enough HDD/SSD speed for recording to %1.").arg(reasonText);
-            break;
-        case QnBusiness::StorageIssueNotEnoughSpace:
-            if (eventType == BusinessEventType::Storage_Failure)
-                result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(reasonText);
-            break;
-        default:
-            break;
+    case QnBusiness::NetworkIssueNoFrame: {
+        int msecs = QnNetworkIssueBusinessEvent::decodeTimeoutMsecs(reasonParamsEncoded, 5000);
+        result = tr("No video frame received during last %n seconds.", 0, msecs / 1000);
+        break;
+    }
+    case QnBusiness::NetworkIssueConnectionClosed: {
+        bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
+        if (isPrimaryStream)
+            result = tr("Connection to camera primary stream was unexpectedly closed.");
+        else
+            result = tr("Connection to camera secondary stream was unexpectedly closed.");
+        break;
+    }
+    case QnBusiness::NetworkIssueRtpPacketLoss: {
+        QnNetworkIssueBusinessEvent::PacketLossSequence seq = QnNetworkIssueBusinessEvent::decodePacketLossSequence(reasonParamsEncoded);
+        if (seq.valid)
+            result = tr("RTP packet loss detected, prev seq.=%1 next seq.=%2.").arg(seq.prev).arg(seq.next);
+        else
+            result = tr("RTP packet loss detected.");
+        break;
+    }
+    case QnBusiness::MServerIssueTerminated: {
+        result = tr("Server terminated.");
+        break;
+    }
+    case QnBusiness::MServerIssueStarted: {
+        result = tr("Server started after crash.");
+        break;
+    }
+    case QnBusiness::StorageIssueIoError: {
+        QString storageUrl = reasonParamsEncoded;
+        result = tr("I/O error has occurred at %1.").arg(storageUrl);
+        break;
+    }
+    case QnBusiness::StorageIssueNotEnoughSpeed: {
+        QString storageUrl = reasonParamsEncoded;
+        result = tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
+        break;
+    }
+    case QnBusiness::StorageIssueNotEnoughSpace: {
+        QString storageUrl = reasonParamsEncoded;
+        result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+        break;
+    }
+    default:
+        break;
     }
 
     return result;
