@@ -16,7 +16,7 @@ QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption
 QnTwoStepFileDialog::~QnTwoStepFileDialog() { }
 
 void QnTwoStepFileDialog::setOptions(QFileDialog::Options options) {
-    Q_ASSERT(options = 0);
+    Q_ASSERT(options == 0);
 }
 
 void QnTwoStepFileDialog::setFileMode(QFileDialog::FileMode mode) {
