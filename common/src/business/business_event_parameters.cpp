@@ -16,7 +16,7 @@ static QString PARAM_NAMES[] =
     QLatin1String("inputPortId"),
 
     QLatin1String("reasonCode"),
-    QLatin1String("reasonText"),
+    QLatin1String("reasonParamsEncoded"),
 
     QLatin1String("source"),
     QLatin1String("conflicts"),
@@ -75,12 +75,12 @@ void QnBusinessEventParameters::setReasonCode(QnBusiness::EventReason value) {
     m_reasonCode =  value;
 }
 
-QString QnBusinessEventParameters::getReasonText() const {
-    return m_reasonText;
+QString QnBusinessEventParameters::getReasonParamsEncoded() const {
+    return m_reasonParamsEncoded;
 }
 
-void QnBusinessEventParameters::setReasonText(const QString& value) {
-    m_reasonText = value;
+void QnBusinessEventParameters::setReasonParamsEncoded(const QString& value) {
+    m_reasonParamsEncoded = value;
 }
 
 QString QnBusinessEventParameters::getSource() const {
@@ -177,8 +177,8 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                 case reasonCodeParam:
                     result.m_reasonCode = (QnBusiness::EventReason) toInt(field);
                     break;
-                case reasonTextParam:
-                    result.m_reasonText = QString::fromUtf8(field.data(), field.size());
+                case reasonParamsEncodedParam:
+                    result.m_reasonParamsEncoded = QString::fromUtf8(field.data(), field.size());
                     break;
 
                 case sourceParam:
@@ -238,7 +238,7 @@ QByteArray QnBusinessEventParameters::serialize() const
     serializeIntParam(result, m_actionResourceId, m_defaultParams.m_actionResourceId);
     serializeStringParam(result, m_inputPort, m_defaultParams.m_inputPort);
     serializeIntParam(result, m_reasonCode, m_defaultParams.m_reasonCode);
-    serializeStringParam(result, m_reasonText, m_defaultParams.m_reasonText);
+    serializeStringParam(result, m_reasonParamsEncoded, m_defaultParams.m_reasonParamsEncoded);
     serializeStringParam(result, m_source, m_defaultParams.m_source);
     serializeStringListParam(result, m_conflicts);
 
@@ -280,8 +280,8 @@ QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
     if (m_reasonCode != m_defaultParams.m_reasonCode)
         result.insert(PARAM_NAMES[reasonCodeParam], m_reasonCode);
 
-    if (m_reasonText != m_defaultParams.m_reasonText)
-        result.insert(PARAM_NAMES[reasonTextParam], m_reasonText);
+    if (m_reasonParamsEncoded != m_defaultParams.m_reasonParamsEncoded)
+        result.insert(PARAM_NAMES[reasonParamsEncodedParam], m_reasonParamsEncoded);
 
     if (m_source != m_defaultParams.m_source)
         result.insert(PARAM_NAMES[sourceParam], m_source);
@@ -343,8 +343,8 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
             case reasonCodeParam:
                 result.m_reasonCode = (QnBusiness::EventReason) itr.value().toInt();
                 break;
-            case reasonTextParam:
-                result.m_reasonText = itr.value().toString();
+            case reasonParamsEncodedParam:
+                result.m_reasonParamsEncoded = itr.value().toString();
                 break;
 
             case sourceParam:
@@ -378,7 +378,7 @@ bool QnBusinessEventParameters::operator==(const QnBusinessEventParameters& othe
 
     if (m_reasonCode != other.m_reasonCode)
         return false;
-    if (m_reasonText != other.m_reasonText)
+    if (m_reasonParamsEncoded != other.m_reasonParamsEncoded)
         return false;
     if (m_source != other.m_source)
         return false;
@@ -411,7 +411,7 @@ QString QnBusinessEventParameters::getParamsKey() const
         case BusinessEventType::Storage_Failure:
             paramKey += QLatin1String("_") + QString::number(getReasonCode());
             if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpace)
-                paramKey += QLatin1String("_") + getReasonText();
+                paramKey += QLatin1String("_") + getReasonParamsEncoded();
             break;
         case BusinessEventType::Camera_Input:
             paramKey += QLatin1String("_") + getInputPortId();

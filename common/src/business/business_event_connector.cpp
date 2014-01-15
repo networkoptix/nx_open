@@ -75,14 +75,14 @@ void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource
     qnBusinessRuleProcessor->processBusinessEvent(ipConflictEvent);
 }
 
-void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonText)
+void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonParamsEncoded)
 {
 #ifdef REDUCE_NET_ISSUE_HACK
     static int netIssueCounter;
     if (++netIssueCounter % 10)
         return; // mutex is not nessessary here
 #endif
-    QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(resource, timeStamp, reasonCode, reasonText));
+    QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(resource, timeStamp, reasonCode, reasonParamsEncoded));
     qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
 }
 

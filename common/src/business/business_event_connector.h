@@ -40,7 +40,7 @@ public slots:
 
     /*! Some problem with network
     */
-    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonText);
+    void at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonParamsEncoded);
 
     /*!
         \param inputPortID device-specific ID of input port
