@@ -178,12 +178,13 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         serverDelegate.open(res);
         serverDelegate.seek(time, true);
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == IFrameAfterTime ? time : AV_NOPTS_VALUE);
-        if (roundMethod != Precise) {
-            if (!video)
-                video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
-            if (!video)
-                video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
+
+        if (!video) {
+            video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
+            time = DATETIME_NOW;
         }
+        if (!video)
+            video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
     }
     if (!video) 
         return noVideoError(result, time);
