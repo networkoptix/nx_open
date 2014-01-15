@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnGeneralPreferencesWidget</class>
- <widget class="QWidget" name="QnGeneralPreferencesWidget">
+ <class>GeneralPreferencesWidget</class>
+ <widget class="QWidget" name="GeneralPreferencesWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -152,7 +152,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="tourCycleTimeLabel">
         <property name="text">
-         <string>Sequence Cycle Time:</string>
+         <string>Tour sequence cycle time:</string>
         </property>
         <property name="buddy">
          <cstring>tourCycleTimeSpinBox</cstring>
@@ -162,7 +162,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="showIpInTreeLabel">
         <property name="text">
-         <string>Show IP in Tree:</string>
+         <string>Show IP in tree:</string>
         </property>
         <property name="buddy">
          <cstring>showIpInTreeCheckBox</cstring>
@@ -179,7 +179,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Timeline Mode:</string>
+         <string>Timeline mode:</string>
         </property>
        </widget>
       </item>
@@ -278,7 +278,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Downmix Audio from 5.1 to 2.1:</string>
+           <string>Downmix audio from 5.1 to 2.1:</string>
           </property>
          </widget>
         </item>
@@ -335,7 +335,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Use Hardware Acceleration:</string>
+            <string>Use hardware acceleration:</string>
            </property>
           </widget>
          </item>
@@ -468,7 +468,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Run Application when PC Boots up:</string>
+           <string>Run application when PC boots up:</string>
           </property>
          </widget>
         </item>

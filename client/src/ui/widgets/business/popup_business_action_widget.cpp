@@ -11,7 +11,7 @@
 QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnPopupBusinessActionWidget)
+    ui(new Ui::PopupBusinessActionWidget)
 {
     ui->setupUi(this);
 
