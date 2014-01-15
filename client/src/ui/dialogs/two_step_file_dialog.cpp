@@ -6,32 +6,25 @@ QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption
     ui(new Ui::QnTwoStepFileDialog)
 {
     ui->setupUi(this);
+    setWindowTitle(caption);
+
+    ui->directoryLabel->setText(directory);
+
+
 }
 
 QnTwoStepFileDialog::~QnTwoStepFileDialog() { }
 
-void QnTwoStepFileDialog::setOption(QFileDialog::Option option, bool on) {
-    dialog->setOption(option, on); //TODO: #GDM handle some options locally?
-}
-
 void QnTwoStepFileDialog::setOptions(QFileDialog::Options options) {
-    dialog->setOptions(options);
+    Q_ASSERT(options = 0);
 }
 
 void QnTwoStepFileDialog::setFileMode(QFileDialog::FileMode mode) {
-    dialog->setFileMode(mode);
-}
-
-QFileDialog::FileMode QnTwoStepFileDialog::fileMode() const {
-    return dialog->fileMode();
+    Q_ASSERT(mode == QFileDialog::AnyFile);
 }
 
 void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
-    dialog->setAcceptMode(mode);
-}
-
-QFileDialog::AcceptMode QnTwoStepFileDialog::acceptMode() const {
-    return dialog->acceptMode();
+    Q_ASSERT(mode == QFileDialog::AcceptSave);
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
