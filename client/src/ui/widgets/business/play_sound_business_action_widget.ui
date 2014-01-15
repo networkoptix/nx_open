@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnPlaySoundBusinessActionWidget</class>
- <widget class="QWidget" name="QnPlaySoundBusinessActionWidget">
+ <class>PlaySoundBusinessActionWidget</class>
+ <widget class="QWidget" name="PlaySoundBusinessActionWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,10 +11,19 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
