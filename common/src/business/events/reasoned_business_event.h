@@ -11,12 +11,12 @@ public:
                                      const QnResourcePtr& resource,
                                      const qint64 timeStamp,
                                      const QnBusiness::EventReason reasonCode,
-                                     const QString& reasonText = QString());
+                                     const QString& reasonParamsEncoded = QString());
 
     virtual QnBusinessEventParameters getRuntimeParams() const override;
 protected:
     QnBusiness::EventReason m_reasonCode;
-    QString m_reasonText;
+    QString m_reasonParamsEncoded;
 };
 
 #endif // REASONED_BUSINESS_EVENT_H

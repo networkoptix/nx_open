@@ -66,10 +66,10 @@ QnSignHelper::QnSignHelper():
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = QString(tr("FREE license"));
+    m_licensedToStr = tr("FREE license");
     foreach (QnLicensePtr license, list)
     {
-        if (license->name() != QLatin1String("FREE")) // TODO: #TR #VASILENKO I believe license->type() == QnLicense::FreeLicense was intended?
+        if (license->type() != QnLicense::FreeLicense)
             m_licensedToStr = license->name();
     }
 }

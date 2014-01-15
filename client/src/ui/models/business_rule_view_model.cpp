@@ -28,39 +28,8 @@
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
-// TODO: #TR #GDM move these to QnBusinessRuleViewModel and provide proper contexts to tr (so that those are not QObject::tr).
 namespace {
-QString toggleStateToModelString(Qn::ToggleState value) {
-    switch( value )
-    {
-    case Qn::OffState:
-        return QObject::tr("Stops");
-    case Qn::OnState:
-        return QObject::tr("Starts");
-    case Qn::UndefinedState:
-        return QObject::tr("Starts/Stops");
-    }
-    return QString();
-}
-
-QString toggleStateToString(Qn::ToggleState state) {
-    switch (state) {
-    case Qn::OnState: return QObject::tr("start");
-    case Qn::OffState: return QObject::tr("stop");
-    default: return QString();
-    }
-    return QString();
-}
-
-QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
-    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-    if (BusinessActionType::hasToggleState(actionType))
-        return QObject::tr("While %1").arg(typeStr);
-    else
-        return QObject::tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
-}
-
-const int ProlongedActionRole = Qt::UserRole + 2;
+    const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
@@ -911,4 +880,37 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
         return tr("Every %n minutes", "", m_aggregationPeriod / MINUTE);
 
     return tr("Every %n seconds", "", m_aggregationPeriod);
+}
+
+QString QnBusinessRuleViewModel::toggleStateToModelString(Qn::ToggleState value) {
+    switch( value )
+    {
+    case Qn::OffState:
+        return tr("Stops");
+    case Qn::OnState:
+        return tr("Starts");
+    case Qn::UndefinedState:
+        return tr("Starts/Stops");
+    }
+    return QString();
+}
+
+QString QnBusinessRuleViewModel::toggleStateToString(Qn::ToggleState state) {
+    switch (state) {
+    case Qn::OnState:
+        return tr("start");
+    case Qn::OffState:
+        return tr("stop");
+    default:
+        break;
+    }
+    return QString();
+}
+
+QString QnBusinessRuleViewModel::eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType) {
+    QString typeStr = QnBusinessStringsHelper::eventName(eventType);
+    if (BusinessActionType::hasToggleState(actionType))
+        return tr("While %1").arg(typeStr);
+    else
+        return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
 }
