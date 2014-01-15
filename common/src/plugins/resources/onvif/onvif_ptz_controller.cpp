@@ -32,14 +32,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     if(m_resource->getPtzfUrl().isEmpty())
         m_capabilities = Qn::NoPtzCapabilities;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(resource);
-    
-    m_stopBroken = resourceData.value<bool>(lit("onvifPtzStopBroken"), false);
-
-    if(resourceData.value<bool>(lit("onvifPtzBroken"), false)) {
-        m_capabilities = Qn::NoPtzCapabilities;
-        return;
-    }
+    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
 
     initCoefficients();
 
