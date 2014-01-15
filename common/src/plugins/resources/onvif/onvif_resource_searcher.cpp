@@ -70,9 +70,9 @@ QString OnvifResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     if (url.port() == -1)
@@ -81,14 +81,14 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const
         {
             QUrl newUrl(url);
             newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
-            QList<QnResourcePtr> result = checkHostAddrInternal(newUrl, auth, doMultichannelCheck);
+            QList<QnResourcePtr> result = checkHostAddrInternal(newUrl, auth, isSearchAction);
             if (!result.isEmpty())
                 return result;
         }
         return QList<QnResourcePtr>();
     }
     else {
-        return checkHostAddrInternal(url, auth, doMultichannelCheck);
+        return checkHostAddrInternal(url, auth, isSearchAction);
     }
 }
 
