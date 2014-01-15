@@ -9,7 +9,7 @@
 #include <QtWidgets/QLineEdit>
 
 #ifdef Q_OS_MAC
-#define QN_NO_CUSTOM_DIALOGS
+//#define QN_NO_CUSTOM_DIALOGS
 #endif
 
 
