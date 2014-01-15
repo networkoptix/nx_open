@@ -812,11 +812,7 @@ void QnResource::setProperty(const QString &key, const QString &value) {
         QMutexLocker mutexLocker(&m_mutex);
         if (m_propertyByKey.value(key) == value)
             return;
-        if(value.isEmpty()) {
-            m_propertyByKey.remove(key);
-        } else {
-            m_propertyByKey[key] = value;
-        }
+        m_propertyByKey[key] = value;
     }
     emit propertyChanged(toSharedPointer(this), key);
 }
