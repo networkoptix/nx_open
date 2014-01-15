@@ -317,17 +317,13 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 }
 
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
-    dialog->setDirectory(ui->recordingFolderLabel->text());
-    dialog->setFileMode(QFileDialog::DirectoryOnly);
-    if (!dialog->exec())
+    QString dirName = QFileDialog::getExistingDirectory(this,
+                                                        tr("Select directory"),
+                                                        ui->recordingFolderLabel->text(),
+                                                        QnCustomFileDialog::directoryDialogOptions());
+    if (dirName.isEmpty())
         return;
-
-    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
-    if (dir.isEmpty())
-        return;
-
-    ui->recordingFolderLabel->setText(dir);
+    ui->recordingFolderLabel->setText(dirName);
 }
 
 void QnRecordingSettingsWidget::at_dwm_compositionChanged() {

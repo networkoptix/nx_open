@@ -252,10 +252,10 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()));
         dialog->addWidget(comboBox, false);
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return;
 
-        QString fileName = dialog->selectedFiles().value(0);
+        QString fileName = dialog->selectedFile();
         if (fileName.isEmpty())
             return;
 

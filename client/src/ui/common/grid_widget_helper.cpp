@@ -23,25 +23,18 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
     QString fileName;
     while (true) 
     {
-
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
-            caption,
-            previousDir,
-            tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")
-        ));
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-            return;
-
-        fileName = dialog->selectedFiles().value(0);
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
+        QString selectedFilter;
+        fileName = QFileDialog::getSaveFileName(mainWindow(),
+                                                caption,
+                                                previousDir,
+                                                tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)"),
+                                                &selectedFilter,
+                                                QnCustomFileDialog::fileDialogOptions());
         if (fileName.isEmpty())
             return;
+
+        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+
 
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;

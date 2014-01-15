@@ -42,6 +42,7 @@
 #include <ui/style/skin.h>
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
+#include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -656,7 +657,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             previousDir + QLatin1Char('/') + suggetion,
             tr("AVI (Audio/Video Interleaved) (*.avi)"),
             &selectedFilter,
-            QFileDialog::DontUseNativeDialog
+            QnCustomFileDialog::fileDialogOptions()
         );
 
         if (!filePath.isEmpty()) {

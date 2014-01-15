@@ -276,10 +276,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             }
         }
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return;
 
-        fileName = dialog->selectedFiles().value(0);
+        fileName = dialog->selectedFile();
         if (fileName.isEmpty())
             return;
 
@@ -537,10 +537,10 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         dialog->setAcceptMode(QFileDialog::AcceptSave);
         dialog->addCheckBox(tr("Make file read-only"), &readOnly);
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return false;
 
-        fileName = dialog->selectedFiles().value(0);
+        fileName = dialog->selectedFile();
         QString selectedFilter = dialog->selectedNameFilter();
         QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 

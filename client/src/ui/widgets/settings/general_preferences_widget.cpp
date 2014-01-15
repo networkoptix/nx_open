@@ -207,36 +207,32 @@ void QnGeneralPreferencesWidget::initTranslations() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
-    dialog->setDirectory(ui->mainMediaFolderLabel->text());
-    dialog->setFileMode(QFileDialog::DirectoryOnly);
-    if (!dialog->exec())
+    QString dirName = QFileDialog::getExistingDirectory(this,
+                                                        tr("Select directory"),
+                                                        ui->mainMediaFolderLabel->text(),
+                                                        QnCustomFileDialog::directoryDialogOptions());
+    if (dirName.isEmpty())
         return;
-
-    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
-    if (dir.isEmpty())
-        return;
-
-    ui->mainMediaFolderLabel->setText(dir);
+    ui->mainMediaFolderLabel->setText(dirName);
 }
 
 void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
-    //TODO: #Elric call setDirectory
-    dialog->setFileMode(QFileDialog::DirectoryOnly);
-    if (!dialog->exec())
+    QString initialDir = ui->extraMediaFoldersList->count() == 0
+            ? ui->mainMediaFolderLabel->text()
+            : ui->extraMediaFoldersList->item(0)->text();
+    QString dirName = QFileDialog::getExistingDirectory(this,
+                                                        tr("Select directory"),
+                                                        initialDir,
+                                                        QnCustomFileDialog::directoryDialogOptions());
+    if (dirName.isEmpty())
         return;
 
-    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
-    if (dir.isEmpty())
-        return;
-
-    if(!ui->extraMediaFoldersList->findItems(dir, Qt::MatchExactly).empty()) {
+    if(!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty()) {
         QMessageBox::information(this, tr("Folder is already added"), tr("This folder is already added."), QMessageBox::Ok);
         return;
     }
 
-    ui->extraMediaFoldersList->addItem(dir);
+    ui->extraMediaFoldersList->addItem(dirName);
 }
 
 void QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked() {

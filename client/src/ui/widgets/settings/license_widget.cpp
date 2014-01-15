@@ -140,15 +140,19 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
 }
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open License File")));
-    dialog->setNameFilters(QStringList() << tr("All files (*.*)"));
-    dialog->setFileMode(QFileDialog::ExistingFile);
-    if (dialog->exec() && !dialog->selectedFiles().isEmpty()) {
-        QFile file(dialog->selectedFiles().first());
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
-            ui->licenseFileLabel->setText(file.fileName());
-        }
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open License File"),
+                                                    QString(),
+                                                    tr("All files (*.*)"),
+                                                    0,
+                                                    QnCustomFileDialog::fileDialogOptions());
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
+        ui->licenseFileLabel->setText(file.fileName());
     }
 }
 
