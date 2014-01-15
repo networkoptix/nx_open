@@ -165,7 +165,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
         OnvifResourceInformationFetcher fetcher;
         QnId rt = fetcher.getOnvifResourceType(manufacturer, modelName);
-        resource->setVendorName( manufacturer );
+        resource->setVendor( manufacturer );
         resource->setName( modelName );
         //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (rt.isValid())
@@ -190,7 +190,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                 for (int i = 1; i < resource->getMaxChannels(); ++i) 
                 {
                     QnPlOnvifResourcePtr res(new QnPlOnvifResource());
-                    res->setVendorName( manufacturer );
+                    res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource, true);
                     res->updateToChannel(i);

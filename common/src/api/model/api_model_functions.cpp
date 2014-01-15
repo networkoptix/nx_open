@@ -8,7 +8,7 @@
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnCameraDiagnosticsReply, (performedStep)(errorCode)(errorParams))
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchStatus, (state)(current)(total))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera, (name)(url)(manufacturer)(existsInPool))
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera, (name)(url)(manufacturer)(vendor)(existsInPool))
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply, (status)(processUuid)(cameras))
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storageProtocols))
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting))
