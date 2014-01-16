@@ -179,6 +179,9 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <environmentVariables>                            
+                        	<PATH>${python.dir}:${env.PATH}</PATH>
+                            </environmentVariables>                            
                             <executable>${python.dir}/python</executable>
                             <arguments>
                                 <argument>install_packages.py</argument>
