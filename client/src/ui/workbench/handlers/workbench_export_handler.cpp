@@ -230,6 +230,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
     QString fileName;
     QString selectedExtension;
+    QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
@@ -279,6 +280,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             return;
 
         fileName = dialog->selectedFile();
+        selectedFilter = dialog->selectedNameFilter();
         if (fileName.isEmpty())
             return;
 

@@ -138,6 +138,7 @@ QString QnTwoStepFileDialog::selectedNameFilter() const {
         break;
     }
     Q_ASSERT(false);
+    return QString();
 }
 
 bool QnTwoStepFileDialog::event(QEvent *event) {
