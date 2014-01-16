@@ -21,6 +21,7 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/string.h>
+#include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
 #include "file_processor.h"
@@ -213,12 +214,13 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     if(parameters.filename.isEmpty()) {
-        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
-                + QLatin1Char('_') + parameters.timeString();
-
         QString previousDir = qnSettings->lastScreenshotDir();
         if (previousDir.isEmpty())
             previousDir = qnSettings->mediaFolder();
+
+        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
+                + QLatin1Char('_') + parameters.timeString();
+        suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
         QString filterSeparator = lit(";;");
         QString pngFileFilter = tr("PNG Image (*.png)");
@@ -234,7 +236,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             tr("Save Screenshot As..."),
-            previousDir + QDir::separator() + suggestion,
+            suggestion,
             allowedFormatFilter
         ));
 
@@ -268,7 +270,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).baseName()),
+                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Ok | QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Cancel)
@@ -280,7 +282,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).baseName()),
+                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
             );
             return;
@@ -338,7 +340,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).baseName())
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).completeBaseName())
         );
         return;
     }

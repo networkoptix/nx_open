@@ -6,6 +6,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
+#include <client/client_settings.h>
+
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
@@ -60,7 +62,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), QString(), supportedFormats));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;

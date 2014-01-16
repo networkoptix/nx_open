@@ -35,6 +35,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/common/environment.h>
 #include <utils/common/string.h>
 
 #include "version.h"
@@ -43,7 +44,6 @@ namespace {
 
     /** Maximum sane duration: 30 minutes of recording. */
     static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
-
 }
 
 // -------------------------------------------------------------------------- //
@@ -92,7 +92,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
         QMessageBox::critical(
             mainWindow(),
             tr("File is in use"),
-            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).baseName()),
+            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
             QMessageBox::Ok
         );
         return false;
@@ -102,7 +102,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not overwrite file"),
-            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).baseName()),
+            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
             QMessageBox::Ok
         );
         return false;
@@ -233,17 +233,17 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
 
-    while (true) {
-        QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
-        QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
-                ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-                : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
-        QString suggestion = namePart + lit("_") + timePart;
+    QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
+    QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
+            ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+            : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+    QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
+    while (true) {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             tr("Export Video As..."),
-            previousDir + QDir::separator() + suggestion,
+            suggestion,
             allowedFormatFilter
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
@@ -327,7 +327,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                             mainWindow(),
                             tr("Save As"),
-                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).baseName()),
+                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                             );
                 if (button == QMessageBox::Cancel)
@@ -507,14 +507,15 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString suggestion = layout->getName();
+    QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
+    suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+
     QString fileName;
     bool readOnly = false;
 
 #ifdef Q_OS_WIN
     QString filterSeparator(QLatin1String(";;"));
 #endif
-    // TODO: #GDM #TR translatable string concatenation. Totally evil.
     QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(lit(QN_ORGANIZATION_NAME))
 #ifdef Q_OS_WIN
             + filterSeparator
@@ -527,7 +528,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             dialogName,
-            previousDir + QDir::separator() + suggestion,
+            suggestion,
             mediaFileFilter
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
@@ -550,7 +551,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                 QMessageBox::StandardButton button = QMessageBox::information(
                             mainWindow(),
                             tr("Save As"),
-                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).baseName()),
+                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                             );
                 if (button == QMessageBox::Cancel)

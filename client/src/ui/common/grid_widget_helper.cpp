@@ -43,7 +43,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                     );
 
@@ -56,7 +56,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
                 );
             continue;
