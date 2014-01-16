@@ -517,9 +517,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString filterSeparator(QLatin1String(";;"));
 #endif
     // TODO: #GDM #TR translatable string concatenation. Totally evil.
-    QString mediaFileFilter = tr("Media File (*.nov)");
-    QString mediaFilter =
-            QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
+    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(lit(QN_ORGANIZATION_NAME))
 #ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName()
@@ -532,7 +530,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             mainWindow(),
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            mediaFilter
+            mediaFileFilter
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);

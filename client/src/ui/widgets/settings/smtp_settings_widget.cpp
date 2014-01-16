@@ -24,26 +24,36 @@ namespace {
     };
 }
 
-QValidator::State QnPortNumberValidator::validate(QString &input, int &pos) const {
-    // TODO: #GDM #TR Logic on translated strings? And if it is translated differently in different context? Overall this is evil. 
-    // You should consider translated strings as objects with only one operation: showToUser.
-    if (input == tr("Auto")) 
-        return QValidator::Acceptable;
+class QnPortNumberValidator: public QIntValidator {
+    typedef QIntValidator base_type;
+public:
+    QnPortNumberValidator(const QString &autoString, QObject* parent = 0):
+        base_type(parent), m_autoString(autoString) {}
 
-    QValidator::State result = base_type::validate(input, pos);
-    if (result == QValidator::Acceptable &&
-            (input.toInt() == 0 || input.toInt() > 65535)
-            )
-        return QValidator::Intermediate;
-    return result;
-}
+    virtual QValidator::State validate(QString &input, int &pos) const override {
+        if (m_autoString.compare(input, Qt::CaseInsensitive) == 0)
+            return QValidator::Acceptable;
 
-void QnPortNumberValidator::fixup(QString &input) const {
-    if (input == tr("Auto"))
-        return;
-    if (input.toInt() == 0 || input.toInt() > 65535)
-        input = tr("Auto");
-}
+        if (m_autoString.startsWith(input, Qt::CaseInsensitive))
+            return QValidator::Intermediate;
+
+        QValidator::State result = base_type::validate(input, pos);
+        if (result == QValidator::Acceptable &&
+                (input.toInt() == 0 || input.toInt() > 65535)
+                )
+            return QValidator::Intermediate;
+        return result;
+    }
+
+    virtual void fixup(QString &input) const override {
+        if (m_autoString.compare(input, Qt::CaseInsensitive) == 0)
+            return;
+        if (input.toInt() == 0 || input.toInt() > USHRT_MAX)
+            input = m_autoString;
+    }
+private:
+    QString m_autoString;
+};
 
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -70,14 +80,13 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     setWarningStyle(ui->detectErrorLabel);
 
-    ui->portComboBox->addItem(tr("Auto"), 0);
+    const QString autoPort = tr("Auto");
+    ui->portComboBox->addItem(autoPort, 0);
     for (int i = 0; i < QnEmail::ConnectionTypeCount; i++) {
         int port = QnEmail::defaultPort(static_cast<QnEmail::ConnectionType>(i));
         ui->portComboBox->addItem(QString::number(port), port);
     }
-    ui->portComboBox->setValidator(new QnPortNumberValidator(this));
-//    ui->portComboBox->setCurrentIndex(0);
-//    at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
+    ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
