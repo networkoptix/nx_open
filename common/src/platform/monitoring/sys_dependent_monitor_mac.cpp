@@ -30,4 +30,8 @@ QList<QnPlatformMonitor::NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
     return base_type::totalNetworkLoad();
 }
 
+QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSpaceInfo() {
+    return base_type::totalPartitionSpaceInfo();
+}
+
 #endif  //__APPLE__

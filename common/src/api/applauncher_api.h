@@ -119,6 +119,8 @@ namespace applauncher
             enum Value
             {
                 ok,
+                //!Failed to connect to applauncher
+                connectError,
                 versionNotInstalled,
                 alreadyInstalled,
                 invalidVersionFormat,

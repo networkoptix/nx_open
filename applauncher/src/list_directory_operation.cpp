@@ -24,7 +24,7 @@ namespace detail
 
         \code {*.xml}
         <?xml version="1.0" encoding="UTF-8"?>
-        <contents validation="md5">
+        <contents totalSize="123456" validation="md5">
             <directory>client</directory>
             <directory>mediaserver</directory>
             <directory>appserver</directory>

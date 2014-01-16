@@ -10,12 +10,7 @@
 #include <netinet/ip_icmp.h>
 
 bool Icmp::ping(const QString& hostAddr, int timeoutMSec) {
-#ifdef Q_OS_MAC
     unsigned short id  = (unsigned short) (arc4random() >> 15);
-#else
-    unsigned short id  = (unsigned short) (random() >> 15);
-#endif
-
     int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
     if (fd == -1)
     {
@@ -34,9 +29,7 @@ bool Icmp::ping(const QString& hostAddr, int timeoutMSec) {
     memset(&packet.icmp, 0, sizeof(packet.icmp));
     packet.icmp.icmp_type = ICMP_ECHO;
     packet.icmp.icmp_id = id;
-#ifdef Q_OS_MAC
-    packet.icmp.icmp_cksum = checksum(packet.icmp);
-#endif
+//    packet.icmp.icmp_cksum = checksum(packet.icmp);
 
     in_addr_t addr = inet_addr(hostAddr.toLatin1().data());
     if (addr == INADDR_NONE)
