@@ -564,12 +564,16 @@ void QnLoginDialog::at_deleteButton_clicked() {
 }
 
 void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
-    Q_UNUSED(moduleVersion)
     Q_UNUSED(localInterfaceAddress)
 
     QString portId = QLatin1String("port");
 
     if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
+        return;
+
+    QnCompatibilityChecker compatibilityChecker(localCompatibilityItems());
+    if (!compatibilityChecker.isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION),
+                                           QLatin1String("ECS"),    QnSoftwareVersion(moduleVersion)))
         return;
 
     QString host = isLocal ? QString::fromLatin1("127.0.0.1") : remoteHostAddress;

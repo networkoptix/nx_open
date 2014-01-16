@@ -694,9 +694,10 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnCheckForUpdatesActionCondition(this));
 
     factory(Qn::AboutAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("About...")).
         shortcut(tr("F1")).
+        shortcutContext(Qt::ApplicationShortcut).
         role(QAction::AboutRole).
         autoRepeat(false);
 

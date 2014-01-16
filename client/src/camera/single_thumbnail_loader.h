@@ -41,23 +41,6 @@ public:
                                      QObject *parent = NULL);
 
     virtual QImage image() const override;
-signals:
-    /**
-     * This signal is emitted whenever thumbnail was successfully loaded.
-     *
-     * \param image                     Loaded thumbnail.
-     */
-    void success(const QImage& image);
-
-    /**
-     * This signal is emitted whenever the loader was unable to load thumbnail.
-     *
-     * \param status                    Error code.
-     */
-    void failed(int status);
-
-    void finished();
-
 protected:
     virtual void doLoadAsync() override;
 

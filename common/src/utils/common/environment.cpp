@@ -10,6 +10,8 @@
 #include <QtWidgets/QMessageBox>
 #endif
 
+#include <utils/common/string.h>
+
 
 QString QnEnvironment::searchInPath(QString executable) {
     if (executable.isEmpty())
@@ -83,3 +85,12 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
 #endif
 }
 
+QString QnEnvironment::getUniqueFileName(const QString &dirName, const QString &baseName) {
+    QStringList existingFiles;
+    foreach (const QFileInfo &info, QDir(dirName).entryInfoList(QDir::Files)) {
+        existingFiles << info.completeBaseName();
+    }
+
+    QString name = generateUniqueString(existingFiles, baseName, lit("_"));
+    return QFileInfo(dirName, name).absoluteFilePath();
+}
