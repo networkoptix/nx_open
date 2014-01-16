@@ -413,13 +413,45 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         QMessageBox::Cancel
                     );
                     if(button == QMessageBox::Ok) {
-                        if (applauncher::restartClient(connectInfo->version, currentUrl().toEncoded()) != applauncher::api::ResultType::ok) {
-                            QMessageBox::critical(
-                                this,
-                                tr("Launcher process is not found"),
-                                tr("Cannot restart the client in compatibility mode.\n"
-                                    "Please close the application and start it again using the shortcut in the start menu.")
-                            );
+                        switch( applauncher::restartClient(connectInfo->version, currentUrl().toEncoded()) )
+                        {
+                            case applauncher::api::ResultType::ok:
+                                break;
+
+                            case applauncher::api::ResultType::connectError:
+                                QMessageBox::critical(
+                                    this,
+                                    tr("Launcher process is not found"),
+                                    tr("Cannot restart the client in compatibility mode.\n"
+                                        "Please close the application and start it again using the shortcut in the start menu.")
+                                );
+                                break;
+
+                            default:
+                            {
+                                //trying to restore installation
+                                int selectedButton = QnMessageBox::warning(
+                                    this,
+                                    Qn::VersionMismatch_Help,
+                                    tr("Failure"),
+                                    tr("Failed to launch compatiblity version %1\n"
+                                       "Try to restore version %1?").
+                                       arg(connectInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                                    QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+                                    QMessageBox::Cancel
+                                );
+                                if( selectedButton == QMessageBox::Ok ) {
+                                    //starting installation
+                                    if( !m_installationDialog.get() )
+                                        m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
+                                    m_installationDialog->setVersionToInstall( connectInfo->version );
+                                    m_installationDialog->exec();
+                                    if( m_installationDialog->installationSucceeded() )
+                                        continue;   //offering to start newly-installed compatibility version
+                                }
+                                m_restartPending = false;
+                                break;
+                            }
                         }
                     } else {
                         m_restartPending = false;
