@@ -43,10 +43,13 @@ namespace {
         return false;
     }
 
-    QnManualCameraSearchSingleCamera fromResource(const QnResourcePtr &resource) {
+    QnManualCameraSearchSingleCamera fromResource(const QnResourcePtr &resource) 
+    {
+        QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
         return QnManualCameraSearchSingleCamera(resource->getName(),
                                                 resource->getUrl(),
                                                 qnResTypePool->getResourceType(resource->getTypeId())->getName(),
+                                                cameraResource->getVendor(),
                                                 resourceExistsInPool(resource));
     }
 }
