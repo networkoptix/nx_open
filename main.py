@@ -20,7 +20,7 @@ class cd:
 def get_environment_variable(variable):
     #print (os.path.abspath(__file__))
     try:
-        with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration, child_customization
+        with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration
     except IOError:
         print 'Please run configure.py first'
         sys.exit(1)
@@ -41,9 +41,6 @@ def get_environment_variable(variable):
     
     elif variable == 'customization':
         return customization
-
-    elif variable == 'child_customization':
-        return child_customization
         
     elif variable == 'configuration':
         return configuration
@@ -53,7 +50,7 @@ def get_environment_variable(variable):
             return os.getenv(variable)
         else:
             config = ConfigParser.RawConfigParser(allow_no_value=True)
-            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + child_customization + '/build.properties'))
+            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + '/build.properties'))
             return config.get("basic", variable)  
 
 def get_environment_build_dir():

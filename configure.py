@@ -25,9 +25,8 @@ if __name__ == '__main__':
 
     f = open('configure_settings_tmp.py', 'w')
     print >> f, \
-    'customization = "%s" \nchild_customization = "%s" \nconfiguration = "%s"' %(build_customization, child_customization, build_configuration)
+    'customization = "%s" \nconfiguration = "%s"' %(build_customization, build_configuration)
 
     print '\n++++++++++++++++++++++++ CONFUGURED ++++++++++++++++++++++++\n'
     print >> sys.stderr, 'customization is: %s' % build_customization
-    print >> sys.stderr, 'child_customization is: %s' % child_customization
     print >> sys.stderr, 'configuration is: %s' % build_configuration

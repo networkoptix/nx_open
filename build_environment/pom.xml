@@ -88,26 +88,6 @@
                 <version>1.1.1</version>
                 <executions>
                     <execution>
-                        <id>configure</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${python.dir}/python</executable>
-                            <arguments>
-                                <argument>configure.py</argument>
-                                <argument>--cst</argument>
-                                <argument>${parent.customization}</argument>
-                                <argument>--chld</argument>
-                                <argument>${customization}</argument>                                
-                                <argument>--cfg</argument>
-                                <argument>${build.configuration}</argument>                                
-                            </arguments>
-                            <workingDirectory>${root.dir}</workingDirectory>		
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>update-buildenv</id>
                         <phase>generate-sources</phase>
                         <goals>
