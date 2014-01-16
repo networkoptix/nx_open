@@ -277,7 +277,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
     clearTable();
 
     int newCameras = 0;
-    foreach(QnManualCameraSearchSingleCamera info, cameras){
+    foreach(const QnManualCameraSearchSingleCamera &info, cameras) {
         bool enabledRow = !info.existsInPool;
         if (enabledRow)
             newCameras++;
