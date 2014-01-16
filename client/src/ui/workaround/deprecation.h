@@ -42,7 +42,7 @@ namespace boost {
 
 #endif // __cplusplus
 
-#ifndef Q_OS_MAC
+#ifdef Q_OS_MAC
     /* Prevent usage of custom file dialogs on mac os due to appstore limitations  */
     #define DontUseNativeDialog YOU_SHOULD_ALWAYS_USE_NATIVE_DIALOGS_ON_MAC_OS
 #endif

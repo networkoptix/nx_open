@@ -9,7 +9,14 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QGridLayout>
 
-#ifndef Q_OS_MAC
+//--debug string, do not forget to remove
+#define QN_TWO_STEP_DIALOG
+
+#ifdef Q_OS_MAC
+#define QN_TWO_STEP_DIALOG
+#endif
+
+#ifdef QN_TWO_STEP_DIALOG
     #include <ui/dialogs/two_step_file_dialog.h>
     typedef QnTwoStepFileDialog QnSystemBasedCustomDialog;
 
