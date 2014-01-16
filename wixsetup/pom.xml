@@ -51,7 +51,7 @@
                                     <filtering>true</filtering>
                                 </resource>	                                
                                 <resource>
-                                    <directory>${master.customization.dir}/wixsetup</directory>
+                                    <directory>${parent.customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
                                 </resource>		                
                                 <resource>

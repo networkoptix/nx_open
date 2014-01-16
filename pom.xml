@@ -56,11 +56,11 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->         
         <customization>default</customization>
+        <parent.customization>whooy</parent.customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
-        <parent.customization>${customization}</parent.customization>
-        <parent.customization.dir>${customization.dir}/child/${parent.customization}</parent.customization.dir>        
+        <parent.customization.dir>${root.dir}/customization/${p.customization}</parent.customization.dir>        
 
-        <additional.defines></additional.defines>
+        <additional.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -99,6 +99,7 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${customization.dir}/parent.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${root.dir}/appserver/appserver-${arch}.properties</file>
                             </files>
@@ -152,6 +153,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <encoding>UTF-8</encoding>                            
                             <resources>          
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
@@ -176,8 +179,6 @@
                                     </excludes>
                                 </resource>	        	                                                             
                             </resources>              
-                            <encoding>UTF-8</encoding>
-                            <overwrite>true</overwrite>
                         </configuration>            
                     </execution>
                 </executions>
@@ -350,7 +351,7 @@
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <toolchain.version>2011.09</toolchain.version>
-		<compiler>${toolchain.version}</compiler>
+                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>

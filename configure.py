@@ -7,7 +7,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--cfg", help="configuration, default - release or environment variable <configuration>")
     parser.add_argument("--cst", help="customization, default - HD Witness or environment variable <customization>")
-    parser.add_argument("--chld", help="child customization, default - same as the parent one or environment variable <child_customization>")    
+
     args = parser.parse_args()    
     if args.cfg:
         build_configuration = args.cfg
@@ -22,13 +22,6 @@ if __name__ == '__main__':
         build_customization = os.getenv('customization')
     else:
         build_customization = 'default'        
-
-    if args.chld:
-        child_customization = args.chld
-    elif os.getenv('child_customization'):
-        child_customization = os.getenv('child_customization')
-    else:
-        child_customization = build_customization            
 
     f = open('configure_settings_tmp.py', 'w')
     print >> f, \
