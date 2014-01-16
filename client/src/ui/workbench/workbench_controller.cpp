@@ -623,7 +623,7 @@ void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
         return;
 
     if (m_countdownCanceled) {
-        m_recordingCountdownLabel->setText(tr("Cancelled"));
+        m_recordingCountdownLabel->setText(tr("Canceled"));
         return;
     }
     int left = m_recordingCountdownLabel->timeout() - tick;
@@ -646,7 +646,7 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
     QString suggetion = QFileInfo(recordedFileName).fileName();
     if (suggetion.isEmpty())
-        suggetion = tr("recorded_video");
+        suggetion = tr("Recorded Video");
 
     QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;

@@ -13,8 +13,6 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource_directory_browser.h>
-#include <decoders/abstractvideodecoderplugin.h>
-#include <plugins/plugin_manager.h>
 #include <translation/translation_list_model.h>
 
 #include <ui/actions/actions.h>
@@ -49,21 +47,14 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
-    setHelpTopic(ui->hardwareDecodingLabel,   ui->hardwareDecodingCheckBox,   Qn::SystemSettings_General_HWAcceleration_Help);
 
     initTranslations();
 
-    at_pluginManager_pluginLoaded();
-
-    setWarningStyle(ui->hwAccelerationWarningLabel);
     setWarningStyle(ui->downmixWarningLabel);
     setWarningStyle(ui->languageWarningLabel);
-    ui->hwAccelerationWarningLabel->setVisible(false);
     ui->languageWarningLabel->setVisible(false);
     ui->downmixWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
-
-    connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_pluginManager_pluginLoaded()) );
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
@@ -76,7 +67,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
     connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
-    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
     connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setEnabled(bool)));
 }
 
@@ -89,7 +79,6 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     qnSettings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
-    qnSettings->setUseHardwareDecoding(ui->hardwareDecodingCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
     qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked()
@@ -124,9 +113,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->isIpShownInTree());
 
-    m_oldHardwareAcceleration = qnSettings->isHardwareDecodingUsed();
-    ui->hardwareDecodingCheckBox->setChecked(m_oldHardwareAcceleration);
-
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
     ui->autoStartCheckBox->setChecked(qnSettings->autoStart());
 
@@ -155,25 +141,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
-    bool newHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
-    if(newHardwareAcceleration && m_oldHardwareAcceleration != newHardwareAcceleration) {
-        switch (QMessageBox::warning(
-            this,
-            tr("Warning"),
-            tr("Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?"),
-            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-            QMessageBox::No
-        )) {
-        case QMessageBox::Cancel:
-            return false;
-        case QMessageBox::No:
-            ui->hardwareDecodingCheckBox->setCheckState(Qt::Unchecked);
-            break;
-        default:
-            break;
-        }
-    }
-
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
         m_oldLanguage != ui->languageComboBox->currentIndex()) {
         switch(QMessageBox::information(
@@ -248,21 +215,6 @@ void QnGeneralPreferencesWidget::at_timeModeComboBox_activated() {
     if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
         QMessageBox::warning(this, tr("Warning"), tr("This option will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
     }
-}
-
-void QnGeneralPreferencesWidget::at_pluginManager_pluginLoaded()
-{
-    //checking, whether hardware decoding plugin present
-    const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
-    foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
-    {
-        if( plugin->isHardwareAccelerated() )
-        {
-            ui->hardwareAccelerationWidget->setVisible(true);
-            return;
-        }
-    }
-    ui->hardwareAccelerationWidget->setVisible(false);
 }
 
 void QnGeneralPreferencesWidget::at_downmixAudioCheckBox_toggled(bool checked) {

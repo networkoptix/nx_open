@@ -48,7 +48,7 @@ void QnPortNumberValidator::fixup(QString &input) const {
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     QWidget(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSmtpSettingsWidget),
+    ui(new Ui::SmtpSettingsWidget),
     m_requestHandle(-1),
     m_testHandle(-1),
     m_timeoutTimer(new QTimer(this)),
@@ -244,7 +244,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
     QnEmail::Settings result = settings();
     if (result.isNull()) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("Cannot test such parameters"));
+        QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
         return;
     }
 
@@ -277,7 +277,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 }
 
 void QnSmtpSettingsWidget::at_cancelTestButton_clicked() {
-    stopTesting(tr("Cancelled"));
+    stopTesting(tr("Canceled"));
 }
 
 void QnSmtpSettingsWidget::at_timer_timeout() {
@@ -287,7 +287,7 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
         return;
     }
 
-    stopTesting(tr("Timeout"));
+    stopTesting(tr("Timed out"));
 }
 
 void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, bool result, int handle) {
@@ -318,7 +318,7 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
 
     bool success = (status == 0);
     if(!success) {
-        QMessageBox::critical(this, tr("Error"), tr("Error while receiving settings"));
+        QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
         m_settingsReceived = true;
         return;
     }

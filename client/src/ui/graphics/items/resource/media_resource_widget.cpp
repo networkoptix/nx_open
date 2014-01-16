@@ -785,15 +785,13 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         );
     }
 
-    QString decoderType = m_renderer->isHardwareDecoderUsed(0) ? tr(" HW") : tr(" SW");
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7%8")
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7")
         .arg(size.width())
         .arg(size.height())
         .arg(fps, 0, 'f', 2)
         .arg(mbps, 0, 'f', 2)
         .arg(codecString)
         .arg(hqLqString)
-        .arg(decoderType)
         .arg(timeString);
 }
 

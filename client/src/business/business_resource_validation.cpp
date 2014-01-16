@@ -15,7 +15,7 @@ namespace {
         static QString anyCamera() { return tr("<Any Camera>"); }
         static QString selectCamera() { return tr("Select at least one camera"); }
         static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
-        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); }
+        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); } 
     };
 
     template <typename CheckingPolicy>
@@ -108,11 +108,20 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
     foreach (const QnUserResourcePtr &user, users) {
         QString userMail = user->getEmail();
         if (isResourceValid(user))
-            receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
         else
             invalid++;
     }
 
+    // TODO: #GDM #TR string composition won't work well in russian.
+    // See for yourself:
+    //
+    // %1 imeyut nevalidnyi e-mail adres
+    // Polzovatel GDM
+    // =>
+    // Polzovatel GDM imeyut nevalidnyi e-mail adres
+    // 
+    // Split these into two full strings.
     if (detailed && invalid > 0)
         return tr("%1 have invalid E-Mail address", "", invalid).arg(
                     (users.size() == 1)
@@ -128,6 +137,7 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
             invalid++;
     }
 
+    //
     if (detailed && invalid > 0)
         return (additional.size() == 1)
                 ? tr("Invalid E-Mail address %1").arg(additional.first())

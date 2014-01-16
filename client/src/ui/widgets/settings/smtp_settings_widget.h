@@ -12,7 +12,7 @@
 #include <utils/common/email.h>
 
 namespace Ui {
-    class QnSmtpSettingsWidget;
+    class SmtpSettingsWidget;
 }
 
 class QnPortNumberValidator: public QIntValidator {
@@ -61,7 +61,7 @@ private slots:
     void at_simpleEmail_textChanged(const QString &value);
 
 private:
-    QScopedPointer<Ui::QnSmtpSettingsWidget> ui;
+    QScopedPointer<Ui::SmtpSettingsWidget> ui;
 
     int m_requestHandle;
     int m_testHandle;
