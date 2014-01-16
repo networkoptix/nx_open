@@ -50,7 +50,7 @@ def get_environment_variable(variable):
             return os.getenv(variable)
         else:
             config = ConfigParser.RawConfigParser(allow_no_value=True)
-            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + '/build.properties'))
+            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + customization + '/build.properties'))
             return config.get("basic", variable)  
 
 def get_environment_build_dir():
