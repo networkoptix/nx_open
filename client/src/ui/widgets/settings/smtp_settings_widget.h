@@ -15,19 +15,6 @@ namespace Ui {
     class SmtpSettingsWidget;
 }
 
-class QnPortNumberValidator: public QIntValidator {
-    typedef QIntValidator base_type;
-
-    Q_OBJECT
-public:
-    QnPortNumberValidator(QObject* parent = 0):
-        base_type(parent) {}
-
-    virtual QValidator::State validate(QString &input, int &pos) const override;
-
-    virtual void fixup(QString &input) const override;
-};
-
 class QnSmtpSettingsWidget : public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT

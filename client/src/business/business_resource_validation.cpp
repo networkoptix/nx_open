@@ -113,21 +113,11 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
             invalid++;
     }
 
-    // TODO: #GDM #TR string composition won't work well in russian.
-    // See for yourself:
-    //
-    // %1 imeyut nevalidnyi e-mail adres
-    // Polzovatel GDM
-    // =>
-    // Polzovatel GDM imeyut nevalidnyi e-mail adres
-    // 
-    // Split these into two full strings.
-    if (detailed && invalid > 0)
-        return tr("%1 have invalid E-Mail address", "", invalid).arg(
-                    (users.size() == 1)
-                     ? tr("User %1").arg(users.first()->getName())
-                     : tr("%n of %1 users", "", invalid).arg(users.size())
-                       );
+    if (detailed && invalid > 0) {
+        if (users.size() == 1)
+            return tr("User %1 has invalid email address").arg(users.first()->getName());
+        return tr("%n of %1 users have invalid E-Mail address", "", invalid).arg(users.size());
+    }
 
     invalid = 0;
     foreach(const QString &email, additional) {
