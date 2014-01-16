@@ -404,10 +404,13 @@ void QnMainWindow::showNormal() {
 }
 
 void QnMainWindow::minimize() {
+    setWindowState(windowState() | Qt::WindowMinimized);
+
     // workaround against QTBUG-25727
-    setWindowState(windowState()|Qt::WindowMinimized);
+#ifdef Q_OS_LINUX
     QApplication::processEvents();
-    setWindowState(windowState()&~Qt::WindowMinimized);
+    setWindowState(windowState() &~ Qt::WindowMinimized);
+#endif
 }
 
 void QnMainWindow::toggleTitleVisibility() {
