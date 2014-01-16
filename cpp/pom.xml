@@ -45,6 +45,7 @@
                                     <fileset dir="${project.build.outputDirectory}/resources" />
                                 </delete>
                             </tasks>
+                            <failOnError>false</failOnError>
                         </configuration>
                     </execution>
                 </executions>
