@@ -176,8 +176,13 @@ void AsyncFileProcessor::doCloseFile( const CloseFileTask* task )
 
 void AsyncFileProcessor::doStat( const AsyncStatTask* task )
 {
+#ifdef _WIN32
     struct _stat64 fInfo;
     if( _wstat64( reinterpret_cast<const wchar_t*>(task->filePath.utf16()), &fInfo ) < 0 )
+#else
+    struct stat64 fInfo;
+    if( stat64( task->filePath.toUtf8().constData(), &fInfo ) < 0 )
+#endif
         task->handler->done( SystemError::getLastOSErrorCode(), -1 );
     else
         task->handler->done( SystemError::noError, fInfo.st_size );
