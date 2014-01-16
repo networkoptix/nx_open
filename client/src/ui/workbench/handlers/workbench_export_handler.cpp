@@ -92,7 +92,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
         QMessageBox::critical(
             mainWindow(),
             tr("File is in use"),
-            tr("File '%1' is used for recording already. Please try another name.").arg(QFileInfo(filename).baseName()),
+            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).baseName()),
             QMessageBox::Ok
         );
         return false;
@@ -102,7 +102,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not overwrite file"),
-            tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(filename).baseName()),
+            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).baseName()),
             QMessageBox::Ok
         );
         return false;
@@ -256,10 +256,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 #endif
         QComboBox* comboBox = new QComboBox(dialog.data());
         comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
-        comboBox->addItem(tr("Top left corner (required transcoding)"), Qn::TopLeftCorner);
-        comboBox->addItem(tr("Top right corner (required transcoding)"), Qn::TopRightCorner);
-        comboBox->addItem(tr("Bottom left corner (required transcoding)"), Qn::BottomLeftCorner);
-        comboBox->addItem(tr("Bottom right corner (required transcoding)"), Qn::BottomRightCorner);
+        comboBox->addItem(tr("Top left corner (requires transcoding)"), Qn::TopLeftCorner);
+        comboBox->addItem(tr("Top right corner (requires transcoding)"), Qn::TopRightCorner);
+        comboBox->addItem(tr("Bottom left corner (requires transcoding)"), Qn::BottomLeftCorner);
+        comboBox->addItem(tr("Bottom right corner (requires transcoding)"), Qn::BottomRightCorner);
 
         dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()), true, delegate);
         dialog->addWidget(comboBox, false, delegate);
@@ -299,8 +299,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                     int result = QMessageBox::warning(
                         mainWindow(),
                         tr("AVI format is not recommended"),
-                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists."\
-                           "Press 'Yes' to continue export or 'No' to select other format"), // TODO: #Elric bad Engrish
+                        tr("AVI format is not recommended for export of non-continuous recording when audio track is present."
+                           "Do you want to continue?"), 
                         QMessageBox::Yes | QMessageBox::No
                     );
                     if (result != QMessageBox::Yes)
@@ -313,7 +313,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             QMessageBox::StandardButton button = QMessageBox::question(
                         mainWindow(),
                         tr("Save As"),
-                        tr("You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?"),
+                        tr("You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?"),
                         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                         QMessageBox::No
                         );
@@ -329,7 +329,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                             mainWindow(),
                             tr("Save As"),
-                            tr("File '%1' already exists. Do you want to replace it?").arg(QFileInfo(fileName).baseName()),
+                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).baseName()),
                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                             );
                 if (button == QMessageBox::Cancel)
@@ -466,7 +466,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
-            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files"),
+            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files."),
             QMessageBox::Ok
         );
         return false;
@@ -516,13 +516,14 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 #ifdef Q_OS_WIN
     QString filterSeparator(QLatin1String(";;"));
 #endif
+    // TODO: #GDM #TR translatable string concatenation. Totally evil.
     QString mediaFileFilter = tr("Media File (*.nov)");
     QString mediaFilter =
             QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
-        #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName()
-        #endif
+#endif
             ;
 
     while (true) {
@@ -555,7 +556,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                 QMessageBox::StandardButton button = QMessageBox::information(
                             mainWindow(),
                             tr("Save As"),
-                            tr("File '%1' already exists. Do you want to replace it?").arg(QFileInfo(fileName).baseName()),
+                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).baseName()),
                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                             );
                 if (button == QMessageBox::Cancel)
@@ -597,8 +598,8 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         int button = QMessageBox::question(
             mainWindow(),
             tr("Warning"),
-            tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n"\
-               "It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n"\
+            tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n"
+               "It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n"
                "Do you want to continue?"),
                QMessageBox::Yes | QMessageBox::No
             );
@@ -622,5 +623,5 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(int status, const QStrin
     file->setStatus(QnResource::Online);
     resourcePool()->addResource(file);
 
-    QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+    QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);
 }
