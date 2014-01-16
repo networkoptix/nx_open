@@ -318,7 +318,7 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
     QString dirName = QFileDialog::getExistingDirectory(this,
-                                                        tr("Select directory"),
+                                                        tr("Select folder..."),
                                                         ui->recordingFolderLabel->text(),
                                                         QnCustomFileDialog::directoryDialogOptions());
     if (dirName.isEmpty())

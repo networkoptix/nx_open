@@ -74,7 +74,7 @@ void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
     m_lineEdits.insert(edit, value);
     layout->addWidget(edit);
 
-    layout->addStretch();
+//    layout->addStretch();
 
     widget->setLayout(layout);
 

@@ -1,6 +1,8 @@
 #include "two_step_file_dialog.h"
 #include "ui_two_step_file_dialog.h"
 
+#include <QtCore/QTimer>
+
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
@@ -63,7 +65,9 @@ namespace {
 
 QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter) :
     base_type(parent),
-    ui(new Ui::QnTwoStepFileDialog)
+    ui(new Ui::QnTwoStepFileDialog),
+    m_mode(QFileDialog::AnyFile),
+    m_filter(filter)
 {
     ui->setupUi(this);
     setWindowTitle(caption);
@@ -75,9 +79,11 @@ QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption
     setWarningStyle(ui->alreadyExistsLabel);
 
     connect(ui->fileNameLineEdit,   &QLineEdit::textChanged,    this,   &QnTwoStepFileDialog::updateFileExistsWarning);
-    connect(ui->browseButton,       &QPushButton::clicked,      this,   &QnTwoStepFileDialog::at_browseButton_clicked);
-    connect(ui->filterComboBox, SIGNAL(QComboBox::currentIndexChanged(int)), this, SLOT(QnTwoStepFileDialog::updateFileExistsWarning)); //f**ing overloaded currentIndexChanged
+    connect(ui->browseFolderButton, &QPushButton::clicked,      this,   &QnTwoStepFileDialog::at_browseFolderButton_clicked);
+    connect(ui->browseFileButton,   &QPushButton::clicked,      this,   &QnTwoStepFileDialog::at_browseFileButton_clicked);
+    connect(ui->filterComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFileExistsWarning())); //f**ing overloaded currentIndexChanged
 
+    updateMode();
     updateFileExistsWarning();
 }
 
@@ -88,7 +94,10 @@ void QnTwoStepFileDialog::setOptions(QFileDialog::Options options) {
 }
 
 void QnTwoStepFileDialog::setFileMode(QFileDialog::FileMode mode) {
-    Q_ASSERT(mode == QFileDialog::AnyFile);
+    if (mode == m_mode)
+        return;
+    m_mode = mode;
+    updateMode();
 }
 
 void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
@@ -96,8 +105,21 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
-    QFileInfo info(QDir(ui->directoryLabel->text()), ui->fileNameLineEdit->text());
-    QString fileName = info.absoluteFilePath();
+
+    QString fileName;
+    switch (m_mode) {
+    case QFileDialog::AnyFile: {
+        QFileInfo info(QDir(ui->directoryLabel->text()), ui->fileNameLineEdit->text());
+        fileName = info.absoluteFilePath();
+        break;
+    }
+    case QFileDialog::ExistingFile: {
+        fileName = ui->existingFileLabel->text();
+        break;
+    }
+    default:
+        Q_ASSERT(false);
+    }
 
     QString selectedExtension = extractFileExtension(selectedNameFilter());
 
@@ -107,7 +129,24 @@ QString QnTwoStepFileDialog::selectedFile() const {
 }
 
 QString QnTwoStepFileDialog::selectedNameFilter() const {
-    return ui->filterComboBox->currentText();
+    switch (m_mode) {
+    case QFileDialog::AnyFile:
+        return ui->filterComboBox->currentText();
+    case QFileDialog::ExistingFile:
+        return m_selectedExistingFilter;
+    default:
+        break;
+    }
+    Q_ASSERT(false);
+}
+
+bool QnTwoStepFileDialog::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QEvent::Polish && m_mode == QFileDialog::ExistingFile)
+        at_browseFileButton_clicked();
+
+    return result;
 }
 
 QGridLayout* QnTwoStepFileDialog::customizedLayout() const {
@@ -120,14 +159,41 @@ void QnTwoStepFileDialog::setNameFilters(const QStringList &filters) {
 }
 
 void QnTwoStepFileDialog::updateFileExistsWarning() {
-    ui->alreadyExistsLabel->setVisible(QFileInfo(selectedFile()).exists());
+    ui->alreadyExistsLabel->setVisible(m_mode != QFileDialog::ExistingFile
+            && QFileInfo(selectedFile()).exists());
 }
 
-void QnTwoStepFileDialog::at_browseButton_clicked() {
+void QnTwoStepFileDialog::updateMode() {
+    Q_ASSERT(m_mode == QFileDialog::ExistingFile || m_mode == QFileDialog::AnyFile);
+
+    ui->existingFileWidget->setVisible(m_mode == QFileDialog::ExistingFile);
+    ui->newFileWidget->setVisible(m_mode == QFileDialog::AnyFile);
+}
+
+void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
     QString dirName = QFileDialog::getExistingDirectory(this,
-                                                        tr("Select directory"),
+                                                        tr("Select folder..."),
                                                         ui->directoryLabel->text(),
                                                         directoryDialogOptions());
-    if (!dirName.isEmpty())
-        ui->directoryLabel->setText(dirName);
+    if (dirName.isEmpty())
+        return;
+
+    ui->directoryLabel->setText(dirName);
+}
+
+void QnTwoStepFileDialog::at_browseFileButton_clicked() {
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Select file..."),
+                                                    ui->existingFileLabel->text(),
+                                                    m_filter,
+                                                    &m_selectedExistingFilter,
+                                                    fileDialogOptions());
+    if (fileName.isEmpty()) {
+        if (ui->existingFileLabel->text().isEmpty())
+            QTimer::singleShot(1, this, SLOT(reject()));
+//            accept();   //close dialog immediately
+        return;
+    }
+
+    ui->existingFileLabel->setText(fileName);
 }

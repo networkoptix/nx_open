@@ -32,13 +32,22 @@ signals:
     void filterSelected(const QString &filter);
 
 protected:
+    virtual bool event(QEvent *event) override;
+
     QGridLayout* customizedLayout() const;
     void setNameFilters(const QStringList &filters);
+    void updateMode();
+
     Q_SLOT void updateFileExistsWarning();
-    Q_SLOT void at_browseButton_clicked();
+    Q_SLOT void at_browseFolderButton_clicked();
+    Q_SLOT void at_browseFileButton_clicked();
 
 private:
     QScopedPointer<Ui::QnTwoStepFileDialog> ui;
+
+    QFileDialog::FileMode m_mode;
+    QString m_filter;
+    QString m_selectedExistingFilter;
 };
 
 #endif // TWO_STEP_FILE_DIALOG_H

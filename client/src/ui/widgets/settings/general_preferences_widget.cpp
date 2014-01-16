@@ -175,7 +175,7 @@ void QnGeneralPreferencesWidget::initTranslations() {
 // -------------------------------------------------------------------------- //
 void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
     QString dirName = QFileDialog::getExistingDirectory(this,
-                                                        tr("Select directory"),
+                                                        tr("Select folder..."),
                                                         ui->mainMediaFolderLabel->text(),
                                                         QnCustomFileDialog::directoryDialogOptions());
     if (dirName.isEmpty())
@@ -188,7 +188,7 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
             ? ui->mainMediaFolderLabel->text()
             : ui->extraMediaFoldersList->item(0)->text();
     QString dirName = QFileDialog::getExistingDirectory(this,
-                                                        tr("Select directory"),
+                                                        tr("Select folder..."),
                                                         initialDir,
                                                         QnCustomFileDialog::directoryDialogOptions());
     if (dirName.isEmpty())

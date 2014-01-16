@@ -56,29 +56,22 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     //TODO: #GDM progressbar required
-  /*  QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file...")));
-    dialog->setFileMode(QFileDialog::ExistingFile);*/
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
-  /*  dialog->setNameFilter(supportedFormats);*/
 
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Select file..."),
-                                                    QString(),
-                                                    supportedFormats,
-                                                    0,
-                                                    QnCustomFileDialog::fileDialogOptions());
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), QString(), supportedFormats));
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;
     QString title;
 
-  /*  dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
-    dialog->addLineEdit(tr("Custom Title"), &title);
+    dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
+    dialog->addLineEdit(tr("Custom Title:"), &title);
     if(!dialog->exec())
         return;
 
-    QString fileName = dialog->selectedFile();*/
+    QString fileName = dialog->selectedFile();
     if (fileName.isEmpty())
         return;
 

@@ -1082,7 +1082,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
     QString dirName = QFileDialog::getExistingDirectory(mainWindow(),
-                                                        tr("Select directory"),
+                                                        tr("Select folder..."),
                                                         QString(),
                                                         QnCustomFileDialog::directoryDialogOptions());
 
