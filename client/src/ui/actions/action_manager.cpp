@@ -1503,6 +1503,8 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
         qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
     } else {
         result = newMenuRecursive(rootAction, scope, parameters, parent);
+        if (!result)
+            result = new QMenu(parent);
     }
 
     if(result) {

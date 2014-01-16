@@ -4,7 +4,7 @@
 #include <ui/dialogs/button_box_dialog.h>
 
 namespace Ui {
-class QnWeekTimeScheduleDialog;
+    class WeekTimeScheduleDialog;
 }
 
 class QnWeekTimeScheduleDialog : public QnButtonBoxDialog
@@ -37,7 +37,7 @@ private:
 private:
     Q_DISABLE_COPY(QnWeekTimeScheduleDialog)
 
-    QScopedPointer<Ui::QnWeekTimeScheduleDialog> ui;
+    QScopedPointer<Ui::WeekTimeScheduleDialog> ui;
 
     bool m_disableUpdateGridParams;
 

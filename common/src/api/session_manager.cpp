@@ -82,10 +82,8 @@ QnSessionManager::~QnSessionManager() {
     at_aboutToBeStopped();
 }
 
-void QnSessionManager::at_replyReceived() 
+void QnSessionManager::at_replyReceived(QNetworkReply * reply) 
 {
-    QNetworkReply *reply = (QNetworkReply *)sender();
-
     QString errorString = reply->errorString();
     // Common EC error looks like:
     // "Error downloading https://user:password@host:port/path - server replied: INTERNAL SERVER ERROR"
@@ -265,6 +263,7 @@ void QnSessionManager::at_aboutToBeStarted() {
     connect(m_accessManager, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
     connect(m_accessManager, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), this, SLOT(at_proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator*)), Qt::DirectConnection);
     connect(m_accessManager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(at_sslErrors(QNetworkReply*,QList<QSslError>)));
+    connect(m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(at_replyReceived(QNetworkReply *)));
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
@@ -356,7 +355,6 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
         return;
     }
     m_handleInProgress.insert(reply, reqInfo);
-    connect(reply, SIGNAL(finished()), this, SLOT(at_replyReceived()));
 }
 
 void QnSessionManager::at_sslErrors(QNetworkReply* reply, const QList<QSslError> &)

@@ -55,7 +55,16 @@
       <string>Capture Mode</string>
      </property>
      <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>12</number>
+      </property>
+      <property name="topMargin">
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>12</number>
+      </property>
+      <property name="bottomMargin">
        <number>12</number>
       </property>
       <item row="0" column="0">
@@ -250,7 +259,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Icon</string>
+         <string notr="true">X</string>
         </property>
        </widget>
       </item>
@@ -300,7 +309,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Icon</string>
+         <string notr="true">X</string>
         </property>
        </widget>
       </item>

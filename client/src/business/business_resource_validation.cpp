@@ -15,7 +15,7 @@ namespace {
         static QString anyCamera() { return tr("<Any Camera>"); }
         static QString selectCamera() { return tr("Select at least one camera"); }
         static QString multipleCameras(int total) { return tr("%n Camera(s)", "", total); }
-        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); }
+        static QString subsetCameras(int count, int total) { return tr("%n of %1 cameras", "", count).arg(total); } 
     };
 
     template <typename CheckingPolicy>
@@ -108,17 +108,16 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
     foreach (const QnUserResourcePtr &user, users) {
         QString userMail = user->getEmail();
         if (isResourceValid(user))
-            receivers << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(userMail);
+            receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
         else
             invalid++;
     }
 
-    if (detailed && invalid > 0)
-        return tr("%1 have invalid E-Mail address", "", invalid).arg(
-                    (users.size() == 1)
-                     ? tr("User %1").arg(users.first()->getName())
-                     : tr("%n of %1 users", "", invalid).arg(users.size())
-                       );
+    if (detailed && invalid > 0) {
+        if (users.size() == 1)
+            return tr("User %1 has invalid email address").arg(users.first()->getName());
+        return tr("%n of %1 users have invalid E-Mail address", "", invalid).arg(users.size());
+    }
 
     invalid = 0;
     foreach(const QString &email, additional) {
@@ -128,6 +127,7 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
             invalid++;
     }
 
+    //
     if (detailed && invalid > 0)
         return (additional.size() == 1)
                 ? tr("Invalid E-Mail address %1").arg(additional.first())
