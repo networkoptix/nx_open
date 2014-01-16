@@ -220,7 +220,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         if (previousDir.isEmpty())
             previousDir = qnSettings->mediaFolder();
 
-        QString filterSeparator(QLatin1String(";;"));
+        QString filterSeparator = lit(";;");
         QString pngFileFilter = tr("PNG Image (*.png)");
         QString jpegFileFilter = tr("JPEG Image (*.jpg)");
 
@@ -249,7 +249,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         comboBox->addItem(tr("Bottom right corner"), Qn::BottomRightCorner);
         comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
-        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()));
+        dialog->addWidget(new QLabel(tr("Timestamp:"), dialog.data()));
         dialog->addWidget(comboBox, false);
 
         if (!dialog->exec() || dialog->selectedFiles().isEmpty())
@@ -268,7 +268,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Do you want to replace it?").arg(QFileInfo(fileName).baseName()),
+                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Ok | QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Cancel)
@@ -280,7 +280,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).baseName()),
                 QMessageBox::Ok
             );
             return;

@@ -12,7 +12,7 @@
 
 QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnWeekTimeScheduleDialog),
+    ui(new Ui::WeekTimeScheduleDialog),
     m_disableUpdateGridParams(false),
     m_inUpdate(0)
 {

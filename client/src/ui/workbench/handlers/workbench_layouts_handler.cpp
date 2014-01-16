@@ -54,8 +54,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
         QMessageBox::warning(
             mainWindow(),
             tr("Layout already exists"),
-            tr("Layout with the same name already exists\n"\
-               "and you do not have the rights to overwrite it.")
+            tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
         );
         return;
     }
@@ -142,8 +141,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 QMessageBox::warning(
                     mainWindow(),
                     tr("Layout already exists"),
-                    tr("Layout with the same name already exists\n"\
-                       "and you do not have the rights to overwrite it.")
+                    tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
                 );
                 return;
             }
@@ -164,7 +162,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             QMessageBox::warning(
                 mainWindow(),
                 tr("Layout already exists"),
-                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+                tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
             );
             return;
         }
@@ -245,7 +243,7 @@ QMessageBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QMessag
     return QMessageBox::warning(
         mainWindow(),
         tr("Layout already exists"),
-        tr("Layout with the same name already exists. Overwrite it?"),
+        tr("Layout with the same name already exists. Do you want to overwrite it?"),
         buttons,
         defaultButton
     );
@@ -446,7 +444,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
             QMessageBox::warning(
                 mainWindow(),
                 tr("Layout already exists"),
-                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+                tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
             );
             return;
         }

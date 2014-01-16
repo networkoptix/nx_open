@@ -1238,6 +1238,9 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 
     /* Update tool tip format. */
     if (value == DATETIME_NOW) {
+        //: Time slider's tooltip for position on live. 
+        //: Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
+        //: That's where these single quotes come from.
         m_timeSlider->setToolTipFormat(tr("'Live'"));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
