@@ -975,7 +975,7 @@ void QnMain::run()
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
-    QnServerPtzControllerPool ptzPool;
+    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
@@ -1326,6 +1326,8 @@ void QnMain::run()
     QnResourcePool::initStaticInstance( NULL );
 
     QnStorageManager::instance()->stopAsyncTasks();
+
+    ptzPool.reset();
 
 #ifdef ENABLE_ONVIF
     delete QnSoapServer::instance();
