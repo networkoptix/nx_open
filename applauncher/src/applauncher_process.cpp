@@ -105,7 +105,7 @@ int ApplauncherProcess::run()
     {
         applauncher::api::Response response;
         startApplication(
-            std::shared_ptr<applauncher::api::StartApplicationTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ),
+            std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs),
             &response );
     }
 
@@ -301,11 +301,12 @@ bool ApplauncherProcess::startInstallation(
         return true;
     }
 
-    if( m_installationManager->isVersionInstalled(task->version) )
-    {
-        response->result = applauncher::api::ResultType::alreadyInstalled;
-        return true;
-    }
+    //if already installed, running restore
+    //if( m_installationManager->isVersionInstalled(task->version) )
+    //{
+    //    response->result = applauncher::api::ResultType::alreadyInstalled;
+    //    return true;
+    //}
 
     //detecting directory to download to 
     const QString& targetDir = m_installationManager->getInstallDirForVersion(task->version);

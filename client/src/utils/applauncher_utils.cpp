@@ -19,14 +19,14 @@ namespace applauncher
         sock.connectToServer(launcherPipeName);
         if(!sock.waitForConnected(-1)) {
             qDebug() << "Failed to connect to local server" << launcherPipeName << sock.errorString();
-            return api::ResultType::ioError;
+            return api::ResultType::connectError;
         }
 
         //const QByteArray &serializedTask = applauncher::api::StartApplicationTask(version.toString(QnSoftwareVersion::MinorFormat), arguments).serialize();
         const QByteArray &serializedTask = commandToSend.serialize();
         if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
             qDebug() << "Failed to send launch task to local server" << launcherPipeName << sock.errorString();
-            return api::ResultType::ioError;
+            return api::ResultType::connectError;
         }
 
         sock.waitForReadyRead(-1);
@@ -73,12 +73,15 @@ namespace applauncher
         arguments << QLatin1String("--screen");
         arguments << QString::number(qApp->desktop()->screenNumber(qApp->activeWindow()));
 
+        api::Response response;
+
         //return sendCommandToLauncher(version, arguments);
-        return sendCommandToLauncher(
+        const api::ResultType::Value result = sendCommandToLauncher(
             applauncher::api::StartApplicationTask(
                 version.toString(QnSoftwareVersion::MinorFormat),
                 arguments.join(QLatin1String("")) ),
-            nullptr );
+            &response );
+        return result != api::ResultType::ok ? result : response.result;
     }
 
     api::ResultType::Value startInstallation(

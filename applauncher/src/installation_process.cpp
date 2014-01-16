@@ -62,8 +62,8 @@ bool InstallationProcess::start( const QSettings& settings )
     {
         m_httpClient.reset( new nx_http::AsyncHttpClient() );
         connect(
-            m_httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),
-            this, SLOT(onHttpDone(nx_http::AsyncHttpClientPtr)),
+            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            this, &InstallationProcess::onHttpDone,
             Qt::DirectConnection );
     }
 
