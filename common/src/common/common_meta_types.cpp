@@ -134,6 +134,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
+    qRegisterMetaType<QnManualCameraSearchSingleCamera>();
 
     qRegisterMetaType<QnPtzPreset>();
 
