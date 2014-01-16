@@ -54,13 +54,13 @@
         <boost.version>1.54-SNAPSHOT</boost.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
 
-        <!-- Set parent (customization) and child (child.customization) customizations here -->         
+        <!-- Set parent (parent.customization) and child (customization) customizations here -->         
         <customization>default</customization>
+        <parent.customization>whooy</parent.customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
-        <child.customization>${customization}</child.customization>
-        <child.customization.dir>${customization.dir}/child/${child.customization}</child.customization.dir>        
+        <parent.customization.dir>${root.dir}/customization/${p.customization}</parent.customization.dir>        
 
-        <additional.defines></additional.defines>
+        <additional.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -73,7 +73,6 @@
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>                    
-
         <!-- qtlib11 is used in macos profile only -->
         <qtlib12/>
 
@@ -100,8 +99,8 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/rsa-key-${license.environment}.properties</file>
-                                <file>${child.customization.dir}/build.properties</file>
+                                <file>${customization.dir}/parent.properties</file>
+                                <file>${customization.dir}/build.properties</file>
                                 <file>${root.dir}/appserver/appserver-${arch}.properties</file>
                             </files>
                         </configuration>
@@ -154,14 +153,9 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <encoding>UTF-8</encoding>                            
                             <resources>          
-                                <resource>
-                                    <directory>${root.dir}/customization</directory>
-                                    <includes>
-                                        <include>version.h</include>
-                                    </includes>
-                                    <filtering>true</filtering>
-                                </resource>	
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
@@ -171,22 +165,20 @@
                                     <filtering>false</filtering>
                                 </resource>                                
                                 <resource>
+                                    <directory>${parent.customization.dir}/${project.artifactId}</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/_unused/**</exclude>
+                                    </excludes>
+                                </resource>	   
+                                <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
-                                </resource>	        	                                
-                                <resource>
-                                    <directory>${child.customization.dir}/${project.artifactId}</directory>
-                                    <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/_unused/**</exclude>
-                                    </excludes>
-                                </resource>	                                
+                                </resource>	        	                                                             
                             </resources>              
-                            <encoding>UTF-8</encoding>
-                            <overwrite>true</overwrite>
                         </configuration>            
                     </execution>
                 </executions>
@@ -359,7 +351,7 @@
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <toolchain.version>2011.09</toolchain.version>
-		<compiler>${toolchain.version}</compiler>
+                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
