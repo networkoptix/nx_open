@@ -74,7 +74,8 @@ QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption
     setNameFilters(qt_make_filter_list(filter));
     setWarningStyle(ui->alreadyExistsLabel);
 
-    connect(ui->fileNameLineEdit, &QLineEdit::textChanged, this, &QnTwoStepFileDialog::updateFileExistsWarning);
+    connect(ui->fileNameLineEdit,   &QLineEdit::textChanged,    this,   &QnTwoStepFileDialog::updateFileExistsWarning);
+    connect(ui->browseButton,       &QPushButton::clicked,      this,   &QnTwoStepFileDialog::at_browseButton_clicked);
     connect(ui->filterComboBox, SIGNAL(QComboBox::currentIndexChanged(int)), this, SLOT(QnTwoStepFileDialog::updateFileExistsWarning)); //f**ing overloaded currentIndexChanged
 
     updateFileExistsWarning();
@@ -120,4 +121,13 @@ void QnTwoStepFileDialog::setNameFilters(const QStringList &filters) {
 
 void QnTwoStepFileDialog::updateFileExistsWarning() {
     ui->alreadyExistsLabel->setVisible(QFileInfo(selectedFile()).exists());
+}
+
+void QnTwoStepFileDialog::at_browseButton_clicked() {
+    QString dirName = QFileDialog::getExistingDirectory(this,
+                                                        tr("Select directory"),
+                                                        ui->directoryLabel->text(),
+                                                        directoryDialogOptions());
+    if (!dirName.isEmpty())
+        ui->directoryLabel->setText(dirName);
 }

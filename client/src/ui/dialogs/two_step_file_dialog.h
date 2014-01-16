@@ -35,6 +35,7 @@ protected:
     QGridLayout* customizedLayout() const;
     void setNameFilters(const QStringList &filters);
     Q_SLOT void updateFileExistsWarning();
+    Q_SLOT void at_browseButton_clicked();
 
 private:
     QScopedPointer<Ui::QnTwoStepFileDialog> ui;
