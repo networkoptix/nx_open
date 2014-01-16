@@ -32,7 +32,7 @@
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnGeneralPreferencesWidget)
+    ui(new Ui::GeneralPreferencesWidget)
 {
     ui->setupUi(this);
 
@@ -278,7 +278,7 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     if (!QDir(logsLocation).exists()) {
         QMessageBox::information(this,
                                  tr("Information"),
-                                 tr("Folder &1 not exists.").arg(logsLocation));
+                                 tr("Folder '%1' does not exist.").arg(logsLocation));
         return;
     }
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);

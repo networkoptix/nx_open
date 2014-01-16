@@ -693,15 +693,20 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 }
 
 QString QnServerResourceWidget::calculateTitleText() const {
-    QString result =  tr("%1 %2 ").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
-    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
-    if (uptimeMs) {
-        int msInDay = 24*3600*1000;
-        QString timeStr = QTime(0,0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"));
-        result += tr("(up %1 days, %2)").arg(uptimeMs/msInDay).arg(timeStr);
-    }
+    QString name = m_resource->getName();
+    QString host = QUrl(m_resource->getUrl()).host();
 
-    return result;
+    //QString result =  tr("%1 %2 ").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
+    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
+    if (uptimeMs > 0) {
+        int msInDay = 24 * 3600 * 1000;
+        return tr("%1 %2 (up %n days, %2)", "", uptimeMs / msInDay)
+            .arg(name)
+            .arg(host)
+            .arg(QTime(0, 0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"))); // TODO: #TR #Elric this hh:mm is bad even in English...
+    } else {
+        return tr("%1 %2").arg(name).arg(host);
+    }
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {

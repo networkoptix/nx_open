@@ -200,15 +200,11 @@ public:
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
-    void setVendorName( const QString& vendorName );
-
     QMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
 
 protected:
-    virtual QString getVendorInternal() const override;
-
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -423,7 +419,6 @@ private:
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
-    QString m_vendorName;
     
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;

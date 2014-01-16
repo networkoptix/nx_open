@@ -110,7 +110,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
         QMessageBox::warning(this,
                              tr("Error"),
-                             tr("New title could not be set"));
+                             tr("New title could not be set."));
 
 }
 
@@ -127,7 +127,7 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
     QString title = soundModel->titleByFilename(filename);
     if (QMessageBox::question(this,
                               tr("Confirm file deletion"),
-                              tr("Are you sure you want to delete\n%1").arg(title),
+                              tr("Are you sure you want to delete '%1'?").arg(title),
                               QMessageBox::Ok,
                               QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

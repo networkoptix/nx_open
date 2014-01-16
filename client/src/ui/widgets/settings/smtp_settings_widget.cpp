@@ -25,7 +25,9 @@ namespace {
 }
 
 QValidator::State QnPortNumberValidator::validate(QString &input, int &pos) const {
-    if (input == tr("Auto"))
+    // TODO: #GDM #TR Logic on translated strings? And if it is translated differently in different context? Overall this is evil. 
+    // You should consider translated strings as objects with only one operation: showToUser.
+    if (input == tr("Auto")) 
         return QValidator::Acceptable;
 
     QValidator::State result = base_type::validate(input, pos);

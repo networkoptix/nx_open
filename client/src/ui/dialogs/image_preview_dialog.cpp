@@ -5,7 +5,7 @@
 
 QnImagePreviewDialog::QnImagePreviewDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QnImagePreviewDialog)
+    ui(new Ui::ImagePreviewDialog)
 {
     ui->setupUi(this);
 }

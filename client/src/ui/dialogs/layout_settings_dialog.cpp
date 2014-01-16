@@ -124,7 +124,7 @@ public:
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QnLayoutSettingsDialog),
+    ui(new Ui::LayoutSettingsDialog),
     d_ptr(new QnLayoutSettingsDialogPrivate()),
     m_cache(NULL),
     m_isUpdating(false)

@@ -471,7 +471,7 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
     m_tooltipWidget->setOpacity(0.0);
     m_tooltipWidget->setAcceptHoverEvents(true);
 
-    m_tooltipWidget->setText(tr("Sample Tooltip"));
+    m_tooltipWidget->setText(tr("Sample Tooltip")); // TODO: #GDM #TR can remove?
 
 //    m_tooltipWidget->installEventFilter(item);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
