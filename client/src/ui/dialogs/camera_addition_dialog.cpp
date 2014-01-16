@@ -277,7 +277,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
     clearTable();
 
     int newCameras = 0;
-    foreach(QnManualCameraSearchSingleCamera info, cameras){
+    foreach(const QnManualCameraSearchSingleCamera &info, cameras) {
         bool enabledRow = !info.existsInPool;
         if (enabledRow)
             newCameras++;
@@ -295,6 +295,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
             checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
             checkItem->setCheckState(Qt::PartiallyChecked);
         }
+        checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualCameraSearchSingleCamera>(info));
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
@@ -461,7 +462,8 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
-    QString urlText = ui->camerasTable->item(row, column)->text();
+    QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
+    QString urlText = info.url;
     if (!urlText.contains(QLatin1String("://")))
         urlText = QLatin1String("http://") + urlText;
 
@@ -582,8 +584,10 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
-        urls.append(ui->camerasTable->item(row, UrlColumn)->text());
-        manufacturers.append(ui->camerasTable->item(row, ManufColumn)->text());
+
+        QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
+        urls.append(info.url);
+        manufacturers.append(info.vendor);
     }
     if (urls.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));

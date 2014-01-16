@@ -43,14 +43,14 @@
             <version>${onvif.version}</version>
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency>                               
+        </dependency>		                        
         <dependency>
             <groupId>org.hyperic</groupId>
             <artifactId>sigar</artifactId>
             <version>${sigar.version}</version>
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>                                   
+        </dependency>                               	
 
         <!--   
         <dependency>                 
@@ -60,7 +60,7 @@
             <type>tar.gz</type>
             <classifier>${platform}</classifier>
         </dependency>                      -->
-    </dependencies>     
+    </dependencies>		
 
     <build>
         <defaultGoal>compile</defaultGoal>
@@ -79,34 +79,14 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>                        
-                    </execution>                            
+                    </execution>							
                 </executions>
-            </plugin>       
+            </plugin>  		
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
-                    <execution>
-                        <id>configure</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${python.dir}/python</executable>
-                            <arguments>
-                                <argument>configure.py</argument>
-                                <argument>--cst</argument>
-                                <argument>${customization}</argument>
-                                <argument>--chld</argument>
-                                <argument>${child.customization}</argument>                                
-                                <argument>--cfg</argument>
-                                <argument>${build.configuration}</argument>                                
-                            </arguments>
-                            <workingDirectory>${root.dir}</workingDirectory>        
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>update-buildenv</id>
                         <phase>generate-sources</phase>
@@ -118,7 +98,7 @@
                             <arguments>
                                 <argument>buildenv.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>		
                             <skip>${rsync.skip}</skip>
                         </configuration>
                     </execution>          
@@ -133,7 +113,7 @@
                             <arguments>
                                 <argument>copy_additional_resources.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>		
                         </configuration>
                     </execution>     
                     <execution>
@@ -150,7 +130,7 @@
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>
-                            <workingDirectory>${basedir}/python</workingDirectory>      
+                            <workingDirectory>${basedir}/python</workingDirectory>		
                             <skip>${unix}</skip>
                         </configuration>
                     </execution>
@@ -161,14 +141,14 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <environmentVariables>
-                                <PATH>${environment.dir}/python/x64;${environment.dir}/python/x64/Scripts;${env.PATH}</PATH>
-                            </environmentVariables>      
                             <executable>${environment.dir}/python/x64/python.exe</executable>
+                            <environmentVariables>
+                                <PATH>${environment.dir}/python/x86;${environment.dir}/python/x86/Scripts;${env.PATH}</PATH>
+                            </environmentVariables>      
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>
-                            <workingDirectory>${basedir}/python</workingDirectory>      
+                            <workingDirectory>${basedir}/python</workingDirectory>		
                             <skip>${unix}</skip>
                         </configuration>
                     </execution>
@@ -179,21 +159,21 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <environmentVariables>                            
-                        	<PATH>${python.dir}:${env.PATH}</PATH>
-                            </environmentVariables>                            
                             <executable>${python.dir}/python</executable>
+                            <environmentVariables>                            
+                                <PATH>${python.dir}:${env.PATH}</PATH>
+                            </environmentVariables>           
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>
-                            <workingDirectory>${basedir}/python</workingDirectory>      
+                            <workingDirectory>${basedir}/python</workingDirectory>		
                             <skip>${windows}</skip>
                         </configuration>
 
                     </execution>                    
                 </executions>
-            </plugin>   
-        </plugins>      
+            </plugin>	
+        </plugins>		
     </build>
     <profiles>
         <profile>
@@ -217,7 +197,7 @@
                     <version>1.0-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
-                </dependency>               
+                </dependency>				
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>directx</artifactId>
@@ -231,14 +211,14 @@
                     <version>2012-R2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
-                </dependency>                                   
+                </dependency>                               	
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>redistributable</artifactId>
                     <version>vs2008-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
-                </dependency>       
+                </dependency>		
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -246,7 +226,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>      
-            </dependencies>           
+            </dependencies>	          
         </profile>
         <profile>
             <id>noarm</id>
@@ -263,7 +243,7 @@
                     <artifactId>help</artifactId>
                     <version>${project.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${child.customization}-${help.language}</classifier>
+                    <classifier>${customization}-${help.language}</classifier>
                 </dependency>
 
                 <dependency>
@@ -272,14 +252,14 @@
                     <version>${festival.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>                                   
+                </dependency>                               	
                 <dependency>
                     <groupId>org.festival</groupId>
                     <artifactId>festival-vox</artifactId>
                     <version>${festival.version}</version>
                     <type>tar.gz</type>
                     <classifier>all-os</classifier>
-                </dependency>       
+                </dependency> 		
                 <dependency>
                     <groupId>com.sourceforge.cloudcity</groupId>
                     <artifactId>bespin</artifactId>
@@ -294,7 +274,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>      
-            </dependencies>             
+            </dependencies>	            
         </profile>      
 
         <profile>
@@ -311,7 +291,7 @@
                 </property>
             </activation>
 
-            <dependencies>              
+            <dependencies>	            
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -326,7 +306,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>      
-            </dependencies>             
+            </dependencies>	            
         </profile>
-    </profiles> 
+    </profiles>	
 </project>

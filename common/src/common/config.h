@@ -58,6 +58,9 @@
 #   endif
 #endif
 
+#ifdef __APPLE__
+    #define nullptr 0
+#endif
 
 /* Define foreach */
 //#define foreach BOOST_FOREACH

@@ -33,7 +33,6 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
-#include <ui/workbench/handlers/workbench_panic_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
@@ -405,7 +404,13 @@ void QnMainWindow::showNormal() {
 }
 
 void QnMainWindow::minimize() {
-    setWindowState(Qt::WindowMinimized | windowState());
+    setWindowState(windowState() | Qt::WindowMinimized);
+
+    // workaround against QTBUG-25727
+#ifdef Q_OS_LINUX
+    QApplication::processEvents();
+    setWindowState(windowState() &~ Qt::WindowMinimized);
+#endif
 }
 
 void QnMainWindow::toggleTitleVisibility() {

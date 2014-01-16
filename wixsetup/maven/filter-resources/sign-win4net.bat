@@ -1,1 +1,0 @@
-${environment.dir}\bin\signtool.exe sign /d "${company.name} ${product.name}" /f win4net.pfx bin\${project.build.finalName}.msi
