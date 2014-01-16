@@ -19,7 +19,7 @@ QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFl
     ui->setupUi(this);
 
     m_removeButton = new QPushButton(tr("Remove"));
-    m_removeButton->setIcon(qnSkin->icon("buttons/remove.png"));
+//    m_removeButton->setIcon(qnSkin->icon("buttons/remove.png"));
 
     m_activateButton = new QPushButton(tr("Activate"));
 
