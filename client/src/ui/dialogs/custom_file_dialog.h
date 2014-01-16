@@ -107,6 +107,9 @@ public:
      */
     void addWidget(QWidget *widget, bool newRow = true, QnWidgetControlAbstractDelegate* delegate = NULL);
 
+    /** Returns extension of the selected filter, containing the dot, e.g. ".png". */
+    QString selectedExtension() const;
+
     static QString valueSpacer() {return lit("%value%"); }
 private slots:
     void at_accepted();

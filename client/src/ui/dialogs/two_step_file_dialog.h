@@ -16,7 +16,7 @@ class QnTwoStepFileDialog : public QnButtonBoxDialog
 
     typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
+    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &initialFile = QString(), const QString &filter = QString());
     ~QnTwoStepFileDialog();
 
     void setOptions(QFileDialog::Options options);
@@ -33,7 +33,8 @@ signals:
 
 protected:
     QGridLayout* customizedLayout() const;
-
+    void setNameFilters(const QStringList &filters);
+    Q_SLOT void updateFileExistsWarning();
 
 private:
     QScopedPointer<Ui::QnTwoStepFileDialog> ui;

@@ -287,10 +287,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         contrastParams.enabled &= doTranscode;
         dewarpingParams.enabled &= doTranscode;
-        selectedFilter = dialog->selectedNameFilter();
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
-        if (selectedFilter.contains(aviFileFilter)) {
+        if (dialog->selectedNameFilter().contains(aviFileFilter)) {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) {
@@ -321,6 +319,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 return;
         }
 
+        selectedExtension = dialog->selectedExtension();
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
@@ -540,12 +539,10 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             return false;
 
         fileName = dialog->selectedFile();
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
         if (fileName.isEmpty())
             return false;
 
+        QString selectedExtension = dialog->selectedExtension();
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 

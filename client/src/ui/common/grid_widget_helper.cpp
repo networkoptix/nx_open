@@ -9,6 +9,8 @@
 #include "client/client_settings.h"
 #include "ui/dialogs/custom_file_dialog.h"
 
+#include <utils/common/string.h>
+
 QnGridWidgetHelper::QnGridWidgetHelper(QnWorkbenchContext *context):
     QnWorkbenchContextAware(context)
 {
@@ -33,9 +35,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
         if (fileName.isEmpty())
             return;
 
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
-
+        QString selectedExtension = extractFileExtension(selectedFilter);
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 

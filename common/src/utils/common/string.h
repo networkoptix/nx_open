@@ -58,5 +58,11 @@ bool naturalStringCaseInsensitiveLessThan(const QString &lhs, const QString &rhs
 QString xorEncrypt(const QString &plaintext, const QString &key);
 QString xorDecrypt(const QString &crypted, const QString &key);
 
+/** Returns filename extension (with dot) from the string containing filename of dialog filter.
+ *  Supports strings like "/home/file.avi" -> ".avi"; "Avi files (*.avi)" -> ".avi"
+ *  Returns an empty string if the string does not contain any dot.
+ */
+QString extractFileExtension(const QString &string);
+
 #endif // QN_STRING_H
 

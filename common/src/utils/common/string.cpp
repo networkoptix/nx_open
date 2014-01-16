@@ -252,3 +252,18 @@ QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity cas
 	return retVal;
 }
 
+QString extractFileExtension(const QString &string) {
+    int pos = string.lastIndexOf(L'.');
+    if (pos < 0)
+        return QString();
+
+    QString result(L'.');
+    while (++pos < string.length()) {
+        QChar curr = string[pos];
+        if (!curr.isLetterOrNumber())
+            return result;
+        result.append(curr);
+    }
+
+    return result;
+}

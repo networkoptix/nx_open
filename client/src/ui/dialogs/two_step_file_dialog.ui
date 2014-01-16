@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>652</width>
-    <height>225</height>
+    <width>407</width>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="fileNameLineEdit"/>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
@@ -62,10 +62,10 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="filterComboBox"/>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="alreadyExistsLabel">
        <property name="text">
         <string>Warning: file with same name already exists!</string>
        </property>
@@ -74,21 +74,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="optionsWidget" native="true">
-     <layout class="QGridLayout" name="optionsLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-     </layout>
+    <widget class="QGroupBox" name="optionsGroupBox">
+     <property name="title">
+      <string>Options</string>
+     </property>
+     <layout class="QGridLayout" name="optionsLayout"/>
     </widget>
    </item>
    <item>

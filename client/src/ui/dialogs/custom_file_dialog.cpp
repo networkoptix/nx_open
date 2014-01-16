@@ -3,6 +3,8 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 
+#include <utils/common/string.h>
+
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter),
     m_currentCol(0)
@@ -113,4 +115,8 @@ void QnCustomFileDialog::at_accepted() {
 
     foreach(QLineEdit* key, m_lineEdits.keys())
         *m_lineEdits[key] = key->text();
+}
+
+QString QnCustomFileDialog::selectedExtension() const {
+    return extractFileExtension(selectedNameFilter());
 }

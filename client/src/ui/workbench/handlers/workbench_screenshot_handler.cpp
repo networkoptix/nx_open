@@ -259,8 +259,8 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         if (fileName.isEmpty())
             return;
 
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        QString selectedExtension = dialog->selectedExtension();
+
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
