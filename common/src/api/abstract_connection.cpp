@@ -78,7 +78,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
         params, 
         data,
         processor, 
-        SLOT(processReply(QnHTTPRawResponse, int))
+        "processReply"
     );
 }
 

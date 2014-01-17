@@ -15,7 +15,7 @@ def fixasfiles():
     open('ClientHelp.wxs', 'w').write(text)
 
 if __name__ == '__main__':
-    p = subprocess.Popen(r'heat dir ${ClientHelpSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientHelp.wxs -cg ClientHelpComponent -dr ${installer.customization}HelpDir -var var.ClientHelpSourceDir', shell=True, stdout=PIPE)
+    p = subprocess.Popen(r'heat dir ${ClientHelpSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientHelp.wxs -cg ClientHelpComponent -dr ${customization}HelpDir -var var.ClientHelpSourceDir', shell=True, stdout=PIPE)
     out, err = p.communicate()
     print out
     p.wait()

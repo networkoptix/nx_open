@@ -12,8 +12,6 @@
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
 
-#include "version.h"
-
 
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
@@ -107,7 +105,7 @@ int ApplauncherProcess::run()
     {
         applauncher::api::Response response;
         startApplication(
-            std::shared_ptr<applauncher::api::StartApplicationTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ),
+            std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs),
             &response );
     }
 
@@ -235,12 +233,6 @@ bool ApplauncherProcess::addTaskToThePipe( const QByteArray& serializedTask )
 #endif
 }
 
-#ifdef AK_DEBUG
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
-#endif
-
 static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
 static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
 
@@ -309,11 +301,12 @@ bool ApplauncherProcess::startInstallation(
         return true;
     }
 
-    if( m_installationManager->isVersionInstalled(task->version) )
-    {
-        response->result = applauncher::api::ResultType::alreadyInstalled;
-        return true;
-    }
+    //if already installed, running restore
+    //if( m_installationManager->isVersionInstalled(task->version) )
+    //{
+    //    response->result = applauncher::api::ResultType::alreadyInstalled;
+    //    return true;
+    //}
 
     //detecting directory to download to 
     const QString& targetDir = m_installationManager->getInstallDirForVersion(task->version);
@@ -358,8 +351,22 @@ bool ApplauncherProcess::getInstallationStatus(
     response->status = installationIter->second->getStatus();
     response->progress = installationIter->second->getProgress();
 
-    if( response->status > applauncher::api::InstallationStatus::inProgress )
+    if( response->status > applauncher::api::InstallationStatus::cancelInProgress )
+    {
+        switch( response->status )
+        {
+            case applauncher::api::InstallationStatus::success:
+                NX_LOG( QString::fromLatin1("Installation finished successfully"), cl_logDEBUG2 );
+                break;
+            case applauncher::api::InstallationStatus::failed:
+                NX_LOG( QString::fromLatin1("Installation has failed. %1").arg(installationIter->second->errorText()), cl_logDEBUG1 );
+                break;
+            case applauncher::api::InstallationStatus::cancelled:
+                NX_LOG( QString::fromLatin1("Installation has been cancelled"), cl_logDEBUG2 );
+                break;
+        }
         m_activeInstallations.erase( installationIter );
+    }
 
     return true;
 }

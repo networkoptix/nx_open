@@ -67,7 +67,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
 {
-    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(QnHTTPRawResponse, int)));
+    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, "requestFinished");
     m_handleToResource.insert(handle, resource);
 }
 

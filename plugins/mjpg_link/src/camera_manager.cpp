@@ -15,7 +15,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_refManager( this ),
     m_pluginRef( HttpLinkPlugin::instance() ),
     m_info( info ),
-    m_capabilities( nxcip::BaseCameraManager::nativeMediaStreamCapability )
+    m_capabilities( nxcip::BaseCameraManager::nativeMediaStreamCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
 {
 }
 

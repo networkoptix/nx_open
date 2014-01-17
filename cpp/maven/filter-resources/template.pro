@@ -93,7 +93,7 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${child.customization.dir}/icons/hdw_logo.ico	
+  ICON = ${customization.dir}/icons/hdw_logo.ico	
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
   win32-msvc* {

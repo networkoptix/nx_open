@@ -44,7 +44,8 @@ bool InstrumentEventDispatcher<T>::registeredNotify(Instrument *instrument, QGra
 
 template<class T>
 void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode, Instrument *reference) {
-//    assert(!dispatching()); /* Can install while dispatching - iterators are not used, see comments in dispatch(). */
+    /* Note that installation during dispatch is perfectly safe, and no
+     * additional checks are needed as in case of uninstallation. */
 
     if(!registeredNotify(instrument, target))
         return;

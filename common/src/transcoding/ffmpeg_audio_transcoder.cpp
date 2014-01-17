@@ -39,7 +39,7 @@ bool QnFfmpegAudioTranscoder::open(QnConstCompressedAudioDataPtr audio)
 {
     if (!audio->context)
     {
-        m_lastErrMessage = tr("Audio context must be specified");
+        m_lastErrMessage = tr("Audio context was not specified.");
         return false;
     }
 
@@ -53,7 +53,7 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
-        m_lastErrMessage = tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
+        m_lastErrMessage = tr("Could not find encoder for codec %1.").arg(m_codecId);
         return false;
     }
 
@@ -82,7 +82,7 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Can't initialize audio encoder");
+        m_lastErrMessage = tr("Could not initialize audio encoder.");
         return false;
     }
 
@@ -91,7 +91,7 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     avcodec_copy_context(m_decoderContext, codecCtx->ctx());
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Can't initialize audio decoder");
+        m_lastErrMessage = tr("Could not initialize audio decoder.");
         return false;
     }
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));

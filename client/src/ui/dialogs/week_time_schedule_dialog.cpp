@@ -12,7 +12,7 @@
 
 QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnWeekTimeScheduleDialog),
+    ui(new Ui::WeekTimeScheduleDialog),
     m_disableUpdateGridParams(false),
     m_inUpdate(0)
 {
@@ -36,8 +36,8 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
 
     connectToGridWidget();
 
-    ui->gridWidget->setShowSecondParam(false);
-    ui->gridWidget->setShowFirstParam(false);
+    ui->gridWidget->setShowQuality(false);
+    ui->gridWidget->setShowFps(false);
 }
 
 QnWeekTimeScheduleDialog::~QnWeekTimeScheduleDialog()

@@ -4,6 +4,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_type.h>
 #include <core/resource/camera_resource.h>
 
@@ -11,10 +13,6 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-namespace {
-    const QString overrideArKey = lit("overrideAr"); //TODO: #GDM globalize
-}
 
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
@@ -46,11 +44,13 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     ui->highQualityWarningLabel->setVisible(false);
     ui->lowQualityWarningLabel->setVisible(false);
 
-    connect(ui->arOverrideCheckBox, &QCheckBox::toggled,                ui->arComboBox, &QWidget::setEnabled);
+    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_arOverrideCheckBox_stateChanged(int)));
+    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dataChanged()));
+
     ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
     ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
     ui->arComboBox->addItem(tr("1:1"),  1.0);
-
+    ui->arComboBox->setCurrentIndex(0);
     connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dataChanged()));
 
     connect(ui->restoreDefaultsButton, SIGNAL(clicked()), this, SLOT(at_restoreDefaultsButton_clicked()));
@@ -112,7 +112,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
             }
         }
 
-        QString changedAr = camera->getProperty(overrideArKey);
+        QString changedAr = camera->getProperty(Qn::customAspectRatioKey);
         if (isFirstAr) {
             isFirstAr = false;
             arOverride = changedAr;
@@ -146,7 +146,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 
         qreal ar = arOverride.toDouble();
         int idx = ui->arComboBox->findData(ar, Qt::UserRole, Qt::MatchExactly);
-        ui->arComboBox->setCurrentIndex(idx);
+        ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
     }
     else
         ui->arOverrideCheckBox->setCheckState(Qt::PartiallyChecked);
@@ -157,11 +157,6 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
-
-    if (arecontCamerasCount != cameras.size() || anyHasDualStreaming)
-        ui->stackedWidget->setCurrentWidget(ui->pageSettings);
-    else
-        ui->stackedWidget->setCurrentWidget(ui->pageNoSettings);
 }
 
 void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
@@ -188,9 +183,9 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
             camera->setSecondaryStreamQuality(quality);
 
         if (overrideAr)
-            camera->setProperty(overrideArKey, QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+            camera->setProperty(Qn::customAspectRatioKey, QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
         else if (clearAr)
-            camera->setProperty(overrideArKey, QString());
+            camera->setProperty(Qn::customAspectRatioKey, QString());
     }
 }
 
@@ -217,6 +212,10 @@ void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
     Qn::SecondStreamQuality quality = sliderPosToQuality(value);
     ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
+}
+
+void QnAdvancedSettingsWidget::at_arOverrideCheckBox_stateChanged(int state) {
+    ui->arComboBox->setEnabled(state == Qt::Checked);
 }
 
 Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos)

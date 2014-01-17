@@ -51,17 +51,19 @@ Mirror list is defined by xml of following format:
 <condition resName="product" matchType="equal">
 
     <condition value="dwspectrum" resName="customization" matchType="equal">
-        <condition value="digitalwatchdog" resName="module" matchType="equal">
-            <condition value="client" resName="version" matchType="equal">
-                <sequence value="1.5">
-                    <set resName="mirrorUrl" resValue="http://dwserver1/1.5/"/>
-                    <set resName="mirrorUrl" resValue="http://dwserver2/1.5/"/>
-                </sequence>
-                <sequence name="1.6">
-                    <set resName="mirrorUrl" resValue="http://dwserver1/1.6/"/>
-                    <set resName="mirrorUrl" resValue="http://dwserver2/1.6/"/>
-                    <set resName="mirrorUrl" resValue="http://dwserverN/1.6/"/>
-                </sequence>
+        <condition value="digitalwatchdog" resName="platform" matchType="equal">
+            <condition value="windows" resName="module" matchType="equal">
+                <condition value="client" resName="version" matchType="equal">
+                    <sequence value="1.5">
+                        <set resName="mirrorUrl" resValue="http://dwserver1/1.5/"/>
+                        <set resName="mirrorUrl" resValue="http://dwserver2/1.5/"/>
+                    </sequence>
+                    <sequence name="1.6">
+                        <set resName="mirrorUrl" resValue="http://dwserver1/1.6/"/>
+                        <set resName="mirrorUrl" resValue="http://dwserver2/1.6/"/>
+                        <set resName="mirrorUrl" resValue="http://dwserverN/1.6/"/>
+                    </sequence>
+                </condition>
             </condition>
         </condition>
     </condition>

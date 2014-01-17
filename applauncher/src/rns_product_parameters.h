@@ -24,7 +24,9 @@ namespace ProductParameters
         //!String
         mirrorUrl,
         //!String (x86 or x64)
-        arch
+        arch,
+        //!String (windows, linux, macos)
+        platform
     };
 
 }

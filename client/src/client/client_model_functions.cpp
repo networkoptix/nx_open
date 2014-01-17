@@ -4,8 +4,4 @@
 
 QN_DEFINE_STRUCT_FUNCTIONS(QnWorkbenchState, (datastream), (currentLayoutIndex)(layoutUuids));
 QN_DEFINE_STRUCT_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash), (serverUuid)(storagePath));
-QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime)(ignore));
-
-
-
-
+QN_DEFINE_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime));

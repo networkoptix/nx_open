@@ -38,6 +38,10 @@
         <source>Connected servers</source>
         <translation>连接的服务器</translation>
     </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished">関于</translation>
+    </message>
 </context>
 <context>
     <name>AdjustVideoDialog</name>
@@ -71,7 +75,7 @@
     </message>
     <message>
         <source>Enable enhancement</source>
-        <translation>启用增强</translation>
+        <translation type="obsolete">启用增强</translation>
     </message>
     <message>
         <source>Black level</source>
@@ -80,6 +84,10 @@
     <message>
         <source>White level</source>
         <translation>白电平</translation>
+    </message>
+    <message>
+        <source>Enable image enhancement</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -134,7 +142,7 @@
     </message>
     <message>
         <source>Warning! Please read documentation prior to change these settings!</source>
-        <translation>警告!更改这些设置之前请阅读文档!</translation>
+        <translation type="obsolete">警告!更改这些设置之前请阅读文档!</translation>
     </message>
     <message>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
@@ -142,7 +150,7 @@
     </message>
     <message>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation>警告！录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
+        <translation type="obsolete">警告！录影排程中的每秒帧数/画质设置将无法正常运作!</translation>
     </message>
     <message utf8="true">
         <source>Warning! Low quality may result in low resolution image. High quality may result in Media Server’s CPU overload and network connection errors.</source>
@@ -162,7 +170,7 @@
     </message>
     <message>
         <source>Secondary Stream Quality Control</source>
-        <translation>次视频流画质控制</translation>
+        <translation type="obsolete">次视频流画质控制</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -182,7 +190,50 @@
     </message>
     <message>
         <source>Selected camera(s) have no expert settings</source>
-        <translation>所选摄像机无专家设置</translation>
+        <translation type="obsolete">所选摄像机无专家设置</translation>
+    </message>
+    <message>
+        <source>Secondary Stream Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect Ratio Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force aspect ratio to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning! Please read documentation before changing these settings!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AggregationWidget</name>
+    <message>
+        <source>Check to set aggregation period</source>
+        <translation type="unfinished">勾选以设置聚合期</translation>
+    </message>
+    <message>
+        <source>Interval of action :</source>
+        <translation type="unfinished">动作的时间间隔：</translation>
+    </message>
+    <message>
+        <source>No more than once per</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instant</source>
+        <translation type="unfinished">立即作用</translation>
     </message>
 </context>
 <context>
@@ -190,6 +241,45 @@
     <message>
         <source>%1%</source>
         <translation>%1%</translation>
+    </message>
+</context>
+<context>
+    <name>BusinessRuleWidget</name>
+    <message>
+        <source>Event</source>
+        <translation type="unfinished">事件</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>at</source>
+        <translation type="unfinished">在</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;任何摄像机&gt;</translation>
+    </message>
+    <message>
+        <source>Schedule...</source>
+        <translation type="unfinished">日程...</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished">动作</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Select at least one camera&gt;</source>
+        <translation type="unfinished">&lt;选择至少一台摄像机&gt;</translation>
+    </message>
+    <message>
+        <source>Comments:</source>
+        <translation type="unfinished">注释:</translation>
     </message>
 </context>
 <context>
@@ -317,11 +407,11 @@
     </message>
     <message>
         <source>Cancel &amp;scan</source>
-        <translation>取消&amp;搜索</translation>
+        <translation type="obsolete">取消&amp;搜索</translation>
     </message>
     <message>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation>IP地址区间太大，最大允许255个地址</translation>
+        <translation type="obsolete">IP地址区间太大，最大允许255个地址</translation>
     </message>
     <message>
         <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
@@ -349,7 +439,7 @@
     </message>
     <message>
         <source>&amp;Camera Address:</source>
-        <translation>&amp;摄像机地址:</translation>
+        <translation type="obsolete">&amp;摄像机地址:</translation>
     </message>
     <message>
         <source>Cl&amp;ose</source>
@@ -367,12 +457,40 @@
         <source>IP, hostname, RTSP link...</source>
         <translation>IP，主机名，RTSP链接...</translation>
     </message>
+    <message>
+        <source>Add cameras...</source>
+        <translation type="unfinished">添加摄像机...</translation>
+    </message>
+    <message>
+        <source>Selected server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ca&amp;mera Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New scan...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to media server %1</source>
-        <translation>无法连接到媒体服务器 %1</translation>
+        <translation type="obsolete">无法连接到媒体服务器 %1</translation>
+    </message>
+    <message>
+        <source>No connection to media server %1.</source>
+        <translation type="unfinished">无法连接到媒体服务器 %1.</translation>
     </message>
 </context>
 <context>
@@ -387,6 +505,20 @@
     </message>
 </context>
 <context>
+    <name>CameraDisconnectedBusinessEventWidget</name>
+    <message>
+        <source>Event will be raised when any camera goes offline</source>
+        <translation type="unfinished">当有摄像机离线时事件会产生</translation>
+    </message>
+</context>
+<context>
+    <name>CameraInputBusinessEventWidget</name>
+    <message>
+        <source>Input ID:</source>
+        <translation type="unfinished">输入ID:</translation>
+    </message>
+</context>
+<context>
     <name>CameraListDialog</name>
     <message>
         <source>Camera list</source>
@@ -394,7 +526,22 @@
     </message>
     <message>
         <source>Search string:</source>
-        <translation>搜寻字串:</translation>
+        <translation type="obsolete">搜寻字串:</translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CameraOutputBusinessActionWidget</name>
+    <message>
+        <source>&amp;Output ID:</source>
+        <translation type="unfinished">&amp;输出ID:</translation>
+    </message>
+    <message>
+        <source>&amp;Auto-reset in (sec):</source>
+        <translation type="unfinished">&amp;自动重置在(秒):</translation>
     </message>
 </context>
 <context>
@@ -481,6 +628,9 @@
     </message>
     <message>
         <source> s</source>
+        <extracomment>Short for &quot;seconds&quot;
+----------
+Short for &quot;seconds&quot;</extracomment>
         <translation>秒</translation>
     </message>
     <message>
@@ -570,6 +720,33 @@
     <message>
         <source>Apply changes before copying schedule</source>
         <translation>复制日程前執行修改</translation>
+    </message>
+</context>
+<context>
+    <name>CompatibilityVersionInstallationDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="obsolete">对话框</translation>
+    </message>
+    <message>
+        <source>Installing version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installation failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not cancel installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installation completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Installation has been cancelled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -711,7 +888,7 @@
     <name>FisheyeSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Horizontal mount (camera on the wall)</source>
@@ -728,6 +905,97 @@
     <message>
         <source>Vertical mount (camera on the floor)</source>
         <translation>垂直安装(摄像机安装在地板上)</translation>
+    </message>
+    <message>
+        <source>Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GeneralPreferencesWidget</name>
+    <message>
+        <source>Main Media Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Browse...</source>
+        <translation type="unfinished">&amp;浏览...</translation>
+    </message>
+    <message>
+        <source>Extra Media Folders</source>
+        <translation type="unfinished">其他媒体文件夹</translation>
+    </message>
+    <message>
+        <source>&amp;Add...</source>
+        <translation type="unfinished">&amp;添加...</translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation type="unfinished">&amp;删除</translation>
+    </message>
+    <message>
+        <source>Look and Feel</source>
+        <translation type="unfinished">看和感觉</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation type="unfinished">秒</translation>
+    </message>
+    <message>
+        <source>Tour sequence cycle time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show IP in tree:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeline mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Misc</source>
+        <translation type="unfinished">杂项</translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation type="unfinished">语言:</translation>
+    </message>
+    <message>
+        <source>Restart required.</source>
+        <translation type="unfinished">需重新启动。</translation>
+    </message>
+    <message>
+        <source>Downmix audio from 5.1 to 2.1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto pause video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>after</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes of inactivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run application when PC boots up:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear local cache</source>
+        <translation type="unfinished">清除本地快取</translation>
+    </message>
+    <message>
+        <source>Network Interfaces</source>
+        <translation type="unfinished">网络界面</translation>
     </message>
 </context>
 <context>
@@ -797,6 +1065,76 @@
     </message>
 </context>
 <context>
+    <name>ImagePreviewDialog</name>
+    <message>
+        <source>Image View</source>
+        <translation type="unfinished">图像浏览</translation>
+    </message>
+    <message>
+        <source>Loading image... Please wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LayoutSettingsDialog</name>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished">一般设定</translation>
+    </message>
+    <message>
+        <source>Layout is locked</source>
+        <translation type="unfinished">Layout被锁定</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished">背景</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">浏览...</translation>
+    </message>
+    <message>
+        <source>View...</source>
+        <translation type="unfinished">查看...</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">清除</translation>
+    </message>
+    <message>
+        <source>Processing image... Please wait.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Crop to monitor aspect ratio</source>
+        <translation type="unfinished">&amp;裁切至显示器宽高比</translation>
+    </message>
+    <message>
+        <source>&amp;Width:</source>
+        <translation type="unfinished">&amp;宽:</translation>
+    </message>
+    <message>
+        <source> cells</source>
+        <translation type="unfinished">格</translation>
+    </message>
+    <message>
+        <source>&amp;Height:</source>
+        <translation type="unfinished">&amp;高:</translation>
+    </message>
+    <message>
+        <source>&amp;Opacity:</source>
+        <translation type="unfinished">&amp;不透明度:</translation>
+    </message>
+    <message>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+    <message>
+        <source>Keep aspect ratio</source>
+        <translation type="unfinished">保存宽高比不变</translation>
+    </message>
+</context>
+<context>
     <name>LicenseManagerWidget</name>
     <message>
         <source>Form</source>
@@ -820,7 +1158,7 @@
     </message>
     <message>
         <source>...</source>
-        <translation>...</translation>
+        <translation type="obsolete">...</translation>
     </message>
     <message>
         <source>Selected License Details</source>
@@ -1182,15 +1520,15 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>Licensing</source>
-        <translation>许可</translation>
+        <translation type="obsolete">许可</translation>
     </message>
     <message>
         <source>Use analog licenses to view selected analog cameras</source>
-        <translation>&gt;使用类比许可来浏览选取的类比摄像机</translation>
+        <translation type="obsolete">&gt;使用类比许可来浏览选取的类比摄像机</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>取得更多软件许可...</translation>
+        <translation type="obsolete">取得更多软件许可...</translation>
     </message>
     <message>
         <source>Expert</source>
@@ -1201,11 +1539,11 @@ Would you like to restart client in compatibility mode?</source>
     <name>Node</name>
     <message>
         <source>Root</source>
-        <translation>根</translation>
+        <translation type="obsolete">根</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation>本地</translation>
+        <translation type="obsolete">本地</translation>
     </message>
     <message>
         <source>Servers</source>
@@ -1213,7 +1551,7 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>Users</source>
-        <translation>用户</translation>
+        <translation type="obsolete">用户</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -1221,7 +1559,7 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>System</source>
-        <translation>系统</translation>
+        <translation type="obsolete">系统</translation>
     </message>
 </context>
 <context>
@@ -1259,6 +1597,47 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
 </context>
 <context>
+    <name>PlaySoundBusinessActionWidget</name>
+    <message>
+        <source>Manage...</source>
+        <translation type="unfinished">管理...</translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished">音量:</translation>
+    </message>
+    <message>
+        <source>Test...</source>
+        <translation type="unfinished">测试...</translation>
+    </message>
+</context>
+<context>
+    <name>PopupBusinessActionWidget</name>
+    <message>
+        <source>Show to Administrators only</source>
+        <translation type="unfinished">仅显示给管理员</translation>
+    </message>
+    <message>
+        <source>Global Notification Settings...</source>
+        <translation type="unfinished">全局通知设定...</translation>
+    </message>
+</context>
+<context>
+    <name>PopupSettingsWidget</name>
+    <message>
+        <source>Show all notifications</source>
+        <translation type="unfinished">显示所有通知</translation>
+    </message>
+    <message>
+        <source>Alarms/Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PreferencesDialog</name>
     <message>
         <source>System Settings</source>
@@ -1266,31 +1645,31 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>General</source>
-        <translation>一般</translation>
+        <translation type="obsolete">一般</translation>
     </message>
     <message>
         <source>Main Media Folder</source>
-        <translation>主要媒体文件夹</translation>
+        <translation type="obsolete">主要媒体文件夹</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
-        <translation>&amp;浏览...</translation>
+        <translation type="obsolete">&amp;浏览...</translation>
     </message>
     <message>
         <source>Extra Media Folders</source>
-        <translation>其他媒体文件夹</translation>
+        <translation type="obsolete">其他媒体文件夹</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
-        <translation>&amp;添加...</translation>
+        <translation type="obsolete">&amp;添加...</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
-        <translation>&amp;删除</translation>
+        <translation type="obsolete">&amp;删除</translation>
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation>看和感觉</translation>
+        <translation type="obsolete">看和感觉</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -1302,7 +1681,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Misc</source>
-        <translation>杂项</translation>
+        <translation type="obsolete">杂项</translation>
     </message>
     <message>
         <source>Downmix the Audio from 5.1 to 2.1 channels (restart required)</source>
@@ -1310,7 +1689,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Network Interfaces</source>
-        <translation>网络界面</translation>
+        <translation type="obsolete">网络界面</translation>
     </message>
     <message>
         <source>Maximum video items on the scene (*):</source>
@@ -1326,7 +1705,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Language:</source>
-        <translation>语言:</translation>
+        <translation type="obsolete">语言:</translation>
     </message>
     <message>
         <source>Tour cycle time:</source>
@@ -1338,19 +1717,19 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Sequence Cycle Time:</source>
-        <translation>轮巡周期:</translation>
+        <translation type="obsolete">轮巡周期:</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation>秒</translation>
+        <translation type="obsolete">秒</translation>
     </message>
     <message>
         <source>Show IP in Tree:</source>
-        <translation>在树狀表中显示IP:</translation>
+        <translation type="obsolete">在树狀表中显示IP:</translation>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation>时间轴模式:</translation>
+        <translation type="obsolete">时间轴模式:</translation>
     </message>
     <message>
         <source>Downmix the Audio from 5.1 to 2.1 Channels (Restart Required)</source>
@@ -1362,15 +1741,15 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Clear local cache</source>
-        <translation>清除本地快取</translation>
+        <translation type="obsolete">清除本地快取</translation>
     </message>
     <message>
         <source>Use Hardware Acceleration:</source>
-        <translation>使用硬件加速:</translation>
+        <translation type="obsolete">使用硬件加速:</translation>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1:</source>
-        <translation>从5.1到2.1音频缩混:</translation>
+        <translation type="obsolete">从5.1到2.1音频缩混:</translation>
     </message>
     <message>
         <source>(Restart required)</source>
@@ -1378,22 +1757,22 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Run Application when PC Boots up:</source>
-        <translation>电脑开机同时运行应用程序:</translation>
+        <translation type="obsolete">电脑开机同时运行应用程序:</translation>
     </message>
     <message>
         <source>Restart required.</source>
-        <translation>需重新启动。</translation>
+        <translation type="obsolete">需重新启动。</translation>
     </message>
     <message>
         <source>Experimental. May result in glitches.</source>
-        <translation>试验阶段。可能会导致故障。</translation>
+        <translation type="obsolete">试验阶段。可能会导致故障。</translation>
     </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
         <source>PTZ Position</source>
-        <translation>PTZ位置</translation>
+        <translation type="obsolete">PTZ位置</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -1406,6 +1785,10 @@ For easy instructions on how to install or update your video driver, follow inst
     <message>
         <source>None</source>
         <translation type="obsolete">无</translation>
+    </message>
+    <message>
+        <source>Save position</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1420,6 +1803,40 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
 </context>
 <context>
+    <name>PtzTourWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="obsolete">表格</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished">名称:</translation>
+    </message>
+</context>
+<context>
+    <name>PtzToursDialog</name>
+    <message>
+        <source>Manage PTZ Tours...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">添加</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">删除</translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select tour to edit...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Using authentication parameters from command line: %1.</source>
@@ -1431,7 +1848,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Can&apos;t overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation>无法覆盖文件&apos;%1&apos;。请尝试另一个名称。</translation>
+        <translation type="obsolete">无法覆盖文件&apos;%1&apos;。请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -1439,15 +1856,15 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>* Last used connection *</source>
-        <translation>*最后使用的连接*</translation>
+        <translation type="obsolete">*最后使用的连接*</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation>当 %1</translation>
+        <translation type="obsolete">当 %1</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation>在 %1 %2</translation>
+        <translation type="obsolete">在 %1 %2</translation>
     </message>
     <message>
         <source>Stops</source>
@@ -1463,11 +1880,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>start</source>
-        <translation>开始</translation>
+        <translation type="obsolete">开始</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation>终止</translation>
+        <translation type="obsolete">终止</translation>
     </message>
     <message>
         <source>Occurs</source>
@@ -1491,7 +1908,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation>输出选取的事件至档案</translation>
+        <translation type="obsolete">输出选取的事件至档案</translation>
     </message>
     <message>
         <source>HTML file (*.html);;CSV file (*.csv)</source>
@@ -1499,35 +1916,35 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Save As</source>
-        <translation>另存为</translation>
+        <translation type="obsolete">另存为</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>文件&apos;%1&apos;已经存在。要覆盖吗?</translation>
+        <translation type="obsolete">文件&apos;%1&apos;已经存在。要覆盖吗?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>无法覆盖文件</translation>
+        <translation type="obsolete">无法覆盖文件</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
+        <translation type="obsolete">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Not recording</source>
-        <translation>不录像</translation>
+        <translation type="obsolete">不录像</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation>录像全部</translation>
+        <translation type="obsolete">录像全部</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation>仅移动侦测录像</translation>
+        <translation type="obsolete">仅移动侦测录像</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation>移动侦测和低分辨率录像</translation>
+        <translation type="obsolete">移动侦测和低分辨率录像</translation>
     </message>
     <message>
         <source>Everything</source>
@@ -1535,11 +1952,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Motion only</source>
-        <translation>仅移动</translation>
+        <translation type="obsolete">仅移动</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation>移动+低分辨率</translation>
+        <translation type="obsolete">移动+低分辨率</translation>
     </message>
     <message>
         <source>b/s</source>
@@ -1555,23 +1972,15 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
+        <translation type="obsolete">HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
     </message>
     <message>
         <source>Continuous</source>
-        <translation>连续</translation>
+        <translation type="obsolete">连续</translation>
     </message>
     <message>
         <source>Export selected cameras to file</source>
-        <translation>输出选取的摄像机至档案</translation>
-    </message>
-    <message>
-        <source>Beta version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are running beta version of %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">输出选取的摄像机至档案</translation>
     </message>
 </context>
 <context>
@@ -1621,7 +2030,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br&gt;
 </source>
-        <translation>&lt;b&gt;系统控制器&lt;/b&gt;未连接。&lt;br&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;系统控制器&lt;/b&gt;未连接。&lt;br&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; version %1 at %2:%3.&lt;br&gt;
@@ -1671,7 +2080,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>About</source>
-        <translation>関于</translation>
+        <translation type="obsolete">関于</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
@@ -1679,6 +2088,18 @@ Built for %5-%6 with %7.&lt;br/&gt;
 </source>
         <translation>&lt;b&gt;%1&lt;/b&gt; 版本 %2 (%3).&lt;br/&gt;
 以%7为 %5-%6 创建。&lt;br/&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Enterprise controller&lt;/b&gt; is not connected.&lt;br&gt;
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnAbstractPtzDialog</name>
+    <message>
+        <source>Synchronizing...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2524,7 +2945,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Go to Position...</source>
-        <translation>去预设位...</translation>
+        <translation type="obsolete">去预设位...</translation>
     </message>
     <message>
         <source>Manage Saved Positions...</source>
@@ -2698,12 +3119,48 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Show Beta Version Warning Message</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Restart application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate PTZ Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tours...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Tours...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Calibrate Fisheye</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom to Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+Shift+D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug Control Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
         <source>[No item selected]</source>
-        <translation>[未选择任何项目]</translation>
+        <translation type="obsolete">[未选择任何项目]</translation>
     </message>
     <message>
         <source>Adjust video - %1</source>
@@ -2713,12 +3170,31 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <source>Image Enhancement - %1</source>
         <translation>图像增强 - %1</translation>
     </message>
+    <message>
+        <source>Image Enhancement</source>
+        <translation type="unfinished">图像增强</translation>
+    </message>
+</context>
+<context>
+    <name>QnAdvancedSettingsWidget</name>
+    <message>
+        <source>4:3</source>
+        <translation type="unfinished">4:3</translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation type="unfinished">16:9</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation type="unfinished">1:1</translation>
+    </message>
 </context>
 <context>
     <name>QnAggregationWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>no more than once per</source>
@@ -2746,19 +3222,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Check to set aggregation period</source>
-        <translation>勾选以设置聚合期</translation>
+        <translation type="obsolete">勾选以设置聚合期</translation>
     </message>
     <message>
         <source>Interval of action :</source>
-        <translation>动作的时间间隔：</translation>
+        <translation type="obsolete">动作的时间间隔：</translation>
     </message>
     <message>
         <source>Once per</source>
-        <translation>一次每</translation>
+        <translation type="obsolete">一次每</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation>立即作用</translation>
+        <translation type="obsolete">立即作用</translation>
     </message>
 </context>
 <context>
@@ -2873,6 +3349,29 @@ for recording at
     </message>
 </context>
 <context>
+    <name>QnBusinessResourceValidationStrings</name>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;任何摄像机&gt;</translation>
+    </message>
+    <message>
+        <source>Select at least one camera</source>
+        <translation type="unfinished">选择至少一台摄像机</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Camera(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n 台摄像机</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
         <source>For All Users</source>
@@ -2891,11 +3390,11 @@ for recording at
     </message>
     <message>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation>%1 禁用录像或移动侦测</translation>
+        <translation type="obsolete">%1 禁用录像或移动侦测</translation>
     </message>
     <message>
         <source>%1 of %2 cameras</source>
-        <translation>%2 台摄像机中的 %1台</translation>
+        <translation type="obsolete">%2 台摄像机中的 %1台</translation>
     </message>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -2927,23 +3426,23 @@ for recording at
     </message>
     <message>
         <source>Invalid email address: %1</source>
-        <translation>无效的邮件地址：%1</translation>
+        <translation type="obsolete">无效的邮件地址：%1</translation>
     </message>
     <message>
         <source>Select at least one user</source>
-        <translation>选择至少一个用户</translation>
+        <translation type="obsolete">选择至少一个用户</translation>
     </message>
     <message>
         <source>Send mail to %1</source>
-        <translation>发送邮件到 %1</translation>
+        <translation type="obsolete">发送邮件到 %1</translation>
     </message>
     <message>
         <source>%1 users, %2 additional</source>
-        <translation>%1 用户, %2 其他</translation>
+        <translation type="obsolete">%1 用户, %2 其他</translation>
     </message>
     <message>
         <source>%1 users</source>
-        <translation>%1 用户</translation>
+        <translation type="obsolete">%1 用户</translation>
     </message>
     <message>
         <source>Administrators only</source>
@@ -2959,12 +3458,12 @@ for recording at
     </message>
     <message>
         <source>Recording is disabled for %1</source>
-        <translation>%1 录像禁用</translation>
+        <translation type="obsolete">%1 录像禁用</translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n 台摄像机中的%1</numerusform>
         </translation>
     </message>
@@ -3006,15 +3505,15 @@ for recording at
     </message>
     <message>
         <source>Enter the text</source>
-        <translation>输入文字</translation>
+        <translation type="obsolete">输入文字</translation>
     </message>
     <message>
         <source>User &apos;%1&apos; has empty E-Mail</source>
-        <translation>用户 %1 邮件为空</translation>
+        <translation type="obsolete">用户 %1 邮件为空</translation>
     </message>
     <message>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
-        <translation>用户 %1 拥有无效的邮件地址:%2</translation>
+        <translation type="obsolete">用户 %1 拥有无效的邮件地址:%2</translation>
     </message>
     <message>
         <source>Not Applied</source>
@@ -3044,20 +3543,56 @@ for recording at
             <numerusform>每 %n </numerusform>
         </translation>
     </message>
+    <message>
+        <source>Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stops</source>
+        <translation type="unfinished">终止</translation>
+    </message>
+    <message>
+        <source>Starts</source>
+        <translation type="unfinished">开始</translation>
+    </message>
+    <message>
+        <source>Starts/Stops</source>
+        <translation type="unfinished">开始/终止</translation>
+    </message>
+    <message>
+        <source>start</source>
+        <translation type="unfinished">开始</translation>
+    </message>
+    <message>
+        <source>stop</source>
+        <translation type="unfinished">终止</translation>
+    </message>
+    <message>
+        <source>While %1</source>
+        <translation type="unfinished">当 %1</translation>
+    </message>
+    <message>
+        <source>On %1 %2</source>
+        <translation type="unfinished">在 %1 %2</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Event</source>
-        <translation>事件</translation>
+        <translation type="obsolete">事件</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>at</source>
@@ -3065,23 +3600,23 @@ for recording at
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
+        <translation type="obsolete">&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <source>Schedule...</source>
-        <translation>日程...</translation>
+        <translation type="obsolete">日程...</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation>动作</translation>
+        <translation type="obsolete">动作</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation>&lt;选择至少一台摄像机&gt;</translation>
+        <translation type="obsolete">&lt;选择至少一台摄像机&gt;</translation>
     </message>
     <message>
         <source>no more than once per</source>
@@ -3105,7 +3640,7 @@ for recording at
     </message>
     <message>
         <source>Comments:</source>
-        <translation>注释:</translation>
+        <translation type="obsolete">注释:</translation>
     </message>
     <message>
         <source>to</source>
@@ -3132,7 +3667,7 @@ for recording at
     </message>
     <message>
         <source>Error while receiving rules</source>
-        <translation>接收规则时发生错误</translation>
+        <translation type="obsolete">接收规则时发生错误</translation>
     </message>
     <message>
         <source>Error while saving rule</source>
@@ -3156,11 +3691,11 @@ for recording at
     </message>
     <message>
         <source>Confirm save invalid rules</source>
-        <translation>确认保存无效规则</translation>
+        <translation type="obsolete">确认保存无效规则</translation>
     </message>
     <message>
         <source>Some rules are not valid. Should we disable them?</source>
-        <translation>一些规则无效。是否要禁用他们?</translation>
+        <translation type="obsolete">一些规则无效。是否要禁用他们?</translation>
     </message>
     <message>
         <source>Error</source>
@@ -3183,6 +3718,18 @@ for recording at
 This action CANNOT be undone!</source>
         <translation>您确定要重置到默认的规则吗？
 此操作无法取消！</translation>
+    </message>
+    <message>
+        <source>Error while receiving rules.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some rules are not valid. Should they be disabled?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3264,11 +3811,11 @@ This action CANNOT be undone!</source>
     </message>
     <message>
         <source>First address in range is greater than last one</source>
-        <translation>区间内的第一个地址大于最后一个</translation>
+        <translation type="obsolete">区间内的第一个地址大于最后一个</translation>
     </message>
     <message>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation>IP地址区间太大，最大允许255个地址</translation>
+        <translation type="obsolete">IP地址区间太大，最大允许255个地址</translation>
     </message>
     <message>
         <source>Finished</source>
@@ -3300,7 +3847,7 @@ This action CANNOT be undone!</source>
     </message>
     <message numerus="yes">
         <source>Error while adding camera(s)</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>添加摄像机时发生错误</numerusform>
         </translation>
     </message>
@@ -3327,7 +3874,7 @@ This action CANNOT be undone!</source>
     </message>
     <message>
         <source>Select target mediaserver in the tree.</source>
-        <translation>在树状表中选择目标媒体服务器。</translation>
+        <translation type="obsolete">在树状表中选择目标媒体服务器。</translation>
     </message>
     <message>
         <source>Server is offline.
@@ -3354,17 +3901,17 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <source>Camera address field must contain valid url, ip address or rtsp link</source>
-        <translation>摄像机地址栏必须包含有效的网址，IP地址或rtsp链接</translation>
+        <translation type="obsolete">摄像机地址栏必须包含有效的网址，IP地址或rtsp链接</translation>
     </message>
     <message>
         <source>Could not connect to server.
 Make sure the server is available and try again.</source>
-        <translation>无法连接到服务器。
+        <translation type="obsolete">无法连接到服务器。
 请确认服务器在线并重新尝试。</translation>
     </message>
     <message>
         <source>Server returned an error.</source>
-        <translation>服务器回报一个错误。</translation>
+        <translation type="obsolete">服务器回报一个错误。</translation>
     </message>
     <message>
         <source>All cameras are already in the resource tree.</source>
@@ -3373,6 +3920,80 @@ Make sure the server is available and try again.</source>
     <message>
         <source>No cameras found.</source>
         <translation>没有找到摄像机。</translation>
+    </message>
+    <message>
+        <source>select target mediaserver in the tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initializing scan...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finishing search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server went offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server went offline, search aborted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server went offline, cameras can be added when the server will be available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server was removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server was removed, search aborted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server was removed, cameras cannot be added anymore.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while searching cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning online hosts...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Scanning hosts... (%1)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>First address in range is greater than the last one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specified IP address range contains more than 255 addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Error while adding camera(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3418,26 +4039,35 @@ Make sure the server is available and try again.</source>
     <name>QnCameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Event will be raised when any camera goes offline</source>
-        <translation>当有摄像机离线时事件会产生</translation>
+        <translation type="obsolete">当有摄像机离线时事件会产生</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Input ID:</source>
-        <translation>输入ID:</translation>
+        <translation type="obsolete">输入ID:</translation>
     </message>
     <message>
         <source>&lt;automatic&gt;</source>
         <translation>&lt;自动&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraInputPolicy</name>
+    <message numerus="yes">
+        <source>%1 have no input ports</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3477,6 +4107,10 @@ Make sure the server is available and try again.</source>
         <translation>
             <numerusform>依媒体服务器 &apos;%1&apos; 摄像机列表-找到%n台摄像机</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Export selected cameras to file</source>
+        <translation type="unfinished">输出选取的摄像机至档案</translation>
     </message>
 </context>
 <context>
@@ -3538,18 +4172,27 @@ Make sure the server is available and try again.</source>
     </message>
 </context>
 <context>
+    <name>QnCameraMotionPolicy</name>
+    <message numerus="yes">
+        <source>Recording or motion detection is disabled for %1</source>
+        <translation type="unfinished">
+            <numerusform>%1 禁用录像或移动侦测</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>&amp;Output ID:</source>
-        <translation>&amp;输出ID:</translation>
+        <translation type="obsolete">&amp;输出ID:</translation>
     </message>
     <message>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;自动重置在(秒):</translation>
+        <translation type="obsolete">&amp;自动重置在(秒):</translation>
     </message>
     <message>
         <source>&lt;automatic&gt;</source>
@@ -3557,10 +4200,30 @@ Make sure the server is available and try again.</source>
     </message>
 </context>
 <context>
+    <name>QnCameraOutputPolicy</name>
+    <message numerus="yes">
+        <source>%1 have no output relays</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraRecordingPolicy</name>
+    <message numerus="yes">
+        <source>Recording is disabled for %1</source>
+        <translation type="unfinished">
+            <numerusform>%1 录像禁用</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnCameraScheduleWidget</name>
-    <message>
+    <message numerus="yes">
         <source>%n license(s) are used out of %1.</source>
-        <translation type="obsolete">%1许可已经使用%n</translation>
+        <translation type="unfinished">
+            <numerusform>%1许可已经使用%n</numerusform>
+        </translation>
     </message>
     <message>
         <source>%1. %2.</source>
@@ -3582,9 +4245,11 @@ Make sure the server is available and try again.</source>
         <source>On</source>
         <translation>开</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Activate %n more license(s).</source>
-        <translation type="obsolete">激活%n更多许可</translation>
+        <translation type="unfinished">
+            <numerusform>激活%n更多许可</numerusform>
+        </translation>
     </message>
     <message>
         <source>%n license(s) will be used.</source>
@@ -3612,11 +4277,11 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2</source>
-        <translation>日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2帧</translation>
+        <translation type="obsolete">日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2帧</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
-        <translation>对于软件移动侦测，副码流预留为每秒2帧。日程网格中当前为每秒 %1帧。每秒帧数降到每秒 %2帧</translation>
+        <translation type="obsolete">对于软件移动侦测，副码流预留为每秒2帧。日程网格中当前为每秒 %1帧。每秒帧数降到每秒 %2帧</translation>
     </message>
     <message>
         <source>%1 digital license(s) are used out of %2.</source>
@@ -3628,7 +4293,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
-        <translation>增加激活%1 路数码和%2 路类比许可。</translation>
+        <translation type="obsolete">增加激活%1 路数码和%2 路类比许可。</translation>
     </message>
     <message>
         <source>Activate %1 more digital license(s).</source>
@@ -3642,7 +4307,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
-        <translation>將需增加%1 路数码和%2 路类比许可。</translation>
+        <translation type="obsolete">將需增加%1 路数码和%2 路类比许可。</translation>
     </message>
     <message>
         <source>%1 more digital license(s) will be used.</source>
@@ -3654,7 +4319,7 @@ Make sure the server is available and try again.</source>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1路中的%n 路数码许可已被使用。</numerusform>
         </translation>
     </message>
@@ -3666,13 +4331,13 @@ Make sure the server is available and try again.</source>
     </message>
     <message numerus="yes">
         <source>Activate %n more digital license(s).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>增加激活%n路数码许可。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more digital license(s) will be used.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>將需增加%n 路数码许可。</numerusform>
         </translation>
     </message>
@@ -3688,9 +4353,27 @@ Make sure the server is available and try again.</source>
     </message>
     <message numerus="yes">
         <source>Activate %n more analog license(s).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>增加激活%n路类比许可。</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>%1 more licenses and %2 more analog licenses will be used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more license(s) will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
+        <translation type="unfinished">日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2.帧 {1.?}</translation>
+    </message>
+    <message>
+        <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
+        <translation type="unfinished">对于软件运动侦测，副码流默认2.fps。当前在日程表中的fps是%1。fps下降到%2.。 {2 ?} {1.?}</translation>
     </message>
 </context>
 <context>
@@ -3728,6 +4411,13 @@ Make sure the server is available and try again.</source>
     <message>
         <source>Do not ask again</source>
         <translation>不再询问</translation>
+    </message>
+</context>
+<context>
+    <name>QnClientVideoCamera</name>
+    <message>
+        <source>Invalid resource type for data export.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3772,6 +4462,18 @@ You will be asked to restart the client in compatibility mode.</source>
  - 客户端版本：%1
  - 系统控制器版本：%2
 您需要在兼容模式下重新启动客户端。</translation>
+    </message>
+    <message>
+        <source>Testing connection to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login or password you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to connect to incompatible Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4129,14 +4831,53 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
 </context>
 <context>
-    <name>QnDesktopFileEncoder</name>
+    <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
+        <translation type="unfinished">音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
     </message>
     <message>
         <source>Can&apos;t find video encoder </source>
-        <translation>无法找到视频编码器</translation>
+        <translation type="obsolete">无法找到视频编码器</translation>
+    </message>
+    <message>
+        <source>Could not find video encoder %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen width must be a multiplier of 8.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start primary audio device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnDesktopFileEncoder</name>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
+        <translation type="obsolete">音频捕捉设备不支持44.1Khz和48Khz音频格式！请在屏幕录像設定中选择其他的音频设备或空白</translation>
+    </message>
+    <message>
+        <source>Can&apos;t find video encoder </source>
+        <translation type="obsolete">无法找到视频编码器</translation>
     </message>
     <message>
         <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please check &apos;root media folder&apos; setting.</source>
@@ -4144,28 +4885,72 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation>无法在文件夹&apos;%1&apos;中创建临时文件。请在屏幕录像设定中配置&apos;主媒体文件夹&apos;。</translation>
+        <translation type="obsolete">无法在文件夹&apos;%1&apos;中创建临时文件。请在屏幕录像设定中配置&apos;主媒体文件夹&apos;。</translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find video encoder %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not allocate output stream for video codec.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen width must be a multiplier of 8.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not allocate output audio stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find audio encoder &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio device &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start primary audio device.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnEmailValidDelegate</name>
     <message>
         <source>%1 of %2 selected users have invalid email.</source>
-        <translation>%2 选中用户中%1 没有有效邮件。</translation>
+        <translation type="obsolete">%2 选中用户中%1 没有有效邮件。</translation>
     </message>
 </context>
 <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
 </context>
 <context>
     <name>QnEmptyBusinessEventWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
 </context>
 <context>
@@ -4212,23 +4997,23 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Event log for period from %1 to %2 - %3 event(s) found</source>
-        <translation>从 %1 到 %2 事件日志 - 发现 %3 个事件</translation>
+        <translation type="obsolete">从 %1 到 %2 事件日志 - 发现 %3 个事件</translation>
     </message>
     <message>
         <source>Event log for %1  - %2 event(s) found</source>
-        <translation>%1 事件日志 - 发现 %2 个事件</translation>
+        <translation type="obsolete">%1 事件日志 - 发现 %2 个事件</translation>
     </message>
     <message>
         <source>&lt; Any camera &gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
+        <translation type="obsolete">&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <source>&lt; 1 camera &gt;</source>
-        <translation>&lt; 1 台摄像机&gt;</translation>
+        <translation type="obsolete">&lt; 1 台摄像机&gt;</translation>
     </message>
     <message>
         <source>&lt; %1 cameras &gt;</source>
-        <translation>&lt; %1 台摄像机&gt;</translation>
+        <translation type="obsolete">&lt; %1 台摄像机&gt;</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
@@ -4237,6 +5022,32 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <source>You have not configured any Alarm/Event Rules to match the current filter condition.</source>
         <translation type="obsolete">您还没有配置任何报警/事件规则以匹配当前的过滤条件。</translation>
+    </message>
+    <message numerus="yes">
+        <source>Event log for period from %1 to %2 - %n event(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Event log for %1 - %n event(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>&lt;Any camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Export selected events to file</source>
+        <translation type="unfinished">输出选取的事件至档案</translation>
     </message>
 </context>
 <context>
@@ -4328,7 +5139,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>将需要%1中的%n路数码许可。</numerusform>
         </translation>
     </message>
@@ -4338,24 +5149,200 @@ You will be asked to restart the client in compatibility mode.</source>
             <numerusform>将需要%1中的%n路类比许可。</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>%n license(s) will be used out of %1.</source>
+        <translation type="unfinished">
+            <numerusform>%1中%n的许可将被使用</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnFisheyeCalibrationWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="obsolete">表格</translation>
+    </message>
+    <message>
+        <source>Auto Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">错误</translation>
+    </message>
+    <message>
+        <source>Autodetection failed. Image is not round.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Autodetection failed. The image might be too dim.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnGeneralPreferencesWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="obsolete">表格</translation>
+    </message>
+    <message>
+        <source>&amp;Browse...</source>
+        <translation type="obsolete">&amp;浏览...</translation>
+    </message>
+    <message>
+        <source>Extra Media Folders</source>
+        <translation type="obsolete">其他媒体文件夹</translation>
+    </message>
+    <message>
+        <source>&amp;Add...</source>
+        <translation type="obsolete">&amp;添加...</translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation type="obsolete">&amp;删除</translation>
+    </message>
+    <message>
+        <source>Look and Feel</source>
+        <translation type="obsolete">看和感觉</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation type="obsolete">秒</translation>
+    </message>
+    <message>
+        <source>Sequence Cycle Time:</source>
+        <translation type="obsolete">轮巡周期:</translation>
+    </message>
+    <message>
+        <source>Show IP in Tree:</source>
+        <translation type="obsolete">在树狀表中显示IP:</translation>
+    </message>
+    <message>
+        <source>Timeline Mode:</source>
+        <translation type="obsolete">时间轴模式:</translation>
+    </message>
+    <message>
+        <source>Misc</source>
+        <translation type="obsolete">杂项</translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation type="obsolete">语言:</translation>
+    </message>
+    <message>
+        <source>Restart required.</source>
+        <translation type="obsolete">需重新启动。</translation>
+    </message>
+    <message>
+        <source>Downmix Audio from 5.1 to 2.1:</source>
+        <translation type="obsolete">从5.1到2.1音频缩混:</translation>
+    </message>
+    <message>
+        <source>Use Hardware Acceleration:</source>
+        <translation type="obsolete">使用硬件加速:</translation>
+    </message>
+    <message>
+        <source>Experimental. May result in glitches.</source>
+        <translation type="obsolete">试验阶段。可能会导致故障。</translation>
+    </message>
+    <message>
+        <source>Run Application when PC Boots up:</source>
+        <translation type="obsolete">电脑开机同时运行应用程序:</translation>
+    </message>
+    <message>
+        <source>Clear local cache</source>
+        <translation type="obsolete">清除本地快取</translation>
+    </message>
+    <message>
+        <source>Network Interfaces</source>
+        <translation type="obsolete">网络界面</translation>
+    </message>
+    <message>
+        <source>Server Time</source>
+        <translation type="unfinished">服务器时间</translation>
+    </message>
+    <message>
+        <source>Client Time</source>
+        <translation type="unfinished">客户端时间</translation>
+    </message>
+    <message>
+        <source>IP Address: %1, Network Mask: %2</source>
+        <translation type="unfinished">IP地址：%1，网络遮罩：%2</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
+        <translation type="obsolete">硬件加速是高度实验性的，并可能在一些配置上导致死机。你确定你要启用它吗？</translation>
+    </message>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">信息</translation>
+    </message>
+    <message>
+        <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder is already added</source>
+        <translation type="unfinished">文件夹已添加</translation>
+    </message>
+    <message>
+        <source>This folder is already added.</source>
+        <translation type="unfinished">这个文件夹已添加。</translation>
+    </message>
+    <message>
+        <source>This option will not affect Recording Schedule. 
+Recording Schedule is always based on Server Time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder &apos;%1&apos; does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation>我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation type="obsolete">我们发现您的显卡不支持。您可以继续但是存在风险。安装或者升级显卡驱动可能可以解决问题但我们无法保证。关于如何安装和升级显卡驱动，请参照&lt;a href=http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation>重要性能提示</translation>
+        <translation type="obsolete">重要性能提示</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation>我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation type="obsolete">我们偵测到您的视频卡驱动程序可能没有安装或者已经过时。&lt;br/&gt;安装及/或更新您的视频驱动程序可以大大提高你查看和使用视频时的系统性能。&lt;br/&gt;关于如何安装或更新您的视频驱动程序，请按照以下指令 &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation>关键性能提示</translation>
+        <translation type="obsolete">关键性能提示</translation>
+    </message>
+</context>
+<context>
+    <name>QnGridWidgetHelper</name>
+    <message>
+        <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
+        <translation type="unfinished">HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
+    </message>
+    <message>
+        <source>Save As</source>
+        <translation type="unfinished">另存为</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; already exists. Overwrite?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not overwrite file</source>
+        <translation type="unfinished">无法覆盖文件</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation type="unfinished">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
     </message>
 </context>
 <context>
@@ -4369,29 +5356,44 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnImagePreviewDialog</name>
     <message>
         <source>Image View</source>
-        <translation>图像浏览</translation>
+        <translation type="obsolete">图像浏览</translation>
     </message>
     <message>
         <source>Image loading can take a lot of time. Please be patient.</source>
-        <translation>图像加载需要很多时间。请耐心等待。</translation>
+        <translation type="obsolete">图像加载需要很多时间。请耐心等待。</translation>
     </message>
 </context>
 <context>
     <name>QnInputEnabledDelegate</name>
     <message>
         <source>%1 of %2 selected cameras have no input ports.</source>
-        <translation>%2 台选中摄像机中%1 台没有输入端口。</translation>
+        <translation type="obsolete">%2 台选中摄像机中%1 台没有输入端口。</translation>
+    </message>
+</context>
+<context>
+    <name>QnLayoutExportTool</name>
+    <message>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation type="unfinished">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
+    </message>
+    <message>
+        <source>Exporting %1 to &quot;%2&quot;...</source>
+        <translation type="unfinished">输出%1至&quot;%2&quot;...</translation>
+    </message>
+    <message>
+        <source>Could not export camera %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
         <source>Dialog</source>
-        <translation>对话框</translation>
+        <translation type="obsolete">对话框</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation>背景</translation>
+        <translation type="obsolete">背景</translation>
     </message>
     <message>
         <source>View in full size</source>
@@ -4407,11 +5409,11 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Clear</source>
-        <translation>清除</translation>
+        <translation type="obsolete">清除</translation>
     </message>
     <message>
         <source>Layout is locked</source>
-        <translation>Layout被锁定</translation>
+        <translation type="obsolete">Layout被锁定</translation>
     </message>
     <message>
         <source>User can edit layout</source>
@@ -4427,47 +5429,47 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>General Settings</source>
-        <translation>一般设定</translation>
+        <translation type="obsolete">一般设定</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation>浏览...</translation>
+        <translation type="obsolete">浏览...</translation>
     </message>
     <message>
         <source>View...</source>
-        <translation>查看...</translation>
+        <translation type="obsolete">查看...</translation>
     </message>
     <message>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation>图像处理需要很多时间。请耐心等待。</translation>
+        <translation type="obsolete">图像处理需要很多时间。请耐心等待。</translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;裁切至显示器宽高比</translation>
+        <translation type="obsolete">&amp;裁切至显示器宽高比</translation>
     </message>
     <message>
         <source>&amp;Width:</source>
-        <translation>&amp;宽:</translation>
+        <translation type="obsolete">&amp;宽:</translation>
     </message>
     <message>
         <source> cells</source>
-        <translation>格</translation>
+        <translation type="obsolete">格</translation>
     </message>
     <message>
         <source>&amp;Height:</source>
-        <translation>&amp;高:</translation>
+        <translation type="obsolete">&amp;高:</translation>
     </message>
     <message>
         <source>&amp;Opacity:</source>
-        <translation>&amp;不透明度:</translation>
+        <translation type="obsolete">&amp;不透明度:</translation>
     </message>
     <message>
         <source>%</source>
-        <translation>%</translation>
+        <translation type="obsolete">%</translation>
     </message>
     <message>
         <source>Keep aspect ratio</source>
-        <translation>保存宽高比不变</translation>
+        <translation type="obsolete">保存宽高比不变</translation>
     </message>
     <message>
         <source>&lt;No image&gt;</source>
@@ -4555,7 +5557,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Invalid License. Contact our support team to get a valid License.</source>
-        <translation>无效许可。联系我们的技术支持团队取得有效许可。</translation>
+        <translation type="obsolete">无效许可。联系我们的技术支持团队取得有效许可。</translation>
     </message>
     <message>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
@@ -4592,7 +5594,7 @@ Archive Streams Allowed: %4</source>
     <message>
         <source>Network error has occurred during the Automatic License Activation.
 Try to activate your License manually.</source>
-        <translation>自动激活许可时发生网络错误。请尝试手动激活许可。</translation>
+        <translation type="obsolete">自动激活许可时发生网络错误。请尝试手动激活许可。</translation>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial license.</source>
@@ -4605,7 +5607,7 @@ Try to activate your License manually.</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Required at least %3 digital and %4 analog licenses.</source>
-        <translation>本许可支持%1 路数码和%2 路类比摄像机。需要至少%3 路数码和%4 路类比许可。</translation>
+        <translation type="obsolete">本许可支持%1 路数码和%2 路类比摄像机。需要至少%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
@@ -4639,7 +5641,7 @@ Archive Streams Allowed: %4</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 %3 digital and %4 analog licenses are currently in use.</source>
-        <translation>本软件许可支持%1 路数码和%2 路类比摄像机。
+        <translation type="obsolete">本软件许可支持%1 路数码和%2 路类比摄像机。
 当前使用%3 路数码和%4 路类比许可。</translation>
     </message>
     <message>
@@ -4663,11 +5665,40 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are trying to activate {{brand}} license on {{db_brand}}. This is not allowed.</source>
+        <source>The software is licensed to %1 cameras and %2 analog cameras.
+%3 licenses and %4 analog licenses are currently in use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license key has been previously activated to {{hwid}} on {{time}}.</source>
+        <source>The software is licensed to %1 cameras.
+%2 licenses are currently in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license. You are trying to activate an incompatible license with your software.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The software is licensed to %1 cameras and %2 analog cameras.
+At least %3 licenses are required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The software is licensed to %1 cameras.
+At least %3 licenses are required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid License. Please contact our support team to get a valid license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error has occurred during automatic license activation.
+Try to activate your license manually.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4721,7 +5752,7 @@ Archive Streams Allowed: %4</source>
     </message>
     <message>
         <source>The Login Information you have entered is not valid.</source>
-        <translation>您输入的登录信息无效。</translation>
+        <translation type="obsolete">您输入的登录信息无效。</translation>
     </message>
     <message>
         <source>Saved Sessions</source>
@@ -4773,7 +5804,7 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 Would you like to restart client in compatibility mode?</source>
-        <translation>您正在连接到不同版本的系统控制器：
+        <translation type="obsolete">您正在连接到不同版本的系统控制器：
  - 客户端版本：%1
  - 系统控制器版本：%2
 您希望在兼容模式下重新启动客户端吗?</translation>
@@ -4812,7 +5843,7 @@ Would you like to restart client in compatibility mode?</source>
     </message>
     <message>
         <source>Connection with the same name already exists. Overwrite it?</source>
-        <translation>连接名称已存在。需要覆盖?</translation>
+        <translation type="obsolete">连接名称已存在。需要覆盖?</translation>
     </message>
     <message>
         <source>Delete connections</source>
@@ -4834,10 +5865,52 @@ Please close the application and start it again using the shortcut in the start 
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation>您连接到了不同版本的系统控制器:
+        <translation type="obsolete">您连接到了不同版本的系统控制器:
   - 客户端版本n: %1。
   -系统控制器版本: %2。
 客户端版本 %2必须连接到此系统控制器。请下载版本 %2 並升级系统。</translation>
+    </message>
+    <message>
+        <source>* Last used connection *</source>
+        <translation type="unfinished">*最后使用的连接*</translation>
+    </message>
+    <message>
+        <source>The login information you have entered is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login or password you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are trying to connect to incompatible Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected Enterprise controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+An error has occurred while trying to restart in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Would you like to restart in compatibility mode?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to connect to Enterprise Controller which has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Client version %3 is required to connect to this Enterprise Controller.
+Download version %3?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection with this name already exists. Do you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4908,19 +5981,19 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7</source>
-        <translation type="obsolete">%1x%2 %3fps @ %4Mbps%5%6%7</translation>
+        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7</translation>
     </message>
     <message>
         <source> HW</source>
-        <translation>硬件</translation>
+        <translation type="obsolete">硬件</translation>
     </message>
     <message>
         <source> SW</source>
-        <translation>软件</translation>
+        <translation type="obsolete">软件</translation>
     </message>
     <message>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
+        <translation type="obsolete">%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -4947,7 +6020,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnMotionEnabledDelegate</name>
     <message>
         <source>Recording or motion detection is disabled for %1 of %2 selected cameras.</source>
-        <translation>%2 台选中摄像机中的%1 台禁用录像或移动侦测。</translation>
+        <translation type="obsolete">%2 台选中摄像机中的%1 台禁用录像或移动侦测。</translation>
     </message>
 </context>
 <context>
@@ -4980,13 +6053,13 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1路中的%n 路数码许可已被使用。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1路中的%n 路类比许可已被使用。</numerusform>
         </translation>
     </message>
@@ -5106,7 +6179,13 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>%1 items more</source>
-        <translation>多%1个项目</translation>
+        <translation type="obsolete">多%1个项目</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more item(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5141,7 +6220,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Clip sound up to %n seconds</source>
-        <translation>剪辑音效至％n秒</translation>
+        <translation type="obsolete">剪辑音效至％n秒</translation>
     </message>
     <message>
         <source>Custom Title</source>
@@ -5165,7 +6244,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>New title could not be set</source>
-        <translation>新标题无法设定</translation>
+        <translation type="obsolete">新标题无法设定</translation>
     </message>
     <message>
         <source>Confirm file deletion</source>
@@ -5174,7 +6253,19 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <source>Are you sure you want to delete
 %1</source>
-        <translation>确认要删除%1？</translation>
+        <translation type="obsolete">确认要删除%1？</translation>
+    </message>
+    <message>
+        <source>Clip sound up to %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New title could not be set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5306,14 +6397,29 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnOutputEnabledDelegate</name>
     <message>
         <source>%1 of %2 selected cameras have not output relays.</source>
-        <translation>%2 选中摄像机中%1 台没有输出继电器。</translation>
+        <translation type="obsolete">%2 选中摄像机中%1 台没有输出继电器。</translation>
+    </message>
+</context>
+<context>
+    <name>QnPictureSettingsDialog</name>
+    <message>
+        <source>Picture Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image is not loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is a fish-eye lens image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnPlaySoundBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Play Sound</source>
@@ -5321,7 +6427,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Manage...</source>
-        <translation>管理...</translation>
+        <translation type="obsolete">管理...</translation>
     </message>
     <message>
         <source>Say Text</source>
@@ -5329,22 +6435,22 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Test...</source>
-        <translation>测试...</translation>
+        <translation type="obsolete">测试...</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>音量:</translation>
+        <translation type="obsolete">音量:</translation>
     </message>
 </context>
 <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
         <source>Show to Administrators only</source>
-        <translation>仅显示给管理员</translation>
+        <translation type="obsolete">仅显示给管理员</translation>
     </message>
     <message>
         <source>Global Notification Settings...</source>
-        <translation>全局通知设定...</translation>
+        <translation type="obsolete">全局通知设定...</translation>
     </message>
 </context>
 <context>
@@ -5362,26 +6468,26 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnPopupSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Show all notifications</source>
-        <translation>显示所有通知</translation>
+        <translation type="obsolete">显示所有通知</translation>
     </message>
     <message>
         <source>Show Alarms/Events</source>
-        <translation>显示报警/事件</translation>
+        <translation type="obsolete">显示报警/事件</translation>
     </message>
     <message>
         <source>Show System Notifications</source>
-        <translation>显示系统提醒</translation>
+        <translation type="obsolete">显示系统提醒</translation>
     </message>
 </context>
 <context>
     <name>QnPortNumberValidator</name>
     <message>
         <source>Auto</source>
-        <translation>自动</translation>
+        <translation type="obsolete">自动</translation>
     </message>
 </context>
 <context>
@@ -5392,11 +6498,11 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation>屏幕录像</translation>
+        <translation type="obsolete">屏幕录像</translation>
     </message>
     <message>
         <source>YouTube</source>
-        <translation>YouTube</translation>
+        <translation type="obsolete">YouTube</translation>
     </message>
     <message>
         <source>Licenses</source>
@@ -5468,7 +6574,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Information</source>
-        <translation>信息</translation>
+        <translation type="obsolete">信息</translation>
     </message>
     <message>
         <source>Very powerful machine is required for BestQuality and Native resolution.</source>
@@ -5476,15 +6582,15 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>IP Address: %1, Network Mask: %2</source>
-        <translation>IP地址：%1，网络遮罩：%2</translation>
+        <translation type="obsolete">IP地址：%1，网络遮罩：%2</translation>
     </message>
     <message>
         <source>Folder is already added</source>
-        <translation>文件夹已添加</translation>
+        <translation type="obsolete">文件夹已添加</translation>
     </message>
     <message>
         <source>This folder is already added.</source>
-        <translation>这个文件夹已添加。</translation>
+        <translation type="obsolete">这个文件夹已添加。</translation>
     </message>
     <message>
         <source>The language change will take effect after application restart.</source>
@@ -5492,20 +6598,20 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Server Time</source>
-        <translation>服务器时间</translation>
+        <translation type="obsolete">服务器时间</translation>
     </message>
     <message>
         <source>Client Time</source>
-        <translation>客户端时间</translation>
+        <translation type="obsolete">客户端时间</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation type="obsolete">警告</translation>
     </message>
     <message>
         <source>This settings will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
-        <translation>该设定不会影响录像日程。录像日程永远根据服务器时间。</translation>
+        <translation type="obsolete">该设定不会影响录像日程。录像日程永远根据服务器时间。</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -5533,21 +6639,29 @@ All changes will be lost after program exit.</source>
     </message>
     <message>
         <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
-        <translation>硬件加速是高度实验性的，并可能在一些配置上导致死机。你确定你要启用它吗？</translation>
+        <translation type="obsolete">硬件加速是高度实验性的，并可能在一些配置上导致死机。你确定你要启用它吗？</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
-        <translation>某些更改需要重新启动应用程序后才会生效。按&quot;好&quot;现在重新启动应用程序。</translation>
+        <translation type="obsolete">某些更改需要重新启动应用程序后才会生效。按&quot;好&quot;现在重新启动应用程序。</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation>未发现启动过程</translation>
+        <translation type="obsolete">未发现启动过程</translation>
     </message>
     <message>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation>无法重新启动客户端。
+        <translation type="obsolete">无法重新启动客户端。
 请关闭应用程序并使用开始菜单中的快捷方式重新启动它。</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">一般</translation>
+    </message>
+    <message>
+        <source>Screen Recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5562,6 +6676,10 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>None</source>
         <translation>无</translation>
+    </message>
+    <message>
+        <source>Saved Position %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5598,7 +6716,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>PTZ presets for camera %1:</source>
-        <translation>摄像机%1 的PTZ预设位:</translation>
+        <translation type="obsolete">摄像机%1 的PTZ预设位:</translation>
     </message>
     <message>
         <source>Name</source>
@@ -5614,41 +6732,101 @@ Please close the application and start it again using the shortcut in the start 
     </message>
 </context>
 <context>
+    <name>QnPtzTourListModel</name>
+    <message>
+        <source>New Tour %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">名称</translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzTourModel</name>
+    <message>
+        <source>Lowest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished">低</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished">高</translation>
+    </message>
+    <message>
+        <source>Highest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instant</source>
+        <translation type="unfinished">立即作用</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n seconds</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>&lt;Invalid&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stay Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnRecordingBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Quality:</source>
-        <translation>质量:</translation>
+        <translation type="obsolete">质量:</translation>
     </message>
     <message>
         <source>fps</source>
-        <translation>每秒帧数</translation>
+        <translation type="obsolete">每秒帧数</translation>
     </message>
     <message>
         <source>before</source>
-        <translation>前</translation>
+        <translation type="obsolete">前</translation>
     </message>
     <message>
         <source>s</source>
-        <translation>秒</translation>
+        <translation type="obsolete">秒</translation>
     </message>
     <message>
         <source>Post-recording:</source>
-        <translation>事件后录像:</translation>
+        <translation type="obsolete">事件后录像:</translation>
     </message>
     <message>
         <source>max</source>
-        <translation>最大</translation>
+        <translation type="obsolete">最大</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingEnabledDelegate</name>
     <message>
         <source>Recording is disabled for %1 of %2 selected cameras.</source>
-        <translation>%2 台选中摄像机中%1 台禁用录像。</translation>
+        <translation type="obsolete">%2 台选中摄像机中%1 台禁用录像。</translation>
     </message>
 </context>
 <context>
@@ -5671,6 +6849,37 @@ Please close the application and start it again using the shortcut in the start 
     </message>
 </context>
 <context>
+    <name>QnRecordingStatusHelper</name>
+    <message>
+        <source>Not recording</source>
+        <translation type="unfinished">不录像</translation>
+    </message>
+    <message>
+        <source>Recording everything</source>
+        <translation type="unfinished">录像全部</translation>
+    </message>
+    <message>
+        <source>Recording motion only</source>
+        <translation type="unfinished">仅移动侦测录像</translation>
+    </message>
+    <message>
+        <source>Recording motion and low quality</source>
+        <translation type="unfinished">移动侦测和低分辨率录像</translation>
+    </message>
+    <message>
+        <source>Continuous</source>
+        <translation type="unfinished">连续</translation>
+    </message>
+    <message>
+        <source>Motion only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished">移动+低分辨率</translation>
+    </message>
+</context>
+<context>
     <name>QnResourceBrowserWidget</name>
     <message>
         <source>Any Type</source>
@@ -5690,7 +6899,26 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>Sample Tooltip</source>
-        <translation>范例工具提示</translation>
+        <translation type="obsolete">范例工具提示</translation>
+    </message>
+</context>
+<context>
+    <name>QnResourcePoolModel::Node</name>
+    <message>
+        <source>Root</source>
+        <translation type="unfinished">根</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation type="unfinished">本地</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished">系统</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">用户</translation>
     </message>
 </context>
 <context>
@@ -5782,34 +7010,41 @@ Please close the application and start it again using the shortcut in the start 
     <name>QnSayTextBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation type="obsolete">表格</translation>
     </message>
     <message>
         <source>Say the following:</source>
-        <translation>说以下内容:</translation>
+        <translation type="obsolete">说以下内容:</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>音量:</translation>
+        <translation type="obsolete">音量:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation>测试...</translation>
+        <translation type="obsolete">测试...</translation>
     </message>
     <message>
         <source>Type any text here</source>
-        <translation>键入任何文字在这里</translation>
+        <translation type="obsolete">键入任何文字在这里</translation>
+    </message>
+</context>
+<context>
+    <name>QnScreenRecorder</name>
+    <message>
+        <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
-        <translation>&amp;其他收件人:</translation>
+        <translation type="obsolete">&amp;其他收件人:</translation>
     </message>
     <message>
         <source>&amp;Global Email Settings...</source>
-        <translation>&amp;全局邮件设定...</translation>
+        <translation type="obsolete">&amp;全局邮件设定...</translation>
     </message>
 </context>
 <context>
@@ -5828,7 +7063,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
+        <translation type="obsolete">%1 (%2)</translation>
     </message>
     <message>
         <source>Ping</source>
@@ -5841,6 +7076,20 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <source>Check Issues</source>
         <translation>检查问题</translation>
+    </message>
+    <message>
+        <source>%1 %2 </source>
+        <translation type="obsolete">%1% {1 %2 ?}</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 %2 (up %n days, %2)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 %2</source>
+        <translation type="unfinished">%1% {1 %2?}</translation>
     </message>
 </context>
 <context>
@@ -5927,6 +7176,14 @@ You have only %2Gb left for video archive.</source>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;添加外部存储空间...&lt;/a&gt;</translation>
     </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSignInfo</name>
@@ -5979,13 +7236,13 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1路中的%n 路数码许可已被使用。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%1路中的%n 路类比许可已被使用。</numerusform>
         </translation>
     </message>
@@ -5994,19 +7251,19 @@ You have only %2Gb left for video archive.</source>
     <name>QnSmtpSettingsWidget</name>
     <message>
         <source>Advanced settings...</source>
-        <translation>进阶设定...</translation>
+        <translation type="obsolete">进阶设定...</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation>测试</translation>
+        <translation type="obsolete">测试</translation>
     </message>
     <message>
         <source>&amp;E-Mail:</source>
-        <translation>&amp;邮箱:</translation>
+        <translation type="obsolete">&amp;邮箱:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation>&amp;密码:</translation>
+        <translation type="obsolete">&amp;密码:</translation>
     </message>
     <message>
         <source>&amp;Signature</source>
@@ -6014,31 +7271,31 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
-        <translation>SMTP &amp;服务器:</translation>
+        <translation type="obsolete">SMTP &amp;服务器:</translation>
     </message>
     <message>
         <source>&amp;User:</source>
-        <translation>&amp;用户:</translation>
+        <translation type="obsolete">&amp;用户:</translation>
     </message>
     <message>
         <source>P&amp;ort</source>
-        <translation>端口</translation>
+        <translation type="obsolete">端口</translation>
     </message>
     <message>
         <source>Unsecure connection</source>
-        <translation>不安全的连接</translation>
+        <translation type="obsolete">不安全的连接</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(建议)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(建议)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Secure connection using TLS</source>
-        <translation>使用TLS安全连接</translation>
+        <translation type="obsolete">使用TLS安全连接</translation>
     </message>
     <message>
         <source>Secure connection using SSL</source>
-        <translation>使用SSL安全连接</translation>
+        <translation type="obsolete">使用SSL安全连接</translation>
     </message>
     <message>
         <source>&amp;Signature:</source>
@@ -6046,35 +7303,35 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Server:</source>
-        <translation>服务器:</translation>
+        <translation type="obsolete">服务器:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation>端口:</translation>
+        <translation type="obsolete">端口:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation>用户:</translation>
+        <translation type="obsolete">用户:</translation>
     </message>
     <message>
         <source>Security:</source>
-        <translation>安全性:</translation>
+        <translation type="obsolete">安全性:</translation>
     </message>
     <message>
         <source>Progress:</source>
-        <translation>进展:</translation>
+        <translation type="obsolete">进展:</translation>
     </message>
     <message>
         <source>Result:</source>
-        <translation>结果:</translation>
+        <translation type="obsolete">结果:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>好</translation>
+        <translation type="obsolete">好</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation type="obsolete">取消</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -6094,7 +7351,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Cannot test such parameters</source>
-        <translation>无法测试这些参数</translation>
+        <translation type="obsolete">无法测试这些参数</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -6114,11 +7371,11 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation>取消</translation>
+        <translation type="obsolete">取消</translation>
     </message>
     <message>
         <source>Timeout</source>
-        <translation>超时</translation>
+        <translation type="obsolete">超时</translation>
     </message>
     <message>
         <source>Error while testing settings</source>
@@ -6134,7 +7391,7 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Error while receiving settings</source>
-        <translation>接收设定时发生错误</translation>
+        <translation type="obsolete">接收设定时发生错误</translation>
     </message>
     <message>
         <source>Error</source>
@@ -6146,11 +7403,27 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Enter short system description here...</source>
-        <translation>在这里输入短的系统描述...</translation>
+        <translation type="obsolete">在这里输入短的系统描述...</translation>
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation>&amp;系统签名:</translation>
+        <translation type="obsolete">&amp;系统签名:</translation>
+    </message>
+    <message>
+        <source>Provided parameters are not valid. Could not perform a test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read settings from Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6188,11 +7461,15 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>Activate analog license to remove this message</source>
-        <translation>激活类比许可来移除这条信息</translation>
+        <translation type="obsolete">激活类比许可来移除这条信息</translation>
     </message>
     <message>
         <source>Diagnose...</source>
         <translation>诊断...</translation>
+    </message>
+    <message>
+        <source>Server offline</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6247,6 +7524,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>ms</source>
+        <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>毫秒</translation>
     </message>
     <message>
@@ -6267,6 +7545,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>s</source>
+        <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>秒</translation>
     </message>
     <message>
@@ -6275,6 +7554,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>m</source>
+        <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>分</translation>
     </message>
     <message>
@@ -6283,10 +7563,12 @@ AVAILABLE</source>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <translation type="obsolete">日 月 年 时:分</translation>
+        <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">日 月 年 时:分</translation>
     </message>
     <message>
         <source>h</source>
+        <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>时</translation>
     </message>
     <message>
@@ -6295,7 +7577,8 @@ AVAILABLE</source>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <translation type="obsolete">日 月 年 时</translation>
+        <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">日 月 年 时</translation>
     </message>
     <message>
         <source>dd MMM</source>
@@ -6307,11 +7590,13 @@ AVAILABLE</source>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <translation type="obsolete">日 月 年</translation>
+        <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">日 月 年</translation>
     </message>
     <message>
         <source>MMMM</source>
-        <translation type="obsolete">月</translation>
+        <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">月</translation>
     </message>
     <message>
         <source>September</source>
@@ -6319,11 +7604,15 @@ AVAILABLE</source>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <translation type="obsolete">月 年</translation>
+        <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">月 年</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <translation type="obsolete">年</translation>
+        <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
+----------
+Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">年</translation>
     </message>
     <message>
         <source>2000</source>
@@ -6331,6 +7620,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>d</source>
+        <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>日</translation>
     </message>
     <message>
@@ -6339,6 +7629,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>M</source>
+        <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>月</translation>
     </message>
     <message>
@@ -6347,11 +7638,77 @@ AVAILABLE</source>
     </message>
     <message>
         <source>y</source>
+        <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>年</translation>
     </message>
     <message>
         <source>2000y</source>
         <translation type="obsolete">2000年</translation>
+    </message>
+    <message>
+        <source>auto</source>
+        <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM</source>
+        <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>MINUTES</comment>
+        <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>HOURS</comment>
+        <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnUserEmailPolicy</name>
+    <message>
+        <source>Select at least one user</source>
+        <translation type="unfinished">选择至少一个用户</translation>
+    </message>
+    <message>
+        <source>Invalid E-Mail address %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional E-Mail addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send mail to %1</source>
+        <translation type="unfinished">发送邮件到 %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n User(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1, %n additional</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>User %1 has invalid email address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid E-Mail address</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6446,7 +7803,7 @@ AVAILABLE</source>
     <name>QnVideoCamera</name>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation>无效资源类型的数据输出。</translation>
+        <translation type="obsolete">无效资源类型的数据输出。</translation>
     </message>
 </context>
 <context>
@@ -6458,6 +7815,33 @@ AVAILABLE</source>
     <message>
         <source>%1%</source>
         <translation>%1%</translation>
+    </message>
+</context>
+<context>
+    <name>QnWeekTimeScheduleDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="obsolete">对话框</translation>
+    </message>
+    <message>
+        <source>Schedule Grid</source>
+        <translation type="obsolete">日程网格</translation>
+    </message>
+    <message>
+        <source>Note: Schedule is based on Server Time</source>
+        <translation type="obsolete">注意：日程根据服务器时间</translation>
+    </message>
+    <message>
+        <source>Schedule Settings</source>
+        <translation type="obsolete">日程设定</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation type="obsolete">开</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="obsolete">关</translation>
     </message>
 </context>
 <context>
@@ -6476,27 +7860,27 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Close Layouts</source>
-        <translation>关闭Layout</translation>
+        <translation type="obsolete">关闭Layout</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>以下%n个layout没有保存。需保存吗?</numerusform>
         </translation>
     </message>
     <message>
         <source>Saving Layouts</source>
-        <translation>保存Layout</translation>
+        <translation type="obsolete">保存Layout</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are being saved.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>以下%n个正在保存。</numerusform>
         </translation>
     </message>
     <message>
         <source>Please wait.</source>
-        <translation>请稍等。</translation>
+        <translation type="obsolete">请稍等。</translation>
     </message>
     <message>
         <source>Licenses limit exceeded (%1 of %2 used). Your schedule will be saved, but will not take effect.</source>
@@ -6508,11 +7892,11 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Save Layout As</source>
-        <translation>另存Layout为</translation>
+        <translation type="obsolete">另存Layout为</translation>
     </message>
     <message>
         <source>Enter layout name:</source>
-        <translation>输入Layout名称:</translation>
+        <translation type="obsolete">输入Layout名称:</translation>
     </message>
     <message>
         <source>Error</source>
@@ -6600,11 +7984,11 @@ AVAILABLE</source>
     </message>
     <message>
         <source>New Layout</source>
-        <translation>新Layout</translation>
+        <translation type="obsolete">新Layout</translation>
     </message>
     <message>
         <source>Enter the name of the layout to create:</source>
-        <translation>输入创建的layout名称:</translation>
+        <translation type="obsolete">输入创建的layout名称:</translation>
     </message>
     <message>
         <source>Save Video Screenshot As...</source>
@@ -6624,17 +8008,17 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation type="obsolete">警告</translation>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation>您将要输出的几段视频总长超过30分钟。这将需要超过1Gb的硬盘，而且基于您的连接速度，这将花费好几分钟来完成。确认要继续?</translation>
+        <translation type="obsolete">您将要输出的几段视频总长超过30分钟。这将需要超过1Gb的硬盘，而且基于您的连接速度，这将花费好几分钟来完成。确认要继续?</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
-        <translation>输出Layout为...</translation>
+        <translation type="obsolete">输出Layout为...</translation>
     </message>
     <message>
         <source>Network optix media file (*.nov)</source>
@@ -6642,11 +8026,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Save As</source>
-        <translation>另存为</translation>
+        <translation type="obsolete">另存为</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
+        <translation type="obsolete">文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
     </message>
     <message>
         <source>Can&apos;t overwrite file</source>
@@ -6654,27 +8038,27 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
+        <translation type="obsolete">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
-        <translation>输出Layout</translation>
+        <translation type="obsolete">输出Layout</translation>
     </message>
     <message>
         <source>Export finished</source>
-        <translation>输出完成</translation>
+        <translation type="obsolete">输出完成</translation>
     </message>
     <message>
         <source>Export successfully finished</source>
-        <translation>输出成功完成</translation>
+        <translation type="obsolete">输出成功完成</translation>
     </message>
     <message>
         <source>Exporting %1 to &quot;%2&quot;...</source>
-        <translation>输出%1至&quot;%2&quot;...</translation>
+        <translation type="obsolete">输出%1至&quot;%2&quot;...</translation>
     </message>
     <message>
         <source>Could not export layout</source>
-        <translation>无法输出Layout</translation>
+        <translation type="obsolete">无法输出Layout</translation>
     </message>
     <message>
         <source>Cannot export file</source>
@@ -6682,7 +8066,7 @@ Do you want to continue?</source>
     </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>仅能选择一个项目输出，但是目前选择了%n个项目。</numerusform>
         </translation>
     </message>
@@ -6690,7 +8074,7 @@ Do you want to continue?</source>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation>您将要输出的视频总长超过30分钟。这将需要超过1Gb的硬盘，而且基于您的连接速度，这将花费好几分钟来完成。确认要继续?</translation>
+        <translation type="obsolete">您将要输出的视频总长超过30分钟。这将需要超过1Gb的硬盘，而且基于您的连接速度，这将花费好几分钟来完成。确认要继续?</translation>
     </message>
     <message>
         <source>dd-mmm-yyyy hh-mm-ss</source>
@@ -6702,7 +8086,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Export Video As...</source>
-        <translation>输出视频为...</translation>
+        <translation type="obsolete">输出视频为...</translation>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv)</source>
@@ -6710,25 +8094,25 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>Exporting Video</source>
-        <translation>输出视频</translation>
+        <translation type="obsolete">输出视频</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation>输出至 &quot;%1&quot;...</translation>
+        <translation type="obsolete">输出至 &quot;%1&quot;...</translation>
     </message>
     <message>
         <source>Could not export video</source>
-        <translation>无法输出视频</translation>
+        <translation type="obsolete">无法输出视频</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>无法保存下列%n个layout到系统控制器。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>要还原这%n个layout吗?</numerusform>
         </translation>
     </message>
@@ -6815,7 +8199,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation>当前的layout包含图像文件。图像不能作为多视频输出。</translation>
+        <translation type="obsolete">当前的layout包含图像文件。图像不能作为多视频输出。</translation>
     </message>
     <message>
         <source>Current layout contains several cameras and several local files. You have to keep only cameras or only local files</source>
@@ -6831,19 +8215,19 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation>可执行 %1 媒体文件 (x86) (*.exe)</translation>
+        <translation type="obsolete">可执行 %1 媒体文件 (x86) (*.exe)</translation>
     </message>
     <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation>可执行 %1 媒体文件 (x64) (*.exe)</translation>
+        <translation type="obsolete">可执行 %1 媒体文件 (x64) (*.exe)</translation>
     </message>
     <message>
         <source>Save local layout As...</source>
-        <translation>保存本地layout为...</translation>
+        <translation type="obsolete">保存本地layout为...</translation>
     </message>
     <message>
         <source>Media File (*.nov)</source>
-        <translation>媒体文件(*.nov)</translation>
+        <translation type="obsolete">媒体文件(*.nov)</translation>
     </message>
     <message>
         <source>Media File (read only) (*.nov)</source>
@@ -6855,11 +8239,11 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Another export in progress. Please wait</source>
-        <translation>另一个输出正在进行中，请稍等</translation>
+        <translation type="obsolete">另一个输出正在进行中，请稍等</translation>
     </message>
     <message>
         <source>Could not create output file %1</source>
-        <translation>无法创建输出文件%1</translation>
+        <translation type="obsolete">无法创建输出文件%1</translation>
     </message>
     <message>
         <source>AVI (*.avi);;Matroska (*.mkv);;</source>
@@ -6871,7 +8255,7 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>AVI format is not recommended</source>
-        <translation>不建议AVI格式</translation>
+        <translation type="obsolete">不建议AVI格式</translation>
     </message>
     <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists. Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
@@ -6931,11 +8315,11 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Layout already exists</source>
-        <translation>Layout已经存在</translation>
+        <translation type="obsolete">Layout已经存在</translation>
     </message>
     <message>
         <source>Layout with the same name already exists. Overwrite it?</source>
-        <translation>相同名称的Layout已经存在。要覆盖吗?</translation>
+        <translation type="obsolete">相同名称的Layout已经存在。要覆盖吗?</translation>
     </message>
     <message>
         <source>Could not save screenshot</source>
@@ -6947,41 +8331,41 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Could not save a layout</source>
-        <translation>无法保存layout</translation>
+        <translation type="obsolete">无法保存layout</translation>
     </message>
     <message>
         <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files</source>
-        <translation>当前的layout包含多个摄像机和本地文件。您只能仅保留摄像机或仅本地文件</translation>
+        <translation type="obsolete">当前的layout包含多个摄像机和本地文件。您只能仅保留摄像机或仅本地文件</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation>无法覆盖文件</translation>
+        <translation type="obsolete">无法覆盖文件</translation>
     </message>
     <message>
         <source>Could not export file</source>
-        <translation>无法输出文件</translation>
+        <translation type="obsolete">无法输出文件</translation>
     </message>
     <message>
         <source>Could not get position from camera</source>
-        <translation>无法从摄像机取得预设位</translation>
+        <translation type="obsolete">无法从摄像机取得预设位</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation>尝试从摄像机 %1 取得预设位当前位置时发生错误。
+        <translation type="obsolete">尝试从摄像机 %1 取得预设位当前位置时发生错误。
 请等待摄像机上线。</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.
 
 The camera is probably in continuous movement mode. Please stop the camera and try again.</source>
-        <translation>尝试从摄像机 %1 取得预设位当前位置时发生错误。
+        <translation type="obsolete">尝试从摄像机 %1 取得预设位当前位置时发生错误。
 摄像机可能处于连续运动模式。请停止摄像机并重新尝试。</translation>
     </message>
     <message>
         <source>Save Position</source>
-        <translation>保存预设位</translation>
+        <translation type="obsolete">保存预设位</translation>
     </message>
     <message>
         <source>Enter position name:</source>
@@ -6989,13 +8373,13 @@ The camera is probably in continuous movement mode. Please stop the camera and t
     </message>
     <message>
         <source>Could not set position from camera</source>
-        <translation>无法从摄像机设定位置</translation>
+        <translation type="obsolete">无法从摄像机设定位置</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation>尝试为摄像机 %1 设定当前位置时发生错误。
+        <translation type="obsolete">尝试为摄像机 %1 设定当前位置时发生错误。
 请等待摄像机上线。</translation>
     </message>
     <message>
@@ -7012,7 +8396,7 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>Layout with the same name already exists
 and you do not have the rights to overwrite it.</source>
-        <translation>相同名称的Layout已经存在而您没有权利覆盖。</translation>
+        <translation type="obsolete">相同名称的Layout已经存在而您没有权利覆盖。</translation>
     </message>
     <message>
         <source>Layout Settings</source>
@@ -7028,7 +8412,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation>PTZ_校准_%1.jpg</translation>
+        <translation type="obsolete">PTZ_校准_%1.jpg</translation>
     </message>
     <message>
         <source>Layout is locked and cannot be changed.</source>
@@ -7044,15 +8428,15 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Make file read-only</source>
-        <translation>設定文件成唯读</translation>
+        <translation type="obsolete">設定文件成唯读</translation>
     </message>
     <message>
         <source>AVI (*.avi)</source>
-        <translation>AVI (*.avi)</translation>
+        <translation type="obsolete">AVI (*.avi)</translation>
     </message>
     <message>
         <source>Matroska (*.mkv)</source>
-        <translation>Matroska (*.mkv)</translation>
+        <translation type="obsolete">Matroska (*.mkv)</translation>
     </message>
     <message>
         <source>Include Timestamps (Requires Transcoding)</source>
@@ -7064,7 +8448,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
-        <translation>带音频的摄像机不建议使用AVI格式因其存在一些记录漏洞。点击&apos;是&apos;继续输出或&apos;否&apos;选择其他格式</translation>
+        <translation type="obsolete">带音频的摄像机不建议使用AVI格式因其存在一些记录漏洞。点击&apos;是&apos;继续输出或&apos;否&apos;选择其他格式</translation>
     </message>
     <message>
         <source>Updating background</source>
@@ -7104,27 +8488,27 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Include timestamps (requires transcoding)</source>
-        <translation>包括时间戳(需转码)</translation>
+        <translation type="obsolete">包括时间戳(需转码)</translation>
     </message>
     <message>
         <source>Apply dewarping and image correction (requires transcoding)</source>
-        <translation>实行扭曲影像還原和图像校正(需转码)</translation>
+        <translation type="obsolete">实行扭曲影像還原和图像校正(需转码)</translation>
     </message>
     <message>
         <source>Apply image correction (requires transcoding)</source>
-        <translation>实行图像校正(需转码)</translation>
+        <translation type="obsolete">实行图像校正(需转码)</translation>
     </message>
     <message>
         <source>Apply dewarping (requires transcoding)</source>
-        <translation>实行扭曲影像還原(需转码)</translation>
+        <translation type="obsolete">实行扭曲影像還原(需转码)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
-        <translation>您將输出的视频包含过滤器需要转码。转码可能需要很长的时间。要继续吗？</translation>
+        <translation type="obsolete">您將输出的视频包含过滤器需要转码。转码可能需要很长的时间。要继续吗？</translation>
     </message>
     <message>
         <source>Open New Window</source>
-        <translation>开启新窗口</translation>
+        <translation type="obsolete">开启新窗口</translation>
     </message>
     <message>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
@@ -7133,6 +8517,32 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
         <translation>超过许可限制。您的修改将会保存，但不会生效。</translation>
+    </message>
+    <message>
+        <source>Process is in progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beta version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process is not found</source>
+        <translation type="unfinished">未发现启动过程</translation>
+    </message>
+    <message>
+        <source>Cannot restart the client.
+Please close the application and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished">无法重新启动客户端。
+请关闭应用程序并使用开始菜单中的快捷方式重新启动它。</translation>
     </message>
 </context>
 <context>
@@ -7143,7 +8553,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation>取消</translation>
+        <translation type="obsolete">取消</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -7151,7 +8561,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>recorded_video</source>
-        <translation>录像_视频</translation>
+        <translation type="obsolete">录像_视频</translation>
     </message>
     <message>
         <source>Save Recording As...</source>
@@ -7173,6 +8583,18 @@ and you do not have the rights to overwrite it.</source>
         <source>Press any key to stop the tour</source>
         <translation>按任意键停止轮巡</translation>
     </message>
+    <message>
+        <source>Canceled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recorded Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchDisplay</name>
@@ -7189,49 +8611,334 @@ and you do not have the rights to overwrite it.</source>
     <name>QnWorkbenchEcsHandler</name>
     <message>
         <source>Error</source>
-        <translation>错误</translation>
+        <translation type="obsolete">错误</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>无法保存下列%n个layout到系统控制器。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>要还原这%n个layout吗?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>无法保存下列%n个项目到系统控制器。</numerusform>
         </translation>
     </message>
     <message>
         <source>Error description: 
 %1</source>
-        <translation>错误描述：%1</translation>
+        <translation type="obsolete">错误描述：%1</translation>
     </message>
     <message>
         <source>Could not delete resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
-        <translation>无法从系统控制器中删除资源。
+        <translation type="obsolete">无法从系统控制器中删除资源。
 错误描述：&apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>无法保存以下 %n 个资源的修改。</numerusform>
         </translation>
     </message>
     <message>
         <source>Error description:
 %1</source>
-        <translation>错误描述:
+        <translation type="obsolete">错误描述:
 %1</translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchExportHandler</name>
+    <message>
+        <source>Executable %1 Media File (x64) (*.exe)</source>
+        <translation type="unfinished">可执行 %1 媒体文件 (x64) (*.exe)</translation>
+    </message>
+    <message>
+        <source>Executable %1 Media File (x86) (*.exe)</source>
+        <translation type="unfinished">可执行 %1 媒体文件 (x86) (*.exe)</translation>
+    </message>
+    <message>
+        <source>File is in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not overwrite file</source>
+        <translation type="unfinished">无法覆盖文件</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
+        <translation type="obsolete">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
+    </message>
+    <message>
+        <source>Exporting Layout</source>
+        <translation type="unfinished">输出Layout</translation>
+    </message>
+    <message>
+        <source>Could not export file</source>
+        <translation type="unfinished">无法输出文件</translation>
+    </message>
+    <message numerus="yes">
+        <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
+        <translation type="unfinished">
+            <numerusform>仅能选择一个项目输出，但是目前选择了%n个项目。</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <source>You are about to export a video sequence that is longer than 30 minutes.
+It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
+Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AVI (*.avi)</source>
+        <translation type="unfinished">AVI (*.avi)</translation>
+    </message>
+    <message>
+        <source>Matroska (*.mkv)</source>
+        <translation type="unfinished">Matroska (*.mkv)</translation>
+    </message>
+    <message>
+        <source>Export Video As...</source>
+        <translation type="unfinished">输出视频为...</translation>
+    </message>
+    <message>
+        <source>No timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timestamps:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply dewarping and image correction (requires transcoding)</source>
+        <translation type="unfinished">实行扭曲影像還原和图像校正(需转码)</translation>
+    </message>
+    <message>
+        <source>Apply image correction (requires transcoding)</source>
+        <translation type="unfinished">实行图像校正(需转码)</translation>
+    </message>
+    <message>
+        <source>Apply dewarping (requires transcoding)</source>
+        <translation type="unfinished">实行扭曲影像還原(需转码)</translation>
+    </message>
+    <message>
+        <source>AVI format is not recommended</source>
+        <translation type="unfinished">不建议AVI格式</translation>
+    </message>
+    <message>
+        <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
+        <translation type="obsolete">带音频的摄像机不建议使用AVI格式因其存在一些记录漏洞。点击&apos;是&apos;继续输出或&apos;否&apos;选择其他格式</translation>
+    </message>
+    <message>
+        <source>Save As</source>
+        <translation type="unfinished">另存为</translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
+        <translation type="obsolete">您將输出的视频包含过滤器需要转码。转码可能需要很长的时间。要继续吗？</translation>
+    </message>
+    <message>
+        <source>Exporting Video</source>
+        <translation type="unfinished">输出视频</translation>
+    </message>
+    <message>
+        <source>Exporting to &quot;%1&quot;...</source>
+        <translation type="unfinished">输出至 &quot;%1&quot;...</translation>
+    </message>
+    <message>
+        <source>Export finished</source>
+        <translation type="unfinished">输出完成</translation>
+    </message>
+    <message>
+        <source>Export successfully finished</source>
+        <translation type="unfinished">输出成功完成</translation>
+    </message>
+    <message>
+        <source>Could not export layout</source>
+        <translation type="unfinished">无法输出Layout</translation>
+    </message>
+    <message>
+        <source>Could not save a layout</source>
+        <translation type="unfinished">无法保存layout</translation>
+    </message>
+    <message>
+        <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
+        <translation type="unfinished">当前的layout包含图像文件。图像不能作为多视频输出。</translation>
+    </message>
+    <message>
+        <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files</source>
+        <translation type="obsolete">当前的layout包含多个摄像机和本地文件。您只能仅保留摄像机或仅本地文件</translation>
+    </message>
+    <message>
+        <source>Save local layout As...</source>
+        <translation type="unfinished">保存本地layout为...</translation>
+    </message>
+    <message>
+        <source>Export Layout As...</source>
+        <translation type="unfinished">输出Layout为...</translation>
+    </message>
+    <message>
+        <source>Media File (*.nov)</source>
+        <translation type="obsolete">媒体文件(*.nov)</translation>
+    </message>
+    <message>
+        <source>Make file read-only</source>
+        <translation type="unfinished">設定文件成唯读</translation>
+    </message>
+    <message>
+        <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
+It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
+Do you want to continue?</source>
+        <translation type="unfinished">您将要输出的几段视频总长超过30分钟。这将需要超过1Gb的硬盘，而且基于您的连接速度，这将花费好几分钟来完成。确认要继续?</translation>
+    </message>
+    <message>
+        <source>Could not export video</source>
+        <translation type="unfinished">无法输出视频</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top left corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top right corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom left corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom right corner (requires transcoding)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Media File (*.nov)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export successfully finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchLayoutsHandler</name>
+    <message>
+        <source>Layout already exists</source>
+        <translation type="unfinished">Layout已经存在</translation>
+    </message>
+    <message>
+        <source>Layout with the same name already exists
+and you do not have the rights to overwrite it.</source>
+        <translation type="obsolete">相同名称的Layout已经存在而您没有权利覆盖。</translation>
+    </message>
+    <message>
+        <source>Save Layout As</source>
+        <translation type="unfinished">另存Layout为</translation>
+    </message>
+    <message>
+        <source>Enter layout name:</source>
+        <translation type="unfinished">输入Layout名称:</translation>
+    </message>
+    <message>
+        <source>Layout with the same name already exists. Overwrite it?</source>
+        <translation type="obsolete">相同名称的Layout已经存在。要覆盖吗?</translation>
+    </message>
+    <message>
+        <source>Close Layouts</source>
+        <translation type="unfinished">关闭Layout</translation>
+    </message>
+    <message numerus="yes">
+        <source>The following %n layout(s) are not saved. Do you want to save them?</source>
+        <translation type="unfinished">
+            <numerusform>以下%n个layout没有保存。需保存吗?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Saving Layouts</source>
+        <translation type="unfinished">保存Layout</translation>
+    </message>
+    <message numerus="yes">
+        <source>The following %n layout(s) are being saved.</source>
+        <translation type="unfinished">
+            <numerusform>以下%n个正在保存。</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Please wait.</source>
+        <translation type="unfinished">请稍等。</translation>
+    </message>
+    <message>
+        <source>New Layout</source>
+        <translation type="unfinished">新Layout</translation>
+    </message>
+    <message>
+        <source>Enter the name of the layout to create:</source>
+        <translation type="unfinished">输入创建的layout名称:</translation>
+    </message>
+    <message>
+        <source>New layout</source>
+        <translation type="unfinished">新layout</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">错误</translation>
+    </message>
+    <message numerus="yes">
+        <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
+        <translation type="unfinished">
+            <numerusform>无法保存下列%n个layout到系统控制器。</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you want to restore these %n layout(s)?</source>
+        <translation type="unfinished">
+            <numerusform>要还原这%n个layout吗?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout with the same name already exists. Do you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7243,7 +8950,7 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
-        <translation>&apos;实时&apos;</translation>
+        <translation type="obsolete">&apos;实时&apos;</translation>
     </message>
     <message>
         <source>yyyy MMM dd
@@ -7262,6 +8969,61 @@ hh:mm:ss</source>
         <comment>SHORT_TOOL_TIP_FORMAT</comment>
         <translation type="obsolete">分:秒</translation>
     </message>
+    <message>
+        <source>&apos;Live&apos;</source>
+        <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
+        <translation type="unfinished">&apos;实时&apos;</translation>
+    </message>
+    <message>
+        <source>yyyy MMM dd
+hh:mm:ss</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">年 月 日
+时:分:秒</translation>
+    </message>
+    <message>
+        <source>hh:mm:ss</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">时:分:秒</translation>
+    </message>
+    <message>
+        <source>mm:ss</source>
+        <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
+        <translation type="unfinished">分:秒</translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+        <source>Could not get position from camera</source>
+        <translation type="unfinished">无法从摄像机取得预设位</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get current position from camera %1.
+
+Please wait for the camera to go online.</source>
+        <translation type="unfinished">尝试从摄像机 %1 取得预设位当前位置时发生错误。
+请等待摄像机上线。</translation>
+    </message>
+    <message>
+        <source>Could not set position to camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set current position for camera %1.
+
+Please wait for the camera to go online.</source>
+        <translation type="unfinished">尝试为摄像机 %1 设定当前位置时发生错误。
+请等待摄像机上线。</translation>
+    </message>
+    <message>
+        <source>PTZ_CALIBRATION_%1.jpg</source>
+        <translation type="unfinished">PTZ_校准_%1.jpg</translation>
+    </message>
+    <message>
+        <source>Could not set position for camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchScreenshotHandler</name>
@@ -7271,7 +9033,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>JPEG Image(*.jpg)</source>
-        <translation>JPEG图片(*.jpg)</translation>
+        <translation type="obsolete">JPEG图片(*.jpg)</translation>
     </message>
     <message>
         <source>Save Screenshot As...</source>
@@ -7279,7 +9041,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Include Timestamp</source>
-        <translation>带时间戳</translation>
+        <translation type="obsolete">带时间戳</translation>
     </message>
     <message>
         <source>Save As</source>
@@ -7287,7 +9049,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation>文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
+        <translation type="obsolete">文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
@@ -7295,7 +9057,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
+        <translation type="obsolete">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
     </message>
     <message>
         <source>Could not save screenshot</source>
@@ -7304,6 +9066,42 @@ hh:mm:ss</source>
     <message>
         <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
         <translation>保存截屏&apos;%1&apos;时发生错误。</translation>
+    </message>
+    <message>
+        <source>JPEG Image (*.jpg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top left corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top right corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom left corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom right corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timestamp:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7315,6 +9113,33 @@ hh:mm:ss</source>
     <message>
         <source>Authentication Succeeded</source>
         <translation type="obsolete">认证成功</translation>
+    </message>
+</context>
+<context>
+    <name>RecordingBusinessActionWidget</name>
+    <message>
+        <source>Quality:</source>
+        <translation type="unfinished">质量:</translation>
+    </message>
+    <message>
+        <source>FPS</source>
+        <translation type="unfinished">每秒帧数</translation>
+    </message>
+    <message>
+        <source>Pre-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished">秒</translation>
+    </message>
+    <message>
+        <source>Post-recording:</source>
+        <translation type="unfinished">事件后录像:</translation>
+    </message>
+    <message>
+        <source>max</source>
+        <translation type="unfinished">最大</translation>
     </message>
 </context>
 <context>
@@ -7405,7 +9230,7 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Icon</source>
-        <translation>图标</translation>
+        <translation type="obsolete">图标</translation>
     </message>
     <message>
         <source>Primary device:</source>
@@ -7495,7 +9320,7 @@ hh:mm:ss</source>
     <name>ResourceListDialog</name>
     <message>
         <source>Dialog</source>
-        <translation>对话框</translation>
+        <translation type="obsolete">对话框</translation>
     </message>
 </context>
 <context>
@@ -7515,6 +9340,36 @@ hh:mm:ss</source>
     <message>
         <source>X</source>
         <translation type="obsolete">X</translation>
+    </message>
+</context>
+<context>
+    <name>SayTextBusinessActionWidget</name>
+    <message>
+        <source>Speak the following:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type any text here</source>
+        <translation type="unfinished">键入任何文字在这里</translation>
+    </message>
+    <message>
+        <source>Volume:</source>
+        <translation type="unfinished">音量:</translation>
+    </message>
+    <message>
+        <source>Test...</source>
+        <translation type="unfinished">测试...</translation>
+    </message>
+</context>
+<context>
+    <name>SendmailBusinessActionWidget</name>
+    <message>
+        <source>&amp;Additional Recipients:</source>
+        <translation type="unfinished">&amp;其他收件人:</translation>
+    </message>
+    <message>
+        <source>&amp;Global Email Settings...</source>
+        <translation type="unfinished">&amp;全局邮件设定...</translation>
     </message>
 </context>
 <context>
@@ -7590,6 +9445,22 @@ hh:mm:ss</source>
     <message>
         <source>Ping</source>
         <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Rebuild archive index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
@@ -7734,15 +9605,15 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Licensing</source>
-        <translation>许可</translation>
+        <translation type="obsolete">许可</translation>
     </message>
     <message>
         <source>Use an analog license to view this camera</source>
-        <translation>使用类比许可来浏览此摄像机</translation>
+        <translation type="obsolete">使用类比许可来浏览此摄像机</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation>取得更多软件许可...</translation>
+        <translation type="obsolete">取得更多软件许可...</translation>
     </message>
     <message>
         <source>Firmware:</source>
@@ -7766,7 +9637,102 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation>软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+        <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
+    </message>
+    <message>
+        <source>Vendor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software (Max FPS may be slightly decreased on media server)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmtpSettingsWidget</name>
+    <message>
+        <source>Advanced settings...</source>
+        <translation type="unfinished">进阶设定...</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">测试</translation>
+    </message>
+    <message>
+        <source>&amp;E-Mail:</source>
+        <translation type="unfinished">&amp;邮箱:</translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished">&amp;密码:</translation>
+    </message>
+    <message>
+        <source>&amp;System Signature:</source>
+        <translation type="unfinished">&amp;系统签名:</translation>
+    </message>
+    <message>
+        <source>Enter short system description here...</source>
+        <translation type="unfinished">在这里输入短的系统描述...</translation>
+    </message>
+    <message>
+        <source>SMTP &amp;Server:</source>
+        <translation type="unfinished">SMTP &amp;服务器:</translation>
+    </message>
+    <message>
+        <source>&amp;User:</source>
+        <translation type="unfinished">&amp;用户:</translation>
+    </message>
+    <message>
+        <source>P&amp;ort:</source>
+        <translation type="unfinished">端口:</translation>
+    </message>
+    <message>
+        <source>Unsecure connection</source>
+        <translation type="unfinished">不安全的连接</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(建议)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Secure connection using TLS</source>
+        <translation type="unfinished">使用TLS安全连接</translation>
+    </message>
+    <message>
+        <source>Secure connection using SSL</source>
+        <translation type="unfinished">使用SSL安全连接</translation>
+    </message>
+    <message>
+        <source>Server:</source>
+        <translation type="unfinished">服务器:</translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished">端口:</translation>
+    </message>
+    <message>
+        <source>User:</source>
+        <translation type="unfinished">用户:</translation>
+    </message>
+    <message>
+        <source>Security:</source>
+        <translation type="unfinished">安全性:</translation>
+    </message>
+    <message>
+        <source>Progress:</source>
+        <translation type="unfinished">进展:</translation>
+    </message>
+    <message>
+        <source>Result:</source>
+        <translation type="unfinished">结果:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">好</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
@@ -7898,6 +9864,29 @@ hh:mm:ss</source>
     </message>
 </context>
 <context>
+    <name>WeekTimeScheduleDialog</name>
+    <message>
+        <source>Schedule Grid</source>
+        <translation type="unfinished">日程网格</translation>
+    </message>
+    <message>
+        <source>Note: Schedule is based on Server Time</source>
+        <translation type="unfinished">注意：日程根据服务器时间</translation>
+    </message>
+    <message>
+        <source>Schedule Settings</source>
+        <translation type="unfinished">日程设定</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation type="unfinished">开</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">关</translation>
+    </message>
+</context>
+<context>
     <name>WeekTimeScheduleWidget</name>
     <message>
         <source>WeekTime Schedule Editor</source>
@@ -7905,27 +9894,27 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Schedule Grid</source>
-        <translation>日程网格</translation>
+        <translation type="obsolete">日程网格</translation>
     </message>
     <message>
         <source>Note: Schedule is based on Server Time</source>
-        <translation>注意：日程根据服务器时间</translation>
+        <translation type="obsolete">注意：日程根据服务器时间</translation>
     </message>
     <message>
         <source>Schedule Settings</source>
-        <translation>日程设定</translation>
+        <translation type="obsolete">日程设定</translation>
     </message>
     <message>
         <source>On</source>
-        <translation>开</translation>
+        <translation type="obsolete">开</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>关</translation>
+        <translation type="obsolete">关</translation>
     </message>
     <message>
         <source>Weekly Schedule Editor</source>
-        <translation>每周日程编辑器</translation>
+        <translation type="obsolete">每周日程编辑器</translation>
     </message>
 </context>
 <context>

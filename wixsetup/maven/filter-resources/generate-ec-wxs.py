@@ -26,7 +26,7 @@ def fixasfiles():
     open('AppServerFiles.wxs', 'w').write(text)
 
 if __name__ == '__main__':
-    p = subprocess.Popen(r'heat dir ${AppServerDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr ${installer.customization}AppServerDir -var var.AppServerSourceDir -wixvar', shell=True, stdout=PIPE)
+    p = subprocess.Popen(r'heat dir ${AppServerDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr ${customization}AppServerDir -var var.AppServerSourceDir -wixvar', shell=True, stdout=PIPE)
     out, err = p.communicate()
     print out
     p.wait()

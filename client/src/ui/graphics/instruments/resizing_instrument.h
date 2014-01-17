@@ -67,6 +67,8 @@ public:
         m_effectRadius = effectRadius;
     }
 
+    void rehandle();
+
 signals:
     void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);
     void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, ResizingInfo *info);

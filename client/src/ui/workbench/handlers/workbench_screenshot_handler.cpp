@@ -12,12 +12,16 @@
 
 #include <client/client_settings.h>
 
+#include <transcoding/filters/contrast_image_filter.h>
+#include <transcoding/filters/fisheye_image_filter.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/string.h>
+#include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
 #include "file_processor.h"
@@ -136,18 +140,20 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
 
 
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(const QnScreenshotParameters &parameters, QnResourceDisplay *display) {
+QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay *display) {
     if (!display)
         return NULL;
 
     QList<QImage> images;
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
+    bool anyQuality = layout->channelCount() > 1;   //screenshots for the panoramica cameras will be done localy
     for (int i = 0; i < layout->channelCount(); ++i) {
         QImage channelImage = display->camDisplay()->getScreenshot(i,
                                                                    parameters.imageCorrectionParams,
                                                                    parameters.mediaDewarpingParams,
-                                                                   parameters.itemDewarpingParams);
+                                                                   parameters.itemDewarpingParams,
+                                                                   anyQuality);
         if (channelImage.isNull())
             return NULL;    // async remote screenshoy provider will be used
         images.push_back(channelImage);
@@ -155,17 +161,22 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(const 
     QSize channelSize = images[0].size();
     QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
 
-    QImage screenshot(totalSize.width() * parameters.zoomRect.width(), totalSize.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
+    QImage screenshot(totalSize.width(), totalSize.height(), QImage::Format_ARGB32);
     screenshot.fill(qRgba(0, 0, 0, 0));
 
     QScopedPointer<QPainter> painter(new QPainter(&screenshot));
     painter->setCompositionMode(QPainter::CompositionMode_Source);
     for (int i = 0; i < layout->channelCount(); ++i) {
         painter->drawImage(
-                    QnGeometry::cwiseMul(layout->position(i), channelSize) - QnGeometry::cwiseMul(parameters.zoomRect.topLeft(), totalSize),
+                    QnGeometry::cwiseMul(layout->position(i), channelSize),
                     images[i]
                     );
     }
+
+    // avoiding post-processing duplication
+    parameters.imageCorrectionParams.enabled = false;
+    parameters.mediaDewarpingParams.enabled = false;
+    parameters.itemDewarpingParams.enabled = false;
 
     return new QnBasicImageProvider(screenshot);
 }
@@ -187,11 +198,13 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
-    parameters.itemDewarpingParams = widget->item()->dewarpingParams();
+    if (widget->item()->zoomTargetItem())
+        parameters.itemDewarpingParams = widget->item()->zoomTargetItem()->dewarpingParams();
+    else
+        parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
-    //TODO: #GDM whay should we disable zoomrect on dewarping cameras? Ask Roma.
-    parameters.zoomRect =  (widget->zoomRect().isNull() || parameters.mediaDewarpingParams.enabled) ? QRectF(0, 0, 1, 1) : widget->zoomRect();
+    parameters.zoomRect = widget->zoomRect();
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
@@ -201,14 +214,15 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     if(parameters.filename.isEmpty()) {
-        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
-                + QLatin1Char('_') + parameters.timeString();
-
         QString previousDir = qnSettings->lastScreenshotDir();
         if (previousDir.isEmpty())
             previousDir = qnSettings->mediaFolder();
 
-        QString filterSeparator(QLatin1String(";;"));
+        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
+                + QLatin1Char('_') + parameters.timeString();
+        suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+
+        QString filterSeparator = lit(";;");
         QString pngFileFilter = tr("PNG Image (*.png)");
         QString jpegFileFilter = tr("JPEG Image (*.jpg)");
 
@@ -222,7 +236,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             tr("Save Screenshot As..."),
-            previousDir + QDir::separator() + suggestion,
+            suggestion,
             allowedFormatFilter
         ));
 
@@ -237,18 +251,18 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         comboBox->addItem(tr("Bottom right corner"), Qn::BottomRightCorner);
         comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
-        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()));
+        dialog->addWidget(new QLabel(tr("Timestamp:"), dialog.data()));
         dialog->addWidget(comboBox, false);
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return;
 
-        QString fileName = dialog->selectedFiles().value(0);
+        QString fileName = dialog->selectedFile();
         if (fileName.isEmpty())
             return;
 
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        QString selectedExtension = dialog->selectedExtension();
+
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
@@ -256,7 +270,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Do you want to replace it?").arg(QFileInfo(fileName).baseName()),
+                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Ok | QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Cancel)
@@ -268,7 +282,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
             );
             return;
@@ -292,8 +306,33 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         return;
     loader->deleteLater();
 
-    QImage timestamped(image);
-    drawTimeStamp(timestamped, loader->parameters().timestampPosition, loader->parameters().timeString());
+    QnScreenshotParameters parameters = loader->parameters();
+
+    QImage resized;
+    if (!parameters.zoomRect.isNull()) {
+        resized = QImage(image.width() * parameters.zoomRect.width(), image.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
+        resized.fill(qRgba(0, 0, 0, 0));
+
+        QScopedPointer<QPainter> painter(new QPainter(&resized));
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+        painter->drawImage(QPointF(0, 0), image, QnGeometry::cwiseMul(parameters.zoomRect, image.size()));
+    } else {
+        resized = image;
+    }
+
+    QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
+    if (parameters.imageCorrectionParams.enabled) {
+        QnContrastImageFilter filter(parameters.imageCorrectionParams);
+        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
+
+    if (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) {
+        QnFisheyeImageFilter filter(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
+        filter.updateImage(frame.data(), QRectF(0.0, 0.0, 1.0, 1.0));
+    }
+
+    QImage timestamped = frame->toImage();
+    drawTimeStamp(timestamped, parameters.timestampPosition, parameters.timeString());
 
     QString filename = loader->parameters().filename;
 
@@ -301,7 +340,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).baseName())
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).completeBaseName())
         );
         return;
     }

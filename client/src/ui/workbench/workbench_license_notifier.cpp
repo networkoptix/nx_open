@@ -51,26 +51,34 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
 
     foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) {
         qint64 expirationTime = license->expirationTime();
+        // skip infinite lcense
         if(expirationTime < 0)
+            continue;
+
+        QnLicenseWarningState licenseWarningState = licenseWarningStates.value(license->key());
+        // skip already notified expired license
+        qint64 lastTimeLeft = expirationTime - licenseWarningState.lastWarningTime;
+        if(lastTimeLeft < 0)
+            continue;
+        // skip license that didn't pass the maximum pre-notification interval
+        qint64 timeLeft = expirationTime - currentTime;
+        if (timeLeft > warningTimes[0])
             continue;
 
         licenses.push_back(license);
 
-        QnLicenseWarningState licenseWarningState = licenseWarningStates.value(license->key());
-        if(licenseWarningState.ignore)
+        int lastWarningIndex = 0;
+        for(; warningTimes[lastWarningIndex] > lastTimeLeft; lastWarningIndex++);
+
+        int warningIndex = 0;
+        for(; warningTimes[warningIndex] > timeLeft && warningTimes[warningIndex] > 0; warningIndex++);
+
+        // warn user only if pre-notification interval has been changed.
+        if (warningIndex == lastWarningIndex && timeLeft > 0)
             continue;
 
-        qint64 lastTimeLeft = expirationTime - licenseWarningState.lastWarningTime;
-        if(lastTimeLeft < 0)
-            continue;
-        int nextWarningIndex = 0;
-        for(; warningTimes[nextWarningIndex] > lastTimeLeft; nextWarningIndex++);
-
-        qint64 timeLeft = expirationTime - currentTime;
-        if(warningTimes[nextWarningIndex] == 0 || timeLeft < warningTimes[nextWarningIndex]) {
-            warn = true;
-            licenseWarningStates[license->key()].lastWarningTime = currentTime;
-        }
+        warn = true;
+        licenseWarningStates[license->key()].lastWarningTime = currentTime;
     }
 
     if(warn) {

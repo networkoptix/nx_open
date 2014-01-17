@@ -67,6 +67,7 @@ private:
     QnMediaContextPtr m_audioContext;
     nxcip::CameraMediaEncoder2* m_mediaEncoder2Ref;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
+    unsigned int m_cameraCapabilities;
 
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution

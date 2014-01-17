@@ -16,7 +16,7 @@
 
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController);
+    connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
     base_type::registerResource(resource);
 }
 

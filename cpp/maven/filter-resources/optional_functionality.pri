@@ -48,7 +48,9 @@
   DEFINES += ENABLE_DESKTOP_CAMERA
 }
 
-IS_VMAX_ENABLED=${vmax}
-contains( IS_VMAX_ENABLED, true ) {
-  DEFINES += ENABLE_VMAX
+contains(NAME, mediaserver) || contains(NAME, common) {
+  IS_VMAX_ENABLED=${vmax}
+  contains( IS_VMAX_ENABLED, true ) {
+    DEFINES += ENABLE_VMAX
+  }
 }
