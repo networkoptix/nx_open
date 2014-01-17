@@ -57,26 +57,6 @@
 #       undef __null
 #       define __null nullptr
 #   endif
-#
-#   if defined(__APPLE__) && !defined(_NATIVE_NULLPTR_SUPPORTED)
-/* No nullptr on this system... We do it the evil way. */
-namespace {
-    const class nullptr_t {
-    public:
-        /* Convertible to any type of null non-member pointer... */
-        template<class T>
-        inline operator T*() const { return 0; } 
-
-        /* ...or any type of null member pointer. */
-        template<class C, class T>
-        inline operator T C::*() const { return 0; } 
-
-    private:
-        /* Can't take address of nullptr. */
-        void operator&() const;  
-    } nullptr = {};
-}
-#   endif
 #endif
 
 
