@@ -27,7 +27,7 @@
                 <Control Id="FolderLabel" Type="Text" X="14" Y="46" Width="290" Height="18" NoPrefix="yes" Text="Please Specify Enterprise Controller Parameters" />
                 <Control Type="Text" Id="LoginLabel" Width="50" Height="17" X="16" Y="104" Text="Login" />
                 <Control Type="Text" Id="PasswordLabel" Width="73" Height="17" X="16" Y="122" Text="Create Password" />
-                <Control Type="Edit" Id="ProxyPort" Height="15" Width="203" X="112" Y="81" Property="PROXY_PORT" />
+                <Control Type="Edit" Id="Port" Height="15" Width="203" X="112" Y="81" Property="APPSERVER_PORT" />
                 <Control Type="Edit" Id="Login" X="112" Y="100" Width="203" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
                 <Control Type="Edit" Id="Password" Width="203" Height="15" X="112" Y="119" Property="APPSERVER_PASSWORD" Password="yes" />
                 <Control Type="Edit" Id="PasswordConfirm" Height="15" Width="203" X="112" Y="140" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes" />
