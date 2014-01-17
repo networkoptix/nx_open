@@ -57,23 +57,18 @@ Application will now quit.</source>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="586"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>Insufficient privileges to manage services</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="586"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSystrayWindow</name>
-    <message>
-        <location filename="../src/systraywindow.cpp" line="126"/>
-        <source> Tray Assistant</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="145"/>
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
@@ -82,23 +77,34 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/systraywindow.cpp" line="126"/>
+        <source>%1 Tray Assistant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/systraywindow.cpp" line="232"/>
-        <source>The requested access was denied</source>
+        <source>Access denied.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="235"/>
-        <source>The specified database does not exist.</source>
+        <source>Specified database does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="238"/>
-        <source>A specified parameter is invalid.</source>
+        <source>Specified parameter is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
-        <source>Insufficient permissions to start/stop services</source>
+        <source>Could not access installed services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>An error has occurred while trying to access installed services:
+ %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -162,14 +168,18 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="533"/>
-        <location filename="../src/systraywindow.cpp" line="555"/>
-        <location filename="../src/systraywindow.cpp" line="876"/>
-        <location filename="../src/systraywindow.cpp" line="909"/>
-        <location filename="../src/systraywindow.cpp" line="956"/>
-        <location filename="../src/systraywindow.cpp" line="966"/>
-        <location filename="../src/systraywindow.cpp" line="973"/>
-        <source>Systray</source>
+        <location filename="../src/systraywindow.cpp" line="633"/>
+        <source>Show &amp;Media Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="638"/>
+        <source>Show &amp;Enterprise Controller Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="967"/>
+        <source>%1 port is already used by another process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -183,108 +193,88 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="626"/>
+        <location filename="../src/systraywindow.cpp" line="627"/>
         <source>&amp;Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="632"/>
-        <source>&amp;Show Media Server Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/systraywindow.cpp" line="637"/>
-        <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/systraywindow.cpp" line="642"/>
+        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="645"/>
+        <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Start Media Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="650"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Stop Media Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="655"/>
+        <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Start Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="660"/>
+        <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Stop Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="753"/>
+        <location filename="../src/systraywindow.cpp" line="754"/>
         <source>* Last used connection *</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="869"/>
+        <location filename="../src/systraywindow.cpp" line="870"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="871"/>
+        <location filename="../src/systraywindow.cpp" line="872"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="873"/>
+        <location filename="../src/systraywindow.cpp" line="874"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="909"/>
+        <location filename="../src/systraywindow.cpp" line="910"/>
         <source>Invalid %1 port specified.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="942"/>
+        <location filename="../src/systraywindow.cpp" line="943"/>
         <source>enterprise controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="956"/>
+        <location filename="../src/systraywindow.cpp" line="957"/>
         <source>%1 port is same as %2 port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="966"/>
-        <source>%1 port already used by another process</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/systraywindow.cpp" line="973"/>
+        <location filename="../src/systraywindow.cpp" line="974"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1043"/>
+        <location filename="../src/systraywindow.cpp" line="1044"/>
         <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1043"/>
+        <location filename="../src/systraywindow.cpp" line="1044"/>
         <source>You have entered invalid URL.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SettingsDialog</name>
-    <message>
-        <location filename="../src/settings.ui" line="20"/>
-        <source>HDWitness settings</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
         <source>Media Server Settings</source>

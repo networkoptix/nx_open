@@ -123,7 +123,7 @@ It might take a few moments to populate them in the tree.</numerusform>
     </message>
     <message numerus="yes">
         <source>Error while adding camera(s)</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>Error while adding a camera</numerusform>
             <numerusform>Error while adding cameras</numerusform>
         </translation>
@@ -142,11 +142,18 @@ It might take a few moments to populate them in the tree.</numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>Error while adding camera(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
-        <source>%1 have not input ports</source>
+        <source>%1 have no input ports</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -183,7 +190,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
-        <source>%1 have not output relays</source>
+        <source>%1 have no output relays</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -375,7 +382,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
-        <source>%n item(s) more</source>
+        <source>%n more item(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -386,6 +393,16 @@ It might take a few moments to populate them in the tree.</numerusform>
     <name>QnPtzTourModel</name>
     <message numerus="yes">
         <source>%n seconds</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnServerResourceWidget</name>
+    <message numerus="yes">
+        <source>%1 %2 (up %n days, %2)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -412,20 +429,6 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnUserEmailPolicy</name>
     <message numerus="yes">
-        <source>%1 have invalid E-Mail address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n of %1 additional E-Mail addresses are invalid</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -441,6 +444,13 @@ It might take a few moments to populate them in the tree.</numerusform>
     </message>
     <message numerus="yes">
         <source>%1, %n additional</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid E-Mail address</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -531,28 +541,28 @@ It might take a few moments to populate them in the tree.</numerusform>
     <name>QnWorkbenchEcsHandler</name>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>Could not save the following layout to Enterprise Controller.</numerusform>
             <numerusform>Could not save the following %n layouts to Enterprise Controller.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>Do you want to restore this layout?</numerusform>
             <numerusform>Do you want to restore these %n layouts?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>Could not save the following item to Enterprise Controller.</numerusform>
             <numerusform>Could not save the following %n items to Enterprise Controller.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>Could not save changes made to the following resource.</numerusform>
             <numerusform>Could not save changes made to the following %n resources.</numerusform>
         </translation>

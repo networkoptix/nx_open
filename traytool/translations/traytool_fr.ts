@@ -69,12 +69,12 @@ L&apos;application va être fermée.</translation>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="586"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>Insufficient privileges to manage services</source>
         <translation>Droits insuffisants pour la gestion des services</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="586"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation>Le contrôle UAC doit être activé pour une demande de privilèges avec un utilisateur sans droit administrateur</translation>
     </message>
@@ -100,24 +100,20 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
 </translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="232"/>
         <source>The requested access was denied</source>
-        <translation>L&apos;accès demandé a été refusé</translation>
+        <translation type="obsolete">L&apos;accès demandé a été refusé</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="235"/>
         <source>The specified database does not exist.</source>
-        <translation>La base de données spécifiée n&apos;existe pas.</translation>
+        <translation type="obsolete">La base de données spécifiée n&apos;existe pas.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="238"/>
         <source>A specified parameter is invalid.</source>
-        <translation>Un paramètre spécifié est invalide.</translation>
+        <translation type="obsolete">Un paramètre spécifié est invalide.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="242"/>
         <source>Insufficient permissions to start/stop services</source>
-        <translation>Autorisations insuffisantes pour démarrer / arrêter les services</translation>
+        <translation type="obsolete">Autorisations insuffisantes pour démarrer / arrêter les services</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="260"/>
@@ -176,23 +172,16 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation> (pause en cours)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="533"/>
-        <location filename="../src/systraywindow.cpp" line="555"/>
-        <location filename="../src/systraywindow.cpp" line="876"/>
-        <location filename="../src/systraywindow.cpp" line="909"/>
-        <location filename="../src/systraywindow.cpp" line="956"/>
-        <location filename="../src/systraywindow.cpp" line="966"/>
-        <location filename="../src/systraywindow.cpp" line="973"/>
         <source>Systray</source>
         <translatorcomment>There&apos;s no short term for &quot;System Tray&quot; in French</translatorcomment>
-        <translation>Zone de notifications </translation>
+        <translation type="obsolete">Zone de notifications </translation>
     </message>
     <message>
         <source>%1 is going to be stopped. Are you sure?</source>
         <translation type="obsolete">%1 va être arrêté. Êtes-vous sûr ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="626"/>
+        <location filename="../src/systraywindow.cpp" line="627"/>
         <source>&amp;Settings</source>
         <translation>&amp;Configurations</translation>
     </message>
@@ -201,7 +190,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">&amp;Afficher le registre de %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="642"/>
+        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
@@ -214,7 +203,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">Arrêter %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="753"/>
+        <location filename="../src/systraywindow.cpp" line="754"/>
         <source>* Last used connection *</source>
         <translation>*Dernière connexion utilisée *</translation>
     </message>
@@ -225,11 +214,6 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     <message>
         <source>The changes you made require %1 to be restarted. Would you like to restart now?</source>
         <translation type="obsolete">Les changements que vous avez faits exigent que %1 soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
-    </message>
-    <message>
-        <location filename="../src/systraywindow.cpp" line="126"/>
-        <source> Tray Assistant</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="145"/>
@@ -271,59 +255,103 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Le contrôleur entreprise va être arrêté. Êtes-vous sûr?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="632"/>
         <source>&amp;Show Media Server Log</source>
-        <translation>&amp;Afficher le journal du Média Serveur</translation>
+        <translation type="obsolete">&amp;Afficher le journal du Média Serveur</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="637"/>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation>&amp;Afficher le journal du Contrôleur Entreprise</translation>
+        <translation type="obsolete">&amp;Afficher le journal du Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="645"/>
+        <location filename="../src/systraywindow.cpp" line="126"/>
+        <source>%1 Tray Assistant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="232"/>
+        <source>Access denied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="235"/>
+        <source>Specified database does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="238"/>
+        <source>Specified parameter is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>Could not access installed services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>An error has occurred while trying to access installed services:
+ %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="633"/>
+        <source>Show &amp;Media Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="638"/>
+        <source>Show &amp;Enterprise Controller Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Start Media Server</source>
         <translation>Démarrer le Média Serveur</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="650"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Stop Media Server</source>
         <translation>Arrêter le Média Serveur</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="655"/>
+        <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Start Enterprise Controller</source>
         <translation>Démarrer le Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="660"/>
+        <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Stop Enterprise Controller</source>
         <translation>Arrêter le Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="869"/>
+        <location filename="../src/systraywindow.cpp" line="870"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le contrôleur entreprise et le média serveur soient redémarrés. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="871"/>
+        <location filename="../src/systraywindow.cpp" line="872"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le contrôleur entreprise soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="873"/>
+        <location filename="../src/systraywindow.cpp" line="874"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le serveur média soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="909"/>
+        <location filename="../src/systraywindow.cpp" line="910"/>
         <source>Invalid %1 port specified.</source>
         <translation>Le port %1 spécifié est invalide.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="942"/>
+        <location filename="../src/systraywindow.cpp" line="943"/>
         <source>enterprise controller</source>
         <translation>contrôleur entreprise</translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="967"/>
+        <source>%1 port is already used by another process</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>media proxy</source>
@@ -338,27 +366,26 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Serveur Média API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="956"/>
+        <location filename="../src/systraywindow.cpp" line="957"/>
         <source>%1 port is same as %2 port</source>
         <translation>Le port %1 est le même que %2</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="966"/>
         <source>%1 port already used by another process</source>
-        <translation>Le port %1 est déjà utilisé par un autre processus</translation>
+        <translation type="obsolete">Le port %1 est déjà utilisé par un autre processus</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="973"/>
+        <location filename="../src/systraywindow.cpp" line="974"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>L&apos;adresse IP spécifiée n&apos;est pas une adresse IP publique valide</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1043"/>
+        <location filename="../src/systraywindow.cpp" line="1044"/>
         <source>Invalid parameters</source>
         <translation>Paramètres invalide</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1043"/>
+        <location filename="../src/systraywindow.cpp" line="1044"/>
         <source>You have entered invalid URL.</source>
         <translation>Vous avez entré une URL invalide.</translation>
     </message>
@@ -366,10 +393,9 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.ui" line="20"/>
         <source>HDWitness settings</source>
         <translatorcomment>Changed HDWitness to Spectrum, we guessed it was supposed to be Spectrum</translatorcomment>
-        <translation>Configurations Spectrum</translation>
+        <translation type="obsolete">Configurations Spectrum</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
