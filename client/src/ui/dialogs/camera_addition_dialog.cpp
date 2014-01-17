@@ -297,7 +297,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
         }
         checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualCameraSearchSingleCamera>(info));
 
-        QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
+        QTableWidgetItem *manufItem = new QTableWidgetItem(info.vendor);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
         if (!enabledRow)
             manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
@@ -587,7 +587,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
 
         QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
         urls.append(info.url);
-        manufacturers.append(info.vendor);
+        manufacturers.append(info.manufacturer);
     }
     if (urls.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));
@@ -601,7 +601,6 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     QEventLoop loop;
     connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
     connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
-    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
     loop.exec();
 
     ui->addButton->setEnabled(true);
