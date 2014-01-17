@@ -601,7 +601,6 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     QEventLoop loop;
     connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
     connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
-    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
     loop.exec();
 
     ui->addButton->setEnabled(true);
