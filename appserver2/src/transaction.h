@@ -2,33 +2,18 @@
 #ifndef EC2_TRANSACTION_H
 #define EC2_TRANSACTION_H
 
+#include <QString>
 #include <vector>
-
-
-class Variant
-{
-public:
-    enum Type
-    {
-        //TODO
-    };
-
-    union
-    {
-        qint32 i32;
-        qint64 i64;
-        double d;
-        QString* str;
-    };
-};
+#include "serialization_helper.h"
 
 namespace ec2
 {
-    enum class ActionType
+    struct ApiData;
+
+    enum class ApiCommand
     {
-        add,
-        update,
-        remove
+        addCamera,
+        removeCamera
     };
 
     class QnTransaction
@@ -45,13 +30,54 @@ namespace ec2
         ID id;
 
         bool persistent;
-        ActionType action;
-        EntityType entityType;
-        //todo: static field list or dynamic?
-        std::vector<Variant> actionParams;
+        ApiCommand command;
+        ApiData* params;
     };
+
+
+    struct ApiData {
+        virtual ~ApiData() {}
+    };
+
+    struct ApiResourceData: public ApiData {
+        qint32        id;
+        QString       guid;
+        qint32        typeId;
+        qint32        parentId;
+        QString       name;
+        QString       url;
+        int           status; // enum Status
+        bool         disabled;
+    };
+
+    struct ApiCameraData: public ApiResourceData {
+        bool scheduleDisabled;
+        int motionType;
+    };
+
 }
 
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
+
+void hz()
+{
+    ec2::ApiResourceData h;
+    BinaryStream<QByteArray> z;
+    serialize( h, &z );
+    deserialize( h, &z );
+}
+
+//QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )
+
+/*
+template<class T>
+void serialize( Transaction, BinaryStream<T> );
+
+template<class T>
+void deserialize( BinaryStream<T> , Transaction * );
+
+void serialize( Transaction, QJsonValue * );
+void deserialize( const QJsonValue &, Transaction * );
+*/
 
 #endif  //EC2_TRANSACTION_H
