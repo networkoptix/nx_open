@@ -83,7 +83,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     addArgumentName(UPDATES_ENABLED,       "--updates-enabled");
 
     /* Load from internal resource. */
-    QFile file(QLatin1String(":/skin") + QLatin1String("/globals.json")); // TODO: #Elric
+    QFile file(QLatin1String(":/globals.json"));
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QJsonObject jsonObject;
         if(!QJson::deserialize(file.readAll(), &jsonObject)) {

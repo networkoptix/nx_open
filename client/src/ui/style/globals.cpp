@@ -44,16 +44,6 @@ QnGlobals::QnGlobals(QObject *parent):
      * customization engine to work, but we don't want the write accessors. */
     foreach(int id, variables())
         setWritable(id, true);
-
-    QFile file(QLatin1String(":/skin") + QLatin1String("/globals.json")); // TODO: #Elric
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QJsonObject jsonObject;
-        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
-            qWarning() << "Client settings file could not be parsed!";
-        } else {
-            updateFromJson(jsonObject.value(QLatin1String("style")).toObject());
-        }
-    }
 }
 
 QnGlobals::~QnGlobals() {

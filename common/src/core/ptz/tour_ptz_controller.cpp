@@ -58,6 +58,7 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
 
 QnTourPtzController::~QnTourPtzController() {
     m_executor->deleteLater();
+    // TODO: #Elric this may be a problem, see #2754
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
