@@ -7,13 +7,40 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QGridLayout>
 
 #ifdef Q_OS_MAC
-//#define QN_NO_CUSTOM_DIALOGS
+#define QN_TWO_STEP_DIALOG
+#endif
+
+#ifdef QN_TWO_STEP_DIALOG
+    #include <ui/dialogs/two_step_file_dialog.h>
+    typedef QnTwoStepFileDialog QnSystemBasedCustomDialog;
+
+#else
+    class QnSystemBasedCustomDialog: public QFileDialog {
+    public:
+        explicit QnSystemBasedCustomDialog(QWidget *parent = 0,
+                                           const QString &caption = QString(),
+                                           const QString &directory = QString(),
+                                           const QString &filter = QString()):
+            QFileDialog(parent, caption, directory, filter) {}
+
+        QString selectedFile() const {
+            QStringList files = selectedFiles();
+            if (files.size() < 0)
+                return QString();
+            return files.first();
+        }
+
+        static QFileDialog::Options fileDialogOptions() { return QFileDialog::DontUseNativeDialog; }
+        static QFileDialog::Options directoryDialogOptions() {return QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly; }
+    protected:
+        QGridLayout* customizedLayout() const {return dynamic_cast<QGridLayout*>(layout()); }
+    };
 #endif
 
 
-#ifndef QN_NO_CUSTOM_DIALOGS
 class QnWidgetControlAbstractDelegate: public QObject
 {
     Q_OBJECT
@@ -37,11 +64,12 @@ private:
     QList<QWidget*> m_widgets;
 };
 
-class QnCustomFileDialog : public QFileDialog
+
+class QnCustomFileDialog : public QnSystemBasedCustomDialog
 {
     Q_OBJECT
 
-    typedef QFileDialog base_type;
+    typedef QnSystemBasedCustomDialog base_type;
 
 public:
     explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
@@ -83,6 +111,9 @@ public:
      */
     void addWidget(QWidget *widget, bool newRow = true, QnWidgetControlAbstractDelegate* delegate = NULL);
 
+    /** Returns extension of the selected filter, containing the dot, e.g. ".png". */
+    QString selectedExtension() const;
+
     static QString valueSpacer() {return lit("%value%"); }
 private slots:
     void at_accepted();
@@ -93,6 +124,5 @@ private:
     QMap<QLineEdit*, QString *> m_lineEdits;
     int m_currentCol;
 };
-#endif
 
 #endif // CUSTOM_FILE_DIALOG_H

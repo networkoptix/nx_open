@@ -9,6 +9,8 @@ public:
     static QString searchInPath(QString executable);
 
     static void showInGraphicalShell(QWidget *parent, const QString &path);
+
+    static QString getUniqueFileName(const QString &dirName, const QString &baseName);
 };
 
 

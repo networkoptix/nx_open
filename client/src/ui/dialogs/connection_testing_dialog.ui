@@ -4,10 +4,10 @@
  <widget class="QDialog" name="ConnectionTestingDialog">
   <property name="geometry">
    <rect>
-    <x>818</x>
-    <y>420</y>
+    <x>0</x>
+    <y>0</y>
     <width>328</width>
-    <height>185</height>
+    <height>181</height>
    </rect>
   </property>
   <property name="sizePolicy">

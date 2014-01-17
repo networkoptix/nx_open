@@ -54,6 +54,7 @@ struct QnManualCameraSearchSingleCamera {
         return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(vendor);
     }
 };
+Q_DECLARE_METATYPE(QnManualCameraSearchSingleCamera)
 
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera)
 
