@@ -18,6 +18,7 @@ QnPtzControllerPool::~QnPtzControllerPool() {
 }
 
 QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const {
+    QMutexLocker locker(&m_mutex);
     return m_controllerByResource.value(resource, QnPtzControllerPtr());
 }
 
@@ -25,10 +26,13 @@ void QnPtzControllerPool::setController(const QnResourcePtr &resource, const QnP
     if(controller == this->controller(resource))
         return;
 
-    if(!controller) {
-        m_controllerByResource.remove(resource);
-    } else {
-        m_controllerByResource.insert(resource, controller);
+    {
+        QMutexLocker locker(&m_mutex);
+        if(!controller) {
+            m_controllerByResource.remove(resource);
+        } else {
+            m_controllerByResource.insert(resource, controller);
+        }
     }
 
     emit controllerChanged(resource);
