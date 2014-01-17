@@ -52,15 +52,13 @@
 #ifdef __cplusplus
 #   undef NULL
 #   define NULL nullptr
+#
 #   ifdef __GNUC__
 #       undef __null
 #       define __null nullptr
 #   endif
 #endif
 
-#ifdef __APPLE__
-    #define nullptr 0
-#endif
 
 /* Define foreach */
 //#define foreach BOOST_FOREACH

@@ -600,6 +600,9 @@ int main(int argc, char **argv)
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
+    // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
+    qApp->desktop();
+
     //adding exe dir to plugin search path
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
