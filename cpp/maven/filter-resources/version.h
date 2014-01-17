@@ -21,7 +21,7 @@
 #define QN_APPLICATION_REVISION         "${changeSet}"
 #define QN_APPLICATION_PLATFORM         "${platform}"
 #define QN_APPLICATION_ARCH             "${arch}"
-#define QN_APPLICATION_COMPILER         "${compiler}"
+#define QN_APPLICATION_COMPILER         "${additional.compiler}"
 #define QN_FFMPEG_VERSION               "${ffmpeg.version}"
 #define QN_SIGAR_VERSION                "${sigar.version}"
 #define QN_BOOST_VERSION                "${boost.version}"
