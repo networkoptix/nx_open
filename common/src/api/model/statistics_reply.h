@@ -11,7 +11,7 @@ enum QnStatisticsDeviceType {
     CPU,                /**< CPU load in percents. */
     RAM,                /**< RAM load in percents. */
     HDD,                /**< HDD load in percents. */
-    NETWORK            /**< Network load in percent. */
+    NETWORK             /**< Network load in percent. */
 };
 
 struct QnStatisticsDataItem {

@@ -28,12 +28,15 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_rtpStreamParser( res ),
     m_camManager( camManager ),
     m_liveStreamReader( NULL ),
-    m_mediaEncoder2Ref( NULL )
+    m_mediaEncoder2Ref( NULL ),
+    m_cameraCapabilities( 0 )
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
     Q_ASSERT( m_thirdPartyRes );
 
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
+
+    m_camManager.getCameraCapabilities( &m_cameraCapabilities );
 }
 
 ThirdPartyStreamReader::~ThirdPartyStreamReader()
@@ -254,6 +257,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         if( !isStreamOpened() )
             return QnAbstractMediaDataPtr(0);
     }
+
+    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetaData() )
+        return getMetaData();
 
     QnAbstractMediaDataPtr rez;
     static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;

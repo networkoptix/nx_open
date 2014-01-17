@@ -735,11 +735,10 @@ QString QnServerResourceWidget::calculateTitleText() const {
     QString name = m_resource->getName();
     QString host = QUrl(m_resource->getUrl()).host();
 
-    //QString result =  tr("%1 %2 ").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
     qint64 uptimeMs = m_manager->uptimeMs(m_resource);
     if (uptimeMs > 0) {
         int msInDay = 24 * 3600 * 1000;
-        return tr("%1 %2 (up %n days, %2)", "", uptimeMs / msInDay)
+        return tr("%1 %2 (up %n days, %3)", "", uptimeMs / msInDay)
             .arg(name)
             .arg(host)
             .arg(QTime(0, 0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"))); // TODO: #TR #Elric this hh:mm is bad even in English...

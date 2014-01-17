@@ -1,8 +1,4 @@
-#include <qglobal.h>
-
-#ifdef Q_OS_LINUX
-
-#include "sys_dependent_monitor.h"
+#include "monitor_linux.h"
 
 #include <iostream>
 #include <map>
@@ -29,7 +25,10 @@ static const int MS_PER_SEC = 1000;
 static const int DEFAULT_INTERFACE_SPEED_MBPS = 1000;
 static const size_t MAX_LINE_LENGTH = 512;
 
-class QnSysDependentMonitorPrivate
+// -------------------------------------------------------------------------- //
+// QnLinuxMonitorPrivate
+// -------------------------------------------------------------------------- //
+class QnLinuxMonitorPrivate
 {
 public:
     //!This structure is read from /proc/diskstat
@@ -84,14 +83,14 @@ public:
     static const unsigned int APPROXIMATION_VALUES_NUMBER = 3;
 
 
-    QnSysDependentMonitorPrivate()
+    QnLinuxMonitorPrivate()
     :
         lastPartitionsUpdateTime(0)
     {
         memset(&lastDiskUsageUpdateTime, 0, sizeof(lastDiskUsageUpdateTime));
     }
 
-    virtual ~QnSysDependentMonitorPrivate()
+    virtual ~QnLinuxMonitorPrivate()
     {
     }
 
@@ -356,31 +355,25 @@ private:
     struct timespec lastDiskUsageUpdateTime;
 
 private:
-    Q_DECLARE_PUBLIC(QnSysDependentMonitor);
-    QnSysDependentMonitor *q_ptr;
+    Q_DECLARE_PUBLIC(QnLinuxMonitor);
+    QnLinuxMonitor *q_ptr;
 };
 
-QnSysDependentMonitor::QnSysDependentMonitor(QObject *parent):
+// -------------------------------------------------------------------------- //
+// QnLinuxMonitor
+// -------------------------------------------------------------------------- //
+QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
     base_type(parent),
-    d_ptr(new QnSysDependentMonitorPrivate())
+    d_ptr(new QnLinuxMonitorPrivate())
 {
     d_ptr->q_ptr = this;
 }
 
-QnSysDependentMonitor::~QnSysDependentMonitor() {
+QnLinuxMonitor::~QnLinuxMonitor() {
     return;
 }
 
-QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
-    return d_func()->totalHddLoad();
-}
-
-QList<QnPlatformMonitor::NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
-{
-    return d_func()->totalNetworkLoad();
-}
-
-QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSpaceInfo()
+QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
     QList<QnPlatformMonitor::PartitionSpace> partitions = base_type::totalPartitionSpaceInfo();
     //filtering driectories, mounted to the same device
@@ -432,5 +425,3 @@ QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSp
     }
     return partitions;
 }
-
-#endif
