@@ -222,7 +222,7 @@ public:
     }
 
 private:
-    const QnSysDependentMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
+    const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
     
 private:
     /** Handle to PHD dll. Used to query error messages via <tt>FormatMessage</tt>. */
