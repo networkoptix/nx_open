@@ -13,7 +13,7 @@
 
 QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnSayTextBusinessActionWidget)
+    ui(new Ui::SayTextBusinessActionWidget)
 {
     ui->setupUi(this);
 

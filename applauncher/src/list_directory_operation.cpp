@@ -24,7 +24,7 @@ namespace detail
 
         \code {*.xml}
         <?xml version="1.0" encoding="UTF-8"?>
-        <contents validation="md5">
+        <contents totalSize="123456" validation="md5">
             <directory>client</directory>
             <directory>mediaserver</directory>
             <directory>appserver</directory>
@@ -41,9 +41,9 @@ namespace detail
 
         ContentsXmlSaxHandler( std::list<detail::RDirEntry>* const entries )
         :
+            totalSize( -1 ),
             m_readingContents( false ),
-            m_entries( entries ),
-            totalSize( -1 )
+            m_entries( entries )
         {
         }
 
@@ -196,7 +196,7 @@ namespace detail
     {
         //starting download
         m_downloadUrl = baseUrl;
-        m_downloadUrl.setPath( baseUrl.path() + entryPath + "/" + CONTENTS_FILE_NAME );
+        m_downloadUrl.setPath( baseUrl.path() + (baseUrl.path().endsWith('/') ? "" : "/") + entryPath + "/" + CONTENTS_FILE_NAME );
         if( !m_httpClient->doGet( m_downloadUrl ) )
         {
             m_httpClient->terminate();

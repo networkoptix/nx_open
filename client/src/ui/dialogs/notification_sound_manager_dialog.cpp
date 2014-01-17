@@ -6,6 +6,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
+#include <client/client_settings.h>
+
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
@@ -56,28 +58,26 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
     //TODO: #GDM progressbar required
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file...")));
-    dialog->setFileMode(QFileDialog::ExistingFile);
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
-    dialog->setNameFilter(supportedFormats);
+
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;
     QString title;
 
-    dialog->addSpinBox(tr("Clip sound up to %n seconds"), 1, 10, &cropSoundSecs); // TODO: #GDM using %n is confusing for translators as he would expect multiple (singular/plural) translations to be generated.
-    dialog->addLineEdit(tr("Custom Title"), &title);
+    dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
+    dialog->addLineEdit(tr("Custom Title:"), &title);
     if(!dialog->exec())
         return;
 
-    QStringList files = dialog->selectedFiles();
-    if (files.size() < 0)
+    QString fileName = dialog->selectedFile();
+    if (fileName.isEmpty())
         return;
 
-    QString filename = files[0];
-
-    if (!context()->instance<QnAppServerNotificationCache>()->storeSound(filename, cropSoundSecs*1000, title))
+    if (!context()->instance<QnAppServerNotificationCache>()->storeSound(fileName, cropSoundSecs*1000, title))
         QMessageBox::warning(this,
                              tr("Error"),
                              tr("File cannot be added."));
@@ -105,7 +105,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
         QMessageBox::warning(this,
                              tr("Error"),
-                             tr("New title could not be set"));
+                             tr("New title could not be set."));
 
 }
 
@@ -122,7 +122,7 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
     QString title = soundModel->titleByFilename(filename);
     if (QMessageBox::question(this,
                               tr("Confirm file deletion"),
-                              tr("Are you sure you want to delete\n%1").arg(title),
+                              tr("Are you sure you want to delete '%1'?").arg(title),
                               QMessageBox::Ok,
                               QMessageBox::Cancel) == QMessageBox::Cancel)
         return;

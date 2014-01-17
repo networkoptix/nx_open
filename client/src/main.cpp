@@ -290,8 +290,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath;
-        QString customizationPath = lit(":/skin");
-    bool devBackgroundEditable = false;
+    QString customizationPath = lit(":/skin");
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
@@ -303,13 +302,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+#ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+#endif
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
-    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+#endif
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
@@ -597,6 +599,9 @@ int main(int argc, char **argv)
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
+
+    // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
+    qApp->desktop();
 
     //adding exe dir to plugin search path
     QStringList pluginDirs = QCoreApplication::libraryPaths();

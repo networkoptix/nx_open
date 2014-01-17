@@ -9,6 +9,8 @@
 #include "client/client_settings.h"
 #include "ui/dialogs/custom_file_dialog.h"
 
+#include <utils/common/string.h>
+
 QnGridWidgetHelper::QnGridWidgetHelper(QnWorkbenchContext *context):
     QnWorkbenchContextAware(context)
 {
@@ -23,34 +25,25 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
     QString fileName;
     while (true) 
     {
-
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
-            caption,
-            previousDir,
-            QObject::tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")
-        ));
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-            return;
-
-        fileName = dialog->selectedFiles().value(0);
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
+        QString selectedFilter;
+        fileName = QFileDialog::getSaveFileName(mainWindow(),
+                                                caption,
+                                                previousDir,
+                                                tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)"),
+                                                &selectedFilter,
+                                                QnCustomFileDialog::fileDialogOptions());
         if (fileName.isEmpty())
             return;
 
+        QString selectedExtension = extractFileExtension(selectedFilter);
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
-                    QObject::tr("Save As"),
-                    QObject::tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                    tr("Save As"),
+                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
                     );
 
@@ -62,8 +55,8 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 mainWindow(),
-                QObject::tr("Could not overwrite file"),
-                QObject::tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                tr("Could not overwrite file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
                 );
             continue;

@@ -128,7 +128,7 @@ void QnCameraListDialog::at_selectAllAction()
 
 void QnCameraListDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, QObject::tr("Export selected cameras to file"));
+    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, tr("Export selected cameras to file"));
 }
 
 void QnCameraListDialog::at_copyToClipboard()

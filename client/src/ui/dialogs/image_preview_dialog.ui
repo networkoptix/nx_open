@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnImagePreviewDialog</class>
- <widget class="QDialog" name="QnImagePreviewDialog">
+ <class>ImagePreviewDialog</class>
+ <widget class="QDialog" name="ImagePreviewDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -28,7 +28,7 @@
         <x>0</x>
         <y>0</y>
         <width>568</width>
-        <height>470</height>
+        <height>474</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -69,7 +69,7 @@
            <item>
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>Image loading can take a lot of time. Please be patient.</string>
+              <string>Loading image... Please wait.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
@@ -130,7 +130,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>QnImagePreviewDialog</receiver>
+   <receiver>ImagePreviewDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -146,7 +146,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>QnImagePreviewDialog</receiver>
+   <receiver>ImagePreviewDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

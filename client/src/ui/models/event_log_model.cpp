@@ -49,7 +49,7 @@ public:
         // action types to lex order
         QMap<QString, int> actions;
         for (int i = 0; i < 256; ++i) {
-            actions.insert(BusinessActionType::toString(BusinessActionType::Value(i)), i);
+            actions.insert(QnBusinessStringsHelper::actionName(BusinessActionType::Value(i)), i);
             m_actionTypeToLexOrder[i] = 255; // put undefined actions to the end of the list
         }
         cnt = 0;
@@ -426,7 +426,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     case EventCameraColumn:
         return getResourceNameString(action.getRuntimeParams().getEventResourceId());
     case ActionColumn:
-        return BusinessActionType::toString(action.actionType());
+        return QnBusinessStringsHelper::actionName(action.actionType());
     case ActionCameraColumn: {
         BusinessActionType::Value actionType = action.actionType();
         if (actionType == BusinessActionType::SendMail)

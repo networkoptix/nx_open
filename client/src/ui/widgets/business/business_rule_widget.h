@@ -13,7 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnBusinessRuleWidget;
+    class BusinessRuleWidget;
 }
 
 class QStateMachine;
@@ -57,7 +57,7 @@ private slots:
 
     void updateModelAggregationPeriod();
 private:
-    QScopedPointer<Ui::QnBusinessRuleWidget> ui;
+    QScopedPointer<Ui::BusinessRuleWidget> ui;
 
     QnBusinessRuleViewModel* m_model;
 

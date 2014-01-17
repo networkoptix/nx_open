@@ -248,6 +248,8 @@ namespace applauncher
             {
                 if( str == "ok" )
                     return ok;
+                else if( str == "connectError" )
+                    return connectError;
                 else if( str == "versionNotInstalled" )
                     return versionNotInstalled;
                 else if( str == "alreadyInstalled" )
@@ -268,6 +270,8 @@ namespace applauncher
                 {
                     case ok:
                         return "ok";
+                    case connectError:
+                        return "connectError";
                     case versionNotInstalled:
                         return "versionNotInstalled";
                     case alreadyInstalled:

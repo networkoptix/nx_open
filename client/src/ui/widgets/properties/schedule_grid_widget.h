@@ -5,32 +5,31 @@
 #include <QtWidgets/QWidget>
 #include <core/misc/schedule_recording_type.h>
 
+//TODO: #Elric omg look at these global constants =)
 static const int SEL_CELL_CLR_DELTA = 40;
-static const int TEXT_SPACING = 4;
 static const int COL_COUNT = 24;
 static const int ROW_COUNT = 7;
 
 
-class QnScheduleGridWidget : public QWidget
-{
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+class QnScheduleGridWidget : public QWidget {
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
 public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
     virtual ~QnScheduleGridWidget();
 
     enum ParamType {
-        FirstParam,
-        SecondParam,
+        FpsParam,
+        QualityParam,
         RecordTypeParam,
         DiffersFlagParam,
         ParamType_Count 
     };
 
     void setDefaultParam(ParamType number, const QVariant& value);
-    void setShowFirstParam(bool value);
-    void setShowSecondParam(bool value);
+    void setShowFps(bool value);
+    void setShowQuality(bool value);
 
     inline int rowCount() const { return ROW_COUNT; }
     inline int columnCount() const { return COL_COUNT; }
@@ -42,7 +41,7 @@ public:
     Qn::RecordingType cellRecordingType(const QPoint &cell) const;
     void setCellRecordingType(const QPoint &cell, const Qn::RecordingType &value);
 
-    virtual QSize minimumSizeHint() const;
+    virtual QSize minimumSizeHint() const override;
 
     void setEnabled(bool val);
     bool isEnabled() const;
@@ -84,8 +83,8 @@ private:
 private:
     CellParams m_defaultParams;
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
-    bool m_showFirstParam;
-    bool m_showSecondParam;
+    bool m_showFps;
+    bool m_showQuality;
     QString m_cornerText;
     QStringList m_weekDays;
     QVector<QSize> m_weekDaysSize;

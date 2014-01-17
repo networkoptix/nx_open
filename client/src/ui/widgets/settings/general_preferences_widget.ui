@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnGeneralPreferencesWidget</class>
- <widget class="QWidget" name="QnGeneralPreferencesWidget">
+ <class>GeneralPreferencesWidget</class>
+ <widget class="QWidget" name="GeneralPreferencesWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -152,7 +152,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="tourCycleTimeLabel">
         <property name="text">
-         <string>Sequence Cycle Time:</string>
+         <string>Tour sequence cycle time:</string>
         </property>
         <property name="buddy">
          <cstring>tourCycleTimeSpinBox</cstring>
@@ -162,7 +162,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="showIpInTreeLabel">
         <property name="text">
-         <string>Show IP in Tree:</string>
+         <string>Show IP in tree:</string>
         </property>
         <property name="buddy">
          <cstring>showIpInTreeCheckBox</cstring>
@@ -179,7 +179,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Timeline Mode:</string>
+         <string>Timeline mode:</string>
         </property>
        </widget>
       </item>
@@ -278,7 +278,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Downmix Audio from 5.1 to 2.1:</string>
+           <string>Downmix audio from 5.1 to 2.1:</string>
           </property>
          </widget>
         </item>
@@ -310,64 +310,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QWidget" name="hardwareAccelerationWidget" native="true">
-        <layout class="QHBoxLayout" name="hardwareDecodingControlsLayout">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="hardwareDecodingLabel">
-           <property name="minimumSize">
-            <size>
-             <width>210</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Use Hardware Acceleration:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="hardwareDecodingCheckBox">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="hwAccelerationWarningLabel">
-           <property name="text">
-            <string>Experimental. May result in glitches.</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="pauseOnInactivityLayout">
@@ -468,7 +410,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Run Application when PC Boots up:</string>
+           <string>Run application when PC boots up:</string>
           </property>
          </widget>
         </item>

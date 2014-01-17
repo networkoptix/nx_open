@@ -124,7 +124,7 @@ public:
 
 QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::QnLayoutSettingsDialog),
+    ui(new Ui::LayoutSettingsDialog),
     d_ptr(new QnLayoutSettingsDialogPrivate()),
     m_cache(NULL),
     m_isUpdating(false)
@@ -487,10 +487,6 @@ void QnLayoutSettingsDialog::viewFile() {
 void QnLayoutSettingsDialog::selectFile() {
     Q_D(QnLayoutSettingsDialog);
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open file")));
-    dialog->setFileMode(QFileDialog::ExistingFile);
-    dialog->setDirectory(qnSettings->backgroundsFolder());
-
     QString nameFilter;
     foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
         if (!nameFilter.isEmpty())
@@ -498,18 +494,21 @@ void QnLayoutSettingsDialog::selectFile() {
         nameFilter += QLatin1String("*.") + QLatin1String(format);
     }
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
-    dialog->setNameFilter(tr("Pictures %1").arg(nameFilter));
 
-    if(!dialog->exec())
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                 tr("Open file"),
+                                 qnSettings->backgroundsFolder(),
+                                 tr("Pictures %1").arg(nameFilter),
+                                 0,
+                                 QnCustomFileDialog::fileDialogOptions());
+
+    if (fileName.isEmpty())
         return;
 
-    QStringList files = dialog->selectedFiles();
-    if (files.size() < 0)
-        return;
-    qnSettings->setBackgroundsFolder(dialog->directory().absolutePath());
+    qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
 
     d->clear();
-    d->imageSourcePath = files[0];
+    d->imageSourcePath = fileName;
     d->imageFilename = QString();
     d->state = NewImageSelected;
 

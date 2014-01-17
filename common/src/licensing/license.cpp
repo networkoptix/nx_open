@@ -18,7 +18,10 @@
 #include <utils/common/product_features.h>
 
 namespace {
-    const char *networkOptixRSAPublicKey = QN_RSA_PUBLIC_KEY;
+    const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
+        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n"
+        "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
+        "-----END PUBLIC KEY-----";
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {

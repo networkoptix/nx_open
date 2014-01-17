@@ -785,12 +785,9 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_connectionOpened()
 {
-    if (m_firstRunningTime) {
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
-            m_firstRunningTime*1000,
-            QnBusiness::MServerIssueStarted);
-        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
-    }
+    if (m_firstRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
+    qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
     m_firstRunningTime = 0;
 }
 
@@ -978,7 +975,7 @@ void QnMain::run()
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
-    QnServerPtzControllerPool ptzPool;
+    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
@@ -1328,12 +1325,14 @@ void QnMain::run()
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+    QnStorageManager::instance()->stopAsyncTasks();
+
+    ptzPool.reset();
+
 #ifdef ENABLE_ONVIF
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
 #endif //ENABLE_ONVIF
-
-    QnStorageManager::instance()->stopAsyncTasks();
 
     av_lockmgr_register(NULL);
 

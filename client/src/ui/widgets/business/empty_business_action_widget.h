@@ -6,7 +6,7 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-class QnEmptyBusinessActionWidget;
+    class EmptyBusinessActionWidget;
 }
 
 class QnEmptyBusinessActionWidget : public QnAbstractBusinessParamsWidget
@@ -18,7 +18,7 @@ public:
     explicit QnEmptyBusinessActionWidget(QWidget *parent = 0);
     ~QnEmptyBusinessActionWidget();
 private:
-    QScopedPointer<Ui::QnEmptyBusinessActionWidget> ui;
+    QScopedPointer<Ui::EmptyBusinessActionWidget> ui;
 };
 
 #endif // EMPTY_BUSINESS_ACTION_WIDGET_H

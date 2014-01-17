@@ -20,7 +20,7 @@
    <item>
     <widget class="QCheckBox" name="enableAdjustment">
      <property name="text">
-      <string>Enable enhancement</string>
+      <string>Enable image enhancement</string>
      </property>
     </widget>
    </item>

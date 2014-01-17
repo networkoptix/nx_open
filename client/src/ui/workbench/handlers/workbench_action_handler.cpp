@@ -504,6 +504,9 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (hasDbChanges) {
         connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        foreach(const QnResourcePtr &camera, cameras) {
+            connection()->saveAsync(camera->getId(), camera->getProperties());
+        }
     }
 
     if (hasCameraChanges) {
@@ -1041,9 +1044,6 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered()
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
-    dialog->setFileMode(QFileDialog::ExistingFiles);
-    
     QStringList filters;
     //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
@@ -1051,33 +1051,43 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
-    dialog->setNameFilters(filters);
 
-    if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
+    QStringList files = QFileDialog::getOpenFileNames(mainWindow(),
+                                                      tr("Open file"),
+                                                      QString(),
+                                                      filters.join(lit(";;")),
+                                                      0,
+                                                      QnCustomFileDialog::fileDialogOptions());
+
+    if (!files.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(files));
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
-    dialog->setFileMode(QFileDialog::ExistingFiles);
-
     QStringList filters;
     filters << tr("All Supported (*.layout)");
     filters << tr("Layouts (*.layout)");
     filters << tr("All files (*.*)");
-    dialog->setNameFilters(filters);
 
-    if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()).filtered<QnLayoutResource>());
+    QString fileName = QFileDialog::getOpenFileName(mainWindow(),
+                                                    tr("Open file"),
+                                                    QString(),
+                                                    filters.join(lit(";;")),
+                                                    0,
+                                                    QnCustomFileDialog::fileDialogOptions());
+
+    if(!fileName.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
-    dialog->setFileMode(QFileDialog::Directory);
-    dialog->setOption(QFileDialog::ShowDirsOnly);
+    QString dirName = QFileDialog::getExistingDirectory(mainWindow(),
+                                                        tr("Select folder..."),
+                                                        QString(),
+                                                        QnCustomFileDialog::directoryDialogOptions());
 
-    if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
+    if(!dirName.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dirName));
 }
 
 void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
@@ -1844,6 +1854,11 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if (!resource)
         return;
+
+//    QnConnectionTestingDialog dialog;
+//    dialog.testResource(QUrl::fromUserInput(resource->getUrl()));
+//    dialog.exec();
+
 
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();

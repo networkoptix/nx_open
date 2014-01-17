@@ -91,23 +91,40 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_licenses.isEmpty()) {
         QnLicenseUsageHelper helper;
 
+        // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
+
         if (!helper.isValid()) {
             useRedLabel = true;
-            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "Required at least %3 digital and %4 analog licenses."))
-                                   .arg(helper.totalDigital())
-                                   .arg(helper.totalAnalog())
-                                   .arg(helper.requiredDigital())
-                                   .arg(helper.requiredAnalog()));
-
+            if (helper.totalAnalog() > 0) {
+                ui->infoLabel->setText(
+                    tr("The software is licensed to %1 cameras and %2 analog cameras.\nAt least %3 licenses are required.")
+                        .arg(helper.totalDigital())
+                        .arg(helper.totalAnalog())
+                        .arg(helper.required())
+                );
+            } else {
+                ui->infoLabel->setText(
+                    tr("The software is licensed to %1 cameras.\nAt least %3 licenses are required.")
+                        .arg(helper.totalDigital())
+                        .arg(helper.required())
+                );
+            }
         } else {
-            ui->infoLabel->setText(QString(tr("The software is licensed to %1 digital and %2 analog cameras.\n"\
-                                              "%3 digital and %4 analog licenses are currently in use."))
-                                   .arg(helper.totalDigital())
-                                   .arg(helper.totalAnalog())
-                                   .arg(helper.usedDigital())
-                                   .arg(helper.usedAnalog()));
-
+            if (helper.totalAnalog() > 0) {
+                ui->infoLabel->setText(
+                    tr("The software is licensed to %1 cameras and %2 analog cameras.\n%3 licenses and %4 analog licenses are currently in use.")
+                        .arg(helper.totalDigital())
+                        .arg(helper.totalAnalog())
+                        .arg(helper.usedDigital())
+                        .arg(helper.usedAnalog())
+                );
+            } else {
+                ui->infoLabel->setText(
+                    tr("The software is licensed to %1 cameras.\n%2 licenses are currently in use.")
+                        .arg(helper.totalDigital())
+                        .arg(helper.usedDigital())
+                );
+            }
         }
     } else {
         if (qnLicensePool->currentHardwareId().isEmpty()) {
@@ -194,7 +211,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     if (!keyLicense) {
         /* QNetworkReply slots should not start event loop. */
         emit showMessageLater(tr("License Activation"),
-                              tr("Invalid License. Contact our support team to get a valid License."),
+                              tr("Invalid License. Please contact our support team to get a valid license."),
                               true);
     } else if (licenseListHelper.getLicenseByKey(licenseKey)) {
         emit showMessageLater(tr("License Activation"),
@@ -264,7 +281,7 @@ void QnLicenseManagerWidget::at_downloadError() {
 
         /* QNetworkReply slots should not start eventLoop */
         emit showMessageLater(tr("License Activation"),
-                              tr("Network error has occurred during the Automatic License Activation.\nTry to activate your License manually."),
+                              tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
                               true);
 
         ui->licenseWidget->setOnline(false);
@@ -294,7 +311,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             } else if(messageId == lit("InvalidKey")) {
                 message = tr("The license key is invalid.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate {{brand}} license on %1. This is not allowed.").arg(QLatin1String(QN_PRODUCT_NAME_LONG));
+                message = tr("There was a problem activating your license. You are trying to activate an incompatible license with your software.");
             } else if(messageId == lit("AlreadyActivated")) {
                 message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
             }

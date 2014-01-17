@@ -7,7 +7,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnPlaySoundBusinessActionWidget;
+    class PlaySoundBusinessActionWidget;
 }
 
 class QnPlaySoundBusinessActionWidget : public QnAbstractBusinessParamsWidget, public QnWorkbenchContextAware
@@ -34,7 +34,7 @@ private slots:
     void at_soundModel_itemChanged(const QString &filename);
     void at_volumeSlider_valueChanged(int value);
 private:
-    QScopedPointer<Ui::QnPlaySoundBusinessActionWidget> ui;
+    QScopedPointer<Ui::PlaySoundBusinessActionWidget> ui;
 
     QString m_filename;
 };

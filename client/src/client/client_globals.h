@@ -165,7 +165,6 @@ namespace Qn {
         NoDataOverlay,
         UnauthorizedOverlay,
         OfflineOverlay,
-        AnalogWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount
@@ -218,6 +217,13 @@ namespace Qn {
         LayoutLocalSaveAs,
         LayoutExport
     };
+
+
+    /**
+     * Custom resource properties names.
+     */
+    const QString customAspectRatioKey = lit("overrideAr");
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
