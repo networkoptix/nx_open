@@ -117,7 +117,6 @@ void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
 
 void QnFisheyeCalibrationWidget::at_image_animationFinished() {
     ui->autoButton->setEnabled(true);
-    //TODO: #Elric review these text pls.
     switch (m_lastError) {
     case QnFisheyeCalibrator::ErrorNotFisheyeImage:
         QMessageBox::warning(this, tr("Error"), tr("Autodetection failed. Image is not round."));

@@ -20,7 +20,7 @@ public:
     void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) override;
     void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) override;
     void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) override;
-    void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
+    void deserializeConnectInfo(QnConnectionInfoPtr& connectInfo, const QByteArray& data) override;
     void deserializeBusinessRules(QnBusinessEventRuleList& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
     void deserializeBusinessActionVector(QnBusinessActionDataListPtr &businessActionList, const QByteArray& data) override;

@@ -88,7 +88,6 @@
 #include <rest/handlers/exec_action_handler.h>
 #include <rest/handlers/ext_bevent_handler.h>
 #include <rest/handlers/favico_handler.h>
-#include <rest/handlers/file_system_handler.h>
 #include <rest/handlers/image_handler.h>
 #include <rest/handlers/log_handler.h>
 #include <rest/handlers/manual_camera_addition_handler.h>
@@ -98,6 +97,7 @@
 #include <rest/handlers/recorded_chunks_handler.h>
 #include <rest/handlers/statistics_handler.h>
 #include <rest/handlers/storage_space_handler.h>
+#include <rest/handlers/storage_status_handler.h>
 #include <rest/handlers/time_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
@@ -829,7 +829,7 @@ void QnMain::initTcpListener()
     Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnFileSystemHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
     QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
@@ -982,7 +982,7 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
 
-    QnConnectInfoPtr connectInfo(new QnConnectInfo());
+    QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
     {
         if (appServerConnection->connect(connectInfo) == 0)

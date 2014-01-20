@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include "core/resource/resource.h"
-#include "core/resource_managment/resource_criterion.h"
+#include "core/resource_management/resource_criterion.h"
 #include "core/resource/network_resource.h"
 
 class QnResource;
@@ -32,7 +32,7 @@ class QN_EXPORT QnResourcePool : public QObject
 public:
     enum Filter
     {
-        /** Do not check resources owned by another entites. */
+        /** Do not check resources owned by another entities. */
         OnlyFriends,
         /** Check all resources. */
         AllResources

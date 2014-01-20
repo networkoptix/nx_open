@@ -52,7 +52,7 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
 
     setHelpTopic(this, Qn::Login_Help);
 
-    QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectInfoPtr, int)));
+    QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
 
     m_timeoutTimer->start();
 }
@@ -106,7 +106,7 @@ void QnConnectionTestingDialog::tick() {
     updateUi(false, tr("Request timed out."));
 }
 
-void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectInfoPtr connectInfo, int requestHandle) {
+void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
     Q_UNUSED(requestHandle)
 
     if (!m_timeoutTimer->isActive())
@@ -114,7 +114,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectInfo
     m_timeoutTimer->stop();
     ui->progressBar->setValue(ui->progressBar->maximum());
 
-    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
@@ -128,8 +128,8 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectInfo
     QString detail;
     int helpTopicId = -1;
 
-    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
-            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
+            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
 
     if (status == 202) {
         success = false;
@@ -145,16 +145,16 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectInfo
         success = false;
         detail = tr("You are trying to connect to incompatible Enterprise Controller.");
         helpTopicId = Qn::Login_Help;
-    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
         QnSoftwareVersion minSupportedVersion("1.4");
 
-        if (connectInfo->version < minSupportedVersion) {
+        if (connectionInfo->version < minSupportedVersion) {
             detail = tr("Enterprise Controller has a different version:\n"\
                         " - Client version: %1.\n"\
                         " - EC version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version.toString())
+                    .arg(connectionInfo->version.toString())
                     .arg(minSupportedVersion.toString());
             success = false;
             helpTopicId = Qn::VersionMismatch_Help;
@@ -164,7 +164,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectInfo
                         " - EC version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version.toString());
+                    .arg(connectionInfo->version.toString());
             helpTopicId = Qn::VersionMismatch_Help;
         }
     }

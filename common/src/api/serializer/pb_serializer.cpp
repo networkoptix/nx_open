@@ -762,7 +762,7 @@ void QnApiPbSerializer::deserializeSettings(QnKvPairList& kvPairs, const QByteAr
     parseSettings(kvPairs, pb_settings.setting());
 }
 
-void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data)
+void QnApiPbSerializer::deserializeConnectInfo(QnConnectionInfoPtr& connectInfo, const QByteArray& data)
 {
     pb::ConnectInfo pb_connectInfo;
 

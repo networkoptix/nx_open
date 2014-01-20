@@ -1356,7 +1356,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connectionData.isValid())
         return;
 
-    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectionInfoRole);
+    QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
 
@@ -1365,7 +1365,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         if(result.exec() != 0)
             return;
 
-        connectionInfo = result.reply<QnConnectInfoPtr>();
+        connectionInfo = result.reply<QnConnectionInfoPtr>();
     }
 
     // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM

@@ -37,7 +37,7 @@
 
 #include "connection_testing_dialog.h"
 
-#include "connectinfo.h"
+#include <api/model/connection_info.h>
 #include "compatibility_version_installation_dialog.h"
 #include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
@@ -158,7 +158,7 @@ QString QnLoginDialog::currentName() const {
     return ui->connectionsComboBox->currentText();
 }
 
-QnConnectInfoPtr QnLoginDialog::currentInfo() const {
+QnConnectionInfoPtr QnLoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
@@ -174,7 +174,7 @@ void QnLoginDialog::accept() {
     }
 
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectInfoPtr, int)));
+    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectionInfoPtr, int)));
 
     updateUsability();
 }
@@ -317,15 +317,15 @@ void QnLoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo, int requestHandle) {
+void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
         return;
     m_requestHandle = -1;
 
     updateUsability();
 
-    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
-            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
+            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
     bool success = (status == 0) && compatibleProduct;
 
     QString detail;
@@ -351,7 +351,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         return;
     }
 
-    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
@@ -361,11 +361,11 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
         QnSoftwareVersion minSupportedVersion("1.4"); 
 
         m_restartPending = true;
-        if (connectInfo->version < minSupportedVersion) {
+        if (connectionInfo->version < minSupportedVersion) {
             QnMessageBox::warning(
                 this,
                 Qn::VersionMismatch_Help,
@@ -374,7 +374,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "Compatibility mode for versions lower than %3 is not supported."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()).arg(minSupportedVersion.toString()),
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
                 QMessageBox::Ok
             );
             m_restartPending = false;
@@ -384,7 +384,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
             for( ;; )
             {
                 bool isInstalled = false;
-                if( applauncher::isVersionInstalled(connectInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
+                if( applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
                 {
                     QnMessageBox::warning(
                         this,
@@ -394,7 +394,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "An error has occurred while trying to restart in compatibility mode."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                         QMessageBox::Ok
                     );
                     m_restartPending = false;
@@ -408,12 +408,12 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "Would you like to restart in compatibility mode?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
                         QMessageBox::Cancel
                     );
                     if(button == QMessageBox::Ok) {
-                        switch( applauncher::restartClient(connectInfo->version, currentUrl().toEncoded()) )
+                        switch( applauncher::restartClient(connectionInfo->version, currentUrl().toEncoded()) )
                         {
                             case applauncher::api::ResultType::ok:
                                 break;
@@ -436,7 +436,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                                     tr("Failure"),
                                     tr("Failed to launch compatiblity version %1\n"
                                        "Try to restore version %1?").
-                                       arg(connectInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                                       arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
                                     QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                                     QMessageBox::Cancel
                                 );
@@ -444,7 +444,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                                     //starting installation
                                     if( !m_installationDialog.get() )
                                         m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                                    m_installationDialog->setVersionToInstall( connectInfo->version );
+                                    m_installationDialog->setVersionToInstall( connectionInfo->version );
                                     m_installationDialog->exec();
                                     if( m_installationDialog->installationSucceeded() )
                                         continue;   //offering to start newly-installed compatibility version
@@ -466,7 +466,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                             " - EC version: %2.\n"
                             "Client version %3 is required to connect to this Enterprise Controller.\n"
                             "Download version %3?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()).arg(connectInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                         QMessageBox::Cancel
                     );
@@ -474,7 +474,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         //starting installation
                         if( !m_installationDialog.get() )
                             m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                        m_installationDialog->setVersionToInstall( connectInfo->version );
+                        m_installationDialog->setVersionToInstall( connectionInfo->version );
                         m_installationDialog->exec();
                         if( m_installationDialog->installationSucceeded() )
                             continue;   //offering to start newly-installed compatibility version
@@ -491,7 +491,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         }
     }
 
-    m_connectInfo = connectInfo;
+    m_connectInfo = connectionInfo;
     base_type::accept();
 }
 
