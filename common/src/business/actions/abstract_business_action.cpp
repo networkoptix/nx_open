@@ -3,7 +3,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <business/business_strings_helper.h>
 

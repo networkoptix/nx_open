@@ -7,7 +7,7 @@
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>

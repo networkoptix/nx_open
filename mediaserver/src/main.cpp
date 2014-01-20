@@ -35,10 +35,10 @@
 #include <common/global_settings.h>
 
 #include <core/misc/schedule_task.h>
-#include <core/resource_managment/camera_driver_restriction_list.h>
-#include <core/resource_managment/mserver_resource_discovery_manager.h>
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 

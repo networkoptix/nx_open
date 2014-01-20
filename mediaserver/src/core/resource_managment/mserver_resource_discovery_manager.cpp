@@ -12,8 +12,8 @@
 #include "core/resource/network_resource.h"
 #include "core/resource/abstract_storage_resource.h"
 #include "core/resource/storage_resource.h"
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource_management/resource_searcher.h"
 
 #include "plugins/storage/dts/abstract_dts_searcher.h"
 

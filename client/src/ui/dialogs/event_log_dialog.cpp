@@ -9,7 +9,7 @@
 #include <utils/common/event_processors.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <business/events/abstract_business_event.h>
 #include <business/business_strings_helper.h>

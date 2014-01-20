@@ -4,8 +4,7 @@
 
 #include <api/app_server_connection.h>
 
-// TODO: #Elric managment? rename to managEment
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <core/resource/camera_resource.h>
 
 #include <core/ptz/mapped_ptz_controller.h>

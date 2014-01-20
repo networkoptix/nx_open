@@ -6,7 +6,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 
 QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),

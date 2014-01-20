@@ -7,7 +7,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/warning_style.h>

@@ -5,7 +5,7 @@
 
 #include <api/media_server_statistics_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>

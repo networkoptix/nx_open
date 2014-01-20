@@ -4,7 +4,7 @@
 
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "recorder/storage_manager.h"

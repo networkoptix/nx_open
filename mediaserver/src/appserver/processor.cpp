@@ -3,8 +3,8 @@
 #include <QtCore/QThread>
 
 #include <core/resource/camera_resource.h>
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource_management/resource_discovery_manager.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)

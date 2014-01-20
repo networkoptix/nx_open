@@ -2,7 +2,7 @@
 #define onvif_device_server_h_2054
 
 #include "core/resource/network_resource.h"
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 
 bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 

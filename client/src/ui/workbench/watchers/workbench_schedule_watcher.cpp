@@ -1,6 +1,6 @@
 #include "workbench_schedule_watcher.h"
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 
 QnWorkbenchScheduleWatcher::QnWorkbenchScheduleWatcher(QObject *parent):

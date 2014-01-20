@@ -5,7 +5,7 @@
 
 #include "camera_diagnose_tool.h"
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/network/http/httptypes.h>
