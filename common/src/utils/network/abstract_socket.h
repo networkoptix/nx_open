@@ -6,23 +6,27 @@
 #ifndef ABSTRACT_SOCKET_H
 #define ABSTRACT_SOCKET_H
 
-#ifdef _WIN32
-#   include <winsock2.h>
-#endif
+#include <cstdint> /* For std::uintptr_t. */
 
 #include <QByteArray>
 
+#include <utils/common/byte_array.h>
+
 #include "nettools.h"
 #include "socket_common.h"
-#include "../common/byte_array.h"
-
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class AbstractSocket
 {
 public:
-#ifdef _WIN32
-    typedef SOCKET SOCKET_HANDLE;
+#ifdef Q_OS_WIN
+    /* Note: this actually is the following define:
+     * 
+     * typedef SOCKET SOCKET_HANDLE 
+     * 
+     * But we don't want to include windows headers here.
+     * Equivalence of these typedefs is checked via static_assert in system_socket.cpp. */
+    typedef std::uintptr_t SOCKET_HANDLE;
 #else
     typedef int SOCKET_HANDLE;
 #endif
