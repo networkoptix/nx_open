@@ -1,9 +1,10 @@
-
 #include "system_socket.h"
+
+#include <boost/type_traits/is_same.hpp>
 
 #include <utils/common/warnings.h>
 #include <utils/common/stdext.h>
-#include "utils/network/ssl_socket.h"
+#include <utils/network/ssl_socket.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -13,7 +14,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include "system_socket_impl.h"
-#include "../common/systemerror.h"
+#include <utils/common/systemerror.h>
 
 
 #ifdef Q_OS_WIN
