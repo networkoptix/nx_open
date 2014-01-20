@@ -1,6 +1,5 @@
 #include "ptz_controller_pool.h"
 
-// TODO: #Elric managment? rename to managEment
 #include <core/resource_management/resource_pool.h>
 
 QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
