@@ -62,9 +62,7 @@ namespace QnBinary {
     }
 
     template <class T, class T2>
-    void serialize(const std::vector<T2>& field, BinaryStream<T>* binStream) {
-        // todo: implement me        
-    }
+    void serialize(const std::vector<T2>& field, BinaryStream<T>* binStream);
 
     // -------------------- deserialize ---------------------
 
@@ -90,6 +88,7 @@ namespace QnBinary {
 };
 
 #define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+namespace bin_serializator { \
     template <class T> \
     __VA_ARGS__ void serialize(const TYPE &value, BinaryStream<T> *target) { \
        BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
@@ -99,6 +98,7 @@ namespace QnBinary {
     __VA_ARGS__ void deserialize(TYPE &value, BinaryStream<T> *target) { \
        BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
     } \
+}
 
 
 #define SERIALIZE_FIELD(R, D, FIELD) \
@@ -107,6 +107,15 @@ namespace QnBinary {
 #define DESERIALIZE_FIELD(R, D, FIELD) \
     QnBinary::deserialize(value.FIELD, target);
 
-//}
+
+namespace QnBinary
+{
+    template <class T, class T2>
+    void serialize(const std::vector<T2>& field, BinaryStream<T>* binStream) 
+    {
+        for (std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
+            bin_serializator::serialize(*itr, binStream);
+    }
+}
 
 #endif  //SERIALIZATION_HELPER_H

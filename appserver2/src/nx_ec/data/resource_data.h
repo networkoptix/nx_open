@@ -2,7 +2,7 @@
 #define __RESOURCE_TRANSACTION_DATA_H__
 
 #include "api_data.h"
-#include "serialization_helper.h"
+#include "../../serialization_helper.h"
 
 #include <QTCore/qglobal.h>
 #include <QString>
@@ -31,14 +31,12 @@ struct ApiResourceData: public ApiData {
     template <class T> void serialize(BinaryStream<T>& stream);
 };
 
-namespace detail {
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
-}
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
 
 template <class T>
 void ApiResourceData::serialize(BinaryStream<T>& stream)
 {
-    detail::serialize( *this, &stream );
+    bin_serializator::serialize( *this, &stream );
 }
 
 }

@@ -31,7 +31,7 @@ enum SecondaryQuality {
     SecondaryDontUse    = 4
 };
 
-struct ScheduleTask {
+struct ScheduleTask: public ApiData {
     qint32   id;
     qint32   sourceId;
     qint32   startTime;
@@ -43,7 +43,11 @@ struct ScheduleTask {
     qint32   afterThreshold;
     Quality  streamQuality;
     qint32   fps;
+
+    template <class T> void serialize(BinaryStream<T>& stream);
 };
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ScheduleTask, (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) \
+    (beforeThreshold) (afterThreshold) (streamQuality) (fps) )
 
 struct ApiCameraData: public ApiResourceData 
 {
@@ -70,17 +74,21 @@ struct ApiCameraData: public ApiResourceData
     template <class T> void serialize(BinaryStream<T>& stream);
 };
 
-namespace detail {
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiCameraData, (scheduleDisabled) (motionType) (region) (mac) (login)\
-        (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) (firmware) (groupId) (groupName) (secondaryQuality)\
-        (controlDisabled) (statusFlags) (dewarpingParams) (vendor) )
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiCameraData, (scheduleDisabled) (motionType) (region) (mac) (login)\
+    (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) (firmware) (groupId) (groupName) (secondaryQuality)\
+    (controlDisabled) (statusFlags) (dewarpingParams) (vendor) )
+
+template <class T>
+void ScheduleTask::serialize(BinaryStream<T>& stream)
+{
+    bin_serializator::serialize(*this, &stream);
 }
 
 template <class T>
 void ApiCameraData::serialize(BinaryStream<T>& stream)
 {
     ApiResourceData::serialize(stream);
-    detail::serialize(*this, &stream);
+    bin_serializator::serialize(*this, &stream);
 }
 
 }

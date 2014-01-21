@@ -127,6 +127,10 @@
 #endif
 #include "core/ptz/server_ptz_controller_pool.h"
 
+
+#include "c:\develop\netoptix_new_ec\appserver2\src\serialization_helper.h"
+#include "c:\develop\netoptix_new_ec\appserver2\src\transaction.h"
+
 #define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
