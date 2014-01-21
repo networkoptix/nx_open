@@ -203,6 +203,13 @@
                                         </replacement> -->
                                         <replacement>
                                             <token>
+                                                <![CDATA[</RootNamespace>]]></token>
+                                            <value>
+                                                <![CDATA[</RootNamespace>
+    <PlatformToolSet>v110</PlatformToolSet>]]></value>
+                                        </replacement>                                        
+                                        <replacement>
+                                            <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
                                             <value>
                                                 <![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
