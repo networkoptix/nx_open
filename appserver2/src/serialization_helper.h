@@ -14,8 +14,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 
-//namespace ec2
-//{
+#include <QIODevice>
 
 template<class T>
 class BinaryStream;
@@ -62,6 +61,13 @@ namespace QnBinary {
         // todo: implement me        
     }
 
+    template <class T, class T2>
+    void serialize(const std::vector<T2>& field, BinaryStream<T>* binStream) {
+        // todo: implement me        
+    }
+
+    // -------------------- deserialize ---------------------
+
     template <class T>
     void deserialize(qint32& field, BinaryStream<T>* binStream) {
         binStream->read(&field, sizeof(field));
@@ -74,6 +80,11 @@ namespace QnBinary {
 
     template <class T>
     void deserialize(QString& field, BinaryStream<T>* binStream) {
+        // todo: implement me        
+    }
+
+    template <class T, class T2>
+    void deserialize(const std::vector<T2>& field, BinaryStream<T>* binStream) {
         // todo: implement me        
     }
 };

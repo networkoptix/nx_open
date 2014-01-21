@@ -1,12 +1,24 @@
 
+#include "transaction.h"
 #include "media_server_manager.h"
 
 using namespace ec2;
 
+QnTransaction<ApiCameraData> prepareTransaction(ApiCommand command, const QnMediaServerResourcePtr& resource)
+{
+    QnTransaction<ApiCameraData> tran;
+    tran.createNewID();
+    tran.command = command;
+    tran.persistent = true;
+    tran.
+    return tran;
+}
+
+
 ReqID QnMediaServerManager::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
 {
     //create transaction
-    QnTransaction tran = prepareTransaction( /*...,*/ resource );
+    QnTransaction<ApiCameraData> tran = prepareTransaction( addCamera, resource );
 
     //update db
         //get sql query
