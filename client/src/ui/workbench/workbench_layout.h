@@ -407,6 +407,9 @@ private:
     QHash<int, QVariant> m_dataByRole;
 };
 
+typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;
+
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);
+Q_DECLARE_METATYPE(QnWorkbenchLayoutList);
 
 #endif // QN_WORKBENCH_LAYOUT_H
