@@ -11,6 +11,7 @@
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
+#include <utils/common/process.h>
 
 
 ApplauncherProcess::ApplauncherProcess(
@@ -30,9 +31,17 @@ ApplauncherProcess::ApplauncherProcess(
 
 void ApplauncherProcess::pleaseStop()
 {
-    std::lock_guard<std::mutex> lk( m_mutex );
-    m_terminated = true;
-    m_cond.notify_all();
+    {
+        std::lock_guard<std::mutex> lk( m_mutex );
+        m_terminated = true;
+        m_cond.notify_all();
+    }
+
+    std::for_each(
+        m_killProcessTasks.begin(),
+        m_killProcessTasks.end(),
+        []( const std::pair<qint64, KillProcessTask>& val ){ TimerManager::instance()->joinAndDeleteTimer(val.first); } );
+    m_killProcessTasks.clear();
 }
 
 void ApplauncherProcess::processRequest(
@@ -78,6 +87,13 @@ void ApplauncherProcess::processRequest(
             cancelInstallation(
                 std::static_pointer_cast<applauncher::api::CancelInstallationRequest>( request ),
                 static_cast<applauncher::api::CancelInstallationResponse*>(*response) );
+            break;
+
+        case applauncher::api::TaskType::addProcessKillTimer:
+            *response = new applauncher::api::AddProcessKillTimerResponse();
+            addProcessKillTimer(
+                std::static_pointer_cast<applauncher::api::AddProcessKillTimerRequest>( request ),
+                static_cast<applauncher::api::AddProcessKillTimerResponse*>(*response) );
             break;
 
         default:
@@ -386,6 +402,46 @@ bool ApplauncherProcess::cancelInstallation(
     //TODO/IMPL cancelling by id request->installationID
     response->result = applauncher::api::ResultType::otherError;
     return true;
+}
+
+bool ApplauncherProcess::addProcessKillTimer(
+    const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
+    applauncher::api::AddProcessKillTimerResponse* const response )
+{
+    KillProcessTask task;
+    task.processID = request->processID;
+    {
+        std::lock_guard<std::mutex> lk( m_mutex );
+        if( m_terminated )
+        {
+            response->result = applauncher::api::ResultType::otherError;
+            return true;
+        }
+
+        m_killProcessTasks[TimerManager::instance()->addTimer( this, request->timeoutMillis )] = task;
+    }
+
+    response->result = applauncher::api::ResultType::ok;
+    return true;
+}
+
+void ApplauncherProcess::onTimer( const quint64& timerID )
+{
+    KillProcessTask task;
+    {
+        std::lock_guard<std::mutex> lk( m_mutex );
+        if( m_terminated )
+            return;
+
+        auto it = m_killProcessTasks.find( timerID );
+        if( it == m_killProcessTasks.end() )
+            return;
+        task = it->second;
+        m_killProcessTasks.erase( it );
+    }
+
+    //stopping process if needed
+    killProcessByPid( task.processID );
 }
 
 void ApplauncherProcess::onInstallationSucceeded()
