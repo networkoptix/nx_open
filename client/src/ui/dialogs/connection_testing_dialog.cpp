@@ -24,6 +24,10 @@
 
 #include <utils/common/warnings.h>
 
+#ifdef Q_OS_MACX
+    #include <utils/network/icmp_mac.h>
+#endif
+
 #include "version.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
@@ -57,20 +61,22 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
     m_timeoutTimer->start();
 }
 
-static void pingResourceAsync(const QString &host, int port, QPointer<QnConnectionTestingDialog> dialog) {
+static void pingResourceAsync(const QString &host, QPointer<QnConnectionTestingDialog> dialog) {
     bool success = false;
     if (!dialog)
         return;
 
-    if (port < 0)
-        port = 80;
-
+#ifdef Q_OS_MACX
+    success = Icmp::ping(host, 10000);
+#else
     QScopedPointer<QTcpSocket> socket(new QTcpSocket());
-    socket->connectToHost(host, port, QAbstractSocket::ReadOnly);
+    socket->connectToHost(host, 80, QAbstractSocket::ReadOnly);
     if(socket->waitForConnected()) {
         socket->disconnectFromHost();
         success = true;
     }
+#endif
+
     if(!dialog)
         return;
 
@@ -84,12 +90,12 @@ void QnConnectionTestingDialog::testResource(const QnResourcePtr &resource) {
 
     QUrl url = QUrl::fromUserInput(resource->getUrl());
 
-    qnDebug("Testing connectivity for URL '%1:%2'.", url.host(), url.port());
+    qnDebug("Testing connectivity for URL '%1'.", url.host());
 
     ui->groupBox->setTitle(tr("Testing connection to %1").arg(getFullResourceName(resource, true)));
 
     QPointer<QnConnectionTestingDialog> owner(this);
-    QtConcurrent::run(&pingResourceAsync, url.host(), url.port(), owner);
+    QtConcurrent::run(&pingResourceAsync, url.host(), owner);
 
     m_timeoutTimer->start();
 }
