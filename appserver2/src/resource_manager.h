@@ -2,7 +2,7 @@
 #ifndef EC2_RESOURCE_MANAGER_H
 #define EC2_RESOURCE_MANAGER_H
 
-#include "ec_api.h"
+#include "nx_ec/ec_api.h"
 
 
 namespace ec2

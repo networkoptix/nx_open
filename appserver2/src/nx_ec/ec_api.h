@@ -79,6 +79,7 @@ namespace ec2
             return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+
     protected:
         virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual ReqID getResources( impl::GetResourcesHandlerPtr handler ) = 0;
@@ -178,6 +179,9 @@ namespace ec2
             return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+signals:
+        void cameraHistoryChanged(QnCameraHistoryItemPtr cameraHistory);
+
     protected:
         virtual ReqID addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
         virtual ReqID addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) = 0;
@@ -208,6 +212,9 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID addLicenses( const QList<QnLicensePtr>& licenses, TargetType* target, HandlerType handler ) {
             return addLicensesAsync( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+signals:
+    void licenseChanged(QnLicensePtr license);
 
     protected:
         virtual ReqID getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;

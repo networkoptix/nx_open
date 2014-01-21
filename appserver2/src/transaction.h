@@ -8,6 +8,7 @@
 
 namespace ec2
 {
+
     struct ApiData;
 
     enum class ApiCommand
@@ -16,6 +17,7 @@ namespace ec2
         removeCamera
     };
 
+    template<class T>
     class QnTransaction
     {
     public:
@@ -31,7 +33,7 @@ namespace ec2
 
         bool persistent;
         ApiCommand command;
-        ApiData* params;
+        T params;
     };
 
 
@@ -53,18 +55,31 @@ namespace ec2
     struct ApiCameraData: public ApiResourceData {
         bool scheduleDisabled;
         int motionType;
+
+        template <class T> void serialize(BinaryStream<T>& stream);
+        //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS ( (scheduleDisabled) (motionType) )
     };
+
+    namespace detail {
+        QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
+        QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiCameraData, (scheduleDisabled) (motionType) )
+    }
+
+    template <class T>
+    void ApiCameraData::serialize(BinaryStream<T>& stream)
+    {
+        //serialize( (ApiResourceData*) this, &stream );
+        detail::serialize( *((ApiCameraData*) this), &stream );
+    }
+
 
 }
 
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
-
-void hz()
+void test()
 {
-    ec2::ApiResourceData h;
-    BinaryStream<QByteArray> z;
-    serialize( h, &z );
-    deserialize( h, &z );
+    ec2::ApiCameraData data;
+    BinaryStream<QByteArray> stream;
+    data.serialize(stream);
 }
 
 //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )

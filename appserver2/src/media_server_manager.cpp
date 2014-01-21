@@ -1,6 +1,7 @@
 
 #include "media_server_manager.h"
 
+using namespace ec2;
 
 ReqID QnMediaServerManager::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
 {
