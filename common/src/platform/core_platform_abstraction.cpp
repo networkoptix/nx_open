@@ -27,7 +27,7 @@
 #   include "monitoring/monitor_mac.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
-#   define QnMonitorImpl QnLinuxMonitor
+#   define QnMonitorImpl QnMacMonitor
 #else
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
