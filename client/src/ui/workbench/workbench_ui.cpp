@@ -1509,12 +1509,20 @@ void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
-    return QMargins(
+    QMargins result(
         isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
         std::floor(qMax(0.0, m_notificationsPinned ? m_controlsWidgetRect.right() - notificationsX : 0.0)),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
+
+    if (result.left() + result.right() >= m_controlsWidgetRect.width()) {
+        result.setLeft(0.0);
+        result.setRight(0.0);
+    }
+
+    return result;
+
 }
 
 bool QnWorkbenchUi::isFpsVisible() const {
