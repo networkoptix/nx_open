@@ -85,8 +85,7 @@ void QnBufferedFrameDisplayer::run()
     QSharedPointer<CLVideoDecoderOutput> frame;
     while (!needToStop())
     {
-        QMutexLocker processFrameLock( &m_processFrameMutex );
-
+        m_processFrameMutex.lock();
         if (m_queue.size() > 0)
         {
             frame = m_queue.front();
@@ -154,9 +153,11 @@ void QnBufferedFrameDisplayer::run()
             syncLock.relock();
             m_queue.pop(frame);
             syncLock.unlock();
+            m_processFrameMutex.unlock();
             //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
         }
         else {
+            m_processFrameMutex.unlock();
             msleep(1);
         }
     }
