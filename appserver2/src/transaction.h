@@ -43,6 +43,7 @@ void test()
     ec2::ApiCameraData data;
     BinaryStream<QByteArray> stream;
     data.serialize(stream);
+    data.deserialize(stream);
 }
 #endif
 

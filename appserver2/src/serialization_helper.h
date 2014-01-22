@@ -48,6 +48,23 @@ private:
 namespace QnBinary {
     template <class T>
     void serialize(qint32 field, BinaryStream<T>* binStream) {
+        qint32 tmp = htonl(field);
+        binStream->write(&tmp, sizeof(tmp));
+    }
+
+    template <class T>
+    void serialize(qint64& field, BinaryStream<T>* binStream) {
+        qint64 tmp = htonll(field);
+        binStream->write(&tmp, sizeof(field));
+    }
+
+    template <class T>
+    void serialize(float& field, BinaryStream<T>* binStream) {
+        binStream->write(&field, sizeof(field));
+    }
+
+    template <class T>
+    void serialize(double& field, BinaryStream<T>* binStream) {
         binStream->write(&field, sizeof(field));
     }
 
@@ -57,8 +74,14 @@ namespace QnBinary {
     }
 
     template <class T>
+    void serialize(const QByteArray& field, BinaryStream<T>* binStream) {
+        serialize((qint32) field.size(), binStream);
+        binStream->write(field.data(), field.size());
+    }
+
+    template <class T>
     void serialize(const QString& field, BinaryStream<T>* binStream) {
-        // todo: implement me        
+        serialize(field.toUtf8(), binStream);
     }
 
     template <class T, class T2>
@@ -68,7 +91,33 @@ namespace QnBinary {
 
     template <class T>
     void deserialize(qint32& field, BinaryStream<T>* binStream) {
+        qint32 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = ntohl(tmp);
+    }
+
+    template <class T>
+    void deserialize(qint64& field, BinaryStream<T>* binStream) {
+        qint64 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = ntohll(tmp);
+    }
+
+    template <class T>
+    void deserialize(float& field, BinaryStream<T>* binStream) {
         binStream->read(&field, sizeof(field));
+    }
+
+    template <class T>
+    void deserialize(double& field, BinaryStream<T>* binStream) {
+        binStream->read(&field, sizeof(field));
+    }
+
+    template <class T, typename T2>
+    void deserialize(T2& field, BinaryStream<T>* binStream) {
+        qint32 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = (T2) ntohl(tmp);
     }
 
     template <class T>
@@ -77,14 +126,22 @@ namespace QnBinary {
     }
 
     template <class T>
+    void deserialize(QByteArray& field, BinaryStream<T>* binStream) {
+        qint32 size;
+        deserialize(size, binStream);
+        field.resize(size);
+        binStream->read(field.data(), size);
+    }
+
+    template <class T>
     void deserialize(QString& field, BinaryStream<T>* binStream) {
-        // todo: implement me        
+        QByteArray data;
+        deserialize(data, binStream);
+        field = QString::fromUtf8(data);
     }
 
     template <class T, class T2>
-    void deserialize(const std::vector<T2>& field, BinaryStream<T>* binStream) {
-        // todo: implement me        
-    }
+    void deserialize(const std::vector<T2>& field, BinaryStream<T>* binStream);
 };
 
 #define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
@@ -113,8 +170,19 @@ namespace QnBinary
     template <class T, class T2>
     void serialize(const std::vector<T2>& field, BinaryStream<T>* binStream) 
     {
+        QnBinary::serialize((qint32) field.size(), binStream);
         for (std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
             QnBinary::serialize(*itr, binStream);
+    }
+
+    template <class T, class T2>
+    void deserialize(const std::vector<T2>& field, BinaryStream<T>* binStream) 
+    {
+        qint32 size;
+        deserialize(size, binStream);
+        field.resize(size);
+        for (std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
+            QnBinary::deserialize(*itr, binStream);
     }
 }
 
