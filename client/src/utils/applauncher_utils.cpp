@@ -128,4 +128,16 @@ namespace applauncher
             return result;
         return response.result;
     }
+
+    api::ResultType::Value scheduleProcessKill( qint64 processID, quint32 timeoutMillis )
+    {
+        api::AddProcessKillTimerRequest request;
+        request.processID = processID;
+        request.timeoutMillis = timeoutMillis;
+        api::AddProcessKillTimerResponse response;
+        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        if( result != api::ResultType::ok )
+            return result;
+        return response.result;
+    }
 }

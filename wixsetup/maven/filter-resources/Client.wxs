@@ -5,6 +5,7 @@
         <?include BuildVars.wxi ?>
 
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
+        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}ClientDir" Name="Client">
@@ -52,6 +53,9 @@
 
                     <Directory Id="ImageFormats" Name="imageformats">
                     </Directory>    
+                    
+                    <Directory Id="Plugins" Name="plugins">
+                    </Directory>                        
 
                     <Directory Id="Platforms" Name="platforms">
                     </Directory>                    
@@ -126,12 +130,12 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientQuickSync" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
-                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.SourceDir)/quicksyncdecoder.dll"/>
+                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll"/>
             </Component>
             <Component>
-                <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.SourceDir)/hw_decoding_conf.xml"/>                               
+                <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml"/>                               
             </Component>
         </ComponentGroup>                            
 

@@ -131,6 +131,8 @@ namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 }
 
+//!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
+static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -2058,6 +2060,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     menu()->trigger(Qn::ClearCameraSettingsAction);
     if(context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
         qApp->exit(0);
+        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
     }
 
 }
@@ -2648,5 +2651,6 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         return;
     }
     qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 

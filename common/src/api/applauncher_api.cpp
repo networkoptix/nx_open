@@ -27,6 +27,8 @@ namespace applauncher
                     return isVersionInstalled;
                 else if( str == "cancelInstallation" )
                     return cancelInstallation;
+                else if( str == "addProcessKillTimer" )
+                    return addProcessKillTimer;
                 else
                     return invalidTaskType;
             }
@@ -45,6 +47,10 @@ namespace applauncher
                         return "getInstallationStatus";
                     case isVersionInstalled:
                         return "isVersionInstalled";
+                    case cancelInstallation:
+                        return "cancelInstallation";
+                    case addProcessKillTimer:
+                        return "addProcessKillTimer";
                     default:
                         return "unknown";
                 }
@@ -93,6 +99,10 @@ namespace applauncher
                     
                 case TaskType::cancelInstallation:
                     *ptr = new CancelInstallationRequest();
+                    break;
+
+                case TaskType::addProcessKillTimer:
+                    *ptr = new AddProcessKillTimerRequest();
                     break;
 
                 case TaskType::invalidTaskType:
@@ -481,6 +491,35 @@ namespace applauncher
             if( lines[0] != TaskType::toString(type) )
                 return false;
             installationID = lines[1].toByteArrayWithRawData().toUInt();
+            return true;
+        }
+
+
+
+        ////////////////////////////////////////////////////////////
+        //// class AddProcessKillTimerRequest
+        ////////////////////////////////////////////////////////////
+        AddProcessKillTimerRequest::AddProcessKillTimerRequest()
+        :
+            BaseTask( TaskType::addProcessKillTimer ),
+            processID( 0 )
+        {
+        }
+
+        QByteArray AddProcessKillTimerRequest::serialize() const
+        {
+            return QString::fromLatin1("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(processID).arg(timeoutMillis).toLatin1();
+        }
+
+        bool AddProcessKillTimerRequest::deserialize( const QnByteArrayConstRef& data )
+        {
+            const QList<QnByteArrayConstRef>& lines = data.split('\n');
+            if( lines.size() < 3 )
+                return false;
+            if( lines[0] != TaskType::toString(type) )
+                return false;
+            processID = lines[1].toByteArrayWithRawData().toUInt();
+            timeoutMillis = lines[2].toByteArrayWithRawData().toUInt();
             return true;
         }
     }
