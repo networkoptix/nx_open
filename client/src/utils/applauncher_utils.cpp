@@ -1,38 +1,52 @@
+
 #include "applauncher_utils.h"
 
-#include <QtNetwork/QLocalSocket>
 #include <QtWidgets/QApplication>
 
 #include "version.h"
 
 #include <api/applauncher_api.h>
 #include <api/ipc_pipe_names.h>
+#include <utils/ipc/named_pipe_socket.h>
+#include <utils/common/log.h>
 
 
 namespace applauncher
 {
+    static const int MAX_MSG_LEN = 1024;
+
     static api::ResultType::Value sendCommandToLauncher(
         const applauncher::api::BaseTask& commandToSend,
         applauncher::api::Response* const response )
     {
-        QLocalSocket sock;
-        sock.connectToServer(launcherPipeName);
-        if(!sock.waitForConnected(-1)) {
-            qDebug() << "Failed to connect to local server" << launcherPipeName << sock.errorString();
+        NamedPipeSocket sock;
+        SystemError::ErrorCode resultCode = sock.connectToServerSync( launcherPipeName );
+        if( resultCode != SystemError::noError )
+        {
+            NX_LOG( QString::fromLatin1("Failed to connect to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
             return api::ResultType::connectError;
         }
 
         //const QByteArray &serializedTask = applauncher::api::StartApplicationTask(version.toString(QnSoftwareVersion::MinorFormat), arguments).serialize();
-        const QByteArray &serializedTask = commandToSend.serialize();
-        if(sock.write(serializedTask.data(), serializedTask.size()) != serializedTask.size()) {
-            qDebug() << "Failed to send launch task to local server" << launcherPipeName << sock.errorString();
+        const QByteArray& serializedTask = commandToSend.serialize();
+        unsigned int bytesWritten = 0;
+        resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
+        if( resultCode != SystemError::noError )
+        {
+            NX_LOG( QString::fromLatin1("Failed to send launch task to local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
             return api::ResultType::connectError;
         }
 
-        sock.waitForReadyRead(-1);
-        const QByteArray& responseData = sock.readAll();
+        char buf[MAX_MSG_LEN];
+        unsigned int bytesRead = 0;
+        resultCode = sock.read( buf, sizeof(buf), &bytesRead );  //ignoring return code
+        if( resultCode != SystemError::noError )
+        {
+            NX_LOG( QString::fromLatin1("Failed to read response from local server %1. %2").arg(launcherPipeName).arg(SystemError::toString(resultCode)), cl_logWARNING );
+            return api::ResultType::connectError;
+        }
         if( response )
-            if( !response->deserialize( responseData ) )
+            if( !response->deserialize( QByteArray::fromRawData(buf, bytesRead) ) )
                 return api::ResultType::badResponse;
         return api::ResultType::ok;
     }
