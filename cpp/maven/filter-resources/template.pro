@@ -49,7 +49,12 @@ DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
   plugin {
     win* {
-      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+      contains(BUILDLIB,staticlib) {
+        DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+      }
+      else {
+        DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/plugins
+      }
     }
     else {
       DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
