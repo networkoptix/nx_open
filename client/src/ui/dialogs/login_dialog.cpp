@@ -603,11 +603,6 @@ void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, 
     if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
         return;
 
-    QnCompatibilityChecker compatibilityChecker(localCompatibilityItems());
-    if (!compatibilityChecker.isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION),
-                                           QLatin1String("ECS"),    QnSoftwareVersion(moduleVersion)))
-        return;
-
     QString host = isLocal ? QString::fromLatin1("127.0.0.1") : remoteHostAddress;
     QUrl url;
     url.setHost(host);

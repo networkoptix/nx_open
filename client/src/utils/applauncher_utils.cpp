@@ -79,7 +79,7 @@ namespace applauncher
         const api::ResultType::Value result = sendCommandToLauncher(
             applauncher::api::StartApplicationTask(
                 version.toString(QnSoftwareVersion::MinorFormat),
-                arguments.join(QLatin1String("")) ),
+                arguments ),
             &response );
         return result != api::ResultType::ok ? result : response.result;
     }
