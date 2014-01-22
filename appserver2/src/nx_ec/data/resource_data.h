@@ -31,12 +31,16 @@ struct ApiResourceData: public ApiData {
     template <class T> void serialize(BinaryStream<T>& stream);
 };
 
+}
+
 QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
 
+namespace ec2
+{
 template <class T>
 void ApiResourceData::serialize(BinaryStream<T>& stream)
 {
-    bin_serializator::serialize( *this, &stream );
+    QnBinary::serialize( *this, &stream );
 }
 
 }

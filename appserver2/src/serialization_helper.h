@@ -88,7 +88,7 @@ namespace QnBinary {
 };
 
 #define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-namespace bin_serializator { \
+namespace QnBinary { \
     template <class T> \
     __VA_ARGS__ void serialize(const TYPE &value, BinaryStream<T> *target) { \
        BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
@@ -114,7 +114,7 @@ namespace QnBinary
     void serialize(const std::vector<T2>& field, BinaryStream<T>* binStream) 
     {
         for (std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
-            bin_serializator::serialize(*itr, binStream);
+            QnBinary::serialize(*itr, binStream);
     }
 }
 

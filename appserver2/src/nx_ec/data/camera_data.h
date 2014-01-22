@@ -2,6 +2,8 @@
 #define __API_CAMERA_DATA_H_
 
 #include "resource_data.h"
+#include "serialization_helper.h"
+
 
 namespace ec2
 {
@@ -46,8 +48,13 @@ struct ScheduleTask: public ApiData {
 
     template <class T> void serialize(BinaryStream<T>& stream);
 };
+
+}
 QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ScheduleTask, (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) \
     (beforeThreshold) (afterThreshold) (streamQuality) (fps) )
+
+namespace ec2
+{
 
 struct ApiCameraData: public ApiResourceData 
 {
@@ -74,21 +81,25 @@ struct ApiCameraData: public ApiResourceData
     template <class T> void serialize(BinaryStream<T>& stream);
 };
 
+}
+
 QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiCameraData, (scheduleDisabled) (motionType) (region) (mac) (login)\
     (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) (firmware) (groupId) (groupName) (secondaryQuality)\
     (controlDisabled) (statusFlags) (dewarpingParams) (vendor) )
 
+namespace ec2
+{
 template <class T>
 void ScheduleTask::serialize(BinaryStream<T>& stream)
 {
-    bin_serializator::serialize(*this, &stream);
+    QnBinary::serialize(*this, &stream);
 }
 
 template <class T>
 void ApiCameraData::serialize(BinaryStream<T>& stream)
 {
     ApiResourceData::serialize(stream);
-    bin_serializator::serialize(*this, &stream);
+    QnBinary::serialize(*this, &stream);
 }
 
 }

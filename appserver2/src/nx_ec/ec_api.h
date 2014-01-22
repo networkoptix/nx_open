@@ -4,13 +4,15 @@
 
 #include <memory>
 
+#include <QObject>
+
 #include "api/model/email_attachment.h"
 #include "impl/ec_api_impl.h"
 
 
 //!Contains API classes for the new enterprise controller
 /*!
-    TODO comment all API classes
+    TODO describe all API classes
 */
 namespace ec2
 {
@@ -138,7 +140,11 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractCameraManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractCameraManager() {}
 
@@ -179,7 +185,7 @@ namespace ec2
             return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-signals:
+    signals:
         void cameraHistoryChanged(QnCameraHistoryItemPtr cameraHistory);
 
     protected:
