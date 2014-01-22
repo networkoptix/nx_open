@@ -8,41 +8,6 @@
 #include <QString>
 #include <vector>
 
-#define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... /* PREFIX */) \
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
-    template <class T> \
-    void TYPE::serialize(BinaryStream<T>& stream) \
-    { \
-        BASE_TYPE::serialize(stream); \
-        QnBinary::serialize(*this, &stream); \
-    } \
-    \
-    template <class T> \
-    void TYPE::deserialize(BinaryStream<T>& stream) \
-    { \
-        BASE_TYPE::deserialize(stream); \
-        QnBinary::deserialize(*this, &stream); \
-    }
-
-#define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
-    template <class T> \
-    void TYPE::serialize(BinaryStream<T>& stream) \
-    { \
-        QnBinary::serialize(*this, &stream); \
-    } \
-    \
-    template <class T> \
-    void TYPE::deserialize(BinaryStream<T>& stream) \
-    { \
-        QnBinary::deserialize(*this, &stream); \
-    }
-
-
-#define QN_DECLARE_STRUCT_SERIALIZATORS() \
-    template <class T> void serialize(BinaryStream<T>& stream); \
-    template <class T> void deserialize(BinaryStream<T>& stream); \
-
 
 namespace ec2
 {

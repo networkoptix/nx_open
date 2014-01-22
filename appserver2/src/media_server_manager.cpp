@@ -1,6 +1,8 @@
 
-#include "transaction.h"
+#include "transaction/transaction_log.h"
 #include "media_server_manager.h"
+#include "database/db_manager.h"
+#include "cluster/cluster_manager.h"
 
 using namespace ec2;
 
@@ -10,7 +12,6 @@ QnTransaction<ApiCameraData> prepareTransaction(ApiCommand command, const QnMedi
     tran.createNewID();
     tran.command = command;
     tran.persistent = true;
-    tran.
     return tran;
 }
 
@@ -18,19 +19,19 @@ QnTransaction<ApiCameraData> prepareTransaction(ApiCommand command, const QnMedi
 ReqID QnMediaServerManager::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
 {
     //create transaction
-    QnTransaction<ApiCameraData> tran = prepareTransaction( addCamera, resource );
+    QnTransaction<ApiCameraData> tran = prepareTransaction( ec2::addCamera, resource );
 
-    //update db
+    // update db
         //get sql query
         //bind params
         //execute
-    DBManager::instance()->executeTransaction( tran );
+    dbManager->executeTransaction( tran );
 
-    //add to transaction log
-    TransactionLog::instance()->saveTransaction( tran );
+    // add to transaction log
+    transactionLog->saveTransaction( tran );
 
-    //
-    ClusterManager::instance()->distributeAsync( tran );
+    // delivery transaction to the remote peers
+    clusterManager->distributeAsync( tran );
 
 
 
@@ -38,6 +39,8 @@ ReqID QnMediaServerManager::save( const QnMediaServerResourcePtr& resource, impl
 
     return -1;
 }
+
+#if 0
 
 void ClusterNodeListener::transactionReceived( QnTransactionPtr tran )
 {
@@ -62,3 +65,5 @@ void ClusterNodeListener::processRemoteTransaction( const QnTransaction& tran )
 
     //notifying external listener
 }
+
+#endif

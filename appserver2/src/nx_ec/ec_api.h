@@ -139,9 +139,7 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractCameraManager
-    :
-        public QObject
+    class AbstractCameraManager: public QObject
     {
         Q_OBJECT
 
@@ -201,8 +199,9 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractLicenseManager
+    class AbstractLicenseManager: public QObject
     {
+        Q_OBJECT
     public:
         virtual ~AbstractLicenseManager() {}
 
@@ -231,7 +230,7 @@ signals:
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractBusinessEventManager
+    class AbstractBusinessEventManager: public QObject
     {
     public:
         virtual ~AbstractBusinessEventManager() {}

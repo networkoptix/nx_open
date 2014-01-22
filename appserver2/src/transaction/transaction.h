@@ -4,36 +4,50 @@
 
 #include <QString>
 #include <vector>
+#include <QUuid>
 #include "serialization_helper.h"
 
 namespace ec2
 {
 
-    enum class ApiCommand
+    enum ApiCommand
     {
         addCamera,
         removeCamera
     };
 
-    template <class T>
-    class QnTransaction
+    class QnAbstractTransaction
     {
     public:
+        void createNewID();
+        
+        static void setPeerGuid(const QUuid& value);
+        static void setStartNumber(const qint64& value);
+
         struct ID
         {
-            GUID peerGUID;
+            QUuid peerGUID;
             qint64 number;
         };
-
-        QnTransaction( const QnTransaction& xvalue );
-
         ID id;
         ApiCommand command;
         bool persistent;
-        
-        T params;
+
+        QN_DECLARE_STRUCT_SERIALIZATORS();
+    private:
+        static QUuid m_staticPeerGUID;
+        static qint64 m_staticNumber;
+        static QMutex m_mutex;
     };
 
+    template <class T>
+    class QnTransaction: public QnAbstractTransaction
+    {
+    public:
+        QnTransaction();
+        QnTransaction( const QnTransaction& xvalue );
+        T params;
+    };
 }
 
 #if 1
