@@ -96,8 +96,13 @@ private:
     QnRenderingWidget *m_renderingWidget;
     NetworkOptixModuleFinder *m_entCtrlFinder;
 
+    struct QnEcData {
+        QUrl url;
+        QString version;
+    };
+
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
-    QMultiHash<QString, QUrl> m_foundEcs;
+    QMultiHash<QString, QnEcData> m_foundEcs;
     std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
 
     bool m_restartPending;
