@@ -2,7 +2,9 @@
 #ifndef SERIALIZATION_HELPER_H
 #define SERIALIZATION_HELPER_H
 
+#include <QString>
 #include <QByteArray>
+#include <QUuid>
 
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/transform.hpp>
@@ -53,23 +55,46 @@ namespace QnBinary {
     }
 
     template <class T>
-    void serialize(qint64& field, BinaryStream<T>* binStream) {
+    void serialize(quint32 field, BinaryStream<T>* binStream) {
+        quint32 tmp = htonl(field);
+        binStream->write(&tmp, sizeof(tmp));
+    }
+
+    template <class T>
+    void serialize(qint16 field, BinaryStream<T>* binStream) {
+        qint16 tmp = htons(field);
+        binStream->write(&tmp, sizeof(tmp));
+    }
+
+    template <class T>
+    void serialize(quint16 field, BinaryStream<T>* binStream) {
+        quint16 tmp = htons(field);
+        binStream->write(&tmp, sizeof(tmp));
+    }
+
+    template <class T>
+    void serialize(qint64 field, BinaryStream<T>* binStream) {
         qint64 tmp = htonll(field);
         binStream->write(&tmp, sizeof(field));
     }
 
     template <class T>
-    void serialize(float& field, BinaryStream<T>* binStream) {
+    void serialize(float field, BinaryStream<T>* binStream) {
         binStream->write(&field, sizeof(field));
     }
 
     template <class T>
-    void serialize(double& field, BinaryStream<T>* binStream) {
+    void serialize(double field, BinaryStream<T>* binStream) {
         binStream->write(&field, sizeof(field));
     }
 
     template <class T>
     void serialize(bool field, BinaryStream<T>* binStream) {
+        binStream->write(&field, sizeof(field));
+    }
+
+    template <class T>
+    void serialize(quint8 field[], BinaryStream<T>* binStream) {
         binStream->write(&field, sizeof(field));
     }
 
@@ -94,6 +119,27 @@ namespace QnBinary {
         qint32 tmp;
         binStream->read(&tmp, sizeof(field));
         field = ntohl(tmp);
+    }
+
+    template <class T>
+    void deserialize(quint32& field, BinaryStream<T>* binStream) {
+        quint32 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = ntohl(tmp);
+    }
+
+    template <class T>
+    void deserialize(qint16& field, BinaryStream<T>* binStream) {
+        qint16 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = ntohs(tmp);
+    }
+
+    template <class T>
+    void deserialize(quint16& field, BinaryStream<T>* binStream) {
+        quint16 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = ntohs(tmp);
     }
 
     template <class T>
@@ -122,6 +168,12 @@ namespace QnBinary {
 
     template <class T>
     void deserialize(bool& field, BinaryStream<T>* binStream) {
+        binStream->read(&field, sizeof(field));
+    }
+
+    typedef quint8 FixedArray[];
+    template <class T>
+    void deserialize(FixedArray& field, BinaryStream<T>* binStream) {
         binStream->read(&field, sizeof(field));
     }
 

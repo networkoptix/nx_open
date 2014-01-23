@@ -4,7 +4,6 @@
 
 #include <QString>
 #include <vector>
-#include <QUuid>
 #include "serialization_helper.h"
 
 namespace ec2
@@ -16,26 +15,38 @@ namespace ec2
         removeCamera
     };
 
+    struct QnUuid {
+        quint32 data1;
+        quint16 data2;
+        quint16 data3;
+        qint64  data4;
+
+        QN_DECLARE_STRUCT_SERIALIZATORS();
+    };
+
     class QnAbstractTransaction
     {
     public:
         void createNewID();
         
-        static void setPeerGuid(const QUuid& value);
+        static void setPeerGuid(const QnUuid& value);
         static void setStartNumber(const qint64& value);
 
         struct ID
         {
-            QUuid peerGUID;
+            QnUuid peerGUID;
             qint64 number;
+
+            QN_DECLARE_STRUCT_SERIALIZATORS();
         };
-        ID id;
+
         ApiCommand command;
+        ID id;
         bool persistent;
 
         QN_DECLARE_STRUCT_SERIALIZATORS();
     private:
-        static QUuid m_staticPeerGUID;
+        static QnUuid m_staticPeerGUID;
         static qint64 m_staticNumber;
         static QMutex m_mutex;
     };
@@ -56,7 +67,9 @@ namespace ec2
     };
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (persistent))
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnUuid, (data1) (data2) (data3) (data4) )
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (number) )
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
 
 #if 1
 #include "nx_ec/data/camera_data.h"

@@ -3,11 +3,11 @@
 namespace ec2
 {
 
-QUuid QnAbstractTransaction::m_staticPeerGUID;
+QnUuid QnAbstractTransaction::m_staticPeerGUID;
 qint64 QnAbstractTransaction::m_staticNumber;
 QMutex QnAbstractTransaction::m_mutex;
 
-void QnAbstractTransaction::setPeerGuid(const QUuid& value)
+void QnAbstractTransaction::setPeerGuid(const QnUuid& value)
 {
     m_staticPeerGUID = value;
 }
