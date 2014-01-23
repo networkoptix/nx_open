@@ -190,7 +190,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">停止p %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="754"/>
+        <location filename="../src/systraywindow.cpp" line="763"/>
         <source>* Last used connection *</source>
         <translation>*最后使用的连接*</translation>
     </message>
@@ -310,32 +310,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>停止系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="870"/>
+        <location filename="../src/systraywindow.cpp" line="884"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>您所做的更改需重新启动系统控制器和媒体服务器。现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="872"/>
+        <location filename="../src/systraywindow.cpp" line="886"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>您所做的更改需重新启动系统控制器。现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="874"/>
+        <location filename="../src/systraywindow.cpp" line="888"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>您所做的更改需重新启动媒体服务器。现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="910"/>
+        <location filename="../src/systraywindow.cpp" line="924"/>
         <source>Invalid %1 port specified.</source>
         <translation>指定了无效的 %1端口。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="943"/>
+        <location filename="../src/systraywindow.cpp" line="957"/>
         <source>enterprise controller</source>
         <translation>系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="967"/>
+        <location filename="../src/systraywindow.cpp" line="981"/>
         <source>%1 port is already used by another process</source>
         <translation type="unfinished"></translation>
     </message>
@@ -352,7 +352,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">媒体服务器 API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="957"/>
+        <location filename="../src/systraywindow.cpp" line="971"/>
         <source>%1 port is same as %2 port</source>
         <translation>%1 与%2端口相同</translation>
     </message>
@@ -361,17 +361,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">%1端口已经被另一个程序使用</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="974"/>
+        <location filename="../src/systraywindow.cpp" line="988"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>无效的IP地址指定为公共IP地址</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1044"/>
+        <location filename="../src/systraywindow.cpp" line="1059"/>
         <source>Invalid parameters</source>
         <translation>无效的参数</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1044"/>
+        <location filename="../src/systraywindow.cpp" line="1059"/>
         <source>You have entered invalid URL.</source>
         <translation>您所输入的网址无效。</translation>
     </message>
@@ -413,7 +413,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="95"/>
-        <location filename="../src/settings.ui" line="362"/>
         <source>Port</source>
         <translation>端口</translation>
     </message>
@@ -430,6 +429,21 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="259"/>
         <source>Enable auto discovery for cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="345"/>
+        <source>Enterprise controller settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="351"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="358"/>
+        <source>Do not control camera settings:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -461,12 +475,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>系统控制器设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="345"/>
         <source>Enterprise controller network settings</source>
-        <translation>系统控制器网络设置</translation>
+        <translation type="obsolete">系统控制器网络设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="406"/>
+        <location filename="../src/settings.ui" line="405"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>允许通过公网IP地址存取系统服务器</translation>
     </message>
@@ -504,13 +517,13 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="280"/>
-        <location filename="../src/settings.ui" line="415"/>
+        <location filename="../src/settings.ui" line="414"/>
         <source>Use specified IP or host name</source>
         <translation>使用指定的IP地址或主机名</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="290"/>
-        <location filename="../src/settings.ui" line="425"/>
+        <location filename="../src/settings.ui" line="424"/>
         <source>Auto detect public IP</source>
         <translation>自动侦测公共IP</translation>
     </message>
@@ -531,22 +544,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">允许通过公共IP地址访问系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="465"/>
+        <location filename="../src/settings.ui" line="464"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="475"/>
+        <location filename="../src/settings.ui" line="474"/>
         <source>Language:</source>
         <translation>语言：</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="487"/>
+        <location filename="../src/settings.ui" line="486"/>
         <source>(requires restart)</source>
         <translation>(需重新启动)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="498"/>
+        <location filename="../src/settings.ui" line="497"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>

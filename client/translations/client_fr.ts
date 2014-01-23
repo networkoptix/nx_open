@@ -1319,6 +1319,13 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Dewarping panoramic mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PtzPresetDialog</name>
     <message>
         <source>PTZ Position</source>
@@ -4538,6 +4545,10 @@ Recording Schedule is always based on Server Time.</source>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
@@ -5116,6 +5127,15 @@ Download version %3?</source>
         <source>Connection with this name already exists. Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to launch compatiblity version %1
+Try to restore version %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -5309,7 +5329,7 @@ Download version %3?</source>
     </message>
     <message>
         <source>Custom Title</source>
-        <translation>Titre personnalisé</translation>
+        <translation type="obsolete">Titre personnalisé</translation>
     </message>
     <message>
         <source>Error</source>
@@ -5351,6 +5371,10 @@ Download version %3?</source>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Title:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5799,6 +5823,10 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
         <source>%1 (Primary)</source>
         <translation>%1(Primaire)</translation>
     </message>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -5978,16 +6006,16 @@ S’il vous plait, fermer l&apos;application et recommencer en utilisant le racc
         <source>%1 %2 </source>
         <translation type="obsolete">%1% {1 %2 ?}</translation>
     </message>
+    <message>
+        <source>%1 %2</source>
+        <translation type="unfinished">%1% {1 %2?}</translation>
+    </message>
     <message numerus="yes">
-        <source>%1 %2 (up %n days, %2)</source>
+        <source>%1 %2 (up %n days, %3)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>%1 %2</source>
-        <translation type="unfinished">%1% {1 %2?}</translation>
     </message>
 </context>
 <context>
@@ -6402,6 +6430,41 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>MMMM yyyy</source>
         <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnTwoStepFileDialog</name>
+    <message>
+        <source>Folder:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation type="unfinished">Parcourir...</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: file with same name already exists!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select file...</source>
+        <translation type="unfinished">Sélectionner un fichier...</translation>
     </message>
 </context>
 <context>
@@ -7131,7 +7194,7 @@ et vous n&apos;avez pas les droits pour l&apos;écraser.</translation>
     </message>
     <message>
         <source>You are running beta version of %1</source>
-        <translation type="unfinished">Vous utilisez la version bêta de %1</translation>
+        <translation type="obsolete">Vous utilisez la version bêta de %1</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
@@ -7142,6 +7205,14 @@ et vous n&apos;avez pas les droits pour l&apos;écraser.</translation>
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished">Impossible de redémarrer le client.
 S’il vous plait, fermer l&apos;application et recommencer en utilisant le raccourci dans le menu Démarrer.</translation>
+    </message>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are running beta version of %1.</source>
+        <translation type="unfinished">Vous utilisez la version bêta de %1.</translation>
     </message>
 </context>
 <context>

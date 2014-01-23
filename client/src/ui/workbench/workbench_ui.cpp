@@ -694,11 +694,20 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
+    QnSingleEventEater *sliderWheelEater = new QnSingleEventEater(this);
+    sliderWheelEater->setEventType(QEvent::GraphicsSceneWheel);
+    m_sliderResizerWidget->installEventFilter(sliderWheelEater);
+
+    QnSingleEventSignalizer *sliderWheelSignalizer = new QnSingleEventSignalizer(this);
+    sliderWheelSignalizer->setEventType(QEvent::GraphicsSceneWheel);
+    m_sliderResizerWidget->installEventFilter(sliderWheelSignalizer);
+
     connect(sliderZoomInButton,         SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomInButton_pressed()));
     connect(sliderZoomInButton,         SIGNAL(released()),                         this,           SLOT(at_sliderZoomInButton_released()));
     connect(sliderZoomOutButton,        SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomOutButton_pressed()));
     connect(sliderZoomOutButton,        SIGNAL(released()),                         this,           SLOT(at_sliderZoomOutButton_released()));
 
+    connect(sliderWheelSignalizer,      SIGNAL(activated(QObject *, QEvent *)),     this,           SLOT(at_sliderResizerWidget_wheelEvent(QObject *, QEvent *)));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                     this,           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                        this,           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                     this,           SLOT(updateControlsVisibility()));
@@ -1881,6 +1890,16 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
+}
+
+void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event) {
+    QGraphicsSceneWheelEvent *oldEvent = static_cast<QGraphicsSceneWheelEvent *>(event);
+
+    QGraphicsSceneWheelEvent newEvent(QEvent::GraphicsSceneWheel);
+    newEvent.setDelta(oldEvent->delta());
+    newEvent.setPos(m_sliderItem->timeSlider()->mapFromItem(m_sliderResizerWidget, oldEvent->pos()));
+    newEvent.setScenePos(oldEvent->scenePos());
+    display()->scene()->sendEvent(m_sliderItem->timeSlider(), &newEvent);
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
