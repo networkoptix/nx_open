@@ -129,7 +129,7 @@
                 <File Id="ClientX264" Name="x264.exe" Source="$(var.SourceDir)/x264.exe"/>                                
             </Component>
         </ComponentGroup>
-        
+
         <?if ${quicksync} = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
@@ -140,7 +140,7 @@
             </Component>
         </ComponentGroup>                            
         <?endif?>
-        
+
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
@@ -224,7 +224,9 @@
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentRef Id="ClientConfiguration" />
+            <?if ${quicksync} = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
+            <?endif?>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />
