@@ -94,8 +94,11 @@
                         </goals>
                         <configuration>
                             <target>
+                                <exec dir="${environment.dir}" executable="hg" failifexecutionfails="true">
+                                    <arg line="pull -u"/> 
+                                </exec>
                                 <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>	
-                                <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="false">
+                                <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                     <arg line="${arch} ${toolchain.version}"/> 
                                 </exec>
                             </target>
@@ -235,13 +238,6 @@
                 </property>
             </activation>            
             <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>help</artifactId>
-                    <version>${project.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${customization}-${help.language}</classifier>
-                </dependency>
 
                 <dependency>
                     <groupId>org</groupId>
@@ -250,13 +246,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>                               	
-                <dependency>
-                    <groupId>org.festival</groupId>
-                    <artifactId>festival-vox</artifactId>
-                    <version>${festival.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>all-os</classifier>
-                </dependency> 		
+
                 <dependency>
                     <groupId>com.sourceforge.cloudcity</groupId>
                     <artifactId>bespin</artifactId>

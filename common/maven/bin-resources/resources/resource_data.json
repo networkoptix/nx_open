@@ -29,7 +29,7 @@
         },
         {
             "keys": [
-                "FW3471-PS-E", "DWC-MPTZ20X", "ACTi-KCM8111"
+                "FW3471-PS-E", "DWC-MPTZ20X", "KCM8111"
             ],
             "octagonalPtz": true
         },
