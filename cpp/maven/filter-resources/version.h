@@ -1,8 +1,8 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#ifndef ${artifactId}_VERSION_H
-#define ${artifactId}_VERSION_H
+#ifndef ${project.artifactId}_VERSION_H
+#define ${project.artifactId}_VERSION_H
 
 /* 
  * Some defines from the build system. Feel free to use these.
@@ -66,9 +66,9 @@
 #define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2013 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR        "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR        VER_LEGALTRADEMARKS1_STR
-#define VER_ORIGINALFILENAME_STR        "${artifactId}.exe"
-#define VER_PRODUCTNAME_STR             "${artifactId}"
+#define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"
+#define VER_PRODUCTNAME_STR             "${project.artifactId}"
 #define VER_COMPANYDOMAIN_STR           "${company.url}"
 /* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
 
-#endif // ${artifactId}_VERSION_H
+#endif // ${project.artifactId}_VERSION_H

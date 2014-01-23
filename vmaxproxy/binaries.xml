@@ -9,7 +9,7 @@
 			<directory>${libdir}/bin/${build.configuration}</directory>
 			<outputDirectory>/bin/${build.configuration}/${project.artifactId}</outputDirectory>
 			<includes>
-				<include>${artifactId}.exe</include>
+				<include>${project.artifactId}.exe</include>
 				<include>acs_*.dll</include>
 				<include>qt5core.dll</include>
 				<include>pid.dat</include>

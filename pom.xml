@@ -436,7 +436,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
+                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
             </properties>
         </profile>	      
         <profile>
@@ -448,7 +448,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
+                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
             </properties>       
         </profile>	        
     </profiles>	
