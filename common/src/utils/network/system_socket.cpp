@@ -1,9 +1,10 @@
-
 #include "system_socket.h"
+
+#include <boost/type_traits/is_same.hpp>
 
 #include <utils/common/warnings.h>
 #include <utils/common/stdext.h>
-#include "utils/network/ssl_socket.h"
+#include <utils/network/ssl_socket.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -13,10 +14,12 @@
 #include <QtCore/QElapsedTimer>
 
 #include "system_socket_impl.h"
-#include "../common/systemerror.h"
+#include <utils/common/systemerror.h>
 
 
 #ifdef Q_OS_WIN
+/* Check that the typedef in AbstractSocket is correct. */
+static_assert(boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value, "Invalid socket type is used in AbstractSocket.");
 typedef int socklen_t;
 typedef char raw_type;       // Type used for raw data on this platform
 #else

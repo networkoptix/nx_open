@@ -3,8 +3,8 @@
 #include <QtWidgets/QAction>
 
 #include <utils/common/warnings.h>
-#include <core/resource_managment/resource_criterion.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_criterion.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>

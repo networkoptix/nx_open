@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 #include <utils/math/fuzzy.h>
 #include <core/resource/resource_data.h>
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <plugins/resources/onvif/onvif_resource.h>
 
 #include "soap_wrapper.h"

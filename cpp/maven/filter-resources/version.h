@@ -1,8 +1,8 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#ifndef ${artifactId}_VERSION_H
-#define ${artifactId}_VERSION_H
+#ifndef ${project.artifactId}_VERSION_H
+#define ${project.artifactId}_VERSION_H
 
 /* 
  * Some defines from the build system. Feel free to use these.
@@ -40,14 +40,10 @@
 #define QN_FREE_LICENSE_COUNT           ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY             "${freeLicenseKey}"
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}
-#define QN_LICENSE_URL                  "${license.url}"
-#define QN_RSA_PUBLIC_KEY               ${rsa.public.key}
 #define QN_SHOWCASE_URL                 "${showcase.url}"
 #define QN_SETTINGS_URL                 "${settings.url}"
 #define QN_PRODUCT_NAME_LONG            "${product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
-#define QN_AGGREGATION_PERIOD           ${aggregation.period}
-
 
 /* 
  * These constants are here for windows resource file.
@@ -66,9 +62,9 @@
 #define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2013 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR        "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR        VER_LEGALTRADEMARKS1_STR
-#define VER_ORIGINALFILENAME_STR        "${artifactId}.exe"
-#define VER_PRODUCTNAME_STR             "${artifactId}"
+#define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"
+#define VER_PRODUCTNAME_STR             "${project.artifactId}"
 #define VER_COMPANYDOMAIN_STR           "${company.url}"
 /* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
 
-#endif // ${artifactId}_VERSION_H
+#endif // ${project.artifactId}_VERSION_H

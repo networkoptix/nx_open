@@ -11,9 +11,8 @@
 #include <licensing/license.h>
 
 #include <api/model/servers_reply.h>
+#include <api/model/connection_info.h>
 #include <api/serializer/pb_serializer.h>
-
-#include "connectinfo.h"
 
 #include "api_fwd.h"
 #include "abstract_connection.h"
@@ -40,7 +39,7 @@ signals:
     void finished(int status, const QnServersReply &reply, int handle);
     void finished(int status, const QnLicenseList &reply, int handle);
     void finished(int status, const QnKvPairListsById &reply, int handle);
-    void finished(int status, const QnConnectInfoPtr &reply, int handle);
+    void finished(int status, const QnConnectionInfoPtr &reply, int handle);
     void finished(int status, const QnBusinessEventRuleList &reply, int handle);
     void finished(int status, const QnKvPairList &reply, int handle);
     void finished(int status, bool reply, int handle);
@@ -65,7 +64,7 @@ public:
     QByteArray getLastError() const;
 
     // Synchronous API
-    int connect(QnConnectInfoPtr& connectInfo);
+    int connect(QnConnectionInfoPtr& connectInfo);
     int getResourceTypes(QnResourceTypeList& resourceTypes);
     int getResources(QnResourceList& resources);
     int getResource(const QnId& id, QnResourcePtr& resource);

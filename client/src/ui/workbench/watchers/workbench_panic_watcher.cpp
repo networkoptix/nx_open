@@ -3,7 +3,7 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 QnWorkbenchPanicWatcher::QnWorkbenchPanicWatcher(QObject *parent):
     QObject(parent),

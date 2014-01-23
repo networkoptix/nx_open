@@ -46,6 +46,7 @@ if get_environment_variable('platform') == 'windows':
         lib_source_dir = '${environment.dir}/qt5/qtbase-%s/bin' % arch
         pdb_source_dir = '${environment.dir}/qt5/qtbase-%s/lib' % arch
         target_dir = join('${project.build.directory}', arch, 'bin')
+        lib_target_dir = join('${project.build.directory}', arch, 'lib')
         help_dir = join('${project.build.directory}', arch, 'bin/help')
             
         if os.path.exists(help_dir):
@@ -87,11 +88,14 @@ if get_environment_variable('platform') == 'windows':
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
                         
         for config in ('debug', 'release'):
-            target = join(target_dir, config, 'vox')
-            if os.path.exists(target):
-                shutil.rmtree(target)            
-            shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target)                        
-            shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))
+            target_vox = join(target_dir, config, 'vox')
+            if os.path.exists(target_vox):
+                shutil.rmtree(target_vox)            
+            target_plugins = join(target_dir, config, 'plugins')
+            if not os.path.exists(target_plugins):
+                os.makedirs(join(target_dir, config, 'plugins'))
+            shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        
+            shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', target_plugins)
 
 else:     
     lib_source_dir = '${qt.dir}/lib'
@@ -132,8 +136,6 @@ else:
     else: print '+++++++++++++++++++++++ Could not recognize platform +++++++++++++++++++++++'
                               
     for config in ('debug', 'release'):
-        shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', join(target_dir, config))  
-
         for qtplugin in qtplugins:
             if qtplugin != '':
                 target = join(target_dir, config, qtplugin)

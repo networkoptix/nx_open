@@ -1,7 +1,4 @@
-
-#ifdef _WIN32
-
-#include "sys_dependent_monitor.h"
+#include "monitor_win.h"
 
 #include <cassert>
 
@@ -50,9 +47,9 @@ namespace {
 
 
 // -------------------------------------------------------------------------- //
-// QnSysDependentMonitorPrivate
+// QnWindowsMonitorPrivate
 // -------------------------------------------------------------------------- //
-class QnSysDependentMonitorPrivate {
+class QnWindowsMonitorPrivate {
 public:
     enum {
         /** Minimal interval between consequent re-reads of the performance counter,
@@ -70,7 +67,7 @@ public:
         PDH_RAW_COUNTER counter;
     };
 
-    QnSysDependentMonitorPrivate(): 
+    QnWindowsMonitorPrivate(): 
         pdhLibrary(0), 
         query(0),
         diskCounter(0),
@@ -81,7 +78,7 @@ public:
             checkError("LoadLibrary", GetLastError());
     }
 
-    virtual ~QnSysDependentMonitorPrivate() {
+    virtual ~QnWindowsMonitorPrivate() {
         if(query != 0 && query != INVALID_HANDLE_VALUE)
             INVOKE(PdhCloseQuery(query));
 
@@ -225,7 +222,7 @@ public:
     }
 
 private:
-    const QnSysDependentMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
+    const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
     
 private:
     /** Handle to PHD dll. Used to query error messages via <tt>FormatMessage</tt>. */
@@ -250,32 +247,32 @@ private:
     QHash<int, HddItem> lastItemByDiskId;
 
 private:
-    Q_DECLARE_PUBLIC(QnSysDependentMonitor);
-    QnSysDependentMonitor *q_ptr;
+    Q_DECLARE_PUBLIC(QnWindowsMonitor);
+    QnWindowsMonitor *q_ptr;
 };
 
 
 // -------------------------------------------------------------------------- //
 // QnSysDependentMonitor
 // -------------------------------------------------------------------------- //
-QnSysDependentMonitor::QnSysDependentMonitor(QObject *parent):
+QnWindowsMonitor::QnWindowsMonitor(QObject *parent):
     base_type(parent),
-    d_ptr(new QnSysDependentMonitorPrivate())
+    d_ptr(new QnWindowsMonitorPrivate())
 {
     d_ptr->q_ptr = this;
 }
 
-QnSysDependentMonitor::~QnSysDependentMonitor() {
+QnWindowsMonitor::~QnWindowsMonitor() {
     return;
 }
 
-QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
-    Q_D(QnSysDependentMonitor);
+QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
+    Q_D(QnWindowsMonitor);
 
     d->collectQuery();
 
     QList<QnPlatformMonitor::HddLoad> result;
-    foreach(const QnSysDependentMonitorPrivate::HddItem &item, d->itemByDiskId) {
+    foreach(const QnWindowsMonitorPrivate::HddItem &item, d->itemByDiskId) {
         qreal load = 0.0;
         if(d->lastItemByDiskId.contains(item.hdd.id)) 
             load = d->diskCounterValue(d->diskCounter, d->lastItemByDiskId[item.hdd.id].counter, item.counter);
@@ -284,14 +281,3 @@ QList<QnPlatformMonitor::HddLoad> QnSysDependentMonitor::totalHddLoad() {
     }
     return result;
 }
-
-QList<QnPlatformMonitor::NetworkLoad> QnSysDependentMonitor::totalNetworkLoad()
-{
-    return base_type::totalNetworkLoad();
-}
-
-QList<QnPlatformMonitor::PartitionSpace> QnSysDependentMonitor::totalPartitionSpaceInfo()
-{
-    return base_type::totalPartitionSpaceInfo();
-}
-#endif

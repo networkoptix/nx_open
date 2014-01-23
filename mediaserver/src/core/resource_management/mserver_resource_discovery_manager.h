@@ -1,7 +1,7 @@
 #ifndef QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
 #define QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
 
-#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_management/resource_discovery_manager.h"
 
 
 class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager

@@ -14,7 +14,7 @@
 
 #include <utils/common/event_processors.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 
 #include <ui/help/help_topic_accessor.h>

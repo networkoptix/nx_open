@@ -12,7 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>

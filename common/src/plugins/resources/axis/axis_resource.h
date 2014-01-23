@@ -128,8 +128,6 @@ private:
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     void forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient );
 
-    void initializePtz(CLSimpleHTTPClient *http);
-
     friend class QnAxisPtzController;
 };
 

@@ -5,7 +5,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArray>
 
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 #include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 

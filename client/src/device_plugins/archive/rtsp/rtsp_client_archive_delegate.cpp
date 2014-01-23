@@ -9,7 +9,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/network/ffmpeg_sdp.h"

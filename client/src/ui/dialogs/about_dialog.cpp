@@ -14,7 +14,7 @@
 
 #include "api/app_server_connection.h"
 #include "core/resource/resource_type.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
 
 #include <ui/actions/action_manager.h>

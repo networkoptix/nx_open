@@ -363,7 +363,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     initializeIOPorts( &http );
 
-    initializePtz(&http);
+    /* Ptz capabilities will be initialized by PTZ controller pool. */
 
     // determin camera max resolution
 
@@ -881,27 +881,8 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient 
     }
 }
 
-void QnPlAxisResource::initializePtz(CLSimpleHTTPClient *http) {
-    Q_UNUSED(http)
-    // TODO: #Elric make configurable.
-    static const char *brokenPtzCameras[] = {"AXISP3344", "AXISP1344", NULL}; // TODO
-
-    // TODO: #Elric use QHash here, +^
-    QString localModel = getModel();
-    for(const char **model = brokenPtzCameras; *model; model++)
-        if(localModel == QLatin1String(*model))
-            return;
-
-    QScopedPointer<QnAxisPtzController> controller(new QnAxisPtzController(toSharedPointer(this)));
-    setPtzCapabilities(controller->getCapabilities());
-}
-
 QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
-    if(getPtzCapabilities() == 0) {
-        return NULL;
-    } else {
-        return new QnAxisPtzController(toSharedPointer(this));
-    }
+    return new QnAxisPtzController(toSharedPointer(this));
 }
 
 int QnPlAxisResource::getChannel() const

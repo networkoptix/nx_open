@@ -402,7 +402,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnServerResourceWidget</name>
     <message numerus="yes">
-        <source>%1 %2 (up %n days, %2)</source>
+        <source>%1 %2 (up %n days, %3)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>

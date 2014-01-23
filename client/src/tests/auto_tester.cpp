@@ -4,7 +4,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QTimer>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <utils/common/warnings.h>
 #include <utils/common/command_line_parser.h>
 

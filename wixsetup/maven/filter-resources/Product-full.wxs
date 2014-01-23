@@ -13,6 +13,7 @@
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
+        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -38,10 +39,16 @@
         <SetProperty Id="APPSERVER_PORT" Value="[APPSERVER_PORT32]" After="AppSearch">
             <![CDATA[ APPSERVER_PORT = "" ]]>
         </SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]></SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
-        
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch">
             <![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
         </SetProperty>
@@ -49,7 +56,7 @@
         <Property Id="INSTALL_ECS" Secure="yes"/>
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
-        
+
 
         <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
@@ -124,7 +131,7 @@
 
         <Property Id="ALLOW_CAMERA_CHANGES_REF1" Value="ALLOW_CAMERA_CHANGES"/>
         <Property Id="ALLOW_CAMERA_CHANGES_REF2" Value="ALLOW_CAMERA_CHANGES"/>
-        
+
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
                             Root="HKLM"
@@ -663,9 +670,11 @@
                                 <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
                             </Component>
 
-                            <Component Id="ServerRtspPlugin">
-                                <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.SourceDir)\genericrtspplugin.dll" />
-                            </Component>                    
+                            <Directory Id="ServerPlugins" Name="plugins">
+                                <Component Id="ServerRtspPlugin">
+                                    <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
+                                </Component>                    
+                            </Directory>
 
                             <Component Id="ServerSigar">
                                 <File Id="ServerSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>

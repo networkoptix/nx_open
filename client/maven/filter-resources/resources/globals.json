@@ -1,6 +1,7 @@
 {
     "settings": {
         "updateFeedUrl":            "${updatefeed.url}",
-        "translationPath":          ":/translations/common_${translation1}.qm"
+        "translationPath":          ":/translations/common_${translation1}.qm",
+        "isAutoCheckForUpdates":    ${updatefeed.auto}
     }
 }

@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>

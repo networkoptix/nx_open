@@ -10,7 +10,7 @@
 #include <QtXml/QXmlDefaultHandler>
 #include <QtCore/QUrlQuery>
 
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
 
 

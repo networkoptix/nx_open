@@ -5,7 +5,7 @@
 
 #include <common/common_meta_types.h>
 #include <utils/common/product_features.h>
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <api/session_manager.h>
 
 

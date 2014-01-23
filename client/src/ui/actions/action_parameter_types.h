@@ -57,7 +57,4 @@ public:
     static QnResourceWidgetList widgets(const QList<QGraphicsItem *> items);
 };
 
-Q_DECLARE_METATYPE(QnResourceWidgetList);
-Q_DECLARE_METATYPE(QnWorkbenchLayoutList);
-
 #endif // QN_ACTION_TARGET_TYPES_H

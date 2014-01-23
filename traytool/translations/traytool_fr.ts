@@ -203,7 +203,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">Arrêter %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="754"/>
+        <location filename="../src/systraywindow.cpp" line="763"/>
         <source>* Last used connection *</source>
         <translation>*Dernière connexion utilisée *</translation>
     </message>
@@ -324,32 +324,32 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Arrêter le Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="870"/>
+        <location filename="../src/systraywindow.cpp" line="884"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le contrôleur entreprise et le média serveur soient redémarrés. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="872"/>
+        <location filename="../src/systraywindow.cpp" line="886"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le contrôleur entreprise soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="874"/>
+        <location filename="../src/systraywindow.cpp" line="888"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le serveur média soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="910"/>
+        <location filename="../src/systraywindow.cpp" line="924"/>
         <source>Invalid %1 port specified.</source>
         <translation>Le port %1 spécifié est invalide.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="943"/>
+        <location filename="../src/systraywindow.cpp" line="957"/>
         <source>enterprise controller</source>
         <translation>contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="967"/>
+        <location filename="../src/systraywindow.cpp" line="981"/>
         <source>%1 port is already used by another process</source>
         <translation type="unfinished"></translation>
     </message>
@@ -366,7 +366,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Serveur Média API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="957"/>
+        <location filename="../src/systraywindow.cpp" line="971"/>
         <source>%1 port is same as %2 port</source>
         <translation>Le port %1 est le même que %2</translation>
     </message>
@@ -375,17 +375,17 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Le port %1 est déjà utilisé par un autre processus</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="974"/>
+        <location filename="../src/systraywindow.cpp" line="988"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>L&apos;adresse IP spécifiée n&apos;est pas une adresse IP publique valide</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1044"/>
+        <location filename="../src/systraywindow.cpp" line="1059"/>
         <source>Invalid parameters</source>
         <translation>Paramètres invalide</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1044"/>
+        <location filename="../src/systraywindow.cpp" line="1059"/>
         <source>You have entered invalid URL.</source>
         <translation>Vous avez entré une URL invalide.</translation>
     </message>
@@ -430,7 +430,6 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="95"/>
-        <location filename="../src/settings.ui" line="362"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
@@ -447,6 +446,21 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="259"/>
         <source>Enable auto discovery for cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="345"/>
+        <source>Enterprise controller settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="351"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="358"/>
+        <source>Do not control camera settings:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -478,12 +492,11 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Configurations du contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="345"/>
         <source>Enterprise controller network settings</source>
-        <translation>Configurations réseau du contrôleur entreprise</translation>
+        <translation type="obsolete">Configurations réseau du contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="406"/>
+        <location filename="../src/settings.ui" line="405"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publique</translation>
     </message>
@@ -521,13 +534,13 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="280"/>
-        <location filename="../src/settings.ui" line="415"/>
+        <location filename="../src/settings.ui" line="414"/>
         <source>Use specified IP or host name</source>
         <translation>Spécifier IP ou le nom d&apos;hôte</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="290"/>
-        <location filename="../src/settings.ui" line="425"/>
+        <location filename="../src/settings.ui" line="424"/>
         <source>Auto detect public IP</source>
         <translation>Détection automatique IP publique</translation>
     </message>
@@ -548,22 +561,22 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="465"/>
+        <location filename="../src/settings.ui" line="464"/>
         <source>About</source>
         <translation>À propos</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="475"/>
+        <location filename="../src/settings.ui" line="474"/>
         <source>Language:</source>
         <translation>Langue:</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="487"/>
+        <location filename="../src/settings.ui" line="486"/>
         <source>(requires restart)</source>
         <translation>(nécessite un redémarrage)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="498"/>
+        <location filename="../src/settings.ui" line="497"/>
         <source>Information</source>
         <translation>Informations</translation>
     </message>

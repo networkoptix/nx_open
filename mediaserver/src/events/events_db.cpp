@@ -8,7 +8,7 @@
 #include "utils/common/util.h"
 #include "serverutil.h"
 #include "business/business_action_factory.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
 #include "settings.h"
 

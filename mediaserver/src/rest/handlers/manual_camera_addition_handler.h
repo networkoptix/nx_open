@@ -6,7 +6,7 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QHostInfo>
 
-#include <core/resource_managment/manual_camera_searcher.h>
+#include <core/resource_management/manual_camera_searcher.h>
 
 #include <rest/server/json_rest_handler.h>
 

@@ -3,8 +3,7 @@
 
 #include <rest/server/json_rest_handler.h>
 
-// TODO: #Elric QnStorageStatusHandler
-class QnFileSystemHandler: public QnJsonRestHandler {
+class QnStorageStatusHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
 

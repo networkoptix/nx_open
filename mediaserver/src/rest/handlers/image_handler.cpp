@@ -11,7 +11,7 @@ extern "C"
 #include "rest/server/rest_server.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"

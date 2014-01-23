@@ -4,9 +4,9 @@
 
 #include <QtCore/QFutureWatcher>
 
-#include <core/resource_managment/resource_pool.h>
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_searcher.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_searcher.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>

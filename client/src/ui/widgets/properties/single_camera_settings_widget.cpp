@@ -17,7 +17,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>

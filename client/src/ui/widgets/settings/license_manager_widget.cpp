@@ -17,7 +17,7 @@
 
 #include <client/client_translation_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <common/common_module.h>
 

@@ -18,7 +18,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
