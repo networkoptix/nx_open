@@ -94,11 +94,12 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${buildenv.script}</executable>
                             <arguments>
-                                <argument>buildenv.py</argument>
+                                <argument>${arch}</argument>
+                                <argument>${toolchain.version}</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>		
+                            <workingDirectory>${environment.dir}</workingDirectory>		
                             <skip>${rsync.skip}</skip>
                         </configuration>
                     </execution>          
