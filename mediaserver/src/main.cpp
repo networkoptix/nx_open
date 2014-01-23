@@ -963,7 +963,8 @@ void QnMain::run()
     QnMotionHelper::initStaticInstance( new QnMotionHelper() );
 
     QnBusinessEventConnector::initStaticInstance( new QnBusinessEventConnector() );
-    std::auto_ptr<QThread> connectorThread( new QThread() );
+    auto stopQThreadFunc = []( QThread* obj ){ obj->quit(); obj->wait(); delete obj; };
+    std::unique_ptr<QThread, decltype(stopQThreadFunc)> connectorThread( new QThread(), stopQThreadFunc );
     connectorThread->start();
     qnBusinessRuleConnector->moveToThread(connectorThread.get());
 
