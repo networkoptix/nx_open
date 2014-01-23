@@ -3,7 +3,7 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 QnWorkbenchPtzCameraWatcher::QnWorkbenchPtzCameraWatcher(QObject *parent):
     QObject(parent),
@@ -61,7 +61,7 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceRemoved(const QnResour
 void QnWorkbenchPtzCameraWatcher::at_resource_ptzCapabilitiesChanged(const QnResourcePtr &resource) 
 {
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-        if(resource->getPtzCapabilities() & Qn::AllPtzCapabilities) {
+        if(resource->getPtzCapabilities() != Qn::NoPtzCapabilities) {
             addPtzCamera(camera);
         } else {
             removePtzCamera(camera);

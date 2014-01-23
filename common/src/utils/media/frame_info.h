@@ -13,7 +13,8 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 #include "core/datapacket/media_data_packet.h"
-#include <core/resource/dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/item_dewarping_params.h>
 #include "utils/color_space/image_correction.h"
 
 
@@ -148,7 +149,10 @@ public:
     QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
+    CLVideoDecoderOutput(QImage image);
     ~CLVideoDecoderOutput();
+
+    QImage toImage() const;
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -165,7 +169,7 @@ public:
 
     void copyDataFrom(const AVFrame* frame);
 public:
-    int flags;
+    QnAbstractMediaData::MediaFlags flags;
 
     /** Pixel width to pixel height ratio. Some videos have non-square pixels, we support that. */
     double sample_aspect_ratio; 
@@ -252,7 +256,10 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot(const ImageCorrectionParams& params, const DewarpingParams& dewarping) = 0; // 8 bit Y channel only
+    virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
+                                 const QnMediaDewarpingParams& mediaDewarping,
+                                 const QnItemDewarpingParams& itemDewarping,
+                                 bool anyQuality) = 0; // 8 bit Y channel only
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

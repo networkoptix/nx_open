@@ -25,6 +25,7 @@ namespace applauncher
                 getInstallationStatus,
                 isVersionInstalled,
                 cancelInstallation,
+                addProcessKillTimer,
                 invalidTaskType
             };
 
@@ -119,6 +120,8 @@ namespace applauncher
             enum Value
             {
                 ok,
+                //!Failed to connect to applauncher
+                connectError,
                 versionNotInstalled,
                 alreadyInstalled,
                 invalidVersionFormat,
@@ -229,6 +232,23 @@ namespace applauncher
         };
 
         class CancelInstallationResponse : public Response {};
+
+
+        class AddProcessKillTimerRequest
+        :
+            public BaseTask
+        {
+        public:
+            qint64 processID;
+            quint32 timeoutMillis;
+
+            AddProcessKillTimerRequest();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class AddProcessKillTimerResponse : public Response {};
     }
 }
 

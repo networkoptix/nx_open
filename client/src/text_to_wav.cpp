@@ -313,21 +313,9 @@ bool TextToWaveServer::generateSoundSync( const QString& text, QIODevice* const 
     return task->result;
 }
 
-static TextToWaveServer* _staticInstance = NULL;
-
-void TextToWaveServer::initStaticInstance( TextToWaveServer* _instance )
-{
-    _staticInstance = _instance;
-}
-
-TextToWaveServer* TextToWaveServer::instance()
-{
-    return _staticInstance;
-}
-
 void TextToWaveServer::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
 
     FestivalInitializer festivalInitializer;
 

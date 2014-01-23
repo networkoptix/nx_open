@@ -61,9 +61,10 @@ public:
     void loadFromRule(QnBusinessEventRulePtr businessRule);
     QnBusinessEventRulePtr createRule() const;
 
-    QVariant getText(const int column, const bool detailed = true) const;
-    QVariant getIcon(const int column) const;
-    QVariant getHelpTopic(const int column) const;
+    QString getText(const int column, const bool detailed = true) const;
+    QString getToolTip(const int column) const;
+    QIcon getIcon(const int column) const;
+    int getHelpTopic(const int column) const;
 
     bool isValid(int column) const;
     bool isValid() const; //checks validity for all row
@@ -132,6 +133,10 @@ private:
     QString getTargetText(const bool detailed) const;
 
     QString getAggregationText() const;
+
+    static QString toggleStateToModelString(Qn::ToggleState value);
+    static QString toggleStateToString(Qn::ToggleState state);
+    static QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType);
 private:
     int m_id;
     bool m_modified;

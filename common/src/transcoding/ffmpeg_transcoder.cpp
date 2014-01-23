@@ -101,7 +101,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = tr("No %1 container in FFMPEG library.").arg(container);
+        m_lastErrMessage = tr("Container %1 was not found in FFMPEG library.").arg(container);
         qWarning() << m_lastErrMessage;
         return -1;
     }
@@ -109,7 +109,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, "");
     if (err != 0)
     {
-        m_lastErrMessage = tr("Can't create output context for format %1").arg(container);
+        m_lastErrMessage = tr("Could not create output context for format %1.").arg(container);
         qWarning() << m_lastErrMessage;
         return -2;
     }
@@ -128,7 +128,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
         AVStream* videoStream = av_new_stream(m_formatCtx, 0);
         if (videoStream == 0)
         {
-            m_lastErrMessage = tr("Can't allocate output stream for recording.");
+            m_lastErrMessage = tr("Could not allocate output stream for recording.");
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return -1;
         }
@@ -167,7 +167,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
                 videoHeight = decoder.getHeight();
                 if (videoWidth < 1 || videoHeight < 1)
                 {
-                    m_lastErrMessage = tr("Transcoder error: for direct stream copy video frame size must exists");
+                    m_lastErrMessage = tr("Could not perform direct stream copy because frame size is undefined.");
                     return -3;
                 }
             }
@@ -205,7 +205,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
         AVStream* audioStream = av_new_stream(m_formatCtx, 0);
         if (audioStream == 0)
         {
-            m_lastErrMessage = tr("Can't allocate output stream for recording.");
+            m_lastErrMessage = tr("Could not allocate output stream for recording.");
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return -1;
         }
@@ -213,7 +213,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
         AVCodec* avCodec = avcodec_find_decoder(m_audioCodec);
         if (avCodec == 0)
         {
-            m_lastErrMessage = tr("Transcoder error: can't find codec").arg(m_audioCodec);
+            m_lastErrMessage = tr("Could not find codec %1.").arg(m_audioCodec);
             return -2;
         }
         audioStream->codec = m_audioEncoderCodecCtx = avcodec_alloc_context3(avCodec);
@@ -248,7 +248,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
     if (rez < 0) 
     {
         closeFfmpegContext();
-        m_lastErrMessage = tr("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container);
+        m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return -3;
     }
@@ -328,7 +328,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnConstAbstractMediaDataPtr medi
             }
         }
         media.clear();
-    } while (transcoder && packet.size > 0);
+    } while (transcoder && transcoder->existMoreData());
     return 0;
 }
 

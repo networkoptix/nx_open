@@ -11,7 +11,7 @@
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "camera/camera_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -88,7 +88,7 @@ public:
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
         CLDataQueue tmpQueue(20);
-        camera->copyLastGop(true, 0, tmpQueue);
+        camera->copyLastGop(true, 0, tmpQueue, 0);
 
         if (tmpQueue.size() > 0)
         {
@@ -406,7 +406,7 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    saveSysThreadID();
+    initSystemThreadId();
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 

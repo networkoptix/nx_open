@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_ARECONT
 
+#include <QElapsedTimer>
 #include "av_resource.h"
 
 
@@ -24,15 +25,16 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 private:
     bool setResolution(bool full);
     bool setCamQuality(int q);
 
 protected:
-    QnResourceVideoLayout* m_vrl;
+    QnResourceVideoLayoutPtr m_vrl;
     bool m_isRotated;    
-    QnCustomResourceVideoLayout* m_rotatedLayout;
+    QnCustomResourceVideoLayoutPtr m_rotatedLayout;
+    QElapsedTimer m_flipTimer;
 };
 
 typedef QnSharedResourcePointer<QnArecontPanoramicResource> QnArecontPanoramicResourcePtr;

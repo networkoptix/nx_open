@@ -2,29 +2,23 @@
 #define QN_DW_ZOOM_PTZ_CONTROLLER_H
 
 #ifdef ENABLE_ONVIF
+#include <core/ptz/basic_ptz_controller.h>
 
-#include <core/resource/interface/abstract_ptz_controller.h>
-#include "core/resource/media_resource.h"
+class QnDwZoomPtzController: public QnBasicPtzController {
+    Q_OBJECT
+    typedef QnBasicPtzController base_type;
 
-
-class QnDwZoomPtzController: public QnAbstractPtzController {
-    Q_OBJECT;
 public:
-    QnDwZoomPtzController(QnPlWatchDogResource* resource);
+    QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource);
     virtual ~QnDwZoomPtzController();
 
-    virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
-    virtual int stopMove() override;
-    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
-    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
     virtual Qn::PtzCapabilities getCapabilities() override;
-    virtual const QnPtzSpaceMapper *getSpaceMapper() override;
+    virtual bool continuousMove(const QVector3D &speed) override;
 
 private:
-    QnPlWatchDogResource* m_resource;
+    QnPlWatchDogResourcePtr m_resource;
 };
 
-
-#endif //ENABLE_ONVIF
+#endif // ENABLE_ONVIF
 
 #endif // QN_DW_ZOOM_PTZ_CONTROLLER_H

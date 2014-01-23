@@ -41,7 +41,7 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
             if (values.size() < 2)
                 continue;
             QByteArray codecName = values[1];
-            if (!codecName.startsWith("H264"))
+            if (!codecName.toUpper().startsWith("H264"))
                 continue;
             QList<QByteArray> values2 = codecName.split('/');
             if (values2.size() < 2)
@@ -162,7 +162,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
     result->width = m_sps.getWidth();
     result->height = m_sps.getHeight();
     if (m_keyDataExists) {
-        result->flags = AV_PKT_FLAG_KEY;
+        result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
             serializeSpsPps(result->data);
     }

@@ -87,7 +87,7 @@ protected:
 class QnRtpAudioStreamParser: public QnRtpStreamParser
 {
 public:
-    virtual QnResourceAudioLayout* getAudioLayout() = 0;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() = 0;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
 protected:

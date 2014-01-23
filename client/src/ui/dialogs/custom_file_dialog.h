@@ -7,35 +7,69 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QGridLayout>
 
-class QnCheckboxControlAbstractDelegate: public QObject
+#ifdef Q_OS_MAC
+#define QN_TWO_STEP_DIALOG
+#endif
+
+#ifdef QN_TWO_STEP_DIALOG
+    #include <ui/dialogs/two_step_file_dialog.h>
+    typedef QnTwoStepFileDialog QnSystemBasedCustomDialog;
+
+#else
+    class QnSystemBasedCustomDialog: public QFileDialog {
+    public:
+        explicit QnSystemBasedCustomDialog(QWidget *parent = 0,
+                                           const QString &caption = QString(),
+                                           const QString &directory = QString(),
+                                           const QString &filter = QString()):
+            QFileDialog(parent, caption, directory, filter) {}
+
+        QString selectedFile() const {
+            QStringList files = selectedFiles();
+            if (files.size() < 0)
+                return QString();
+            return files.first();
+        }
+
+        static QFileDialog::Options fileDialogOptions() { return QFileDialog::DontUseNativeDialog; }
+        static QFileDialog::Options directoryDialogOptions() {return QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly; }
+    protected:
+        QGridLayout* customizedLayout() const {return dynamic_cast<QGridLayout*>(layout()); }
+    };
+#endif
+
+
+class QnWidgetControlAbstractDelegate: public QObject
 {
     Q_OBJECT
 
 public:
-    QnCheckboxControlAbstractDelegate(QObject *parent = 0): QObject(parent) {}
-    ~QnCheckboxControlAbstractDelegate() {}
+    QnWidgetControlAbstractDelegate(QObject *parent = 0): QObject(parent) {}
+    ~QnWidgetControlAbstractDelegate() {}
 
-    QCheckBox* checkbox() const {
-        return m_checkBox;
+    QList<QWidget*> widgets() const {
+        return m_widgets;
     }
 
-    void setCheckbox(QCheckBox *value) {
-        m_checkBox = value;
+    void addWidget(QWidget *value) {
+        m_widgets << value;
     }
 
 public slots:
     virtual void at_filterSelected(const QString &value) = 0;
 
 private:
-    QCheckBox* m_checkBox;
+    QList<QWidget*> m_widgets;
 };
 
-class QnCustomFileDialog : public QFileDialog
+
+class QnCustomFileDialog : public QnSystemBasedCustomDialog
 {
     Q_OBJECT
 
-    typedef QFileDialog base_type;
+    typedef QnSystemBasedCustomDialog base_type;
 
 public:
     explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
@@ -52,7 +86,7 @@ public:
      *                                  that pointed-to value still exists at that point.
      * @param delegate                  Delegate that will control state of the checkbox.
      */
-    void addCheckBox(const QString &text, bool *value, QnCheckboxControlAbstractDelegate* delegate = NULL);
+    void addCheckBox(const QString &text, bool *value, QnWidgetControlAbstractDelegate* delegate = NULL);
 
     /**
      * @brief addSpinBox                Adds a spinbox to this file dialog.
@@ -75,8 +109,12 @@ public:
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
      */
-    void addWidget(QWidget *widget, bool newRow = true);
+    void addWidget(QWidget *widget, bool newRow = true, QnWidgetControlAbstractDelegate* delegate = NULL);
 
+    /** Returns extension of the selected filter, containing the dot, e.g. ".png". */
+    QString selectedExtension() const;
+
+    static QString valueSpacer() {return lit("%value%"); }
 private slots:
     void at_accepted();
 

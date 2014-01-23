@@ -13,6 +13,7 @@
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
+        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -38,10 +39,16 @@
         <SetProperty Id="APPSERVER_PORT" Value="[APPSERVER_PORT32]" After="AppSearch">
             <![CDATA[ APPSERVER_PORT = "" ]]>
         </SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]></SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
-        
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch">
             <![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
         </SetProperty>
@@ -49,7 +56,7 @@
         <Property Id="INSTALL_ECS" Secure="yes"/>
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
-        
+
 
         <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
@@ -124,7 +131,7 @@
 
         <Property Id="ALLOW_CAMERA_CHANGES_REF1" Value="ALLOW_CAMERA_CHANGES"/>
         <Property Id="ALLOW_CAMERA_CHANGES_REF2" Value="ALLOW_CAMERA_CHANGES"/>
-        
+
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
                             Root="HKLM"
@@ -355,7 +362,7 @@
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller"/>
 
         <CustomAction Id="CopyAppServerNotificationFiles_Cmd" Property="CopyAppServerNotificationFiles" Execute="immediate" Impersonate="yes"
-            Value="[${installer.customization}AppServerDir]hostedfiles\notifications;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles\notifications"/>
+            Value="[${customization}AppServerDir]hostedfiles\notifications;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles\notifications"/>
 
         <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
@@ -366,12 +373,12 @@
                       Execute="deferred" Return="check" Impersonate="no" />
 
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[${installer.customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[${installer.customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -533,20 +540,20 @@
             </Directory>
 
             <Directory Id="MyPicturesFolder">
-                <Directory Id="${installer.customization}BgDir" Name="${product.name} Backgrounds"/>
+                <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
                     <Directory Id="INSTALLDIR" Name="${product.name}">
-                        <Directory Id="${installer.customization}AppServerDir" Name="${appserver.name}">
+                        <Directory Id="${customization}AppServerDir" Name="${appserver.name}">
                             <Component Id="AppServerExecutable">
                                 <File Id="ecexe" Name="ecs.exe" Source="${AppServerDir}/ecs.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="${company.name} ${appserver.name}" Scope="any" IgnoreFailure="yes" />
                                 </File>
 
-                                <ServiceInstall Id="${installer.customization}AppServerService"
-                                                Name="${installer.customization}AppServer"
+                                <ServiceInstall Id="${customization}AppServerService"
+                                                Name="${customization}AppServer"
                                                 DisplayName="${company.name} ${appserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -555,8 +562,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
 
-                                <ServiceControl Id="Start${installer.customization}AppServerService" Name="${installer.customization}AppServer" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${installer.customization}AppServerService" Name="${installer.customization}AppServer" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${customization}AppServerService" Name="${customization}AppServer" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${customization}AppServerService" Name="${customization}AppServer" Stop="both" Wait="yes" Remove="uninstall" />
 
                             </Component>
 
@@ -583,31 +590,31 @@
                             </Component>
                         </Directory>
 
-                        <Directory Id="${installer.customization}TrayToolDir" Name="TrayTool">
+                        <Directory Id="${customization}TrayToolDir" Name="TrayTool">
                             <Directory Id="TraytoolPlatforms" Name="platforms">                                   
                             </Directory>     
                             <Component Id="traytool.exe">   
                                 <File Id="traytool.exe" Name="traytool.exe" Source="$(var.SourceDir)/traytool.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallException${installer.customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallException${customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
 
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
-                                              WorkingDirectory='${installer.customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
 
                                     <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.name}"
-                                              WorkingDirectory='${installer.customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
                             </Component>                                  
                         </Directory>
-                        <Directory Id="${installer.customization}ProxyServerDir" Name="MediaProxy">
+                        <Directory Id="${customization}ProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable">
                                 <File Id="ProxyExe" Name="mediaproxy.exe" Source="$(var.SourceDir)/mediaproxy.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionProxyServer" Name="${mediaproxy.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
 
-                                <ServiceInstall Id="${installer.customization}MediaProxyService"
-                                                Name="${installer.customization}MediaProxy"
+                                <ServiceInstall Id="${customization}MediaProxyService"
+                                                Name="${customization}MediaProxy"
                                                 DisplayName="${mediaproxy.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -616,12 +623,12 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
 
-                                <ServiceControl Id="Start${installer.customization}ProxyService" Name="${installer.customization}MediaProxy" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${installer.customization}ProxyService" Name="${installer.customization}MediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${customization}ProxyService" Name="${customization}MediaProxy" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${customization}ProxyService" Name="${customization}MediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>                   
                         </Directory>
 
-                        <Directory Id="${installer.customization}MediaServerDir" Name="MediaServer">
+                        <Directory Id="${customization}MediaServerDir" Name="MediaServer">
                             <Directory Id="ServerImageFormats" Name="imageformats">
                             </Directory>
 
@@ -630,8 +637,8 @@
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
 
-                                <ServiceInstall Id="${installer.customization}MediaServerService"
-                                                Name="${installer.customization}MediaServer"
+                                <ServiceInstall Id="${customization}MediaServerService"
+                                                Name="${customization}MediaServer"
                                                 DisplayName="${mediaserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -640,8 +647,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
 
-                                <ServiceControl Id="Start${installer.customization}ServerService" Name="${installer.customization}MediaServer" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${installer.customization}ServerService" Name="${installer.customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${customization}ServerService" Name="${customization}MediaServer" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
 
                             <Component Id="ServerConfigurationGuid" Permanent="yes" NeverOverwrite="yes">
@@ -663,18 +670,20 @@
                                 <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
                             </Component>
 
-                            <Component Id="ServerRtspPlugin">
-                                <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.SourceDir)\genericrtspplugin.dll" />
-                            </Component>                    
+                            <Directory Id="ServerPlugins" Name="plugins">
+                                <Component Id="ServerRtspPlugin">
+                                    <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
+                                </Component>                    
+                            </Directory>
 
                             <Component Id="ServerSigar">
                                 <File Id="ServerSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
                             </Component>
 
-                            <Directory Id="${installer.customization}VmaxDir" Name="VmaxProxy">
+                            <Directory Id="${customization}VmaxDir" Name="VmaxProxy">
                                 <Component Id="vmaxproxy.exe">
                                     <File Id="vmaxproxy.exe" Name="vmaxproxy.exe" Source="$(var.SourceDir)/vmaxproxy/vmaxproxy.exe" KeyPath="yes">
-                                        <fire:FirewallException Id="FirewallException${installer.customization}VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
+                                        <fire:FirewallException Id="FirewallException${customization}VmaxProxy" Name="VMS Vmax Proxy" Scope="any" IgnoreFailure="yes"/>
                                     </File>
                                 </Component>
 
@@ -713,7 +722,7 @@
                 <File Id="Traytoolqwindows$(var.suffix).dll" Name="Traytoolqwindows4.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
             </Component>      
         </ComponentGroup>         
-        <ComponentGroup Id="TrayToolQTLibraries" Directory="${installer.customization}TrayToolDir">
+        <ComponentGroup Id="TrayToolQTLibraries" Directory="${customization}TrayToolDir">
             <Component>
                 <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />       
             </Component>
@@ -731,7 +740,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="TrayToolOpenSSL" Directory="${installer.customization}TrayToolDir">
+        <ComponentGroup Id="TrayToolOpenSSL" Directory="${customization}TrayToolDir">
             <Component>
                 <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
@@ -740,7 +749,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ProxyQTLibraries" Directory="${installer.customization}ProxyServerDir">
+        <ComponentGroup Id="ProxyQTLibraries" Directory="${customization}ProxyServerDir">
             <Component>
                 <File Id="ProxyQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
             </Component>
@@ -761,7 +770,7 @@
             </Component>             
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerFFmpegLibraries" Directory="${installer.customization}MediaServerDir">
+        <ComponentGroup Id="ServerFFmpegLibraries" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
@@ -794,7 +803,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerQTLibraries" Directory="${installer.customization}MediaServerDir">
+        <ComponentGroup Id="ServerQTLibraries" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="ServerQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
             </Component>
@@ -830,7 +839,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ServerOpenSSL" Directory="${installer.customization}MediaServerDir">
+        <ComponentGroup Id="ServerOpenSSL" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
@@ -839,7 +848,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ProxyOpenSSL" Directory="${installer.customization}ProxyServerDir">
+        <ComponentGroup Id="ProxyOpenSSL" Directory="${customization}ProxyServerDir">
             <Component>
                 <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
@@ -848,7 +857,7 @@
             </Component>
         </ComponentGroup>                            
 
-        <ComponentGroup Id="VmaxProxySDK" Directory="${installer.customization}VmaxDir">
+        <ComponentGroup Id="VmaxProxySDK" Directory="${customization}VmaxDir">
             <Component>
                 <File Id="VmaxProxyacsstreamsourcemr.dll" Name="acs_stream_source_mr.dll" Source="$(var.SourceDir)/vmaxproxy/acs_stream_source_m$(var.vmaxsuffix).dll"/>
             </Component>

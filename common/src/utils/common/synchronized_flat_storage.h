@@ -20,10 +20,16 @@ public:
 
     ~QnSynchronizedFlatStorage() {}
 
-    T value(const Key &key) {
+    T value(const Key &key) const {
         QReadLocker guard(&m_lock);
 
         return base_type::value(key);
+    }
+
+    QList<T> values() const {
+        QReadLocker guard(&m_lock);
+
+        return base_type::values();
     }
 
     void insert(const Key &key, T value, bool claimOwnership = true) {
@@ -48,7 +54,7 @@ private:
     Q_DISABLE_COPY(QnSynchronizedFlatStorage);
 
 private:
-    QReadWriteLock m_lock;
+    mutable QReadWriteLock m_lock;
 };
 
 #endif // QN_PROTECTED_STORAGE_H

@@ -1,8 +1,9 @@
 #include "camera_resource.h"
-#include "resource_consumer.h"
-#include "api/app_server_connection.h"
 
 #include <QtCore/QUrlQuery>
+
+#include <utils/math/math.h>
+#include <api/app_server_connection.h>
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -151,7 +152,7 @@ void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters
 void QnVirtualCameraResource::save()
 {
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
+    if (conn->saveSync(::toSharedPointer(this)) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
             << getPhysicalId() << ". Description: " << conn->getLastError();
     }
@@ -160,7 +161,7 @@ void QnVirtualCameraResource::save()
 int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
 {
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    return conn->saveAsync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), target, slot);
+    return conn->saveAsync(::toSharedPointer(this), target, slot);
 }
 
 QString QnVirtualCameraResource::toSearchString() const

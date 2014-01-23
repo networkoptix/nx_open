@@ -24,7 +24,7 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include <utils/common/util.h>
+#include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -598,7 +598,7 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::processImage( quint8* yPlane, int width, int height, int stride, const ImageCorrectionParams& data)
 {
-    m_imgCorrection.analizeImage(yPlane, width, height, stride, data, m_displayedRect);
+    m_imgCorrection.analyseImage(yPlane, width, height, stride, data, m_displayedRect);
 }
 
 GLuint DecodedPictureToOpenGLUploader::UploadedPicture::pboID( int index ) const

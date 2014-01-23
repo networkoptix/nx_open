@@ -46,6 +46,7 @@
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
+#include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
@@ -72,7 +73,7 @@
 #include <client/client_settings.h>
 
 #include "openal/qtvaudiodevice.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "watchers/workbench_render_watcher.h"
@@ -319,18 +320,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
     m_treeWidget->resize(qnSettings->treeWidth(), 0);
 
-    m_treeBackgroundItem = new QnFramedWidget(m_controlsWidget);
-    {
-        QLinearGradient gradient(0, 0, 1, 0);
-        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
-        gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
-        gradient.setSpread(QGradient::RepeatSpread);
-
-        m_treeBackgroundItem->setWindowBrush(gradient);
-    }
-    m_treeBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_treeBackgroundItem->setFrameWidth(0.5);
+    m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
 
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
@@ -397,18 +387,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Title bar. */
-    m_titleBackgroundItem = new QnFramedWidget(m_controlsWidget);
-    {
-        QLinearGradient gradient(0, 0, 0, 1);
-        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(0.0, QColor(0, 0, 0, 255));
-        gradient.setColorAt(1.0, QColor(0, 0, 0, 64));
-        gradient.setSpread(QGradient::RepeatSpread);
-
-        m_titleBackgroundItem->setWindowBrush(gradient);
-    }
-    m_titleBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_titleBackgroundItem->setFrameWidth(0.5);
+    m_titleBackgroundItem = new QnControlBackgroundWidget(Qn::TopBorder, m_controlsWidget);
 
     m_titleItem = new QnClickableWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
@@ -510,18 +489,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Notifications panel. */
-    m_notificationsBackgroundItem = new QnFramedWidget(m_controlsWidget);
-    {
-        QLinearGradient gradient(0, 0, 1, 0);
-        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-        gradient.setColorAt(1.0, QColor(0, 0, 0, 255));
-        gradient.setColorAt(0.0, QColor(0, 0, 0, 64));
-        gradient.setSpread(QGradient::RepeatSpread);
-
-        m_notificationsBackgroundItem->setWindowBrush(gradient);
-    }
-    m_notificationsBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_notificationsBackgroundItem->setFrameWidth(0.5);
+    m_notificationsBackgroundItem = new QnControlBackgroundWidget(Qn::RightBorder, m_controlsWidget);
 
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
@@ -726,11 +694,20 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
+    QnSingleEventEater *sliderWheelEater = new QnSingleEventEater(this);
+    sliderWheelEater->setEventType(QEvent::GraphicsSceneWheel);
+    m_sliderResizerWidget->installEventFilter(sliderWheelEater);
+
+    QnSingleEventSignalizer *sliderWheelSignalizer = new QnSingleEventSignalizer(this);
+    sliderWheelSignalizer->setEventType(QEvent::GraphicsSceneWheel);
+    m_sliderResizerWidget->installEventFilter(sliderWheelSignalizer);
+
     connect(sliderZoomInButton,         SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomInButton_pressed()));
     connect(sliderZoomInButton,         SIGNAL(released()),                         this,           SLOT(at_sliderZoomInButton_released()));
     connect(sliderZoomOutButton,        SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomOutButton_pressed()));
     connect(sliderZoomOutButton,        SIGNAL(released()),                         this,           SLOT(at_sliderZoomOutButton_released()));
 
+    connect(sliderWheelSignalizer,      SIGNAL(activated(QObject *, QEvent *)),     this,           SLOT(at_sliderResizerWidget_wheelEvent(QObject *, QEvent *)));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                     this,           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                        this,           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                     this,           SLOT(updateControlsVisibility()));
@@ -1293,7 +1270,7 @@ void QnWorkbenchUi::updateTreeGeometry() {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_sliderYAnimator->isRunning()) {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_sliderYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         sliderPos = m_sliderItem->pos();
     }
@@ -1304,14 +1281,14 @@ void QnWorkbenchUi::updateTreeGeometry() {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     } else if(m_titleYAnimator->isRunning()) {
         titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(titlePos, m_titleItem->pos());
+        defer |= !qFuzzyEquals(titlePos, m_titleItem->pos());
     } else {
         titlePos = m_titleItem->pos();
     }
 
     /* Calculate target geometry. */
     geometry = updatedTreeGeometry(m_treeItem->geometry(), QRectF(titlePos, m_titleItem->size()), QRectF(sliderPos, m_sliderItem->size()));
-    if(qFuzzyCompare(geometry, m_treeItem->geometry()))
+    if(qFuzzyEquals(geometry, m_treeItem->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
@@ -1337,7 +1314,7 @@ void QnWorkbenchUi::updateTreeResizerGeometry() {
     treeResizerGeometry.moveTo(treeResizerGeometry.topRight());
     treeResizerGeometry.setWidth(8);
 
-    if(!qFuzzyCompare(treeResizerGeometry, m_treeResizerWidget->geometry())) {
+    if(!qFuzzyEquals(treeResizerGeometry, m_treeResizerWidget->geometry())) {
         QN_SCOPED_VALUE_ROLLBACK(&m_ignoreTreeResizerGeometryChanges2, true);
 
         m_treeResizerWidget->setGeometry(treeResizerGeometry);
@@ -1381,7 +1358,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_sliderYAnimator->isRunning()) {
         sliderPos = QPointF(m_sliderItem->pos().x(), m_sliderYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(sliderPos, m_sliderItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         sliderPos = m_sliderItem->pos();
     }
@@ -1392,7 +1369,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         calendarPos = QPointF(m_calendarItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_calendarSizeAnimator->isRunning()) {
         calendarPos = QPointF(m_calendarItem->pos().x(), sliderPos.y() - m_calendarSizeAnimator->targetValue().toSizeF().height());
-        defer |= !qFuzzyCompare(calendarPos, m_calendarItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(calendarPos, m_calendarItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         calendarPos = m_calendarItem->pos();
     }
@@ -1403,7 +1380,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         titlePos = QPointF(m_titleItem->pos().x(), -m_titleItem->size().height());
     } else if(m_titleYAnimator->isRunning()) {
         titlePos = QPointF(m_titleItem->pos().x(), m_titleYAnimator->targetValue().toReal());
-        defer |= !qFuzzyCompare(titlePos, m_titleItem->pos());
+        defer |= !qFuzzyEquals(titlePos, m_titleItem->pos());
     } else {
         titlePos = m_titleItem->pos();
     }
@@ -1413,7 +1390,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
         dayTimePos = QPointF(m_dayTimeItem->pos().x(), m_controlsWidgetRect.bottom());
     } else if(m_dayTimeSizeAnimator->isRunning()) {
         dayTimePos = QPointF(m_dayTimeItem->pos().x(), calendarPos.y() - m_dayTimeSizeAnimator->targetValue().toSizeF().height());
-        defer |= !qFuzzyCompare(dayTimePos, m_dayTimeItem->pos()); /* If animation is running, then geometry sync should be deferred. */
+        defer |= !qFuzzyEquals(dayTimePos, m_dayTimeItem->pos()); /* If animation is running, then geometry sync should be deferred. */
     } else {
         dayTimePos = m_dayTimeItem->pos();
     }
@@ -1426,7 +1403,7 @@ void QnWorkbenchUi::updateNotificationsGeometry() {
                                             QRectF(calendarPos, m_calendarItem->paintSize()),
                                             QRectF(dayTimePos, m_dayTimeItem->paintSize()),
                                             &maxHeight);
-    if(qFuzzyCompare(geometry, m_notificationsItem->geometry()))
+    if(qFuzzyEquals(geometry, m_notificationsItem->geometry()))
         return;
 
     /* Defer size change if it doesn't cause empty space to occur. */
@@ -1502,7 +1479,7 @@ void QnWorkbenchUi::updateFpsGeometry() {
         m_titleItem->geometry().bottom()
     );
 
-    if(qFuzzyCompare(pos, m_fpsItem->pos()))
+    if(qFuzzyEquals(pos, m_fpsItem->pos()))
         return;
 
     m_fpsItem->setPos(pos);
@@ -1524,7 +1501,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     sliderResizerGeometry.moveTo(sliderResizerGeometry.topLeft() - QPointF(0, 8));
     sliderResizerGeometry.setHeight(16);
 
-    if(!qFuzzyCompare(sliderResizerGeometry, m_sliderResizerWidget->geometry())) {
+    if(!qFuzzyEquals(sliderResizerGeometry, m_sliderResizerWidget->geometry())) {
         QN_SCOPED_VALUE_ROLLBACK(&m_ignoreSliderResizerGeometryChanges2, true);
 
         m_sliderResizerWidget->setGeometry(sliderResizerGeometry);
@@ -1541,12 +1518,20 @@ void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
-    return QMargins(
+    QMargins result(
         isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
         std::floor(qMax(0.0, m_notificationsPinned ? m_controlsWidgetRect.right() - notificationsX : 0.0)),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
+
+    if (result.left() + result.right() >= m_controlsWidgetRect.width()) {
+        result.setLeft(0.0);
+        result.setRight(0.0);
+    }
+
+    return result;
+
 }
 
 bool QnWorkbenchUi::isFpsVisible() const {
@@ -1879,7 +1864,7 @@ void QnWorkbenchUi::at_controlsWidget_deactivated() {
 void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     QGraphicsWidget *controlsWidget = m_controlsWidget;
     QRectF rect = controlsWidget->rect();
-    if(qFuzzyCompare(m_controlsWidgetRect, rect))
+    if(qFuzzyEquals(m_controlsWidgetRect, rect))
         return;
     QRectF oldRect = m_controlsWidgetRect;
     m_controlsWidgetRect = rect;
@@ -1905,6 +1890,16 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
+}
+
+void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event) {
+    QGraphicsSceneWheelEvent *oldEvent = static_cast<QGraphicsSceneWheelEvent *>(event);
+
+    QGraphicsSceneWheelEvent newEvent(QEvent::GraphicsSceneWheel);
+    newEvent.setDelta(oldEvent->delta());
+    newEvent.setPos(m_sliderItem->timeSlider()->mapFromItem(m_sliderResizerWidget, oldEvent->pos()));
+    newEvent.setScenePos(oldEvent->scenePos());
+    display()->scene()->sendEvent(m_sliderItem->timeSlider(), &newEvent);
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
@@ -1943,9 +1938,15 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
     if(m_ignoreSliderResizerGeometryChanges)
         return;
 
+    QRectF sliderResizerGeometry = m_sliderResizerWidget->geometry();
+    if (!sliderResizerGeometry.isValid()) {
+        updateSliderResizerGeometry();
+        return;
+    }
+
     QRectF sliderGeometry = m_sliderItem->geometry();
 
-    qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerWidget->geometry().center().y();
+    qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
     qreal jmpHeight = minHeight + 48.0;
     qreal maxHeight = minHeight + 196.0;

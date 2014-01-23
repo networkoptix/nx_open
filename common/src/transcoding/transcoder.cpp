@@ -1,6 +1,9 @@
 #include "transcoder.h"
+
+#include <utils/math/math.h>
+#include <core/resource/media_resource.h>
+
 #include "ffmpeg_transcoder.h"
-#include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
@@ -77,7 +80,7 @@ QnVideoTranscoder::~QnVideoTranscoder()
         delete filter;
 }
 
-void QnVideoTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+void QnVideoTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_layout = layout;
 }
@@ -256,7 +259,7 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
-void QnTranscoder::setVideoLayout(const QnResourceVideoLayout* layout)
+void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_vLayout = layout;
 }
@@ -294,10 +297,10 @@ int QnTranscoder::setVideoCodec(
             break;
             */
         case TM_OpenCLTranscode:
-            m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            m_lastErrMessage = tr("OpenCL transcoding is not implemented.");
             return -1;
         default:
-            m_lastErrMessage = tr("Unknown Transcode Method");
+            m_lastErrMessage = tr("Unknown transcoding method.");
             return -1;
     }
     if (m_vTranscoder)

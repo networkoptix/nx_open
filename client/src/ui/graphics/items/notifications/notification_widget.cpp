@@ -269,7 +269,7 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
 
     base_type::setGeometry(geometry);
 
-    if(!qFuzzyCompare(size(), oldSize))
+    if(!qFuzzyEquals(size(), oldSize))
         updateOverlayGeometry();
 }
 

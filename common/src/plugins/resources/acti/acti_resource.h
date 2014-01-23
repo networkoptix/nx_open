@@ -41,7 +41,7 @@ public:
 
     virtual bool shoudResolveConflicts() const override;
 
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
     virtual bool hasDualStreaming() const override;
     virtual int getMaxFps() const override;
 
@@ -56,7 +56,7 @@ public:
     int roundBitrate(int srcBitrateKbps) const;
 
     bool isAudioSupported() const;
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
@@ -141,7 +141,6 @@ private:
     QList<int> m_availBitrate;
     int m_rtspPort;
     bool m_hasAudio;
-    QScopedPointer<QnActiPtzController> m_ptzController;
     QByteArray m_platform;
     QMutex m_dioMutex;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;

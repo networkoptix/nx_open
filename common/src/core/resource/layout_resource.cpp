@@ -7,7 +7,7 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 
 
 QnLayoutResource::QnLayoutResource(): 
@@ -241,7 +241,7 @@ QSizeF QnLayoutResource::cellSpacing() const {
 void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
     {
         QMutexLocker locker(&m_mutex);
-        if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+        if(qFuzzyEquals(m_cellSpacing, cellSpacing))
             return;
         m_cellSpacing = cellSpacing;
     }

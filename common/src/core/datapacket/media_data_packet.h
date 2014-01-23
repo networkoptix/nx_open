@@ -8,6 +8,7 @@ extern "C"
 {
     #include "libavcodec/avcodec.h"
 }
+
 #include "abstract_data_packet.h"
 #include <plugins/camera_plugin.h>
 #include "utils/common/byte_array.h"
@@ -19,10 +20,11 @@ extern "C"
 #   include <QtMultimedia/QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
-#include "utils/math/math.h"
+
 #include "utils/network/socket.h"
 #include "utils/common/aligned_allocator.h"
 #include "utils/common/util.h"
+#include <utils/math/math.h>
 
 struct AVCodecContext;
 
@@ -51,33 +53,33 @@ private:
 };
 typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
 
-
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
-    enum MediaFlags {
-        MediaFlags_None = 0, 
-        //MediaFlags_Key = 1,
-        MediaFlags_AfterEOF = 2,
-        MediaFlags_BOF = 4,
-        MediaFlags_LIVE = 8,
-        MediaFlags_Ignore = 16,
+    enum MediaFlag {
+        MediaFlags_None                 = 0x00000,
+        MediaFlags_AVKey                = 0x00001,  /**< KeyFrame, must be equal to AV_PKT_FLAG_KEY from avcodec.h, checked via static_assert below. */
+        MediaFlags_AfterEOF             = 0x00002,
+        MediaFlags_BOF                  = 0x00004,
+        MediaFlags_LIVE                 = 0x00008,
+        MediaFlags_Ignore               = 0x00010,
                      
-        MediaFlags_ReverseReordered = 32,
-        MediaFlags_ReverseBlockStart = 64,
-        MediaFlags_Reverse = 128,
+        MediaFlags_ReverseReordered     = 0x00020,
+        MediaFlags_ReverseBlockStart    = 0x00040,
+        MediaFlags_Reverse              = 0x00080,
 
-        MediaFlags_LowQuality = 256,
-        MediaFlags_StillImage = 512,
+        MediaFlags_LowQuality           = 0x00100,
+        MediaFlags_StillImage           = 0x00200,
 
-        MediaFlags_NewServer = 1024, // swith archive to a new media server
-        MediaFlags_DecodeTwice = 2048,
-        MediaFlags_FCZ = 4096, // fast channel zapping flag
-        MediaFlags_AfterDrop = 1024*8, // some data were dropped before current data
+        MediaFlags_NewServer            = 0x00400, /**< switch archive to a new media server */
+        MediaFlags_DecodeTwice          = 0x00800,
+        MediaFlags_FCZ                  = 0x01000, /**< fast channel zapping flag */
+        MediaFlags_AfterDrop            = 0x02000, /**< some data was dropped before current data */
 
-        MediaFlags_HWDecodingUsed = 1024*16, //hardware decoding used
-        MediaFlags_PlayUnsync = 1024*32, // ignore syncplay mode
-        MediaFlags_Skip = 1024*64 // ignore packet at all
+        MediaFlags_HWDecodingUsed       = 0x04000, /**< hardware decoding is used */
+        MediaFlags_PlayUnsync           = 0x08000, /**< ignore syncplay mode */
+        MediaFlags_Skip                 = 0x10000, /**< ignore packet at all */
     };
+    Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
 
     enum DataType {
         VIDEO, 
@@ -122,7 +124,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     QnByteArray data;
     DataType dataType;
     CodecID compressionType;
-    unsigned flags;
+    MediaFlags flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more that one sensor.
     QnMediaContextPtr context;
     int opaque;
@@ -134,6 +136,8 @@ private:
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
 typedef QSharedPointer<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
 
+Q_STATIC_ASSERT(AV_PKT_FLAG_KEY == QnAbstractMediaData::MediaFlags_AVKey);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
 
 struct QnEmptyMediaData : public QnAbstractMediaData
 {
@@ -149,8 +153,6 @@ typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
-
-
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
@@ -188,6 +190,7 @@ typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
 
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
 
 /** 
 * This structure used for serialized QnMetaDataV1

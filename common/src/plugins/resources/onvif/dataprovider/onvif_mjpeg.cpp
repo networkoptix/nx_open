@@ -61,9 +61,9 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 */
 
 MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
-:CLServerPushStreamReader(res),
-mHttpClient(0),
-m_request(requst)
+:
+    CLServerPushStreamReader(res),
+    m_request(requst)
 {
 
 }
@@ -132,7 +132,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;
     videoData->height = 1088;
-    videoData->flags |= AV_PKT_FLAG_KEY;
+    videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     videoData->channelNumber = 0;
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
@@ -147,7 +147,7 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
-    mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
+    mHttpClient.reset( new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth()) );
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
     switch( httpStatus )
     {
@@ -169,11 +169,10 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
 
 void MJPEGtreamreader::closeStream()
 {
-    delete mHttpClient;
-    mHttpClient = 0;
+    mHttpClient.reset();
 }
 
 bool MJPEGtreamreader::isStreamOpened() const
 {
-    return ( mHttpClient && mHttpClient->isOpened() );
+    return ( mHttpClient.get() && mHttpClient->isOpened() );
 }

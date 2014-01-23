@@ -6,6 +6,10 @@
 #include <sys/select.h>
 #endif
 
+#include <business/business_event_connector.h>
+#include <business/events/reasoned_business_event.h>
+#include <business/events/network_issue_business_event.h>
+
 #include "utils/network/rtp_stream_parser.h"
 #include "core/resource/network_resource.h"
 #include "utils/network/h264_rtp_parser.h"
@@ -16,8 +20,6 @@
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
 #include "core/resource/camera_resource.h"
-#include <business/business_event_connector.h>
-#include <business/events/reasoned_business_event.h>
 #include "utils/common/synctime.h"
 
 static const int RTSP_RETRY_COUNT = 6;
@@ -225,23 +227,20 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
 
         int elapsed = dataTimer.elapsed();
-        QString reasonText;
+        QString reasonParamsEncoded;
         QnBusiness::EventReason reason;
         if (elapsed > MAX_FRAME_DURATION*2) {
             reason = QnBusiness::NetworkIssueNoFrame;
-            reasonText = QString::number((qlonglong) elapsed/1000);
+            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
         }
         else {
             reason = QnBusiness::NetworkIssueConnectionClosed;
-            if (m_role == QnResource::Role_LiveVideo)
-                reasonText = tr("(primary video)");
-            else if (m_role == QnResource::Role_SecondaryLiveVideo)
-                reasonText = tr("(secondary video)");
+            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != QnResource::Role_SecondaryLiveVideo);
         }
         emit networkIssue(getResource(),
                           qnSyncTime->currentUSecsSinceEpoch(),
                           reason,
-                          reasonText);
+                          reasonParamsEncoded);
         QnVirtualCameraResourcePtr cam = getResource().dynamicCast<QnVirtualCameraResource>();
         if (cam)
             cam->issueOccured();
@@ -404,7 +403,8 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
     emit networkIssue(getResource(),
                       qnSyncTime->currentUSecsSinceEpoch(),
                       QnBusiness::NetworkIssueRtpPacketLoss,
-                      QString(QLatin1String("%1;%2")).arg(prev).arg(next));
+                      QnNetworkIssueBusinessEvent::encodePacketLossSequence(prev, next));
+
 }
 
 
@@ -524,12 +524,12 @@ bool QnMulticodecRtpReader::isStreamOpened() const
     return m_RtpSession.isOpened();
 }
 
-const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
+QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
 {
     if (m_audioParser)
         return m_audioParser->getAudioLayout();
     else
-        return 0;
+        return nullptr;
 }
 
 void QnMulticodecRtpReader::pleaseStop()

@@ -1,6 +1,7 @@
 #include "workbench_export_handler.h"
 
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QComboBox>
 
 #include <client/client_settings.h>
 
@@ -11,12 +12,11 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
-
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -35,6 +35,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/common/environment.h>
 #include <utils/common/string.h>
 
 #include "version.h"
@@ -43,22 +44,22 @@ namespace {
 
     /** Maximum sane duration: 30 minutes of recording. */
     static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
-
 }
 
 // -------------------------------------------------------------------------- //
 // QnTimestampsCheckboxControlDelegate
 // -------------------------------------------------------------------------- //
-class QnTimestampsCheckboxControlDelegate: public QnCheckboxControlAbstractDelegate {
+class QnTimestampsCheckboxControlDelegate: public QnWidgetControlAbstractDelegate {
 public:
     QnTimestampsCheckboxControlDelegate(const QString &target, QObject *parent = NULL):
-        QnCheckboxControlAbstractDelegate(parent),
+        QnWidgetControlAbstractDelegate(parent),
         m_target(target){ }
 
     ~QnTimestampsCheckboxControlDelegate() {}
 
     void at_filterSelected(const QString &value) override {
-        checkbox()->setEnabled(value != m_target);
+        foreach(QWidget* widget, widgets())
+            widget->setEnabled(value != m_target);
     }
 private:
     QString m_target;
@@ -85,6 +86,35 @@ QString QnWorkbenchExportHandler::binaryFilterName() const {
 #endif
 }
 #endif
+
+bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
+    if (m_filesIsUse.contains(filename)) {
+        QMessageBox::critical(
+            mainWindow(),
+            tr("File is in use"),
+            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
+            QMessageBox::Ok
+        );
+        return false;
+    }
+
+    if (QFile::exists(filename) && !QFile::remove(filename)) {
+        QMessageBox::critical(
+            mainWindow(),
+            tr("Could not overwrite file"),
+            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).completeBaseName()),
+            QMessageBox::Ok
+        );
+        return false;
+    }
+
+    m_filesIsUse << filename;
+    return true;
+}
+
+void QnWorkbenchExportHandler::unlockFile(const QString &filename) {
+    m_filesIsUse.remove(filename);
+}
 
 bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
                                                      const QnTimePeriod &exportPeriod,
@@ -118,10 +148,12 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     connect(tool,                   SIGNAL(rangeChanged(int, int)), exportProgressDialog,   SLOT(setRange(int,int)));
     connect(tool,                   SIGNAL(valueChanged(int)),      exportProgressDialog,   SLOT(setValue(int)));
     connect(tool,                   SIGNAL(stageChanged(QString)),  exportProgressDialog,   SLOT(setLabelText(QString)));
-    connect(tool,                   SIGNAL(finished(bool)),         exportProgressDialog,   SLOT(hide()));
-    connect(tool,                   SIGNAL(finished(bool)),         exportProgressDialog,   SLOT(deleteLater()));
-    connect(tool,                   SIGNAL(finished(bool)),         this,                   SLOT(at_layout_exportFinished(bool)));
-    connect(tool,                   SIGNAL(finished(bool)),         tool,                   SLOT(deleteLater()));
+
+    connect(tool,                   &QnLayoutExportTool::finished,  exportProgressDialog,   &QWidget::hide);
+    connect(tool,                   &QnLayoutExportTool::finished,  exportProgressDialog,   &QObject::deleteLater);
+    connect(tool,                   &QnLayoutExportTool::finished,  this,                   &QnWorkbenchExportHandler::at_layout_exportFinished);
+    connect(tool,                   &QnLayoutExportTool::finished,  tool,                   &QObject::deleteLater);
+
     connect(exportProgressDialog,   SIGNAL(canceled()),             tool,                   SLOT(stop()));
     if (target && slot)
         connect(tool,               SIGNAL(finished(bool)),         target,                 slot);
@@ -200,37 +232,37 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString selectedExtension;
     QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
-    DewarpingParams dewarpingParams = itemData.dewarpingParams;
+    QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
+
+    QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
+    QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
+            ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+            : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+    QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {
-        QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), lit('_'));
-        QString timePart = (widget->resource()->toResource()->flags() & QnResource::utc)
-                ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-                : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
-        QString suggestion = namePart + lit("_") + timePart;
-
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             tr("Export Video As..."),
-            previousDir + QDir::separator() + suggestion,
+            suggestion,
             allowedFormatFilter
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        QnCheckboxControlAbstractDelegate* delegate = NULL;
+        QnWidgetControlAbstractDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
         QComboBox* comboBox = new QComboBox(dialog.data());
         comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
-        comboBox->addItem(tr("Top left corner (required transcoding)"), Qn::TopLeftCorner);
-        comboBox->addItem(tr("Top right corner (required transcoding)"), Qn::TopRightCorner);
-        comboBox->addItem(tr("Bottom left corner (required transcoding)"), Qn::BottomLeftCorner);
-        comboBox->addItem(tr("Bottom right corner (required transcoding)"), Qn::BottomRightCorner);
+        comboBox->addItem(tr("Top left corner (requires transcoding)"), Qn::TopLeftCorner);
+        comboBox->addItem(tr("Top right corner (requires transcoding)"), Qn::TopRightCorner);
+        comboBox->addItem(tr("Bottom left corner (requires transcoding)"), Qn::BottomLeftCorner);
+        comboBox->addItem(tr("Bottom right corner (requires transcoding)"), Qn::BottomRightCorner);
 
-        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()));
-        dialog->addWidget(comboBox, false);
+        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()), true, delegate);
+        dialog->addWidget(comboBox, false, delegate);
 
 
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
@@ -244,10 +276,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             }
         }
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return;
 
-        fileName = dialog->selectedFiles().value(0);
+        fileName = dialog->selectedFile();
+        selectedFilter = dialog->selectedNameFilter();
         if (fileName.isEmpty())
             return;
 
@@ -255,50 +288,18 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         contrastParams.enabled &= doTranscode;
         dewarpingParams.enabled &= doTranscode;
-        selectedFilter = dialog->selectedNameFilter();
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
-        if(doTranscode || timestampPos != Qn::NoCorner) {
-            QMessageBox::StandardButton button = QMessageBox::question(
-                        mainWindow(),
-                        tr("Save As"),
-                        tr("You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?"),
-                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                        QMessageBox::No
-                        );
-            if(button != QMessageBox::Yes)
-                return;
-        }
-
-        if (!fileName.toLower().endsWith(selectedExtension)) {
-            fileName += selectedExtension;
-
-            if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
-                    mainWindow(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                );
-                if(button != QMessageBox::Yes)
-                    return;
-            }
-        }
-
-        if (selectedFilter.contains(aviFileFilter))
-        {
+        if (dialog->selectedNameFilter().contains(aviFileFilter)) {
             QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
-            if (loader && archive)
-            {
+            if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
-                if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
-                {
+                if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0) {
                     int result = QMessageBox::warning(
                         mainWindow(),
                         tr("AVI format is not recommended"),
-                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists."\
-                           "Press 'Yes' to continue export or 'No' to select other format"), // TODO: #Elric bad Engrish
+                        tr("AVI format is not recommended for export of non-continuous recording when audio track is present."
+                           "Do you want to continue?"), 
                         QMessageBox::Yes | QMessageBox::No
                     );
                     if (result != QMessageBox::Yes)
@@ -307,15 +308,39 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             }
         }
 
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
-                mainWindow(),
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
-                QMessageBox::Ok
-            );
-            continue;
+        if(doTranscode || timestampPos != Qn::NoCorner) {
+            QMessageBox::StandardButton button = QMessageBox::question(
+                        mainWindow(),
+                        tr("Save As"),
+                        tr("You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?"),
+                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                        QMessageBox::No
+                        );
+            if(button != QMessageBox::Yes)
+                return;
         }
+
+        selectedExtension = dialog->selectedExtension();
+        if (!fileName.toLower().endsWith(selectedExtension)) {
+            fileName += selectedExtension;
+
+            // method called under condition because in other case this message is popped out by the dialog itself
+            if (QFile::exists(fileName)) {
+                QMessageBox::StandardButton button = QMessageBox::information(
+                            mainWindow(),
+                            tr("Save As"),
+                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
+                            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                            );
+                if (button == QMessageBox::Cancel)
+                    return;
+                if (button == QMessageBox::No)
+                    continue;
+            }
+        }
+
+        if (!lockFile(fileName))
+            continue;
 
         break;
     }
@@ -356,15 +381,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
     connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
 
-    connect(camera,                 SIGNAL(exportFailed(QString)),      camera,                 SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(hide()));
-    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
-
-    connect(camera,                 SIGNAL(exportFinished(QString)),    camera,                 SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(hide()));
-    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
+    connect(camera,                 &QnClientVideoCamera::exportFinished,   camera,                 &QObject::deleteLater);
+    connect(camera,                 &QnClientVideoCamera::exportFinished,   exportProgressDialog,   &QWidget::hide);
+    connect(camera,                 &QnClientVideoCamera::exportFinished,   exportProgressDialog,   &QObject::deleteLater);
+    connect(camera,                 &QnClientVideoCamera::exportFinished,   this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
 
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
 
@@ -391,7 +411,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
 }
 
-void QnWorkbenchExportHandler::at_layout_exportFinished(bool success) {
+void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename) {
+    unlockFile(filename);
 
     QnLayoutExportTool* tool = dynamic_cast<QnLayoutExportTool*>(sender());
     if (!tool)
@@ -407,7 +428,7 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success) {
 }
 
 
-bool QnWorkbenchExportHandler::validateItemTypes(QnLayoutResourcePtr layout)
+bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout)
 {
     bool nonUtcExists = false;
     bool utcExists = false;
@@ -445,7 +466,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(QnLayoutResourcePtr layout)
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
-            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files"),
+            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files."),
             QMessageBox::Ok
         );
         return false;
@@ -453,7 +474,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
-void QnWorkbenchExportHandler::removeLayoutFromPool(QnLayoutResourcePtr existingLayout)
+void QnWorkbenchExportHandler::removeLayoutFromPool(const QnLayoutResourcePtr &existingLayout)
 {
     QnLayoutItemDataMap items = existingLayout->getItems();
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
@@ -466,8 +487,11 @@ void QnWorkbenchExportHandler::removeLayoutFromPool(QnLayoutResourcePtr existing
     qnResPool->removeResource(existingLayout);
 }
 
-bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, Qn::LayoutExportMode mode)
-{
+bool QnWorkbenchExportHandler::saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target, const char *slot) {
+    return saveLayoutToLocalFile(layout, layout->getLocalRange(), layout->getUrl(), Qn::LayoutLocalSave, readOnly, cancellable, target, slot);
+}
+
+bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode) {
     // TODO: #Elric we have a lot of copypasta with at_exportTimeSelectionAction_triggered
 
     if (!validateItemTypes(layout))
@@ -485,20 +509,20 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString suggestion = layout->getName();
+    QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
+    suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+
     QString fileName;
     bool readOnly = false;
 
 #ifdef Q_OS_WIN
     QString filterSeparator(QLatin1String(";;"));
 #endif
-    QString mediaFileFilter = tr("Media File (*.nov)");
-    QString mediaFilter =
-            QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
-        #ifdef Q_OS_WIN
+    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(lit(QN_ORGANIZATION_NAME))
+#ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName()
-        #endif
+#endif
             ;
 
     while (true) {
@@ -506,48 +530,41 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             dialogName,
-            previousDir + QDir::separator() + suggestion,
-            mediaFilter
+            suggestion,
+            mediaFileFilter
         ));
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
         dialog->addCheckBox(tr("Make file read-only"), &readOnly);
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return false;
 
-        fileName = dialog->selectedFiles().value(0);
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
+        fileName = dialog->selectedFile();
         if (fileName.isEmpty())
             return false;
 
+        QString selectedExtension = dialog->selectedExtension();
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
+            // method called under condition because in other case this message is popped out by the dialog itself
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
-                    mainWindow(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                );
-
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                            mainWindow(),
+                            tr("Save As"),
+                            tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
+                            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                            );
+                if (button == QMessageBox::Cancel)
                     return false;
+                if (button == QMessageBox::No)
+                    continue;
             }
         }
 
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
-                mainWindow(),
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
-                QMessageBox::Ok
-            );
+        if (!lockFile(fileName))
             continue;
-        }
 
         break;
     }
@@ -578,8 +595,8 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         int button = QMessageBox::question(
             mainWindow(),
             tr("Warning"),
-            tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n"\
-               "It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n"\
+            tr("You are about to export several video sequences with a total length exceeding 30 minutes. \n"
+               "It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.\n"
                "Do you want to continue?"),
                QMessageBox::Yes | QMessageBox::No
             );
@@ -591,14 +608,17 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 }
 
 
-void QnWorkbenchExportHandler::at_camera_exportFinished(QString fileName) {
+void QnWorkbenchExportHandler::at_camera_exportFinished(int status, const QString &fileName) {
+    unlockFile(fileName);
+
+    if (status != QnClientVideoCamera::NoError) {
+        QMessageBox::warning(mainWindow(), tr("Could not export video"), QnClientVideoCamera::errorString(status), QMessageBox::Ok);
+        return;
+    }
+
     QnAviResourcePtr file(new QnAviResource(fileName));
     file->setStatus(QnResource::Online);
     resourcePool()->addResource(file);
 
-    QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
-}
-
-void QnWorkbenchExportHandler::at_camera_exportFailed(QString errorMessage) {
-    QMessageBox::warning(mainWindow(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
+    QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);
 }

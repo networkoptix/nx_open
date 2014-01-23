@@ -11,7 +11,6 @@
 #include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
 
-
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* context )
 :
     QnAbstractRenderer( parent ),
@@ -37,6 +36,10 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
     setChannelCount(1);
 
     connect(this, SIGNAL(canBeDestroyed()), this, SLOT(deleteLater()), Qt::QueuedConnection);
+
+#ifdef TEST_FISHEYE_CALIBRATOR
+    m_isCircleDetected = false;
+#endif
 }
 
 void QnResourceWidgetRenderer::setChannelCount(int channelCount)

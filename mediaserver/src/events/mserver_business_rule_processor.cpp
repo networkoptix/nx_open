@@ -1,5 +1,6 @@
-
 #include <QtCore/QList>
+
+#include <utils/math/math.h>
 
 #include "business/actions/panic_business_action.h"
 #include "mserver_business_rule_processor.h"
@@ -8,7 +9,7 @@
 #include "recorder/recording_manager.h"
 #include "serverutil.h"
 #include "api/app_server_connection.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 
 #include "core/resource/camera_resource.h"
 #include "camera/camera_pool.h"

@@ -24,7 +24,7 @@ public:
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
-    int copyLastGop(qint64 skipTime, CLDataQueue& dstQueue);
+    int copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, int cseq);
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
@@ -65,7 +65,7 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnVideoCamera* camera, QnResource
     m_role(role),
     m_nextMinTryTime(0)
 {
-    const QnResourceVideoLayout* layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
+    QnConstResourceVideoLayoutPtr layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
     m_allChannelsMask = (1 << layout->channelCount()) - 1;
 }
 
@@ -132,7 +132,7 @@ bool QnVideoCameraGopKeeper::processData(QnAbstractDataPacketPtr /*data*/)
     return true;
 }
 
-int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
+int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, int cseq)
 {
     int rez = 0;
     QMutexLocker lock(&m_queueMtx);
@@ -140,10 +140,12 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     {
         QnConstAbstractDataPacketPtr data = m_dataQueue.at(i);
         QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
-        if (video && skipTime && video->timestamp <= skipTime)
+        if (video)
         {
             QnCompressedVideoData* newData = video->clone();
-            newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            if (skipTime && video->timestamp <= skipTime)
+                newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            newData->opaque = cseq;
             dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
         else { 
@@ -279,9 +281,13 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
-        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*> (m_resource->createDataProvider(role)));
+        QnAbstractStreamDataProvider* dataProvider = m_resource->createDataProvider(role);
+        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
         if (reader == 0)
+        {
+            delete dataProvider;
             return;
+        }
 
         QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, role);
         if (primaryLiveStream)
@@ -308,12 +314,12 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole 
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 
-int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue)
+int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq)
 {
     if (primaryLiveStream)
-        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue);
+        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq);
     else
-        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue);
+        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq);
 }
 
 /*

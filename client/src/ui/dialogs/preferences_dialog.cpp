@@ -27,7 +27,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     if (QnScreenRecorder::isSupported()) {
         m_pages[RecordingPage] = new QnRecordingSettingsWidget(this);
-        ui->tabWidget->addTab(m_pages[RecordingPage], tr("Screen Recorder"));
+        ui->tabWidget->addTab(m_pages[RecordingPage], tr("Screen Recording"));
     }
 
     m_pages[NotificationsPage] = new QnPopupSettingsWidget(this);

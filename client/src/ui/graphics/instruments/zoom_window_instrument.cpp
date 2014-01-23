@@ -245,7 +245,7 @@ public:
 
         base_type::setGeometry(rect);
 
-        if(!qFuzzyCompare(oldSize, size()))
+        if(!qFuzzyEquals(oldSize, size()))
             updateLayout();
     }
 
@@ -329,7 +329,11 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
     ),
     QnWorkbenchContextAware(parent)
 {
-    m_zoomWindowColors = qnGlobals->zoomWindowColors();
+    /* Sensible default. */
+    m_colors 
+        << QColor(192, 32, 32)
+        << QColor(32, 192, 32)
+        << QColor(64, 64, 255);
 
     connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
     connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
@@ -345,11 +349,15 @@ QColor ZoomWindowInstrument::nextZoomWindowColor() const {
     foreach(QnResourceWidget *widget, display()->widgets())
         colors.insert(widget->frameColor());
 
-    foreach(const QColor &color, m_zoomWindowColors)
+    foreach(const QColor &color, m_colors)
         if(!colors.contains(color))
             return color;
 
-    return m_zoomWindowColors[random(0, m_zoomWindowColors.size())];
+    if(m_colors.isEmpty()) {
+        return Qt::white;
+    } else {
+        return m_colors[random(0, m_colors.size())];
+    }
 }
 
 ZoomOverlayWidget *ZoomWindowInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
@@ -473,12 +481,12 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
     } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity)) {
         /* Leave invisible. */
     } else if(widget->options() & QnResourceWidget::DisplayCrosshair) {
-        if(widget->virtualPtzController()) {
-            /* Leave invisible. */
-        } else {
+        //if(widget->virtualPtzController()) {
+            ///* Leave invisible. */
+        //} else {
             opacity = 0.4;
             interactive = false;
-        }
+        //} // TODO: #PTZ
     } else {
         opacity = 1.0;
         interactive = true;
@@ -528,10 +536,11 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 void ZoomWindowInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
-    if(ResizingInstrument *resizingInstrument = manager()->instrument<ResizingInstrument>()) {
-        connect(resizingInstrument, SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
-        connect(resizingInstrument, SIGNAL(resizing(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizing(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
-        connect(resizingInstrument, SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)), this, SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *)));
+    m_resizingInstrument = manager()->instrument<ResizingInstrument>();
+    if(m_resizingInstrument) {
+        connect(m_resizingInstrument,   &ResizingInstrument::resizingStarted,   this, &ZoomWindowInstrument::at_resizingStarted);
+        connect(m_resizingInstrument,   &ResizingInstrument::resizing,          this, &ZoomWindowInstrument::at_resizing);
+        connect(m_resizingInstrument,   &ResizingInstrument::resizingFinished,  this, &ZoomWindowInstrument::at_resizingFinished);
     }
 
     base_type::installedNotify();
@@ -755,6 +764,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     }
 
     emit zoomTargetChanged(widget, zoomRect, newTargetWidget);
+    m_resizingInstrument->rehandle();
 }
 
 void ZoomWindowInstrument::at_resizingFinished(QGraphicsView *, QGraphicsWidget *, ResizingInfo *) {

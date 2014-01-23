@@ -22,7 +22,7 @@ public:
      * \returns                         Newly created thumbnail loader.
      */
     static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource,
-                                                qint64 usecSinceEpoch,
+                                                qint64 microSecSinceEpoch,
                                                 const QSize &size,
                                                 QObject *parent = NULL);
 
@@ -36,28 +36,11 @@ public:
      */
     explicit QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
                                      QnNetworkResourcePtr resource,
-                                     qint64 usecSinceEpoch,
+                                     qint64 microSecSinceEpoch,
                                      const QSize &size,
                                      QObject *parent = NULL);
 
     virtual QImage image() const override;
-signals:
-    /**
-     * This signal is emitted whenever thumbnail was successfully loaded.
-     *
-     * \param image                     Loaded thumbnail.
-     */
-    void success(const QImage& image);
-
-    /**
-     * This signal is emitted whenever the loader was unable to load thumbnail.
-     *
-     * \param status                    Error code.
-     */
-    void failed(int status);
-
-    void finished();
-
 protected:
     virtual void doLoadAsync() override;
 
@@ -73,7 +56,8 @@ private:
 
     QImage m_image;
 
-    qint64 m_usecSinceEpoch;
+    /** Time in microseconds since epoch */
+    qint64 m_microSecSinceEpoch;
     QSize m_size;
 };
 

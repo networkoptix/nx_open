@@ -8,19 +8,15 @@
 
 #include "resource_media_layout.h"
 
-namespace {
-    QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
-        ((Qn::QualityLowest,  "lowest"))
-        ((Qn::QualityLow,     "low"))
-        ((Qn::QualityNormal,  "normal"))
-        ((Qn::QualityHigh,    "high"))
-        ((Qn::QualityHighest, "highest"))
-        ((Qn::QualityPreSet,  "preset"))
-    )
-
-    Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<Qn::StreamQuality>, qn_streamQuality_nameMapper, (createEnumNameMapper<Qn::StreamQuality>()))
-} // anonymous namespace
-
+QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
+    ((Qn::QualityLowest,  "lowest"))
+    ((Qn::QualityLow,     "low"))
+    ((Qn::QualityNormal,  "normal"))
+    ((Qn::QualityHigh,    "high"))
+    ((Qn::QualityHighest, "highest"))
+    ((Qn::QualityPreSet,  "preset"))
+)
+Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<Qn::StreamQuality>, qn_streamQualityNameMapper_instance, (QnEnumNameMapper::create<Qn::StreamQuality>()))
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -81,12 +77,12 @@ QString Qn::toShortDisplayString(Qn::StreamQuality value) {
 
 template<>
 Qn::StreamQuality Qn::fromString<Qn::StreamQuality>(const QString &string) {
-    return qn_streamQuality_nameMapper()->value(string, Qn::QualityNotDefined);
+    return qn_streamQualityNameMapper_instance()->value(string, Qn::QualityNotDefined);
 }
 
 template<>
 QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
-    return qn_streamQuality_nameMapper()->name(value, QString());
+    return qn_streamQualityNameMapper_instance()->name(value, QString());
 }
 
 
@@ -95,12 +91,10 @@ QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
 // -------------------------------------------------------------------------- //
 QnMediaResource::QnMediaResource()
 {
-    m_customVideoLayout = 0;
 }
 
 QnMediaResource::~QnMediaResource()
 {
-    delete m_customVideoLayout;
 }
 
 QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
@@ -108,36 +102,36 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
     return QImage();
 }
 
-static QnDefaultResourceVideoLayout defaultVideoLayout;
-const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
     if (strVal.isEmpty())
     {
-        return &defaultVideoLayout;
+        return defaultVideoLayout;
     }
     else {
-        if (m_customVideoLayout == 0)
+        if (!m_customVideoLayout)
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
         return m_customVideoLayout;
     }
 }
 
-void QnMediaResource::setCustomVideoLayout(const QnCustomResourceVideoLayout* newLayout)
+void QnMediaResource::setCustomVideoLayout(QnConstCustomResourceVideoLayoutPtr newLayout)
 {
-    if (m_customVideoLayout == 0)
-        m_customVideoLayout = new QnCustomResourceVideoLayout(newLayout->size());
+    if (!m_customVideoLayout)
+        m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
 
     *m_customVideoLayout = *newLayout;
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
 
-static QnEmptyResourceAudioLayout audioLayout;
-const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
+static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
-    return &audioLayout;
+    return audioLayout;
 }
 
 void QnMediaResource::initMediaResource()
@@ -145,27 +139,24 @@ void QnMediaResource::initMediaResource()
     toResource()->addFlags(QnResource::media);
 }
 
-DewarpingParams QnMediaResource::getDewarpingParams() const
-{
+QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
     return m_dewarpingParams;
 }
 
 
-void QnMediaResource::setDewarpingParams(const DewarpingParams& params)
-{
+void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
+    if (m_dewarpingParams == params)
+        return;
+
     bool capsChanged = params.enabled != m_dewarpingParams.enabled;
     m_dewarpingParams = params;
     if (capsChanged) {
         if (params.enabled)
-            toResource()->setPtzCapabilities(Qn::AllPtzCapabilities);
+            toResource()->setPtzCapabilities(Qn::FisheyePtzCapabilities); // TODO: #PTZ this is not the right place?
         else
             toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
     }
-}
-
-bool QnMediaResource::isFisheye() const
-{
-    return m_dewarpingParams.enabled;
+    emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
 void QnMediaResource::updateInner(QnResourcePtr other)

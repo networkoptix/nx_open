@@ -1,12 +1,11 @@
-#ifndef JSON_UTILS_H
-#define JSON_UTILS_H
+#ifndef QN_JSON_FUNCTIONS_H
+#define QN_JSON_FUNCTIONS_H
 
 #include <QtCore/QList>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
 #include <QtCore/QHash>
 #include <QtCore/QVarLengthArray>
-
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
 #include <QtCore/QRect>
@@ -14,21 +13,74 @@
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QUuid>
+#include <QtCore/QtNumeric>
 #include <QtGui/QColor>
 #include <QtGui/QRegion>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
+#include <QtGui/QVector4D>
+#include <QtGui/QFont>
 
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
 
+inline void serialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
+    *target = value;
+}
+
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
+    *target = value;
+    return true;
+}
+
+
+/* Situation with doubles is more complicated than with other built-in types 
+ * as we have to take non-finite numbers into account. */
+inline void serialize(QnJsonContext *, const double &value, QJsonValue *target) {
+    *target = QJsonValue(value);
+}
+
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, double *target) {
+    if(value.type() == QJsonValue::Double) {
+        *target = value.toDouble();
+        return true;
+    } else if(value.type() == QJsonValue::Null) {
+        /* Strictly speaking, that's either a nan, or a +-inf, 
+         * but at this point we cannot say what it really was. */
+        *target = qQNaN(); 
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+/* Floats are (de)serialized via conversion to/from double.
+ * Note that we don't do any additional boundary checks for floats as we do for 
+ * integers as it doesn't really make much sense. */
+inline void serialize(QnJsonContext *ctx, const float &value, QJsonValue *target) {
+    ::serialize(ctx, static_cast<double>(value), target); /* Note the direct call instead of invocation through QJson. */
+}
+
+inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, float *target) {
+    double tmp;
+    if(!::deserialize(ctx, value, &tmp)) /* Note the direct call instead of invocation through QJson. */
+        return false;
+
+    *target = tmp;
+    return true;
+}
+
+
 
 namespace QJsonDetail {
     template<class T, class List>
-    void serialize_list(const List &value, QJsonValue *target) {
+    void serialize_list(QnJsonContext *ctx, const List &value, QJsonValue *target) {
         QJsonArray result;
 
         foreach(const T &element, value) {
             QJsonValue jsonValue;
-            QJson::serialize(element, &jsonValue);
+            QJson::serialize(ctx, element, &jsonValue);
             result.push_back(jsonValue);
         }
 
@@ -36,7 +88,7 @@ namespace QJsonDetail {
     }
 
     template<class T, class List>
-    bool deserialize_list(const QJsonValue &value, List *target) {
+    bool deserialize_list(QnJsonContext *ctx, const QJsonValue &value, List *target) {
         if(value.type() != QJsonValue::Array)
             return false;
         QJsonArray jsonArray = value.toArray();
@@ -46,7 +98,7 @@ namespace QJsonDetail {
 
         foreach(const QJsonValue &jsonValue, jsonArray) {
             result.push_back(T());
-            if(!QJson::deserialize(jsonValue, &result.back()))
+            if(!QJson::deserialize(ctx, jsonValue, &result.back()))
                 return false;
         }
 
@@ -55,12 +107,12 @@ namespace QJsonDetail {
     }
 
     template<class T, class Map>
-    void serialize_string_map(const Map &value, QJsonValue *target) {
+    void serialize_string_map(QnJsonContext *ctx, const Map &value, QJsonValue *target) {
         QJsonObject result;
 
         for(typename Map::const_iterator pos = value.begin(); pos != value.end(); pos++) {
             QJsonValue jsonValue;
-            QJson::serialize(pos.value(), &jsonValue);
+            QJson::serialize(ctx, pos.value(), &jsonValue);
             result.insert(pos.key(), jsonValue);
         }
 
@@ -68,7 +120,7 @@ namespace QJsonDetail {
     }
 
     template<class T, class Map>
-    bool deserialize_string_map(const QJsonValue &value, Map *target) {
+    bool deserialize_string_map(QnJsonContext *ctx, const QJsonValue &value, Map *target) {
         if(value.type() != QJsonValue::Object)
             return false;
         QJsonObject jsonObject = value.toObject();
@@ -76,7 +128,7 @@ namespace QJsonDetail {
         Map result;
 
         for(typename QJsonObject::const_iterator pos = jsonObject.begin(); pos != jsonObject.end(); pos++)
-            if(!QJson::deserialize(pos.value(), &result[pos.key()]))
+            if(!QJson::deserialize(ctx, pos.value(), &result[pos.key()]))
                 return false;
 
         *target = result;
@@ -84,13 +136,13 @@ namespace QJsonDetail {
     }
 
     template<class T, class Map>
-    void serialize_any_map(const Map &value, QJsonValue *target) {
+    void serialize_any_map(QnJsonContext *ctx, const Map &value, QJsonValue *target) {
         QJsonArray result;
 
         for(typename Map::const_iterator pos = value.begin(); pos != value.end(); pos++) {
             QJsonObject jsonObject;
-            QJson::serialize(pos.key(), "key", &jsonObject);
-            QJson::serialize(pos.value(), "value", &jsonObject);
+            QJson::serialize(ctx, pos.key(), lit("key"), &jsonObject);
+            QJson::serialize(ctx, pos.value(), lit("value"), &jsonObject);
             result.push_back(jsonObject);
         }
 
@@ -98,7 +150,7 @@ namespace QJsonDetail {
     }
 
     template<class T, class Map>
-    bool deserialize_any_map(const QJsonValue &value, Map *target) {
+    bool deserialize_any_map(QnJsonContext *ctx, const QJsonValue &value, Map *target) {
         if(value.type() != QJsonValue::Array)
             return false;
         QJsonArray jsonArray = value.toArray();
@@ -111,10 +163,10 @@ namespace QJsonDetail {
             QJsonObject jsonObject = jsonValue.toObject();
 
             typename Map::key_type key;
-            if(!QJson::deserialize(jsonObject, "key", &key))
+            if(!QJson::deserialize(ctx, jsonObject, lit("key"), &key))
                 return false;
 
-            if(!QJson::deserialize(jsonObject, "value", &result[key]))
+            if(!QJson::deserialize(ctx, jsonObject, lit("value"), &result[key]))
                 return false;
         }
 
@@ -123,14 +175,14 @@ namespace QJsonDetail {
     }
 
     template<class T>
-    void serialize_numeric(const T &value, QJsonValue *target) {
-        QJson::serialize(static_cast<double>(value), target);
+    void serialize_integer(QnJsonContext *ctx, const T &value, QJsonValue *target) {
+        ::serialize(ctx, static_cast<double>(value), target); /* Note the direct call instead of invocation through QJson. */
     }
     
     template<class T>
-    bool deserialize_numeric(const QJsonValue &value, T *target) {
+    bool deserialize_integer(QnJsonContext *ctx, const QJsonValue &value, T *target) {
         double tmp;
-        if(!QJson::deserialize(value, &tmp))
+        if(!::deserialize(ctx, value, &tmp)) /* Note the direct call instead of invocation through QJson. */
             return false;
         if(tmp < static_cast<double>(std::numeric_limits<T>::min()) || tmp > static_cast<double>(std::numeric_limits<T>::max()))
             return false;
@@ -140,15 +192,15 @@ namespace QJsonDetail {
     }
 
     template<class T>
-    void serialize_numeric_string(const T &value, QJsonValue *target) {
+    void serialize_integer_string(QnJsonContext *, const T &value, QJsonValue *target) {
         *target = QJsonValue(QnLexical::serialized(value));
     }
 
     template<class T>
-    bool deserialize_numeric_string(const QJsonValue &value, T *target) {
+    bool deserialize_integer_string(QnJsonContext *ctx, const QJsonValue &value, T *target) {
         /* Support both strings and doubles during deserialization, just to feel safe. */
         if(value.type() == QJsonValue::Double) {
-            return QJsonDetail::deserialize_numeric<T>(value, target);
+            return QJsonDetail::deserialize_integer<T>(ctx, value, target);
         } else if(value.type() == QJsonValue::String) {
             return QnLexical::deserialize(value.toString(), target);
         } else {
@@ -163,22 +215,12 @@ namespace QJsonDetail {
  * the actual implementation. Feel free to add them for your own types. */
 
 
-inline void serialize(const QJsonValue &value, QJsonValue *target) {
-    *target = value;
-}
-
-inline bool deserialize(const QJsonValue &value, QJsonValue *target) {
-    *target = value;
-    return true;
-}
-
-
 #define QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(TYPE, JSON_TYPE, JSON_GETTER)  \
-inline void serialize(const TYPE &value, QJsonValue *target) {                  \
+inline void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
     *target = QJsonValue(value);                                                \
 }                                                                               \
                                                                                 \
-inline bool deserialize(const QJsonValue &value, TYPE *target) {                \
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *target) { \
     if(value.type() != QJsonValue::JSON_TYPE)                                   \
         return false;                                                           \
                                                                                 \
@@ -187,57 +229,56 @@ inline bool deserialize(const QJsonValue &value, TYPE *target) {                
 }
 
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QString,      String, toString)
-QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(double,       Double, toDouble)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(bool,         Bool,   toBool)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonArray,   Array,  toArray)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonObject,  Object, toObject)
 #undef QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS
 
 
-#define QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(TYPE)         \
-inline void serialize(const TYPE &value, QJsonValue *target) {                  \
-    QJsonDetail::serialize_numeric<TYPE>(value, target);                        \
+#define QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(TYPE)                    \
+inline void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
+    QJsonDetail::serialize_integer<TYPE>(ctx, value, target);                   \
 }                                                                               \
                                                                                 \
-inline bool deserialize(const QJsonValue &value, TYPE *target) {                \
-    return QJsonDetail::deserialize_numeric<TYPE>(value, target);               \
+inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
+    return QJsonDetail::deserialize_integer<TYPE>(ctx, value, target);          \
 }
 
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(char);
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(unsigned char);
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(short);
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(unsigned short);
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(int);
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(unsigned int);
-QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS(float);
-#undef QN_DEFINE_NUMERIC_CONVERSION_JSON_SERIALIZATION_FUNCTIONS
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(char);
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(signed char); /* char, signed char and unsigned char are distinct types. */
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(unsigned char);
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(short);
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(unsigned short);
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(int);
+QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(unsigned int);
+#undef QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS
 
 
-#define QN_DEFINE_NUMERIC_STRING_JSON_SERIALIZATION_FUNCTIONS(TYPE)             \
-inline void serialize(const TYPE &value, QJsonValue *target) {                  \
-    QJsonDetail::serialize_numeric_string<TYPE>(value, target);                 \
+#define QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(TYPE)             \
+inline void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
+    QJsonDetail::serialize_integer_string<TYPE>(ctx, value, target);            \
 }                                                                               \
                                                                                 \
-inline bool deserialize(const QJsonValue &value, TYPE *target) {                \
-    return QJsonDetail::deserialize_numeric_string<TYPE>(value, target);        \
+inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
+    return QJsonDetail::deserialize_integer_string<TYPE>(ctx, value, target);   \
 }
 
-QN_DEFINE_NUMERIC_STRING_JSON_SERIALIZATION_FUNCTIONS(long)
-QN_DEFINE_NUMERIC_STRING_JSON_SERIALIZATION_FUNCTIONS(unsigned long)
-QN_DEFINE_NUMERIC_STRING_JSON_SERIALIZATION_FUNCTIONS(long long)
-QN_DEFINE_NUMERIC_STRING_JSON_SERIALIZATION_FUNCTIONS(unsigned long long)
-#undef QN_DEFINE_NUMERIC_STRING_JSON_SERIALIZATION_FUNCTIONS
+QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(long)
+QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(unsigned long)
+QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(long long)
+QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(unsigned long long)
+#undef QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS
 
 
 #define QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF)>                                          \
-void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QJsonValue *target) { \
-    QJsonDetail::BOOST_PP_CAT(serialize_, IMPL)<T, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> >(value, target); \
+void serialize(QnJsonContext *ctx, const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QJsonValue *target) { \
+    QJsonDetail::BOOST_PP_CAT(serialize_, IMPL)<T, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> >(ctx, value, target); \
 }                                                                               \
                                                                                 \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF)>                                          \
-bool deserialize(const QJsonValue &value, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
-    return QJsonDetail::BOOST_PP_CAT(deserialize_, IMPL)<T, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> >(value, target); \
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
+    return QJsonDetail::BOOST_PP_CAT(deserialize_, IMPL)<T, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> >(ctx, value, target); \
 }                                                                               \
 
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QList, (class T), (T), list);
@@ -249,18 +290,20 @@ QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Ke
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), any_map);
 #undef QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS
 
-
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QColor)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QSize)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QSizeF)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QRect)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QRectF)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QPoint)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QPointF)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QUuid)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QColor)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QRegion)
-
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QVector2D)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QVector3D)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QVector4D)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QUuid)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QFont)
 
 void qnJsonFunctionsUnitTest();
 
-#endif // JSON_UTILS_H
+#endif // QN_JSON_FUNCTIONS_H

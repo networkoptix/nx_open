@@ -2,9 +2,11 @@
 #define QN_COMMON_META_TYPES_H
 
 #include <QtCore/QUuid>
+#include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
 
+// TODO: #Elric move to model functions?
 /**
  * Convenience macro for generating stream operators of enumerations.
  */
@@ -32,5 +34,6 @@ Q_DECLARE_METATYPE(QUuid);
 Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);
+Q_DECLARE_METATYPE(Qt::Orientations);
 
 #endif // QN_COMMON_META_TYPES_H

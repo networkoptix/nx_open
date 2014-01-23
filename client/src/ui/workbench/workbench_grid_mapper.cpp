@@ -1,5 +1,8 @@
 #include "workbench_grid_mapper.h"
+
 #include <cmath>
+
+#include <utils/math/fuzzy.h>
 
 QnWorkbenchGridMapper::QnWorkbenchGridMapper(QObject *parent):
     QObject(parent),
@@ -13,7 +16,7 @@ QnWorkbenchGridMapper::~QnWorkbenchGridMapper() {
 }
 
 void QnWorkbenchGridMapper::setOrigin(const QPointF &origin) {
-    if(qFuzzyCompare(origin, m_origin))
+    if(qFuzzyEquals(origin, m_origin))
         return;
 
     m_origin = origin;
@@ -22,7 +25,7 @@ void QnWorkbenchGridMapper::setOrigin(const QPointF &origin) {
 }
 
 void QnWorkbenchGridMapper::setCellSize(const QSizeF &cellSize) {
-    if(qFuzzyCompare(cellSize, m_cellSize))
+    if(qFuzzyEquals(cellSize, m_cellSize))
         return;
 
     m_cellSize = cellSize;
@@ -31,7 +34,7 @@ void QnWorkbenchGridMapper::setCellSize(const QSizeF &cellSize) {
 }
 
 void QnWorkbenchGridMapper::setSpacing(const QSizeF &spacing) {
-    if(qFuzzyCompare(spacing, m_spacing))
+    if(qFuzzyEquals(spacing, m_spacing))
         return;
 
     m_spacing = spacing;

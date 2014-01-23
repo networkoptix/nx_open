@@ -24,7 +24,12 @@ class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSetti
 
 public:
     enum Variable {
-        MAX_VIDEO_ITEMS,
+        /** Maximum number of items that is allowed on the scene. */
+        MAX_SCENE_VIDEO_ITEMS,
+
+        /** Maximum number of items that is allowed during the preview search. */
+        MAX_PREVIEW_SEARCH_ITEMS,
+
         DOWNMIX_AUDIO,
         AUDIO_VOLUME,
         MEDIA_FOLDER,
@@ -52,7 +57,14 @@ public:
         EXTRA_PTZ_MAPPINGS_PATH,
 
         UPDATE_FEED_URL,
+
+        /** Is updating enabled at all. */
         UPDATES_ENABLED,
+
+        /** Check for updates automatically. */
+        AUTO_CHECK_FOR_UPDATES,
+
+        /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
         SHOWCASE_URL,
@@ -63,7 +75,6 @@ public:
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
 
-        USE_HARDWARE_DECODING,
         TIME_MODE,
 
         DEV_MODE,
@@ -136,7 +147,8 @@ private:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
-        QN_DECLARE_RW_PROPERTY(int,                         maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24)
+        QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
+        QN_DECLARE_RW_PROPERTY(int,                         maxPreviewSearchItems,  setMaxPreviewSearchItems,   MAX_PREVIEW_SEARCH_ITEMS,   16)
         QN_DECLARE_RW_PROPERTY(bool,                        isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
         QN_DECLARE_RW_PROPERTY(qreal,                       audioVolume,            setAudioVolume,             AUDIO_VOLUME,               1.0)
         QN_DECLARE_RW_PROPERTY(QString,                     mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
@@ -156,16 +168,16 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
-        QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
+        QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en.qm"))
         QN_DECLARE_RW_PROPERTY(QUrl,                        updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isUpdatesEnabled,       setUpdatesEnabled,          UPDATES_ENABLED,            true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isAutoCheckForUpdates,  setAutoCheckForUpdates,     AUTO_CHECK_FOR_UPDATES,     true)
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
         QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                        isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_RW_PROPERTY(bool,                        isDevMode,              setDevMode,                 DEV_MODE,                   false)
         QN_DECLARE_RW_PROPERTY(bool,                        isTreePinned,           setTreePinned,              TREE_PINNED,                true)

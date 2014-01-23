@@ -30,8 +30,8 @@ public:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
     qint64 seek(qint64 startTime, qint64 endTime);
-    virtual QnResourceVideoLayout* getVideoLayout();
-    virtual QnResourceAudioLayout* getAudioLayout();
+    virtual QnResourceVideoLayoutPtr getVideoLayout();
+    virtual QnResourceAudioLayoutPtr getAudioLayout();
 
     virtual void onReverseMode(qint64 displayTime, bool value);
 
@@ -80,7 +80,7 @@ private:
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
-    QnDefaultResourceVideoLayout m_defaultVideoLayout;
+    std::shared_ptr<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
     bool m_opened;
     QnResourcePtr m_resource;
     //bool m_waitBOF;
@@ -100,11 +100,11 @@ private:
 
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
-    QnResourceCustomAudioLayout* m_audioLayout;
+    QnResourceCustomAudioLayoutPtr m_audioLayout;
     bool m_playNowModeAllowed; // fast open mode without DESCRIBE
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
-    QnCustomResourceVideoLayout* m_customVideoLayout;
+    QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
 };

@@ -35,7 +35,7 @@ const QSizeF &QnViewportBoundWidget::fixedSize() {
 }
 
 void QnViewportBoundWidget::setFixedSize(const QSizeF &fixedSize) {
-    if(qFuzzyCompare(m_fixedSize, fixedSize))
+    if(qFuzzyEquals(m_fixedSize, fixedSize))
         return;
 
     m_fixedSize = fixedSize;
@@ -121,7 +121,7 @@ void QnViewportBoundWidget::setGeometry(const QRectF &geometry) {
 
         base_type::setGeometry(geometry);
 
-        if(!qFuzzyCompare(size(), oldSize))
+        if(!qFuzzyEquals(size(), oldSize))
             updateScale();
     }
 }

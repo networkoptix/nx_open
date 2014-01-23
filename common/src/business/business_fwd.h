@@ -8,6 +8,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
+#undef PlaySound // TODO: #Elric who includes windows.h?
+
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
 typedef QList<QnAbstractBusinessEventPtr> QnAbstractBusinessEventList;
@@ -25,6 +27,10 @@ typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
+
+class QnBusinessEventRule;
+typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
 namespace QnBusiness {
     enum EventReason {

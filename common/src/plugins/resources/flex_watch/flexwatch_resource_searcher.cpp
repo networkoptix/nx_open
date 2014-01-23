@@ -73,6 +73,11 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
     }
 }
 
+QList<QnResourcePtr> QnFlexWatchResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+{
+    return QList<QnResourcePtr>(); // do not duplicate resource with ONVIF discovery!
+}
+
 QnResourceList QnFlexWatchResourceSearcher::findResources()
 {
     if (updateSocketList()) {

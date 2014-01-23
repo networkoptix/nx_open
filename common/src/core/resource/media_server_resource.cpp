@@ -228,9 +228,9 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        //TestConnectionTask *task = new TestConnectionTask(toSharedPointer().dynamicCast<QnMediaServerResource>(), url);
+        //TestConnectionTask *task = new TestConnectionTask(::toSharedPointer(this), url);
         //QThreadPool::globalInstance()->start(task);
-        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, "at_pingResponse", Qt::DirectConnection);
         m_runningIfRequests.insert(requestNum, url.toString());
     }
 
@@ -253,7 +253,7 @@ void QnMediaServerResource::determineOptimalNetIF()
 void QnMediaServerResource::determineOptimalNetIF_testProxy() {
     QMutexLocker lock(&m_mutex);
     m_runningIfRequests.remove(-1);
-    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, SLOT(at_pingResponse(QnHTTPRawResponse, int)), Qt::DirectConnection);
+    int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, "at_pingResponse", Qt::DirectConnection);
     m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
 }
 

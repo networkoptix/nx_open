@@ -5,7 +5,7 @@
 
 #include <api/media_server_statistics_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -46,7 +46,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 #endif
 
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
-    connect(m_userWatcher,    SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
+    connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 
     /* Create dependent objects. */
     m_synchronizer.reset(new QnWorkbenchSynchronizer(this));

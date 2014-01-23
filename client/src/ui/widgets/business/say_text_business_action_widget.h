@@ -5,8 +5,8 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-    class QnSayTextBusinessActionWidget;
-    }
+    class SayTextBusinessActionWidget;
+}
 
 class QnSayTextBusinessActionWidget: public QnAbstractBusinessParamsWidget
 {
@@ -27,7 +27,7 @@ private slots:
     void at_testButton_clicked();
     void at_volumeSlider_valueChanged(int value);
 private:
-    QScopedPointer<Ui::QnSayTextBusinessActionWidget> ui;
+    QScopedPointer<Ui::SayTextBusinessActionWidget> ui;
 };
 
 #endif // SAY_TEXT_BUSINESS_ACTION_WIDGET_H

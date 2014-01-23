@@ -28,10 +28,15 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_rtpStreamParser( res ),
     m_camManager( camManager ),
     m_liveStreamReader( NULL ),
-    m_mediaEncoder2Ref( NULL )
+    m_mediaEncoder2Ref( NULL ),
+    m_cameraCapabilities( 0 )
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
     Q_ASSERT( m_thirdPartyRes );
+
+    m_audioLayout.reset( new QnResourceCustomAudioLayout() );
+
+    m_camManager.getCameraCapabilities( &m_cameraCapabilities );
 }
 
 ThirdPartyStreamReader::~ThirdPartyStreamReader()
@@ -253,6 +258,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             return QnAbstractMediaDataPtr(0);
     }
 
+    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetaData() )
+        return getMetaData();
+
     QnAbstractMediaDataPtr rez;
     static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;
     for( int i = 0; i < MAX_TRIES_TO_READ_MEDIA_PACKET; ++i )
@@ -334,10 +342,10 @@ void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
         pleaseReOpen();
 }
 
-const QnResourceAudioLayout* ThirdPartyStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
 {
     return m_liveStreamReader
-        ? &m_audioLayout    //TODO/IMPL
+        ? m_audioLayout    //TODO/IMPL
         : m_rtpStreamParser.getAudioLayout();
 }
 
@@ -462,7 +470,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
         }
     }
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
-        mediaPacket->flags |= AV_PKT_FLAG_KEY;
+        mediaPacket->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
     {
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -582,5 +590,5 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     m_audioContext->ctx()->block_align = audioFormat.blockAlign;
     m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
 
-    m_audioLayout.addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
+    m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }

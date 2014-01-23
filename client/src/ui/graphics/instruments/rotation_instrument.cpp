@@ -11,6 +11,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
+#include <utils/math/fuzzy.h>
 
 #include <utils/math/coordinate_transformations.h>
 
@@ -400,7 +401,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
     if(!qFuzzyCompare(currentRotation, newRotation)) {
         target()->setRotation(newRotation);
 
-        if(!qFuzzyCompare(target()->transformOriginPoint(), itemOrigin)) {
+        if(!qFuzzyEquals(target()->transformOriginPoint(), itemOrigin)) {
             QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
             moveViewportScene(info->view(), newSceneOrigin - sceneOrigin);
             sceneOrigin = newSceneOrigin;

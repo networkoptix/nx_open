@@ -37,7 +37,7 @@
 
 #include "connection_testing_dialog.h"
 
-#include "connectinfo.h"
+#include <api/model/connection_info.h>
 #include "compatibility_version_installation_dialog.h"
 #include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
@@ -158,7 +158,7 @@ QString QnLoginDialog::currentName() const {
     return ui->connectionsComboBox->currentText();
 }
 
-QnConnectInfoPtr QnLoginDialog::currentInfo() const {
+QnConnectionInfoPtr QnLoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
@@ -169,12 +169,12 @@ bool QnLoginDialog::restartPending() const {
 void QnLoginDialog::accept() {
     QUrl url = currentUrl();
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid Login Information"), tr("The login information you have entered is not valid."));
         return;
     }
 
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectInfoPtr, int)));
+    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectionInfoPtr, int)));
 
     updateUsability();
 }
@@ -272,15 +272,34 @@ void QnLoginDialog::resetSavedSessionsModel() {
 }
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {
+    QnCompatibilityChecker checker(localCompatibilityItems());
+    QnSoftwareVersion clientVersion(QN_ENGINE_VERSION);
+
+
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
     } else {
-        foreach (QUrl url, m_foundEcs) {
-            QStandardItem* item = new QStandardItem(url.host() + QLatin1Char(':') + QString::number(url.port()));
+        foreach (QnEcData data, m_foundEcs) {
+            QUrl url = data.url;
+
+            QnSoftwareVersion ecVersion(data.version);
+            bool isCompatible = checker.isCompatible(QLatin1String("Client"), clientVersion,
+                                                     QLatin1String("ECS"),    ecVersion);
+
+
+            QString title;
+            if (isCompatible)
+                title = lit("%1:%2").arg(url.host()).arg(url.port());
+            else
+                title = lit("%1:%2 (v%3)").arg(url.host()).arg(url.port()).arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+            QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
+
+            if (!isCompatible)
+                item->setData(QColor(Qt::red), Qt::TextColorRole);
             m_autoFoundItem->appendRow(item);
         }
     }
@@ -317,30 +336,41 @@ void QnLoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo, int requestHandle) {
+void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
         return;
     m_requestHandle = -1;
 
     updateUsability();
 
-    bool compatibleProduct = qnSettings->isDevMode() || connectInfo->brand.isEmpty()
-            || connectInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
+            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool success = (status == 0) && compatibleProduct;
 
-    if(status != 0 || !compatibleProduct) {
+    QString detail;
+
+    if (status == 202) {
+        detail = tr("Login or password you have entered are incorrect, please try again.");
+    } else if (status != 0) {
+        detail = tr("Connection to the Enterprise Controller could not be established.\n"
+                               "Connection details that you have entered are incorrect, please try again.\n\n"
+                               "If this error persists, please contact your VMS administrator.");
+    } else {
+        detail = tr("You are trying to connect to incompatible Enterprise Controller.");
+    }
+
+    if(!success) {
         QnMessageBox::warning(
-            this, 
+            this,
             Qn::Login_Help,
-            tr("Could not connect to Enterprise Controller"), 
-            tr("Connection to the Enterprise Controller could not be established.\n"
-               "Connection details that you have entered are incorrect, please try again.\n\n"
-               "If this error persists, please contact your VMS administrator.")
+            tr("Could not connect to Enterprise Controller"),
+            detail
         );
         updateFocus();
         return;
     }
 
-    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
@@ -350,22 +380,21 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
         QnSoftwareVersion minSupportedVersion("1.4"); 
 
         m_restartPending = true;
-        if (connectInfo->version < minSupportedVersion) {
+        if (connectionInfo->version < minSupportedVersion) {
             QnMessageBox::warning(
                 this,
                 Qn::VersionMismatch_Help,
                 tr("Could not connect to Enterprise Controller"),
                 tr("You are about to connect to Enterprise Controller which has a different version:\n"
-                   " - Client version: %1.\n"
-                   " - EC version: %2.\n"
-                   "Compatibility mode for versions lower than %3 is not supported.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectInfo->version.toString())
-                    .arg(minSupportedVersion.toString())
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "Compatibility mode for versions lower than %3 is not supported."
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
+                QMessageBox::Ok
             );
             m_restartPending = false;
         }
@@ -374,17 +403,17 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
             for( ;; )
             {
                 bool isInstalled = false;
-                if( applauncher::isVersionInstalled(connectInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
+                if( applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
                 {
                     QnMessageBox::warning(
                         this,
                         Qn::VersionMismatch_Help,
                         tr("Could not connect to Enterprise Controller"),
-                        tr("You are about to connect to Enterprise Controller which has a different version:\n"
+                        tr("Selected Enterprise controller has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Unable to connect to applauncher to enable client compatibility mode"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
+                            "An error has occurred while trying to restart in compatibility mode."
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                         QMessageBox::Ok
                     );
                     m_restartPending = false;
@@ -397,19 +426,51 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         tr("You are about to connect to Enterprise Controller which has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Would you like to restart client in compatibility mode?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()),
+                            "Would you like to restart in compatibility mode?"
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
                         QMessageBox::Cancel
                     );
                     if(button == QMessageBox::Ok) {
-                        if (applauncher::restartClient(connectInfo->version, currentUrl().toEncoded()) != applauncher::api::ResultType::ok) {
-                            QMessageBox::critical(
-                                        this,
-                                        tr("Launcher process is not found"),
-                                        tr("Cannot restart the client in compatibility mode.\n"
-                                           "Please close the application and start it again using the shortcut in the start menu.")
-                                        );
+                        switch( applauncher::restartClient(connectionInfo->version, currentUrl().toEncoded()) )
+                        {
+                            case applauncher::api::ResultType::ok:
+                                break;
+
+                            case applauncher::api::ResultType::connectError:
+                                QMessageBox::critical(
+                                    this,
+                                    tr("Launcher process is not found"),
+                                    tr("Cannot restart the client in compatibility mode.\n"
+                                        "Please close the application and start it again using the shortcut in the start menu.")
+                                );
+                                break;
+
+                            default:
+                            {
+                                //trying to restore installation
+                                int selectedButton = QnMessageBox::warning(
+                                    this,
+                                    Qn::VersionMismatch_Help,
+                                    tr("Failure"),
+                                    tr("Failed to launch compatiblity version %1\n"
+                                       "Try to restore version %1?").
+                                       arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                                    QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+                                    QMessageBox::Cancel
+                                );
+                                if( selectedButton == QMessageBox::Ok ) {
+                                    //starting installation
+                                    if( !m_installationDialog.get() )
+                                        m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
+                                    m_installationDialog->setVersionToInstall( connectionInfo->version );
+                                    m_installationDialog->exec();
+                                    if( m_installationDialog->installationSucceeded() )
+                                        continue;   //offering to start newly-installed compatibility version
+                                }
+                                m_restartPending = false;
+                                break;
+                            }
                         }
                     } else {
                         m_restartPending = false;
@@ -422,9 +483,9 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         tr("You are about to connect to Enterprise Controller which has a different version:\n"
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
-                            "Client Version %3 is required to connect to this Enterprise Controller.\n"
+                            "Client version %3 is required to connect to this Enterprise Controller.\n"
                             "Download version %3?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectInfo->version.toString()).arg(connectInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                         QMessageBox::Cancel
                     );
@@ -432,7 +493,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
                         //starting installation
                         if( !m_installationDialog.get() )
                             m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                        m_installationDialog->setVersionToInstall( connectInfo->version );
+                        m_installationDialog->setVersionToInstall( connectionInfo->version );
                         m_installationDialog->exec();
                         if( m_installationDialog->installationSucceeded() )
                             continue;   //offering to start newly-installed compatibility version
@@ -449,7 +510,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectInfoPtr connectInfo,
         }
     }
 
-    m_connectInfo = connectInfo;
+    m_connectInfo = connectionInfo;
     base_type::accept();
 }
 
@@ -472,8 +533,8 @@ void QnLoginDialog::at_testButton_clicked() {
         return;
     }
 
-    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(url, this));
-    dialog->setModal(true);
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
+    dialog->testEnterpriseController(url);
     dialog->exec();
 
     updateFocus();
@@ -508,7 +569,7 @@ void QnLoginDialog::at_saveButton_clicked() {
 
     if (connections.contains(name)){
         QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
-                                                                  tr("Connection with the same name already exists. Overwrite it?"),
+                                                                  tr("Connection with this name already exists. Do you want to overwrite it?"),
                                                                   QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                                                                   QMessageBox::Yes);
         switch(button) {
@@ -554,7 +615,6 @@ void QnLoginDialog::at_deleteButton_clicked() {
 }
 
 void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
-    Q_UNUSED(moduleVersion)
     Q_UNUSED(localInterfaceAddress)
 
     QString portId = QLatin1String("port");
@@ -569,14 +629,18 @@ void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, 
     QString port = moduleParameters[portId];
     url.setPort(port.toInt());
 
-    QMultiHash<QString, QUrl>::iterator i = m_foundEcs.find(seed);
+    QMultiHash<QString, QnEcData>::iterator i = m_foundEcs.find(seed);
     while (i != m_foundEcs.end() && i.key() == seed) {
-        QUrl found = i.value();
+        QUrl found = i.value().url;
         if (found.host() == url.host() && found.port() == url.port())
             return; // found the same host, e.g. two interfaces on local controller
         ++i;
     }
-    m_foundEcs.insert(seed, url);
+
+    QnEcData data;
+    data.url = url;
+    data.version = moduleVersion;
+    m_foundEcs.insert(seed, data);
     resetAutoFoundConnectionsModel();
 }
 

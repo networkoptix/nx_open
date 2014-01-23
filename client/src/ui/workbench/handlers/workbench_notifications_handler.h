@@ -3,24 +3,14 @@
 
 #include <QtCore/QObject>
 
+#include <api/model/kvpair.h>
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/kvpair_usage_helper.h>
 
 class QnWorkbenchUserEmailWatcher;
-
-class QnShowBusinessEventsHelper : public QnUint64KvPairUsageHelper {
-    Q_OBJECT
-
-    typedef QnUint64KvPairUsageHelper base_type;
-public:
-    explicit QnShowBusinessEventsHelper(QObject *parent = 0);
-    virtual ~QnShowBusinessEventsHelper();
-};
-
 
 class QnWorkbenchNotificationsHandler : public QObject, public QnWorkbenchContextAware
 {
@@ -66,7 +56,6 @@ private:
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
 private:
-    QnUint64KvPairUsageHelper* m_showBusinessEventsHelper;
     QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
 };
 

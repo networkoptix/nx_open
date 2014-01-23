@@ -2,16 +2,21 @@
 
 #include <QtCore/QDir>
 
-#include "utils/common/util.h"
-#include <utils/fs/file.h>
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
-#include "server_stream_recorder.h"
-#include "recording_manager.h"
-#include "serverutil.h"
-#include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/resource/camera_resource.h"
+#include <core/resource/media_server_resource.h>
+
+#include <recorder/server_stream_recorder.h>
+#include <recorder/recording_manager.h>
+
+#include "plugins/storage/file_storage/file_storage_resource.h"
+
 #include "utils/common/sleep.h"
+#include <utils/fs/file.h>
+#include "utils/common/util.h"
+
+#include "serverutil.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -728,7 +733,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         QList<QFileInfo> list = storage->getFileList(text);
         QList<QString> baseNameList;
         foreach(const QFileInfo& info, list)
-            baseNameList << info.baseName();
+            baseNameList << info.completeBaseName();
         qSort(baseNameList.begin(), baseNameList.end());
         if (!baseNameList.isEmpty()) 
             fileNum = baseNameList.last().toInt() + 1;
@@ -788,7 +793,14 @@ void QnStorageManager::addDataToCatalog(DeviceFileCatalogPtr newCatalog, const Q
                     newCatalog->addChunk(existingCatalog->m_chunks[i]);
             }
 
+            qint64 recordingTime = existingCatalog->getLatRecordingTime();
             existingCatalog = catalog[mac] = newCatalog;
+            if (recordingTime > 0)
+                existingCatalog->setLatRecordingTime(recordingTime);
+        }
+        else if (existingCatalog->isEmpty())
+        {
+            existingCatalog->m_chunks = newCatalog->m_chunks;
         }
     }
     existingCatalog->rewriteCatalog(isLastRecordRecording);

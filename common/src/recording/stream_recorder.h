@@ -11,12 +11,13 @@ extern "C"
 
 #include <utils/common/cryptographic_hash.h>
 
+#include <core/ptz/item_dewarping_params.h>
+
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/datapacket/media_data_packet.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
-#include <core/resource/dewarping_params.h>
 #include "utils/color_space/image_correction.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -26,9 +27,23 @@ class QnFfmpegVideoTranscoder;
 class QnStreamRecorder : public QnAbstractDataConsumer
 {
     Q_OBJECT
-
+    Q_ENUMS(StreamRecorderError)
+    Q_ENUMS(Role)
 public:
     enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
+    enum StreamRecorderError {
+        NoError = 0,
+        ContainerNotFoundError,
+        FileCreateError,
+        VideoStreamAllocationError,
+        AudioStreamAllocationError,
+        InvalidAudioCodecError,
+        IncompatibleCodecError,
+
+        LastError
+    };
+
+    static QString errorString(int errCode);
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
@@ -94,7 +109,7 @@ public:
 
     void setContrastParams(const ImageCorrectionParams& params);
 
-    void setDewarpingParams(const DewarpingParams& params);
+    void setItemDewarpingParams(const QnItemDewarpingParams& params);
 
     /*
     * Server time zone. Used for export to avi/mkv files
@@ -103,11 +118,9 @@ public:
 
     void setSrcRect(const QRectF& srcRect);
 signals:
-    void recordingFailed(QString errMessage);
     void recordingStarted();
-
-    void recordingFinished(QString fileName);
     void recordingProgress(int progress);
+    void recordingFinished(int status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData);
@@ -127,7 +140,7 @@ protected:
     }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 
-    bool addSignatureFrame(QString& errorString);
+    bool addSignatureFrame();
     void markNeedKeyData();
     virtual bool saveData(QnConstAbstractMediaDataPtr md);
     virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
@@ -151,7 +164,7 @@ private:
     bool m_forceDefaultCtx;
     AVFormatContext* m_formatCtx;
     bool m_packetWrited;
-    QString m_lastErrMessage;
+    int  m_lastError;
     qint64 m_currentChunkLen;
 
     QString m_fileName;
@@ -190,7 +203,7 @@ private:
     qint64 m_truncateIntervalEps;
     QRectF m_srcRect;
     ImageCorrectionParams m_contrastParams;
-    DewarpingParams m_dewarpingParams;
+    QnItemDewarpingParams m_itemDewarpingParams;
 };
 
 #endif // _STREAM_RECORDER_H__

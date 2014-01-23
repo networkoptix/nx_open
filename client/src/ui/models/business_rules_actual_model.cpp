@@ -1,6 +1,8 @@
 #include "business_rules_actual_model.h"
-#include "api/app_server_connection.h"
-#include "client_message_processor.h"
+
+#include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
+
 #include "ui/workbench/workbench_context.h"
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent): 
@@ -10,11 +12,11 @@ QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
 {
     connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)),          
             this, SLOT(reloadData()));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
+    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
+    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
             this, SLOT(at_message_ruleDeleted(int)));
-    connect(QnClientMessageProcessor::instance(),           SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
+    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
             this, SLOT(at_message_ruleReset(QnBusinessEventRuleList)));
 
 }

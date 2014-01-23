@@ -435,7 +435,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
         if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
             return result;
     }
-    return sendProfileToCamera(info, profile);
+
+    if (m_onvifRes->isCameraControlDisabled())
+        return CameraDiagnostics::NoErrorResult();
+    else
+        return sendProfileToCamera(info, profile);
+
 }
 
 CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(const QString& name, const QString& token) const
@@ -542,30 +547,26 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
-        if(QnOnvifPtzController *ptzController = dynamic_cast<QnOnvifPtzController *>(m_onvifRes->getPtzController())) // TODO: #Elric EVIL!
-        {
+        if(!m_onvifRes->getPtzfUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
             bool ptzMatched = profile && profile->PTZConfiguration;
-            if (!ptzMatched)
-            {
+            if (!ptzMatched) {
                 AddPTZConfigReq request;
                 AddPTZConfigResp response;
 
                 request.ProfileToken = info.profileToken.toStdString();
-                request.ConfigurationToken = ptzController->getPtzConfigurationToken().toStdString();
+                request.ConfigurationToken = m_onvifRes->getPtzConfigurationToken().toStdString();
 
                 int soapRes = soapWrapper.addPTZConfiguration(request, response);
                 if (soapRes == SOAP_OK) {
-                    ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
-                }
-                else {
+                    m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
+                } else {
                     qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
                         << soapRes << ", description: " << soapWrapper.getLastError() 
                         << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
                     return CameraDiagnostics::RequestFailedResult( QLatin1String("addPTZConfiguration"), soapWrapper.getLastError() );
                 }
-            }
-            else {
-                ptzController->setMediaProfileToken(QString::fromStdString(profile->token));
+            } else {
+                m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
             }
         }
     }
@@ -749,7 +750,7 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
     return 0;
 }
 
-const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
+QnConstResourceAudioLayoutPtr QnOnvifStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }

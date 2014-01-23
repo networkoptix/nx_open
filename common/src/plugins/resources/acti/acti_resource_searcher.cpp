@@ -70,25 +70,17 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
         {
             QString urlStr = url.toString();
 
-            nx_http::AsyncHttpClient* request = new nx_http::AsyncHttpClient();
-            connect(request, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(at_replyReceived(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
-            connect(request, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(at_httpConnectionDone(nx_http::AsyncHttpClient*)), Qt::DirectConnection);
-            if (request->doGet(url))
-                m_httpInProgress << url.host();
-            else
-                request->scheduleForRemoval();
+            std::shared_ptr<nx_http::AsyncHttpClient> request = std::make_shared<nx_http::AsyncHttpClient>();
+            connect(request.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)), this, SLOT(at_httpConnectionDone(nx_http::AsyncHttpClientPtr)), Qt::DirectConnection);
+            if( request->doGet(url) )
+                m_httpInProgress[url.host()] = request;
         }
     }
 
     return m_cachedXml.value(host).xml;
 }
 
-void QnActiResourceSearcher::at_replyReceived(nx_http::AsyncHttpClient* reply)
-{
-    reply->startReadMessageBody();
-}
-
-void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClient* reply)
+void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -96,8 +88,6 @@ void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClient* rep
     m_cachedXml[host].xml = reply->fetchMessageBodyBuffer();
     m_cachedXml[host].timer.restart();
     m_httpInProgress.remove(host);
-
-    reply->scheduleForRemoval();
 }
 
 QnActiResourceSearcher& QnActiResourceSearcher::instance()
@@ -143,6 +133,9 @@ QString QnActiResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     Q_UNUSED(doMultichannelCheck)
 
     QnResourceList result;

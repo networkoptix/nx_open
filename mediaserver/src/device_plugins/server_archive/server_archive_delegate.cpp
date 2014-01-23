@@ -2,7 +2,7 @@
 #include <QtCore/QMutexLocker>
 
 #include "server_archive_delegate.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
@@ -341,14 +341,14 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnectio
     return QnMotionHelper::instance()->createConnection(m_resource, channel);
 }
 
-QnResourceVideoLayout* QnServerArchiveDelegate::getVideoLayout()
+QnResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()
 {
     QMutexLocker lk( &m_mutex );
 
     return m_aviDelegate->getVideoLayout();
 }
 
-QnResourceAudioLayout* QnServerArchiveDelegate::getAudioLayout()
+QnResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
 {
     QMutexLocker lk( &m_mutex );
 

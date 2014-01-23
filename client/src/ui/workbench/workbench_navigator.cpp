@@ -21,7 +21,7 @@ extern "C"
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <camera/caching_time_period_loader.h>
 #include <camera/cam_display.h>
@@ -1128,7 +1128,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
             if (resourceDisplay->isPaused())
                 continue;
 
-            bool isLive = resourceDisplay->archiveReader()->isRealTimeSource();
+            bool isLive = resourceDisplay->archiveReader() && resourceDisplay->archiveReader()->isRealTimeSource();
             resourceDisplay->pause();
             m_autoPausedResourceDisplays.insert(resourceDisplay, isLive);
         }
@@ -1172,7 +1172,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
 
     QScopedPointer<QMenu> menu(manager->newMenu(
-        Qn::SliderScope, 
+        Qn::SliderScope,
+        mainWindow(),
         QnActionParameters(currentTarget(Qn::SliderScope)).
             withArgument(Qn::TimePeriodRole, selection).
             withArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)). // TODO: #Elric move this out into global scope!
@@ -1237,6 +1238,9 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 
     /* Update tool tip format. */
     if (value == DATETIME_NOW) {
+        //: Time slider's tooltip for position on live. 
+        //: Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
+        //: That's where these single quotes come from.
         m_timeSlider->setToolTipFormat(tr("'Live'"));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {

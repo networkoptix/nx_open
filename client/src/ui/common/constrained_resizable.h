@@ -43,7 +43,7 @@ public:
     virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
 
     static QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint, const QSizeF &constrainedSize) {
-        if(qFuzzyCompare(constrainedSize, geometry.size()))
+        if(qFuzzyEquals(constrainedSize, geometry.size()))
             return geometry;
 
         if(pinCorner == Qn::NoCorner)

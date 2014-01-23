@@ -238,6 +238,7 @@ private slots:
     void at_controlsWidget_deactivated();
     void at_controlsWidget_geometryChanged();
 
+    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
     void at_sliderItem_geometryChanged();
     void at_sliderResizerWidget_geometryChanged();
     void at_toggleThumbnailsAction_toggled(bool checked);

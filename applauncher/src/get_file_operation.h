@@ -11,20 +11,18 @@
 #include <memory>
 #include <mutex>
 
+#include <boost/optional.hpp>
+
 #include <QObject>
 #include <QString>
 #include <QUrl>
 
 #include <utils/common/systemerror.h>
 #include <utils/fs/file.h>
+#include <utils/network/http/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
 
-
-namespace nx_http
-{
-    class AsyncHttpClient;
-}
 
 namespace detail
 {
@@ -61,6 +59,8 @@ namespace detail
         enum class State
         {
             sInit,
+            //checking, if local file already valid and no download is required
+            sCheckingLocalFile,
             sCheckingHashPresence,
             sCheckingHash,
             sDownloadingFile,
@@ -72,7 +72,7 @@ namespace detail
         };
 
         const QString m_filePath;
-        nx_http::AsyncHttpClient* m_httpClient;
+        nx_http::AsyncHttpClientPtr m_httpClient;
         State m_state;
         const QString m_localDirPath;
         const QString m_hashTypeName;
@@ -81,7 +81,11 @@ namespace detail
         mutable std::mutex m_mutex;
         uint64_t m_totalBytesDownloaded;
         uint64_t m_totalBytesWritten;
+        boost::optional<qint64> m_localFileSize;
+        boost::optional<qint64> m_remoteFileSize;
+        bool m_responseReceivedCalled;
 
+        void asyncStatDone( SystemError::ErrorCode errorCode, qint64 fileSize );
         //!Implementation of QnFile::AbstractWriteHandler::onAsyncWriteFinished
         virtual void onAsyncWriteFinished(
             const std::shared_ptr<QnFile>& file,
@@ -91,13 +95,17 @@ namespace detail
         virtual void onAsyncCloseFinished(
             const std::shared_ptr<QnFile>& file,
             SystemError::ErrorCode errorCode ) override;
+        //!Starts async validation of local file. If file is not valid, async download is started
+        bool startAsyncFilePresenceCheck();
+        //!Checks if file download is necessary and starts download (if necessary)
+        void checkIfFileDownloadRequired();
         bool startFileDownload();
         void onSomeMessageBodyAvailableNonSafe();
 
     private slots:
-        void onResponseReceived( nx_http::AsyncHttpClient* );
-        void onSomeMessageBodyAvailable( nx_http::AsyncHttpClient* );
-        void onHttpDone( nx_http::AsyncHttpClient* );
+        void onResponseReceived( nx_http::AsyncHttpClientPtr );
+        void onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
+        void onHttpDone( nx_http::AsyncHttpClientPtr );
     };
 }
 

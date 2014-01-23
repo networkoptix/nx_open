@@ -13,13 +13,13 @@ public:
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) override;
-    virtual QnResourceAudioLayout* getAudioLayout() override;
+    virtual QnResourceAudioLayoutPtr getAudioLayout() override;
     void setCodecId(CodecID codecId);
     void setBitsPerSample(int value);
     void setSampleFormat(AVSampleFormat sampleFormat);
 private:
     QnMediaContextPtr m_context;
-    QnRtspAudioLayout m_audioLayout;
+    std::shared_ptr<QnRtspAudioLayout> m_audioLayout;
     int m_frequency;
     int m_channels;
     int m_bits_per_coded_sample;

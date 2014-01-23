@@ -4,7 +4,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/style/globals.h>
 
@@ -205,10 +205,10 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         newCellAspectRatio = m_currentLayout->cellAspectRatio();
         newCellSpacing = m_currentLayout->cellSpacing();
 
-        if(!qFuzzyCompare(newCellAspectRatio, oldCellAspectRatio))
+        if(!qFuzzyEquals(newCellAspectRatio, oldCellAspectRatio))
             at_layout_cellAspectRatioChanged();
 
-        if(!qFuzzyCompare(newCellSpacing, oldCellSpacing))
+        if(!qFuzzyEquals(newCellSpacing, oldCellSpacing))
             at_layout_cellSpacingChanged();
 
         updateActiveRoleItem();

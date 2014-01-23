@@ -7,8 +7,9 @@
 #define SENDMAILBUSINESSACTION_H
 
 #include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
 #include <business/business_aggregation_info.h>
+
+#include <core/resource/resource_fwd.h>
 
 class QnBusinessAggregationInfo;
 

@@ -8,10 +8,10 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnPopupSettingsWidget;
+    class PopupSettingsWidget;
 }
 
-class QnShowBusinessEventsHelper;
+class QnBusinessEventsFilterKvPairAdapter;
 
 class QnPopupSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
@@ -30,11 +30,10 @@ private slots:
     void at_showBusinessEvents_valueChanged(quint64 value);
 
 private:
-    QScopedPointer<Ui::QnPopupSettingsWidget> ui;
+    QScopedPointer<Ui::PopupSettingsWidget> ui;
     QList<QCheckBox* > m_businessRulesCheckBoxes;
     QList<QCheckBox* > m_systemHealthCheckBoxes;
-
-    QnShowBusinessEventsHelper* m_showBusinessEventsHelper;
+    QScopedPointer<QnBusinessEventsFilterKvPairAdapter> m_adapter;
 };
 
 #endif // POPUP_SETTINGS_WIDGET_H

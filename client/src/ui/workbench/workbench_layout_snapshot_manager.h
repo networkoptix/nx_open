@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/layout_resource.h>
 #include <api/app_server_connection.h>
 
 #include <client/client_globals.h>

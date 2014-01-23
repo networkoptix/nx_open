@@ -85,7 +85,7 @@ void QnProxySenderConnection::run()
 {
     Q_D(QnProxySenderConnection);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     if (!d->socket->connect(d->proxyServerUrl.host(), d->proxyServerUrl.port(), SOCKET_TIMEOUT)) {
         doDelay();
@@ -136,6 +136,9 @@ void QnProxySenderConnection::run()
                 break;
         }
     }
+
+    if (!gotRequest && timer.elapsed() < PROXY_KEEP_ALIVE_INTERVAL)
+        doDelay();
 
     if (!m_needStop) {
         addNewProxyConnect();

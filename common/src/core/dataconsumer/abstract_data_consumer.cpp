@@ -32,7 +32,7 @@ void QnAbstractDataConsumer::run()
 {
 //    const int timeoutMs = 100;
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     while(!needToStop())
     {

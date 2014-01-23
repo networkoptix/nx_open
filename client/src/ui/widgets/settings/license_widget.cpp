@@ -11,11 +11,11 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include <common/customization.h>
+#include <utils/common/product_features.h>
 
-#include "ui/dialogs/custom_file_dialog.h"
-#include "licensing/license.h"
-#include "version.h"
+#include <ui/dialogs/custom_file_dialog.h>
+
+#include <licensing/license.h>
 
 namespace {
     bool isValidSerialKey(const QString &key) {
@@ -39,7 +39,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->manualActivationInfoLabel->setText(tr(
         "Please send E-Mail with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
         "Then we'll send you an Activation Key which should be filled in the field below."
-    ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS)));
+    ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS))); // TODO: #Elric move to product features?
 
     connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
@@ -140,15 +140,19 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
 }
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Open License File")));
-    dialog->setNameFilters(QStringList() << tr("All files (*.*)"));
-    dialog->setFileMode(QFileDialog::ExistingFile);
-    if (dialog->exec() && !dialog->selectedFiles().isEmpty()) {
-        QFile file(dialog->selectedFiles().first());
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
-            ui->licenseFileLabel->setText(file.fileName());
-        }
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open License File"),
+                                                    QString(),
+                                                    tr("All files (*.*)"),
+                                                    0,
+                                                    QnCustomFileDialog::fileDialogOptions());
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
+        ui->licenseFileLabel->setText(file.fileName());
     }
 }
 

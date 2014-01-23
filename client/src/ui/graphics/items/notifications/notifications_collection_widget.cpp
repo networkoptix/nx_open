@@ -12,7 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
 
@@ -257,7 +257,7 @@ void QnNotificationsCollectionWidget::setToolTipsEnclosingRect(const QRectF &rec
 
 void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *blinker) {
     if (m_blinker)
-        disconnect(m_list, 0, m_blinker, 0);
+        disconnect(m_list, NULL, m_blinker, NULL);
     
     m_blinker = blinker;
     
@@ -577,12 +577,11 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = qnResPool->getResources().filtered<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
             if (!sampleServer)
                 continue;
             resource = sampleServer;
             break;
-        case QnSystemHealth::StoragesAreFull:
-            continue;
         default:
             break;
         }
@@ -624,7 +623,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                     continue;
                 params.setEventResourceId(sampleCamera->getId());
                 params.setReasonCode(QnBusiness::NetworkIssueNoFrame);
-                params.setReasonText(lit("15"));
+                params.setReasonParamsEncoded(lit("15000"));
                 break;
             }
 
@@ -633,7 +632,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                     continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setReasonCode(QnBusiness::StorageIssueNotEnoughSpeed);
-                params.setReasonText(lit("C: E:"));
+                params.setReasonParamsEncoded(lit("C: E:"));
                 break;
             }
 

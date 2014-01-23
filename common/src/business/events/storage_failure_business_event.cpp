@@ -12,5 +12,5 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
                             reasonCode)
 {
     if (storageResource)
-        m_reasonText = storageResource->getUrl();
+        m_reasonParamsEncoded = storageResource->getUrl();
 }

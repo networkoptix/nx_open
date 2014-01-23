@@ -18,7 +18,7 @@
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
@@ -456,7 +456,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
         return -1;
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnResourceVideoLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
+    QnConstResourceVideoLayoutPtr layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->channelCount() : -1;
 }
 
@@ -525,14 +525,15 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     }
 };
 
-QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, const QnResourceVideoLayout* vLayout)
+QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = CODEC_ID_H263P;
     else
-        //dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
-        dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
+        dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
+        //dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_VORBIS; // keep aac without transcoding for audio
+        //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
 
@@ -641,7 +642,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     QTextStream sdp(&d->responseBody);
 
     
-    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
 
     
     int numAudio = 0;
@@ -653,7 +654,7 @@ int QnRtspConnectionProcessor::composeDescribe()
             numAudio = 1;
     }
     else {
-        const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
+        QnConstResourceAudioLayoutPtr audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
         if (audioLayout)
             numAudio = audioLayout->channelCount();
     }
@@ -782,7 +783,7 @@ int QnRtspConnectionProcessor::composeSetup()
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
+    QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->channelCount()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
@@ -1006,7 +1007,7 @@ void QnRtspConnectionProcessor::checkQuality()
     }
 }
 
-void QnRtspConnectionProcessor::createPredefinedTracks(const QnResourceVideoLayout* videoLayout)
+void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
 {
     Q_D(QnRtspConnectionProcessor);
 
@@ -1055,7 +1056,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->sessionTimeOut = 0;
         //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
         //d->socket->setSendTimeout(LARGE_RTSP_TIMEOUT); // set large timeout for native connection
-        const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+        QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
         if (videoLayout) {
             QString layoutStr = videoLayout->toString();
@@ -1146,7 +1147,7 @@ int QnRtspConnectionProcessor::composePlay()
 
         int copySize = 0;
         if (!getResource()->toResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
-            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0);
+            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 
         if (copySize == 0) {
@@ -1165,7 +1166,8 @@ int QnRtspConnectionProcessor::composePlay()
         }
 
         d->dataProcessor->unlockDataQueue();
-        d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
+        quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
+        d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
         connectToLiveDataProviders();
     }
     else if (d->liveMode == Mode_Archive && d->archiveDP) 
@@ -1293,7 +1295,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time); // for fast quality switching
+                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
@@ -1414,7 +1416,7 @@ void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    saveSysThreadID();
+    initSystemThreadId();
 
     //d->socket->setNoDelay(true);
     d->socket->setSendBufferSize(16*1024);

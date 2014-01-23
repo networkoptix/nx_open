@@ -6,7 +6,7 @@
 #ifndef IP_RANGE_CHECKER_ASYNC_H
 #define IP_RANGE_CHECKER_ASYNC_H
 
-#include <map>
+#include <set>
 
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
@@ -39,15 +39,9 @@ public:
     QStringList onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan );
 
 private:
-    enum Status
-    {
-        sInit,
-        sPortOpened
-    };
-
     QStringList m_openedIPs;
-    //!It is only because of aio::AIOService API bug we have to create this terrible dictionary. Gonna fix that in default
-    std::map<nx_http::AsyncHttpClient*, Status> m_socketsBeingScanned;
+    //!It is only because of aio::AsyncHttpClient API bug we have to create this terrible dictionary. it will be fixed soon
+    std::set<std::shared_ptr<nx_http::AsyncHttpClient> > m_socketsBeingScanned;
     QMutex m_mutex;
     QWaitCondition m_cond;
     int m_portToScan;
@@ -59,9 +53,7 @@ private:
     bool launchHostCheck();
 
 private slots:
-    void onTcpConnectionEstablished( nx_http::AsyncHttpClient* );
-    void onResponseReceived( nx_http::AsyncHttpClient* );
-    void onDone( nx_http::AsyncHttpClient* );
+    void onDone( nx_http::AsyncHttpClientPtr );
 };
 
 #endif //IP_RANGE_CHECKER_ASYNC_H

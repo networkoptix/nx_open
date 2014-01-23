@@ -29,6 +29,14 @@ QnAbstractConnection::~QnAbstractConnection() {
     return;
 }
 
+const QnRequestHeaderList &QnAbstractConnection::extraHeaders() const {
+    return m_extraHeaders;
+}
+
+void QnAbstractConnection::setExtraHeaders(const QnRequestHeaderList& extraHeaders) {
+    m_extraHeaders = extraHeaders;
+}
+
 QUrl QnAbstractConnection::url() const {
     return m_url;
 }
@@ -58,15 +66,19 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }
 
+    QnRequestHeaderList actualHeaders = headers;
+    if(!m_extraHeaders.isEmpty())
+        actualHeaders.append(m_extraHeaders);
+
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
         m_url, 
         nameMapper()->name(processor->object()), 
-        headers, 
+        actualHeaders, 
         params, 
         data,
         processor, 
-        SLOT(processReply(QnHTTPRawResponse, int))
+        "processReply"
     );
 }
 
@@ -75,23 +87,34 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestHeaderL
 }
 
 int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(object, m_headers, params, replyTypeName, target, slot);
+    return sendAsyncGetRequest(object, QnRequestHeaderList(), params, replyTypeName, target, slot);
+}
+
+int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
+    return sendAsyncRequest(QNetworkAccessManager::PostOperation, object, headers, params, data, replyTypeName, target, slot);
+}
+
+int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
+    return sendAsyncPostRequest(object, QnRequestHeaderList(), params, data, replyTypeName, target, slot);
 }
 
 int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
+    QnRequestHeaderList actualHeaders = headers;
+    if(!m_extraHeaders.isEmpty())
+        actualHeaders.append(m_extraHeaders);
+
     QnHTTPRawResponse response;
     int status = QnSessionManager::instance()->sendSyncRequest(
         operation,
         m_url,
         nameMapper()->name(object),
-        headers,
+        actualHeaders,
         params,
         data,
         response
-        );
-    if (status) {
+    );
+    if (status != 0)
         return status;
-    }
 
     QScopedPointer<QnAbstractReplyProcessor> processor(newReplyProcessor(object));
     processor->processReply(response, -1);
@@ -109,8 +132,11 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
     return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
 }
 
-
-void QnAbstractConnection::setExtraHeaders(const QnRequestHeaderList& headers)
-{
-    m_headers = headers;
+int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
+    return sendSyncRequest(QNetworkAccessManager::PostOperation, object, headers, params, data, reply);
 }
+
+int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
+    return sendSyncPostRequest(object, QnRequestHeaderList(), params, data, reply);
+}
+

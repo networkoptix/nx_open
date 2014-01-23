@@ -36,7 +36,7 @@ public:
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
-    int copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime = 0);
+    int copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq);
     void lockDataQueue();
     void unlockDataQueue();
     void setSingleShotMode(bool value);

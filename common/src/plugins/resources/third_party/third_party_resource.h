@@ -30,7 +30,7 @@ public:
     virtual ~QnThirdPartyResource();
 
     //!Implementation of QnResource::getPtzController
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //!Implementation of QnNetworkResource::isResourceAccessible
     virtual bool isResourceAccessible() override;
     //!Implementation of QnNetworkResource::ping
@@ -47,7 +47,7 @@ public:
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
 
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QStringList getInputPortList() const override;

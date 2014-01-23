@@ -4,6 +4,7 @@
 
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
+#include <utils/common/json_serializer.h>
 #include <utils/appcast/update_info.h>
 #include <utils/network/networkoptixmodulerevealcommon.h>
 #include <utils/math/space_mapper.h>
@@ -12,10 +13,11 @@
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/camera_diagnostics_reply.h>
+#include <api/model/manual_camera_seach_reply.h>
+#include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
+#include <api/model/connection_info.h>
 #include <api/message.h>
-#include <api/media_server_cameras_data.h>
-#include <api/media_server_connection.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -30,13 +32,16 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/misc/schedule_task.h>
+#include <core/ptz/ptz_data.h>
+#include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/item_dewarping_params.h>
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
-#include "connectinfo.h"
+
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -50,12 +55,13 @@ void QnCommonMetaTypes::initilize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QnConnectInfoPtr>();
+    qRegisterMetaType<QnConnectionInfoPtr>();
 
     qRegisterMetaType<QUuid>();
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
+    qRegisterMetaType<Qt::Orientations>();
 
     qRegisterMetaType<QnMacAddress>();
 
@@ -64,7 +70,7 @@ void QnCommonMetaTypes::initilize() {
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
-    qRegisterMetaType<QnKvPairs>();
+    qRegisterMetaType<QnKvPairListsById>();
 
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
@@ -95,11 +101,6 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnMessage>();
 
-    qRegisterMetaType<QnManualCameraSearchProcessReply>();
-    qRegisterMetaType<QnStatisticsData>();
-
-    qRegisterMetaType<QnPtzSpaceMapper>();
-
     qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();
 
@@ -122,6 +123,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnBusinessEventRuleList>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
+    qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
@@ -129,11 +131,28 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnTimeReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnRebuildArchiveReply>();
+    qRegisterMetaType<QnManualCameraSearchReply>();
+    qRegisterMetaType<QnServersReply>();
+    qRegisterMetaType<QnStatisticsData>();
+    qRegisterMetaType<QnManualCameraSearchSingleCamera>();
 
-    qRegisterMetaType<DewarpingParams>();
+    qRegisterMetaType<QnPtzPreset>();
+
+    qRegisterMetaType<QnPtzPresetList>();
+    qRegisterMetaType<QnPtzTour>();
+    qRegisterMetaType<QnPtzTourList>();
+    qRegisterMetaType<QnPtzData>();
+    qRegisterMetaType<QnPtzLimits>();
+    qRegisterMetaType<Qn::PtzDataFields>();
+    qRegisterMetaType<Qn::PtzCommand>();
+
+    qRegisterMetaType<QnMediaDewarpingParams>();
+    qRegisterMetaType<QnItemDewarpingParams>();
 
     qRegisterMetaType<Qn::Corner>();
     qRegisterMetaTypeStreamOperators<Qn::Corner>();
+
+    QnJsonSerializer::registerSerializer<QUuid>();
 
     qn_commonMetaTypes_initialized = true;
 }

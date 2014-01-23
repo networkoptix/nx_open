@@ -10,7 +10,7 @@
 #include <utils/common/invocation_event.h>
 
 #ifdef QN_HAS_DWM
-#include <QtWidgets/5.1.1/QtWidgets/private/qwidget_p.h>
+#include <QtWidgets/private/qwidget_p.h>
 #include <qt_windows.h>
 #include <utils/qt5port_win.h>
 
@@ -420,7 +420,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
                 QApplication::postEvent(d->widget, new QnInvocationEvent(AdjustPositionInvocation), Qt::LowEventPriority);
         }
 
-        if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
+        if(event->type() == QnEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
             d->widget->move(d->widget->pos()); 
     }
 #endif // QN_HAS_DWM

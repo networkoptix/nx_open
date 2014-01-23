@@ -99,7 +99,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
         scaleContext[ch] = sws_getContext(decodedFrame->width, decodedFrame->height, (PixelFormat) decodedFrame->format, 
                                       dstRect.width(), dstRect.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
-            m_lastErrMessage = tr("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
+            m_lastErrMessage = tr("Could not allocate scaler context for resolution %1x%2.").arg(m_resolution.width()).arg(m_resolution.height());
             return -4;
         }
     }
@@ -124,7 +124,7 @@ bool QnFfmpegVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
-        m_lastErrMessage = tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
+        m_lastErrMessage = tr("Could not find encoder for codec %1.").arg(m_codecId);
         return false;
     }
 
@@ -171,7 +171,7 @@ bool QnFfmpegVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Can't initialize video encoder");
+        m_lastErrMessage = tr("Could not initialize video encoder.");
         return false;
     }
 
@@ -277,7 +277,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, 
         *result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded));
         (*result)->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
         if(m_encoderCtx->coded_frame->key_frame)
-            (*result)->flags |= AV_PKT_FLAG_KEY;
+            (*result)->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         (*result)->data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
         return 0;
     }

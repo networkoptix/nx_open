@@ -6,6 +6,19 @@
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
+QString QnClientVideoCamera::errorString(int errCode) {
+    switch (errCode) {
+    case NoError:
+        return QString();
+    case InvalidResourceType:
+        return tr("Invalid resource type for data export.");
+    default:
+        break;
+    }
+
+    return QnStreamRecorder::errorString(errCode);
+}
+
 QnClientVideoCamera::QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
     m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
@@ -127,7 +140,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
                                             qint64 timeOffsetMs, qint64 serverTimeZoneMs,
                                             QRectF srcRect,
                                             const ImageCorrectionParams& contrastParams,
-                                            const DewarpingParams& dewarpingParams)
+                                            const QnItemDewarpingParams& itemDwarpingParams)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -137,10 +150,10 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(QnResource::Role_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
-        if (m_exportReader == 0)
+        if (!m_exportReader)
         {
             delete tmpReader;
-            emit recordingFailed(tr("Invalid resource type for data export."));
+            emit exportFinished(InvalidResourceType, fileName);
             return;
         }
         m_exportReader->setCycleMode(false);
@@ -159,13 +172,10 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             m_exportRecorder->setStorage(storage);
         m_exportRecorder->setSrcRect(srcRect);
         m_exportRecorder->setContrastParams(contrastParams);
-        m_exportRecorder->setDewarpingParams(dewarpingParams);
-        connect(m_exportRecorder,   SIGNAL(recordingFailed(QString)),   this,   SLOT(stopExport()));
-        connect(m_exportRecorder,   SIGNAL(recordingFinished(QString)), this,   SLOT(stopExport()));
-
-        connect(m_exportRecorder,   SIGNAL(recordingFailed(QString)),   this,   SIGNAL(exportFailed(QString)));
-        connect(m_exportRecorder,   SIGNAL(recordingFinished(QString)), this,   SIGNAL(exportFinished(QString)));
-        connect(m_exportRecorder,   SIGNAL(recordingProgress(int)),     this,   SIGNAL(exportProgress(int)));
+        m_exportRecorder->setItemDewarpingParams(itemDwarpingParams);
+        connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
+        connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
+        connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::exportFinished);
 
         if (fileName.toLower().endsWith(QLatin1String(".avi")))
         {

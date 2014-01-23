@@ -5,7 +5,7 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-    class QnCameraInputBusinessEventWidget;
+    class CameraInputBusinessEventWidget;
 }
 
 class QnCameraInputBusinessEventWidget : public QnAbstractBusinessParamsWidget
@@ -25,7 +25,7 @@ private slots:
     void paramsChanged();
 
 private:
-    QScopedPointer<Ui::QnCameraInputBusinessEventWidget> ui;
+    QScopedPointer<Ui::CameraInputBusinessEventWidget> ui;
 };
 
 #endif // CAMERA_INPUT_BUSINESS_EVENT_WIDGET_H

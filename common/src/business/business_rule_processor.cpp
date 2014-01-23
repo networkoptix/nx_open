@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 
 #include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
 
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
@@ -11,7 +12,9 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "mustache/mustache_helper.h"
 #include "mustache/partial_info.h"
@@ -47,6 +50,13 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
     connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
+
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
+            this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(int)),
+            this, SLOT(at_businessRuleDeleted(int)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
+            this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(at_timer()));
     m_timer.start(1000);
@@ -495,7 +505,7 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int 
     cl_log.log(QString::fromLatin1("Error processing action SendMail."), cl_logWARNING);
 }
 
-void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawResponse response, int handle)
+void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle)
 {
     if (response.status == 0)
         return;
@@ -506,7 +516,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(QnHTTPRawRespon
 bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_broadcastBusinessActionFinished(QnHTTPRawResponse, int)));
+    appServerConnection->broadcastBusinessAction(action, this, "at_broadcastBusinessActionFinished");
     return true;
 }
 

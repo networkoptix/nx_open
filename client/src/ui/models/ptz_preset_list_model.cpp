@@ -1,11 +1,12 @@
 #include "ptz_preset_list_model.h"
 
 #include <common/common_globals.h>
+#include <core/ptz/ptz_preset.h>
+#include <utils/common/string.h>
 
 QnPtzPresetListModel::QnPtzPresetListModel(QObject *parent):
     base_type(parent),
-    m_readOnly(false),
-    m_duplicateHotkeysEnabled(false)
+    m_readOnly(false)
 {
     QList<Column> columns;
     columns << NameColumn << HotkeyColumn;
@@ -24,21 +25,26 @@ void QnPtzPresetListModel::setReadOnly(bool readOnly) {
     m_readOnly = readOnly;
 }
 
-bool QnPtzPresetListModel::isDuplicateHotkeysEnabled() {
-    return m_duplicateHotkeysEnabled;
-}
-
-void QnPtzPresetListModel::setDuplicateHotkeysEnabled(bool duplicateHotkeysEnabled) {
-    m_duplicateHotkeysEnabled = duplicateHotkeysEnabled;
-}
-
-const QList<QnPtzPreset> &QnPtzPresetListModel::presets() const {
+const QnPtzPresetList &QnPtzPresetListModel::presets() const {
     return m_presets;
 }
 
-void QnPtzPresetListModel::setPresets(const QList<QnPtzPreset> &presets) {
+void QnPtzPresetListModel::setPresets(const QnPtzPresetList &presets) {
     beginResetModel();
     m_presets = presets;
+    qSort(m_presets.begin(), m_presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+    });
+    endResetModel();
+}
+
+QnHotkeysHash QnPtzPresetListModel::hotkeys() const {
+    return m_hotkeys;
+}
+
+void QnPtzPresetListModel::setHotkeys(const QnHotkeysHash &value) {
+    beginResetModel();
+    m_hotkeys = value;
     endResetModel();
 }
 
@@ -92,6 +98,8 @@ QVariant QnPtzPresetListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     const QnPtzPreset &preset = m_presets[index.row()];
+    int hotkey = m_hotkeys.value(preset.id, Qn::NoHotkey);
+
     Column column = m_columns[index.column()];
 
     switch(role) {
@@ -105,7 +113,7 @@ QVariant QnPtzPresetListModel::data(const QModelIndex &index, int role) const {
         case NameColumn: 
             return preset.name;
         case HotkeyColumn:
-            return preset.hotkey < 0 ? tr("None") : QString::number(preset.hotkey);
+            return hotkey < 0 ? tr("None") : QString::number(hotkey);
         default:
             break;
         }
@@ -115,7 +123,7 @@ QVariant QnPtzPresetListModel::data(const QModelIndex &index, int role) const {
         case NameColumn:
             return preset.name;
         case HotkeyColumn:
-            return preset.hotkey;
+            return hotkey;
         default:
             break;
         }
@@ -161,18 +169,22 @@ bool QnPtzPresetListModel::setData(const QModelIndex &index, const QVariant &val
         if(!ok || hotkey > 9)
             return false;
 
-        if(hotkey >= 0 && !m_duplicateHotkeysEnabled) {
-            for(int i = 0; i < m_presets.size(); i++) {
-                if(m_presets[i].hotkey == hotkey) {
-                    m_presets[i].hotkey = preset.hotkey;
+        if(hotkey >= 0) {
+            int oldHotkey = m_hotkeys.value(preset.id, Qn::NoHotkey);
+            QString existing = m_hotkeys.key(hotkey, QString());
+            m_hotkeys[preset.id] = hotkey;
+
+            if (!existing.isEmpty()) {
+                for(int i = 0; i < m_presets.size(); i++) {
+                    if (m_presets[i].id != existing)
+                        continue;
+                    m_hotkeys[existing] = oldHotkey;
                     QModelIndex siblingIndex = index.sibling(i, index.column());
                     emit dataChanged(siblingIndex, siblingIndex);
                 }
             }
+            emit dataChanged(index, index);
         }
-
-        preset.hotkey = hotkey;
-        emit dataChanged(index, index);
         return true;
     }
     default:

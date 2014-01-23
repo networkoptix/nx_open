@@ -3,6 +3,8 @@
 
 #define CL_MAX_CHANNELS 4 // TODO: #Elric get rid of this definition
 
+#include <memory>
+
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
 #include <QtCore/QPoint>
@@ -35,6 +37,9 @@ public:
     virtual AudioTrack getAudioTrackInfo(int index) const = 0;
 };
 
+typedef std::shared_ptr<QnResourceAudioLayout> QnResourceAudioLayoutPtr;
+typedef std::shared_ptr<const QnResourceAudioLayout> QnConstResourceAudioLayoutPtr;
+
 
 class QnEmptyResourceAudioLayout: public QnResourceAudioLayout {
 public:
@@ -58,6 +63,9 @@ private:
     QVector<AudioTrack> m_audioTracks;
 };
 
+typedef std::shared_ptr<QnResourceCustomAudioLayout> QnResourceCustomAudioLayoutPtr;
+typedef std::shared_ptr<const QnResourceCustomAudioLayout> QnConstResourceCustomAudioLayoutPtr;
+
 
 class QnResourceVideoLayout: public QnResourceLayout {
 public:
@@ -75,6 +83,9 @@ public:
 
     virtual QString toString() const { return QString(); }
 };
+
+typedef std::shared_ptr<QnResourceVideoLayout> QnResourceVideoLayoutPtr;
+typedef std::shared_ptr<const QnResourceVideoLayout> QnConstResourceVideoLayoutPtr;
 
 
 /**
@@ -98,9 +109,14 @@ public:
 };
 
 
+class QnCustomResourceVideoLayout;
+
+typedef std::shared_ptr<QnCustomResourceVideoLayout> QnCustomResourceVideoLayoutPtr;
+typedef std::shared_ptr<const QnCustomResourceVideoLayout> QnConstCustomResourceVideoLayoutPtr;
+
 class QnCustomResourceVideoLayout : public QnResourceVideoLayout {
 public:
-    static QnCustomResourceVideoLayout *fromString(const QString &value)
+    static QnCustomResourceVideoLayoutPtr fromString(const QString &value)
     {
         QStringList params = value.split(QLatin1Char(';'));
         int width = 1;
@@ -120,7 +136,7 @@ public:
             }
         }
 
-        QnCustomResourceVideoLayout *result = new QnCustomResourceVideoLayout(QSize(width, height));
+        QnCustomResourceVideoLayoutPtr result( new QnCustomResourceVideoLayout(QSize(width, height)) );
         for (int i = 0; i < sensors.size(); ++i)
             result->setChannel(i, sensors[i].toInt());
         return result;

@@ -3,6 +3,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QtNumeric> /* For qIsFinite. */
 
 void QJsonDetail::serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format) {
     switch (value.type()) {
@@ -12,8 +13,15 @@ void QJsonDetail::serialize_json(const QJsonValue &value, QByteArray *target, QJ
     case QJsonValue::Bool:
         *target = value.toBool() ? "true" : "false";
         break;
-    case QJsonValue::Double:
-        *target = QByteArray::number(value.toDouble(), 'g', 17);
+    case QJsonValue::Double: {
+        double d = value.toDouble();
+        if(qIsFinite(d)) {
+            *target = QByteArray::number(value.toDouble(), 'g', 17);
+        } else {
+            *target = "null"; /* +INF || -INF || NaN (see RFC4627#section2.4) */
+        }
+        break;
+    }
     case QJsonValue::String:
         target->clear();
         target->append('\"');

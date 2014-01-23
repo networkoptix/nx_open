@@ -6,7 +6,7 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-    class QnRecordingBusinessActionWidget;
+    class RecordingBusinessActionWidget;
 }
 
 class QnRecordingBusinessActionWidget : public QnAbstractBusinessParamsWidget
@@ -26,7 +26,7 @@ private slots:
     void paramsChanged();
 
 private:
-    QScopedPointer<Ui::QnRecordingBusinessActionWidget> ui;
+    QScopedPointer<Ui::RecordingBusinessActionWidget> ui;
 };
 
 #endif // RECORDING_BUSINESS_ACTION_WIDGET_H

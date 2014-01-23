@@ -3,7 +3,7 @@
 
 QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::QnAggregationWidget)
+    ui(new Ui::AggregationWidget)
 {
     ui->setupUi(this);
     ui->periodComboBox->addItem(tr("sec"), 1);

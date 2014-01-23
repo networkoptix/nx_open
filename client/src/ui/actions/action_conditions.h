@@ -7,7 +7,7 @@
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -373,7 +373,6 @@ public:
     QnOpenInNewEntityActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
-
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };
 
@@ -382,7 +381,6 @@ public:
     QnSetAsBackgroundActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
-
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };
 
@@ -409,6 +407,22 @@ class QnShowcaseActionCondition: public QnActionCondition {
 public:
     QnShowcaseActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnPtzActionCondition: public QnActionCondition {
+public:
+    QnPtzActionCondition(Qn::PtzCapabilities capabilities, QObject* parent = NULL):
+        QnActionCondition(parent),
+        m_capabilities(capabilities) {}
+    
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+
+private:
+    bool check(const QnPtzControllerPtr &controller);
+
+private:
+    Qn::PtzCapabilities m_capabilities;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

@@ -7,7 +7,7 @@
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/network/http/httptypes.h>
 
@@ -23,22 +23,11 @@ QnCameraDiagnosticsHandler::QnCameraDiagnosticsHandler()
 
 int QnCameraDiagnosticsHandler::executeGet(
     const QString& /*path*/,
-    const QnRequestParamList &params,
-    JsonResult& result )
+    const QnRequestParams &params,
+    QnJsonRestResult& result )
 {
-    QString resID;
-    CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::none;
-    for( QnRequestParamList::const_iterator
-        it = params.begin();
-        it != params.end();
-        ++it )
-    {
-        if( it->first == resIDParamName )
-            resID = it->second;
-        else if( it->first == diagnosticsTypeParamName )
-            diagnosticsType = CameraDiagnostics::Step::fromString(it->second);
-    }
-
+    QString resID = params.value("res_id");
+    CameraDiagnostics::Step::Value diagnosticsType = CameraDiagnostics::Step::fromString(params.value("type"));
     if( resID.isEmpty() || diagnosticsType == CameraDiagnostics::Step::none )
         return nx_http::StatusCode::badRequest;
 

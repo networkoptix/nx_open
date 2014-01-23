@@ -16,7 +16,8 @@ class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 public:
     QnDesktopCameraStreamReader(QnResourcePtr res);
     virtual ~QnDesktopCameraStreamReader();
-    const QnResourceAudioLayout* getDPAudioLayout() const;
+    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStream() override;
@@ -35,7 +36,7 @@ private:
     quint8 m_recvBuffer[65536];
     QnFfmpegRtpParser m_parsers[2];
     QElapsedTimer m_keepaliveTimer;
-    QnResourceCustomAudioLayout* m_audioLayout;
+    QnResourceCustomAudioLayoutPtr m_audioLayout;
     mutable QMutex m_audioLayoutMutex;
 };
 

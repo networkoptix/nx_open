@@ -21,8 +21,6 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "core/resource/interface/abstract_ptz_controller.h"
-#include "onvif_ptz_controller.h"
 #include "utils/common/timermanager.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -164,19 +162,25 @@ public:
     QString getPtzfUrl() const;
     void setPtzfUrl(const QString& src);
 
+    QString getPtzConfigurationToken() const;
+    void setPtzConfigurationToken(const QString &src);
+
+    QString getPtzProfileToken() const;
+    void setPtzProfileToken(const QString& src); 
+
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
 
-    virtual QnAbstractPtzController* getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     bool fetchAndSetDeviceInformation(bool performSimpleCheck);
 
     //!Relay input with token \a relayToken has changed its state to \a active
@@ -196,16 +200,11 @@ public:
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
-    void setVendorName( const QString& vendorName );
-
     QMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    bool isPTZDisabled() const;
 protected:
-    virtual QString getVendorInternal() const override;
-
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -260,7 +259,7 @@ private:
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
-    OnvifCameraSettingsResp* m_onvifAdditionalSettings;
+    std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
 
     mutable QMutex m_physicalParamsMutex;
     QDateTime m_advSettingsLastUpdated;
@@ -402,10 +401,11 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    QScopedPointer<QnOnvifPtzController> m_ptzController;
 
     QString m_imagingUrl;
     QString m_ptzUrl;
+    QString m_ptzProfileToken;
+    QString m_ptzConfigurationToken;
     int m_timeDrift;
     int m_prevSoapCallResult;
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
@@ -419,7 +419,6 @@ private:
     quint64 m_renewSubscriptionTaskID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
-    QString m_vendorName;
     
     QMutex m_streamConfMutex;
     QWaitCondition m_streamConfCond;
@@ -435,6 +434,7 @@ private:
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
+    bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
     bool setRelayOutputStateNonSafe(

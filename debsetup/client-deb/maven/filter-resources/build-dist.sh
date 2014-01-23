@@ -5,7 +5,7 @@ COMPANY_NAME=${deb.customization.company.name}
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
-ARCHITECTURE=${arch}
+ARCHITECTURE=${os.arch}
 
 TARGET=/opt/$COMPANY_NAME/client
 USRTARGET=/usr
@@ -30,7 +30,7 @@ CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
 CLIENT_HELP_PATH=${libdir}/help
-ICONS_PATH=${child.customization.dir}/icons/hicolor
+ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
 #. $CLIENT_BIN_PATH/env.sh

@@ -1,8 +1,10 @@
+#include "processor.h"
+
 #include <QtCore/QThread>
 
-#include "processor.h"
-#include "core/resource_managment/resource_pool.h"
-#include "core/resource_managment/resource_discovery_manager.h"
+#include <core/resource/camera_resource.h>
+#include "core/resource_management/resource_pool.h"
+#include "core/resource_management/resource_discovery_manager.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
@@ -65,7 +67,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
 {
-    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(QnHTTPRawResponse, int)));
+    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, "requestFinished");
     m_handleToResource.insert(handle, resource);
 }
 

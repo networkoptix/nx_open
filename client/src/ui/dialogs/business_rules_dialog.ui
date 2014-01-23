@@ -23,7 +23,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../../x64/build/client.qrc">
-         <normaloff>:/skin/titlebar/new_layout_hovered.png</normaloff>:/skin/titlebar/new_layout_hovered.png</iconset>
+         <normaloff>:/skin/buttons/add.png</normaloff>:/skin/buttons/add.png</iconset>
        </property>
       </widget>
      </item>
@@ -33,9 +33,8 @@
         <string>Delete</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normalon>:/skin/titlebar/exit_hovered.png</normalon>
-        </iconset>
+        <iconset resource="../../../x64/build/client.qrc">
+         <normaloff>:/skin/buttons/remove.png</normaloff>:/skin/buttons/remove.png</iconset>
        </property>
       </widget>
      </item>

@@ -24,11 +24,13 @@
 #include <utils/common/toggle.h>
 #include <utils/math/color_transformations.h>
 
+#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -40,6 +42,7 @@
 #include <ui/style/skin.h>
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
+#include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -90,8 +93,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
-#include "workbench_ptz_preset_manager.h"
-
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 
@@ -401,7 +402,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
-    m_wheelZoomInstrument->recursiveDisable();
+    //m_wheelZoomInstrument->recursiveDisable();
     m_zoomedToggle = new QnToggle(false, this);
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
@@ -409,8 +410,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
-    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
+    //connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
+    //connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        this,                           SLOT(at_zoomedToggle_activated()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
@@ -558,7 +559,12 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
     if(!m_menuEnabled)
         return;
 
-    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, display()->scene()->selectedItems()));
+    QMetaObject::invokeMethod(this, "showContextMenuAtInternal", Qt::QueuedConnection,
+                              Q_ARG(QPoint, pos), Q_ARG(WeakGraphicsItemPointerList, display()->scene()->selectedItems()));
+}
+
+void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const WeakGraphicsItemPointerList &selectedItems) {
+    QScopedPointer<QMenu> menu(this->menu()->newMenu(Qn::SceneScope, mainWindow(), selectedItems.materialized()));
     if(menu->isEmpty())
         return;
 
@@ -575,13 +581,6 @@ void QnWorkbenchController::startRecording() {
     }
 
     if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
-        return;
-    }
-
-    QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport());
-    if (widget == NULL) {
-        qnWarning("Viewport was expected to be a QGLWidget.");
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
@@ -613,9 +612,8 @@ void QnWorkbenchController::at_recordingAnimation_finished() {
         m_recordingCountdownLabel->setOpacity(0.0);
     m_recordingCountdownLabel = NULL;
     if (!m_countdownCanceled) {
-        if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            if (m_screenRecorder) // just in case =)
-                m_screenRecorder->startRecording(widget);
+        if (m_screenRecorder) // just in case =)
+            m_screenRecorder->startRecording();
     }
     m_countdownCanceled = false;
 }
@@ -625,7 +623,7 @@ void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
         return;
 
     if (m_countdownCanceled) {
-        m_recordingCountdownLabel->setText(tr("Cancelled"));
+        m_recordingCountdownLabel->setText(tr("Canceled"));
         return;
     }
     int left = m_recordingCountdownLabel->timeout() - tick;
@@ -648,7 +646,7 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
     QString suggetion = QFileInfo(recordedFileName).fileName();
     if (suggetion.isEmpty())
-        suggetion = tr("recorded_video");
+        suggetion = tr("Recorded Video");
 
     QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;
@@ -659,7 +657,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             previousDir + QLatin1Char('/') + suggetion,
             tr("AVI (Audio/Video Interleaved) (*.avi)"),
             &selectedFilter,
-            QFileDialog::DontUseNativeDialog
+            QnCustomFileDialog::fileDialogOptions()
         );
 
         if (!filePath.isEmpty()) {
@@ -668,7 +666,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
-                QString message = QObject::tr("Can't overwrite file '%1'. Please try another name.").arg(filePath);
+                QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
                 QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
@@ -763,20 +761,18 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_7:
     case Qt::Key_8:
     case Qt::Key_9: {
-        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-        if(!widget)
-            break;
-
-        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-        if(!camera)
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+        if(!widget || !widget->ptzController())
             break;
 
         int hotkey = e->key() - Qt::Key_0;
-        QnPtzPreset preset = context()->instance<QnWorkbenchPtzPresetManager>()->ptzPreset(camera, hotkey);
-        if(preset.isNull())
+
+        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->resource()->toResourcePtr(), hotkey);
+        if (presetId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(camera).withArgument(Qn::ResourceNameRole, preset.name));
+        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::PtzPresetIdRole, presetId));
+        break;
     }
     default:
         event->ignore(); /* Wasn't recognized? Ignore. */
@@ -1071,7 +1067,10 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
-    workbench()->currentLayout()->resource()->addItem(data);
+    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+        return;
+    layout->addItem(data);
     display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
@@ -1386,7 +1385,7 @@ void QnWorkbenchController::at_toggleTourModeAction_triggered(bool checked) {
     if (!checked) {
         if (m_tourModeHintLabel) {
             m_tourModeHintLabel->hideImmideately();
-            disconnect(m_tourModeHintLabel, 0, this, 0);
+            disconnect(m_tourModeHintLabel, NULL, this, NULL);
             m_tourModeHintLabel = NULL;
         }
         return;

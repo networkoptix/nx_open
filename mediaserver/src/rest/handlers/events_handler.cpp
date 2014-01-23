@@ -1,12 +1,19 @@
 #include "events_handler.h"
+
+#include "api/serializer/pb_serializer.h"
+
+#include "business/actions/abstract_business_action.h"
+
+#include <core/resource/camera_resource.h>
+#include "core/resource_management/resource_pool.h"
+
+#include "events/events_db.h"
+
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
+
 #include "serverutil.h"
-#include "business/actions/abstract_business_action.h"
-#include "events/events_db.h"
-#include "api/serializer/pb_serializer.h"
-#include "core/resource_managment/resource_pool.h"
 
 QnRestEventsHandler::QnRestEventsHandler()
 {

@@ -7,7 +7,7 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -64,7 +64,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
     m_screenshotIndex = 0;
     m_target = target;
 
-    ui.reset(new Ui::QnResourceSelectionDialog);
+    ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
     bool flat;
@@ -112,6 +112,8 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
         connect(m_thumbnailManager, SIGNAL(thumbnailReady(int,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
         updateThumbnail(QModelIndex());
     }
+
+    at_resourceModel_dataChanged();
 }
 
 QnResourceSelectionDialog::~QnResourceSelectionDialog() {
@@ -124,6 +126,7 @@ QnResourceList QnResourceSelectionDialog::selectedResources() const {
 
 void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selected) {
     setSelectedResourcesInner(selected);
+    at_resourceModel_dataChanged();
 }
 
 QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelIndex &parent) const {

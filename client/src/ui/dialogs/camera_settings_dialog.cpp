@@ -4,12 +4,14 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 
+#include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
+
 #include <ui/widgets/properties/camera_settings_widget.h>
-#include <ui/workbench/workbench_context.h>
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     QDialog(parent, windowFlags),
+    QnWorkbenchContextAware(parent),
     m_ignoreAccept(false)
 {
     setWindowTitle(tr("Camera settings"));
@@ -40,18 +42,15 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
     connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
     connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
-    connect(m_settingsWidget,   SIGNAL(fisheyeSettingChanged()),    this,   SIGNAL(fisheyeSettingChanged()));
     connect(m_settingsWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(m_openButton,       SIGNAL(clicked()),                  this,   SIGNAL(cameraOpenRequested()));
-    connect(m_diagnoseButton,   SIGNAL(clicked()),                  this,   SIGNAL(cameraIssuesRequested()));
-    connect(m_rulesButton,      SIGNAL(clicked()),                  this,   SIGNAL(cameraRulesRequested()));
-
+    connect(m_diagnoseButton,   &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_diagnoseButton_clicked);
+    connect(m_rulesButton,      &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_rulesButton_clicked);
 
     at_settingsWidget_hasChangesChanged();
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
-    return;
 }
 
 
@@ -85,4 +84,12 @@ void QnCameraSettingsDialog::acceptIfSafe() {
         m_ignoreAccept = false;
     else
         accept();
+}
+
+void QnCameraSettingsDialog::at_diagnoseButton_clicked() {
+    menu()->trigger(Qn::CameraIssuesAction, m_settingsWidget->resources());
+}
+
+void QnCameraSettingsDialog::at_rulesButton_clicked() {
+    menu()->trigger(Qn::CameraBusinessRulesAction, m_settingsWidget->resources());
 }

@@ -3,11 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtCore/QDateTime>
 #include <QtCore/QBasicTimer>
 
-#include <common/common_globals.h>
-#include <utils/math/math.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/time_reply.h>
 

@@ -26,4 +26,24 @@ protected:
 
 };
 
+class QnBasicImageProvider: public QnImageProvider {
+    Q_OBJECT
+public:
+    QnBasicImageProvider(const QImage &image, QObject *parent = 0):
+        QnImageProvider(parent),
+        m_image(image)
+    {
+        connect(this, &QnBasicImageProvider::loadDelayed, this, &QnImageProvider::imageChanged, Qt::QueuedConnection);
+    }
+    virtual ~QnBasicImageProvider() {}
+    virtual QImage image() const override { return m_image; }
+signals:
+    void loadDelayed(const QImage &image);
+protected:
+    virtual void doLoadAsync() { emit loadDelayed(m_image); }
+private:
+    QImage m_image;
+
+};
+
 #endif // IMAGE_PROVIDER_H

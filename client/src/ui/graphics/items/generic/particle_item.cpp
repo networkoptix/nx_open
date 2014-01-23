@@ -32,7 +32,7 @@ void QnParticleItem::setColor(const QColor &color) {
 }
 
 void QnParticleItem::setRect(const QRectF &rect) {
-    if(qFuzzyCompare(m_rect, rect))
+    if(qFuzzyEquals(m_rect, rect))
         return;
 
     prepareGeometryChange();

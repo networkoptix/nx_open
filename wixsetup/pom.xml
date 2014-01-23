@@ -19,37 +19,6 @@
         <skip.compress>true</skip.compress>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
-            <type>zip</type>
-            <scope>runtime</scope>
-            <classifier>1.4-${platform}-${arch}-${customization}</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>cpp</artifactId>
-                </exclusion>                
-            </exclusions>           
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>client</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-            <type>zip</type>
-            <scope>runtime</scope>
-            <classifier>1.5-${platform}-${arch}-${customization}</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>cpp</artifactId>
-                </exclusion>                
-            </exclusions>           
-        </dependency>        
-    </dependencies>
-
     <build>
         <finalName>${finalName}</finalName>
         <directory>${arch}</directory>
@@ -82,11 +51,11 @@
                                     <filtering>true</filtering>
                                 </resource>	                                
                                 <resource>
-                                    <directory>${customization.dir}/wixsetup</directory>
+                                    <directory>${parent.customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
                                 </resource>		                
                                 <resource>
-                                    <directory>${child.customization.dir}/wixsetup</directory>
+                                    <directory>${customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
                                 </resource>                             
                             </resources>              
@@ -164,6 +133,19 @@
                     </execution>                   
 
                     <execution>
+                        <id>wix-sign</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${project.build.directory}/sign.bat</executable>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <skip>${skip.sign}</skip>
+                        </configuration>
+                    </execution>        
+
+                    <execution>
                         <id>integration-test</id>
                         <phase>integration-test</phase>
                         <goals>
@@ -175,11 +157,11 @@
                             <skip>${skip.test}</skip>                        
                         </configuration>    
                     </execution>
-                </executions> 
+                </executions>
             </plugin>            
         </plugins>
     </build>
-    <profiles>        
+    <profiles>
         <profile>
             <id>beta</id>
             <activation>

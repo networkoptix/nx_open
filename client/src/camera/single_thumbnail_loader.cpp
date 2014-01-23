@@ -3,12 +3,12 @@
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
 
 QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr resource,
-                                                              qint64 usecSinceEpoch,
+                                                              qint64 microSecSinceEpoch,
                                                               const QSize &size,
                                                               QObject *parent) {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
@@ -23,18 +23,18 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr reso
     if (!serverConnection)
         return NULL;
 
-    return new QnSingleThumbnailLoader(serverConnection, networkResource, usecSinceEpoch, size, parent);
+    return new QnSingleThumbnailLoader(serverConnection, networkResource, microSecSinceEpoch, size, parent);
 }
 
 QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
                                                  QnNetworkResourcePtr resource,
-                                                 qint64 usecSinceEpoch,
+                                                 qint64 microSecSinceEpoch,
                                                  const QSize &size,
                                                  QObject *parent):
     base_type(parent),
     m_resource(resource),
     m_connection(connection),
-    m_usecSinceEpoch(usecSinceEpoch),
+    m_microSecSinceEpoch(microSecSinceEpoch),
     m_size(size)
 {
     if(!connection)
@@ -42,8 +42,6 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPt
 
     if(!resource)
         qnNullWarning(resource);
-
-    connect(this, SIGNAL(success(QImage)), this, SIGNAL(imageChanged(QImage)));
 }
 
 QImage QnSingleThumbnailLoader::image() const {
@@ -54,10 +52,10 @@ void QnSingleThumbnailLoader::doLoadAsync()
 {
     m_connection->getThumbnailAsync(
             m_resource.dynamicCast<QnNetworkResource>(),
-            m_usecSinceEpoch,
+            m_microSecSinceEpoch,
             m_size,
             QLatin1String("png"),
-            QnMediaServerConnection::IFrameAfterTime,
+            QnMediaServerConnection::Precise,
             this,
             SLOT(at_replyReceived(int, const QImage&, int)));
 }
@@ -65,13 +63,11 @@ void QnSingleThumbnailLoader::doLoadAsync()
 void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requstHandle)
 {
     Q_UNUSED(requstHandle)
-    if (status == 0) {
+    if (status == 0)
         m_image = image;
-        emit success(image);
-    }
     else
-        emit failed(status);
-    emit finished();
+        m_image = QImage();
+    emit imageChanged(m_image);
 }
 
 

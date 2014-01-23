@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
@@ -628,7 +628,7 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
         return;
     }
 
-    if(qFuzzyCompare(m_cellSpacing, cellSpacing))
+    if(qFuzzyEquals(m_cellSpacing, cellSpacing))
         return;
 
     m_cellSpacing = cellSpacing;

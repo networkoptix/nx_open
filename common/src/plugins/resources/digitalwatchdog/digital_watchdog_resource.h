@@ -25,7 +25,7 @@ public:
 
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
-    virtual QnAbstractPtzController *getPtzController() override;
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
@@ -39,9 +39,7 @@ private:
     QString fetchCameraModel();
 
 private:
-    friend class QnWatchDogPtzController; // TODO: #Elric remove
-
-    QScopedPointer<QnAbstractPtzController> m_ptzController;
+    bool m_hasZoom;
 
     //The List contains hierarchy of DW models from child to parent "DIGITALWATCHDOG" (see in camera_settings.xml)
     //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method

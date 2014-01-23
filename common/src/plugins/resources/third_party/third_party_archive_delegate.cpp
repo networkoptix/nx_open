@@ -48,7 +48,7 @@ bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
 {
     if( m_resource != resource )
         return false;
-    if( !m_archiveReader->open() )
+    if( m_archiveReader->open() != nxcip::NX_NO_ERROR )
         return false;
     if( m_streamReader )
         m_streamReader->releaseRef();
@@ -125,16 +125,16 @@ qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
     }
 }
 
-static QnDefaultResourceVideoLayout videoLayout;
-QnResourceVideoLayout* ThirdPartyArchiveDelegate::getVideoLayout()
+static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+QnResourceVideoLayoutPtr ThirdPartyArchiveDelegate::getVideoLayout()
 {
-    return &videoLayout;
+    return videoLayout;
 }
 
-static QnEmptyResourceAudioLayout audioLayout;
-QnResourceAudioLayout* ThirdPartyArchiveDelegate::getAudioLayout()
+static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+QnResourceAudioLayoutPtr ThirdPartyArchiveDelegate::getAudioLayout()
 {
-    return &audioLayout;
+    return audioLayout;
 }
 
 void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )

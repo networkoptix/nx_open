@@ -66,10 +66,10 @@ QnSignHelper::QnSignHelper():
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = QString(tr("FREE license"));
+    m_licensedToStr = tr("FREE license");
     foreach (QnLicensePtr license, list)
     {
-        if (license->name() != QLatin1String("FREE"))
+        if (license->type() != QnLicense::FreeLicense)
             m_licensedToStr = license->name();
     }
 }
@@ -662,7 +662,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     generatedFrame = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
     generatedFrame->compressionType = videoCodecCtx->codec_id;
     generatedFrame->data.write((const char*) videoBuf, out_size);
-    generatedFrame->flags = AV_PKT_FLAG_KEY;
+    generatedFrame->flags = QnAbstractMediaData::MediaFlags_AVKey;
     generatedFrame->channelNumber = 0; 
 error_label:
     delete [] videoBuf;

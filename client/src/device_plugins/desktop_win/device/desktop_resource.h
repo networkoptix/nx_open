@@ -46,7 +46,8 @@ private:
 */
 class QnDesktopResource: public QnAbstractArchiveResource {
 public:
-    QnDesktopResource(QGLWidget* mainWindow = 0);
+    QnDesktopResource(QGLWidget* mainWindow = 0):
+        QnAbstractArchiveResource() {Q_UNUSED(mainWindow)}
 };
 
 #endif

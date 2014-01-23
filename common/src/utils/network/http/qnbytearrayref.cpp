@@ -103,6 +103,21 @@ QList<QnByteArrayConstRef> QnByteArrayConstRef::split( char sep ) const
     return tokenList;
 }
 
+bool QnByteArrayConstRef::isEqualCaseInsensitive( const char* str, size_t strLength ) const
+{
+    if( strLength == (size_t)-1 )
+        strLength = strlen( str );
+    if( isEmpty() )
+        return strLength == 0;
+    if( size() != strLength )
+        return false;
+#ifdef _WIN32
+    return strnicmp( constData(), str, strLength ) == 0;
+#else
+    return strncasecmp( constData(), str, strLength ) == 0;
+#endif
+}
+
 const QnByteArrayConstRef::value_type& QnByteArrayConstRef::operator[]( size_type index ) const
 {
     Q_ASSERT( index < m_count );
@@ -111,7 +126,7 @@ const QnByteArrayConstRef::value_type& QnByteArrayConstRef::operator[]( size_typ
 
 QnByteArrayConstRef::operator QByteArray() const
 {
-    return m_src->mid( m_offset, (int) m_count );
+    return m_src ? m_src->mid( m_offset, (int) m_count ) : QByteArray();
 }
 
 QByteArray QnByteArrayConstRef::toByteArrayWithRawData() const

@@ -175,7 +175,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
 
     if (m_collapsedItemCountChanged) {
         m_collapser.animation.source = m_collapser.item->y();
-        m_collapser.item->setText(tr("%n item(s) more", "", collapsedItemsCount));
+        m_collapser.item->setText(tr("%n more item(s)", "", collapsedItemsCount));
         m_collapsedItemCountChanged = false;
         m_speedUp = 1.0 + collapsedItemsCount / 10.0;
     }
@@ -267,7 +267,7 @@ void QnNotificationListWidget::updateVisibleSize() {
         }
     }
 
-    if (qFuzzyCompare(m_visibleSize, size))
+    if (qFuzzyEquals(m_visibleSize, size))
         return;
     m_visibleSize = size;
 
@@ -339,7 +339,7 @@ Qn::NotificationLevel QnNotificationListWidget::notificationLevel() const {
 }
 
 void QnNotificationListWidget::setToolTipsEnclosingRect(const QRectF &rect) {
-    if (qFuzzyCompare(m_tooltipsEnclosingRect, rect))
+    if (qFuzzyEquals(m_tooltipsEnclosingRect, rect))
         return;
     m_tooltipsEnclosingRect = rect;
 

@@ -4,7 +4,11 @@
 #include <QtWidgets/QDialog>
 #include <QtCore/QTimer>
 
-#include "api/app_server_connection.h"
+#include <api/model/connection_info.h>
+
+#include <core/resource/resource_fwd.h>
+
+#include <ui/dialogs/button_box_dialog.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -13,36 +17,36 @@ namespace Ui {
     class ConnectionTestingDialog;
 }
 
-class QnConnectionTestingDialog : public QDialog {
+class QnConnectionTestingDialog : public QnButtonBoxDialog {
     Q_OBJECT
 
 public:
-    explicit QnConnectionTestingDialog(const QUrl &url, QWidget *parent = NULL);
+    explicit QnConnectionTestingDialog(QWidget *parent = NULL);
     virtual ~QnConnectionTestingDialog();
 
-public slots:
-    virtual void accept() override;
-    virtual void reject() override;
+    void testEnterpriseController(const QUrl &url);
+    void testResource(const QnResourcePtr &resource);
 
-    void timeout();
-
-    void testResults(int status, QnConnectInfoPtr connectInfo, int requestHandle);
+signals:
+    void resourceChecked(bool success);
 
 private:
-    void testSettings();
+    Q_SLOT void tick();
+
+    Q_SLOT void at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
+    Q_SLOT void at_resource_result(bool success);
 
     /**
      * Updates ui elements depending of the test result
      */
-    void updateUi(bool success, const QString &details, int helpTopicId);
+    void updateUi(bool success, const QString &details = QString(), int helpTopicId = -1);
 
 private:
     Q_DISABLE_COPY(QnConnectionTestingDialog)
 
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
-    QTimer m_timeoutTimer;
+    QTimer* m_timeoutTimer;
     QUrl m_url;
-    QnAppServerConnectionPtr m_connection;
 };
 
 #endif // CONNECTION_TESTING_DIALOG_H

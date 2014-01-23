@@ -6,11 +6,9 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QHostInfo>
 
-#include <core/resource_managment/manual_camera_searcher.h>
+#include <core/resource_management/manual_camera_searcher.h>
 
 #include <rest/server/json_rest_handler.h>
-
-#include <utils/common/request_param_wrapper.h>
 
 class QnManualCameraAdditionHandler: public QnJsonRestHandler {
 public:
@@ -18,16 +16,14 @@ public:
     ~QnManualCameraAdditionHandler();
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, JsonResult &result) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
     virtual QString description() const;
 
 private:
-    int searchStartAction(const QnRequestParamWrapper &params, JsonResult &result);
-    int searchStatusAction(const QnRequestParamWrapper &params, JsonResult &result);
-    int searchStopAction(const QnRequestParamWrapper &params, JsonResult &result);
-    int addCamerasAction(const QnRequestParamList &params, JsonResult &result);
-
-
+    int searchStartAction(const QnRequestParams &params, QnJsonRestResult &result);
+    int searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result);
+    int searchStopAction(const QnRequestParams &params, QnJsonRestResult &result);
+    int addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result);
 
     /**
      * @brief getSearchStatus               Get status of the manual camera search process. Thread-safe.

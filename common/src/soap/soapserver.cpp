@@ -92,7 +92,7 @@ static const int SOAP_CONNECTION_ACCEPT_TIMEOUT = 1;    //one second
 
 void QnSoapServer::run()
 {
-    saveSysThreadID();
+    initSystemThreadId();
     strcpy( m_service.soap->endpoint, m_path.c_str() );
     strcpy( m_service.soap->path, m_path.c_str() );
 
@@ -104,13 +104,13 @@ void QnSoapServer::run()
     {
         std::ostringstream ss;
         soap_stream_fault( m_service.soap, ss );
-        cl_log.log( QString::fromLatin1("Error binding soap server to port %1. %2").arg(m_port).arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Error binding soap server to port %1. %2").arg(m_port).arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
         return;
     }
 
     while( !m_terminated )
     {
-        SOAP_SOCKET s = m_service.accept(); 
+        SOAP_SOCKET s = soap_accept( m_service.soap );
         if( s == SOAP_INVALID_SOCKET )
         {
             //error or timeout
@@ -118,7 +118,7 @@ void QnSoapServer::run()
                 break;
             //std::ostringstream ss;
             //soap_stream_fault( m_service.soap, ss );
-            //cl_log.log( QString::fromLatin1("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            //NX_LOG( QString::fromLatin1("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
             msleep( ERROR_SKIP_TIMEOUT_MS );
             continue;
         }
@@ -158,7 +158,7 @@ void QnSoapServer::run()
                 break;
             std::ostringstream ss;
             soap_stream_fault( m_service.soap, ss );
-            cl_log.log( QString::fromLatin1("Error serving soap request %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("Error serving soap request %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
         }
         soap_destroy( m_service.soap );
         soap_end( m_service.soap );

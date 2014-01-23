@@ -20,7 +20,7 @@
     <message numerus="yes">
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
+        <translation type="obsolete">
             <numerusform>First occurence: %1 on %2 (%n time total)</numerusform>
             <numerusform>First occurence: %1 on %2 (%n times total)</numerusform>
         </translation>
@@ -31,6 +31,21 @@
         <translation type="unfinished">
             <numerusform>%n time, first: %2 %1</numerusform>
             <numerusform>%n times, first: %2 %1</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>First occurrence: %1 on %2 (%n times total)</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>No video frame received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

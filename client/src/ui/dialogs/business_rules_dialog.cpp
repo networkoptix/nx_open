@@ -14,7 +14,7 @@
 
 #include <utils/common/event_processors.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -245,7 +245,7 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     if (!ok) {
         switch (change) {
         case RulesLoaded:
-            QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules"));
+            QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules."));
             break;
         case RuleSaved:
             QMessageBox::critical(this, tr("Error"), tr("Error while saving rule."));
@@ -336,8 +336,8 @@ bool QnBusinessRulesDialog::saveAll() {
 
     if (!invalid_modified.isEmpty()) {
         QMessageBox::StandardButton btn =  QMessageBox::question(this,
-                          tr("Confirm save invalid rules"),
-                          tr("Some rules are not valid. Should we disable them?"),
+                          tr("Confirm save"),
+                          tr("Some rules are not valid. Should they be disabled?"),
                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                           QMessageBox::Cancel);
 

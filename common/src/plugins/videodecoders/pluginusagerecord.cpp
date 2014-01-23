@@ -5,27 +5,24 @@
 #include "pluginusagerecord.h"
 
 
-namespace
+template<class T>
+static bool serialize( const T val, quint8** const bufStart, const quint8* const bufEnd )
 {
-    template<class T>
-        bool serialize( const T val, quint8** const bufStart, const quint8* const bufEnd )
-    {
-        if( bufEnd <= *bufStart || (size_t)(bufEnd - *bufStart) < sizeof(val) )
-            return false;
-        memcpy( *bufStart, &val, sizeof(val) );
-        *bufStart += sizeof(val);
-        return true;
-    }
+    if( bufEnd <= *bufStart || (size_t)(bufEnd - *bufStart) < sizeof(val) )
+        return false;
+    memcpy( *bufStart, &val, sizeof(val) );
+    *bufStart += sizeof(val);
+    return true;
+}
 
-    template<class T>
-        bool deserialize( T* const val, const quint8** const bufStart, const quint8* const bufEnd )
-    {
-        if( bufEnd <= *bufStart || (size_t)(bufEnd - *bufStart) < sizeof(*val) )
-            return false;
-        memcpy( val, *bufStart, sizeof(*val) );
-        *bufStart += sizeof(*val);
-        return true;
-    }
+template<class T>
+static bool deserialize( T* const val, const quint8** const bufStart, const quint8* const bufEnd )
+{
+    if( bufEnd <= *bufStart || (size_t)(bufEnd - *bufStart) < sizeof(*val) )
+        return false;
+    memcpy( val, *bufStart, sizeof(*val) );
+    *bufStart += sizeof(*val);
+    return true;
 }
 
 UsageRecord::UsageRecord()

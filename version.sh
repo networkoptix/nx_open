@@ -9,4 +9,4 @@ echo $OLD_VERSION
 
 for f in `find * -name pom.xml`; do sed -i"" -e "s/$OLD_VERSION/$NEW_VERSION/g" $f; done
 
-#~/buildenv/maven/bin/mvn deploy -N
+mvn deploy -N

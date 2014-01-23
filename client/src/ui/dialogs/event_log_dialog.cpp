@@ -9,7 +9,7 @@
 #include <utils/common/event_processors.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <business/events/abstract_business_event.h>
 #include <business/business_strings_helper.h>
@@ -86,7 +86,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         for (int i = 0; i < BusinessActionType::Count; i++) {
             BusinessActionType::Value val = (BusinessActionType::Value)i;
 
-            QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
             item->setData(val);
             item->setData(BusinessActionType::hasToggleState(val), ProlongedActionRole);
 
@@ -481,7 +481,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
         if (resource) {
-            menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resource));
+            menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -489,7 +489,7 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     if (menu)
         menu->addSeparator();
     else
-        menu = new QMenu();
+        menu = new QMenu(this);
 
     m_filterAction->setEnabled(idx.isValid());
     m_clipboardAction->setEnabled(ui->gridEvents->selectionModel()->hasSelection());
@@ -515,7 +515,7 @@ void QnEventLogDialog::at_selectAllAction()
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
+    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()

@@ -112,7 +112,7 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
         videoData->height = m_grabber->height();
         videoData->channelNumber = 0;
         if (m_videoCodecCtx->coded_frame->key_frame)
-            videoData->flags |= AV_PKT_FLAG_KEY;
+            videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
         videoData->compressionType = m_videoCodecCtx->codec_id;
         videoData->timestamp = m_frame->pts * 1000;
         return QnAbstractMediaDataPtr(videoData);

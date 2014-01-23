@@ -10,9 +10,11 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
@@ -45,7 +47,7 @@ namespace {
 // Node
 // -------------------------------------------------------------------------- //
 class QnResourcePoolModel::Node {
-    Q_DECLARE_TR_FUNCTIONS(Node)
+    Q_DECLARE_TR_FUNCTIONS(QnResourcePoolModel::Node)
 public:
     enum State {
         Normal,     /**< Normal node. */

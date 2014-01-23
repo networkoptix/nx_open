@@ -2,7 +2,9 @@
 
 #include <utils/common/warnings.h>
 
+#include <ui/workbench/workbench_layout.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include "action_parameter_types.h"
 

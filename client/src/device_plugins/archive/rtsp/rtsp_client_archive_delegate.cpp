@@ -9,7 +9,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/network/ffmpeg_sdp.h"
@@ -45,11 +45,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
-    m_audioLayout(0),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0),
-    m_customVideoLayout(0)
+    m_frameCnt(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -60,6 +58,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
 
     if (reader)
         connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
+
+    m_defaultVideoLayout.reset( new QnDefaultResourceVideoLayout() );
 }
 
 void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
@@ -75,8 +75,6 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 {
     close();
     delete [] m_rtpDataBuffer;
-    delete m_audioLayout;
-    delete m_customVideoLayout;
 }
 
 QnResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(QnResourcePtr resource, qint64 time)
@@ -180,7 +178,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resou
 
     if (time == DATETIME_NOW)
     {
-        QnServerCameraPtr activeCam = camRes->findEnabledSubling();
+        QnServerCameraPtr activeCam = camRes->findEnabledSibling();
         return activeCam ? activeCam : camRes;
     }
 
@@ -216,8 +214,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     if (m_opened)
         return true;
 
-    delete m_customVideoLayout;
-    m_customVideoLayout = 0;
+    m_customVideoLayout.reset();
 
     updateRtpParam(resource);
     if (m_isMultiserverAllowed)
@@ -292,8 +289,7 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
         if (audioSDP[i].startsWith("a=fmtp")) {
             int configPos = audioSDP[i].indexOf("config=");
             if (configPos > 0) {
-                delete m_audioLayout;
-                m_audioLayout = new QnResourceCustomAudioLayout();
+                m_audioLayout.reset( new QnResourceCustomAudioLayout() );
                 QByteArray contextData = QByteArray::fromBase64(audioSDP[i].mid(configPos + 7));
                 QnMediaContextPtr context(new QnMediaContext(contextData));
                 if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
@@ -319,8 +315,7 @@ void QnRtspClientArchiveDelegate::close()
     m_rtpData = 0;
     m_lastPacketFlags = -1;
     m_opened = false;
-    delete m_audioLayout;
-    m_audioLayout = 0;
+    m_audioLayout.reset();
     m_frameCnt = 0;
     m_parsers.clear();
 }
@@ -438,8 +433,10 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             return result; 
         }
         else if (blockSize == 0) {
+            static const int MAX_ERROR_COUNT = 10;
+
             errCnt++;
-            if (errCnt == 10)
+            if (errCnt >= MAX_ERROR_COUNT)
                 break;
             else
                 continue;
@@ -630,18 +627,18 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
     */
 }
 
-QnResourceVideoLayout* QnRtspClientArchiveDelegate::getVideoLayout()
+QnResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 {
     if (m_customVideoLayout)
         return m_customVideoLayout;
     else
-        return &m_defaultVideoLayout;
+        return m_defaultVideoLayout;
 }
 
-QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
+QnResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 {
-    if (m_audioLayout == 0) {
-        m_audioLayout = new QnResourceCustomAudioLayout();
+    if (!m_audioLayout) {
+        m_audioLayout.reset( new QnResourceCustomAudioLayout() );
         for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
             QnMediaContextPtr context = itr.value()->mediaContext();
@@ -807,7 +804,7 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     int numOfVideoChannels = 1;
     QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
     if (mediaRes) {
-        const QnResourceVideoLayout* videoLayout = mediaRes->getVideoLayout(0);
+        QnConstResourceVideoLayoutPtr videoLayout = mediaRes->getVideoLayout(0);
         if (videoLayout)
             numOfVideoChannels = videoLayout->channelCount();
     }

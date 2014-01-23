@@ -23,7 +23,7 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
 
@@ -762,9 +762,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
-
-    if (m_widgets.size() >= maxItemCount) { // TODO: #Elric item limit must be changeable.
+    if (m_widgets.size() >= qnSettings->maxSceneVideoItems()) {
         qnDeleteLater(item);
         return false;
     }
@@ -1415,7 +1413,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnResourceVideoLayout *videoLayout = widget->channelLayout();
+    QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
     const qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
@@ -1629,6 +1627,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
+            // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }

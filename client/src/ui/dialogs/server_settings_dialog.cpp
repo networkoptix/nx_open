@@ -250,7 +250,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->rebuildGroupBox->setVisible(false);
 #else
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
-    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString )), this, SLOT(at_updateRebuildInfo()));
+    connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString)), this, SLOT(at_updateRebuildInfo()));
 #endif
 
     /* Set up context help. */
@@ -525,7 +525,7 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
     if(item.path.isEmpty() || !item.isExternal)
         return;
 
-    QScopedPointer<QMenu> menu(new QMenu());
+    QScopedPointer<QMenu> menu(new QMenu(this));
     menu->addAction(m_removeAction);
 
     QAction *action = menu->exec(QCursor::pos());
@@ -551,7 +551,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
             tr("Warning"),
             tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
             "Depending on the total size of archive it can take several hours. "
-            "This process is only necessary if your archive folder(s) have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
+            "This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?"),
             QMessageBox::Yes | QMessageBox::No
             );
         if(button == QMessageBox::No)

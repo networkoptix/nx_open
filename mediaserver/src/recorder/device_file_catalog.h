@@ -94,14 +94,16 @@ public:
     bool doRebuildArchive();
     void rewriteCatalog(bool isCatalogUsing);
     bool isLastRecordRecording() const { return m_lastRecordRecording; }
+    qint64 getLatRecordingTime() const;
+    void setLatRecordingTime(qint64 value);
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 
-    void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks);
-    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks);
+    void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
+    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
 private:
     friend class QnStorageManager;

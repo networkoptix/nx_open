@@ -9,7 +9,7 @@
 
 #include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
-#include "core/resource_managment/camera_driver_restriction_list.h"
+#include "core/resource_management/camera_driver_restriction_list.h"
 #include "../../plugin_manager.h"
 
 

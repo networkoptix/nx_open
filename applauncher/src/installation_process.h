@@ -79,7 +79,7 @@ private:
     const QString m_module;
     const QString m_installationDirectory;
     State m_state;
-    nx_http::AsyncHttpClient* m_httpClient;
+    nx_http::AsyncHttpClientPtr m_httpClient;
     applauncher::api::InstallationStatus::Value m_status;
     std::shared_ptr<RDirSyncher> m_syncher;
     QString m_errorText;
@@ -114,7 +114,7 @@ private:
         const QString& errorText ) override;
 
 private slots:
-    void onHttpDone( nx_http::AsyncHttpClient* );
+    void onHttpDone( nx_http::AsyncHttpClientPtr );
 };
 
 #endif  //INSTALLATION_PROCESS_H

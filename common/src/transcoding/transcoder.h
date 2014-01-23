@@ -69,6 +69,7 @@ public:
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
     void setSrcRect(const QRectF& srcRect);
+    virtual bool existMoreData() const { return false; }
 protected:
     QRect roundRect(const QRect& srcRect) const;
 protected:
@@ -97,7 +98,7 @@ public:
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
-    void setVideoLayout(const QnResourceVideoLayout* layout);
+    void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
 
     virtual bool open(QnConstCompressedVideoDataPtr video);
 
@@ -109,7 +110,7 @@ protected:
     void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect);
 protected:
     QSize m_resolution;
-    const QnResourceVideoLayout* m_layout;
+    QnConstResourceVideoLayoutPtr m_layout;
     QList<QnAbstractImageFilter*> m_filters;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
@@ -143,7 +144,7 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
-    void setVideoLayout(const QnResourceVideoLayout* layout);
+    void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
 
     /*
     * Set ffmpeg video codec and params
@@ -231,7 +232,7 @@ protected:
 
 protected:
     bool m_initialized;
-    const QnResourceVideoLayout* m_vLayout;
+    QnConstResourceVideoLayoutPtr m_vLayout;
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;

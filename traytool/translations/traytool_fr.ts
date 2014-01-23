@@ -69,12 +69,12 @@ L&apos;application va être fermée.</translation>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="592"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>Insufficient privileges to manage services</source>
         <translation>Droits insuffisants pour la gestion des services</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="592"/>
+        <location filename="../src/systraywindow.cpp" line="587"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation>Le contrôle UAC doit être activé pour une demande de privilèges avec un utilisateur sans droit administrateur</translation>
     </message>
@@ -82,14 +82,12 @@ L&apos;application va être fermée.</translation>
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="91"/>
         <source>Port</source>
-        <translation>Port</translation>
+        <translation type="obsolete">Port</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="132"/>
         <source>VMS settings</source>
-        <translation>Configurations VMS</translation>
+        <translation type="obsolete">Configurations VMS</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
@@ -102,27 +100,23 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
 </translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="238"/>
         <source>The requested access was denied</source>
-        <translation>L&apos;accès demandé a été refusé</translation>
+        <translation type="obsolete">L&apos;accès demandé a été refusé</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="241"/>
         <source>The specified database does not exist.</source>
-        <translation>La base de données spécifiée n&apos;existe pas.</translation>
+        <translation type="obsolete">La base de données spécifiée n&apos;existe pas.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="244"/>
         <source>A specified parameter is invalid.</source>
-        <translation>Un paramètre spécifié est invalide.</translation>
+        <translation type="obsolete">Un paramètre spécifié est invalide.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="248"/>
         <source>Insufficient permissions to start/stop services</source>
-        <translation>Autorisations insuffisantes pour démarrer / arrêter les services</translation>
+        <translation type="obsolete">Autorisations insuffisantes pour démarrer / arrêter les services</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="266"/>
+        <location filename="../src/systraywindow.cpp" line="260"/>
         <source>No %1 services installed</source>
         <translation>Aucun %1 service installé</translation>
     </message>
@@ -139,12 +133,12 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="460"/>
+        <location filename="../src/systraywindow.cpp" line="454"/>
         <source> (stopped)</source>
         <translation> (arrêté)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="468"/>
+        <location filename="../src/systraywindow.cpp" line="462"/>
         <source> (starting)</source>
         <translation> (démarrage) </translation>
     </message>
@@ -153,48 +147,41 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="476"/>
+        <location filename="../src/systraywindow.cpp" line="470"/>
         <source> (stopping)</source>
         <translation> (arrêt)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="484"/>
+        <location filename="../src/systraywindow.cpp" line="478"/>
         <source> (started)</source>
         <translation> (démarré)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="492"/>
+        <location filename="../src/systraywindow.cpp" line="486"/>
         <source> (resuming)</source>
         <translation> (résumé)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="500"/>
+        <location filename="../src/systraywindow.cpp" line="494"/>
         <source> (paused)</source>
         <translation> (pause)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="508"/>
+        <location filename="../src/systraywindow.cpp" line="502"/>
         <source> (pausing)</source>
         <translation> (pause en cours)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="539"/>
-        <location filename="../src/systraywindow.cpp" line="561"/>
-        <location filename="../src/systraywindow.cpp" line="875"/>
-        <location filename="../src/systraywindow.cpp" line="908"/>
-        <location filename="../src/systraywindow.cpp" line="964"/>
-        <location filename="../src/systraywindow.cpp" line="974"/>
-        <location filename="../src/systraywindow.cpp" line="981"/>
         <source>Systray</source>
         <translatorcomment>There&apos;s no short term for &quot;System Tray&quot; in French</translatorcomment>
-        <translation>Zone de notifications </translation>
+        <translation type="obsolete">Zone de notifications </translation>
     </message>
     <message>
         <source>%1 is going to be stopped. Are you sure?</source>
         <translation type="obsolete">%1 va être arrêté. Êtes-vous sûr ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="632"/>
+        <location filename="../src/systraywindow.cpp" line="627"/>
         <source>&amp;Settings</source>
         <translation>&amp;Configurations</translation>
     </message>
@@ -203,7 +190,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">&amp;Afficher le registre de %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="648"/>
+        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
@@ -216,7 +203,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">Arrêter %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="748"/>
+        <location filename="../src/systraywindow.cpp" line="763"/>
         <source>* Last used connection *</source>
         <translation>*Dernière connexion utilisée *</translation>
     </message>
@@ -229,7 +216,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
         <translation type="obsolete">Les changements que vous avez faits exigent que %1 soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="151"/>
+        <location filename="../src/systraywindow.cpp" line="145"/>
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
@@ -238,127 +225,167 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
 </translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="401"/>
+        <location filename="../src/systraywindow.cpp" line="395"/>
         <source>Enterprise controller has been stopped</source>
         <translation>Le contrôleur entreprise a été arrêté</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="408"/>
+        <location filename="../src/systraywindow.cpp" line="402"/>
         <source>Enterprise controller has been started</source>
         <translation>Le contrôleur entreprise a été démarré</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="427"/>
+        <location filename="../src/systraywindow.cpp" line="421"/>
         <source>Media server has been stopped</source>
         <translation>Le serveur média a été arrêté</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="434"/>
+        <location filename="../src/systraywindow.cpp" line="428"/>
         <source>Media server has been started</source>
         <translation>Le serveur média a été démarré</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="539"/>
+        <location filename="../src/systraywindow.cpp" line="533"/>
         <source>Media server is going to be stopped. Are you sure?</source>
         <translation>Le serveur média va être arrêté. Êtes-vous sûr?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="561"/>
+        <location filename="../src/systraywindow.cpp" line="555"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
         <translation>Le contrôleur entreprise va être arrêté. Êtes-vous sûr?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Media Server Log</source>
-        <translation>&amp;Afficher le journal du Média Serveur</translation>
+        <translation type="obsolete">&amp;Afficher le journal du Média Serveur</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation>&amp;Afficher le journal du Contrôleur Entreprise</translation>
+        <translation type="obsolete">&amp;Afficher le journal du Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="651"/>
+        <location filename="../src/systraywindow.cpp" line="126"/>
+        <source>%1 Tray Assistant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="232"/>
+        <source>Access denied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="235"/>
+        <source>Specified database does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="238"/>
+        <source>Specified parameter is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>Could not access installed services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>An error has occurred while trying to access installed services:
+ %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="633"/>
+        <source>Show &amp;Media Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="638"/>
+        <source>Show &amp;Enterprise Controller Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Start Media Server</source>
         <translation>Démarrer le Média Serveur</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="656"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>Stop Media Server</source>
         <translation>Arrêter le Média Serveur</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="661"/>
+        <location filename="../src/systraywindow.cpp" line="656"/>
         <source>Start Enterprise Controller</source>
         <translation>Démarrer le Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="666"/>
+        <location filename="../src/systraywindow.cpp" line="661"/>
         <source>Stop Enterprise Controller</source>
         <translation>Arrêter le Contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="868"/>
+        <location filename="../src/systraywindow.cpp" line="884"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le contrôleur entreprise et le média serveur soient redémarrés. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="870"/>
+        <location filename="../src/systraywindow.cpp" line="886"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le contrôleur entreprise soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="872"/>
+        <location filename="../src/systraywindow.cpp" line="888"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>Les changements que vous avez faits exigent que le serveur média soit redémarré. Voulez-vous redémarrer maintenant ?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="908"/>
+        <location filename="../src/systraywindow.cpp" line="924"/>
         <source>Invalid %1 port specified.</source>
         <translation>Le port %1 spécifié est invalide.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="941"/>
+        <location filename="../src/systraywindow.cpp" line="957"/>
         <source>enterprise controller</source>
         <translation>contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="942"/>
+        <location filename="../src/systraywindow.cpp" line="981"/>
+        <source>%1 port is already used by another process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>media proxy</source>
-        <translation>Proxy Média</translation>
+        <translation type="obsolete">Proxy Média</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="947"/>
         <source>media server RTSP</source>
-        <translation>Serveur Média RTSP</translation>
+        <translation type="obsolete">Serveur Média RTSP</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="949"/>
         <source>media server API</source>
-        <translation>Serveur Média API</translation>
+        <translation type="obsolete">Serveur Média API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="964"/>
+        <location filename="../src/systraywindow.cpp" line="971"/>
         <source>%1 port is same as %2 port</source>
         <translation>Le port %1 est le même que %2</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="974"/>
         <source>%1 port already used by another process</source>
-        <translation>Le port %1 est déjà utilisé par un autre processus</translation>
+        <translation type="obsolete">Le port %1 est déjà utilisé par un autre processus</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="981"/>
+        <location filename="../src/systraywindow.cpp" line="988"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>L&apos;adresse IP spécifiée n&apos;est pas une adresse IP publique valide</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1046"/>
+        <location filename="../src/systraywindow.cpp" line="1059"/>
         <source>Invalid parameters</source>
         <translation>Paramètres invalide</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1046"/>
+        <location filename="../src/systraywindow.cpp" line="1059"/>
         <source>You have entered invalid URL.</source>
         <translation>Vous avez entré une URL invalide.</translation>
     </message>
@@ -366,10 +393,9 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.ui" line="20"/>
         <source>HDWitness settings</source>
         <translatorcomment>Changed HDWitness to Spectrum, we guessed it was supposed to be Spectrum</translatorcomment>
-        <translation>Configurations Spectrum</translation>
+        <translation type="obsolete">Configurations Spectrum</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
@@ -386,75 +412,91 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Connexion au contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="66"/>
+        <location filename="../src/settings.ui" line="154"/>
         <source>Login</source>
         <translatorcomment>If it need to be shorter, &quot; ID &quot; can be use</translatorcomment>
         <translation>Identifiant</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="83"/>
+        <location filename="../src/settings.ui" line="171"/>
         <source>Password</source>
         <translatorcomment>If it need to be shorter, &quot; MDP &quot; can be use</translatorcomment>
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="101"/>
+        <location filename="../src/settings.ui" line="79"/>
         <source>0.0.0.0</source>
         <translation>0.0.0.0</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="117"/>
-        <location filename="../src/settings.ui" line="405"/>
+        <location filename="../src/settings.ui" line="95"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="165"/>
+        <location filename="../src/settings.ui" line="143"/>
         <source>Find</source>
         <translation>Chercher</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="211"/>
+        <location filename="../src/settings.ui" line="213"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="220"/>
+        <location filename="../src/settings.ui" line="259"/>
+        <source>Enable auto discovery for cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="345"/>
+        <source>Enterprise controller settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="351"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="358"/>
+        <source>Do not control camera settings:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="63"/>
         <source>Host</source>
         <translation>Hôte</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="232"/>
+        <location filename="../src/settings.ui" line="225"/>
         <source>Media server network settings</source>
         <translation>Configurations réseau du Média serveur</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="246"/>
         <source>RTSP port</source>
-        <translation>Port RTSP</translation>
+        <translation type="obsolete">Port RTSP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="269"/>
         <source>API port</source>
-        <translation>Port API</translation>
+        <translation type="obsolete">Port API</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
+        <location filename="../src/settings.ui" line="271"/>
         <source>Allow access to media server via public IP address</source>
         <translation>Autoriser l&apos;accès au serveur média via l&apos;adresse IP publique</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="376"/>
+        <location filename="../src/settings.ui" line="333"/>
         <source>Enterprise Controller Settings</source>
         <translation>Configurations du contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="388"/>
         <source>Enterprise controller network settings</source>
-        <translation>Configurations réseau du contrôleur entreprise</translation>
+        <translation type="obsolete">Configurations réseau du contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="494"/>
+        <location filename="../src/settings.ui" line="405"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publique</translation>
     </message>
@@ -467,22 +509,22 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Port API</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="286"/>
+        <location filename="../src/settings.ui" line="233"/>
         <source>Cameras RTP transport</source>
         <translation>Transport RTP des Caméras</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="294"/>
+        <location filename="../src/settings.ui" line="241"/>
         <source>AUTO</source>
         <translation>AUTO</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="299"/>
+        <location filename="../src/settings.ui" line="246"/>
         <source>UDP</source>
         <translation>UDP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="304"/>
+        <location filename="../src/settings.ui" line="251"/>
         <source>TCP</source>
         <translation>TCP</translation>
     </message>
@@ -491,14 +533,14 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Autoriser l&apos;accès au serveur via l&apos;adresse IP publique</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="323"/>
-        <location filename="../src/settings.ui" line="503"/>
+        <location filename="../src/settings.ui" line="280"/>
+        <location filename="../src/settings.ui" line="414"/>
         <source>Use specified IP or host name</source>
         <translation>Spécifier IP ou le nom d&apos;hôte</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="333"/>
-        <location filename="../src/settings.ui" line="513"/>
+        <location filename="../src/settings.ui" line="290"/>
+        <location filename="../src/settings.ui" line="424"/>
         <source>Auto detect public IP</source>
         <translation>Détection automatique IP publique</translation>
     </message>
@@ -511,31 +553,30 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Configurations Réseau</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="424"/>
         <source>Media proxy port</source>
-        <translation>Port du proxy média</translation>
+        <translation type="obsolete">Port du proxy média</translation>
     </message>
     <message>
         <source>Allow access to the enterprise controller via public IP address</source>
         <translation type="obsolete">Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="553"/>
+        <location filename="../src/settings.ui" line="464"/>
         <source>About</source>
         <translation>À propos</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="563"/>
+        <location filename="../src/settings.ui" line="474"/>
         <source>Language:</source>
         <translation>Langue:</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="575"/>
+        <location filename="../src/settings.ui" line="486"/>
         <source>(requires restart)</source>
         <translation>(nécessite un redémarrage)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="586"/>
+        <location filename="../src/settings.ui" line="497"/>
         <source>Information</source>
         <translation>Informations</translation>
     </message>

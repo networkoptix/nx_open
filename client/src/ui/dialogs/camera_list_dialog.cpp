@@ -4,7 +4,7 @@
 #include <QtWidgets/QMenu>
 #include <QtCore/QMimeData>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
 #include <ui_camera_list_dialog.h>
@@ -100,7 +100,7 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
     QnActionManager* manager = context()->menu();
 
     if (!resList.isEmpty()) {
-        menu = manager->newMenu(Qn::TreeScope, QnActionParameters(resList));
+        menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resList));
         foreach(QAction* action, menu->actions())
             action->setShortcut(QKeySequence());
     }
@@ -108,7 +108,7 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
     if (menu)
         menu->addSeparator();
     else
-        menu = new QMenu();
+        menu = new QMenu(this);
 
     m_clipboardAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
     m_exportAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
@@ -128,7 +128,7 @@ void QnCameraListDialog::at_selectAllAction()
 
 void QnCameraListDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, QObject::tr("Export selected cameras to file"));
+    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, tr("Export selected cameras to file"));
 }
 
 void QnCameraListDialog::at_copyToClipboard()

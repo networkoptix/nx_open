@@ -98,16 +98,16 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnStardotResourcePtr resource( new QnStardotResource() );
                 //resource->setName("AVUNKNOWN");
-                QnId typeId = qnResTypePool->getResourceTypeId(lit(QnStardotResource::MANUFACTURE), lit("STARDOT_COMMON"));
+                QnId typeId = qnResTypePool->getResourceTypeId(QLatin1String(QnStardotResource::MANUFACTURE), lit("STARDOT_COMMON"));
                 if (!typeId.isValid())
                     continue;
                 resource->setTypeId(typeId);
 
                 resource->setHostAddress(sender, QnDomainMemory);
-                resource->setMAC(lit(mac));
+                resource->setMAC(QLatin1String(mac));
                 resource->setDiscoveryAddr(iface.address);
-                resource->setModel(lit(model));
-                resource->setName(lit(model));
+                resource->setModel(QLatin1String(model));
+                resource->setName(QLatin1String(model));
                 
                 int delimPos = model.indexOf('/');
                 if (delimPos >= 0)
@@ -115,10 +115,10 @@ QnResourceList QnStardotResourceSearcher::findResources()
                     QByteArray shortModel = model.mid(delimPos+1);
                     if (shortModel.startsWith("NetCam"))
                         shortModel = shortModel .mid(6);
-                    resource->setName(QString(lit("Stardot-%1")).arg(lit(shortModel)));
+                    resource->setName(QString(lit("Stardot-%1")).arg(QLatin1String(shortModel)));
                 }
                 
-                resource->setFirmware(lit(firmware));
+                resource->setFirmware(QLatin1String(firmware));
 
 
                 bool need_to_continue = false;
@@ -188,6 +188,9 @@ QnResourcePtr QnStardotResourceSearcher::createResource(QnId resourceTypeId, con
 
 QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     Q_UNUSED(doMultichannelCheck)
     QString host = url.host();
     int port = url.port();

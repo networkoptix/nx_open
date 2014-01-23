@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/resource/resource_consumer.h"
+#include "core/resource/resource_media_layout.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/network/rtpsession.h"
@@ -43,14 +44,14 @@ public:
     CameraDiagnostics::Result openStream();
     void closeStream() ;
     bool isStreamOpened() const;
-    const QnResourceAudioLayout* getAudioLayout() const;
+    QnConstResourceAudioLayoutPtr getAudioLayout() const;
     int getLastResponseCode() const;
     void pleaseStop();
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
     void setRole(QnResource::ConnectionRole role);
 signals:
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 private:
     QnRtpStreamParser* createParser(const QString& codecName);
     void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);

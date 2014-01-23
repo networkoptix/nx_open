@@ -1,7 +1,7 @@
 #include "server_camera.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
 
@@ -38,19 +38,14 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-void QnServerCamera::setCroppingPhysical(QRect cropping)
-{
-    Q_UNUSED(cropping)
-}
-
-const QnResourceVideoLayout* QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getVideoLayout();
 }
 
-const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archive)
@@ -77,10 +72,10 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
     return getPhysicalId() + mServer->getId().toString();
 }
 
-QnServerCameraPtr QnServerCamera::findEnabledSubling()
+QnServerCameraPtr QnServerCamera::findEnabledSibling()
 {
     if (!isDisabled())
-        return toSharedPointer(this);
+        return toSharedPointer().dynamicCast<QnServerCamera>();
 
     {
         QMutexLocker lock(&m_mutex);

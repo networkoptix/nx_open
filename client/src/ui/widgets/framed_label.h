@@ -37,7 +37,6 @@ public:
 
     QColor frameColor() const;
     void setFrameColor(const QColor color);
-
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 

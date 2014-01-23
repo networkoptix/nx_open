@@ -6,7 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -26,10 +26,15 @@ namespace ParameterMetaType {
         Invalid = -1
     };
 
+    template<Type type>
+    struct ValueConstructor {
+        Type operator()() const { return type; }
+    };
+
 } // namespace ParameterMetaType
 
 namespace {
-    class QnActionMetaTypeMap: public QnFlatMap<int, ParameterMetaType::Type, QnValueConstructor<ParameterMetaType::Type, ParameterMetaType::Invalid> > {
+    class QnActionMetaTypeMap: public QnFlatMap<unsigned int, ParameterMetaType::Type, ParameterMetaType::ValueConstructor<ParameterMetaType::Invalid> > {
     public:
         QnActionMetaTypeMap() {
             using namespace ParameterMetaType;

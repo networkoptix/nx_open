@@ -22,7 +22,11 @@ namespace ProductParameters
         //!String
         version,
         //!String
-        mirrorUrl
+        mirrorUrl,
+        //!String (x86 or x64)
+        arch,
+        //!String (windows, linux, macos)
+        platform
     };
 
 }

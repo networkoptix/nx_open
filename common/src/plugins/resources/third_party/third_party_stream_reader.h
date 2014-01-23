@@ -25,7 +25,7 @@ public:
         nxcip::BaseCameraManager* camManager );
     virtual ~ThirdPartyStreamReader();
 
-    const QnResourceAudioLayout* getDPAudioLayout() const;
+    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 
     static CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader );
@@ -66,7 +66,8 @@ private:
     QSize m_videoResolution;
     QnMediaContextPtr m_audioContext;
     nxcip::CameraMediaEncoder2* m_mediaEncoder2Ref;
-    QnResourceCustomAudioLayout m_audioLayout;
+    QnResourceCustomAudioLayoutPtr m_audioLayout;
+    unsigned int m_cameraCapabilities;
 
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution

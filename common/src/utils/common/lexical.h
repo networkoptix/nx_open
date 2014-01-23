@@ -5,20 +5,10 @@
 
 #include <QtCore/QString>
 
+#include "adl_wrapper.h"
+#include "lexical_fwd.h"
+
 namespace QnLexicalDetail {
-    template<class T>
-    class ValueWrapper {
-    public:
-        ValueWrapper(const T &value): m_value(value) {}
-
-        operator const T &() const {
-            return m_value;
-        }
-
-    private:
-        const T &m_value;
-    };
-
     template<class T>
     void serialize_value(const T &value, QString *target) {
         serialize(value, target); /* That's the place where ADL kicks in. */
@@ -31,7 +21,7 @@ namespace QnLexicalDetail {
          * Note that we wrap a string into a wrapper so that
          * ADL would find only overloads with QString as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(ValueWrapper<QString>(value), target);
+        return deserialize(adlWrap(value), target);
     }
 
 } // namespace QnLexicalDetail
@@ -71,15 +61,44 @@ namespace QnLexical {
 } // namespace QnLexical
 
 
-/**
- * \param TYPE                          Type to declare lexical (de)serialization functions for.
- * \param PREFIX                        Optional function declaration prefix, e.g. <tt>inline</tt>.
- * \note                                This macro generates function declarations only.
- *                                      Definitions still have to be supplied.
- */
-#define QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)      \
-__VA_ARGS__ void serialize(const TYPE &value, QString *target);                 \
-__VA_ARGS__ bool deserialize(const QString &value, TYPE *target);
+#define QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
+__VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
+    QnLexical::serialize(static_cast<int>(value), target);                      \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
+    int intValue;                                                               \
+    if(!QnLexical::deserialize(value, &intValue))                               \
+        return false;                                                           \
+                                                                                \
+    *target = static_cast<TYPE>(intValue);                                      \
+    return true;                                                                \
+}
+
+
+#define QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+    QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_typedEnumNameMapper_instance, __LINE__), ##__VA_ARGS__)
+
+#define QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */)  \
+template<class T> void QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_macro_cannot_be_used_in_header_files(); \
+template<> void QN_DEFINE_ENUM_LEXICAL_SERIALIZATION_FUNCTIONS_macro_cannot_be_used_in_header_files<TYPE>() {}; \
+                                                                                \
+Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<TYPE>, STATIC_NAME, (QnEnumNameMapper::create<TYPE>())) \
+                                                                                \
+__VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
+    *target = STATIC_NAME()->name(value);                                       \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
+    bool ok;                                                                    \
+    TYPE result = STATIC_NAME()->value(value, &ok);                             \
+    if(!ok) {                                                                   \
+        return false;                                                           \
+    } else {                                                                    \
+        *target = result;                                                       \
+        return true;                                                            \
+    }                                                                           \
+}
 
 
 #include "lexical_functions.h"

@@ -5,9 +5,11 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_criterion.h>
 
 #include <plugins/resources/archive/abstract_archive_resource.h>
 

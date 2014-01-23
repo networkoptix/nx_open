@@ -22,7 +22,7 @@ public:
         inputPortIdParam,
 
         reasonCodeParam,
-        reasonTextParam,
+        reasonParamsEncodedParam,
         
         sourceParam,
         conflictsParam,
@@ -47,8 +47,8 @@ public:
     QnBusiness::EventReason getReasonCode() const;
     void setReasonCode(QnBusiness::EventReason value);
 
-    QString getReasonText() const;
-    void setReasonText(const QString& value);
+    QString getReasonParamsEncoded() const;
+    void setReasonParamsEncoded(const QString& value);
 
     QString getSource() const;
     void setSource(const QString& value);
@@ -85,7 +85,7 @@ private:
 
     QString m_inputPort;
     QnBusiness::EventReason m_reasonCode;
-    QString m_reasonText;
+    QString m_reasonParamsEncoded;
     QString m_source;
     QStringList m_conflicts;
 };

@@ -4,17 +4,20 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
-
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
-#include <ui/actions/actions.h>
-#include <ui/workbench/workbench_context_aware.h>
+
+#include <core/resource/user_resource.h>
+
 #include <client/client_globals.h>
 #include <client/client_settings.h>
-#include "ui/dialogs/event_log_dialog.h"
-#include "ui/dialogs/camera_list_dialog.h"
+
+#include <ui/actions/actions.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/event_log_dialog.h>
+#include <ui/dialogs/camera_list_dialog.h>
 
 class QAction;
 class QMenu;
@@ -114,7 +117,7 @@ protected:
         QColor frameColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
-        DewarpingParams dewarpingParams;
+        QnItemDewarpingParams dewarpingParams;
 
         AddToLayoutParams():
             usePosition(false),
@@ -184,11 +187,6 @@ protected slots:
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
 
-    void at_debugIncrementCounterAction_triggered();
-    void at_debugDecrementCounterAction_triggered();
-    void at_debugShowResourcePoolAction_triggered();
-    void at_debugCalibratePtzAction_triggered();
-
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
@@ -227,6 +225,7 @@ protected slots:
     void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
+    void at_pictureSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
     void at_cameraDiagnosticsAction_triggered();
@@ -238,8 +237,6 @@ protected slots:
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsDialog_advancedSettingChanged();
     void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_cameraSettingsDialog_cameraIssuesRequested();
-    void at_cameraSettingsDialog_cameraRulesRequested();
     void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
@@ -260,10 +257,6 @@ protected slots:
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
 
-    void at_setCurrentItemAspectRatioAutoAction_triggered();
-    void at_setCurrentItemAspectRatio4x3Action_triggered();
-    void at_setCurrentItemAspectRatio16x9Action_triggered();
-
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();
@@ -281,10 +274,6 @@ protected slots:
     void at_radassAutoAction_triggered();
     void at_radassLowAction_triggered();
     void at_radassHighAction_triggered();
-
-    void at_ptzSavePresetAction_triggered();
-    void at_ptzGoToPresetAction_triggered();
-    void at_ptzManagePresetsAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);

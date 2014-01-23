@@ -4,7 +4,7 @@
 #include <QtCore/QAtomicInt>
 #include <QtCore/QElapsedTimer>
 
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 #include "utils/network/nettools.h"
 #include "utils/network/socket.h"
 
