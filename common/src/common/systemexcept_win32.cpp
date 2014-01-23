@@ -338,7 +338,7 @@ static std::string getCallStack(
     ok = SymInitialize(GetCurrentProcess(), NULL, TRUE);
     ou += strlen(ou);
     sprintf( ou, "Stack Trace:\n" );
-    for( ;; )
+    for( int i = 0; ; ++i )
     {
         ok = StackWalk64(
 #ifndef _WIN64
@@ -356,7 +356,11 @@ static std::string getCallStack(
             NULL );
 
         if(!ok || sf.AddrFrame.Offset == 0)
+        {
+            if( i == 0 )
+                sprintf( ou, "StackWalk64 failed\n ");
             break;
+        }
         ou += strlen(ou);
         if( ou>outstr + MAXTEXT-1000 )
         {
