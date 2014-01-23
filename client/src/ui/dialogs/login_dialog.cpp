@@ -272,15 +272,34 @@ void QnLoginDialog::resetSavedSessionsModel() {
 }
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {
+    QnCompatibilityChecker checker(localCompatibilityItems());
+    QnSoftwareVersion clientVersion(QN_ENGINE_VERSION);
+
+
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
     } else {
-        foreach (QUrl url, m_foundEcs) {
-            QStandardItem* item = new QStandardItem(url.host() + QLatin1Char(':') + QString::number(url.port()));
+        foreach (QnEcData data, m_foundEcs) {
+            QUrl url = data.url;
+
+            QnSoftwareVersion ecVersion(data.version);
+            bool isCompatible = checker.isCompatible(QLatin1String("Client"), clientVersion,
+                                                     QLatin1String("ECS"),    ecVersion);
+
+
+            QString title;
+            if (isCompatible)
+                title = lit("%1:%2").arg(url.host()).arg(url.port());
+            else
+                title = lit("%1:%2 (v%3)").arg(url.host()).arg(url.port()).arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+            QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
+
+            if (!isCompatible)
+                item->setData(QColor(Qt::red), Qt::TextColorRole);
             m_autoFoundItem->appendRow(item);
         }
     }
@@ -610,14 +629,18 @@ void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, 
     QString port = moduleParameters[portId];
     url.setPort(port.toInt());
 
-    QMultiHash<QString, QUrl>::iterator i = m_foundEcs.find(seed);
+    QMultiHash<QString, QnEcData>::iterator i = m_foundEcs.find(seed);
     while (i != m_foundEcs.end() && i.key() == seed) {
-        QUrl found = i.value();
+        QUrl found = i.value().url;
         if (found.host() == url.host() && found.port() == url.port())
             return; // found the same host, e.g. two interfaces on local controller
         ++i;
     }
-    m_foundEcs.insert(seed, url);
+
+    QnEcData data;
+    data.url = url;
+    data.version = moduleVersion;
+    m_foundEcs.insert(seed, data);
     resetAutoFoundConnectionsModel();
 }
 

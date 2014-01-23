@@ -56,7 +56,6 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->         
         <customization>default</customization>
-        <parent.customization>whooy</parent.customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
 
@@ -100,7 +99,6 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
-                                <file>${customization.dir}/parent.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${root.dir}/appserver/appserver-${arch}.properties</file>
                             </files>

@@ -1938,9 +1938,15 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
     if(m_ignoreSliderResizerGeometryChanges)
         return;
 
+    QRectF sliderResizerGeometry = m_sliderResizerWidget->geometry();
+    if (!sliderResizerGeometry.isValid()) {
+        updateSliderResizerGeometry();
+        return;
+    }
+
     QRectF sliderGeometry = m_sliderItem->geometry();
 
-    qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerWidget->geometry().center().y();
+    qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
     qreal jmpHeight = minHeight + 48.0;
     qreal maxHeight = minHeight + 196.0;
