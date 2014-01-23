@@ -1,30 +1,36 @@
 
-#ifndef EC2_RESOURCE_MANAGER_H
-#define EC2_RESOURCE_MANAGER_H
+#ifndef RESOURCE_MANAGER_H
+#define RESOURCE_MANAGER_H
 
 #include "nx_ec/ec_api.h"
 
 
 namespace ec2
 {
-
-    class ResourceManager
+    class QnResourceManager
     :
         public AbstractResourceManager
     {
     public:
+        //!Implementation of AbstractResourceManager::getResourceTypes
         virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::getResources
         virtual ReqID getResources( impl::GetResourcesHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::getResource
         virtual ReqID getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::setResourceStatus
         virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler ) override;
-
+        //!Implementation of AbstractResourceManager::getKvPairs
         virtual ReqID getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::setResourceDisabled
         virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID save( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::save
+        virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::save
         virtual ReqID save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractResourceManager::remove
         virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
     };
-
 }
 
-#endif  //EC2_RESOURCE_MANAGER_H
+#endif  //RESOURCE_MANAGER_H

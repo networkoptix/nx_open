@@ -15,10 +15,10 @@ void QnTransactionLog::initStaticInstance(QnTransactionLog* value)
     globalInstance = value;
 }
 
-QnTransactionLog::ErrorCode QnTransactionLog::saveToLogInternal(const BinaryStream<QByteArray>& data)
+ErrorCode QnTransactionLog::saveToLogInternal(const BinaryStream<QByteArray>& data)
 {
     // todo: implement me
-    return No_Error;
+    return ErrorCode::ok;
 }
 
 }

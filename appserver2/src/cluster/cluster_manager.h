@@ -1,7 +1,9 @@
 #ifndef __CLUSTER_MANAGER_H_
 #define __CLUSTER_MANAGER_H_
 
+#include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
+
 
 namespace ec2
 {
@@ -11,17 +13,15 @@ namespace ec2
         static QnClusterManager* instance();
         void initStaticInstance(QnClusterManager* value);
 
-        enum ErrorCode {
-            No_Error,
-            General_Error
-        };
-
         template <class T>
-        ErrorCode distributeAsync(QnTransaction<T> tran) {
+        ErrorCode distributeAsync(const QnTransaction<T>& /*tran*/) {
             // todo: implement me
-            return No_Error;
+            return ErrorCode::ok;
         }
 
+    private:
+        template<class T> void transactionReceived( const QnTransaction<T>& tran );
+        template<class T> void processRemoteTransaction( const QnTransaction<T>& tran );
     };
 };
 

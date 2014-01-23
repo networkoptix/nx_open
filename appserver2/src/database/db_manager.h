@@ -1,7 +1,9 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
+
 
 namespace ec2
 {
@@ -11,15 +13,11 @@ namespace ec2
         static QnDbManager* instance();
         void initStaticInstance(QnDbManager* value);
 
-        enum ErrorCode {
-            No_Error,
-            General_Error
-        };
-
-        ErrorCode executeTransaction(QnTransaction<ApiCameraData> tran)
+        template<class QueryDataType>
+        ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
         {
             // todo: implement me
-            return No_Error;
+            return ErrorCode::ok;
         }
     };
 };

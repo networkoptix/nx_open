@@ -18,6 +18,8 @@
 
 #ifdef QT_API_IMPL
 
+//!Defining multiple handler macro because vs2012 does not support variadic templates. Will move to single macro after move to vs2013
+
 #define DEFINE_ONE_ARG_HANDLER( REQUEST_NAME, FIRST_ARG_TYPE )                          \
     typedef OneParamHandler<FIRST_ARG_TYPE> REQUEST_NAME##Handler;                      \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;            \
@@ -121,6 +123,7 @@
 namespace ec2
 {
     class AbstractECConnection;
+    typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
     enum class ErrorCode
     {
@@ -240,7 +243,7 @@ namespace ec2
             void emitCurrentTimeDone( const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( p1, p2 ); }
             void emitDumpDatabaseDone( const ErrorCode p1, const QByteArray& p2 ) { emit onDumpDatabaseDone( p1, p2 ); }
             void emitGetSettingsDone( const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( p1, p2 ); }
-            void emitConnectDone( const ErrorCode p1, const AbstractECConnection* p2 ) { emit onConnectDone( p1, p2 ); }
+            void emitConnectDone( const ErrorCode p1, AbstractECConnectionPtr p2 ) { emit onConnectDone( p1, p2 ); }
         
         signals:
             void onSimpleDone( const ErrorCode );
@@ -262,7 +265,7 @@ namespace ec2
             void onCurrentTimeDone( const ErrorCode, const qint64& );
             void onDumpDatabaseDone( const ErrorCode, const QByteArray& );
             void onGetSettingsDone( const ErrorCode, const QnKvPairList& );
-            void onConnectDone( const ErrorCode, const AbstractECConnection* );
+            void onConnectDone( const ErrorCode, AbstractECConnectionPtr );
         };
 #endif
 
@@ -294,9 +297,9 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
+        DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceListPtr )
+        DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceListPtr )
+        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryListPtr )
         
 
         //////////////////////////////////////////////////////////
@@ -341,7 +344,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnectionFactory
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( Connect, ErrorCode, AbstractECConnection )
+        DEFINE_TWO_ARG_HANDLER( Connect, ErrorCode, AbstractECConnectionPtr )
     }
 }
 

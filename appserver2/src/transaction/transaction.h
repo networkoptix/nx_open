@@ -12,7 +12,9 @@ namespace ec2
     enum ApiCommand
     {
         addCamera,
-        removeCamera
+        removeCamera,
+
+        saveMediaServer
     };
 
     struct QnUuid {

@@ -1,0 +1,87 @@
+
+#include "camera_manager.h"
+
+#include <functional>
+
+#include <QtConcurrent>
+
+#include "cluster/cluster_manager.h"
+#include "database/db_manager.h"
+#include "transaction/transaction_log.h"
+
+
+namespace ec2
+{
+    //!This function is intended to perform actions same for every request
+    template<class TransactionType,
+             class PrepareTransactionFuncType    //functor with no params, returning TransactionType
+            >
+        ErrorCode doUpdateRequest( PrepareTransactionFuncType prepareTranFunc )
+    {
+        const TransactionType& tran = prepareTranFunc();
+        ErrorCode errorCode = dbManager->executeTransaction( tran );
+        if( errorCode != ErrorCode::ok )
+            return errorCode;
+
+        // saving transaction to the log
+        errorCode = transactionLog->saveTransaction( tran );
+        if( errorCode != ErrorCode::ok )
+            return errorCode;
+
+        // delivering transaction to remote peers
+        return clusterManager->distributeAsync( tran );
+    }
+
+    ReqID QnCameraManager::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
+    {
+        //declaring output data
+        QnVirtualCameraResourceListPtr cameraList;
+
+        //performing request
+        auto prepareTranFunc = std::bind( std::mem_fn( &QnCameraManager::prepareTransaction ), this, ec2::addCamera, resource );
+        ErrorCode errorCode = doUpdateRequest<QnTransaction<ApiCameraData>, decltype(prepareTranFunc)>( prepareTranFunc );
+
+        //preparing output data
+        if( errorCode == ErrorCode::ok )
+            cameraList.reset( new QnVirtualCameraResourceList() );
+
+        QtConcurrent::run( std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, errorCode, cameraList ) );
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnCameraManager::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnCameraManager::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnCameraManager::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnCameraManager::save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnCameraManager::remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    QnTransaction<ApiCameraData> QnCameraManager::prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource )
+    {
+        //TODO/IMPL
+        return QnTransaction<ApiCameraData>();
+    }
+}

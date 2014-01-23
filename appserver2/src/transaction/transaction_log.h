@@ -1,7 +1,9 @@
 #ifndef __TRANSACTION_LOG_H_
 #define __TRANSACTION_LOG_H_
 
+#include "nx_ec/ec_api.h"
 #include "transaction.h"
+
 
 namespace ec2
 {
@@ -10,11 +12,6 @@ namespace ec2
     public:
         static QnTransactionLog* instance();
         void initStaticInstance(QnTransactionLog* value);
-
-        enum ErrorCode {
-            No_Error,
-            General_Error
-        };
 
         template <class T>
         ErrorCode saveTransaction(QnTransaction<T> tran) {

@@ -4,16 +4,57 @@
 
 namespace ec2
 {
-    ReqID ResourceManager::save( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    ReqID QnResourceManager::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
     {
-
-
-        return -1;
+        //TODO/IMPL
+        return INVALID_REQ_ID;
     }
 
-    ReqID ResourceManager::save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    ReqID QnResourceManager::getResources( impl::GetResourcesHandlerPtr handler )
     {
-        //TODO
-        return -1;
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::getResource( const QnId& id, impl::GetResourceHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    ReqID QnResourceManager::remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
     }
 }

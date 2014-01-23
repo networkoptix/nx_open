@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include "api/model/email_attachment.h"
 #include "impl/ec_api_impl.h"
@@ -13,10 +13,12 @@
 //!Contains API classes for the new enterprise controller
 /*!
     TODO describe all API classes
+    \note All methods are thread-safe
 */
 namespace ec2
 {
     typedef int ReqID;
+    const ReqID INVALID_REQ_ID = -1;
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -147,7 +149,9 @@ namespace ec2
         virtual ~AbstractCameraManager() {}
 
         /*!
-            \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
+            Returns list of all available cameras. 
+            \todo is it really needed?
+            \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceListPtr& cameras)
         */
         template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr&, TargetType* target, HandlerType handler ) {
             return addCamera( std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler)) );
@@ -199,9 +203,12 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractLicenseManager: public QObject
+    class AbstractLicenseManager
+    :
+        public QObject
     {
         Q_OBJECT
+
     public:
         virtual ~AbstractLicenseManager() {}
 
@@ -218,8 +225,8 @@ namespace ec2
             return addLicensesAsync( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-signals:
-    void licenseChanged(QnLicensePtr license);
+    signals:
+        void licenseChanged(QnLicensePtr license);
 
     protected:
         virtual ReqID getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
@@ -499,6 +506,8 @@ signals:
         virtual ReqID saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
+    typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
+
     class ECAddress
     {
         //TODO/IMPL
@@ -519,7 +528,7 @@ signals:
             return testConnectionAsync( addr, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
-            \param handler Functor with params: (ErrorCode, AbstractECConnection*)
+            \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
         template<class TargetType, class HandlerType> ReqID connectAsync( const ECAddress& addr, TargetType* target, HandlerType handler ) {
             return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler)) );
