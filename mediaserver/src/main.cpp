@@ -35,10 +35,10 @@
 #include <common/global_settings.h>
 
 #include <core/misc/schedule_task.h>
-#include <core/resource_managment/camera_driver_restriction_list.h>
-#include <core/resource_managment/mserver_resource_discovery_manager.h>
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -88,7 +88,6 @@
 #include <rest/handlers/exec_action_handler.h>
 #include <rest/handlers/ext_bevent_handler.h>
 #include <rest/handlers/favico_handler.h>
-#include <rest/handlers/file_system_handler.h>
 #include <rest/handlers/image_handler.h>
 #include <rest/handlers/log_handler.h>
 #include <rest/handlers/manual_camera_addition_handler.h>
@@ -98,6 +97,7 @@
 #include <rest/handlers/recorded_chunks_handler.h>
 #include <rest/handlers/statistics_handler.h>
 #include <rest/handlers/storage_space_handler.h>
+#include <rest/handlers/storage_status_handler.h>
 #include <rest/handlers/time_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
@@ -785,12 +785,9 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 
 void QnMain::at_connectionOpened()
 {
-    if (m_firstRunningTime) {
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(),
-            m_firstRunningTime*1000,
-            QnBusiness::MServerIssueStarted);
-        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
-    }
+    if (m_firstRunningTime)
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
+    qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
     m_firstRunningTime = 0;
 }
 
@@ -832,7 +829,7 @@ void QnMain::initTcpListener()
     Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnFileSystemHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
     QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
@@ -966,7 +963,8 @@ void QnMain::run()
     QnMotionHelper::initStaticInstance( new QnMotionHelper() );
 
     QnBusinessEventConnector::initStaticInstance( new QnBusinessEventConnector() );
-    std::auto_ptr<QThread> connectorThread( new QThread() );
+    auto stopQThreadFunc = []( QThread* obj ){ obj->quit(); obj->wait(); delete obj; };
+    std::unique_ptr<QThread, decltype(stopQThreadFunc)> connectorThread( new QThread(), stopQThreadFunc );
     connectorThread->start();
     qnBusinessRuleConnector->moveToThread(connectorThread.get());
 
@@ -978,14 +976,14 @@ void QnMain::run()
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
-    QnServerPtzControllerPool ptzPool;
+    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
 
-    QnConnectInfoPtr connectInfo(new QnConnectInfo());
+    QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
     {
         if (appServerConnection->connect(connectInfo) == 0)
@@ -1328,12 +1326,14 @@ void QnMain::run()
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
+    QnStorageManager::instance()->stopAsyncTasks();
+
+    ptzPool.reset();
+
 #ifdef ENABLE_ONVIF
     delete QnSoapServer::instance();
     QnSoapServer::initStaticInstance( NULL );
 #endif //ENABLE_ONVIF
-
-    QnStorageManager::instance()->stopAsyncTasks();
 
     av_lockmgr_register(NULL);
 

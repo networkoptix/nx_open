@@ -6,7 +6,7 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "plugins/resources/flex_watch/flexwatch_resource.h"
 #include "plugins/resources/axis/axis_onvif_resource.h"
 
@@ -336,7 +336,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
-    resource->setVendorName( manufacture );
+    resource->setVendor( manufacture );
 
     return resource;
 }

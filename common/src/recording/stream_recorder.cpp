@@ -23,24 +23,15 @@ static const int STORE_QUEUE_SIZE = 50;
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
-    case NoError:
-        return QString();
-    case ContainerNotFoundError:
-        return tr("Corresponding container in FFMPEG library was not found.");
-    case FileCreateError:
-        return tr("Can't create output file for video recording.");
-    case VideoStreamAllocationError:
-        return tr("Can't allocate output stream for recording.");
-    case AudioStreamAllocationError:
-        return tr("Can't allocate output audio stream.");
-    case InvalidAudioCodecError:
-        return tr("Invalid audio codec information.");
-    case IncompatibleCodecError:
-        return tr("Video or audio codec is incompatible with the selected format.");
-    default:
-        break;
+    case NoError:                       return QString();
+    case ContainerNotFoundError:        return tr("Corresponding container in FFMPEG library was not found.");
+    case FileCreateError:               return tr("Could not create output file for video recording.");
+    case VideoStreamAllocationError:    return tr("Could not allocate output stream for recording.");
+    case AudioStreamAllocationError:    return tr("Could not allocate output audio stream.");
+    case InvalidAudioCodecError:        return tr("Invalid audio codec information.");
+    case IncompatibleCodecError:        return tr("Video or audio codec is incompatible with the selected format.");
+    default:                            return QString();
     }
-    return QString();
 }
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):

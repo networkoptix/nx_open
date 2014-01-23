@@ -8,7 +8,7 @@
 #include <utils/common/synctime.h>
 #include "core/resource/resource.h"
 #include "business/events/reasoned_business_event.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "ui/style/resource_icon_cache.h"
 #include <ui/help/business_help.h>
 #include "business/business_strings_helper.h"
@@ -49,7 +49,7 @@ public:
         // action types to lex order
         QMap<QString, int> actions;
         for (int i = 0; i < 256; ++i) {
-            actions.insert(BusinessActionType::toString(BusinessActionType::Value(i)), i);
+            actions.insert(QnBusinessStringsHelper::actionName(BusinessActionType::Value(i)), i);
             m_actionTypeToLexOrder[i] = 255; // put undefined actions to the end of the list
         }
         cnt = 0;
@@ -426,7 +426,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     case EventCameraColumn:
         return getResourceNameString(action.getRuntimeParams().getEventResourceId());
     case ActionColumn:
-        return BusinessActionType::toString(action.actionType());
+        return QnBusinessStringsHelper::actionName(action.actionType());
     case ActionCameraColumn: {
         BusinessActionType::Value actionType = action.actionType();
         if (actionType == BusinessActionType::SendMail)

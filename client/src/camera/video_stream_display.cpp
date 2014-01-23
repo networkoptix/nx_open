@@ -457,8 +457,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         dec = CLVideoDecoderFactory::createDecoder(
                 data,
                 enableFrameQueue,
-                widgetRenderer ? widgetRenderer->glContext() : NULL,
-                QnClientSettings::instance()->isHardwareDecodingUsed() );
+                widgetRenderer ? widgetRenderer->glContext() : NULL);
         dec->setSpeed( m_speed );
         if (dec == 0) {
             cl_log.log(QString::fromLatin1("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
@@ -1011,7 +1010,8 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 
 QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
                                            const QnMediaDewarpingParams& mediaDewarping,
-                                           const QnItemDewarpingParams& itemDewarping) {
+                                           const QnItemDewarpingParams& itemDewarping,
+                                           bool anyQuality) {
     if (m_decoder.isEmpty())
         return QImage();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
@@ -1025,7 +1025,7 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
         return QImage();
 
     // feature #2563
-    if (m_lastDisplayedFrame->flags && QnAbstractMediaData::MediaFlags_LowQuality)
+    if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return QImage();    //screenshot will be received from the server
 
     // copy image

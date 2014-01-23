@@ -89,7 +89,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 continue;
 
             int videoPort = params[1].toInt();
-            const QString resName(tr("TestCameraLive"));
+            const QString resName(lit("TestCameraLive"));
             for (int j = 2; j < params.size(); ++j)
             {
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
@@ -160,6 +160,9 @@ QString QnTestCameraResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     Q_UNUSED(url)
     Q_UNUSED(auth)
     Q_UNUSED(doMultichannelCheck)

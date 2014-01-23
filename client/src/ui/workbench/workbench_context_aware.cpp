@@ -5,7 +5,7 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include <utils/common/warnings.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "workbench_context.h"
 

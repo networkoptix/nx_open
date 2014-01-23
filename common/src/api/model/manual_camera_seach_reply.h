@@ -42,17 +42,19 @@ struct QnManualCameraSearchSingleCamera {
     QString name;
     QString url;
     QString manufacturer;
+    QString vendor;
     bool existsInPool;
 
     QnManualCameraSearchSingleCamera(){}
 
-    QnManualCameraSearchSingleCamera(const QString &name, const QString &url, const QString &manufacturer, bool existsInPool):
-        name(name), url(url), manufacturer(manufacturer), existsInPool(existsInPool) {}
+    QnManualCameraSearchSingleCamera(const QString &name, const QString &url, const QString &manufacturer, const QString &vendor, bool existsInPool):
+        name(name), url(url), manufacturer(manufacturer), vendor(vendor), existsInPool(existsInPool) {}
 
     QString toString() const {
-        return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(manufacturer);
+        return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(vendor);
     }
 };
+Q_DECLARE_METATYPE(QnManualCameraSearchSingleCamera)
 
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera)
 

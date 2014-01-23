@@ -200,12 +200,12 @@ namespace {
 
     const int legendImageSize = 20;
     const int legendFontSize = 20;
+    const int legendMaxLength = 60;
     const int itemSpacing = 2;
 
     const char *legendKeyPropertyName = "_qn_legendKey";
 
 } // anonymous namespace
-
 
 // -------------------------------------------------------------------------- //
 // LegendButtonWidget
@@ -226,6 +226,17 @@ public:
     }
 
     virtual ~LegendButtonWidget() {}
+
+    QString text() const {
+        return m_text;
+    }
+
+    void setText(const QString &text) {
+        if (m_text == text)
+            return;
+        m_text = text;
+        update();
+    }
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
@@ -634,9 +645,37 @@ void QnServerResourceWidget::updateLegend() {
             data.mask = data.bar->unusedMask();
             data.visible = true;
 
-            data.button = new LegendButtonWidget(key, deviceColor(stats.deviceType, key));
-            data.button->setProperty(legendKeyPropertyName, key);
-            data.button->setChecked(true);
+            LegendButtonWidget* newButton = new LegendButtonWidget(key, deviceColor(stats.deviceType, key));
+            newButton->setProperty(legendKeyPropertyName, key);
+            newButton->setChecked(true);
+
+
+            { // fix text length on already existing buttons and the new one
+                int mask = data.bar->visibleButtons();
+                QList<LegendButtonWidget*> buttons;
+
+                for (int i = 1; i <= mask; i*=2) {
+                    LegendButtonWidget* button = dynamic_cast<LegendButtonWidget*>(data.bar->button(i));
+                    if (!button)
+                        continue;
+                    buttons << button;
+                }
+
+                // we are adding one new button...
+                int maxLength = qMax(legendMaxLength / (buttons.size() + 1), 2);
+
+                foreach (LegendButtonWidget* button, buttons) {
+                    QString text = button->property(legendKeyPropertyName).toString();
+                    if (text.length() > maxLength)
+                        text = text.left(maxLength - 1) + lit("...");
+                    button->setText(text);
+                }
+
+                if (key.length() > maxLength)
+                    newButton->setText(key.left(maxLength - 1) + lit("..."));
+            }
+
+            data.button = newButton;
             data.bar->addButton(data.mask, data.button);
 
             connect(data.button, SIGNAL(stateChanged()), this, SLOT(updateHoverKey()));
@@ -693,15 +732,19 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 }
 
 QString QnServerResourceWidget::calculateTitleText() const {
-    QString result =  tr("%1 %2 ").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host());
-    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
-    if (uptimeMs) {
-        int msInDay = 24*3600*1000;
-        QString timeStr = QTime(0,0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"));
-        result += tr("(up %1 days, %2)").arg(uptimeMs/msInDay).arg(timeStr);
-    }
+    QString name = m_resource->getName();
+    QString host = QUrl(m_resource->getUrl()).host();
 
-    return result;
+    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
+    if (uptimeMs > 0) {
+        int msInDay = 24 * 3600 * 1000;
+        return tr("%1 %2 (up %n days, %3)", "", uptimeMs / msInDay)
+            .arg(name)
+            .arg(host)
+            .arg(QTime(0, 0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"))); // TODO: #TR #Elric this hh:mm is bad even in English...
+    } else {
+        return tr("%1 %2").arg(name).arg(host);
+    }
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {

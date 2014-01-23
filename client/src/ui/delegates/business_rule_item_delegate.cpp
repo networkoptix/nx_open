@@ -16,7 +16,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/models/business_rules_view_model.h>
@@ -188,7 +188,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             BusinessActionType::Value val = (BusinessActionType::Value)i;
             if (instant && BusinessActionType::hasToggleState(val))
                 continue;
-            comboBox->addItem(BusinessActionType::toString(val), val);
+            comboBox->addItem(QnBusinessStringsHelper::actionName(val), val);
         }
         return comboBox;
     }

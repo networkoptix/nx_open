@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -694,9 +694,10 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnCheckForUpdatesActionCondition(this));
 
     factory(Qn::AboutAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("About...")).
         shortcut(tr("F1")).
+        shortcutContext(Qt::ApplicationShortcut).
         role(QAction::AboutRole).
         autoRepeat(false);
 
@@ -1072,11 +1073,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
         condition(hasFlags(QnResource::user));
-
-    factory().
-        flags(Qn::Scene | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        condition(hasFlags(QnResource::live_cam)).
-        text(tr("Change Camera Aspect Ratio..."));
 
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -1508,6 +1504,8 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
         qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
     } else {
         result = newMenuRecursive(rootAction, scope, parameters, parent);
+        if (!result)
+            result = new QMenu(parent);
     }
 
     if(result) {
@@ -1593,13 +1591,13 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         }
     }
 
-    if (!result->isEmpty())
-        result->addSeparator();
-
     if(parent->childFactory()) {
         QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
+            if (!result->isEmpty())
+                result->addSeparator();
+
             foreach(QAction *action, actions) {
                 action->setParent(result);
                 result->addAction(action);

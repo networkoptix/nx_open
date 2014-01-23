@@ -26,7 +26,7 @@
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnPopupSettingsWidget),
+    ui(new Ui::PopupSettingsWidget),
     m_adapter(new QnBusinessEventsFilterKvPairAdapter(context()->user()))
 {
     ui->setupUi(this);

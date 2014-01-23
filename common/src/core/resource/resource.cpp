@@ -12,7 +12,7 @@
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/ptz/abstract_ptz_controller.h"
 
 #include "resource_command_processor.h"
@@ -812,11 +812,7 @@ void QnResource::setProperty(const QString &key, const QString &value) {
         QMutexLocker mutexLocker(&m_mutex);
         if (m_propertyByKey.value(key) == value)
             return;
-        if(value.isEmpty()) {
-            m_propertyByKey.remove(key);
-        } else {
-            m_propertyByKey[key] = value;
-        }
+        m_propertyByKey[key] = value;
     }
     emit propertyChanged(toSharedPointer(this), key);
 }

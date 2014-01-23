@@ -4,7 +4,7 @@
 
 #include "core/dataprovider/live_stream_provider.h"
 
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
 #include <core/resource/media_server_resource.h>
 

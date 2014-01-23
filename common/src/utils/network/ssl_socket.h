@@ -5,7 +5,9 @@
 
 #include "socket_common.h"
 #include "abstract_socket.h"
-#include <openssl/ssl.h>
+
+struct bio_st;
+typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to include in this header. */
 
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;

@@ -30,7 +30,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -42,6 +42,7 @@
 #include <ui/style/skin.h>
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
+#include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -401,7 +402,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
-    m_wheelZoomInstrument->recursiveDisable();
+    //m_wheelZoomInstrument->recursiveDisable();
     m_zoomedToggle = new QnToggle(false, this);
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
@@ -409,8 +410,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
-    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
+    //connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
+    //connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        this,                           SLOT(at_zoomedToggle_activated()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
@@ -622,7 +623,7 @@ void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
         return;
 
     if (m_countdownCanceled) {
-        m_recordingCountdownLabel->setText(tr("Cancelled"));
+        m_recordingCountdownLabel->setText(tr("Canceled"));
         return;
     }
     int left = m_recordingCountdownLabel->timeout() - tick;
@@ -645,7 +646,7 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
     QString suggetion = QFileInfo(recordedFileName).fileName();
     if (suggetion.isEmpty())
-        suggetion = tr("recorded_video");
+        suggetion = tr("Recorded Video");
 
     QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;
@@ -656,7 +657,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             previousDir + QLatin1Char('/') + suggetion,
             tr("AVI (Audio/Video Interleaved) (*.avi)"),
             &selectedFilter,
-            QFileDialog::DontUseNativeDialog
+            QnCustomFileDialog::fileDialogOptions()
         );
 
         if (!filePath.isEmpty()) {
@@ -665,7 +666,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
-                QString message = QObject::tr("Can't overwrite file '%1'. Please try another name.").arg(filePath);
+                QString message = tr("Could not overwrite file '%1'. Please try another name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
                 QMessageBox::warning(display()->view(), QObject::tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;

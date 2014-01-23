@@ -3,7 +3,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
 
@@ -42,8 +42,6 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPt
 
     if(!resource)
         qnNullWarning(resource);
-
-    connect(this, SIGNAL(success(QImage)), this, SIGNAL(imageChanged(QImage)));
 }
 
 QImage QnSingleThumbnailLoader::image() const {
@@ -65,13 +63,11 @@ void QnSingleThumbnailLoader::doLoadAsync()
 void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requstHandle)
 {
     Q_UNUSED(requstHandle)
-    if (status == 0) {
+    if (status == 0)
         m_image = image;
-        emit success(image);
-    }
     else
-        emit failed(status);
-    emit finished();
+        m_image = QImage();
+    emit imageChanged(m_image);
 }
 
 

@@ -7,7 +7,7 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -64,7 +64,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
     m_screenshotIndex = 0;
     m_target = target;
 
-    ui.reset(new Ui::QnResourceSelectionDialog);
+    ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
     bool flat;

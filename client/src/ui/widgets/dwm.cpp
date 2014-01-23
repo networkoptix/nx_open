@@ -10,7 +10,7 @@
 #include <utils/common/invocation_event.h>
 
 #ifdef QN_HAS_DWM
-#include <QtWidgets/5.1.1/QtWidgets/private/qwidget_p.h>
+#include <QtWidgets/private/qwidget_p.h>
 #include <qt_windows.h>
 #include <utils/qt5port_win.h>
 

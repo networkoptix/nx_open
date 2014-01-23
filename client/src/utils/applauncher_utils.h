@@ -1,7 +1,7 @@
 #ifndef APPLAUNCHER_UTILS_H
 #define APPLAUNCHER_UTILS_H
 
-#include <connectinfo.h>
+#include <api/model/connection_info.h>
 #include <api/applauncher_api.h>
 #include <utils/common/software_version.h>
 
@@ -52,6 +52,8 @@ namespace applauncher
         \return \a ResultType::ok if request has been performed successfully, otherwise - error code
     */
     api::ResultType::Value cancelInstallation( unsigned int installationID );
+    //!Adds timer to kill process with pid \a processID in a \a timeoutMillis
+    api::ResultType::Value scheduleProcessKill( qint64 processID, quint32 timeoutMillis );
 }
 
 #endif // APPLAUNCHER_UTILS_H

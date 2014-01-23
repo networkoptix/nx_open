@@ -11,7 +11,7 @@
 #include <business/events/mserver_conflict_business_event.h>
 
 #include "core/resource/resource.h"
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include "health/system_health.h"
 #include "actions/system_health_business_action.h"
 
@@ -75,14 +75,14 @@ void QnBusinessEventConnector::at_cameraIPConflict(const QnResourcePtr& resource
     qnBusinessRuleProcessor->processBusinessEvent(ipConflictEvent);
 }
 
-void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonText)
+void QnBusinessEventConnector::at_networkIssue(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &reasonParamsEncoded)
 {
 #ifdef REDUCE_NET_ISSUE_HACK
     static int netIssueCounter;
     if (++netIssueCounter % 10)
         return; // mutex is not nessessary here
 #endif
-    QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(resource, timeStamp, reasonCode, reasonText));
+    QnNetworkIssueBusinessEventPtr networkEvent(new QnNetworkIssueBusinessEvent(resource, timeStamp, reasonCode, reasonParamsEncoded));
     qnBusinessRuleProcessor->processBusinessEvent(networkEvent);
 }
 

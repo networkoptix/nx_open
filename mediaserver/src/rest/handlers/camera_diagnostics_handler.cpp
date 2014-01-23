@@ -7,7 +7,7 @@
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/network/http/httptypes.h>
 

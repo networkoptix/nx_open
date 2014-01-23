@@ -12,7 +12,7 @@
 QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSendmailBusinessActionWidget)
+    ui(new Ui::SendmailBusinessActionWidget)
 {
     ui->setupUi(this);
 

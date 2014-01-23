@@ -7,7 +7,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/warning_style.h>
@@ -277,7 +277,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
     clearTable();
 
     int newCameras = 0;
-    foreach(QnManualCameraSearchSingleCamera info, cameras){
+    foreach(const QnManualCameraSearchSingleCamera &info, cameras) {
         bool enabledRow = !info.existsInPool;
         if (enabledRow)
             newCameras++;
@@ -295,8 +295,9 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
             checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
             checkItem->setCheckState(Qt::PartiallyChecked);
         }
+        checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualCameraSearchSingleCamera>(info));
 
-        QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
+        QTableWidgetItem *manufItem = new QTableWidgetItem(info.vendor);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
         if (!enabledRow)
             manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
@@ -461,7 +462,8 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
-    QString urlText = ui->camerasTable->item(row, column)->text();
+    QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
+    QString urlText = info.url;
     if (!urlText.contains(QLatin1String("://")))
         urlText = QLatin1String("http://") + urlText;
 
@@ -525,13 +527,13 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         QHostAddress endAddr(endAddrStr);
 
         if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
-            ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
+            ui->validateLabelSearch->setText(tr("First address in range is greater than the last one."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
 
         if (!endAddr.isInSubnet(startAddr, 8)){
-            ui->validateLabelSearch->setText(tr("Ip address range is too big, maximum of 255 addresses is allowed"));
+            ui->validateLabelSearch->setText(tr("Specified IP address range contains more than 255 addresses."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -539,7 +541,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
         QString userInput = ui->singleCameraLineEdit->text();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
-            ui->validateLabelSearch->setText(tr("Camera address field must contain valid url, ip address or rtsp link"));
+            ui->validateLabelSearch->setText(tr("Camera address field must contain valid URL, IP address or RTSP link."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
@@ -582,8 +584,10 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
-        urls.append(ui->camerasTable->item(row, UrlColumn)->text());
-        manufacturers.append(ui->camerasTable->item(row, ManufColumn)->text());
+
+        QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
+        urls.append(info.url);
+        manufacturers.append(info.manufacturer);
     }
     if (urls.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"));
@@ -597,7 +601,6 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     QEventLoop loop;
     connect(&result,            SIGNAL(replyProcessed()),   &loop, SLOT(quit()));
     connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
-    connect(this,               SIGNAL(serverChanged()),    &loop, SLOT(quit()));
     loop.exec();
 
     ui->addButton->setEnabled(true);
@@ -618,7 +621,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)", "", urls.size()));
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s).", "", urls.size()));
         }
     }
     setState(CamerasFound);

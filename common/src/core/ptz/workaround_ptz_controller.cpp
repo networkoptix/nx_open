@@ -6,19 +6,25 @@
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 
 QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_octagonal(false)
+    m_octagonal(false),
+    m_broken(false)
 {
     QnVirtualCameraResourcePtr camera = resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
         return;
 
-    m_octagonal = qnCommon->dataPool()->data(camera).value<bool>(lit("octagonalPtz"), false);
+    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
 
-    // TODO: #Elric propert finished handling.
+    m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
+    m_broken = resourceData.value<bool>(lit("brokenPtz"), false);
+}
+
+Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
+    return m_broken ? Qn::NoPtzCapabilities : base_type::getCapabilities();
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
@@ -40,6 +46,6 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {
-    return true; // TODO: #Elric
+    return true; // TODO: #Elric if no workaround is needed for a camera, we don't really have to extend.
 }
 

@@ -42,8 +42,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
 
 #include <device_plugins/server_camera/appserver.h>
@@ -131,6 +131,8 @@ namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 }
 
+//!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
+static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -504,6 +506,9 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
 
     if (hasDbChanges) {
         connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        foreach(const QnResourcePtr &camera, cameras) {
+            connection()->saveAsync(camera->getId(), camera->getProperties());
+        }
     }
 
     if (hasCameraChanges) {
@@ -1041,9 +1046,6 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered()
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
-    dialog->setFileMode(QFileDialog::ExistingFiles);
-    
     QStringList filters;
     //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
@@ -1051,33 +1053,43 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
-    dialog->setNameFilters(filters);
 
-    if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
+    QStringList files = QFileDialog::getOpenFileNames(mainWindow(),
+                                                      tr("Open file"),
+                                                      QString(),
+                                                      filters.join(lit(";;")),
+                                                      0,
+                                                      QnCustomFileDialog::fileDialogOptions());
+
+    if (!files.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(files));
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
-    dialog->setFileMode(QFileDialog::ExistingFiles);
-
     QStringList filters;
     filters << tr("All Supported (*.layout)");
     filters << tr("Layouts (*.layout)");
     filters << tr("All files (*.*)");
-    dialog->setNameFilters(filters);
 
-    if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()).filtered<QnLayoutResource>());
+    QString fileName = QFileDialog::getOpenFileName(mainWindow(),
+                                                    tr("Open file"),
+                                                    QString(),
+                                                    filters.join(lit(";;")),
+                                                    0,
+                                                    QnCustomFileDialog::fileDialogOptions());
+
+    if(!fileName.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(mainWindow(), tr("Open file")));
-    dialog->setFileMode(QFileDialog::Directory);
-    dialog->setOption(QFileDialog::ShowDirsOnly);
+    QString dirName = QFileDialog::getExistingDirectory(mainWindow(),
+                                                        tr("Select folder..."),
+                                                        QString(),
+                                                        QnCustomFileDialog::directoryDialogOptions());
 
-    if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()));
+    if(!dirName.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dirName));
 }
 
 void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
@@ -1134,7 +1146,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    if(qnSettings->isUpdatesEnabled())
+    if (qnSettings->isAutoCheckForUpdates() && qnSettings->isUpdatesEnabled())
         notifyAboutUpdate(false);
 }
 
@@ -1346,7 +1358,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connectionData.isValid())
         return;
 
-    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectionInfoRole);
+    QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
 
@@ -1355,7 +1367,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         if(result.exec() != 0)
             return;
 
-        connectionInfo = result.reply<QnConnectInfoPtr>();
+        connectionInfo = result.reply<QnConnectionInfoPtr>();
     }
 
     // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM
@@ -1845,21 +1857,22 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     if (!resource)
         return;
 
+#ifdef Q_OS_WIN
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
-#ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -t");
     QProcess::startDetached(cmd.arg(host));
 #endif
 #ifdef Q_OS_LINUX
+    QUrl url = QUrl::fromUserInput(resource->getUrl());
+    QString host = url.host();
     QString cmd = QLatin1String("xterm -e ping %1");
     QProcess::startDetached(cmd.arg(host));
 #endif
 #ifdef Q_OS_MACX
-   QString cmd = QLatin1String("osascript");
-   QStringList args = QStringList() << lit("-e") << QString(lit("tell application \"Terminal\" to do script \"ping %1\"")).arg(host)
-                                    << lit("-e") << lit("tell application \"Terminal\" to activate");
-   QProcess::startDetached(cmd, args);
+    QnConnectionTestingDialog dialog;
+    dialog.testResource(resource);
+    dialog.exec();
 #endif
 
 }
@@ -2047,6 +2060,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     menu()->trigger(Qn::ClearCameraSettingsAction);
     if(context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
         qApp->exit(0);
+        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
     }
 
 }
@@ -2588,7 +2602,7 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
                          tr("Beta version"),
-                         tr("You are running beta version of %1")
+                         tr("You are running beta version of %1.")
                          .arg(QLatin1String(QN_APPLICATION_NAME)));
 }
 
@@ -2637,5 +2651,6 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         return;
     }
     qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 

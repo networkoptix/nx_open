@@ -12,7 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
 
@@ -623,7 +623,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                     continue;
                 params.setEventResourceId(sampleCamera->getId());
                 params.setReasonCode(QnBusiness::NetworkIssueNoFrame);
-                params.setReasonText(lit("15"));
+                params.setReasonParamsEncoded(lit("15000"));
                 break;
             }
 
@@ -632,7 +632,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                     continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setReasonCode(QnBusiness::StorageIssueNotEnoughSpeed);
-                params.setReasonText(lit("C: E:"));
+                params.setReasonParamsEncoded(lit("C: E:"));
                 break;
             }
 

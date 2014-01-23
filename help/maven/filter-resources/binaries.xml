@@ -1,5 +1,5 @@
  <assembly>
-	<id>${child.customization}-${help.language}</id>
+	<id>${customization}-${help.language}</id>
 	<formats>
 		<format>tar.gz</format>
 	</formats>

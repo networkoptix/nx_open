@@ -117,13 +117,12 @@ void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
 
 void QnFisheyeCalibrationWidget::at_image_animationFinished() {
     ui->autoButton->setEnabled(true);
-    //TODO: #Elric review these text pls.
     switch (m_lastError) {
     case QnFisheyeCalibrator::ErrorNotFisheyeImage:
-        QMessageBox::warning(this, tr("Error"), tr("Auto-detection failed. Image is not round."));
+        QMessageBox::warning(this, tr("Error"), tr("Autodetection failed. Image is not round."));
         break;
     case QnFisheyeCalibrator::ErrorTooLowLight:
-        QMessageBox::warning(this, tr("Error"), tr("Auto-detection failed. Possibly, image is too dim. Try to increase light level."));
+        QMessageBox::warning(this, tr("Error"), tr("Autodetection failed. The image might be too dim."));
         break;
     default:
         break;

@@ -180,6 +180,9 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
         break;
     case Qn::QualityNotDefined:
         break;
+
+    default:
+        break;
     }
 
     stream << "type=" << recordingTypeString << " fps=" << data.getFps() << " quality=" << qualityString;

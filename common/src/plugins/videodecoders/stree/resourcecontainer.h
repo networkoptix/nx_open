@@ -9,6 +9,8 @@
 
 #include <QtCore/QVariant>
 
+#include "resourcenameset.h"
+
 
 namespace stree
 {
@@ -87,6 +89,8 @@ namespace stree
         virtual int resID() const override;
         //!Implementation of AbstractIteratableContainer::value
         virtual QVariant value() const override;
+
+        QString toString( const stree::ResourceNameSet& rns ) const;
 
     private:
         std::map<int, QVariant> m_mediaStreamPameters;

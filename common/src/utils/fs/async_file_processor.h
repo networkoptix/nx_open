@@ -12,11 +12,25 @@
 #include "../common/threadqueue.h"
 
 
+class FileTask;
+class OpenFileTask;
+class WriteFileTask;
+class CloseFileTask;
+class AsyncStatTask;
+
 class AsyncFileProcessor
 :
     public QnLongRunnable
 {
 public:
+    //!This class for internal use only. MAY be removed or changed in future
+    class AbstractAsyncStatHandler
+    {
+    public:
+        virtual ~AbstractAsyncStatHandler() {}
+        virtual void done( SystemError::ErrorCode errorCode, qint64 fileSize ) = 0;
+    };
+
     AsyncFileProcessor();
     virtual ~AsyncFileProcessor();
 
@@ -31,6 +45,15 @@ public:
         const std::shared_ptr<QnFile>& file,
         QnFile::AbstractCloseHandler* handler );
 
+    /*!
+        \param handler Functor ( SystemError::ErrorCode errorCode, qint64 fileSize )
+        \todo Not sure, if this is right place for this method. But, things will sort out in the process
+    */
+    template<class HandlerType>
+        bool statAsync( const QString& filePath, HandlerType handler ) {
+            return statAsyncImpl( filePath, std::unique_ptr<AbstractAsyncStatHandler>( new CustomAsyncStatHandler<HandlerType>(std::move(handler)) ) );
+        }
+
     static AsyncFileProcessor* instance();
 
 protected:
@@ -38,67 +61,22 @@ protected:
     virtual void run() override;
 
 private:
-    class FileTask
-    {
-    public:
-        std::shared_ptr<QnFile> file;
-
-        FileTask( const std::shared_ptr<QnFile>& _file )
-        :
-            file( _file )
-        {
-        }
-
-        virtual ~FileTask() {}
-    };
-
-    class OpenFileTask
+    template<class HandlerFunc>
+    class CustomAsyncStatHandler
     :
-        public FileTask
+        public AbstractAsyncStatHandler
     {
     public:
-        OpenFileTask( const std::shared_ptr<QnFile>& _file )
-        :
-            FileTask( _file )
+        CustomAsyncStatHandler( const HandlerFunc& handler ) : m_handler( handler ) {}
+        CustomAsyncStatHandler( const HandlerFunc&& handler ) : m_handler( handler ) {}
+
+        virtual void done( SystemError::ErrorCode errorCode, qint64 fileSize ) override
         {
+            m_handler( errorCode, fileSize );
         }
-    };
 
-    class WriteFileTask
-    :
-        public FileTask
-    {
-    public:
-        const QByteArray buffer;
-        QnFile::AbstractWriteHandler* const handler;
-
-        WriteFileTask(
-            const std::shared_ptr<QnFile>& _file,
-            const QByteArray& _buffer,
-            QnFile::AbstractWriteHandler* const _handler )
-        :
-            FileTask( _file ),
-            buffer( _buffer ),
-            handler( _handler )
-        {
-        }
-    };
-
-    class CloseFileTask
-    :
-        public FileTask
-    {
-    public:
-        QnFile::AbstractCloseHandler* const handler;
-
-        CloseFileTask(
-            const std::shared_ptr<QnFile>& _file,
-            QnFile::AbstractCloseHandler* const _handler )
-        :
-            FileTask( _file ),
-            handler( _handler )
-        {
-        }
+    private:
+        HandlerFunc m_handler;
     };
 
     CLThreadQueue<FileTask*> m_taskQueue;
@@ -106,6 +84,9 @@ private:
     void doOpenFile( const OpenFileTask* task );
     void doWriteFile( const WriteFileTask* task );
     void doCloseFile( const CloseFileTask* task );
+    void doStat( const AsyncStatTask* task );
+
+    bool statAsyncImpl( const QString& filePath, std::unique_ptr<AbstractAsyncStatHandler> handler );
 };
 
 #endif  //ASYNC_FILE_PROCESSOR_H

@@ -5,7 +5,7 @@
 
 #include <QtCore/QCoreApplication>
 
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 #include "utils/network/socket.h"
 
 class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher

@@ -14,7 +14,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -71,7 +71,7 @@ bool QnLayoutExportTool::start() {
     {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {
-            m_errorMessage = tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).baseName());
+            m_errorMessage = tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).completeBaseName());
             emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
             return false;
         }
@@ -165,7 +165,7 @@ bool QnLayoutExportTool::start() {
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
         QnCachingTimePeriodLoader* loader = navigator()->loader(resource->toResourcePtr());
         if (loader) {
-            QIODevice* device = m_storage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()), QIODevice::WriteOnly);
+            QIODevice* device = m_storage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly);
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
             QByteArray data;
             periods.encode(data);
@@ -335,7 +335,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
                 continue;
 
             QString uniqId = camera->resource()->toResource()->getUniqueId();
-            uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
+            uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).completeBaseName(); // simplify name if export from existing layout
             QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
             QIODevice* device = m_storage->open(motionFileName , QIODevice::WriteOnly);
 

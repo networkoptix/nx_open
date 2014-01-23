@@ -3,7 +3,7 @@
 
 QnEmptyBusinessEventWidget::QnEmptyBusinessEventWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnEmptyBusinessEventWidget)
+    ui(new Ui::EmptyBusinessEventWidget)
 {
     ui->setupUi(this);
 }

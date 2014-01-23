@@ -16,6 +16,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
+#include <api/model/connection_info.h>
 #include <api/message.h>
 
 #include <recording/time_period.h>
@@ -40,7 +41,6 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
-#include "connectinfo.h"
 
 
 namespace {
@@ -55,7 +55,7 @@ void QnCommonMetaTypes::initilize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QnConnectInfoPtr>();
+    qRegisterMetaType<QnConnectionInfoPtr>();
 
     qRegisterMetaType<QUuid>();
     qRegisterMetaType<QHostAddress>();
@@ -134,6 +134,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
+    qRegisterMetaType<QnManualCameraSearchSingleCamera>();
 
     qRegisterMetaType<QnPtzPreset>();
 

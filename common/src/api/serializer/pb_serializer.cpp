@@ -1,5 +1,7 @@
 #include "version.h"
 
+#undef PlaySound // TODO: #Elric wtf??????
+
 #include "camera.pb.h"
 #include "server.pb.h"
 #include "user.pb.h"
@@ -21,7 +23,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -760,7 +762,7 @@ void QnApiPbSerializer::deserializeSettings(QnKvPairList& kvPairs, const QByteAr
     parseSettings(kvPairs, pb_settings.setting());
 }
 
-void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data)
+void QnApiPbSerializer::deserializeConnectInfo(QnConnectionInfoPtr& connectInfo, const QByteArray& data)
 {
     pb::ConnectInfo pb_connectInfo;
 

@@ -19,7 +19,7 @@
 
 #include <common/common_meta_types.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -470,8 +470,6 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
     m_tooltipWidget->setFocusProxy(widget);
     m_tooltipWidget->setOpacity(0.0);
     m_tooltipWidget->setAcceptHoverEvents(true);
-
-    m_tooltipWidget->setText(tr("Sample Tooltip"));
 
 //    m_tooltipWidget->installEventFilter(item);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);

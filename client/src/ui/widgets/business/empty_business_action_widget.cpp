@@ -3,7 +3,7 @@
 
 QnEmptyBusinessActionWidget::QnEmptyBusinessActionWidget(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnEmptyBusinessActionWidget)
+    ui(new Ui::EmptyBusinessActionWidget)
 {
     ui->setupUi(this);
 }

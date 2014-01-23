@@ -5,7 +5,7 @@
 
 #include "camera_diagnose_tool.h"
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <utils/network/http/httptypes.h>
@@ -139,7 +139,7 @@ namespace CameraDiagnostics
 
         if( !m_serverConnection )
         {
-            m_errorMessage = tr("No connection to media server %1").arg(m_serverHostAddress);
+            m_errorMessage = tr("No connection to media server %1.").arg(m_serverHostAddress);
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
             m_state = sDone;

@@ -87,11 +87,9 @@ QN_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash));
 // QnLicenseWarningState
 // -------------------------------------------------------------------------- //
 struct QnLicenseWarningState {
-    QnLicenseWarningState(): lastWarningTime(0), ignore(false) {}
-    QnLicenseWarningState(qint64 lastWarningTime, bool ignore): lastWarningTime(lastWarningTime), ignore(ignore) {}
+    QnLicenseWarningState(qint64 lastWarningTime = 0): lastWarningTime(lastWarningTime) {}
 
     qint64 lastWarningTime;
-    bool ignore;
 };
 
 /**

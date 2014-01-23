@@ -10,7 +10,7 @@
 #include <QtXml/QXmlDefaultHandler>
 #include <QtCore/QUrlQuery>
 
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
 
 
@@ -268,6 +268,9 @@ int extractChannelCount(const QByteArray& model)
 
 QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
+    if( !url.scheme().isEmpty() )
+        return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
+
     QList<QnResourcePtr> result;
 
 

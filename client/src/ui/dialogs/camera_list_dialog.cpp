@@ -4,7 +4,7 @@
 #include <QtWidgets/QMenu>
 #include <QtCore/QMimeData>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
 #include <ui_camera_list_dialog.h>
@@ -128,7 +128,7 @@ void QnCameraListDialog::at_selectAllAction()
 
 void QnCameraListDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, QObject::tr("Export selected cameras to file"));
+    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, tr("Export selected cameras to file"));
 }
 
 void QnCameraListDialog::at_copyToClipboard()

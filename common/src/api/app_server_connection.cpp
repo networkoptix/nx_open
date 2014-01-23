@@ -214,7 +214,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
     case ConnectObject: {
         int status = response.status;
 
-        QnConnectInfoPtr reply(new QnConnectInfo());
+        QnConnectionInfoPtr reply(new QnConnectionInfo());
         if(status == 0) {
             try {
                 m_serializer.deserializeConnectInfo(reply, response.data);
@@ -385,7 +385,7 @@ int QnAppServerConnection::getObjects(int object, const QString &args, QnHTTPRaw
 
 int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot)
 {
-    return sendAsyncGetRequest(ConnectObject, headers, params, QN_STRINGIZE_TYPE(QnConnectInfoPtr), target, slot);
+    return sendAsyncGetRequest(ConnectObject, headers, params, QN_STRINGIZE_TYPE(QnConnectionInfoPtr), target, slot);
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject *target, const char *slot)
@@ -401,7 +401,7 @@ int QnAppServerConnection::connectAsync(QObject *target, const char *slot)
     return connectAsync_i(m_requestHeaders, m_requestParams, target, slot);
 }
 
-int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo)
+int QnAppServerConnection::connect(QnConnectionInfoPtr &connectInfo)
 {
     return sendSyncGetRequest(ConnectObject, m_requestHeaders, m_requestParams, &connectInfo);
 }
@@ -749,7 +749,7 @@ int QnAppServerConnection::requestStoredFileAsync(const QString &filename, QObje
                                                              m_requestHeaders,
                                                              m_requestParams,
                                                              processor,
-                                                             SLOT(processReply(QnHTTPRawResponse, int)));
+                                                             "processReply");
 }
 
 int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QByteArray &filedata, QObject *target, const char *slot)
@@ -779,7 +779,7 @@ int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QBy
                                                               m_requestParams,
                                                               data,
                                                               processor,
-                                                              SLOT(processReply(QnHTTPRawResponse, int)));
+                                                              "processReply");
 }
 
 int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot)
@@ -792,7 +792,7 @@ int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObjec
                                                                 m_requestHeaders,
                                                                 m_requestParams,
                                                                 processor,
-                                                                SLOT(processReply(QnHTTPRawResponse, int)));
+                                                                "processReply");
 }
 
 int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot) {
@@ -804,7 +804,7 @@ int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderNam
                                                              m_requestHeaders,
                                                              m_requestParams,
                                                              processor,
-                                                             SLOT(processReply(QnHTTPRawResponse, int)));
+                                                             "processReply");
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

@@ -8,10 +8,10 @@
 class QTableView;
 
 
-class QnGridWidgetHelper: public QnWorkbenchContextAware
-{
+class QnGridWidgetHelper: public QObject, public QnWorkbenchContextAware {
+    Q_OBJECT
 public:
-    QnGridWidgetHelper(QnWorkbenchContext *context);
+    QnGridWidgetHelper(QnWorkbenchContext *context); // TODO: QObject *parent
 
     void exportToFile(QTableView* grid, const QString& caption);
     void copyToClipboard(QTableView* grid);

@@ -75,15 +75,13 @@ private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
-    void at_cameraScheduleWidget_scheduleEnabledChanged(int state);
+    void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_cameraScheduleWidget_controlsChangesApplied();
 
     void at_enableAudioCheckBox_clicked();
-    void at_analogViewCheckBox_clicked();
 
     void updateMaxFPS();
-    void updateLicenseText();
 protected:
     QnCameraSettingsWidgetPrivate* d_ptr;
 

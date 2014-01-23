@@ -22,7 +22,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
@@ -62,7 +62,7 @@ namespace {
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
     base_type(parent),
     QnWorkbenchContextAware(parent, context),
-    ui(new Ui::QnBusinessRuleWidget),
+    ui(new Ui::BusinessRuleWidget),
     m_model(NULL),
     m_eventParameters(NULL),
     m_actionParameters(NULL),

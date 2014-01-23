@@ -21,7 +21,7 @@
 QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnPlaySoundBusinessActionWidget)
+    ui(new Ui::PlaySoundBusinessActionWidget)
 {
     ui->setupUi(this);
 
