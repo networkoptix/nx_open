@@ -213,6 +213,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
             if (isOk)
                 m_lastError = NoError;
 
+            m_recordingFinished = true;
             m_endOfData = true;
         }
 
@@ -326,6 +327,9 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
             return true; // skip audio packets before first video packet
         if (!initFfmpegContainer(vd))
         {
+            if (!m_fileName.isEmpty())
+                m_recordingFinished = true;
+
             if (m_stopOnWriteError)
             {
                 m_needStop = true;

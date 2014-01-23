@@ -197,13 +197,12 @@ void QnLayoutExportTool::stop() {
     m_resources.clear();
     m_errorMessage = QString(); //supress error by manual cancelling
 
-    if (m_currentCamera)
+    if (m_currentCamera) {
         connect(m_currentCamera, SIGNAL(exportStopped()), this, SLOT(at_camera_exportStopped()));
-
-    emit stopped();
-
-    if (!m_currentCamera)
+        m_currentCamera->stopExport();
+    } else {
         finishExport(false);
+    }
 }
 
 Qn::LayoutExportMode QnLayoutExportTool::mode() const {
@@ -268,13 +267,8 @@ void QnLayoutExportTool::finishExport(bool success) {
 
 bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     m_currentCamera = new QnClientVideoCamera(resource);
-    connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this, SLOT(at_camera_progressChanged(int)));
-
+    connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this,   SLOT(at_camera_progressChanged(int)));
     connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &QnLayoutExportTool::at_camera_exportFinished);
-    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   m_currentCamera, &QObject::deleteLater);
-
-    connect(this,               SIGNAL(stopped()),                      m_currentCamera, SLOT(stopExport()));
-    connect(m_currentCamera,    SIGNAL(exportStopped()),                m_currentCamera, SLOT(deleteLater()));
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
@@ -359,6 +353,8 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
         }
     }
 
+    camera->deleteLater();
+
     if (error) {
         m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
         finishExport(false);
@@ -369,6 +365,9 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
 }
 
 void QnLayoutExportTool::at_camera_exportStopped() {
+    if (m_currentCamera)
+        m_currentCamera->deleteLater();
+
     finishExport(false);
 }
 

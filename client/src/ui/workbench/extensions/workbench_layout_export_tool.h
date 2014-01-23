@@ -83,11 +83,6 @@ signals:
     void stageChanged(QString title);
 
     /**
-     * @brief stopped                           This signal is emitted when the process is stopped by calling the stop() method from outside.
-     */
-    void stopped();
-
-    /**
      * @brief finished                          This signal is emitted when the process is finished.
      * @param success                           True if the process is finished successfully, false otherwise.
      */
