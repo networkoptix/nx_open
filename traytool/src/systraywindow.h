@@ -158,6 +158,10 @@ private:
     bool isAppServerParamChanged() const;
     bool isMediaServerParamChanged() const;
     Qt::CheckState getDiscoveryState() const;
+
+    bool readAllowCameraChanges() const;
+    void writeAllowCameraChanges(bool allowCameraChanges);
+
 private:
     QScopedPointer<Ui::SettingsDialog> ui;
     QScopedPointer<QDialog> m_findAppServerDialog;

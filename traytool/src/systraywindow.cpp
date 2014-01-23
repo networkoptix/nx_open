@@ -742,6 +742,15 @@ Qt::CheckState QnSystrayWindow::getDiscoveryState() const
     return discoveryState;
 }
 
+bool QnSystrayWindow::readAllowCameraChanges() const {
+    QVariant result = m_appServerSettings.value(lit("allowCameraChanges"));
+    return result.convert(QMetaType::Bool) ? result.toBool() : true;
+}
+
+void QnSystrayWindow::writeAllowCameraChanges(bool allowCameraChanges) {
+    m_appServerSettings.setValue(lit("allowCameraChanges"), allowCameraChanges);
+}
+
 void QnSystrayWindow::onSettingsAction()
 {
     QUrl appServerUrl = getAppServerURL();
@@ -797,6 +806,8 @@ void QnSystrayWindow::onSettingsAction()
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
 
+    ui->ecsCameraControlCheckBox->setChecked(readAllowCameraChanges());
+
     showNormal();
 }
 
@@ -817,6 +828,9 @@ bool QnSystrayWindow::isAppServerParamChanged() const
         publicIpMode= ECS_PUBLIC_IP_MODE_MANUAL;
 
     if (m_appServerSettings.value(lit("publicIpMode")).toString() != publicIpMode)
+        return true;
+
+    if(readAllowCameraChanges() != ui->ecsCameraControlCheckBox->isChecked())
         return true;
 
     return false;
@@ -1012,6 +1026,7 @@ void QnSystrayWindow::saveData()
 
     setAppServerURL(QString(lit("https://%1:%2")).arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 
+    writeAllowCameraChanges(ui->ecsCameraControlCheckBox->isChecked());
 
     m_mediaServerSettings.setValue(lit("staticPublicIP"), ui->staticPublicIPEdit->text());
     if (!ui->groupBoxPublicIP->isChecked())
