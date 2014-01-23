@@ -8,7 +8,7 @@
         <translation type="obsolete">Échec de connexion (connect ()). %1</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/system_socket.cpp" line="660"/>
+        <location filename="../src/utils/network/system_socket.cpp" line="663"/>
         <source>Couldn&apos;t connect to %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1026,12 +1026,12 @@ Assurez-vos que la caméra est branchée sur le réseau. Essayez de redémarrer 
 <context>
     <name>QnEnvironment</name>
     <message>
-        <location filename="../src/utils/common/environment.cpp" line="55"/>
+        <location filename="../src/utils/common/environment.cpp" line="57"/>
         <source>Launching Windows Explorer failed</source>
         <translation>Le lancement de l&apos;explorateur Windows a échoué</translation>
     </message>
     <message>
-        <location filename="../src/utils/common/environment.cpp" line="56"/>
+        <location filename="../src/utils/common/environment.cpp" line="58"/>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>Impossible de trouver &apos;explorer.exe&apos; pour lancer l&apos;explorateur Windows.</translation>
     </message>
@@ -1190,22 +1190,22 @@ Assurez-vos que la caméra est branchée sur le réseau. Essayez de redémarrer 
 <context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="234"/>
+        <location filename="../src/licensing/license.cpp" line="237"/>
         <source>Free</source>
         <translation>Gratuit</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="235"/>
+        <location filename="../src/licensing/license.cpp" line="238"/>
         <source>Trial</source>
         <translation>Essai</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="236"/>
+        <location filename="../src/licensing/license.cpp" line="239"/>
         <source>Analog</source>
         <translation>Analogue</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="237"/>
+        <location filename="../src/licensing/license.cpp" line="240"/>
         <source>Professional</source>
         <translation>Professionel</translation>
     </message>
@@ -1593,7 +1593,7 @@ Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
 <context>
     <name>Socket</name>
     <message>
-        <location filename="../src/utils/network/system_socket.cpp" line="521"/>
+        <location filename="../src/utils/network/system_socket.cpp" line="524"/>
         <source>Couldn&apos;t resolve %1: %2.</source>
         <translation>Impossible de résoudre %1: %2.</translation>
     </message>
