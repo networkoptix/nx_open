@@ -40,14 +40,10 @@
 #define QN_FREE_LICENSE_COUNT           ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY             "${freeLicenseKey}"
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}
-#define QN_LICENSE_URL                  "${license.url}"
-#define QN_RSA_PUBLIC_KEY               ${rsa.public.key}
 #define QN_SHOWCASE_URL                 "${showcase.url}"
 #define QN_SETTINGS_URL                 "${settings.url}"
 #define QN_PRODUCT_NAME_LONG            "${product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
-#define QN_AGGREGATION_PERIOD           ${aggregation.period}
-
 
 /* 
  * These constants are here for windows resource file.
