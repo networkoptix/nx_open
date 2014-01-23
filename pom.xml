@@ -56,9 +56,8 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->         
         <customization>default</customization>
-        <parent.customization>whooy</parent.customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
-        <parent.customization.dir>${root.dir}/customization/${p.customization}</parent.customization.dir>        
+        <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
 
         <additional.defines/>
 
@@ -100,7 +99,6 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
-                                <file>${customization.dir}/parent.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${root.dir}/appserver/appserver-${arch}.properties</file>
                             </files>
@@ -265,7 +263,8 @@
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${environment.dir}/python/${arch}</python.dir>				
+                <python.dir>${environment.dir}/python/${arch}</python.dir>	
+                <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
@@ -286,7 +285,8 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${environment.dir}/python/bin</python.dir>				
+                <python.dir>${environment.dir}/python/bin</python.dir>		
+                <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>

@@ -31,6 +31,8 @@
 #include <utils/common/json.h>
 #include <utils/common/product_features.h>
 
+#define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
+
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
