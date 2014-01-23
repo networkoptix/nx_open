@@ -44,20 +44,31 @@ namespace ec2
     class QnTransaction: public QnAbstractTransaction
     {
     public:
-        QnTransaction();
-        QnTransaction( const QnTransaction& xvalue );
+        QnTransaction() {}
+        
         T params;
+
+        template <class T2>
+        void serialize(BinaryStream<T2> stream) {
+            QnAbstractTransaction::serialize(stream);
+            params.serialize(stream);
+        }
     };
 }
 
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (persistent))
+
 #if 1
 #include "nx_ec/data/camera_data.h"
-void test()
+static void test()
 {
     ec2::ApiCameraData data;
     BinaryStream<QByteArray> stream;
     data.serialize(stream);
     data.deserialize(stream);
+
+    ec2::QnTransaction<ec2::ApiCameraData> tran;
+    tran.serialize(stream);
 }
 #endif
 

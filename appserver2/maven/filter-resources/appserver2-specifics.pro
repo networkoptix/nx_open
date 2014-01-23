@@ -1,4 +1,4 @@
-TEMPLATE = app
+TEMPLATE = lib
 CONFIG += console
 
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)

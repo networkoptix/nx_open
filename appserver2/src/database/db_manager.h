@@ -16,7 +16,11 @@ namespace ec2
             General_Error
         };
 
-        ErrorCode executeTransaction(QnTransaction<ApiCameraData> tran);
+        ErrorCode executeTransaction(QnTransaction<ApiCameraData> tran)
+        {
+            // todo: implement me
+            return No_Error;
+        }
     };
 };
 
