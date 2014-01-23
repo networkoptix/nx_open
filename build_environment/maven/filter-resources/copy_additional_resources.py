@@ -93,7 +93,6 @@ if get_environment_variable('platform') == 'windows':
             if not os.path.exists(target_plugins):
                 os.makedirs(join(target_dir, config, 'plugins'))
             #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        
-            shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', target_plugins)
 
 else:     
     lib_source_dir = '${qt.dir}/lib'

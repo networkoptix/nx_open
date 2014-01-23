@@ -53,7 +53,7 @@
 
                     <Directory Id="ImageFormats" Name="imageformats">
                     </Directory>    
-                    
+
                     <Directory Id="Plugins" Name="plugins">
                     </Directory>                        
 
@@ -129,7 +129,8 @@
                 <File Id="ClientX264" Name="x264.exe" Source="$(var.SourceDir)/x264.exe"/>                                
             </Component>
         </ComponentGroup>
-
+        
+        <?if ${quicksync} = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
                 <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll"/>
@@ -138,7 +139,8 @@
                 <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml"/>                               
             </Component>
         </ComponentGroup>                            
-
+        <?endif?>
+        
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
