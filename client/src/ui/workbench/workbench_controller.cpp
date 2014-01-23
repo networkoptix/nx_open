@@ -402,7 +402,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
-    m_wheelZoomInstrument->recursiveDisable();
+    //m_wheelZoomInstrument->recursiveDisable();
     m_zoomedToggle = new QnToggle(false, this);
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
@@ -410,8 +410,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_rubberBandInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_rubberBandInstrument,         SLOT(recursiveEnable()));
-    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
-    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
+    //connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_wheelZoomInstrument,          SLOT(recursiveEnable()));
+    //connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_wheelZoomInstrument,          SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        this,                           SLOT(at_zoomedToggle_activated()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
