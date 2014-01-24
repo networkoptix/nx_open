@@ -370,13 +370,17 @@ void QnSystrayWindow::updateServiceInfo()
         return;
     }
 
-    GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
-    connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(mediaServerTask);
-   
-    GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
-    connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(appServerTask);
+    if (m_mediaServerHandle) {
+        GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
+        connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
+        QThreadPool::globalInstance()->start(mediaServerTask);
+    }
+
+    if (m_appServerHandle) {
+        GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
+        connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
+        QThreadPool::globalInstance()->start(appServerTask);
+    }
 }
 
 void QnSystrayWindow::appServerInfoUpdated(quint64 status) {
