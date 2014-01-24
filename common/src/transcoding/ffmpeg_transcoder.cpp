@@ -328,7 +328,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnConstAbstractMediaDataPtr medi
             }
         }
         media.clear();
-    } while (transcoder && packet.size > 0);
+    } while (transcoder && transcoder->existMoreData());
     return 0;
 }
 
