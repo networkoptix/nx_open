@@ -3,6 +3,7 @@
 #define CAMERA_MANAGER_H
 
 #include "nx_ec/ec_api.h"
+#include "nx_ec/data/camera_data.h"
 #include "transaction/transaction.h"
 
 
