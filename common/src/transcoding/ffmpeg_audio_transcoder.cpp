@@ -10,10 +10,12 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_lastTimestamp(AV_NOPTS_VALUE),
     m_downmixAudio(false),
-    m_frameNum(0)
+    m_frameNum(0),
+    m_resampleCtx(0),
+    m_resampleBuffer(0)
 {
     m_bitrate = 128*1000;
-    m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE, 32);
+    m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);
     m_decodedBuffer =  (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);
     m_decodedBufferSize = 0;
 }
@@ -22,6 +24,9 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 {
     qFreeAligned(m_audioEncodingBuffer);
     qFreeAligned(m_decodedBuffer);
+    qFreeAligned(m_resampleBuffer);
+    if (m_resampleCtx)
+        audio_resample_close(m_resampleCtx);
 
     if (m_encoderCtx) {
         avcodec_close(m_encoderCtx);
@@ -60,10 +65,8 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     m_encoderCtx = avcodec_alloc_context3(avCodec);
     //m_encoderCtx->codec_id = m_codecId;
     //m_encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    if (m_codecId == CODEC_ID_VORBIS)
-        m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_FLT;
-    else
-        m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_S16; //avCodec->sample_fmts[0];
+    m_encoderCtx->sample_fmt = avCodec->sample_fmts[0] != AV_SAMPLE_FMT_NONE ? avCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
+
     m_encoderCtx->channels = codecCtx->ctx()->channels;
     if (m_encoderCtx->channels > 2 && (m_codecId == CODEC_ID_MP3 || m_codecId == CODEC_ID_MP2))
     {
@@ -71,14 +74,14 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
         m_encoderCtx->channels = 2;
     }
     m_encoderCtx->sample_rate = codecCtx->ctx()->sample_rate;
+    if (m_encoderCtx->sample_rate < 16000) {
+        m_encoderCtx->sample_rate = 16000;
+    }
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
     m_encoderCtx->bit_rate = 64000 * m_encoderCtx->channels;
 
-    //m_encoderCtx->channels = 2;
-    //m_encoderCtx->sample_rate = 44100;
-    //m_encoderCtx->bit_rate = 128000;
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
@@ -97,6 +100,37 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
     m_frameNum = 0;
     return true;
+}
+
+int sampleSize(AVSampleFormat value)
+{
+    switch(value) {
+        case AV_SAMPLE_FMT_U8:
+        case AV_SAMPLE_FMT_U8P:
+            return 1;
+
+        case AV_SAMPLE_FMT_S16:
+        case AV_SAMPLE_FMT_S16P:
+            return 2;
+
+        case AV_SAMPLE_FMT_S32:
+        case AV_SAMPLE_FMT_S32P:
+        case AV_SAMPLE_FMT_FLT:
+        case AV_SAMPLE_FMT_FLTP:
+            return 4;
+
+        case AV_SAMPLE_FMT_DBL:
+        case AV_SAMPLE_FMT_DBLP:
+            return 8;
+        default:
+            return 2;
+    }
+}
+
+bool QnFfmpegAudioTranscoder::existMoreData() const
+{
+    int encoderFrameSize = m_encoderCtx->frame_size*sizeof(short)*m_encoderCtx->channels;
+    return m_decodedBufferSize >= encoderFrameSize;
 }
 
 int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
@@ -127,8 +161,30 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, 
         if (len < 0)
             return -3;
         if (out_size > 0) {
+            quint8* srcData = m_decodedBuffer + m_decodedBufferSize;
+
             if (m_downmixAudio)
-                out_size = QnAudioProcessor::downmix(m_decodedBuffer + m_decodedBufferSize, out_size, audio->context->ctx());
+                out_size = QnAudioProcessor::downmix(srcData, out_size, m_decoderContext);
+            if (m_encoderCtx->sample_rate != m_decoderContext->sample_rate ||
+                m_encoderCtx->sample_fmt != m_decoderContext->sample_fmt)
+            {
+                if (m_resampleCtx == 0) 
+                {
+                    m_resampleCtx = av_audio_resample_init(
+                        m_encoderCtx->channels,
+                        m_decoderContext->channels,
+                        m_encoderCtx->sample_rate,
+                        m_decoderContext->sample_rate,
+                        m_encoderCtx->sample_fmt,
+                        m_decoderContext->sample_fmt,
+                        16, 10, 1, 2.0);
+                    m_resampleBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);
+                }
+                int inSamples = out_size / sampleSize(m_decoderContext->sample_fmt);
+                out_size = audio_resample(m_resampleCtx, (short*) m_resampleBuffer, (short*) srcData, inSamples) * sampleSize(m_encoderCtx->sample_fmt);
+                memcpy(srcData, m_resampleBuffer, out_size);
+            }
+
             m_decodedBufferSize += out_size;
         }
         Q_ASSERT(m_decodedBufferSize < AVCODEC_MAX_AUDIO_FRAME_SIZE);
