@@ -6,6 +6,8 @@
 #include <QByteArray>
 #include <QUuid>
 
+#include <type_traits>
+
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/transform.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
@@ -159,13 +161,6 @@ namespace QnBinary {
         binStream->read(&field, sizeof(field));
     }
 
-    template <class T, typename T2>
-    void deserialize(T2& field, BinaryStream<T>* binStream) {
-        qint32 tmp;
-        binStream->read(&tmp, sizeof(field));
-        field = (T2) ntohl(tmp);
-    }
-
     template <class T>
     void deserialize(bool& field, BinaryStream<T>* binStream) {
         binStream->read(&field, sizeof(field));
@@ -192,8 +187,15 @@ namespace QnBinary {
         field = QString::fromUtf8(data);
     }
 
-    template <class T, class T2>
-    void deserialize(const std::vector<T2>& field, BinaryStream<T>* binStream);
+    template<class T, class T2>
+        void deserialize( T2& field, BinaryStream<T>* binStream, typename std::enable_if<std::is_enum<T2>::value>::type* = NULL )
+    {
+        qint32 tmp;
+        binStream->read(&tmp, sizeof(field));
+        field = (T2) ntohl(tmp);
+    }
+
+
 };
 
 #define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
@@ -228,13 +230,12 @@ namespace QnBinary
     }
 
     template <class T, class T2>
-    void deserialize(const std::vector<T2>& field, BinaryStream<T>* binStream) 
+    void deserialize(std::vector<T2>& field, BinaryStream<T>* binStream) 
     {
         qint32 size;
         deserialize(size, binStream);
         field.resize(size);
-        for (std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
-            QnBinary::deserialize(*itr, binStream);
+        std::for_each( field.begin(), field.end(), [binStream](T2& val){ QnBinary::deserialize(val, binStream); } );
     }
 }
 
