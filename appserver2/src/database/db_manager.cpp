@@ -16,14 +16,18 @@ void QnDbManager::initStaticInstance(QnDbManager* value)
     globalInstance = value;
 }
 
-ErrorCode QnDbManager::executeTransaction( const QnTransaction<ApiCameraData>& tran)
+ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
 {
     QSqlQuery insQuery(*m_sdb);
     insQuery.prepare("INSERT INTO vms_resource (id, guid, xtype_id, parent_id, name, url, status, disabled) VALUES(:id, :guid, :typeId, :parentId, :name, :url, :status, :disabled)");
+    data.autoBindValues(insQuery);
+    
+    return ErrorCode::ok;
+}
 
-    static_cast<ApiResourceData>(tran.params).autoBindValues(insQuery);
-    //delQuery.bindValue(":id1", resId.toInt());
-
+ErrorCode QnDbManager::executeTransaction( const QnTransaction<ApiCameraData>& tran)
+{
+    insertResource(tran.params);
     return ErrorCode::ok;
 }
 

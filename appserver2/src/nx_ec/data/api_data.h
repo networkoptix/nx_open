@@ -14,11 +14,11 @@ struct ApiData {
 }
 
 #define QN_DECLARE_STRUCT_SQL_BINDER() \
-    inline void autoBindValues(QSqlQuery& query);
+    inline void autoBindValues(QSqlQuery& query) const;
 
 
 #define QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ, ...) \
-    void TYPE::autoBindValues(QSqlQuery& query) \
+    void TYPE::autoBindValues(QSqlQuery& query)  const\
 { \
     BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) \
 }

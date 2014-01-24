@@ -25,6 +25,8 @@ namespace ec2
 
         ErrorCode executeTransaction( const QnTransaction<ApiCameraData>& tran);
     private:
+        ErrorCode insertResource(const ApiResourceData& data);
+    private:
         QSqlDatabase* m_sdb;
     };
 };
