@@ -14,7 +14,7 @@ struct ApiData {
 }
 
 #define QN_DECLARE_STRUCT_SQL_BINDER() \
-    void autoBindValues(QSqlQuery& query);
+    inline void autoBindValues(QSqlQuery& query);
 
 
 #define QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ, ...) \
