@@ -256,8 +256,11 @@ void QnSystrayWindow::findServiceInfo()
     if (m_appServerHandle == 0)
         m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
-    if (!m_mediaServerHandle && !m_appServerHandle)
+    if (!m_mediaServerHandle && !m_appServerHandle && m_firstTimeToolTipError) {
         showMessage(tr("No %1 services installed").arg(lit(QN_ORGANIZATION_NAME)));
+     //   m_trayIcon->setIcon(m_iconBad);   //TODO: #Elric why do we have the same icon for error? And why it is crashed here?
+        m_firstTimeToolTipError = false;
+    }
 }
 
 void QnSystrayWindow::setVisible(bool visible)
