@@ -73,20 +73,6 @@ QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnUuid, (data1) (data2) (data3) (data4) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (number) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
 
-#if 1
-#include "nx_ec/data/camera_data.h"
-static void test()
-{
-    ec2::ApiCameraData data;
-    BinaryStream<QByteArray> stream;
-    data.serialize(stream);
-    data.deserialize(stream);
-
-    ec2::QnTransaction<ec2::ApiCameraData> tran;
-    tran.serialize(stream);
-}
-#endif
-
 //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )
 
 /*
