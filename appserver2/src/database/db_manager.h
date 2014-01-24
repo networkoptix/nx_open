@@ -3,7 +3,10 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
+#include "nx_ec/data/camera_data.h"
 
+
+class QSqlDatabase;
 
 namespace ec2
 {
@@ -16,9 +19,13 @@ namespace ec2
         template<class QueryDataType>
         ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
         {
-            // todo: implement me
+            Q_ASSERT_X(1, "Not implemented", Q_FUNC_INFO);
             return ErrorCode::ok;
         }
+
+        ErrorCode executeTransaction( const QnTransaction<ApiCameraData>& tran);
+    private:
+        QSqlDatabase* m_sdb;
     };
 };
 

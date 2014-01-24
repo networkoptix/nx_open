@@ -2,7 +2,7 @@
 #define __RESOURCE_TRANSACTION_DATA_H__
 
 #include "api_data.h"
-#include "../../serialization_helper.h"
+#include "serialization_helper.h"
 
 #include <QTCore/qglobal.h>
 #include <QString>
@@ -30,11 +30,11 @@ struct ApiResourceData: public ApiData {
     Status        status;
     bool          disabled;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS();
+    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
+QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__
