@@ -34,7 +34,7 @@
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
-        <windows.defines/>
+        <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
         <linux.defines/>
         <mac.defines/>      
 
