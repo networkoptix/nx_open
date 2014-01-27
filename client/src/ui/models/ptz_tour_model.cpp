@@ -124,6 +124,22 @@ int QnPtzTourModel::columnCount(const QModelIndex &parent) const {
     return 0;
 }
 
+bool QnPtzTourModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) {
+    if (destinationParent == sourceParent && (destinationChild == sourceRow || destinationChild == sourceRow + 1)) // see QAbstractItemModel docs
+        return true;
+
+    if (count < 0 || sourceRow < 0 || sourceRow + count > m_tour.spots.size() || destinationChild < 0 || destinationChild + count > m_tour.spots.size() + 1)
+        return false;
+
+    beginMoveRows(sourceParent, sourceRow, sourceRow + count - 1, destinationParent, destinationChild);
+    int offset = sourceRow < destinationChild ? -1 : 0; // QAbstractItemModel and QList have different opinion how to move elements
+    for (int i = 0; i < count; i++)
+        m_tour.spots.move(sourceRow + i, destinationChild + i + offset);
+    endMoveRows();
+    emit tourChanged(m_tour);
+    return true;
+}
+
 bool QnPtzTourModel::removeRows(int row, int count, const QModelIndex &parent) {
     if(parent.isValid() || row < 0 || count < 1 || row + count > m_tour.spots.size())
         return false;
