@@ -100,7 +100,11 @@ namespace ec2
 
     QnTransaction<ApiCameraData> QnCameraManager::prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource )
     {
-        //TODO/IMPL
-        return QnTransaction<ApiCameraData>();
+		QnTransaction<ApiCameraData> result;
+		result.command = cmd;
+		result.createNewID();
+		result.persistent = true;
+		result.params.fromResource(resource);
+        return result;
     }
 }

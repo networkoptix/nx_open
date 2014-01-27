@@ -3,6 +3,7 @@
 
 #include "api_data.h"
 #include "serialization_helper.h"
+#include "core/resource/resource_fwd.h"
 
 #include <QTCore/qglobal.h>
 #include <QString>
@@ -30,6 +31,7 @@ struct ApiResourceData: public ApiData {
     Status        status;
     bool          disabled;
 
+	void fromResource(const QnResourcePtr& resource);
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 

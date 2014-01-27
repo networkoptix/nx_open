@@ -11,6 +11,8 @@ namespace ec2
 
     enum ApiCommand
     {
+		NotDefined,
+
         addCamera,
         removeCamera,
 
@@ -18,6 +20,8 @@ namespace ec2
     };
 
     struct QnUuid {
+		QnUuid(): data1(0), data2(0), data3(0), data4(0) {}
+
         quint32 data1;
         quint16 data2;
         quint16 data3;
@@ -29,6 +33,8 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
+		QnAbstractTransaction(): command(NotDefined), persistent(true) {}
+
         void createNewID();
         
         static void setPeerGuid(const QnUuid& value);
@@ -36,6 +42,8 @@ namespace ec2
 
         struct ID
         {
+			ID(): number(0) {}
+
             QnUuid peerGUID;
             qint64 number;
 

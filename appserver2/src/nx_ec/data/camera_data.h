@@ -3,47 +3,30 @@
 
 #include "resource_data.h"
 #include "serialization_helper.h"
-
+#include "common/common_globals.h"
+#include "core/resource/media_resource.h"
+#include "core/misc/schedule_task.h"
 
 namespace ec2
 {
 
-enum MotionType {
-    Default      = 0,
-    HardwareGrid = 1,
-    SoftwareGrid = 2,
-    MotionWindow = 4,
-    NoMotion     = 8
-};
+struct ScheduleTask: public ApiData 
+{
+	ScheduleTask(): id(0), sourceId(0), startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
+					beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
 
-enum Quality {
-    Lowest  = 0,
-    Low     = 1,
-    Normal  = 2,
-    High    = 3,
-    Highest = 4,
-    Preset  = 5
-};
+	static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
 
-enum SecondaryQuality {
-    SecondaryLow        = 0,
-    SecondaryMedium     = 1,
-    SecondaryHigh       = 2,
-    SecondaryNotDefined = 3,
-    SecondaryDontUse    = 4
-};
-
-struct ScheduleTask: public ApiData {
     qint32   id;
     qint32   sourceId;
     qint32   startTime;
     qint32   endTime;
     bool     doRecordAudio;
-    qint32   recordType;
+    Qn::RecordingType   recordType;
     qint32   dayOfWeek;
     qint32   beforeThreshold;
     qint32   afterThreshold;
-    Quality  streamQuality;
+    Qn::StreamQuality  streamQuality;
     qint32   fps;
 
     QN_DECLARE_STRUCT_SERIALIZATORS();
@@ -52,7 +35,7 @@ struct ScheduleTask: public ApiData {
 struct ApiCameraData: public ApiResourceData 
 {
     bool                scheduleDisabled;
-    MotionType          motionType;
+    Qn::MotionType      motionType;
     QString             region;
     QString             mac;
     QString             login;
@@ -65,12 +48,13 @@ struct ApiCameraData: public ApiResourceData
     QString             firmware;
     QString             groupId;
     QString             groupName;
-    SecondaryQuality    secondaryQuality;
+    Qn::StreamQuality    secondaryQuality;
     bool                controlDisabled;
     qint32              statusFlags;
     QString             dewarpingParams;
     QString             vendor;
 
+	void fromResource(const QnVirtualCameraResourcePtr& resource);
     QN_DECLARE_STRUCT_SERIALIZATORS();
 };
 
