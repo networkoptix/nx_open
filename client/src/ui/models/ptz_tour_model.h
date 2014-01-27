@@ -35,6 +35,7 @@ public:
     const QString tourName() const;
     Q_SLOT void setTourName(const QString &name);
 
+    QnPtzPresetList sortedPresets() const;
     const QnPtzPresetList &presets() const;
     Q_SLOT void setPresets(const QnPtzPresetList &presets);
 

@@ -35,7 +35,7 @@ QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOption
     case QnPtzTourModel::NameColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        foreach (const QnPtzPreset &preset, model->presets()) {
+        foreach (const QnPtzPreset &preset, model->sortedPresets()) {
             comboBox->addItem(preset.name, preset.id);
         }
         return comboBox;
