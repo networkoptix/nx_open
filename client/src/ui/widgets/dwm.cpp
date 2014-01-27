@@ -1,6 +1,8 @@
 #include "dwm.h"
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/remove_pointer.hpp>
+#endif
 
 #include <QtCore/QLibrary>
 #include <QtWidgets/QWidget>

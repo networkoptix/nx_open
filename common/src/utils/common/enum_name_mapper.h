@@ -3,11 +3,13 @@
 
 #include <cassert>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/mpl/bool.hpp>
+#endif
 
 #include <QtCore/QMetaEnum>
 #include <QtCore/QMetaObject>

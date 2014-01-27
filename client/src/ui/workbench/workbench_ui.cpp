@@ -1885,7 +1885,9 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_titleItem->size().height()
     ));
 
-    m_notificationsItem->setX(m_notificationsItem->x() - oldRect.width() + rect.width());
+    if (m_notificationsXAnimator->isRunning())
+        m_notificationsXAnimator->stop();
+    m_notificationsItem->setX(rect.right() + (m_notificationsOpened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */));
 
     updateTreeGeometry();
     updateNotificationsGeometry();
