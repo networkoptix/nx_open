@@ -1,7 +1,9 @@
 #ifndef QN_CUSTOMIZED_H
 #define QN_CUSTOMIZED_H
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/is_base_of.hpp>
+#endif
 
 #include <QtCore/QEvent>
 #include <QtCore/QObject>

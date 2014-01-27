@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>AVSettingsDlg</name>
     <message>
@@ -150,7 +150,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message utf8="true">
+    <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="229"/>
         <source>Warning! High quality may result in Media Server’s CPU overload, network connection errors and other issues.</source>
         <translation type="unfinished"></translation>
@@ -594,9 +594,7 @@
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="553"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="576"/>
         <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;
-----------
-Short for &quot;seconds&quot;</extracomment>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -773,32 +771,32 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="146"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="153"/>
         <source> seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="155"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="134"/>
         <source>Tour sequence cycle time:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="165"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="162"/>
         <source>Show IP in tree:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="182"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="179"/>
         <source>Timeline mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="212"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="209"/>
         <source>Misc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="232"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="230"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -809,12 +807,12 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="281"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="279"/>
         <source>Downmix audio from 5.1 to 2.1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="325"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="323"/>
         <source>Auto pause video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -829,22 +827,22 @@ Short for &quot;seconds&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="413"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="448"/>
         <source>Run application when PC boots up:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="457"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="414"/>
         <source>Browse logs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="470"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="427"/>
         <source>Clear local cache</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="482"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="465"/>
         <source>Network Interfaces</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1265,7 +1263,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PtzOverlayWidget</name>
     <message>
-        <location filename="../src/ui/graphics/instruments/ptz_instrument.cpp" line="309"/>
+        <location filename="../src/ui/graphics/instruments/ptz_instrument.cpp" line="310"/>
         <source>Dewarping panoramic mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4186,71 +4184,71 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnLicenseManagerWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="100"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="102"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 At least %3 licenses are required.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="107"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="109"/>
         <source>The software is licensed to %1 cameras.
 At least %3 licenses are required.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="115"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="117"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 %3 licenses and %4 analog licenses are currently in use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="123"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
         <source>The software is licensed to %1 cameras.
 %2 licenses are currently in use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="131"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="133"/>
         <source>Obtaining licenses from Enterprise Controller...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="135"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="137"/>
         <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="136"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="138"/>
         <source>You do not have a valid license installed. Please activate your commercial license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="213"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="217"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="269"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="283"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="322"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="215"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="219"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="271"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="285"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="324"/>
         <source>License Activation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="214"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="216"/>
         <source>Invalid License. Please contact our support team to get a valid license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="284"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="286"/>
         <source>Network error has occurred during automatic license activation.
 Try to activate your license manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="218"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="220"/>
         <source>The license is already activated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="224"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="226"/>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
 License Type: %1&lt;br /&gt;
 License Key: %2&lt;br /&gt;
@@ -4261,43 +4259,43 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="235"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="237"/>
         <source>License Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="259"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="323"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="261"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="325"/>
         <source>There was a problem activating your license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="261"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="263"/>
         <source>License was successfully activated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="308"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="310"/>
         <source>Database error has occurred.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="310"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="312"/>
         <source>Invalid data was received.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="312"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="314"/>
         <source>The license key is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="314"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="316"/>
         <source>There was a problem activating your license. You are trying to activate an incompatible license with your software.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="316"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="318"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4381,31 +4379,31 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="277"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="281"/>
         <source>&lt;none&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="334"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="353"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="340"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="359"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="347"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="372"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="392"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="406"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="463"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="366"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="391"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="411"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="425"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="482"/>
         <source>Could not connect to Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="393"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="412"/>
         <source>Selected Enterprise controller has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4413,7 +4411,7 @@ An error has occurred while trying to restart in compatibility mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="407"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="426"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4421,7 +4419,7 @@ Would you like to restart in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="464"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="483"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4430,12 +4428,12 @@ Download version %3?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="553"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="572"/>
         <source>Connection with this name already exists. Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="336"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="355"/>
         <source>Connection to the Enterprise Controller could not be established.
 Connection details that you have entered are incorrect, please try again.
 
@@ -4443,7 +4441,7 @@ If this error persists, please contact your VMS administrator.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="373"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="392"/>
         <source>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
@@ -4451,76 +4449,76 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="424"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="443"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="425"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="444"/>
         <source>Cannot restart the client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="436"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="455"/>
         <source>Failure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="437"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="456"/>
         <source>Failed to launch compatiblity version %1
 Try to restore version %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="513"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="528"/>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="534"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="532"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="547"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="553"/>
         <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="513"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="532"/>
         <source>The information you have entered is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="528"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="547"/>
         <source>Entered hostname is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="534"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="553"/>
         <source>Host field cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="543"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="562"/>
         <source>%1 at %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="544"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="563"/>
         <source>Save connection as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="544"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="563"/>
         <source>Enter name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="552"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="571"/>
         <source>Connection already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="587"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="606"/>
         <source>Delete connections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.cpp" line="588"/>
+        <location filename="../src/ui/dialogs/login_dialog.cpp" line="607"/>
         <source>Are you sure you want to delete the connection
 %1?</source>
         <translation type="unfinished"></translation>
