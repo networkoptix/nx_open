@@ -13,6 +13,9 @@ namespace ec2
     class QnDbManager
     {
     public:
+		QnDbManager();
+		virtual ~QnDbManager();
+
         static QnDbManager* instance();
         void initStaticInstance(QnDbManager* value);
 
@@ -25,9 +28,16 @@ namespace ec2
 
         ErrorCode executeTransaction( const QnTransaction<ApiCameraData>& tran);
     private:
-        ErrorCode insertResource(const ApiResourceData& data);
+        ErrorCode updateResource(const ApiResourceData& data);
+		ErrorCode insertResource(ApiResourceData& data);
+
+		ErrorCode updateCamera(const ApiCameraData& data);
+		ErrorCode insertCamera(const ApiCameraData& data);
+
+		bool createDatabase();
     private:
-        QSqlDatabase* m_sdb;
+        QSqlDatabase m_sdb;
+		QMutex m_mutex;
     };
 };
 

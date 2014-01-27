@@ -32,8 +32,6 @@ struct ApiData {
     QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ); \
     QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
 
-#define BIND_FIELD(R, D, FIELD) query.bindValue(":FIELD", FIELD);
-
-
+#define BIND_FIELD(R, D, FIELD) query.bindValue(":" #FIELD, FIELD);
 
 #endif // __COMMON_TRANSACTION_DATA_H__
