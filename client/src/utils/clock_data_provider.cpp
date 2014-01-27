@@ -4,20 +4,23 @@
 
 #include <client/client_settings.h>
 
-QnClockDataProvider::QnClockDataProvider(QObject *parent) :
+QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *parent) :
     QObject(parent),
     m_format(qnSettings->isClock24Hour() ? Hour24 : Hour12),
     m_showWeekDay(qnSettings->isClockWeekdayOn()),
     m_showDateAndMonth(qnSettings->isClockDateOn()),
     m_showSeconds(qnSettings->isClockSecondsOn()),
-    m_timer(new QTimer(this))
+    m_timer(new QTimer(this)),
+    m_formatString(fixedFormat)
 {
-    connect(qnSettings->notifier(QnClientSettings::CLOCK_24HOUR),     SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
-    connect(qnSettings->notifier(QnClientSettings::CLOCK_WEEKDAY),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
-    connect(qnSettings->notifier(QnClientSettings::CLOCK_DATE),       SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
-    connect(qnSettings->notifier(QnClientSettings::CLOCK_SECONDS),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+    if (m_formatString.isEmpty()) {
+        connect(qnSettings->notifier(QnClientSettings::CLOCK_24HOUR),     SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+        connect(qnSettings->notifier(QnClientSettings::CLOCK_WEEKDAY),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+        connect(qnSettings->notifier(QnClientSettings::CLOCK_DATE),       SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
+        connect(qnSettings->notifier(QnClientSettings::CLOCK_SECONDS),    SIGNAL(valueChanged(int)), this, SLOT(updateFormatString()));
 
-    updateFormatString();
+        updateFormatString();
+    }
 
     connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
     m_timer->start(1000);
