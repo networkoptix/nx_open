@@ -5,8 +5,6 @@
 
 /**
  * A simple controller that proxies all requests into another controller.
- * 
- * Note that it does not proxy <tt>finished</tt> signals.
  */
 class QnProxyPtzController: public QnAbstractPtzController {
     Q_OBJECT;

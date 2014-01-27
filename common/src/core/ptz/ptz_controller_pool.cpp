@@ -6,8 +6,8 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     base_type(parent)
 {
     QnResourcePool *resourcePool = qnResPool;
-    connect(resourcePool, &QnResourcePool::resourceAdded,   this,   &QnPtzControllerPool::registerResource,     Qt::QueuedConnection);
-    connect(resourcePool, &QnResourcePool::resourceRemoved, this,   &QnPtzControllerPool::unregisterResource,   Qt::QueuedConnection);
+    connect(resourcePool, &QnResourcePool::resourceAdded,   this,   &QnPtzControllerPool::registerResource);
+    connect(resourcePool, &QnResourcePool::resourceRemoved, this,   &QnPtzControllerPool::unregisterResource);
     foreach(const QnResourcePtr &resource, resourcePool->getResources())
         registerResource(resource);
 }

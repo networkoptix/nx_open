@@ -19,15 +19,6 @@ QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourceP
     if(!camera)
         return QnPtzControllerPtr();
 
-    if(camera->getDewarpingParams().enabled)
-        return QnPtzControllerPtr();
-
-    if(camera->getPtzCapabilities() == Qn::NoPtzCapabilities)
-        return QnPtzControllerPtr();
-
-    if(camera->getPtzCapabilities() & Qn::VirtualPtzCapability)
-        return QnPtzControllerPtr();
-
     QnPtzControllerPtr controller;
     controller.reset(new QnRemotePtzController(camera));
     controller.reset(new QnCachingPtzController(controller));
