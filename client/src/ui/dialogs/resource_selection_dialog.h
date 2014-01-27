@@ -64,6 +64,8 @@ private:
     int m_tooltipResourceId;
 
     int m_screenshotIndex;
+
+    bool m_updating;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H
