@@ -541,9 +541,10 @@ namespace ec2
             return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler, connectionType)) );
         }
         ErrorCode connectSync( const ECAddress& addr, AbstractECConnectionPtr* const connection ) {
-            SyncHandler syncHandler;
-            connect( addr, &syncHandler, &SyncHandler::done, Qt::DirectConnection );
+            SyncConnectHandler syncHandler;
+            connect( addr, &syncHandler, &SyncConnectHandler::done, Qt::DirectConnection );
             syncHandler.wait();
+            *connection = syncHandler.connection();
             return syncHandler.errorCode();
         }
 

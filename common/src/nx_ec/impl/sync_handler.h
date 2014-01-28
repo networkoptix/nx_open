@@ -38,6 +38,22 @@ namespace ec2
         bool m_done;
         ErrorCode m_errorCode;
     };
+
+    class SyncConnectHandler
+    :
+        public SyncHandler
+    {
+        Q_OBJECT
+
+    public:
+        AbstractECConnectionPtr connection() const;
+
+    public slots:
+        void done( ErrorCode errorCode, AbstractECConnectionPtr connection );
+
+    private:
+        AbstractECConnectionPtr m_connection;
+    };
 }
 
 #endif  //SYNC_HANDLER_H

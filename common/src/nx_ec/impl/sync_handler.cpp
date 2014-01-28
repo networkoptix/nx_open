@@ -34,4 +34,16 @@ namespace ec2
         m_errorCode = _errorCode;
         m_cond.notify_all();
     }
+
+
+    AbstractECConnectionPtr SyncConnectHandler::connection() const
+    {
+        return m_connection;
+    }
+
+    void SyncConnectHandler::done( ErrorCode errorCode, AbstractECConnectionPtr connection )
+    {
+        m_connection = connection;
+        SyncHandler::done( errorCode );
+    }
 }
