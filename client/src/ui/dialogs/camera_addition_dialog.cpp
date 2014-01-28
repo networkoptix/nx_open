@@ -511,8 +511,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     if (!ensureServerOnline())
         return;
 
-    QString username(ui->loginLineEdit->text().trimmed());
-    QString password(ui->passwordLineEdit->text().trimmed());
+    QString username(ui->loginLineEdit->text());
+    QString password(ui->passwordLineEdit->text());
     int port = ui->portAutoCheckBox->isChecked()
             ? portAuto
             : ui->portSpinBox->value();
