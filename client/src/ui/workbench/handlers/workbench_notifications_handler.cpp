@@ -26,20 +26,16 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     QnWorkbenchContextAware(parent)
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
-    connect(m_userEmailWatcher, SIGNAL(userEmailValidityChanged(const QnUserResourcePtr &, bool)),
-            this,               SLOT(at_userEmailValidityChanged(const QnUserResourcePtr &, bool)));
+    connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
+    connect(context(),          &QnWorkbenchContext::userChanged,                           this,   &QnWorkbenchNotificationsHandler::at_context_userChanged);
+    connect(qnLicensePool,      &QnLicensePool::licensesChanged,                            this,   &QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged);
 
-    connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
-    connect(qnLicensePool,      SIGNAL(licensesChanged()), this, SLOT(at_licensePool_licensesChanged()));
+    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
+    connect(messageProcessor,   &QnCommonMessageProcessor::connectionOpened,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
+    connect(messageProcessor,   &QnCommonMessageProcessor::connectionClosed,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
+    connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived,          this,   &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
-    connect(QnClientMessageProcessor::instance(), SIGNAL(connectionOpened()),
-            this, SLOT(at_eventManager_connectionOpened()));
-    connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()),
-            this, SLOT(at_eventManager_connectionClosed()));
-    connect(QnClientMessageProcessor::instance(), SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)),
-            this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
-
-    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), SIGNAL(valueChanged(int)), this, SLOT(at_settings_valueChanged(int)));
+    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -51,10 +47,8 @@ void QnWorkbenchNotificationsHandler::clear() {
 }
 
 void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
-    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
-        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                       this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
-    }
+    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
+        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -88,7 +82,6 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
         return;
 
-
     emit businessActionAdded(businessAction);
 }
 
@@ -102,6 +95,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
+
     emit systemHealthEventAdded(message, resource);
 }
 
