@@ -85,9 +85,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
 
     QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(widget->ptzController(), mainWindow()));
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
-    dialog->setPtzController(widget->ptzController());
     dialog->exec();
 }
 
@@ -131,9 +130,8 @@ void QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered() {
 
     QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
 
-    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(mainWindow()));
+    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget->ptzController(), mainWindow()));
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
-    dialog->setPtzController(widget->ptzController());
     dialog->exec();
 }
 
@@ -174,8 +172,7 @@ void QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
         return;
 
-    QScopedPointer<QnPtzToursDialog> dialog(new QnPtzToursDialog(mainWindow()));
-    dialog->setPtzController(widget->ptzController());
+    QScopedPointer<QnPtzToursDialog> dialog(new QnPtzToursDialog(widget->ptzController(), mainWindow()));
     dialog->exec();
 }
 
