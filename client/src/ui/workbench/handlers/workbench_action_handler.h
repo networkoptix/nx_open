@@ -40,7 +40,7 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 
-
+// TODO: #Elric get rid of these processors here
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT
