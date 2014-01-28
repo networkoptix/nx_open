@@ -14,7 +14,7 @@ extern "C"
     /*!
         \return This object MUST be freed by caller using operator delete()
     */
-    EC2_LIB_API ec2::AbstractECConnectionFactory* getConnectionFactory();
+    ec2::AbstractECConnectionFactory* getConnectionFactory();
 }
 
 #endif  //EC2_LIB_H

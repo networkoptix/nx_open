@@ -17,7 +17,7 @@
 namespace ec2
 {
     //!Allows executing ec api methods synchronously
-    class EC2_LIB_API SyncHandler
+    class SyncHandler
     :
         public QObject
     {

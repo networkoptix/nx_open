@@ -4,7 +4,7 @@
 
 #include <QString>
 #include <vector>
-#include "serialization_helper.h"
+#include "nx_ec/binary_serialization_helper.h"
 
 namespace ec2
 {

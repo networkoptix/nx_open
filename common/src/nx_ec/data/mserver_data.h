@@ -3,7 +3,6 @@
 #define MSERVER_DATA_H
 
 #include "resource_data.h"
-#include "serialization_helper.h"
 
 
 namespace ec2

@@ -2,11 +2,10 @@
 #define __RESOURCE_TRANSACTION_DATA_H__
 
 #include "api_data.h"
-#include "serialization_helper.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/resource.h"
 
-#include <QTCore/qglobal.h>
+#include <QtCore/qglobal.h>
 #include <QString>
 #include <vector>
 

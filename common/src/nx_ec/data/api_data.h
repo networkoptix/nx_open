@@ -2,7 +2,7 @@
 #define __COMMON_TRANSACTION_DATA_H__
 
 #include <QtSql/QtSql>
-#include "serialization_helper.h"
+#include "nx_ec/binary_serialization_helper.h"
 
 namespace ec2
 {
@@ -32,6 +32,6 @@ struct ApiData {
     QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ); \
     QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
 
-#define BIND_FIELD(R, D, FIELD) query.bindValue(":" #FIELD, FIELD);
+#define BIND_FIELD(R, D, FIELD) query.bindValue(QString::fromLatin1(":" #FIELD), FIELD);
 
 #endif // __COMMON_TRANSACTION_DATA_H__

@@ -2,7 +2,6 @@
 #define __API_CAMERA_DATA_H_
 
 #include "resource_data.h"
-#include "serialization_helper.h"
 #include "common/common_globals.h"
 #include "core/resource/media_resource.h"
 #include "core/resource/security_cam_resource.h"
