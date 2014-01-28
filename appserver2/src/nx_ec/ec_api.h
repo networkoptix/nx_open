@@ -8,6 +8,7 @@
 
 #include "api/model/email_attachment.h"
 #include "impl/ec_api_impl.h"
+#include "impl/sync_handler.h"
 
 
 //!Contains API classes for the new enterprise controller
@@ -153,8 +154,14 @@ namespace ec2
             \todo is it really needed?
             \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceListPtr& cameras)
         */
-        template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr&, TargetType* target, HandlerType handler ) {
-            return addCamera( std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr& camRes, TargetType* target, HandlerType handler, Qt::ConnectionType connectionType = Qt::AutoConnection ) {
+            return addCamera( camRes, std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler, connectionType)) );
+        }
+        ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceListPtr* const cameras ) {
+            SyncHandler syncHandler;
+            addCamera( camRes, &syncHandler, &SyncHandler::done, Qt::DirectConnection );
+            syncHandler.wait();
+            return syncHandler.errorCode();
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -524,14 +531,20 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> ReqID testConnectionAsync( const ECAddress& addr, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> ReqID testConnection( const ECAddress& addr, TargetType* target, HandlerType handler ) {
             return testConnectionAsync( addr, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
-        template<class TargetType, class HandlerType> ReqID connectAsync( const ECAddress& addr, TargetType* target, HandlerType handler ) {
-            return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> ReqID connect( const ECAddress& addr, TargetType* target, HandlerType handler, Qt::ConnectionType connectionType = Qt::AutoConnection ) {
+            return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler, connectionType)) );
+        }
+        ErrorCode connectSync( const ECAddress& addr, AbstractECConnectionPtr* const connection ) {
+            SyncHandler syncHandler;
+            connect( addr, &syncHandler, &SyncHandler::done, Qt::DirectConnection );
+            syncHandler.wait();
+            return syncHandler.errorCode();
         }
 
     protected:

@@ -1,6 +1,8 @@
 #ifndef _server_appserver_processor_h_
 #define _server_appserver_processor_h_
 
+#include <nx_ec/ec_api.h>
+
 #include "core/resource/resource.h"
 #include "api/app_server_connection.h"
 
@@ -15,6 +17,7 @@ public:
 
 private:
     QnAppServerConnectionPtr m_appServer;
+    ec2::AbstractECConnectionPtr m_ec2Connection;
     QnId m_serverId;
     QSet<QnResourcePtr> m_awaitingSetStatus;
     QMap<int, QnResourcePtr> m_handleToResource;
