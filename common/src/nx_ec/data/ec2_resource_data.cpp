@@ -1,4 +1,4 @@
-#include "resource_data.h"
+#include "ec2_resource_data.h"
 #include "core/resource/resource.h"
 
 namespace ec2 {
