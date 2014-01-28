@@ -3,7 +3,7 @@
 
 #include <QtCore/QUuid>
 #include <QtCore/QCryptographicHash>
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"

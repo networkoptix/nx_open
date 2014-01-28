@@ -214,7 +214,7 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
     case ConnectObject: {
         int status = response.status;
 
-        QnConnectInfoPtr reply(new QnConnectInfo());
+        QnConnectionInfoPtr reply(new QnConnectionInfo());
         if(status == 0) {
             try {
                 m_serializer.deserializeConnectInfo(reply, response.data);
@@ -385,7 +385,7 @@ int QnAppServerConnection::getObjects(int object, const QString &args, QnHTTPRaw
 
 int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot)
 {
-    return sendAsyncGetRequest(ConnectObject, headers, params, QN_STRINGIZE_TYPE(QnConnectInfoPtr), target, slot);
+    return sendAsyncGetRequest(ConnectObject, headers, params, QN_STRINGIZE_TYPE(QnConnectionInfoPtr), target, slot);
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject *target, const char *slot)
@@ -401,7 +401,7 @@ int QnAppServerConnection::connectAsync(QObject *target, const char *slot)
     return connectAsync_i(m_requestHeaders, m_requestParams, target, slot);
 }
 
-int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo)
+int QnAppServerConnection::connect(QnConnectionInfoPtr &connectInfo)
 {
     return sendSyncGetRequest(ConnectObject, m_requestHeaders, m_requestParams, &connectInfo);
 }

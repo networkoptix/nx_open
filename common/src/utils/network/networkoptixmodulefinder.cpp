@@ -99,8 +99,8 @@ void NetworkOptixModuleFinder::setCompatibilityMode(bool value) {
 
 void NetworkOptixModuleFinder::pleaseStop()
 {
-    m_pollSet.interrupt();
     QnLongRunnable::pleaseStop();
+    m_pollSet.interrupt();
 }
 
 static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;

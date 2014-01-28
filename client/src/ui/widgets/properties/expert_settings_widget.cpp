@@ -44,6 +44,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     ui->highQualityWarningLabel->setVisible(false);
     ui->lowQualityWarningLabel->setVisible(false);
 
+    ui->verticalSpacerLabel->setMinimumHeight(ui->verticalSpacerLabel->fontMetrics().height());
+    ui->verticalSpacerLabel_2->setMinimumHeight(ui->verticalSpacerLabel_2->fontMetrics().height());
+
     connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_arOverrideCheckBox_stateChanged(int)));
     connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dataChanged()));
 

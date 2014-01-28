@@ -18,7 +18,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <api/media_server_connection.h>
 
@@ -287,6 +287,7 @@ public:
 // PtzOverlayWidget
 // -------------------------------------------------------------------------- //
 class PtzOverlayWidget: public GraphicsWidget {
+    Q_DECLARE_TR_FUNCTIONS(PtzOverlayWidget);
     typedef GraphicsWidget base_type;
 
 public:
@@ -306,7 +307,7 @@ public:
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
+        m_modeButton->setToolTip(tr("Dewarping panoramic mode"));
 
         updateLayout();
         showCursor();

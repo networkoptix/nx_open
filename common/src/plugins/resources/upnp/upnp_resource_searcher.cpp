@@ -5,7 +5,7 @@
 #include "utils/network/simple_http_client.h"
 
 #include <QtXml/QXmlDefaultHandler>
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 

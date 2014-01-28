@@ -8,7 +8,7 @@
 #include <utils/common/synctime.h>
 #include "core/resource/resource.h"
 #include "business/events/reasoned_business_event.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "ui/style/resource_icon_cache.h"
 #include <ui/help/business_help.h>
 #include "business/business_strings_helper.h"

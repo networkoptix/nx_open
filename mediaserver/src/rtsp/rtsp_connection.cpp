@@ -18,7 +18,7 @@
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
@@ -531,8 +531,9 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = CODEC_ID_H263P;
     else
-        //dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
-        dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
+        dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
+        //dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_VORBIS; // keep aac without transcoding for audio
+        //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
 

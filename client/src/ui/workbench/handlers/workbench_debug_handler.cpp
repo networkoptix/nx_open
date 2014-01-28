@@ -2,7 +2,7 @@
 
 #include <client/client_settings.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>

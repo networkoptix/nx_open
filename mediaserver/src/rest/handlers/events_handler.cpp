@@ -5,7 +5,7 @@
 #include "business/actions/abstract_business_action.h"
 
 #include <core/resource/camera_resource.h>
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 
 #include "events/events_db.h"
 

@@ -19,7 +19,7 @@
 
 #include <common/common_meta_types.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -620,15 +620,17 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
-            if (filter.isEmpty())
+            if (filter.isEmpty()) {
                 model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
-            else
+            }
+            else {
                 model->addCriterion(QnResourceCriterionGroup(filter));
+                model->addCriterion(QnResourceCriterion(QnResource::user));
+                model->addCriterion(QnResourceCriterion(QnResource::layout));
+            }
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
             model->addCriterion(QnResourceCriterion(QnResource::server));
-            model->addCriterion(QnResourceCriterion(QnResource::user));
-            model->addCriterion(QnResourceCriterion(QnResource::layout));
         }
     }
 

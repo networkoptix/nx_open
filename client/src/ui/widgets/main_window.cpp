@@ -16,8 +16,8 @@
 #include <utils/common/environment.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <api/session_manager.h>
 
@@ -287,7 +287,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_viewLayout->addWidget(m_view.data());
 
     m_globalLayout = new QVBoxLayout();
-    m_globalLayout->setContentsMargins(0, 0, 0, 0);
+    // set 1px border to make custom window border visible
+    m_globalLayout->setContentsMargins(1, 1, 1, 1);
     m_globalLayout->setSpacing(0);
     m_globalLayout->addLayout(m_titleLayout);
     m_globalLayout->addLayout(m_viewLayout);
@@ -511,8 +512,14 @@ void QnMainWindow::updateDwmState() {
         /* Windowed or maximized without aero glass. */
         /*m_drawCustomFrame = true;
         m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
+#ifdef Q_OS_LINUX
+        // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
+        m_drawCustomFrame = true;
+        m_frameMargins = QMargins(2, 2, 2, 2);
+#else
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
+#endif
 
         if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
@@ -597,7 +604,7 @@ void QnMainWindow::paintEvent(QPaintEvent *event) {
     if(m_drawCustomFrame) {
         QPainter painter(this);
 
-        painter.setPen(QPen(Qt::black, 1));
+        painter.setPen(QPen(QColor(255, 255, 255, 64), 1));
         painter.drawRect(rect().adjusted(0, 0, -1, -1));
     }
 }

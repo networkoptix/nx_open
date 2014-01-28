@@ -44,8 +44,8 @@ extern "C"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resource_managment/resource_discovery_manager.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_discovery_manager.h"
+#include "core/resource_management/resource_pool.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
@@ -599,6 +599,9 @@ int main(int argc, char **argv)
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
+
+    // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
+    qApp->desktop();
 
     //adding exe dir to plugin search path
     QStringList pluginDirs = QCoreApplication::libraryPaths();

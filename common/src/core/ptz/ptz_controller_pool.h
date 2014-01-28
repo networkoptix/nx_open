@@ -2,6 +2,7 @@
 #define QN_PTZ_CONTROLLER_POOL_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>
@@ -32,6 +33,7 @@ protected:
     Q_SLOT void updateController(const QnResourcePtr &resource);
 
 private:
+    mutable QMutex m_mutex;
     QHash<QnResourcePtr, QnPtzControllerPtr> m_controllerByResource;
 };
 

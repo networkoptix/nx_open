@@ -7,7 +7,7 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -16,6 +16,8 @@
 #include <ui/models/resource_pool_model.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <utils/common/scoped_value_rollback.h>
 
 namespace {
     class QnColoringProxyModel: public QIdentityProxyModel {
@@ -63,6 +65,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
     m_tooltipResourceId = 0;
     m_screenshotIndex = 0;
     m_target = target;
+    m_updating = false;
 
     ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
@@ -125,7 +128,11 @@ QnResourceList QnResourceSelectionDialog::selectedResources() const {
 }
 
 void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selected) {
-    setSelectedResourcesInner(selected);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        setSelectedResourcesInner(selected);
+    }
+
     at_resourceModel_dataChanged();
 }
 
@@ -153,7 +160,6 @@ QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelInd
 
 int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent) {
     int count = 0;
-    bool allSelected = true;
     for (int i = 0; i < m_resourceModel->rowCount(parent); ++i) {
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
         QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
@@ -173,7 +179,6 @@ int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList &s
             count++;
         m_resourceModel->setData(checkedIdx,
                                  checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
-        allSelected &= checked;
     }
     return count;
 }
@@ -236,6 +241,8 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
 }
 
 void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
+    if (m_updating)
+        return;
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
 }
 

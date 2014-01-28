@@ -11,7 +11,7 @@
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "camera/camera_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "plugins/resources/archive/archive_stream_reader.h"

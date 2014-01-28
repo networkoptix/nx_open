@@ -10,7 +10,7 @@
 
 #include <QStringList>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <plugins/resources/acti/acti_resource.h>
 #include <utils/network/http/httptypes.h>
 

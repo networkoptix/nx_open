@@ -17,7 +17,7 @@
 
 #include <client/client_translation_manager.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <common/common_module.h>
 
@@ -30,6 +30,8 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/json.h>
 #include <utils/common/product_features.h>
+
+#define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),

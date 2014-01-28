@@ -13,9 +13,9 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/storage_resource.h>
-#include <core/resource_managment/camera_driver_restriction_list.h>
-#include <core/resource_managment/resource_searcher.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/resource_searcher.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <plugins/resources/upnp/upnp_device_searcher.h>
 #include <plugins/storage/dts/abstract_dts_searcher.h>

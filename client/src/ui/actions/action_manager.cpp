@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
 #include <ui/workbench/workbench_context.h>

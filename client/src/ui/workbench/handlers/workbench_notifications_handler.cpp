@@ -11,7 +11,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -48,6 +48,13 @@ QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
 
 void QnWorkbenchNotificationsHandler::clear() {
     emit cleared();
+}
+
+void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
+    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
+        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
+                       this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
+    }
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -162,15 +169,43 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
-        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                       this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
-    }
+    requestSmtpSettings();
+    at_licensePool_licensesChanged();
+}
 
-    if (qnLicensePool->isEmpty() &&
-            (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        addSystemHealthEvent(QnSystemHealth::NoLicenses);
+void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
+
+    switch (message) {
+    case QnSystemHealth::ConnectionLost:
+    case QnSystemHealth::EmailSendError:
+    case QnSystemHealth::StoragesAreFull:
+        return;
+
+    case QnSystemHealth::EmailIsEmpty:
+        if (context()->user())
+            m_userEmailWatcher->forceCheck(context()->user());
+        return;
+
+    case QnSystemHealth::UsersEmailIsEmpty:
+        m_userEmailWatcher->forceCheckAll();
+        return;
+
+    case QnSystemHealth::NoLicenses:
+        at_licensePool_licensesChanged();
+        return;
+
+    case QnSystemHealth::SmtpIsNotSet:
+        requestSmtpSettings();
+        return;
+
+    case QnSystemHealth::StoragesNotConfigured:
+        return;
+
+    default:
+        break;
+
     }
+    qnWarning("Unknown system health message");
 }
 
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
@@ -238,9 +273,10 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
         return;
     quint64 visible = qnSettings->popupSystemHealth();
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        if (visible & (1ull << i))
-            continue;
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
-        emit systemHealthEventRemoved(message, QnResourcePtr());
+        if (visible & (1ull << i))
+            checkAndAddSystemHealthMessage(message);
+        else
+            setSystemHealthEventVisible(message, false);
     }
 }

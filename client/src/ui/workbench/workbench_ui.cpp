@@ -73,7 +73,7 @@
 #include <client/client_settings.h>
 
 #include "openal/qtvaudiodevice.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "watchers/workbench_render_watcher.h"
@@ -694,11 +694,20 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
 
+    QnSingleEventEater *sliderWheelEater = new QnSingleEventEater(this);
+    sliderWheelEater->setEventType(QEvent::GraphicsSceneWheel);
+    m_sliderResizerWidget->installEventFilter(sliderWheelEater);
+
+    QnSingleEventSignalizer *sliderWheelSignalizer = new QnSingleEventSignalizer(this);
+    sliderWheelSignalizer->setEventType(QEvent::GraphicsSceneWheel);
+    m_sliderResizerWidget->installEventFilter(sliderWheelSignalizer);
+
     connect(sliderZoomInButton,         SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomInButton_pressed()));
     connect(sliderZoomInButton,         SIGNAL(released()),                         this,           SLOT(at_sliderZoomInButton_released()));
     connect(sliderZoomOutButton,        SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomOutButton_pressed()));
     connect(sliderZoomOutButton,        SIGNAL(released()),                         this,           SLOT(at_sliderZoomOutButton_released()));
 
+    connect(sliderWheelSignalizer,      SIGNAL(activated(QObject *, QEvent *)),     this,           SLOT(at_sliderResizerWidget_wheelEvent(QObject *, QEvent *)));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                     this,           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverLeft()),                        this,           SLOT(updateSliderOpacity()));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                     this,           SLOT(updateControlsVisibility()));
@@ -1509,12 +1518,20 @@ void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
-    return QMargins(
+    QMargins result(
         isTreePinned() ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
         std::floor(qMax(0.0, titleY + titleH)),
         std::floor(qMax(0.0, m_notificationsPinned ? m_controlsWidgetRect.right() - notificationsX : 0.0)),
         std::floor(qMax(0.0, m_controlsWidgetRect.bottom() - sliderY))
     );
+
+    if (result.left() + result.right() >= m_controlsWidgetRect.width()) {
+        result.setLeft(0.0);
+        result.setRight(0.0);
+    }
+
+    return result;
+
 }
 
 bool QnWorkbenchUi::isFpsVisible() const {
@@ -1868,11 +1885,23 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_titleItem->size().height()
     ));
 
-    m_notificationsItem->setX(m_notificationsItem->x() - oldRect.width() + rect.width());
+    if (m_notificationsXAnimator->isRunning())
+        m_notificationsXAnimator->stop();
+    m_notificationsItem->setX(rect.right() + (m_notificationsOpened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */));
 
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
+}
+
+void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event) {
+    QGraphicsSceneWheelEvent *oldEvent = static_cast<QGraphicsSceneWheelEvent *>(event);
+
+    QGraphicsSceneWheelEvent newEvent(QEvent::GraphicsSceneWheel);
+    newEvent.setDelta(oldEvent->delta());
+    newEvent.setPos(m_sliderItem->timeSlider()->mapFromItem(m_sliderResizerWidget, oldEvent->pos()));
+    newEvent.setScenePos(oldEvent->scenePos());
+    display()->scene()->sendEvent(m_sliderItem->timeSlider(), &newEvent);
 }
 
 void QnWorkbenchUi::at_sliderItem_geometryChanged() {
@@ -1911,9 +1940,15 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
     if(m_ignoreSliderResizerGeometryChanges)
         return;
 
+    QRectF sliderResizerGeometry = m_sliderResizerWidget->geometry();
+    if (!sliderResizerGeometry.isValid()) {
+        updateSliderResizerGeometry();
+        return;
+    }
+
     QRectF sliderGeometry = m_sliderItem->geometry();
 
-    qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerWidget->geometry().center().y();
+    qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
     qreal jmpHeight = minHeight + 48.0;
     qreal maxHeight = minHeight + 196.0;

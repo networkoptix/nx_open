@@ -3,6 +3,11 @@
 
 #include <QtCore/QString>
 
+// TODO: #GDM is this your class?
+// It should be named properly.
+// E.g. QnMacIcmp.
+// And I cannot find where it is used... %(
+
 /** Class should work only on MacOS. Wasn't even run on other OS'es. */
 class Icmp
 {

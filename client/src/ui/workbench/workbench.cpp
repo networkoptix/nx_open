@@ -4,7 +4,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/style/globals.h>
 

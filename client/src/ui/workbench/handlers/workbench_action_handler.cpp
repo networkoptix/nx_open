@@ -42,8 +42,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_discovery_manager.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
 
 #include <device_plugins/server_camera/appserver.h>
@@ -131,6 +131,8 @@ namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 }
 
+//!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
+static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
@@ -182,7 +184,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
-    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
@@ -1144,7 +1146,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    if(qnSettings->isUpdatesEnabled())
+    if (qnSettings->isAutoCheckForUpdates() && qnSettings->isUpdatesEnabled())
         notifyAboutUpdate(false);
 }
 
@@ -1356,7 +1358,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     if (!connectionData.isValid())
         return;
 
-    QnConnectInfoPtr connectionInfo = parameters.argument<QnConnectInfoPtr>(Qn::ConnectionInfoRole);
+    QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
         QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
 
@@ -1365,7 +1367,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         if(result.exec() != 0)
             return;
 
-        connectionInfo = result.reply<QnConnectInfoPtr>();
+        connectionInfo = result.reply<QnConnectionInfoPtr>();
     }
 
     // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM
@@ -1855,26 +1857,22 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     if (!resource)
         return;
 
-//    QnConnectionTestingDialog dialog;
-//    dialog.testResource(QUrl::fromUserInput(resource->getUrl()));
-//    dialog.exec();
-
-
+#ifdef Q_OS_WIN
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
-#ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -t");
     QProcess::startDetached(cmd.arg(host));
 #endif
 #ifdef Q_OS_LINUX
+    QUrl url = QUrl::fromUserInput(resource->getUrl());
+    QString host = url.host();
     QString cmd = QLatin1String("xterm -e ping %1");
     QProcess::startDetached(cmd.arg(host));
 #endif
 #ifdef Q_OS_MACX
-   QString cmd = QLatin1String("osascript");
-   QStringList args = QStringList() << lit("-e") << QString(lit("tell application \"Terminal\" to do script \"ping %1\"")).arg(host)
-                                    << lit("-e") << lit("tell application \"Terminal\" to activate");
-   QProcess::startDetached(cmd, args);
+    QnConnectionTestingDialog dialog;
+    dialog.testResource(resource);
+    dialog.exec();
 #endif
 
 }
@@ -2062,6 +2060,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     menu()->trigger(Qn::ClearCameraSettingsAction);
     if(context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
         qApp->exit(0);
+        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
     }
 
 }
@@ -2430,6 +2429,8 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
 
     action(Qn::TogglePanicModeAction)->setEnabled(enabled);
+    if (!enabled)
+        action(Qn::TogglePanicModeAction)->setChecked(false);
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
@@ -2603,7 +2604,7 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
                          tr("Beta version"),
-                         tr("You are running beta version of %1")
+                         tr("You are running beta version of %1.")
                          .arg(QLatin1String(QN_APPLICATION_NAME)));
 }
 
@@ -2652,5 +2653,6 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         return;
     }
     qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 

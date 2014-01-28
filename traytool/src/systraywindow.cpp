@@ -256,8 +256,11 @@ void QnSystrayWindow::findServiceInfo()
     if (m_appServerHandle == 0)
         m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
-    if (!m_mediaServerHandle && !m_appServerHandle)
+    if (!m_mediaServerHandle && !m_appServerHandle && m_firstTimeToolTipError) {
         showMessage(tr("No %1 services installed").arg(lit(QN_ORGANIZATION_NAME)));
+     //   m_trayIcon->setIcon(m_iconBad);   //TODO: #Elric why do we have the same icon for error? And why it is crashed here?
+        m_firstTimeToolTipError = false;
+    }
 }
 
 void QnSystrayWindow::setVisible(bool visible)
@@ -319,6 +322,7 @@ void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
         case QSystemTrayIcon::DoubleClick:
         case QSystemTrayIcon::Trigger:
             m_trayIcon->contextMenu()->popup(QCursor::pos());
+            m_trayIcon->contextMenu()->activateWindow();
             break;
         case QSystemTrayIcon::MiddleClick:
             break;
@@ -370,13 +374,17 @@ void QnSystrayWindow::updateServiceInfo()
         return;
     }
 
-    GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
-    connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(mediaServerTask);
-   
-    GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
-    connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(appServerTask);
+    if (m_mediaServerHandle) {
+        GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
+        connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
+        QThreadPool::globalInstance()->start(mediaServerTask);
+    }
+
+    if (m_appServerHandle) {
+        GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
+        connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
+        QThreadPool::globalInstance()->start(appServerTask);
+    }
 }
 
 void QnSystrayWindow::appServerInfoUpdated(quint64 status) {
@@ -742,6 +750,15 @@ Qt::CheckState QnSystrayWindow::getDiscoveryState() const
     return discoveryState;
 }
 
+bool QnSystrayWindow::readAllowCameraChanges() const {
+    QVariant result = m_appServerSettings.value(lit("allowCameraChanges"));
+    return result.convert(QMetaType::Bool) ? result.toBool() : true;
+}
+
+void QnSystrayWindow::writeAllowCameraChanges(bool allowCameraChanges) {
+    m_appServerSettings.setValue(lit("allowCameraChanges"), allowCameraChanges);
+}
+
 void QnSystrayWindow::onSettingsAction()
 {
     QUrl appServerUrl = getAppServerURL();
@@ -797,6 +814,8 @@ void QnSystrayWindow::onSettingsAction()
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
 
+    ui->ecsCameraControlCheckBox->setChecked(readAllowCameraChanges());
+
     showNormal();
 }
 
@@ -817,6 +836,9 @@ bool QnSystrayWindow::isAppServerParamChanged() const
         publicIpMode= ECS_PUBLIC_IP_MODE_MANUAL;
 
     if (m_appServerSettings.value(lit("publicIpMode")).toString() != publicIpMode)
+        return true;
+
+    if(readAllowCameraChanges() != ui->ecsCameraControlCheckBox->isChecked())
         return true;
 
     return false;
@@ -1012,6 +1034,7 @@ void QnSystrayWindow::saveData()
 
     setAppServerURL(QString(lit("https://%1:%2")).arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 
+    writeAllowCameraChanges(ui->ecsCameraControlCheckBox->isChecked());
 
     m_mediaServerSettings.setValue(lit("staticPublicIP"), ui->staticPublicIPEdit->text());
     if (!ui->groupBoxPublicIP->isChecked())

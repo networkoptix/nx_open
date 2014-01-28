@@ -14,7 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
@@ -346,8 +346,7 @@ public:
             return Qt::ItemIsEnabled
                     | Qt::ItemIsSelectable
                     | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable
-                    | Qt::ItemIsTristate;
+                    | Qt::ItemIsEditable;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         

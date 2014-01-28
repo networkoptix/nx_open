@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="ru-RU" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">Да</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">Предупреждение</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">Установка [ProductName]</String>
+
+    <!-- AllFieldsAreMandatoryDlg -->
+    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Все поля обязательны</String>
+
+    <!-- AppServerDlg -->
+    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Настройка Enterprise Controller'а</String>
+    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Укажите параметры Enterprise Controller'а</String>
+    <String Id="AppServerDlg_Port"                                  Overridable="yes">Порт</String>
+    <String Id="AppServerDlg_Login"                                 Overridable="yes">Имя пользователя</String>
+    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Придумайте пароль</String>
+    <String Id="AppServerDlg_Network"                               Overridable="yes">Сеть</String>    
+    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Порт прокси</String>
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Подтвердите пароль</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Дополнительные параметры</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Разрешить системе оптимизировать настройки камер (рекомендуется)</String>   
+    
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${product.name}</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Ярлыки</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Поместить ярлык на рабочий стол</String>
+    
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Установлена более поздняя версия [ProductName].</String> 
+
+    <!-- EmptyPasswordDlg -->
+    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Некорректный пароль</String>
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Пароль не может быть пустым</String>     
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Предупреждение</String>     
+
+    <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Полная (Все компоненты)</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Только клиент(Я хочу смотреть видео, записанное в другом месте)</String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Выборочная</String>
+    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Пожалуйста выберите тип установки</String>
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Тип установки</String>       
+
+    <!-- InvalidPasswordDlg -->
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Пароли должны быть заданы и не должны повторяться</String>    
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Нажмите "Далее" для использования каталогов по умолчанию или "Выбрать" для указания другого.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Каталог для записей</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Выберите каталог для видео записей:</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Имя пользователя</String>    
+
+    <!-- MediaServerDlg -->
+    <String Id="MediaServerDlg_Host"                                Overridable="yes">Сетевой адрес</String>
+    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Порт</String>
+    <String Id="MediaServerDlg_Login"                               Overridable="yes">Имя пользователя</String>
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">Пароль</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Порт Медиа Сервера</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Параметры Медиа Сервера</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Медиа Сервер</String>  
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Компоненты</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (Я хочу смотреть видео, записанное в другом месте)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Я хочу вести локальную запись на этом ПК)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Управление базой данных. Только ОДИН такой компонент должен быть установлен в сети!)</String>    
+
+    <!-- PasswordDlg -->
+    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Введите пароль администратора</String>
+    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Аутентификация администратора</String>
+    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Аутентификация администратора</String>
+    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Имя пользователя</String>
+    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Придумайте пароль</String>
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Подтвердите пароль</String>    
+
+    <!-- PasswordShouldMatchDlg -->
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Ошибка настройки</String>    
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Предупреждение</String>    
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">Пароли должны быть одинаковыми</String>    
+
+    <!-- PortDuplicateDlg -->
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Указаны неверные порты</String>    
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Предупреждение</String>    
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Невозможно назначить один и тот же порт дважды. Пожалуйста, проверьте свои настройки.</String>    
+
+    <!-- PortIsBusyDlg -->
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Порт [BUSYPORT] занят.</String>    
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Предупреждение</String>    
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Указанный порт занят. Нажмите "Далее" если Вы уверены, что хотите его использовать.</String>    
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${product.name} по окончании установки.</String>    
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Хотя бы один компонент должен быть выбран</String>    
+
+    <!-- UninstallOptionsDlg -->
+    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Параметры удаления</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Оставить базу данных ${product.name}</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Удалить базу данных ${product.name}</String>
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Текущую</String>  
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Сохранить:</String>   
+    
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Обнаружена предыдущая версия</String>    
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Способ установки</String>    
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Система будет обновлена</String>    
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Невозможно получить доступ к брандмауэру Windows.  ([2]   [3]   [4]   [5])</String>    
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Выполняется настройка брандмауэра Windows</String>    
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Выполняется настройка брандмауэра Windows</String>    
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Выполняется откат изменений брандмауэра Windows</String>    
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Устанавливаются настройки брандмауэра Windows</String>    
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Выполняется откат настроек брандмауэра Windows</String>    
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Выполняется удаление настроек брандмауэра Windows</String>    
+    
+</WixLocalization>

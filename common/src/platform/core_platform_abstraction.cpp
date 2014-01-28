@@ -10,31 +10,31 @@
 #if defined(Q_OS_WIN)
 #   include "process/process_win.h"
 #   include "notification/notifier_win.h"
-#   include "monitoring/sys_dependent_monitor.h"
+#   include "monitoring/monitor_win.h"
 #   define QnProcessImpl QnWindowsProcess
 #   define QnNotifierImpl QnWindowsNotifier
-#   define QnMonitorImpl QnSysDependentMonitor
+#   define QnMonitorImpl QnWindowsMonitor
 #elif defined(Q_OS_LINUX)
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
-#   include "monitoring/sys_dependent_monitor.h"
+#   include "monitoring/monitor_linux.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
-#   define QnMonitorImpl QnSysDependentMonitor
+#   define QnMonitorImpl QnLinuxMonitor
 #elif defined(Q_OS_MACX)
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
-#   include "monitoring/sys_dependent_monitor.h"
+#   include "monitoring/monitor_mac.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
-#   define QnMonitorImpl QnSysDependentMonitor
+#   define QnMonitorImpl QnMacMonitor
 #else
 #   include "process/process_unix.h"
 #   include "notification/generic_notifier.h"
-#   include "monitoring/sys_dependent_monitor.h"
+#   include "monitoring/sigar_monitor.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
-#   define QnMonitorImpl QnSysDependentMonitor
+#   define QnMonitorImpl QnSigarMonitor
 #endif
 
 QnCorePlatformAbstraction::QnCorePlatformAbstraction(QObject *parent):

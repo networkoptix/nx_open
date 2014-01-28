@@ -137,6 +137,9 @@ void QnProxySenderConnection::run()
         }
     }
 
+    if (!gotRequest && timer.elapsed() < PROXY_KEEP_ALIVE_INTERVAL)
+        doDelay();
+
     if (!m_needStop) {
         addNewProxyConnect();
         if (gotRequest)

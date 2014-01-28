@@ -3,7 +3,7 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 QnWorkbenchPtzCameraWatcher::QnWorkbenchPtzCameraWatcher(QObject *parent):
     QObject(parent),

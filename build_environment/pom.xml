@@ -81,27 +81,36 @@
                         </configuration>                        
                     </execution>							
                 </executions>
-            </plugin>  		
+            </plugin> 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
                 <executions>
                     <execution>
                         <id>update-buildenv</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
-                            <arguments>
-                                <argument>buildenv.py</argument>
-                            </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>		
-                            <skip>${rsync.skip}</skip>
+                            <target>
+                                <exec dir="${environment.dir}" executable="hg" failifexecutionfails="true">
+                                    <arg line="pull -u"/> 
+                                </exec>
+                                <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>	
+                                <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
+                                    <arg line="${arch} ${toolchain.version}"/> 
+                                </exec>
+                            </target>
                         </configuration>
-                    </execution>          
+                    </execution>	
+                </executions>
+            </plugin>            
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>        
                     <execution>
                         <id>copy-additional-resources</id>
                         <phase>process-sources</phase>
@@ -238,13 +247,6 @@
                 </property>
             </activation>            
             <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>help</artifactId>
-                    <version>${project.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${customization}-${help.language}</classifier>
-                </dependency>
 
                 <dependency>
                     <groupId>org</groupId>
@@ -253,13 +255,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>                               	
-                <dependency>
-                    <groupId>org.festival</groupId>
-                    <artifactId>festival-vox</artifactId>
-                    <version>${festival.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>all-os</classifier>
-                </dependency> 		
+
                 <dependency>
                     <groupId>com.sourceforge.cloudcity</groupId>
                     <artifactId>bespin</artifactId>

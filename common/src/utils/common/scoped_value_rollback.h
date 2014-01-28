@@ -5,9 +5,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
+#endif
 
 class QnGenericScopedValueRollbackBase {};
 
