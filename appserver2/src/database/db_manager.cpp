@@ -22,22 +22,19 @@ QnDbManager::QnDbManager()
 
 bool QnDbManager::createDatabase()
 {
-	// todo: implement me
+	Q_ASSERT(!globalInstance);
+	globalInstance = this;
 	return false;
 }
 
 QnDbManager::~QnDbManager()
 {
+	globalInstance = 0;
 }
 
 QnDbManager* QnDbManager::instance()
 {
     return globalInstance;
-}
-
-void QnDbManager::initStaticInstance(QnDbManager* value)
-{
-    globalInstance = value;
 }
 
 ErrorCode QnDbManager::insertResource(ApiResourceData& data)

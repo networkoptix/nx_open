@@ -12,7 +12,7 @@
 #include "media_server_manager.h"
 #include "nx_ec/ec_api.h"
 #include "resource_manager.h"
-
+#include "database/db_manager.h"
 
 namespace ec2
 {
@@ -43,6 +43,7 @@ namespace ec2
         std::shared_ptr<QnResourceManager> m_resourceManager;
         std::shared_ptr<QnMediaServerManager> m_mediaServerManager;
         std::shared_ptr<QnCameraManager> m_cameraManager;
+		std::unique_ptr<QnDbManager> m_dbManager;
     };
 }
 

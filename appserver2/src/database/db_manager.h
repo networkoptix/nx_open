@@ -17,7 +17,6 @@ namespace ec2
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
-        void initStaticInstance(QnDbManager* value);
 
         template<class QueryDataType>
         ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )

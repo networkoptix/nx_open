@@ -12,7 +12,8 @@ namespace ec2
     :
         m_resourceManager( new QnResourceManager() ),
         m_mediaServerManager( new QnMediaServerManager() ),
-        m_cameraManager( new QnCameraManager() )
+        m_cameraManager( new QnCameraManager() ),
+		m_dbManager(new QnDbManager())
     {
     }
 
