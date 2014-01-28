@@ -36,6 +36,18 @@ struct ApiData {
 	QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ); \
 	QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
 
-#define BIND_FIELD(R, D, FIELD) query.bindValue(QString::fromLatin1(":" #FIELD), FIELD);
+//#define BIND_FIELD(R, D, FIELD) query.bindValue(QString::fromLatin1(":" #FIELD), FIELD);
+
+template <class T>
+void doAutoBind(QSqlQuery& query, const char* fieldName, const T& field) {
+	query.bindValue(QString::fromLatin1(fieldName), field);
+}
+
+template <class T>
+void doAutoBind(QSqlQuery& query, const char* fieldName, const std::vector<T>& field) {
+	//
+}
+
+#define BIND_FIELD(R, D, FIELD) doAutoBind(query, ":" #FIELD, FIELD);
 
 #endif // __COMMON_TRANSACTION_DATA_H__

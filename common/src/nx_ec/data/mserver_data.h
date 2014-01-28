@@ -1,8 +1,9 @@
+#include "ec2_resource_data.h"
 
 #ifndef MSERVER_DATA_H
 #define MSERVER_DATA_H
 
-#include "resource_data.h"
+#include "ec2_resource_data.h"
 
 
 namespace ec2

@@ -57,7 +57,7 @@ struct ApiCameraData: public ApiResourceData
 
 	void fromResource(const QnVirtualCameraResourcePtr& resource);
 	void toResource(QnVirtualCameraResourcePtr resource);
-    QN_DECLARE_STRUCT_SERIALIZATORS();
+    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
 }
