@@ -6,6 +6,8 @@
 
 #include <ui/style/globals.h>
 
+#include <utils/common/string.h>
+
 namespace {
     static const qreal speedLowest  = 0.01;
     static const qreal speedLow     = 0.25;
@@ -100,6 +102,14 @@ const QString QnPtzTourModel::tourName() const {
 void QnPtzTourModel::setTourName(const QString &name) {
     m_tour.name = name;
     emit tourChanged(m_tour);
+}
+
+QnPtzPresetList QnPtzTourModel::sortedPresets() const {
+    QnPtzPresetList result = m_presets;
+    qSort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
+        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+    });
+    return result;
 }
 
 const QnPtzPresetList& QnPtzTourModel::presets() const {

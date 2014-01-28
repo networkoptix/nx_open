@@ -17,7 +17,7 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
-        <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
+        <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
         
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">

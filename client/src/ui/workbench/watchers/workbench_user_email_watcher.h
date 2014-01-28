@@ -15,6 +15,9 @@ public:
     explicit QnWorkbenchUserEmailWatcher(QObject *parent = 0);
     virtual ~QnWorkbenchUserEmailWatcher();
 
+    void forceCheck(const QnUserResourcePtr &user);
+    void forceCheckAll();
+
 signals:
     void userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 

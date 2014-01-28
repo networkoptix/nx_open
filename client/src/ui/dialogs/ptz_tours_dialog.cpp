@@ -2,6 +2,7 @@
 #include "ui_ptz_tours_dialog.h"
 
 #include <QtCore/QUuid>
+#include <QtWidgets/QStyledItemDelegate>
 
 #include <common/common_globals.h>
 
@@ -12,6 +13,21 @@
 
 #include <ui/widgets/ptz_tour_widget.h>
 
+class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
+    typedef QStyledItemDelegate base_type;
+public:
+    explicit QnPtzToursDialogItemDelegate(QObject *parent = 0): base_type(parent) {}
+    ~QnPtzToursDialogItemDelegate() {}
+protected:
+    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
+        base_type::initStyleOption(option, index);
+        if (!index.data(Qn::ValidRole).toBool()) {
+            QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
+            option->palette.setColor(QPalette::Highlight, clr.lighter());
+        }
+    }
+};
+
 QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::PtzToursDialog),
@@ -21,6 +37,8 @@ QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     ui->tourTable->setModel(m_model);
 
     connect(ui->tourTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(at_table_currentRowChanged(QModelIndex,QModelIndex)));
+    ui->tourTable->setItemDelegate(new QnPtzToursDialogItemDelegate(this));
+
     connect(ui->tourEditWidget, SIGNAL(tourChanged(QnPtzTour)), m_model, SLOT(updateTour(QnPtzTour)));
 
     connect(ui->addTourButton,      SIGNAL(clicked()), this, SLOT(at_addTourButton_clicked()));

@@ -346,8 +346,7 @@ public:
             return Qt::ItemIsEnabled
                     | Qt::ItemIsSelectable
                     | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable
-                    | Qt::ItemIsTristate;
+                    | Qt::ItemIsEditable;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         

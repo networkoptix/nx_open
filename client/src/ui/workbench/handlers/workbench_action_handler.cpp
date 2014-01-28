@@ -2429,6 +2429,8 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
 
     action(Qn::TogglePanicModeAction)->setEnabled(enabled);
+    if (!enabled)
+        action(Qn::TogglePanicModeAction)->setChecked(false);
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
