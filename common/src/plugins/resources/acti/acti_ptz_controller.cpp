@@ -130,6 +130,8 @@ void QnActiPtzController::init() {
 }
 
 bool QnActiPtzController::query(const QString &request, QByteArray *body, bool keepAllData) const {
+    qDebug() << "ACTI REQUEST" << request;
+
     CLHttpStatus status;
     QByteArray data = m_resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body)

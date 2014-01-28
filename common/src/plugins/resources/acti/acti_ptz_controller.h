@@ -35,6 +35,13 @@ private:
     static QString panTiltDirection(int devicePanSpeed, int deviceTiltSpeed);
 
 private:
+    struct DevicePtzSpeed {
+        DevicePtzSpeed(): pan(0), tilt(0), zoom(0) {}
+        DevicePtzSpeed(int pan, int tilt, int zoom): pan(pan), tilt(tilt), zoom(zoom) {}
+
+        int pan, tilt, zoom;
+    };
+
     QMutex m_mutex;
     QnActiResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
