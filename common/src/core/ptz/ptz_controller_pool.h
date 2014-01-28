@@ -18,6 +18,8 @@ public:
     QnPtzControllerPool(QObject *parent = NULL);
     virtual ~QnPtzControllerPool();
 
+    QThread *executorThread() const { return m_executorThread; }
+
     QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
 
 signals:
@@ -35,6 +37,7 @@ protected:
 private:
     mutable QMutex m_mutex;
     QHash<QnResourcePtr, QnPtzControllerPtr> m_controllerByResource;
+    QThread *m_executorThread;
 };
 
 #define qnPtzPool (QnPtzControllerPool::instance())

@@ -161,7 +161,7 @@ void QnPtzTourExecutorPrivate::startMoving() {
         return; /* Invalid state. */
     }
 
-    qDebug() << "TOUR SPOT" << currentIndex;
+    //qDebug() << "TOUR SPOT" << currentIndex;
 
     spotTimer.restart();
 
@@ -208,7 +208,7 @@ void QnPtzTourExecutorPrivate::processMoving(bool status, const QVector3D &posit
     if(currentState != Entering && currentState != Moving)
         return;
 
-    qDebug() << "GOT POS" << position;
+    //qDebug() << "GOT POS" << position;
 
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(currentPosition, position);
