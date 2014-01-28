@@ -37,7 +37,10 @@ def get_environment_variable(variable):
         if platform.architecture()[0] == '64bit':
             return 'x64'
         else:
-            return 'x86'        
+            return 'x86'      
+
+    elif variable == 'configuration':        
+        return 'release'			
            
     else:        
         if os.getenv(variable):
@@ -45,7 +48,7 @@ def get_environment_variable(variable):
         else:
             config = ConfigParser.RawConfigParser(allow_no_value=True)
             config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + '/default-values.properties'))
-            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + customization + '/build.properties'))
+            #config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + customization + '/build.properties'))
             return config.get("basic", variable)  
 
 def get_environment_build_dir():
