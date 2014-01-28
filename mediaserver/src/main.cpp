@@ -1049,6 +1049,10 @@ void QnMain::run()
         return;
     }
 
+    while (!needToStop() && !initResourceTypes(ec2Connection))
+    {
+        QnSleep::msleep(1000);
+    }
     while (!needToStop() && !initResourceTypes(appServerConnection))
     {
         QnSleep::msleep(1000);
