@@ -4,6 +4,7 @@
 #include "api_data.h"
 #include "serialization_helper.h"
 #include "core/resource/resource_fwd.h"
+#include "core/resource/resource.h"
 
 #include <QTCore/qglobal.h>
 #include <QString>
@@ -13,14 +14,6 @@
 namespace ec2
 {
 
-
-enum Status {
-    Offline      = 0,
-    Unauthorized = 1,
-    Online       = 2,
-    Recording    = 3
-};
-
 struct ApiResourceData: public ApiData {
     qint32        id;
     QString       guid;
@@ -28,10 +21,11 @@ struct ApiResourceData: public ApiData {
     qint32        parentId;
     QString       name;
     QString       url;
-    Status        status;
+    QnResource::Status    status;
     bool          disabled;
 
 	void fromResource(const QnResourcePtr& resource);
+	void toResource(QnResourcePtr resource);
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 

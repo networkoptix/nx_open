@@ -2,6 +2,8 @@
 #include "core/resource/camera_resource.h"
 #include "api/serializer/serializer.h"
 #include "utils/common/json.h"
+#include <QAuthenticator>
+
 
 namespace ec2 {
 
@@ -22,6 +24,47 @@ ScheduleTask ScheduleTask::fromResource(const QnResourcePtr& cameraRes, const Qn
 	return result;
 }
 
+QnScheduleTask ScheduleTask::toResource()
+{
+	return QnScheduleTask(id, sourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
+}
+
+void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource)
+{
+	ApiResourceData::toResource(resource);
+
+	resource->setScheduleDisabled(scheduleDisabled);
+	resource->setMotionType(motionType);
+
+	QList<QnMotionRegion> regions;
+	parseMotionRegionList(regions, region);
+	resource->setMotionRegionList(regions, QnDomainMemory);
+
+	resource->setMAC(mac);
+	QAuthenticator auth;
+	auth.setUser(login);
+	auth.setPassword(password);
+	resource->setAuth(auth);
+
+	QnScheduleTaskList tasks;
+	foreach(ScheduleTask task, scheduleTask)
+		tasks.push_back(task.toResource());
+	resource->setScheduleTasks(tasks);
+
+	resource->setAudioEnabled(audioEnabled);
+	resource->setPhysicalId(physicalId);
+	resource->setManuallyAdded(manuallyAdded);
+	resource->setModel(model);
+	resource->setFirmware(firmware);
+	resource->setGroupId(groupId);
+	resource->setGroupName(groupName);
+	resource->setSecondaryStreamQuality(secondaryQuality);
+	resource->setCameraControlDisabled(controlDisabled);
+	resource->setStatusFlags((QnSecurityCamResource::StatusFlags) statusFlags);
+
+	resource->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(dewarpingParams));
+	resource->setVendor(vendor);
+}
 
 void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 {
@@ -45,7 +88,7 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 	firmware = resource->getFirmware();
 	groupId = resource->getGroupId();
 	groupName = resource->getGroupName();
-	secondaryQuality = resource->getSecondaryStreamQuality();
+	secondaryQuality = resource->secondaryStreamQuality();
 	controlDisabled = resource->isCameraControlDisabled();
 	statusFlags = resource->statusFlags();
 	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());

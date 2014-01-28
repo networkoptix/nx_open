@@ -5,6 +5,7 @@
 #include "serialization_helper.h"
 #include "common/common_globals.h"
 #include "core/resource/media_resource.h"
+#include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
 
 namespace ec2
@@ -16,6 +17,7 @@ struct ScheduleTask: public ApiData
 					beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
 
 	static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
+	QnScheduleTask toResource();
 
     qint32   id;
     qint32   sourceId;
@@ -48,13 +50,14 @@ struct ApiCameraData: public ApiResourceData
     QString             firmware;
     QString             groupId;
     QString             groupName;
-    Qn::StreamQuality    secondaryQuality;
+    Qn::SecondStreamQuality    secondaryQuality;
     bool                controlDisabled;
-    qint32              statusFlags;
-    QString             dewarpingParams;
+    qint32				statusFlags;
+    QByteArray          dewarpingParams;
     QString             vendor;
 
 	void fromResource(const QnVirtualCameraResourcePtr& resource);
+	void toResource(QnVirtualCameraResourcePtr resource);
     QN_DECLARE_STRUCT_SERIALIZATORS();
 };
 

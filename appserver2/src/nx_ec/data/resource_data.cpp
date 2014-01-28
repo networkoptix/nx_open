@@ -11,8 +11,20 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
 	parentId = resource->getParentId();
 	name = resource->getName();
 	url = resource->getUrl();
-	status = (ec2::Status) resource->getStatus();
+	status = resource->getStatus();
 	disabled = resource->isDisabled();
+}
+
+void ApiResourceData::toResource(QnResourcePtr resource)
+{
+	resource->setId(id);
+	resource->setGuid(guid);
+	resource->setTypeId(typeId);
+	resource->setParentId(parentId);
+	resource->setName(name);
+	resource->setUrl(url);
+	resource->setStatus(status);
+	resource->setDisabled(disabled);
 }
 
 }

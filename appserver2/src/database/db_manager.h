@@ -34,6 +34,8 @@ namespace ec2
 		ErrorCode updateCamera(const ApiCameraData& data);
 		ErrorCode insertCamera(const ApiCameraData& data);
 
+		ErrorCode updateCameraSchedule(const ApiCameraData& data);
+
 		bool createDatabase();
     private:
         QSqlDatabase m_sdb;

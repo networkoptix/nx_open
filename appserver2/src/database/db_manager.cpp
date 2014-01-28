@@ -92,6 +92,23 @@ ErrorCode QnDbManager::updateCamera(const ApiCameraData& data)
 	return insQuery.exec() ? ErrorCode::ok : ErrorCode::failure;
 }
 
+ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
+{
+	// todo: not finished yet
+	foreach(ScheduleTask task, data.scheduleTask) 
+	{
+		QSqlQuery insQuery(m_sdb);
+		insQuery.prepare("INSERT INTO vms_scheduletask (id, source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
+					     (:id, :sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
+		data.autoBindValues(insQuery);
+
+		QMutexLocker lock(&m_mutex);
+		if (!insQuery.exec()) 
+			return ErrorCode::failure;
+	}
+	return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransaction( const QnTransaction<ApiCameraData>& tran)
 {
 	ErrorCode result;
@@ -108,6 +125,10 @@ ErrorCode QnDbManager::executeTransaction( const QnTransaction<ApiCameraData>& t
 			return result;
 		result = insertCamera(params);
 	}
+	if (result !=ErrorCode::ok)
+		return result;
+	updateCameraSchedule(tran.params);
+
     return result;
 }
 
