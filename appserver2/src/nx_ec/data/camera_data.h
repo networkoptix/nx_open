@@ -31,7 +31,7 @@ struct ScheduleTask: public ApiData
     Qn::StreamQuality  streamQuality;
     qint32   fps;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS();
+    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
 struct ApiCameraData: public ApiResourceData 
@@ -63,10 +63,10 @@ struct ApiCameraData: public ApiResourceData
 
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ScheduleTask, (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) \
+QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ScheduleTask, (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) \
                                 (beforeThreshold) (afterThreshold) (streamQuality) (fps) )
 
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS (ec2::ApiCameraData, ApiResourceData, (scheduleDisabled) (motionType) (region) (mac) (login)\
+QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraData, ApiResourceData, (scheduleDisabled) (motionType) (region) (mac) (login)\
                                         (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) (firmware) (groupId) (groupName) (secondaryQuality)\
                                         (controlDisabled) (statusFlags) (dewarpingParams) (vendor))
 

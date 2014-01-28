@@ -94,15 +94,21 @@ ErrorCode QnDbManager::updateCamera(const ApiCameraData& data)
 
 ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 {
-	// todo: not finished yet
+	QMutexLocker lock(&m_mutex);
+
+	QSqlQuery delQuery(m_sdb);
+	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = :id");
+	delQuery.bindValue("id", data.id);
+	if (!delQuery.exec()) 
+		return ErrorCode::failure;
+
 	foreach(ScheduleTask task, data.scheduleTask) 
 	{
 		QSqlQuery insQuery(m_sdb);
 		insQuery.prepare("INSERT INTO vms_scheduletask (id, source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
 					     (:id, :sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
-		data.autoBindValues(insQuery);
+		task.autoBindValues(insQuery);
 
-		QMutexLocker lock(&m_mutex);
 		if (!insQuery.exec()) 
 			return ErrorCode::failure;
 	}
