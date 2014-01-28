@@ -1,3 +1,7 @@
+/**********************************************************
+* 27 jan 2014
+* a.kolesnikov
+***********************************************************/
 
 #ifndef EC_API_IMPL_H
 #define EC_API_IMPL_H
@@ -30,8 +34,8 @@
         public REQUEST_NAME##Handler                                                    \
     {                                                                                   \
     public:                                                                             \
-        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func ) {         \
-            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func ); \
+        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
+            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
         }                                                                               \
         virtual void done( const FIRST_ARG_TYPE& val1 ) override { emit##REQUEST_NAME##Done( val1 ); }; \
     };
@@ -47,8 +51,8 @@
         public REQUEST_NAME##Handler                                                    \
     {                                                                                   \
     public:                                                                             \
-        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func ) {         \
-            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func ); \
+        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
+            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
         } \
         virtual void done( \
             const FIRST_ARG_TYPE& val1, \
@@ -66,8 +70,8 @@
         public REQUEST_NAME##Handler                                                    \
     {                                                                                   \
     public:                                                                             \
-        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func ) {         \
-            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func ); \
+        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
+            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
         } \
         virtual void done( \
             const FIRST_ARG_TYPE& val1, \
@@ -130,6 +134,8 @@ namespace ec2
         ok,
         failure
     };
+
+    QString toString( ErrorCode errorCode );
 
     namespace impl
     {
@@ -231,7 +237,7 @@ namespace ec2
             void emitGetKvPairsDone( const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( p1, p2 ); }
             void emitSaveServerDone( const ErrorCode p1, const QnMediaServerResourceList& p2, const QByteArray& p3 ) { emit onSaveServerDone( p1, p2, p3 ); }
             void emitGetServersDone( const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( p1, p2 ); }
-            void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( p1, p2 ); }
+            void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceListPtr& p2 ) { emit onAddCameraDone( p1, p2 ); }
             void emitGetCamerasDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( p1, p2 ); }
             void emitGetCamerasHistoryDone( const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( p1, p2 ); }
             void emitGetUsersDone( const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( p1, p2 ); }
@@ -253,7 +259,7 @@ namespace ec2
             void onGetKvPairsDone( const ErrorCode, const QnKvPairListsById& );
             void onSaveServerDone( const ErrorCode, const QnMediaServerResourceList&, const QByteArray& );
             void onGetServersDone( const ErrorCode, const QnMediaServerResourceList& );
-            void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceList& );
+            void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceListPtr& );
             void onGetCamerasDone( const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasHistoryDone( const ErrorCode, const QnCameraHistoryList& );
             void onGetUsersDone( const ErrorCode, const QnUserResourceList& );

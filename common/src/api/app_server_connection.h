@@ -9,6 +9,7 @@
 #include <core/misc/schedule_task.h>
 
 #include <licensing/license.h>
+#include <nx_ec/ec_api.h>
 
 #include <api/model/servers_reply.h>
 #include <api/model/connection_info.h>
@@ -244,6 +245,9 @@ public:
 
     static QnAppServerConnectionPtr createConnection();
     static QnAppServerConnectionPtr createConnection(const QUrl &url);
+
+    static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
+    static ec2::AbstractECConnectionPtr createConnection2Sync();
 
 private:
     QMutex m_mutex;

@@ -50,6 +50,8 @@
 
 #include <network/authenticate_helper.h>
 #include <network/default_tcp_connection_processor.h>
+#include <nx_ec/ec2_lib.h>
+#include <nx_ec/ec_api.h>
 
 #include <platform/core_platform_abstraction.h>
 
@@ -983,6 +985,24 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
 
+
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    ec2::AbstractECConnectionPtr ec2Connection;
+    while (!needToStop())
+    {
+        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( ec2::ECAddress(), &ec2Connection );
+        if( errorCode == ec2::ErrorCode::ok )
+        {
+            NX_LOG( QString::fromLatin1("Connected to local EC2"), cl_logWARNING );
+            break;
+        }
+
+        NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
+    }
+
+    QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
+
+
     QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
     {
@@ -992,7 +1012,7 @@ void QnMain::run()
         if (directConnectTried) {
             directConnectTried = false;
             initAppServerConnection(*MSSettings::roSettings(), directConnectTried);
-            appServerConnection->setUrl(QnAppServerConnectionFactory::defaultUrl());
+            appServerConnection->setUrl(QnAppServerConnectionFactory::defaultUrl ());
             continue;
         }
 

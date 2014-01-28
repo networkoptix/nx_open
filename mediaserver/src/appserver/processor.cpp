@@ -11,6 +11,8 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 {
     m_appServer = QnAppServerConnectionFactory::createConnection();
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
+
+    m_ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
@@ -59,6 +61,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
             continue;
         }
+
+        QnVirtualCameraResourceListPtr cameraList2;
+        const ec2::ErrorCode errorCode = m_ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameraList2 );
+        if( errorCode != ec2::ErrorCode::ok )
+            NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
 
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
