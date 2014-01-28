@@ -511,8 +511,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     if (!ensureServerOnline())
         return;
 
-    QString username(ui->loginLineEdit->text());
-    QString password(ui->passwordLineEdit->text());
+    QString username(ui->loginLineEdit->text().trimmed());
+    QString password(ui->passwordLineEdit->text().trimmed());
     int port = ui->portAutoCheckBox->isChecked()
             ? portAuto
             : ui->portSpinBox->value();
@@ -520,8 +520,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     QString startAddrStr;
     QString endAddrStr;
     if (m_subnetMode) {
-        startAddrStr = ui->startIPLineEdit->text();
-        endAddrStr = ui->endIPLineEdit->text();
+        startAddrStr = ui->startIPLineEdit->text().simplified();
+        endAddrStr = ui->endIPLineEdit->text().simplified();
 
         QHostAddress startAddr(startAddrStr);
         QHostAddress endAddr(endAddrStr);
@@ -538,14 +538,13 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
             return;
         }
     } else {
-        QString userInput = ui->singleCameraLineEdit->text();
+        QString userInput = ui->singleCameraLineEdit->text().simplified();
         QUrl url = QUrl::fromUserInput(userInput);
         if (!url.isValid()) {
             ui->validateLabelSearch->setText(tr("Camera address field must contain valid URL, IP address or RTSP link."));
             ui->validateLabelSearch->setVisible(true);
             return;
         }
-        //startAddrStr = url.host();
         startAddrStr = userInput;
         endAddrStr = QString();
     }
