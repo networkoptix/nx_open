@@ -6,6 +6,7 @@ QnPtzSynchronizeDialog::QnPtzSynchronizeDialog(QWidget *parent) :
     ui(new Ui::QnPtzSynchronizeDialog)
 {
     ui->setupUi(this);
+    //TODO: #GDM PTZ add an animated "Loading" picture...
 }
 
 QnPtzSynchronizeDialog::~QnPtzSynchronizeDialog() {}
