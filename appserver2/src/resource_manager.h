@@ -7,11 +7,14 @@
 
 namespace ec2
 {
+    template<class QueryProcessorType>
     class QnResourceManager
     :
         public AbstractResourceManager
     {
     public:
+        QnResourceManager( QueryProcessorType* const queryProcessor );
+
         //!Implementation of AbstractResourceManager::getResourceTypes
         virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getResources
@@ -30,6 +33,9 @@ namespace ec2
         virtual ReqID save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+
+    private:
+        QueryProcessorType* const m_queryProcessor;
     };
 }
 

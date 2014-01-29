@@ -9,11 +9,14 @@
 
 namespace ec2
 {
+    template<class QueryProcessorType>
     class QnCameraManager
     :
         public AbstractCameraManager
     {
     public:
+        QnCameraManager( QueryProcessorType* const queryProcessor );
+
         //!Implementation of AbstractCameraManager::addCamera
         virtual ReqID addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::addCameraHistoryItem
@@ -28,6 +31,8 @@ namespace ec2
         virtual ReqID remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
 
     private:
+        QueryProcessorType* const m_queryProcessor;
+
         QnTransaction<ApiCameraData> prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource );
     };
 }

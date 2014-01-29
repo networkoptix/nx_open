@@ -10,9 +10,9 @@ namespace ec2
 {
     Ec2DirectConnection::Ec2DirectConnection()
     :
-        m_resourceManager( new QnResourceManager() ),
+        m_resourceManager( new QnResourceManager<decltype(m_queryProcessor)>(&m_queryProcessor) ),
         m_mediaServerManager( new QnMediaServerManager() ),
-        m_cameraManager( new QnCameraManager() ),
+        m_cameraManager( new QnCameraManager<decltype(m_queryProcessor)>(&m_queryProcessor) ),
 		m_dbManager(new QnDbManager())
     {
     }

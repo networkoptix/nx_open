@@ -13,6 +13,8 @@
 #include "nx_ec/ec_api.h"
 #include "resource_manager.h"
 #include "database/db_manager.h"
+#include "server_query_processor.h"
+
 
 namespace ec2
 {
@@ -40,9 +42,10 @@ namespace ec2
         virtual ReqID saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
     private:
-        std::shared_ptr<QnResourceManager> m_resourceManager;
-        std::shared_ptr<QnMediaServerManager> m_mediaServerManager;
-        std::shared_ptr<QnCameraManager> m_cameraManager;
+        ServerQueryProcessor m_queryProcessor;
+        AbstractResourceManagerPtr m_resourceManager;
+        AbstractMediaServerManagerPtr m_mediaServerManager;
+        AbstractCameraManagerPtr m_cameraManager;
 		std::unique_ptr<QnDbManager> m_dbManager;
     };
 }
