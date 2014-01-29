@@ -3,66 +3,91 @@
 #include <QtConcurrent>
 #include "database/db_manager.h"
 
+#include "client_query_processor.h"
+#include "server_query_processor.h"
+
 
 namespace ec2
 {
-    ReqID QnResourceManager::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
+    template<class T>
+    QnResourceManager<T>::QnResourceManager( T* const queryProcessor )
+    :
+        m_queryProcessor( queryProcessor )
     {
-		
-		ApiResourceTypeList resTypes;
-		dbManager->getResourceTypes(resTypes);
+    }
 
-		QnResourceTypeList result;
-		ErrorCode errorCode;
-		QtConcurrent::run( std::bind( std::mem_fn( &impl::GetResourceTypesHandler::done ), handler, errorCode, result ) );
+    template<class T>
+    ReqID QnResourceManager<T>::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
+    {
+        auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiResourceTypeList& resTypeList ) {
+            QnResourceTypeList outResTypeList;
+            if( errorCode == ErrorCode::ok )
+                ;   //TODO/IMPL moving data from resTypeList to outResTypeList
+            handler->done( errorCode, outResTypeList );
+        };
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>
+            ( ec2::getResourceTypes, nullptr, queryDoneHandler );
         return INVALID_REQ_ID;
     }
 
-    ReqID QnResourceManager::getResources( impl::GetResourcesHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID QnResourceManager::getResource( const QnId& id, impl::GetResourceHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID QnResourceManager::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler )
+    template<class T>
+    ReqID QnResourceManager<T>::getResources( impl::GetResourcesHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnResourceManager::getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler )
+    template<class T>
+    ReqID QnResourceManager<T>::getResource( const QnId& id, impl::GetResourceHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnResourceManager::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler )
+    template<class T>
+    ReqID QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnResourceManager::save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler )
+    template<class T>
+    ReqID QnResourceManager<T>::getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnResourceManager::save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    template<class T>
+    ReqID QnResourceManager<T>::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnResourceManager::remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    template<class T>
+    ReqID QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
+
+    template<class T>
+    ReqID QnResourceManager<T>::save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+    template<class T>
+    ReqID QnResourceManager<T>::remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    {
+        //TODO/IMPL
+        return INVALID_REQ_ID;
+    }
+
+
+
+    template class QnResourceManager<ServerQueryProcessor>;
+    template class QnResourceManager<ClientQueryProcessor>;
 }

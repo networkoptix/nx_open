@@ -6,38 +6,46 @@
 #include <QtConcurrent>
 
 #include "cluster/cluster_manager.h"
-#include "database/db_manager.h"
-#include "transaction/transaction_log.h"
 #include "core/resource/camera_resource.h"
+#include "database/db_manager.h"
+#include "client_query_processor.h"
+#include "server_query_processor.h"
+#include "transaction/transaction_log.h"
 
 
 namespace ec2
 {
-    //!This function is intended to perform actions same for every request
-    template<class TransactionType,
-             class PrepareTransactionFuncType    //functor with no params, returning TransactionType
-            >
-        ErrorCode doUpdateRequest( PrepareTransactionFuncType prepareTranFunc )
+  //  //!This function is intended to perform actions same for every request
+  //  template<class TransactionType,
+  //           class PrepareTransactionFuncType    //functor with no params, returning TransactionType
+  //          >
+  //      ErrorCode doUpdateRequest( PrepareTransactionFuncType prepareTranFunc )
+  //  {
+		//// todo: const TransactionType& MUST be used. Const absent as temporary solution because we are still using ID instead of GUID
+
+  //      const TransactionType& tran = prepareTranFunc();
+  //      ErrorCode errorCode = dbManager->executeTransaction( tran );
+  //      if( errorCode != ErrorCode::ok )
+  //          return errorCode;
+
+  //      // saving transaction to the log
+  //      errorCode = transactionLog->saveTransaction( tran );
+  //      if( errorCode != ErrorCode::ok )
+  //          return errorCode;
+
+  //      // delivering transaction to remote peers
+  //      return clusterManager->distributeAsync( tran );
+  //  }
+
+    template<class QueryProcessorType>
+    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor )
+    :
+        m_queryProcessor( queryProcessor )
     {
-		// todo: const TransactionType& MUST be used. Const absent as temporary solution because we are still using ID instead of GUID
-
-        const TransactionType& tran = prepareTranFunc();
-        ErrorCode errorCode = dbManager->executeTransaction( tran );
-        if( errorCode != ErrorCode::ok )
-            return errorCode;
-
-        // saving transaction to the log
-        errorCode = transactionLog->saveTransaction( tran );
-        if( errorCode != ErrorCode::ok )
-            return errorCode;
-
-
-
-        // delivering transaction to remote peers
-        return clusterManager->distributeAsync( tran );
     }
 
-    ReqID QnCameraManager::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
+    template<class QueryProcessorType>
+    ReqID QnCameraManager<QueryProcessorType>::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
     {
 #if 0
         //building async pipe
@@ -56,60 +64,62 @@ namespace ec2
 
         return INVALID_REQ_ID;
 #endif
- 
 
-        //declaring output data
-        QnVirtualCameraResourceListPtr cameraList;
-
+        //preparing output data
+        QnVirtualCameraResourceListPtr cameraList( new QnVirtualCameraResourceList() );
 		ApiCommand command = ec2::updateCamera;
 		if (!resource->getId().isValid()) {
 			resource->setId(dbManager->getNextSequence());
 			command = ec2::addCamera;
 		}
+        cameraList->push_back( resource );
 
         //performing request
-        auto prepareTranFunc = std::bind( std::mem_fn( &QnCameraManager::prepareTransaction ), this, command, resource );
-        ErrorCode errorCode = doUpdateRequest<QnTransaction<ApiCameraData>, decltype(prepareTranFunc)>( prepareTranFunc );
+        auto tran = prepareTransaction( command, resource );
 
-        //preparing output data
-        if( errorCode == ErrorCode::ok )
-            cameraList.reset( new QnVirtualCameraResourceList() );
-
-        QtConcurrent::run( std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, errorCode, cameraList ) );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, _1, cameraList ) );
+        
         return INVALID_REQ_ID;
     }
 
-    ReqID QnCameraManager::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    ReqID QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnCameraManager::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
+    template<class QueryProcessorType>
+    ReqID QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnCameraManager::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
+    template<class QueryProcessorType>
+    ReqID QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnCameraManager::save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    ReqID QnCameraManager<QueryProcessorType>::save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    ReqID QnCameraManager::remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    ReqID QnCameraManager<QueryProcessorType>::remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
-    QnTransaction<ApiCameraData> QnCameraManager::prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource )
+    template<class QueryProcessorType>
+    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource )
     {
 		QnTransaction<ApiCameraData> result;
 		result.command = cmd;
@@ -118,4 +128,9 @@ namespace ec2
 		result.params.fromResource(resource);
         return result;
     }
+
+
+
+    template class QnCameraManager<ServerQueryProcessor>;
+    template class QnCameraManager<ClientQueryProcessor>;
 }

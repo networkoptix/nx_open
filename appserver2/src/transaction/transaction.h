@@ -13,6 +13,8 @@ namespace ec2
     {
 		NotDefined,
 
+        getResourceTypes,
+
         addCamera,
 		updateCamera,
         removeCamera,

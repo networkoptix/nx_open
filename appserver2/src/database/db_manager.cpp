@@ -161,7 +161,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
 }
 
 // -------------------- getters ----------------------------
-ErrorCode QnDbManager::getResourceTypes(ApiResourceTypeList& data)
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 {
 	QSqlQuery queryTypes(m_sdb);
 	queryTypes.prepare("	select rt.id, rt.name, m.name as manufacture \

@@ -32,7 +32,8 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
 		
 		// --------- get methods ---------------------
-		ErrorCode getResourceTypes(ApiResourceTypeList& tran);
+        //getResourceTypes
+		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& tran);
 
 		// --------- misc -----------------------------
 
