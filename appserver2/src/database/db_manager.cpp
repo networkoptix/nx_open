@@ -172,23 +172,26 @@ ErrorCode QnDbManager::getResourceTypes(ApiResourceTypeList& data)
 		return ErrorCode::failure;
 
 	QSqlQuery queryParents(m_sdb);
-	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parent_id from vms_resourcetype_parents order by from_resourcetype_id");
+	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parentId from vms_resourcetype_parents order by from_resourcetype_id");
 
 	if (!queryParents.exec())
 		return ErrorCode::failure;
-	
-	data.resourceTypes.resize(queryTypes.size());
+
+	data.loadFromQuery(queryTypes);
+
 	int idx = 0;
-
-	QSqlRecord rec = queryTypes.record();
+	QSqlRecord rec = queryParents.record();
 	int idIdx = rec.indexOf("id");
-	int nameIdx = rec.indexOf("name");
-	int manufactureIdx = rec.indexOf("manufacture");
-
-	while (queryTypes.next())
+	int parentIdIdx = rec.indexOf("parentId");
+	while (queryParents.next())
 	{
-		ApiResourceTypeData& typeData = data.resourceTypes[idx++];
-		typeData.id = queryTypes.value(idIdx).toInt();
+		int id = queryParents.value(idIdx).toInt();
+		int parentId = queryParents.value(parentIdIdx).toInt();
+
+		for (; data.data[idx].id != id && idx < data.data.size(););
+		if (idx == data.data.size())
+			break;
+		data.data[idx].parentId.push_back(parentId);
 	}
 
 	return ErrorCode::ok;

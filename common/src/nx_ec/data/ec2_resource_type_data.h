@@ -20,8 +20,9 @@ struct ApiResourceTypeData: public ApiData
 };
 
 struct ApiResourceTypeList: public ApiData {
-	std::vector<ApiResourceTypeData> resourceTypes;
+	std::vector<ApiResourceTypeData> data;
 
+	void loadFromQuery(QSqlQuery& query);
 	QN_DECLARE_STRUCT_SERIALIZATORS();
 };
 
