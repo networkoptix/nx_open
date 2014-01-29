@@ -14,6 +14,7 @@ namespace ec2
 		NotDefined,
 
         addCamera,
+		updateCamera,
         removeCamera,
 
         saveMediaServer

@@ -43,11 +43,17 @@ void doAutoBind(QSqlQuery& query, const char* fieldName, const T& field) {
 	query.bindValue(QString::fromLatin1(fieldName), field);
 }
 
+inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QString& field) {
+	query.bindValue(QString::fromLatin1(fieldName), field.isNull() ? QString(QLatin1String("")) : field);
+}
+
 template <class T>
 void doAutoBind(QSqlQuery& query, const char* fieldName, const std::vector<T>& field) {
 	//
 }
 
-#define BIND_FIELD(R, D, FIELD) doAutoBind(query, ":" #FIELD, FIELD);
+#define TO_STRING(x) #x
+
+#define BIND_FIELD(R, D, FIELD) doAutoBind(query, ":" TO_STRING(FIELD), FIELD);
 
 #endif // __COMMON_TRANSACTION_DATA_H__

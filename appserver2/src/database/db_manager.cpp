@@ -24,6 +24,7 @@ bool QnDbManager::createDatabase()
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
+
 	return false;
 }
 
@@ -37,16 +38,17 @@ QnDbManager* QnDbManager::instance()
     return globalInstance;
 }
 
-ErrorCode QnDbManager::insertResource(ApiResourceData& data)
+ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_resource (id, guid, xtype_id, parent_id, name, url, status, disabled) VALUES(:id, :guid, :typeId, :parentId, :name, :url, :status, :disabled)");
     data.autoBindValues(insQuery);
 	if (insQuery.exec()) {
-		data.id = insQuery.lastInsertId().toInt();
+		//data.id = insQuery.lastInsertId().toInt();
 		return ErrorCode::ok;
 	}
 	else {
+		qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 		return ErrorCode::failure;
 	}
 }
@@ -71,7 +73,13 @@ ErrorCode QnDbManager::insertCamera(const ApiCameraData& data)
 	data.autoBindValues(insQuery);
 
 	QMutexLocker lock(&m_mutex);
-	return insQuery.exec() ? ErrorCode::ok : ErrorCode::failure;
+	if (insQuery.exec()) {
+		return ErrorCode::ok;
+	}
+	else {
+		qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+		return ErrorCode::failure;
+	}
 }
 
 ErrorCode QnDbManager::updateCamera(const ApiCameraData& data)
@@ -112,21 +120,38 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 	return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction( const QnTransaction<ApiCameraData>& tran)
+int QnDbManager::getNextSequence()
+{
+	QMutexLocker lock(&m_mutex);
+
+	QSqlQuery query(m_sdb);
+	query.prepare("update sqlite_sequence set seq = seq + 1 where name=\"vms_resource\"");
+	if (!query.exec())
+		return 0;
+	QSqlQuery query2(m_sdb);
+	query.prepare("select seq from sqlite_sequence where name=\"vms_resource\"");
+	if (!query.exec())
+		return 0;
+	query.next();
+	int result = query.value(0).toInt();
+	return result;
+}
+
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
 {
 	ErrorCode result;
-	if (tran.params.id) {
+	if (tran.command == ec2::updateCamera) {
 		result = updateResource(tran.params);
 		if (result !=ErrorCode::ok)
 			return result;
 		result = updateCamera(tran.params);
 	}
 	else {
-		ApiCameraData params = tran.params;
-		result = insertResource(params);
+		result = insertResource(tran.params);
 		if (result !=ErrorCode::ok)
 			return result;
-		result = insertCamera(params);
+		result = insertCamera(tran.params);
 	}
 	if (result !=ErrorCode::ok)
 		return result;

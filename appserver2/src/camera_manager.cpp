@@ -8,6 +8,7 @@
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
+#include "core/resource/camera_resource.h"
 
 
 namespace ec2
@@ -18,6 +19,8 @@ namespace ec2
             >
         ErrorCode doUpdateRequest( PrepareTransactionFuncType prepareTranFunc )
     {
+		// todo: const TransactionType& MUST be used. Const absent as temporary solution because we are still using ID instead of GUID
+
         const TransactionType& tran = prepareTranFunc();
         ErrorCode errorCode = dbManager->executeTransaction( tran );
         if( errorCode != ErrorCode::ok )
@@ -27,6 +30,8 @@ namespace ec2
         errorCode = transactionLog->saveTransaction( tran );
         if( errorCode != ErrorCode::ok )
             return errorCode;
+
+
 
         // delivering transaction to remote peers
         return clusterManager->distributeAsync( tran );
@@ -56,8 +61,14 @@ namespace ec2
         //declaring output data
         QnVirtualCameraResourceListPtr cameraList;
 
+		ApiCommand command = ec2::updateCamera;
+		if (!resource->getId().isValid()) {
+			resource->setId(dbManager->getNextSequence());
+			command = ec2::addCamera;
+		}
+
         //performing request
-        auto prepareTranFunc = std::bind( std::mem_fn( &QnCameraManager::prepareTransaction ), this, ec2::addCamera, resource );
+        auto prepareTranFunc = std::bind( std::mem_fn( &QnCameraManager::prepareTransaction ), this, command, resource );
         ErrorCode errorCode = doUpdateRequest<QnTransaction<ApiCameraData>, decltype(prepareTranFunc)>( prepareTranFunc );
 
         //preparing output data

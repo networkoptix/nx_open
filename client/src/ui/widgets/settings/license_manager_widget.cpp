@@ -158,7 +158,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
 
     QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
-    request.setUrl(url);
+    //request.setUrl(url.toString());
 
     QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));

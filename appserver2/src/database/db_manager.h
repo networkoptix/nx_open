@@ -18,6 +18,8 @@ namespace ec2
 
         static QnDbManager* instance();
 
+
+		// todo: const QnTransaction<QueryDataType> MUST be used. Const absent as temporary solution because we are still using ID instead of GUID
         template<class QueryDataType>
         ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
         {
@@ -25,10 +27,12 @@ namespace ec2
             return ErrorCode::ok;
         }
 
-        ErrorCode executeTransaction( const QnTransaction<ApiCameraData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
+
+		int getNextSequence();
     private:
         ErrorCode updateResource(const ApiResourceData& data);
-		ErrorCode insertResource(ApiResourceData& data);
+		ErrorCode insertResource(const ApiResourceData& data);
 
 		ErrorCode updateCamera(const ApiCameraData& data);
 		ErrorCode insertCamera(const ApiCameraData& data);
