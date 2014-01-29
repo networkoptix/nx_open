@@ -267,6 +267,7 @@ private:
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);
+bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection);
 bool initLicenses(QnAppServerConnectionPtr appServerConnection);
 bool initCameraHistory(QnAppServerConnectionPtr appServerConnection);
 

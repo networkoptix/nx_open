@@ -35,6 +35,13 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getResourceTypes( TargetType* target, HandlerType handler ) {
             return getResourceTypes( std::static_pointer_cast<impl::GetResourceTypesHandler>(std::make_shared<impl::CustomGetResourceTypesHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        ErrorCode getResourceTypesSync( QnResourceTypeList* const resTypeList ) {
+            auto syncHandler = std::make_shared<impl::GetResourceTypesSyncHandler>();
+            getResourceTypes( syncHandler );
+            syncHandler->wait();
+            *resTypeList = syncHandler->resourceTypeList();
+            return syncHandler->errorCode();
+        }
         /*!
             \param handler Functor with params: (ErrorCode, const QnResourceList&)
         */
@@ -154,14 +161,15 @@ namespace ec2
             \todo is it really needed?
             \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceListPtr& cameras)
         */
-        template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr& camRes, TargetType* target, HandlerType handler, Qt::ConnectionType connectionType = Qt::AutoConnection ) {
-            return addCamera( camRes, std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler, connectionType)) );
+        template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr& camRes, TargetType* target, HandlerType handler ) {
+            return addCamera( camRes, std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceListPtr* const cameras ) {
-            SyncHandler syncHandler;
-            addCamera( camRes, &syncHandler, &SyncHandler::done, Qt::DirectConnection );
-            syncHandler.wait();
-            return syncHandler.errorCode();
+            auto syncHandler = std::make_shared<impl::AddCameraSyncHandler>();
+            addCamera( camRes, syncHandler );
+            syncHandler->wait();
+            *cameras = syncHandler->cameraList();
+            return syncHandler->errorCode();
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -537,15 +545,15 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
-        template<class TargetType, class HandlerType> ReqID connect( const ECAddress& addr, TargetType* target, HandlerType handler, Qt::ConnectionType connectionType = Qt::AutoConnection ) {
-            return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler, connectionType)) );
+        template<class TargetType, class HandlerType> ReqID connect( const ECAddress& addr, TargetType* target, HandlerType handler ) {
+            return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode connectSync( const ECAddress& addr, AbstractECConnectionPtr* const connection ) {
-            SyncConnectHandler syncHandler;
-            connect( addr, &syncHandler, &SyncConnectHandler::done, Qt::DirectConnection );
-            syncHandler.wait();
-            *connection = syncHandler.connection();
-            return syncHandler.errorCode();
+            auto syncHandler = std::make_shared<impl::SyncConnectHandler>();
+            connectAsync( addr, syncHandler );
+            syncHandler->wait();
+            *connection = syncHandler->connection();
+            return syncHandler->errorCode();
         }
 
     protected:

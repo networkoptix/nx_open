@@ -24,18 +24,15 @@ public:
     
 private:
     void init();
-    bool startZoomInternal(int deviceZoomSpeed);
-    bool startMoveInternal(int devicePanSpeed, int deviceTiltSpeed);
-    bool stopZoomInternal();
-    bool stopMoveInternal();
+    bool continuousZoomInternal(int deviceZoomSpeed);
+    bool continuousMoveInternal(int devicePanSpeed, int deviceTiltSpeed);
 
     bool query(const QString &request, QByteArray *body = NULL, bool keepAllData = false) const;
 
-    int toDeviceZoomSpeed(qreal zoomSpeed) const;
-    int toDevicePanTiltSpeed(qreal panTiltSpeed) const;
-    
-    QString zoomDirection(int deviceZoomSpeed) const;
-    QString panTiltDirection(int devicePanSpeed, int deviceTiltSpeed) const;
+    static int toDeviceZoomSpeed(qreal zoomSpeed);
+    static int toDevicePanTiltSpeed(qreal panTiltSpeed);
+    static QString zoomDirection(int deviceZoomSpeed);
+    static QString panTiltDirection(int devicePanSpeed, int deviceTiltSpeed);
 
 private:
     QMutex m_mutex;
@@ -44,6 +41,8 @@ private:
 
     bool m_isFlipped;
     bool m_isMirrored;
+
+    int m_deviceZoomSpeed, m_devicePanSpeed, m_deviceTiltSpeed;
 };
 
 #endif // #ifdef ENABLE_ACTI

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>CommunicatingSocket</name>
     <message>
@@ -711,22 +711,22 @@ Parameters: </source>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="42"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="47"/>
         <source>Audio context was not specified.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="56"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="61"/>
         <source>Could not find encoder for codec %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="85"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="88"/>
         <source>Could not initialize audio encoder.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
+        <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="97"/>
         <source>Could not initialize audio decoder.</source>
         <translation type="unfinished"></translation>
     </message>

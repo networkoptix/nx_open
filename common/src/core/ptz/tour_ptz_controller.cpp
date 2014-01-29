@@ -9,38 +9,7 @@
 #include <api/resource_property_adaptor.h>
 
 #include "ptz_tour_executor.h"
-
-
-// -------------------------------------------------------------------------- //
-// QnPtzTourExecutorThread
-// -------------------------------------------------------------------------- //
-class QnPtzTourExecutorThread: public QnLongRunnable {
-    typedef QnLongRunnable base_type;
-public:
-    QnPtzTourExecutorThread() {
-        setObjectName(lit("QnPtzTourExecutorThread")); /* So that we see this thread's name in debug. */
-        start();
-    }
-
-    virtual ~QnPtzTourExecutorThread() {
-        stop();
-    }
-
-    virtual void pleaseStop() override {
-        base_type::pleaseStop();
-        
-        quit(); /* This call is thread-safe. */
-    }
-
-    virtual void run() override {
-        /* Default implementation is OK, but we want to see this function on 
-         * the stack when debugging. */
-        return base_type::run(); 
-    }
-};
-
-Q_GLOBAL_STATIC(QnPtzTourExecutorThread, qn_ptzTourExecutorThread_instance);
-
+#include "ptz_controller_pool.h"
 
 // -------------------------------------------------------------------------- //
 // QnTourPtzController
@@ -50,7 +19,9 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), this)),
     m_executor(new QnPtzTourExecutor(baseController))
 {
-    m_executor->moveToThread(qn_ptzTourExecutorThread_instance());
+    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+
+    m_executor->moveToThread(qnPtzPool->executorThread());
 
     m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
     connect(this, &QnTourPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
@@ -58,7 +29,6 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
 
 QnTourPtzController::~QnTourPtzController() {
     m_executor->deleteLater();
-    // TODO: #Elric this may be a problem, see #2754
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
@@ -112,10 +82,6 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     QnPtzPresetList presets;
     if(!getPresets(&presets))
-        return false;
-
-    /* We need to check validity of the tour first. */
-    if (!tour.isValid(presets))
         return false;
 
     /* Not so important so fix and continue. */

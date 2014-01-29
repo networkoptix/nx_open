@@ -46,6 +46,8 @@
     <String Id="AppServerDlg_Network"                               Overridable="yes">Network</String>    
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Confirm Password</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Extra parameters</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Allow system to optimize cameras settings (Recommended)</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${product.name}</String>
@@ -121,6 +123,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Launch ${product.name} when setup exits.</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">This package is designed for 32-bit OS. Setup will now exit.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">At least one component should be selected</String>    

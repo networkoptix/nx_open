@@ -5,15 +5,21 @@
 QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     base_type(parent)
 {
+    m_executorThread = new QThread(this);
+    m_executorThread->start();
+
     QnResourcePool *resourcePool = qnResPool;
-    connect(resourcePool, &QnResourcePool::resourceAdded,   this,   &QnPtzControllerPool::registerResource,     Qt::QueuedConnection);
-    connect(resourcePool, &QnResourcePool::resourceRemoved, this,   &QnPtzControllerPool::unregisterResource,   Qt::QueuedConnection);
+    connect(resourcePool, &QnResourcePool::resourceAdded,   this,   &QnPtzControllerPool::registerResource);
+    connect(resourcePool, &QnResourcePool::resourceRemoved, this,   &QnPtzControllerPool::unregisterResource);
     foreach(const QnResourcePtr &resource, resourcePool->getResources())
         registerResource(resource);
 }
 
 QnPtzControllerPool::~QnPtzControllerPool() {
-    return;
+    m_controllerByResource.clear();
+
+    m_executorThread->exit();
+    m_executorThread->wait();
 }
 
 QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource) const {

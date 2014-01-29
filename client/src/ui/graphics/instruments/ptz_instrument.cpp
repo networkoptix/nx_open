@@ -287,6 +287,7 @@ public:
 // PtzOverlayWidget
 // -------------------------------------------------------------------------- //
 class PtzOverlayWidget: public GraphicsWidget {
+    Q_DECLARE_TR_FUNCTIONS(PtzOverlayWidget);
     typedef GraphicsWidget base_type;
 
 public:

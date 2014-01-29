@@ -31,6 +31,8 @@
 #include <utils/common/json.h>
 #include <utils/common/product_features.h>
 
+#define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
+
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
@@ -311,7 +313,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             } else if(messageId == lit("InvalidKey")) {
                 message = tr("The license key is invalid.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("There was a problem activating your license. You are trying to activate an incompatible license with your software.");
+                message = tr("You are trying to activate an incompatible license with your software.");
             } else if(messageId == lit("AlreadyActivated")) {
                 message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
             }

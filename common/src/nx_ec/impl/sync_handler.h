@@ -16,44 +16,88 @@
 
 namespace ec2
 {
-    //!Allows executing ec api methods synchronously
-    class SyncHandler
-    :
-        public QObject
+    namespace impl
     {
-        Q_OBJECT
+        //!Allows executing ec api methods synchronously
+        class SyncHandler
+        :
+            public QObject
+        {
+            Q_OBJECT
 
-    public:
-        SyncHandler();
+        public:
+            SyncHandler();
 
-        void wait();
-        ErrorCode errorCode() const;
+            void wait();
+            ErrorCode errorCode() const;
 
-    public slots:
-        void done( ErrorCode errorCode );
+        public slots:
+            void done( ErrorCode errorCode );
 
-    private:
-        std::condition_variable m_cond;
-        mutable std::mutex m_mutex;
-        bool m_done;
-        ErrorCode m_errorCode;
-    };
+        private:
+            std::condition_variable m_cond;
+            mutable std::mutex m_mutex;
+            bool m_done;
+            ErrorCode m_errorCode;
+        };
 
-    class SyncConnectHandler
-    :
-        public SyncHandler
-    {
-        Q_OBJECT
+        class AddCameraSyncHandler
+        :
+            public SyncHandler,
+            public AddCameraHandler
+        {
+        public:
+            QnVirtualCameraResourceListPtr cameraList() const {
+                return m_cameras;
+            }
 
-    public:
-        AbstractECConnectionPtr connection() const;
+            virtual void done( const ErrorCode& errorCode, const QnVirtualCameraResourceListPtr& cameras ) override {
+                m_cameras = cameras;
+                SyncHandler::done( errorCode );
+            }
 
-    public slots:
-        void done( ErrorCode errorCode, AbstractECConnectionPtr connection );
+        private:
+            QnVirtualCameraResourceListPtr m_cameras;
+        };
 
-    private:
-        AbstractECConnectionPtr m_connection;
-    };
+        class SyncConnectHandler
+        :
+            public SyncHandler,
+            public ConnectHandler
+        {
+        public:
+            AbstractECConnectionPtr connection() const {
+                return m_connection;
+            }
+
+            virtual void done( const ErrorCode& errorCode, const AbstractECConnectionPtr& connection ) override {
+                m_connection = connection;
+                SyncHandler::done( errorCode );
+            }
+
+        private:
+            AbstractECConnectionPtr m_connection;
+        };
+
+        class GetResourceTypesSyncHandler
+        :
+            public SyncHandler,
+            public GetResourceTypesHandler
+        {
+        public:
+            const QnResourceTypeList& resourceTypeList() const {
+                return m_resourceTypeList;
+            }
+
+            virtual void done( const ErrorCode& errorCode, const QnResourceTypeList& resTypeList ) override {
+                m_resourceTypeList = resTypeList;
+                SyncHandler::done( errorCode );
+            }
+
+        private:
+            QnResourceTypeList m_resourceTypeList;
+        };
+    }
 }
 
 #endif  //SYNC_HANDLER_H
