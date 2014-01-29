@@ -655,7 +655,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         case BusinessActionType::PlaySound:
         case BusinessActionType::PlaySoundRepeated:
         case BusinessActionType::SayText:
-            return qnSkin->icon("tree/sound.png");
+            return qnSkin->icon("events/sound.png");
         default:
             break;
         }
