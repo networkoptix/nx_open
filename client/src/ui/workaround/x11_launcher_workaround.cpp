@@ -2,6 +2,8 @@
 #include "x11_win_control.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 
 QnX11LauncherWorkaround::QnX11LauncherWorkaround():
     QObject(){
@@ -33,4 +35,24 @@ bool QnX11LauncherWorkaround::eventFilter(QObject *obj, QEvent *event) {
     }
 
     return QObject::eventFilter(obj, event);
+}
+
+bool QnX11LauncherWorkaround::isUnity3DSession() {
+#ifdef Q_OS_LINUX
+    /* This function assumes that unity session sets environment variable
+       XDG_CURRENT_DESKTOP to 'Unity' and has running process whose name is unity-panel-service. */
+
+    if (qgetenv("XDG_CURRENT_DESKTOP") != "Unity")
+        return false;
+
+    QDir procDir(lit("/proc"));
+    QStringList entries = procDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (const QString &procEntry, entries) {
+        QFileInfo info(lit("/proc/") + procEntry + lit("/exe"));
+        QString realPath = info.symLinkTarget();
+        if (realPath.endsWith(lit("unity-panel-service")))
+            return true;
+    }
+#endif
+    return false;
 }

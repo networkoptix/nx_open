@@ -477,7 +477,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
-    context->menu()->registerAlias(Qn::EffectiveMaximizeAction, Qn::FullscreenAction);
+    Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
+#ifdef Q_OS_LINUX
+    if (QnX11LauncherWorkaround::isUnity3DSession())
+        effectiveMaximizeActionId = Qn::MaximizeAction;
+#endif
+    context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
